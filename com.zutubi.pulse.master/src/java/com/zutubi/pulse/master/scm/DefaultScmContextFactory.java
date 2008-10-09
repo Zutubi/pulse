@@ -23,25 +23,21 @@ public class DefaultScmContextFactory implements ScmContextFactory
     {
         try
         {
-            if (!contexts.containsKey(config.getHandle()))
+            synchronized(contexts)
             {
-                synchronized(contexts)
+                if (!contexts.containsKey(config.getHandle()))
                 {
-                    if (!contexts.containsKey(config.getHandle()))
+                    ScmContextImpl context = new ScmContextImpl();
+                    File projectDir = new File(projectsDir, String.valueOf(id));
+                    File workingDir = new File(projectDir, "scm");
+                    if (!workingDir.isDirectory() && !workingDir.mkdirs())
                     {
-                        ScmContextImpl context = new ScmContextImpl();
-                        File projectDir = new File(projectsDir, String.valueOf(id));
-                        File workingDir = new File(projectDir, "scm");
-                        if (!workingDir.isDirectory() && !workingDir.mkdirs())
-                        {
-                            throw new IOException("Failed to create persistent working directory '" + workingDir.getCanonicalPath() + "'");
-                        }
-                        context.setPersistentWorkingDir(workingDir);
-                        contexts.put(config.getHandle(), context);
+                        throw new IOException("Failed to create persistent working directory '" + workingDir.getCanonicalPath() + "'");
                     }
+                    context.setPersistentWorkingDir(workingDir);
+                    contexts.put(config.getHandle(), context);
                 }
             }
-
             return contexts.get(config.getHandle());
         }
         catch (IOException e)
