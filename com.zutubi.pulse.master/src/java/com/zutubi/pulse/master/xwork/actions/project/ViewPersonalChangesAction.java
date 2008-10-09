@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;

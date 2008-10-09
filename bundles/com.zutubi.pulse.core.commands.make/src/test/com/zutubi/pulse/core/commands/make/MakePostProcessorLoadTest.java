@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.make;
 
 import com.zutubi.pulse.core.FileLoaderTestBase;
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.PulseFile;
 import com.zutubi.pulse.core.Reference;
 

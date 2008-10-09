@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 
 /**
  * An error raised during interaction with an SCM server.

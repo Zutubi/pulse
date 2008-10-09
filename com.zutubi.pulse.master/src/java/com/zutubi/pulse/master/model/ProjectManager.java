@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.security.SecureParameter;

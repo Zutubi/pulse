@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;

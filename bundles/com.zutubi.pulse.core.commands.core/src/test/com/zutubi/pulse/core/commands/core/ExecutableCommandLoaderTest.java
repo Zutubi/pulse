@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.model.ResultState;
 
 import java.util.List;

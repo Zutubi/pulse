@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.scheduling;
 
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 
 /**
  * <class-comment/>

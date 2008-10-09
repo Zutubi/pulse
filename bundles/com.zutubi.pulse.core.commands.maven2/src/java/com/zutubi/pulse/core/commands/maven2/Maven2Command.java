@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.maven2;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.commands.core.ExecutableCommand;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.util.SystemUtils;

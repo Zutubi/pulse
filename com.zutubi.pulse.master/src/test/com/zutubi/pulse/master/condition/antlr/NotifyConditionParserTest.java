@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.condition.antlr;
 
 import antlr.MismatchedTokenException;
 import antlr.collections.AST;
-import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.condition.*;
 import com.zutubi.pulse.master.validation.validators.SubscriptionConditionValidator;

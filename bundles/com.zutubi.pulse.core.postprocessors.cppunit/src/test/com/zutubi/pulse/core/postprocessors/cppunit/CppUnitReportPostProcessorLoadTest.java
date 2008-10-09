@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.cppunit;
 
 import com.zutubi.pulse.core.FileLoaderTestBase;
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 
 /**
  */

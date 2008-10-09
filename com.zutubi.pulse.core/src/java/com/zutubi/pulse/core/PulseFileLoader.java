@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.util.TextUtils;
 
 import java.io.ByteArrayInputStream;

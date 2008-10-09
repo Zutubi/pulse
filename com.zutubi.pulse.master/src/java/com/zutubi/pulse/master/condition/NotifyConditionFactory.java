@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.condition;
 
-import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 

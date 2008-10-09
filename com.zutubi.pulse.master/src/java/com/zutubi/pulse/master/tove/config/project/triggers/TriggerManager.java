@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.tove.config.project.triggers;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.scheduling.Scheduler;

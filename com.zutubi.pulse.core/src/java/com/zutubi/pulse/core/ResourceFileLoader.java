@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.InputStream;

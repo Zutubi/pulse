@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.commands.maven;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.MavenUtils;
 import com.zutubi.pulse.core.ProcessArtifact;
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.commands.core.ExecutableCommand;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.util.SystemUtils;

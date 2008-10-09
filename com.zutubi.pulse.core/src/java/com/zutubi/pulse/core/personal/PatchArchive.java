@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.personal;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -55,7 +55,7 @@ public class PatchArchive
      * Creates a patch from an existing archive file.
      *
      * @param patchFile the file to create the patch from
-     * @throws com.zutubi.pulse.core.PulseException on error
+     * @throws com.zutubi.pulse.core.api.PulseException on error
      */
     public PatchArchive(File patchFile) throws PulseException
     {

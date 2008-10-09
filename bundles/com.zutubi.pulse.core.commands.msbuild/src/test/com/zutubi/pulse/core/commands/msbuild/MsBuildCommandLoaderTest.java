@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.msbuild;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.api.PulseException;
 
 import java.util.List;
 

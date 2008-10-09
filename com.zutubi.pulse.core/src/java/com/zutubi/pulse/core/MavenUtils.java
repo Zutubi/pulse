@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.core.api.PulseException;
 import nu.xom.*;
 
 import java.io.File;

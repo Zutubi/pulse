@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servercore.jetty;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.logging.Logger;

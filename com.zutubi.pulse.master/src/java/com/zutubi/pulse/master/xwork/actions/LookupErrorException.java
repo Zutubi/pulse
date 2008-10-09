@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions;
 
-import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 
 /**
  * Raised when the web UI hits an entity or record that does not exist.  This

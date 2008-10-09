@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.personal;
 
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 
 /**
  */

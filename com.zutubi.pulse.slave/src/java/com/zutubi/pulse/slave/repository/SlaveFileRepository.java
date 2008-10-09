@@ -1,6 +1,6 @@
 package com.zutubi.pulse.slave.repository;
 
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.servercore.repository.FileRepository;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.io.IOUtils;

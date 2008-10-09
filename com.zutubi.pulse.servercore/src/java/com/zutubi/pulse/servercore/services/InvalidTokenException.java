@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servercore.services;
 
-import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 
 /**
  */

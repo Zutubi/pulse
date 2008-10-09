@@ -2,6 +2,7 @@ package com.zutubi.pulse.dev.local;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.api.PulseException;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;

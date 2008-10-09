@@ -5,6 +5,8 @@ import junit.framework.TestCase;
 import java.util.Arrays;
 import java.util.List;
 
+import com.zutubi.pulse.core.api.PulseException;
+
 /**
  * 
  *
