@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.util.config;
+package com.zutubi.util.config;
 
 /**
  * The base interface for a configuration object that supports the getting and

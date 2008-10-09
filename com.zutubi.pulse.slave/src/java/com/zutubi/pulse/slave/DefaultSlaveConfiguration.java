@@ -1,12 +1,11 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.pulse.core.util.config.*;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.core.util.config.EnvConfig;
-import com.zutubi.pulse.core.util.config.VolatileReadOnlyConfig;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.config.*;
 
 import java.io.File;
 

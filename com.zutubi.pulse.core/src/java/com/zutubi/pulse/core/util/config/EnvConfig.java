@@ -2,6 +2,8 @@ package com.zutubi.pulse.core.util.config;
 
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.config.Config;
+import com.zutubi.util.config.ConfigSupport;
 
 public class EnvConfig extends ConfigSupport
 {

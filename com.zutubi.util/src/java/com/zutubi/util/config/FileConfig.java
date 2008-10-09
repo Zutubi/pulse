@@ -1,6 +1,7 @@
-package com.zutubi.pulse.core.util.config;
+package com.zutubi.util.config;
 
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.io.PropertiesWriter;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

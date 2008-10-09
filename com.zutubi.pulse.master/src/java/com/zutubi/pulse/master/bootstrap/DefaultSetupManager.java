@@ -6,7 +6,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.core.util.config.PropertiesWriter;
+import com.zutubi.util.io.PropertiesWriter;
 import com.zutubi.pulse.master.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.DriverRegistry;

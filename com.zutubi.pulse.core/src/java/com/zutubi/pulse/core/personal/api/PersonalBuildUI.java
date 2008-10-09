@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.api;
+package com.zutubi.pulse.core.personal.api;
 
 /**
  * Implementations of this interface listen for details of personal build

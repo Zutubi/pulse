@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.util.config;
 
+import com.zutubi.util.config.Config;
 import org.apache.commons.cli.CommandLine;
 
 import java.util.Map;

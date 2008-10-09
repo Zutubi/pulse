@@ -1,12 +1,12 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.personal;
 
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
+import com.zutubi.pulse.core.personal.api.PersonalBuildUI;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * An implementation of {@link com.zutubi.pulse.core.scm.api.PersonalBuildUI}
+ * An implementation of {@link com.zutubi.pulse.core.personal.api.PersonalBuildUI}
  * that just captures messages and gives blank/default responses for testing
  * purposes.
  */

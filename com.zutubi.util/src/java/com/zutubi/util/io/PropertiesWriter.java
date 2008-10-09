@@ -1,7 +1,6 @@
-package com.zutubi.pulse.core.util.config;
+package com.zutubi.util.io;
 
 import com.zutubi.util.Constants;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
 import java.util.Enumeration;

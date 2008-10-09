@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.util.config;
+package com.zutubi.util.config;
 
 import java.util.Properties;
 

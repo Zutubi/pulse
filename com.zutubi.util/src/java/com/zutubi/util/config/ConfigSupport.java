@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.util.config;
+package com.zutubi.util.config;
 
 /**
  * A wrapper around a delegate config instance that provides some typing support.

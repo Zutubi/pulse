@@ -1,13 +1,14 @@
-package com.zutubi.pulse.core.util.config;
+package com.zutubi.util.config;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-public class FileConfigTest extends PulseTestCase
+public class FileConfigTest extends TestCase
 {
     private Config config = null;
     private File testProperties;
@@ -47,28 +48,28 @@ public class FileConfigTest extends PulseTestCase
 
     public void testGetProperties() throws Exception
     {
-        assertEquals("value", config.getProperty("key"));
+        Assert.assertEquals("value", config.getProperty("key"));
     }
 
     public void testSetProperties() throws Exception
     {
         config.setProperty("key", "anotherValue");
-        assertEquals("anotherValue", config.getProperty("key"));
+        Assert.assertEquals("anotherValue", config.getProperty("key"));
 
         Properties props = IOUtils.read(testProperties);
-        assertEquals("anotherValue", props.getProperty("key"));
-        assertEquals(1, props.size());
+        Assert.assertEquals("anotherValue", props.getProperty("key"));
+        Assert.assertEquals(1, props.size());
     }
 
     public void testCreationOfPropertiesFile() throws Exception
     {
-        assertTrue(testProperties.delete());
+        Assert.assertTrue(testProperties.delete());
 
         config.setProperty("key", "anotherValue");
-        assertEquals("anotherValue", config.getProperty("key"));
+        Assert.assertEquals("anotherValue", config.getProperty("key"));
 
         Properties props = IOUtils.read(testProperties);
-        assertEquals("anotherValue", props.getProperty("key"));
-        assertEquals(1, props.size());
+        Assert.assertEquals("anotherValue", props.getProperty("key"));
+        Assert.assertEquals(1, props.size());
     }
 }

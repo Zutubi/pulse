@@ -1,16 +1,13 @@
-package com.zutubi.pulse.core.util.config;
+package com.zutubi.util.io;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Properties;
 
-public class PropertiesWriterTest extends PulseTestCase
+public class PropertiesWriterTest extends TestCase
 {
     private File tmpDir = null;
     private File config;
@@ -42,7 +39,11 @@ public class PropertiesWriterTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        removeDirectory(tmpDir);
+        if (!FileSystemUtils.rmdir(tmpDir))
+        {
+            throw new IOException("Failed to remove " + tmpDir);
+        }
+
         tmpDir = null;
 
         super.tearDown();
@@ -74,6 +75,43 @@ public class PropertiesWriterTest extends PulseTestCase
                 getClass().getResourceAsStream(getClass().getSimpleName() + "." + getName() + ".expected.properties"),
                 new FileInputStream(config)
         );
+    }
+
+    protected static void assertStreamsEqual(InputStream is1, InputStream is2) throws IOException
+    {
+        try
+        {
+            BufferedReader rs1 = new BufferedReader(new InputStreamReader(is1));
+            BufferedReader rs2 = new BufferedReader(new InputStreamReader(is2));
+            while (true)
+            {
+                String line1 = rs1.readLine();
+                String line2 = rs2.readLine();
+
+                if (line1 == null)
+                {
+                    if (line2 == null)
+                    {
+                        return;
+                    }
+                    throw new AssertionFailedError("Contents of stream 1 differ from contents of stream 2. ");
+                }
+                else
+                {
+                    if (line2 == null)
+                    {
+                        throw new AssertionFailedError("Contents of stream 1 differ from contents of stream 2. ");
+                    }
+                    assertEquals(line1, line2);
+                }
+            }
+        }
+        finally
+        {
+            // close the streams for convenience.
+            IOUtils.close(is1);
+            IOUtils.close(is2);
+        }
     }
 
     public void testUpdateExistingMultilineProperties() throws IOException

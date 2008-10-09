@@ -1,8 +1,8 @@
 package com.zutubi.pulse.servercore.bootstrap;
 
-import com.zutubi.pulse.core.util.config.CompositeConfig;
-import com.zutubi.pulse.core.util.config.Config;
-import com.zutubi.pulse.core.util.config.ConfigSupport;
+import com.zutubi.util.config.CompositeConfig;
+import com.zutubi.util.config.Config;
+import com.zutubi.util.config.ConfigSupport;
 import com.zutubi.util.TextUtils;
 
 import java.net.InetAddress;

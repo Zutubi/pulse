@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.pulse.core.util.config.Config;
+import com.zutubi.util.config.Config;
 
 import java.io.File;
 

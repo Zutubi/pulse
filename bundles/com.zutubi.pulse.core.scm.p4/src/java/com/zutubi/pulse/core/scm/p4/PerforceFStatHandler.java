@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import com.zutubi.pulse.core.personal.api.PersonalBuildUI;
 
 import java.util.HashMap;
 import java.util.Map;

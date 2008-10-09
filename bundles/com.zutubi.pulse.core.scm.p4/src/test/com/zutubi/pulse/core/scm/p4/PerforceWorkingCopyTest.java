@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.scm.TestPersonalBuildUI;
+import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
-import com.zutubi.pulse.core.util.config.PropertiesConfig;
+import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
