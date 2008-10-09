@@ -3,8 +3,11 @@ package com.zutubi.pulse.core.personal;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.personal.api.PersonalBuildUI;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.FileStatus;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
@@ -138,7 +141,7 @@ public class PatchArchive
         {
             if (fs.getState().requiresFile() && !fs.isDirectory())
             {
-                File f = new File(base, FileSystemUtils.denormaliseSeparators(fs.getPath()));
+                File f = new File(base, FileSystemUtils.localiseSeparators(fs.getPath()));
                 String path = FILES_PATH + fs.getTargetPath();
                 addFile(os, f, path, ui);
             }

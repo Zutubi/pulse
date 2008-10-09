@@ -5,80 +5,103 @@ import com.zutubi.util.FileSystemUtils;
 /**
  * Represents a file or directory stored in an SCM.
  */
-public class ScmFile implements Comparable
+public class ScmFile implements Comparable<ScmFile>
 {
-    public static String SEPARATOR = "/";
+    public static String SEPARATOR = FileSystemUtils.NORMAL_SEPARATOR;
 
     private String path;
-    private int prefixLength = 0;
-
     private boolean directory = false;
 
-    private String type = "text/plain";
-
-    private ScmFile(String path, int prefixLength, boolean dir)
-    {
-        this.path = path;
-        this.prefixLength = prefixLength;
-        this.directory = dir;
-    }
-
+    /**
+     * Creates a regular SCM file (i.e. not a directory) for a given path.
+     *
+     * @param path path of the file, relative to the location specified for the
+     *             SCM client
+     */
     public ScmFile(String path)
     {
         this(path, false);
     }
 
+    /**
+     * Creates an SCM file for a given path, indicating if it is a directory.
+     *
+     * @param path path of the file, relative to the location specified for the
+     *             SCM client
+     * @param dir  if true, this path denotes a directory
+     */
     public ScmFile(String path, boolean dir)
     {
-        this.path = normalizePath(path);
+        this.path = normalisePath(path);
         this.directory = dir;
     }
 
-    public ScmFile(String parent, String child)
+    /**
+     * Creates a regular SCM file (i.e. not a directory) for a given parent
+     * path and file name.
+     *
+     * @param parent parent path for the file, relative to the location
+     *               specified for the SCM client
+     * @param name   name of the file (last component of its full path)
+     */
+    public ScmFile(String parent, String name)
     {
-        this(parent, child, false);
+        this(parent, name, false);
     }
 
-    public ScmFile(String parent, String child, boolean dir)
+    /**
+     * Creates an SCM file for a given parent path and file name, indicating if
+     * it is a directory.
+     *
+     * @param parent parent path for the file, relative to the location
+     *               specified for the SCM client
+     * @param name   name of the file (last component of its full path)
+     * @param dir  if true, this path denotes a directory
+     */
+    public ScmFile(String parent, String name, boolean dir)
     {
-        this(normalizePath(parent) + SEPARATOR + normalizePath(child), dir);
+        this(normalisePath(parent) + SEPARATOR + normalisePath(name), dir);
     }
 
-    public ScmFile(ScmFile parent, String child)
+    /**
+     * Creates a regular SCM file (i.e. not a directory) for a given parent
+     * file and file name.
+     *
+     * @param parent parent file, the directory under which this file is nested
+     * @param name   name of the file (last component of its full path)
+     */
+    public ScmFile(ScmFile parent, String name)
     {
-        this(parent, child, false);
+        this(parent, name, false);
     }
 
-    public ScmFile(ScmFile parent, String child, boolean dir)
+    /**
+     * Creates an SCM file for a given parent file and file name, indicating if
+     * it is a directory.
+     *
+     * @param parent parent file, the directory under which this file is nested
+     * @param name   name of the file (last component of its full path)
+     * @param dir    if true, this path denotes a directory
+     */
+    public ScmFile(ScmFile parent, String name, boolean dir)
     {
-        this(parent.getPath() + SEPARATOR + normalizePath(child), dir);
+        this(parent.getPath() + SEPARATOR + normalisePath(name), dir);
     }
 
+    /**
+     * @return the path of this file, relative to the location specified to
+     *         create the corresponding SCM client.  Note all separators are
+     *         normalised to {@link #SEPARATOR}.
+     * @see #SEPARATOR
+     */
     public String getPath()
     {
         return path;
     }
 
-    public boolean isDirectory()
-    {
-        return directory;
-    }
-
-    public boolean isFile()
-    {
-        return !isDirectory();
-    }
-
-    public String getMimeType()
-    {
-        return type;
-    }
-
-    public void setMimeType(String type)
-    {
-        this.type = type;
-    }
-
+    /**
+     * @return the name of this file, which is the last component of the path
+     */
     public String getName()
     {
         int lastIndex = path.lastIndexOf(SEPARATOR);
@@ -89,20 +112,25 @@ public class ScmFile implements Comparable
         return this.path;
     }
 
+    /**
+     * @return the parent path, or null if this file has no parent
+     * @see #getParentFile()
+     */
     public String getParent()
     {
         int index = path.lastIndexOf(SEPARATOR);
-        if (index < prefixLength)
+        if (index < 0)
         {
-            if ((prefixLength > 0) && (path.length() > prefixLength))
-            {
-                return path.substring(0, prefixLength);
-            }
             return null;
         }
         return path.substring(0, index);
     }
 
+    /**
+     * @return a file created for the parent path, or null if this file has no
+     *         parent
+     * @see #getParent()
+     */
     public ScmFile getParentFile()
     {
         String p = this.getParent();
@@ -110,11 +138,28 @@ public class ScmFile implements Comparable
         {
             return null;
         }
-        return new ScmFile(p, this.prefixLength, true);
+        return new ScmFile(p, true);
     }
 
+    /**
+     * @return true iff this path denotes a directory
+     * @see #isFile()
+     */
+    public boolean isDirectory()
+    {
+        return directory;
+    }
 
-    public static String normalizePath(String path)
+    /**
+     * @return true iff this path denotes a regular file (i.e. not a directory)
+     * @see #isDirectory()
+     */
+    public boolean isFile()
+    {
+        return !isDirectory();
+    }
+
+    private static String normalisePath(String path)
     {
         path = FileSystemUtils.normaliseSeparators(path);
         if (path.startsWith(SEPARATOR))
@@ -138,24 +183,25 @@ public class ScmFile implements Comparable
         ScmFile file = (ScmFile) o;
 
         if (directory != file.directory) return false;
-        if (prefixLength != file.prefixLength) return false;
-        if (path != null ? !path.equals(file.path) : file.path != null) return false;
-
-        return true;
+        return !(path != null ? !path.equals(file.path) : file.path != null);
     }
 
     public int hashCode()
     {
         int result;
         result = (path != null ? path.hashCode() : 0);
-        result = 31 * result + prefixLength;
         result = 31 * result + (directory ? 1 : 0);
         return result;
     }
 
-    public int compareTo(Object o)
+    /**
+     * Compares two files by their name only, so siblings can be sorted.
+     *
+     * @param other file to compare to
+     * @return {@inheritDoc}
+     */
+    public int compareTo(ScmFile other)
     {
-        ScmFile other = (ScmFile) o;
         return getName().compareTo(other.getName());
     }
 }

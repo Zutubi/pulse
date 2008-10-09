@@ -207,7 +207,6 @@ public class PerforceClientTest extends PulseTestCase
             assertTrue(f.isFile());
             assertEquals("file" + (i + 1), f.getName());
             assertEquals("depot2/file" + (i + 1), f.getPath());
-            assertEquals("text/plain", f.getMimeType());
         }
 
         f = files.get(9);

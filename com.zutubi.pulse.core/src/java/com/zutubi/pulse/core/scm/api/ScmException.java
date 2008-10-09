@@ -4,20 +4,15 @@ import com.zutubi.pulse.core.api.PulseException;
 
 /**
  * An error raised during interaction with an SCM server.
- *
- * @author jsankey
  */
 public class ScmException extends PulseException
 {
     /**
      * Create a new SCM exception.
-     *
-     * @param message human-readable error message
-     * @param cause   root cause of the error, or null if there is none
      */
-    public ScmException(String message, Throwable cause)
+    public ScmException()
     {
-        super(message, cause);
+        super();
     }
 
     /**
@@ -32,19 +27,22 @@ public class ScmException extends PulseException
 
     /**
      * Create a new SCM exception.
-     */
-    public ScmException()
-    {
-
-    }
-
-    /**
-     * Create a new SCM exception.
      *
      * @param cause root cause of the error, or null if there is none
      */
     public ScmException(Throwable cause)
     {
         super(cause);
+    }
+
+    /**
+     * Create a new SCM exception.
+     *
+     * @param message human-readable error message
+     * @param cause   root cause of the error, or null if there is none
+     */
+    public ScmException(String message, Throwable cause)
+    {
+        super(message, cause);
     }
 }

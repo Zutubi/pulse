@@ -21,6 +21,9 @@ public class FileSystemUtils
 
     private static final int DELETE_RETRIES = 3;
 
+    public static final String NORMAL_SEPARATOR      = "/";
+    public static final char   NORMAL_SEPARATOR_CHAR = NORMAL_SEPARATOR.charAt(0);
+
     // Unix-style file mode values
     
     public static final int PERMISSION_OWNER_READ    = 0x100;
@@ -620,24 +623,16 @@ public class FileSystemUtils
         return StringUtils.join(File.pathSeparator, parts);
     }
 
+    /**
+     * Ensures all separator characters are forward slashes, which works on all
+     * supported file systems.
+     *
+     * @param path the path to normalise
+     * @return an equivalent path, but with all separators as forward slashes
+     */
     public static String normaliseSeparators(String path)
     {
-        if (File.separatorChar != '/')
-        {
-            path = path.replace(File.separatorChar, '/');
-        }
-
-        return path;
-    }
-
-    public static String denormaliseSeparators(String path)
-    {
-        if (File.separatorChar != '/')
-        {
-            path = path.replace('/', File.separatorChar);
-        }
-
-        return path;
+        return path.replace('\\', NORMAL_SEPARATOR_CHAR);
     }
 
     /**
@@ -649,13 +644,13 @@ public class FileSystemUtils
      */
     public static String localiseSeparators(String path)
     {
-        if (File.separatorChar == '/')
+        if (File.separatorChar == NORMAL_SEPARATOR_CHAR)
         {
-            return path.replace('\\', '/');
+            return path.replace('\\', NORMAL_SEPARATOR_CHAR);
         }
         else
         {
-            return path.replace('/', '\\');
+            return path.replace(NORMAL_SEPARATOR_CHAR, '\\');
         }
     }
 

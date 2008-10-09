@@ -350,7 +350,7 @@ public class SubversionClient implements ScmClient
                 handler.status("Processing external '" + external.path + "'");
             }
 
-            update(new File(toDirectory, FileSystemUtils.denormaliseSeparators(external.path)), convertRevision(revision), client);
+            update(new File(toDirectory, FileSystemUtils.localiseSeparators(external.path)), convertRevision(revision), client);
 
             if (handler != null)
             {

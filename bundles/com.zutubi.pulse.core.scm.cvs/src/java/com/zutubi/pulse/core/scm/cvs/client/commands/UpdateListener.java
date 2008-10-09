@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.cvs.client.commands;
 
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.ScmEventHandler;
-import com.zutubi.pulse.core.scm.api.ScmFile;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
 import org.netbeans.lib.cvsclient.command.FileInfoContainer;
@@ -75,7 +75,7 @@ public class UpdateListener extends CVSAdapter
 
     /**
      * Return the string that represents the path of the file relative to the working directory, with separators
-     * normalized.
+     * normalised.
      *
      * @param file for which we want the relative path.
      *
@@ -90,7 +90,15 @@ public class UpdateListener extends CVSAdapter
         {
             path = path.substring(workingDirectory.length());
         }
-        path = ScmFile.normalizePath(path);
+        path = FileSystemUtils.normaliseSeparators(path);
+        if (path.startsWith(FileSystemUtils.NORMAL_SEPARATOR))
+        {
+            path = path.substring(1);
+        }
+        if (path.endsWith(FileSystemUtils.NORMAL_SEPARATOR))
+        {
+            path = path.substring(0, path.length() - 1);
+        }
         return path;
     }
 }
