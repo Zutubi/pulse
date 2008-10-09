@@ -10,10 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- *
- *
- */
 public class ArchiveFactory
 {
     /**
@@ -84,9 +80,7 @@ public class ArchiveFactory
         File exportZipFile = null;
         try
         {
-            String baseArchiveName = nameGenerator.newName(exportDir);
-
-            String archiveName = baseArchiveName + ".zip";
+            String archiveName = nameGenerator.newName(exportDir);
 
             exportZipFile = new File(exportDir, archiveName);
 

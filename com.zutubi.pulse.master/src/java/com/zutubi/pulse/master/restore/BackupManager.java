@@ -192,16 +192,25 @@ public class BackupManager
     {
         // a) mark them for deletion
         // b) delete them.
-
+        final ArchiveNameGenerator generator = new UniqueDatestampedNameGenerator();
+        
         File[] candidateFilesForCleanup = backupDir.listFiles(new FilenameFilter()
         {
             public boolean accept(File dir, String name)
             {
-                return !name.endsWith(".delete");
+                if (name.endsWith(".delete"))
+                {
+                    return false;
+                }
+                if (name.endsWith(".zip"))
+                {
+                    return generator.matches(name.substring(0, name.length() - 4));
+                }
+                return false;
             }
         });
 
-        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(9);
+        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(10);
 
         File[] cleanupTargets = strategy.getCleanupTargets(candidateFilesForCleanup);
         if (cleanupTargets.length > 0)

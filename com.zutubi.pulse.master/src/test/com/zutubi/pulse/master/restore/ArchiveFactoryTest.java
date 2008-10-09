@@ -71,6 +71,10 @@ public class ArchiveFactoryTest extends PulseTestCase
             {
                 return "sample";
             }
+            public boolean matches(String name)
+            {
+                return name.equals("sample");
+            }
         });
         Archive archive = factory.createArchive();
 
