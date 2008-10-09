@@ -100,7 +100,7 @@ public class PerforceClientTest extends PulseTestCase
                 number = i;
             }
 
-            assertEquals(String.format("//depot/file%d", number), change.getFilename());
+            assertEquals(String.format("//depot/file%d", number), change.getPath());
         }
 
         checkDirectory("checkoutHead");
@@ -150,10 +150,10 @@ public class PerforceClientTest extends PulseTestCase
         List<FileChange> changedFiles = list.getChanges();
         assertEquals(2, changedFiles.size());
         FileChange file1 = changedFiles.get(0);
-        assertEquals("//depot2/file1", file1.getFilename());
+        assertEquals("//depot2/file1", file1.getPath());
         assertEquals(FileChange.Action.EDIT, file1.getAction());
         FileChange file10 = changedFiles.get(1);
-        assertEquals("//depot2/file10", file10.getFilename());
+        assertEquals("//depot2/file10", file10.getPath());
         assertEquals(FileChange.Action.DELETE, file10.getAction());
     }
 
@@ -339,7 +339,7 @@ public class PerforceClientTest extends PulseTestCase
         checkDirectory("checkoutHead");
         assertEquals(1, changes.size());
         FileChange change = changes.get(0);
-        assertEquals("//depot/file2", change.getFilename());
+        assertEquals("//depot/file2", change.getPath());
         assertEquals(FileChange.Action.EDIT, change.getAction());
     }
 

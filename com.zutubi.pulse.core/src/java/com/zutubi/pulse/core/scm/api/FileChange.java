@@ -97,55 +97,83 @@ public class FileChange
         public abstract String getPrettyString();
     }
 
-    private String filename;
+    private String path;
     private Action action;
     private boolean directory;
     private String revisionString;
 
-    protected FileChange()
+    /**
+     * Creates a new file change for a regular file with the given details.
+     *
+     * @param path           path of the changed file: the format of which is
+     *                       SCM-specific
+     * @param revisionString freeform file revision string.  For SCMs that
+     *                       track individual file revisions, this string
+     *                       should contain that revision, otherwise it may be
+     *                       identical to the changelist's revision string.
+     * @param action         the action that was performed on the file
+     */
+    public FileChange(String path, String revisionString, Action action)
     {
-
+        this(path, revisionString, action, false);
     }
 
-    public FileChange(String filename, String revisionString, Action action)
+    /**
+     * Creates a new file change for a file with the given details, indicating
+     * if the file is a directory.
+     *
+     * @param path           path of the changed file: the format of which is
+     *                       SCM-specific
+     * @param revisionString freeform file revision string.  For SCMs that
+     *                       track individual file revisions, this string
+     *                       should contain that revision, otherwise it may be
+     *                       identical to the changelist's revision string.
+     * @param action         the action that was performed on the file
+     * @param directory      set to true if the path denotes a directory
+     */
+    public FileChange(String path, String revisionString, Action action, boolean directory)
     {
-        this(filename, revisionString, action, false);
-    }
-
-
-    public FileChange(String filename, String revisionString, Action action, boolean directory)
-    {
-        this.filename = filename;
+        this.path = path;
         this.action = action;
         this.directory = directory;
         this.revisionString = revisionString;
     }
 
     /**
-     * @return the name of the file that was changed as a repository path
+     * @return the path of the file that was changed as an SCM-specific
+     *         repository path
      */
-    public String getFilename()
+    public String getPath()
     {
-        return filename;
+        return path;
     }
 
     /**
-     * @return the action performed on the file
+     * @return a freeform string containing the file revision, which may be the
+     *         same as the changelist revision for SCMs that do not track
+     *         separate revisions for individual files
+     */
+    public String getRevisionString()
+    {
+        return revisionString;
+    }
+
+    /**
+     * @return the action that was performed on the file
      */
     public Action getAction()
     {
         return action;
     }
 
-    public String getRevisionString()
-    {
-        return revisionString;
-    }
-
+    /**
+     * @return true iff the changed path denotes a directory
+     */
     public boolean isDirectory()
     {
         return directory;
     }
+
     public boolean equals(Object o)
     {
         if (this == o)
@@ -166,7 +194,7 @@ public class FileChange
         {
             return false;
         }
-        if (filename != null ? !filename.equals(change.filename) : change.filename != null)
+        if (path != null ? !path.equals(change.path) : change.path != null)
         {
             return false;
         }
@@ -177,7 +205,7 @@ public class FileChange
     public int hashCode()
     {
         int result = super.hashCode();
-        result = 31 * result + (filename != null ? filename.hashCode() : 0);
+        result = 31 * result + (path != null ? path.hashCode() : 0);
         result = 31 * result + (action != null ? action.hashCode() : 0);
         result = 31 * result + (directory ? 1 : 0);
         result = 31 * result + (revisionString != null ? revisionString.hashCode() : 0);
@@ -187,7 +215,7 @@ public class FileChange
     public String toString()
     {
         StringBuffer buffer = new StringBuffer();
-        buffer.append(filename);
+        buffer.append(path);
         if (revisionString != null)
         {
             buffer.append("#").append(revisionString);

@@ -101,24 +101,24 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         Map<String, Change.Action> expectedActions = new HashMap<String, Change.Action>();
         for (Change expectedChange : expectedChanges)
         {
-            expectedActions.put(expectedChange.getFilename(), expectedChange.getAction());
+            expectedActions.put(expectedChange.getPath(), expectedChange.getAction());
         }
         for (Change change : changes)
         {
-            assertTrue(expectedActions.containsKey(change.getFilename()));
+            assertTrue(expectedActions.containsKey(change.getPath()));
 //  it would be nice for the actions to be the same, but it seems that at lease cvs reports them differently to whats expected
-//          assertEquals(expectedActions.get(change.getFilename()), change.getAction());
+//          assertEquals(expectedActions.get(change.getPath()), change.getAction());
         }
 */
         // expected change paths are not necessarily exactly the same as the reported paths. At the very least, they
         // will match the end of a path.
         for (FileChange change : changes)
         {
-            String filename = change.getFilename();
+            String filename = change.getPath();
             boolean found = false;
             for (FileChange expectedChange : expectedChanges)
             {
-                if (filename.endsWith(expectedChange.getFilename()))
+                if (filename.endsWith(expectedChange.getPath()))
                 {
                     found = true;
                 }

@@ -399,7 +399,7 @@ public class CvsClient implements ScmClient, DataCacheAware
                         public FileChange map(FileChange change)
                         {
                             // a) strip off the leading /.
-                            String filename = change.getFilename();
+                            String filename = change.getPath();
                             if (filename.startsWith("/"))
                             {
                                 filename = filename.substring(1);
@@ -439,28 +439,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
         List<Changelist> changes = getChanges(null, from, to);
-        Collections.sort(changes, new Comparator<Changelist>()
-        {
-            public int compare(Changelist o1, Changelist o2)
-            {
-                // filter null dates to the start, although we need to work out what no
-                // date means in a revision...
-                Date d1 = o1.getDate();
-                Date d2 = o2.getDate();
-                if (d1 == null)
-                {
-                    return (d2 == null)? 0 : -1;
-                }
-                else
-                {
-                    if (d2 == null)
-                    {
-                        return 1;
-                    }
-                    return d1.compareTo(o2.getDate());
-                }
-            }
-        });
+        Collections.sort(changes);
 
         List<Revision> result = new LinkedList<Revision>();
         for(Changelist c: changes)

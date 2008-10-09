@@ -43,7 +43,7 @@ public class ScmUtils
             while (i.hasNext())
             {
                 FileChange c = i.next();
-                if (filter != null && !filter.accept(c.getFilename()))
+                if (filter != null && !filter.accept(c.getPath()))
                 {
                     i.remove();
                 }

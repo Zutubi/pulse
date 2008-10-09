@@ -197,17 +197,6 @@ public class LogInformationAnalyser
                     })
             );
             changelists.add(changelist);
-            
-            // CIB-1627: need some logging. We do not expect this to be null, but have had cases where this is so.  Not exactly
-            // sure what should be done until we see some examples of this.
-            if (changelist.getDate() == null)
-            {
-                LOG.warning("Unexpected changelist date 'null'");
-                LOG.warning("  - author: " + changelist.getAuthor());
-                LOG.warning("  - comment: " + changelist.getComment());
-                LOG.warning("  - revision string: " + changelist.getRevision().getRevisionString());
-            }
-
         }
 
         return changelists;

@@ -104,7 +104,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
             revision = "#" + change.getRevisionString();
         }
 
-        outputWriter.println(change.getFilename() + revision + " - " + change.getAction().toString());
+        outputWriter.println(change.getPath() + revision + " - " + change.getAction().toString());
     }
 
     public void checkCancelled() throws ScmCancelledException

@@ -254,14 +254,14 @@ public class SubversionExternalsTest extends PulseTestCase
         {
             public int compare(FileChange o1, FileChange o2)
             {
-                return o1.getFilename().compareTo(o2.getFilename());
+                return o1.getPath().compareTo(o2.getPath());
             }
         });
         
         for(int i = 0; i < paths.length; i++)
         {
             FileChange change = changes.get(i);
-            assertEquals(paths[i], change.getFilename());
+            assertEquals(paths[i], change.getPath());
         }
     }
 

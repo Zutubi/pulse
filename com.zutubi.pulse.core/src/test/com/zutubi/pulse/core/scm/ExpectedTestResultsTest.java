@@ -157,7 +157,7 @@ public class ExpectedTestResultsTest extends TestCase
 
         for (FileChange change : changes)
         {
-            assertEquals(expectedActions.get(change.getFilename()), change.getAction());
+            assertEquals(expectedActions.get(change.getPath()), change.getAction());
         }
     }
 

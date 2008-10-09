@@ -20,7 +20,7 @@ public class PersistentFileChange extends Entity
 
     public PersistentFileChange(FileChange data)
     {
-        this(data.getFilename(), data.getRevisionString(), data.getAction(), data.isDirectory());
+        this(data.getPath(), data.getRevisionString(), data.getAction(), data.isDirectory());
     }
 
     public PersistentFileChange(String filename, String revisionString, FileChange.Action action, boolean directory)

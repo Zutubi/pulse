@@ -24,7 +24,7 @@ public class Revision
      * Creates a new revision from the serialised form.
      *
      * @param revisionString a serialised form of the revision, the content of
-     *                       which is implemented-dependent
+     *                       which is implementation-dependent
      * @throws NullPointerException if revisionString is null
      */
     public Revision(String revisionString)

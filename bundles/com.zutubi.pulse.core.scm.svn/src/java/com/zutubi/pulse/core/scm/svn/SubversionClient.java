@@ -538,13 +538,7 @@ public class SubversionClient implements ScmClient
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
         List<Changelist> changes = getChanges(null, from, to);
-        Collections.sort(changes, new Comparator<Changelist>()
-        {
-            public int compare(Changelist o1, Changelist o2)
-            {
-                return o1.getDate().compareTo(o2.getDate());
-            }
-        });
+        Collections.sort(changes);
 
         List<Revision> result = new LinkedList<Revision>();
         for (Changelist change : changes)

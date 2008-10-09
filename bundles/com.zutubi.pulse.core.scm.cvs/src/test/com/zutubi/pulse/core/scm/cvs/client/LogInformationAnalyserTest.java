@@ -73,7 +73,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt modified by author a\n");
         FileChange change = changelist.getChanges().get(0);
-        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
+        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.EDIT, change.getAction());
         assertEquals("1.2", change.getRevisionString());
         changelist = changes.get(1);
@@ -82,7 +82,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt deleted by author a\n");
         change = changelist.getChanges().get(0);
-        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
+        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.DELETE, change.getAction());
         assertEquals("1.3", change.getRevisionString());
     }
@@ -102,7 +102,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt checked in by author a\n");
         FileChange change = changelist.getChanges().get(0);
-        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
+        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.ADD, change.getAction());
         assertEquals("1.1", change.getRevisionString());
         changelist = changes.get(1);
@@ -111,7 +111,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt modified by author a\n");
         change = changelist.getChanges().get(0);
-        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
+        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.EDIT, change.getAction());
         assertEquals("1.2", change.getRevisionString());
         changelist = changes.get(2);
@@ -120,7 +120,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt deleted by author a\n");
         change = changelist.getChanges().get(0);
-        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
+        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.DELETE, change.getAction());
         assertEquals("1.3", change.getRevisionString());
         changelist = changes.get(3);
@@ -129,7 +129,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file2.txt checked in by author a\n");
         change = changelist.getChanges().get(0);
-        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/file2.txt", change.getFilename());
+        assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/file2.txt", change.getPath());
         assertEquals(FileChange.Action.ADD, change.getAction());
         assertEquals("1.1", change.getRevisionString());
     }
@@ -343,7 +343,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
 
     private static void assertChangeValues(FileChange change, String file, FileChange.Action action, String revision)
     {
-        assertEndsWith(file, change.getFilename());
+        assertEndsWith(file, change.getPath());
         assertEquals(action, change.getAction());
         assertEquals(revision, change.getRevisionString());
     }
@@ -363,8 +363,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
 
         for(FileChange change : changes)
         {
-            assertFalse(filenames.containsKey(change.getFilename()));
-            filenames.put(change.getFilename(), change.getFilename());
+            assertFalse(filenames.containsKey(change.getPath()));
+            filenames.put(change.getPath(), change.getPath());
             assertNotNull(change.getRevisionString());
             assertNotNull(change.getAction());
         }

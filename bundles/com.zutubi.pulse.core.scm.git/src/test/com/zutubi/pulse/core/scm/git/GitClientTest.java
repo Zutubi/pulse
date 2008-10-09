@@ -226,7 +226,7 @@ public class GitClientTest extends PulseTestCase
         assertEquals(1, changelist.getChanges().size());
         FileChange change = changelist.getChanges().get(0);
         assertEquals(FileChange.Action.EDIT, change.getAction());
-        assertEquals("a.txt", change.getFilename());
+        assertEquals("a.txt", change.getPath());
     }
 
     private Date parse(String str) throws ParseException

@@ -230,12 +230,12 @@ public class SubversionClientTest extends PulseTestCase
         Changelist changelist = changes.get(0);
         assertEquals("3", changelist.getRevision().getRevisionString());
         assertEquals(1, changelist.getChanges().size());
-        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getFilename());
+        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getPath());
         assertEquals(FileChange.Action.ADD, changelist.getChanges().get(0).getAction());
         changelist = changes.get(1);
         assertEquals("4", changelist.getRevision().getRevisionString());
         assertEquals(1, changelist.getChanges().size());
-        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getFilename());
+        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getPath());
         assertEquals(FileChange.Action.DELETE, changelist.getChanges().get(0).getAction());
     }
 

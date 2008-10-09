@@ -354,7 +354,7 @@ public class PerforceClient extends CachingScmClient
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
             FileChange change = getChangelistChange(lines[i]);
-            if (filter.accept(change.getFilename()))
+            if (filter.accept(change.getPath()))
             {
                 changes.add(change);
             }
@@ -898,14 +898,14 @@ public class PerforceClient extends CachingScmClient
             {
                 System.out.println("Changelist:");
                 System.out.println("  Revision: " + l.getRevision());
-                System.out.println("  Date    : " + l.getDate());
+                System.out.println("  Date    : " + new Date(l.getTime()));
                 System.out.println("  Author  : " + l.getAuthor());
                 System.out.println("  Comment : " + l.getComment());
                 System.out.println("  Files   : " + l.getRevision());
 
                 for (FileChange c : l.getChanges())
                 {
-                    System.out.println("    " + c.getFilename() + "#" + c.getRevisionString() + " - " + c.getAction());
+                    System.out.println("    " + c.getPath() + "#" + c.getRevisionString() + " - " + c.getAction());
                 }
             }
         }

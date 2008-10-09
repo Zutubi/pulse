@@ -137,10 +137,10 @@ public class ExpectedTestResults
                 switch (change.getAction())
                 {
                     case ADD:
-                        files.add(new ScmFile(change.getFilename(), change.isDirectory()));
+                        files.add(new ScmFile(change.getPath(), change.isDirectory()));
                         break;
                     case DELETE:
-                        files.remove(new ScmFile(change.getFilename(), change.isDirectory()));
+                        files.remove(new ScmFile(change.getPath(), change.isDirectory()));
                         break;
                 }
             }
@@ -246,7 +246,7 @@ public class ExpectedTestResults
         {
             for (FileChange change : changelist.getChanges())
             {
-                String file = change.getFilename();
+                String file = change.getPath();
                 if (latestChanges.containsKey(file))
                 {
                     switch (latestChanges.get(file).getAction())

@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Describes how text file End-Of-Line characters should be managed.  Several
+ * SCMs support translation to/from local system line endings.
  */
 public enum EOLStyle
 {
@@ -73,6 +75,17 @@ public enum EOLStyle
         }
     };
 
+    /**
+     * Translate all end-of-line byte sequences in the given file to the given
+     * byte sequence.  Any byte sequence that could be an end-of-line (CR, LF,
+     * CRLF) will be replaced.  If the file does not exist this request is
+     * ignored.
+     *
+     * @param file               file to translate line endings in
+     * @param lineSeparatorBytes new byte sequence to use for all line endings
+     * @throws IOException if there is an error reading/writing from/to the
+     *         file system
+     */
     public void translateEOLs(File file, byte[] lineSeparatorBytes) throws IOException
     {
         if(file.exists())
@@ -81,5 +94,16 @@ public enum EOLStyle
         }
     }
 
+    /**
+     * Applies this end-of-line style to the given file.  All current line
+     * endings in the file will be translated according to the style.  If the
+     * file does not exist this request is ignored.
+     *
+     * @param file         the file to apply the line ending style to
+     * @param localEOL     the local end-of-line policy, as determined from the
+     *                     environment in which we are running
+     * @throws IOException if there is an error reading/writing from/to the
+     *         file system
+     */
     public abstract void apply(File file, EOLStyle localEOL) throws IOException;
 }
