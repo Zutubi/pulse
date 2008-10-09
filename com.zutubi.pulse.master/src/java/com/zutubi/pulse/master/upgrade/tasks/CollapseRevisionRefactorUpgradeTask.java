@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.hibernate.SchemaRefactor;
+import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -16,6 +17,8 @@ import java.sql.SQLException;
  */
 public class CollapseRevisionRefactorUpgradeTask extends AbstractSchemaRefactorUpgradeTask
 {
+    private static final Logger LOG = Logger.getLogger(CollapseRevisionRefactorUpgradeTask.class);
+
     public String getName()
     {
         return "Scm revision refactor";
@@ -40,7 +43,7 @@ public class CollapseRevisionRefactorUpgradeTask extends AbstractSchemaRefactorU
         catch (SQLException e)
         {
             // Index could already be present.
-            System.out.println("Warning: Unable to add index to BUILD_RESULT.REVISION_STRING: " + e.getMessage());
+            LOG.warning("Unable to add index to BUILD_RESULT.REVISION_STRING: " + e.getMessage());
         }
 
         // revision table.
@@ -60,7 +63,7 @@ public class CollapseRevisionRefactorUpgradeTask extends AbstractSchemaRefactorU
         catch (SQLException e)
         {
             // Index could already be present.
-            System.out.println("Warning: Unable to add index to BUILD_CHANGELIST.REVISION_STRING: " + e.getMessage());
+            LOG.warning("Unable to add index to BUILD_CHANGELIST.REVISION_STRING: " + e.getMessage());
         }
     }
 
@@ -78,13 +81,17 @@ public class CollapseRevisionRefactorUpgradeTask extends AbstractSchemaRefactorU
 
             while (rs.next())
             {
-                JDBCUtils.setString(ps2, 1, JDBCUtils.getString(rs, "REV"));
-                JDBCUtils.setLong(ps2, 2, JDBCUtils.getLong(rs, "ID"));
+                String revision = JDBCUtils.getString(rs, "REV");
+                JDBCUtils.setString(ps2, 1, revision);
+                
+                Long resultId = JDBCUtils.getLong(rs, "ID");
+                JDBCUtils.setLong(ps2, 2, resultId);
                 
                 int rcount = ps2.executeUpdate();
                 if (rcount != 1)
                 {
-                    // this is unexpected.
+                    LOG.warning("Failed to execute: update BUILD_RESULT set REVISION_STRING = " +
+                            revision + " where ID = " + resultId);
                 }
             }
         }

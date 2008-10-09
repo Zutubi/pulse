@@ -4,7 +4,6 @@ import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
-import com.zutubi.pulse.core.spring.SpringObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -24,7 +23,8 @@ public class CustomHessianServlet extends GenericServlet
 
     HessianSkeleton skeleton;
     SerializerFactory factory;
-    private ObjectFactory objectFactory = new SpringObjectFactory();
+    
+    private ObjectFactory objectFactory;
     private CustomSerialiserFactory customSerialiserFactory;
 
     @Override
