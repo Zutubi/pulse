@@ -134,7 +134,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(workingDir);
 
-        RecordingScmEventHandler handler = new RecordingScmEventHandler();
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
 //        Revision revision = client.prepare(context, handler);
         Revision revision = client.checkout(context, Revision.HEAD, handler);
 
@@ -147,15 +147,6 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         assertFilesExist(testData.getFilesFor(revision));
 
         Changelist expectedChangelist = testData.getAggregatedChanges(null, revision);
-
-        if (handler.getChanges().size() > 0)
-        {
-            assertChangesEqual(expectedChangelist.getChanges(), handler.getChanges());
-        }
-        else
-        {
-            assertTrue(handler.getStatusMessages().size() > 0);
-        }
 
 /*
         // these properties are specific to the cvs implementation...
@@ -173,7 +164,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(workingDir);
 
-        RecordingScmEventHandler handler = new RecordingScmEventHandler();
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
 //        client.prepare(context, handler);
         client.checkout(context, initialRevision, handler);
 
@@ -193,14 +184,6 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         Changelist expectedChangelist = testData.getAggregatedChanges(initialRevision, requestedRevision);
 
         assertFilesExist(testData.getFilesFor(requestedRevision));
-        if (handler.getChanges().size() > 0)
-        {
-            assertChangesEqual(expectedChangelist.getChanges(), handler.getChanges());
-        }
-        else
-        {
-            assertTrue(handler.getStatusMessages().size() > 0);
-        }
     }
 
     public void testRetrieveFile() throws ScmException, IOException

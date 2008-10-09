@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.scm.RecordingScmEventHandler;
+import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
@@ -46,7 +46,7 @@ public class NativeGitTest extends PulseTestCase
 
     public void testClone() throws ScmException, IOException
     {
-        git.setScmEventHandler(new RecordingScmEventHandler());
+        git.setScmEventHandler(new RecordingScmFeedbackHandler());
         git.setWorkingDirectory(tmp);
         git.clone(repository, "base");
 
@@ -60,7 +60,7 @@ public class NativeGitTest extends PulseTestCase
 
     public void testCloneStatusMessages() throws ScmException
     {
-        RecordingScmEventHandler handler = new RecordingScmEventHandler();
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         git.setWorkingDirectory(tmp);
         git.setScmEventHandler(handler);
         git.clone(repository, "base");

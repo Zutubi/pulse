@@ -5,7 +5,10 @@ import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.io.ForkOutputStream;
 import com.zutubi.util.io.IOUtils;
@@ -16,7 +19,7 @@ import java.io.*;
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
  */
-public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
+public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandler
 {
     private static final Logger LOG = Logger.getLogger(ScmBootstrapper.class);
 
@@ -94,17 +97,6 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
     public void status(String message)
     {
         outputWriter.println(message);
-    }
-
-    public void fileChanged(FileChange change)
-    {
-        String revision = "";
-        if (change.getRevisionString() != null)
-        {
-            revision = "#" + change.getRevisionString();
-        }
-
-        outputWriter.println(change.getPath() + revision + " - " + change.getAction().toString());
     }
 
     public void checkCancelled() throws ScmCancelledException

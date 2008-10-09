@@ -50,7 +50,8 @@ public class PatchArchiveTest extends PulseTestCase
         fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, EOLStyle.CARRIAGE_RETURN.toString());
         wcs.add(fs);
         
-        PatchArchive archive = new PatchArchive(wcs, archiveFile, null);
+        PatchArchive archive;
+        new PatchArchive(wcs, archiveFile, null);
         assertTrue(archiveFile.exists());
         ZipUtils.extractZip(archiveFile, extractDir);
 

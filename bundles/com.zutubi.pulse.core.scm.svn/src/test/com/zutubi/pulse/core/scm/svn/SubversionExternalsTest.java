@@ -228,16 +228,11 @@ public class SubversionExternalsTest extends PulseTestCase
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(checkoutDir);
         server.addExternalPath(".");
-        server.checkout(context, new Revision(Integer.toString(rev)), new ScmEventHandler()
+        server.checkout(context, new Revision(Integer.toString(rev)), new ScmFeedbackHandler()
         {
             public void status(String message)
             {
                 System.out.println(message);
-            }
-
-            public void fileChanged(FileChange change)
-            {
-                System.out.println(change.toString());
             }
 
             public void checkCancelled() throws ScmCancelledException

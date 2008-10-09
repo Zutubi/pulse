@@ -9,7 +9,7 @@ package com.zutubi.pulse.core.scm.api;
  * just allow this exception to propagate and be handled be the calling
  * infrastructure.
  *
- * @see com.zutubi.pulse.core.scm.api.ScmEventHandler
+ * @see com.zutubi.pulse.core.scm.api.ScmFeedbackHandler
  */
 public class ScmCancelledException extends ScmException
 {

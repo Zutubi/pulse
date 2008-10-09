@@ -15,7 +15,7 @@ public class FileStatus
     /**
      * If set, specifies how line endings should be translated for the file.
      * Possible values are described in the EOLStyle enum (the property value
-     * is just the enum value converted to a string.
+     * is just the enum value converted to a string).
      *
      * @see EOLStyle
      */

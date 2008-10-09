@@ -1,29 +1,23 @@
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
-import com.zutubi.pulse.core.scm.api.FileChange;
-import com.zutubi.pulse.core.scm.api.ScmEventHandler;
-import org.netbeans.lib.cvsclient.event.CVSAdapter;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import org.netbeans.lib.cvsclient.event.FileAddedEvent;
 
-/**
- * <class comment/>
- */
-public class CheckoutListener extends CVSAdapter
-{
-    private final ScmEventHandler handler;
+import java.io.File;
 
-    public CheckoutListener(ScmEventHandler handler)
+/**
+ * An adapter between the CVS library and our SCM API listener interfaces.
+ */
+public class CheckoutListener extends BootstrapListener
+{
+    public CheckoutListener(ScmFeedbackHandler handler, File workingDirectory)
     {
-        if (handler == null)
-        {
-            throw new IllegalArgumentException("handler is a required argument.");
-        }
-        this.handler = handler;
+        super(handler, workingDirectory);
     }
 
     public void fileAdded(FileAddedEvent e)
     {
-        handler.fileChanged(new FileChange(e.getFilePath(), null, FileChange.Action.ADD));
+        reportStatus("U", new File(e.getFilePath()));
     }
 }
 

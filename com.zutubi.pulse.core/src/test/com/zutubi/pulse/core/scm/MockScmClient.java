@@ -62,7 +62,7 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -104,7 +104,7 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }

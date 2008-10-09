@@ -66,7 +66,7 @@ public interface ScmClient extends Closeable
      * @return the revision of the locally checked out working copy.
      * @throws ScmException on error
      */
-    Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException;
+    Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException;
 
     /**
      * Update the working directory to the specified context.  The target directory for this checkout
@@ -81,7 +81,7 @@ public interface ScmClient extends Closeable
      * @return the revision updated to.
      * @throws ScmException on error.
      */
-    Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException;
+    Revision update(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException;
 
     /**
      * Checks out the specified file at the given revision.

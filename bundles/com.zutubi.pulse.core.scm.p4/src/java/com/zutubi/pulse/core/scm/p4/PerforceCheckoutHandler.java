@@ -1,21 +1,15 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
-import com.zutubi.pulse.core.scm.api.ScmEventHandler;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 
 /**
  */
 public class PerforceCheckoutHandler extends PerforceErrorDetectingHandler
 {
-    private static final Pattern PATTERN = Pattern.compile("(.+)#([0-9]+) - (refreshing|updating|added as|deleted as) (.+)");
+    private ScmFeedbackHandler handler;
 
-    private ScmEventHandler handler;
-
-    public PerforceCheckoutHandler(boolean throwOnStderr, ScmEventHandler handler)
+    public PerforceCheckoutHandler(boolean throwOnStderr, ScmFeedbackHandler handler)
     {
         super(throwOnStderr);
         this.handler = handler;
@@ -25,11 +19,7 @@ public class PerforceCheckoutHandler extends PerforceErrorDetectingHandler
     {
         if (handler != null)
         {
-            Matcher m = PATTERN.matcher(line);
-            if (m.matches())
-            {
-                handler.fileChanged(new FileChange(m.group(1), m.group(2), PerforceClient.decodeAction(m.group(3))));
-            }
+            handler.status(line);
         }
     }
 

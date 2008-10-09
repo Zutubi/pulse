@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.scm.api;
 /**
  * A callback interface for receiving information about a checkout in progress.
  */
-public interface ScmEventHandler
+public interface ScmFeedbackHandler
 {
     /**
      * Called to report a simple freeform status message.
@@ -11,13 +11,6 @@ public interface ScmEventHandler
      * @param message status information about the checkout operation
      */
     void status(String message);
-
-    /**
-     * Called when a file is changed.
-     *
-     * @param change holds details, including at least the file path and action
-     */
-    void fileChanged(FileChange change);
 
     /**
      * Called periodically to check if the operation is cancelled.  If this

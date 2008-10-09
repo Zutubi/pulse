@@ -306,7 +306,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         addPropertiesToContext(context);
 
@@ -340,7 +340,7 @@ public class SubversionClient implements ScmClient
         return convertRevision(new NumericalRevision(svnRevision.getNumber()));
     }
 
-    private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, ScmEventHandler handler) throws ScmException
+    private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, ScmFeedbackHandler handler) throws ScmException
     {
         List<ExternalDefinition> externals = getExternals(revision);
         for (ExternalDefinition external : externals)
@@ -618,7 +618,7 @@ public class SubversionClient implements ScmClient
         return result;
     }
 
-    public Revision update(ExecutionContext context, Revision rev, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         addPropertiesToContext(context);
         // CIB-610: cleanup before update in case WC is locked.
@@ -754,34 +754,19 @@ public class SubversionClient implements ScmClient
 
     private static class ChangeEventHandler implements ISVNEventHandler
     {
-        private ScmEventHandler handler;
+        private ScmFeedbackHandler handler;
 
-        public ChangeEventHandler(ScmEventHandler handler)
+        public ChangeEventHandler(ScmFeedbackHandler handler)
         {
             this.handler = handler;
         }
 
         public void handleEvent(SVNEvent event, double progress)
         {
-            FileChange.Action action = null;
-
             SVNEventAction svnAction = event.getAction();
-            if (svnAction == SVNEventAction.UPDATE_ADD)
+            if (svnAction != null)
             {
-                action = FileChange.Action.ADD;
-            }
-            else if (svnAction == SVNEventAction.UPDATE_DELETE)
-            {
-                action = FileChange.Action.DELETE;
-            }
-            else if (svnAction == SVNEventAction.UPDATE_UPDATE)
-            {
-                action = FileChange.Action.EDIT;
-            }
-
-            if (action != null)
-            {
-                handler.fileChanged(new FileChange(event.getPath(), null, action));
+                handler.status(svnAction.toString() + " " + event.getPath());
             }
         }
 

@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
-import com.zutubi.pulse.core.scm.api.ScmEventHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
 import com.zutubi.util.Constants;
@@ -33,7 +33,7 @@ public class NativeGit
      */
     private final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
 
-    private ScmEventHandler scmHandler;
+    private ScmFeedbackHandler scmHandler;
 
     private ProcessBuilder git;
 
@@ -71,7 +71,7 @@ public class NativeGit
         git.directory(dir);
     }
 
-    public void setScmEventHandler(ScmEventHandler scmHandler)
+    public void setScmEventHandler(ScmFeedbackHandler scmHandler)
     {
         this.scmHandler = scmHandler;
     }

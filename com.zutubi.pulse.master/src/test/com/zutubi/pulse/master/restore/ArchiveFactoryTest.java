@@ -80,7 +80,7 @@ public class ArchiveFactoryTest extends PulseTestCase
 
         File exportedZipFile = factory.exportArchive(archive, exportDir);
 
-        assertEquals("sample.zip", exportedZipFile.getName());
+        assertEquals("sample", exportedZipFile.getName());
     }
 
     public void testArchivingDataRoundTrip() throws ArchiveException, IOException

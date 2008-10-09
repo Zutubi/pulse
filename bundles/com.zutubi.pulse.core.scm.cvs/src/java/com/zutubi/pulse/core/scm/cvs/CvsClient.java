@@ -262,7 +262,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         return convertRevision(cvsRevision);
     }
 
-    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         if (revision == Revision.HEAD)
         {
@@ -290,7 +290,7 @@ public class CvsClient implements ScmClient, DataCacheAware
      * @param context
      * @param handler
      */
-    public Revision update(ExecutionContext context, Revision rev, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         assertRevisionArgValid(rev);
         writePropertiesToContext(context);

@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.scm.NumericalRevision;
-import com.zutubi.pulse.core.scm.ScmChangeAccumulator;
+import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
@@ -77,13 +78,12 @@ public class PerforceClientTest extends PulseTestCase
     public void testCheckoutHead() throws Exception
     {
         getServer("depot-client");
-        List<FileChange> changes = checkoutChanges(null, workDir, null, 8);
+        List<String> statuses = checkoutChanges(null, workDir, null, 8);
 
-        assertEquals(10, changes.size());
+        assertEquals(10, statuses.size());
         for (int i = 0; i < 10; i++)
         {
-            FileChange change = changes.get(i);
-            assertEquals(FileChange.Action.ADD, change.getAction());
+            String status = statuses.get(i);
 
             // Foolish of me to create file10 which ruins lexical ordering :|
             int number;
@@ -100,7 +100,8 @@ public class PerforceClientTest extends PulseTestCase
                 number = i;
             }
 
-            assertEquals(String.format("//depot/file%d", number), change.getPath());
+            String re = String.format("//depot/file%d#[1-9][0-9]* - added as.*", number);
+            assertTrue("Status '" + status + "' does not match expected format '" + re + "'", status.matches(re));
         }
 
         checkDirectory("checkoutHead");
@@ -110,10 +111,7 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer("depot-client");
 
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(workDir);
-
-        Revision revision = client.checkout(context, createRevision(1), null);
+        Revision revision = client.checkout(createExecutionContext(workDir, null), createRevision(1), null);
         assertEquals("1", revision.getRevisionString());
         checkDirectory("checkoutRevision");
     }
@@ -327,45 +325,32 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer("depot-client");
 
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(workDir);
-        context.addString("scm.bootstrap.id", "my-id");
-
-        Revision got = client.checkout(context, createRevision(1), null);
+        Revision got = client.checkout(createExecutionContext(workDir, "my-id"), createRevision(1), null);
         assertEquals("1", got.getRevisionString());
         checkDirectory("checkoutRevision");
 
-        List<FileChange> changes = updateChanges("my-id", workDir, createRevision(8));
+        List<String> statuses = updateChanges("my-id", workDir, createRevision(8));
         checkDirectory("checkoutHead");
-        assertEquals(1, changes.size());
-        FileChange change = changes.get(0);
-        assertEquals("//depot/file2", change.getPath());
-        assertEquals(FileChange.Action.EDIT, change.getAction());
+        assertEquals(1, statuses.size());
+        assertTrue(statuses.get(0).startsWith("//depot/file2#2 - updating"));
     }
 
     public void testUpdateSameRevision() throws ScmException, IOException
     {
         getServer("depot-client");
 
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(workDir);
-        context.addString("scm.bootstrap.id", "my-id");
+        client.checkout(createExecutionContext(workDir, "my-id"), null, null);
 
-        client.checkout(context, null, null);
-
-        List<FileChange> changes = updateChanges("my-id", workDir, null);
+        List<String> statuses = updateChanges("my-id", workDir, null);
         checkDirectory("checkoutHead");
-        assertEquals(0, changes.size());
+        assertEquals(0, statuses.size());
     }
 
     public void testMultiUpdates() throws ScmException, IOException
     {
         getServer(TEST_CLIENT);
 
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(workDir);
-
-        client.checkout(context, createRevision(1), null);
+        client.checkout(createExecutionContext(workDir, null), createRevision(1), null);
 
         for(int i = 2; i <= 8; i++)
         {
@@ -514,27 +499,33 @@ public class PerforceClientTest extends PulseTestCase
         return new File(getPulseRoot(), FileSystemUtils.composeFilename("bundles", "com.zutubi.pulse.core.scm.p4", "src", "test", "com", "zutubi", "pulse", "core", "scm", "p4", "data"));
     }
 
-    private List<FileChange> checkoutChanges(String id, File dir, Revision revision, long expectedRevision) throws ScmException
+    private List<String> checkoutChanges(String id, File dir, Revision revision, long expectedRevision) throws ScmException
     {
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(dir);
-        context.addString("scm.bootstrap.id", id);
-
-        ScmChangeAccumulator accumulator = new ScmChangeAccumulator();
-        Revision rev = client.checkout(context, revision, accumulator);
+        ExecutionContext context = createExecutionContext(dir, id);
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
+        Revision rev = client.checkout(context, revision, handler);
         assertEquals(expectedRevision, (long)Long.valueOf(rev.getRevisionString()));
-        return accumulator.getChanges();
+        return handler.getStatusMessages();
     }
 
-    private List<FileChange> updateChanges(String id, File dir, Revision revision) throws ScmException
+    private List<String> updateChanges(String id, File dir, Revision revision) throws ScmException
+    {
+        ExecutionContext context = createExecutionContext(dir, id);
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
+        client.update(context, revision, handler);
+        return handler.getStatusMessages();
+    }
+
+    private ExecutionContext createExecutionContext(File dir, String id)
     {
         ExecutionContext context = new ExecutionContext();
+        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         context.setWorkingDir(dir);
-        context.addString("scm.bootstrap.id", id);
-
-        ScmChangeAccumulator accumulator = new ScmChangeAccumulator();
-        client.update(context, revision, accumulator);
-        return accumulator.getChanges();
+        if (id != null)
+        {
+            context.addString("scm.bootstrap.id", id);
+        }
+        return context;
     }
 
     private Revision createRevision(long rev)

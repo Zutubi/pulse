@@ -413,7 +413,7 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    private Revision sync(String id, File toDirectory, Revision revision, ScmEventHandler handler, boolean force) throws ScmException
+    private Revision sync(String id, File toDirectory, Revision revision, ScmFeedbackHandler handler, boolean force) throws ScmException
     {
         NumericalRevision numericalRevision = core.convertRevision(revision);
         String clientName = updateClient(id, toDirectory, numericalRevision);
@@ -529,7 +529,7 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         addPropertiesToContext(context);
         return sync(context.getString("scm.bootstrap.id"), context.getWorkingDir(), revision, handler, true);
@@ -676,7 +676,7 @@ public class PerforceClient extends CachingScmClient
         return false;
     }
 
-    public Revision update(ExecutionContext context, Revision rev, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         addPropertiesToContext(context);
         sync(context.getString("scm.bootstrap.id"), context.getWorkingDir(), rev, handler, false);

@@ -70,9 +70,9 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#checkout(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.scm.api.Revision,com.zutubi.pulse.core.scm.api.ScmEventHandler)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#checkout(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.scm.api.Revision,com.zutubi.pulse.core.scm.api.ScmFeedbackHandler)
      */
-    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         NativeGit git = new NativeGit();
         git.setScmEventHandler(handler);
@@ -104,9 +104,9 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#update(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.scm.api.Revision,com.zutubi.pulse.core.scm.api.ScmEventHandler)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#update(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.scm.api.Revision,com.zutubi.pulse.core.scm.api.ScmFeedbackHandler)
      */
-    public Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         File workingDir = context.getWorkingDir();
 

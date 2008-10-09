@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.scm.RecordingScmEventHandler;
+import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
@@ -29,7 +29,7 @@ public class GitClientTest extends PulseTestCase
     private GitClient client;
     private File workingDir;
     private ExecutionContext context;
-    private RecordingScmEventHandler handler;
+    private RecordingScmFeedbackHandler handler;
     private ScmContextImpl scmContext;
 
     protected void setUp() throws Exception
@@ -57,7 +57,7 @@ public class GitClientTest extends PulseTestCase
         scmContext = new ScmContextImpl();
         scmContext.setPersistentWorkingDir(workingDir);
 
-        handler = new RecordingScmEventHandler();
+        handler = new RecordingScmFeedbackHandler();
     }
 
     protected void tearDown() throws Exception
