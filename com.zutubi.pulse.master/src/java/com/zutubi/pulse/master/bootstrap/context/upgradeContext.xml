@@ -35,6 +35,7 @@
                 <ref local="buildCompletedTriggerPropagateRevision"/>
                 <ref local="addAllowPersonalBuilds"/>
                 <ref local="ensureBackupConfigPermanent"/>
+                <ref local="collapseRevisionRefactor"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -76,5 +77,14 @@
 
     <bean id="ensureBackupConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureBackupConfigPermanentUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200011004"/>
+    </bean>
+
+    <bean id="collapseRevisionRefactor" class="com.zutubi.pulse.master.upgrade.tasks.CollapseRevisionRefactorUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200013001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.13.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>
