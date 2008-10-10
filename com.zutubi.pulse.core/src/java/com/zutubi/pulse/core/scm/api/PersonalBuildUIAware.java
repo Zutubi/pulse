@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.personal.api;
+package com.zutubi.pulse.core.scm.api;
 
 /**
  * Interface to implement for classes that are aware of the
@@ -9,5 +9,11 @@ package com.zutubi.pulse.core.personal.api;
  */
 public interface PersonalBuildUIAware
 {
+    /**
+     * Setter used to inject the UI.  It will be injected before any other
+     * methods are called on the aware instance.
+     *
+     * @param ui interface for communication with the user
+     */
     void setUI(PersonalBuildUI ui);    
 }
