@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.personal;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.scm.api.FileStatus;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
@@ -11,8 +12,6 @@ import com.zutubi.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 
-/**
- */
 public class PatchArchiveTest extends PulseTestCase
 {
     private static final String TEST_FILENAME = "test.txt";
@@ -51,12 +50,13 @@ public class PatchArchiveTest extends PulseTestCase
         wcs.add(fs);
         
         PatchArchive archive;
-        new PatchArchive(wcs, archiveFile, null);
+        Revision revision = new Revision("test");
+        new PatchArchive(revision, wcs, archiveFile, null);
         assertTrue(archiveFile.exists());
         ZipUtils.extractZip(archiveFile, extractDir);
 
         archive = new PatchArchive(archiveFile);
-        fs = archive.getStatus().getFileStatus(TEST_FILENAME);
+        fs = archive.getMetadata().getFileStatus(TEST_FILENAME);
         assertEquals(EOLStyle.CARRIAGE_RETURN.toString(), fs.getProperty(FileStatus.PROPERTY_EOL_STYLE));
     }
 }

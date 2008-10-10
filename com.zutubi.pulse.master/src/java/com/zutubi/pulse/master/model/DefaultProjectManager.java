@@ -4,8 +4,8 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
@@ -441,7 +441,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             return;
         }
 
-        Revision revision = archive.getStatus().getRevision();
+        Revision revision = archive.getMetadata().getRevision();
         try
         {
             String pulseFile = getPulseFile(projectConfig, revision, archive);

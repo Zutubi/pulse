@@ -402,15 +402,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             SVNEventAction action = event.getAction();
             if (action == SVNEventAction.STATUS_COMPLETED)
             {
-                // This is the repository revision that the status was run
-                // against.  As we check for out of date files against this
-                // revision, if no files are out of date then it is safe to
-                // check out this revision.  (Note even files we don't have,
-                // such as newly-added files, will be reported by the status
-                // operation as out of date.)
-                Revision revision = new Revision(Long.toString(event.getRevision()));
-                status.setRevision(revision);
-                getUI().status("Repository revision: " + revision.getRevisionString());
+                getUI().status("Repository revision: " + event.getRevision());
             }
         }
 

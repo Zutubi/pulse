@@ -24,26 +24,27 @@ import java.util.zip.ZipOutputStream;
  */
 public class PatchArchive
 {
+    private static final String FILES_PATH = "files/";
     private static final String META_ENTRY = "meta.xml";
 
     private File patchFile;
-    private static final String FILES_PATH = "files/";
-    private WorkingCopyStatus status;
+    private PatchMetadata metadata;
 
     /**
      * Creates a new archive from a working copy at base.  The state of the
      * working copy is established and the patch created based on that state.
      *
+     * @param revision  revision to which this patch should be applied
      * @param status    status of the working copy based at base
      * @param patchFile the destination of the patch file created
      * @param ui the ui reference to allow logging to the command output.
-     * 
+     *
      * @throws PersonalBuildException in the event of any error creating the patch
      */
-    public PatchArchive(WorkingCopyStatus status, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
+    public PatchArchive(Revision revision, WorkingCopyStatus status, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
     {
         this.patchFile = patchFile;
-        this.status = status;
+        this.metadata = new PatchMetadata(revision, status.getChanges());
 
         try
         {
@@ -76,7 +77,7 @@ public class PatchArchive
             }
 
             XStream xstream = createXStream();
-            status = (WorkingCopyStatus) xstream.fromXML(zin);
+            metadata = (PatchMetadata) xstream.fromXML(zin);
         }
         catch(IOException e)
         {
@@ -118,26 +119,27 @@ public class PatchArchive
         ZipEntry entry = new ZipEntry(META_ENTRY);
         os.putNextEntry(entry);
         XStream xstream = createXStream();
-        xstream.toXML(status, os);
+        xstream.toXML(metadata, os);
     }
 
     private XStream createXStream()
     {
         XStream xstream = new XStream(new DomDriver());
-        xstream.alias("status", WorkingCopyStatus.class);
+        xstream.alias("status", PatchMetadata.class);
+        xstream.addImplicitCollection(PatchMetadata.class, "fileStatuses");
         xstream.alias("revision", Revision.class);
         xstream.alias("fileStatus", FileStatus.class);
-        xstream.addImplicitCollection(WorkingCopyStatus.class, "changes");
         xstream.setMode(XStream.NO_REFERENCES);
         xstream.registerConverter(new FileStatusConverter());
-        
+        xstream.registerConverter(new RevisionConverter());
+
         return xstream;
     }
 
     private void addFiles(File base, ZipOutputStream os, PersonalBuildUI ui) throws IOException
     {
         os.putNextEntry(new ZipEntry(FILES_PATH));
-        for(FileStatus fs: status)
+        for(FileStatus fs: metadata.getFileStatuses())
         {
             if (fs.getState().requiresFile() && !fs.isDirectory())
             {
@@ -173,23 +175,23 @@ public class PatchArchive
         return patchFile;
     }
 
-    public WorkingCopyStatus getStatus()
+    public PatchMetadata getMetadata()
     {
-        return status;
+        return metadata;
     }
 
     public void apply(File base, EOLStyle localEOL) throws PulseException
     {
         try
         {
-            for(FileStatus fs: status)
+            for(FileStatus fs: metadata.getFileStatuses())
             {
                 preApply(fs, base);
             }
 
             unzip(base);
 
-            for(FileStatus fs: status)
+            for(FileStatus fs: metadata.getFileStatuses())
             {
                 postApply(fs, base, localEOL);
             }
@@ -320,7 +322,7 @@ public class PatchArchive
 
     public boolean containsPath(String path)
     {
-        for(FileStatus fs: status)
+        for(FileStatus fs: metadata.getFileStatuses())
         {
             if(fs.getPath().equals(path) && fs.getState().requiresFile())
             {

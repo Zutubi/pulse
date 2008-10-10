@@ -10,7 +10,6 @@ import java.util.List;
  */
 public class WorkingCopyStatus implements Iterable<FileStatus>
 {
-    private Revision revision;
     private List<FileStatus> changes = new LinkedList<FileStatus>();
     private transient File base;
 
@@ -21,22 +20,6 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
     public WorkingCopyStatus(File base)
     {
         this.base = base;
-    }
-
-    public WorkingCopyStatus(File base, Revision revision)
-    {
-        this(base);
-        this.revision = revision;
-    }
-
-    public Revision getRevision()
-    {
-        return revision;
-    }
-
-    public void setRevision(Revision revision)
-    {
-        this.revision = revision;
     }
 
     public void add(FileStatus status)

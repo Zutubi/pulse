@@ -4,8 +4,8 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
-import com.zutubi.pulse.core.personal.api.PersonalBuildUIAware;
 import com.zutubi.pulse.core.personal.api.PersonalBuildUI;
+import com.zutubi.pulse.core.personal.api.PersonalBuildUIAware;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
@@ -262,7 +262,6 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         try
         {
             status = getStatus(wc, context, spec);
-            status.setRevision(rev);
         }
         finally
         {
@@ -278,7 +277,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
             PatchArchive patchArchive;
             try
             {
-                patchArchive = new PatchArchive(status, patchFile, getUI());
+                patchArchive = new PatchArchive(rev, status, patchFile, getUI());
             }
             finally
             {
