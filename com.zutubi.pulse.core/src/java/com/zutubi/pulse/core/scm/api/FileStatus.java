@@ -366,16 +366,6 @@ public class FileStatus
         this.directory = directory;
     }
 
-    public boolean isOutOfDate()
-    {
-        return outOfDate;
-    }
-
-    public void setOutOfDate(boolean outOfDate)
-    {
-        this.outOfDate = outOfDate;
-    }
-
     public Map<String, String> getProperties()
     {
         return properties;
@@ -393,7 +383,7 @@ public class FileStatus
 
     public boolean isInteresting()
     {
-        return isOutOfDate() || state.isInteresting() || properties.size() > 0;
+        return state.isInteresting() || properties.size() > 0;
     }
 
     public String toString()

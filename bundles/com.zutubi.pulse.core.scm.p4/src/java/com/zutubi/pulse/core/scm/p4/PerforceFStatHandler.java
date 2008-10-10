@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.zutubi.pulse.core.personal.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.core.personal.api.PersonalBuildUI;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,6 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
 {
     private PersonalBuildUI ui;
     private WorkingCopyStatus status;
-    private boolean checkOutOfDate = true;
     private Map<String, String> currentItem = new HashMap<String, String>();
 
     public PerforceFStatHandler(PersonalBuildUI ui, WorkingCopyStatus status)
@@ -21,12 +20,6 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
         super(true);
         this.ui = ui;
         this.status = status;
-    }
-
-    public PerforceFStatHandler(PersonalBuildUI ui, WorkingCopyStatus status, boolean checkOutOfDate)
-    {
-        this(ui, status);
-        this.checkOutOfDate = checkOutOfDate;
     }
 
     public void handleStdout(String line)
@@ -104,13 +97,6 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
 
             FileStatus fs = new FileStatus(path, state, false);
 
-            // Don't bother checking OOD for inconsistent or deleted files:
-            // too tricky, and useless anyhow.
-            if(checkOutOfDate && fs.getState().isConsistent() && fs.getState() != FileStatus.State.DELETED)
-            {
-                fs.setOutOfDate(isCurrentItemOutOfDate());
-            }
-
             if(fs.isInteresting())
             {
                 if(ui != null)
@@ -134,25 +120,6 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
                 status.add(fs);
             }
         }
-    }
-
-    private boolean isCurrentItemOutOfDate()
-    {
-        // It is if the revisions don't match or there is no haveRevision
-        String haveRevision = currentItem.get(FSTAT_HAVE_REVISION);
-        String headRevision = currentItem.get(FSTAT_HEAD_REVISION);
-
-        if(haveRevision == null)
-        {
-            return headRevision != null;
-        }
-
-        if(headRevision == null)
-        {
-            warning("Have revision but no head revision, assuming file is out of date.");
-        }
-
-        return !haveRevision.equals(headRevision);
     }
 
     private String getCurrentItemType()

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
+import com.zutubi.pulse.core.personal.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
-import com.zutubi.pulse.core.personal.api.PersonalBuildUI;
-import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
 
 /**
  */
@@ -64,44 +64,11 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
         return true;
     }
 
-    public WorkingCopyStatus getStatus(WorkingCopyContext context) throws ScmException
-    {
-        WorkingCopyStatus status;
-        NumericalRevision revision;
-        NumericalRevision checkRevision;
-
-        // A little strange, perhaps.  We first get the latest revision, then
-        // run an fstat.  Unfortunately, restricting the fstat to the
-        // revision prevents some required things being reported (e.g. files
-        // that are open for add).  Instead, we double-check the revision
-        // after the fstat.  In the unlikely event that it has changed, we
-        // just go again.
-        int i = 0;
-        do
-        {
-            PerforceCore core = createCore(context);
-            revision = core.getLatestRevisionForFiles(null);
-            // convert revision.
-            status = new WorkingCopyStatus(core.getClientRoot(), core.convertRevision(revision));
-            PerforceFStatHandler handler = new PerforceFStatHandler(getUI(), status);
-            core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, "//...");
-
-            checkRevision = core.getLatestRevisionForFiles(null);
-        } while (!checkRevision.equals(revision) && i++ < RETRY_LIMIT);
-
-        if(i == RETRY_LIMIT)
-        {
-            throw new ScmException("Retry limit hit waiting for revision to stabilise");
-        }
-
-        return status;
-    }
-
     public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
         PerforceCore core = createCore(context);
         WorkingCopyStatus status = new WorkingCopyStatus(core.getClientRoot());
-        PerforceFStatHandler handler = new PerforceFStatHandler(getUI(), status, false);
+        PerforceFStatHandler handler = new PerforceFStatHandler(getUI(), status);
 
         // Spec can be either a changelist # or a list of files
         String changelist;

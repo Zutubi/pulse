@@ -49,19 +49,6 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
         return getChanges().iterator();
     }
 
-    public boolean isOutOfDate()
-    {
-        for(FileStatus fs: getChanges())
-        {
-            if(fs.isOutOfDate())
-            {
-                return true;
-            }
-        }
-
-        return false; 
-    }
-
     public boolean inConsistentState()
     {
         for(FileStatus fs: getChanges())

@@ -6,8 +6,8 @@ import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
-import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.config.PropertiesConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -117,26 +117,10 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         assertWarning("P4PORT setting ':1666' does not match Pulse project's P4PORT 'anotherhost:1666'");
     }
 
-    public void testStatusNoChanges() throws ScmException
-    {
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertEquals(0, status.getChanges().size());
-    }
-
     public void testLocalStatusNoChanges() throws ScmException
     {
         WorkingCopyStatus status = wc.getLocalStatus(context);
         assertEquals(0, status.getChanges().size());
-    }
-
-    public void testStatusOpenForEdit() throws ScmException
-    {
-        openForEdit("file1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
     }
 
     public void testLocalStatusOpenForEdit() throws ScmException
@@ -144,16 +128,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForEdit("file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
-    }
-
-    public void testStatusOpenForEditExecutable() throws ScmException
-    {
-        core.runP4(null, P4_COMMAND, COMMAND_EDIT, "script1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "script1", FileStatus.State.MODIFIED, false, true);
+        assertChange(status, "file1", FileStatus.State.MODIFIED, true);
     }
 
     public void testLocalStatusOpenForEditExecutable() throws ScmException
@@ -161,16 +136,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, "script1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "script1", FileStatus.State.MODIFIED, false, true);
-    }
-
-    public void testStatusOpenForEditAddExecutable() throws ScmException
-    {
-        core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text+x", "file1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertExecutable(status, "file1", true);
+        assertChange(status, "script1", FileStatus.State.MODIFIED, true);
     }
 
     public void testLocalStatusOpenForEditAddExecutable() throws ScmException
@@ -181,15 +147,6 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         assertExecutable(status, "file1", true);
     }
 
-    public void testStatusOpenForEditRemoveExecutable() throws ScmException
-    {
-        core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "script1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertExecutable(status, "script1", false);
-    }
-
     public void testLocalStatusOpenForEditRemoveExecutable() throws ScmException
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "script1");
@@ -198,30 +155,12 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         assertExecutable(status, "script1", false);
     }
 
-    public void testStatusOpenForEditBinary() throws ScmException
-    {
-        core.runP4(null, P4_COMMAND, COMMAND_EDIT, "bin1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "bin1", FileStatus.State.MODIFIED, false, false);
-    }
-
     public void testLocalStatusOpenForEditBinary() throws ScmException
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, "bin1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "bin1", FileStatus.State.MODIFIED, false, false);
-    }
-
-    public void testStatusOpenForEditAddBinary() throws ScmException
-    {
-        core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "binary", "file1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "file1", FileStatus.State.MODIFIED, false, false);
+        assertChange(status, "bin1", FileStatus.State.MODIFIED, false);
     }
 
     public void testLocalStatusOpenForEditAddBinary() throws ScmException
@@ -229,16 +168,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "binary", "file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "file1", FileStatus.State.MODIFIED, false, false);
-    }
-
-    public void testStatusOpenForEditRemoveBinary() throws ScmException
-    {
-        core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "bin1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "bin1", FileStatus.State.MODIFIED, false, true);
+        assertChange(status, "file1", FileStatus.State.MODIFIED, false);
     }
 
     public void testLocalStatusOpenForEditRemoveBinary() throws ScmException
@@ -246,16 +176,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "bin1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "bin1", FileStatus.State.MODIFIED, false, true);
-    }
-
-    public void testStatusOpenForAdd() throws ScmException, IOException
-    {
-        openForAdd(null);
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "newfile", FileStatus.State.ADDED, false, true);
+        assertChange(status, "bin1", FileStatus.State.MODIFIED, true);
     }
 
     public void testLocalStatusOpenForAdd() throws ScmException, IOException
@@ -263,16 +184,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForAdd(null);
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "newfile", FileStatus.State.ADDED, false, true);
-    }
-
-    public void testStatusOpenForAddBinary() throws ScmException, IOException
-    {
-        openForAdd("binary");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "newfile", FileStatus.State.ADDED, false, false);
+        assertChange(status, "newfile", FileStatus.State.ADDED, true);
     }
 
     public void testLocalStatusOpenForAddBinary() throws ScmException, IOException
@@ -280,16 +192,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForAdd("binary");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "newfile", FileStatus.State.ADDED, false, false);
-    }
-
-    public void testStatusOpenForAddExecutable() throws ScmException, IOException
-    {
-        openForAdd("text+x");
-        
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertExecutable(status, "newfile", true);
+        assertChange(status, "newfile", FileStatus.State.ADDED, false);
     }
 
     public void testLocalStatusOpenForAddExecutable() throws ScmException, IOException
@@ -300,30 +203,12 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         assertExecutable(status, "newfile", true);
     }
 
-    public void testStatusOpenForDelete() throws ScmException, IOException
-    {
-        core.runP4(null, P4_COMMAND, COMMAND_DELETE, "dir1/file1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "dir1/file1", FileStatus.State.DELETED, false, false);
-    }
-
     public void testLocalStatusOpenForDelete() throws ScmException, IOException
     {
         core.runP4(null, P4_COMMAND, COMMAND_DELETE, "dir1/file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "dir1/file1", FileStatus.State.DELETED, false, false);
-    }
-
-    public void testStatusOpenForIntegrate() throws ScmException, IOException
-    {
-        core.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "file1", "integrated");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "integrated", FileStatus.State.BRANCHED, false, true);
+        assertChange(status, "dir1/file1", FileStatus.State.DELETED, false);
     }
 
     public void testLocalStatusOpenForIntegrate() throws ScmException, IOException
@@ -331,15 +216,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         core.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "file1", "integrated");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "integrated", FileStatus.State.BRANCHED, false, true);
-    }
-
-    public void testStatusOpenForIntegrateEdited() throws ScmException, IOException
-    {
-        openForMerge("file1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "file1", FileStatus.State.MERGED, false, true);
+        assertChange(status, "integrated", FileStatus.State.BRANCHED, true);
     }
 
     public void testLocalStatusOpenForIntegrateEdited() throws ScmException, IOException
@@ -347,15 +224,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForMerge("file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "file1", FileStatus.State.MERGED, false, true);
-    }
-
-    public void testStatusOpenForIntegrateBinary() throws ScmException, IOException
-    {
-        openForMerge("bin1");
-        
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "bin1", FileStatus.State.MERGED, false, false);
+        assertChange(status, "file1", FileStatus.State.MERGED, true);
     }
 
     public void testLocalStatusOpenForIntegrateBinary() throws ScmException, IOException
@@ -363,15 +232,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForMerge("bin1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "bin1", FileStatus.State.MERGED, false, false);
-    }
-
-    public void testStatusOpenForIntegrateExecutable() throws ScmException, IOException
-    {
-        openForMerge("script1");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "script1", FileStatus.State.MERGED, false, true);
+        assertChange(status, "bin1", FileStatus.State.MERGED, false);
     }
 
     public void testLocalStatusOpenForIntegrateExecutable() throws ScmException, IOException
@@ -379,15 +240,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForMerge("script1");
         
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "script1", FileStatus.State.MERGED, false, true);
-    }
-
-    public void testStatusOpenForIntegrateAddExecutable() throws ScmException, IOException
-    {
-        openForMerge("file1", "text+x");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertExecutable(status, "file1", true);
+        assertChange(status, "script1", FileStatus.State.MERGED, true);
     }
 
     public void testLocalStatusOpenForIntegrateAddExecutable() throws ScmException, IOException
@@ -398,28 +251,12 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         assertExecutable(status, "file1", true);
     }
 
-    public void testStatusOpenForIntegrateRemoveExecutable() throws ScmException, IOException
-    {
-        openForMerge("script1", "text");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertExecutable(status, "script1", false);
-    }
-
     public void testLocalStatusOpenForIntegrateRemoveExecutable() throws ScmException, IOException
     {
         openForMerge("script1", "text");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
         assertExecutable(status, "script1", false);
-    }
-
-    public void testStatusOODEdited() throws ScmException, IOException
-    {
-        otherEdit();
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "file1", FileStatus.State.UNCHANGED, true, false);
     }
 
     public void testLocalStatusIgnoresOOD() throws ScmException, IOException
@@ -430,37 +267,6 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         assertEquals(0, status.getChanges().size());
     }
 
-    public void testStatusOODAdded() throws ScmException, IOException
-    {
-        File newFile = new File(otherClientRoot, "newfile");
-        FileSystemUtils.createFile(newFile, "new");
-        otherCore.runP4(null, P4_COMMAND, COMMAND_ADD, "newfile");
-        otherCore.submit("comment");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "newfile", FileStatus.State.UNCHANGED, true, false);
-    }
-
-    public void testStatusOODDeleted() throws ScmException
-    {
-        otherCore.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
-        otherCore.submit("comment");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "file1", FileStatus.State.UNCHANGED, true, false);
-    }
-
-    public void testStatusOODAndLocalChange() throws ScmException
-    {
-        openForEdit("file1");
-
-        otherCore.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
-        otherCore.submit("comment");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "file1", FileStatus.State.MODIFIED, true, true);
-    }
-
     public void testLocalStatusOODAndLocalChange() throws ScmException
     {
         openForEdit("file1");
@@ -469,64 +275,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         otherCore.submit("comment");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
-    }
-
-    public void testStatusEditEdited() throws ScmException, IOException
-    {
-        otherEdit();
-
-        openForEdit("file1");
-        core.runP4(null, P4_COMMAND, COMMAND_SYNC);
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
-    }
-
-    public void testStatusEditDeleted() throws ScmException
-    {
-        otherCore.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
-        otherCore.submit("comment");
-
-        openForEdit("file1");
-        core.runP4(null, P4_COMMAND, COMMAND_SYNC);
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
-    }
-
-    public void testStatusDeleteEdited() throws ScmException, IOException
-    {
-        otherEdit();
-
-        core.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
-        core.runP4(null, P4_COMMAND, COMMAND_SYNC);
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "file1", FileStatus.State.DELETED, false, false);
-    }
-
-    public void testStatusDeleteDeleted() throws ScmException
-    {
-        otherCore.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
-        otherCore.submit("comment");
-
-        core.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
-        core.runP4(null, P4_COMMAND, COMMAND_SYNC);
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "file1", FileStatus.State.DELETED, false, false);
-    }
-
-    public void testStatusUnresolvedMerge() throws ScmException
-    {
-        core.runP4(null, P4_COMMAND, COMMAND_EDIT, "branches/1/file1");
-        core.submit("edit on branch");
-
-        core.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "//depot/branches/1/...", "//depot/...");
-
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
+        assertChange(status, "file1", FileStatus.State.MODIFIED, true);
     }
 
     public void testLocalStatusRestrictedToFiles() throws ScmException
@@ -585,8 +334,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
     public void testUpdateAlreadyUpToDate() throws ScmException
     {
         wc.update(context, Revision.HEAD);
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertEquals(0, status.getChanges().size());
     }
 
@@ -595,8 +343,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         otherEdit();
 
         wc.update(context, Revision.HEAD);
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals("3", status.getRevision().getRevisionString());
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertEquals(0, status.getChanges().size());
     }
 
@@ -606,9 +353,8 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForEdit("file1");
 
         wc.update(context, Revision.HEAD);
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals("3", status.getRevision().getRevisionString());
-        assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
+        WorkingCopyStatus status = wc.getLocalStatus(context);
+        assertChange(status, "file1", FileStatus.State.MODIFIED, true);
     }
 
     public void testUpdateConflict() throws ScmException, IOException
@@ -620,9 +366,8 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         FileSystemUtils.createFile(file1, "this");
 
         wc.update(context, Revision.HEAD);
-        WorkingCopyStatus status = wc.getStatus(context);
-        assertEquals("3", status.getRevision().getRevisionString());
-        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
+        WorkingCopyStatus status = wc.getLocalStatus(context);
+        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false);
     }
 
     private void openForEdit(String path) throws ScmException
@@ -687,7 +432,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         otherCore.submit("comment");
     }
 
-    private void assertChange(WorkingCopyStatus status, String path, FileStatus.State state, boolean outOfDate, boolean text)
+    private void assertChange(WorkingCopyStatus status, String path, FileStatus.State state, boolean text)
     {
         List<FileStatus> changes = status.getChanges();
         assertEquals(1, changes.size());
@@ -695,7 +440,6 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         assertEquals(path, fs.getPath());
         assertEquals(state, fs.getState());
         assertFalse(fs.isDirectory());
-        assertEquals(outOfDate, fs.isOutOfDate());
         if(text)
         {
             assertEquals(1, fs.getProperties().size());

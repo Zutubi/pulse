@@ -5,9 +5,9 @@ import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
-import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.pulse.core.util.process.ProcessControl;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
@@ -152,184 +152,87 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertTrue(wc.matchesLocation(context, "svn://goober@localhost/test/trunk"));
     }
 
-    public void testGetStatusNoChanges() throws Exception
-    {
-        WorkingCopyStatus wcs = wc.getStatus(context);
-        assertEquals("6", wcs.getRevision().getRevisionString());
-        assertEquals(0, wcs.getChanges().size());
-    }
-
     public void testGetLocalStatusNoChanges() throws Exception
     {
         WorkingCopyStatus wcs = wc.getLocalStatus(context);
         assertEquals(0, wcs.getChanges().size());
     }
 
-    public void testGetStatusEdited() throws Exception
-    {
-        getStatusEdited(false);
-    }
-
     public void testGetLocalStatusEdited() throws Exception
     {
-        getStatusEdited(true);
-    }
-
-    private void getStatusEdited(boolean remote) throws Exception
-    {
         edit("file1");
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, remote);
+        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED);
         assertNoProperties(wcs, "file1");
-    }
-
-    public void testGetStatusEditedText() throws Exception
-    {
-        getStatusEditedText(true);
     }
 
     public void testGetLocalStatusEditedText() throws Exception
     {
-        getStatusEditedText(false);
-    }
-
-    private void getStatusEditedText(boolean remote) throws IOException, ScmException
-    {
         File test = new File(base, "textfile1");
         FileSystemUtils.createFile(test, "hello");
-        WorkingCopyStatus wcs = assertSimpleStatus("textfile1", FileStatus.State.MODIFIED, false, remote);
+        WorkingCopyStatus wcs = assertSimpleStatus("textfile1", FileStatus.State.MODIFIED);
         assertEOL(wcs, "textfile1", EOLStyle.NATIVE);
-    }
-
-    public void testGetStatusEditedNewlyText() throws Exception
-    {
-        getStatusEditedNewlyText(true);
     }
 
     public void testGetLocalStatusEditedNewlyText() throws Exception
     {
-        getStatusEditedNewlyText(false);
-    }
-
-    private void getStatusEditedNewlyText(boolean remote)  throws IOException, SVNException, ScmException
-    {
         File test = edit("file1");
         client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EOL_STYLE, "native", true, false, null);
 
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, remote);
+        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED);
         assertEOL(wcs, "file1", EOLStyle.NATIVE);
-    }
-
-    public void testGetStatusEditedLF() throws Exception
-    {
-        getStatusEditedLF(true);
     }
 
     public void testGetLocalStatusEditedLF() throws Exception
     {
-        getStatusEditedLF(false);
-    }
-
-    private void getStatusEditedLF(boolean remote)  throws IOException, ScmException
-    {
         File test = new File(base, "unixfile1");
         FileSystemUtils.createFile(test, "hello");
-        WorkingCopyStatus wcs = assertSimpleStatus("unixfile1", FileStatus.State.MODIFIED, false, remote);
+        WorkingCopyStatus wcs = assertSimpleStatus("unixfile1", FileStatus.State.MODIFIED);
         assertEOL(wcs, "unixfile1", EOLStyle.LINEFEED);
-    }
-
-    public void testGetStatusEditedAddedRandomProperty() throws Exception
-    {
-        getStatusEditedAddRandomProperty(true);
     }
 
     public void testGetLocalStatusEditedAddedRandomProperty() throws Exception
     {
-        getStatusEditedAddRandomProperty(false);
-    }
-
-    private void getStatusEditedAddRandomProperty(boolean remote) throws IOException, SVNException, ScmException
-    {
         File test = edit("file1");
         client.doSetProperty(test, "random", "value", true, false, null);
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, remote);
+        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED);
         assertNoProperties(wcs, "file1");
-    }
-
-    public void testGetStatusEditedAddedExecutableProperty() throws Exception
-    {
-        getStatusEditedAddedExecutableProperty(true);
     }
 
     public void testGetLocalStatusEditedAddedExecutableProperty() throws Exception
     {
-        getStatusEditedAddedExecutableProperty(false);
-    }
-
-    private void getStatusEditedAddedExecutableProperty(boolean remote) throws IOException, SVNException, ScmException
-    {
         File test = edit("file1");
         client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EXECUTABLE, "yay", true, false, null);
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, remote);
+        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED);
         assertExecutable(wcs, "file1", true);
-    }
-
-    public void testGetStatusEditedRemovedExecutableProperty() throws Exception
-    {
-        getStatusEditedRemovedExecutableProperty(true);
     }
 
     public void testGetLocalStatusEditedRemovedExecutableProperty() throws Exception
     {
-        getStatusEditedRemovedExecutableProperty(false);
-    }
-
-    private void getStatusEditedRemovedExecutableProperty(boolean remote) throws IOException, SVNException, ScmException
-    {
         File test = new File(base, "bin1");
         FileSystemUtils.createFile(test, "hello");
         client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EXECUTABLE, null, true, false, null);
-        WorkingCopyStatus wcs = assertSimpleStatus("bin1", FileStatus.State.MODIFIED, false, remote);
+        WorkingCopyStatus wcs = assertSimpleStatus("bin1", FileStatus.State.MODIFIED);
         assertExecutable(wcs, "bin1", false);
     }
 
-    public void testGetStatusAdded() throws Exception
-    {
-        getStatusAdded(true);
-    }
-
     public void testGetLocalStatusAdded() throws Exception
-    {
-        getStatusAdded(false);
-    }
-
-    private void getStatusAdded(boolean remote) throws IOException, SVNException, ScmException
     {
         File test = new File(base, "newfile");
         FileSystemUtils.createFile(test, "hello");
 
         client.doAdd(test, true, false, false, false);
-        WorkingCopyStatus wcs = assertSimpleStatus("newfile", FileStatus.State.ADDED, false, remote);
+        WorkingCopyStatus wcs = assertSimpleStatus("newfile", FileStatus.State.ADDED);
         assertNoProperties(wcs, "newfile");
     }
 
-    public void testGetStatusAddedText() throws Exception
-    {
-        getStatusAddedText(true);
-    }
-
     public void testGetLocalStatusAddedText() throws Exception
-    {
-        getStatusAddedText(false);
-    }
-
-    private void getStatusAddedText(boolean remote) throws IOException, SVNException, ScmException
     {
         File test = new File(base, "newfile");
         FileSystemUtils.createFile(test, "hello");
 
         client.doAdd(test, true, false, false, false);
         client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EOL_STYLE, "native", true, false, null);
-        WorkingCopyStatus wcs = assertSimpleStatus("newfile", FileStatus.State.ADDED, false, remote);
+        WorkingCopyStatus wcs = assertSimpleStatus("newfile", FileStatus.State.ADDED);
         assertEOL(wcs, "newfile", EOLStyle.NATIVE);
     }
 
@@ -451,21 +354,21 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         long rev = branchEdit("file1");
         doMerge(rev);
-        assertSimpleStatus("file1", FileStatus.State.MODIFIED, false);
+        assertSimpleStatus("file1", FileStatus.State.MODIFIED);
     }
 
     public void getLocalStatusMergeAdded() throws Exception
     {
         long rev = branchAdd("newfile");
         doMerge(rev);
-        assertSimpleStatus("newfile", FileStatus.State.ADDED, false);
+        assertSimpleStatus("newfile", FileStatus.State.ADDED);
     }
 
     public void getLocalStatusMergeDeleted() throws Exception
     {
         long rev = branchDelete("file1");
         doMerge(rev);
-        assertSimpleStatus("file1", FileStatus.State.DELETED, false);
+        assertSimpleStatus("file1", FileStatus.State.DELETED);
     }
 
     public void getLocalStatusMergeMoved() throws Exception
@@ -497,7 +400,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         edit("file1");
         long rev = branchEdit("file1");
         doMerge(rev);
-        assertSimpleStatus("file1", FileStatus.State.UNRESOLVED, false);
+        assertSimpleStatus("file1", FileStatus.State.UNRESOLVED);
     }
 
     public void getLocalStatusMergeEditDeleted() throws Exception
@@ -506,30 +409,13 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         long rev = branchDelete("file1");
         doMerge(rev);
         // Forced merge deletes locally edited file
-        assertSimpleStatus("file1", FileStatus.State.DELETED, false);
-    }
-
-    public void testGetStatusDeleted() throws Exception
-    {
-        getStatusDeleted(true);
+        assertSimpleStatus("file1", FileStatus.State.DELETED);
     }
 
     public void testGetLocalStatusDeleted() throws Exception
     {
-        getStatusDeleted(false);
-    }
-
-    private void getStatusDeleted(boolean remote) throws SVNException, ScmException
-    {
         delete("file1");
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.DELETED, false, remote);
-        assertNoProperties(wcs, "file1");
-    }
-
-    public void testGetStatusUnchangedOOD() throws Exception
-    {
-        otherEdit("file1");
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.UNCHANGED, true);
+        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.DELETED);
         assertNoProperties(wcs, "file1");
     }
 
@@ -544,7 +430,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         otherEdit("file1");
         edit("file1");
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, true);
+        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED);
         assertNoProperties(wcs, "file1");
     }
 
@@ -552,34 +438,21 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         otherEdit("file1");
         edit("file1");
-        assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, false);
-    }
-
-    public void testGetStatusEditDeleted() throws Exception
-    {
-        otherDelete("file1");
-        edit("file1");
-        WorkingCopyStatus wcs = wc.getStatus(context);
-        assertEquals(2, wcs.getChanges().size());
-        assertEquals("file1", wcs.getChanges().get(0).getPath());
-        assertEquals(FileStatus.State.MODIFIED, wcs.getChanges().get(0).getState());
-        assertEquals("", wcs.getChanges().get(1).getPath());
-        assertEquals(FileStatus.State.UNCHANGED, wcs.getChanges().get(1).getState());
-        assertNoProperties(wcs, "file1");
+        assertSimpleStatus("file1", FileStatus.State.MODIFIED);
     }
 
     public void testGetLocalStatusEditDeleted() throws Exception
     {
         otherDelete("file1");
         edit("file1");
-        assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, false);
+        assertSimpleStatus("file1", FileStatus.State.MODIFIED);
     }
 
     public void testGetStatusDeleteEdited() throws Exception
     {
         otherEdit("file1");
         delete("file1");
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.DELETED, true);
+        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.DELETED);
         assertNoProperties(wcs, "file1");
     }
 
@@ -587,7 +460,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         otherEdit("file1");
         delete("file1");
-        assertSimpleStatus("file1", FileStatus.State.DELETED, false, false);
+        assertSimpleStatus("file1", FileStatus.State.DELETED);
     }
 
     public void testGetLocalStatusRestrictedToUnchanged() throws Exception
@@ -621,7 +494,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     public void testUpdateAlreadyUpToDate() throws Exception
     {
         wc.update(context, Revision.HEAD);
-        testGetStatusNoChanges();
+        testGetLocalStatusNoChanges();
     }
 
     public void testUpdateBasic() throws Exception
@@ -629,8 +502,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         otherEdit("file1");
 
         wc.update(context, Revision.HEAD);
-        WorkingCopyStatus wcs = wc.getStatus(context);
-        assertEquals("7", wcs.getRevision().getRevisionString());
+        WorkingCopyStatus wcs = wc.getLocalStatus(context);
         assertEquals(0, wcs.getChanges().size());
     }
 
@@ -641,8 +513,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         File test = new File(base, "file1");
         FileSystemUtils.createFile(test, "goodbye");
         wc.update(context, Revision.HEAD);
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.UNRESOLVED, false);
-        assertEquals("7", wcs.getRevision().getRevisionString());
+        assertSimpleStatus("file1", FileStatus.State.UNRESOLVED);
     }
 
     private File edit(String path) throws IOException, SVNException
@@ -753,28 +624,13 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         clientManager.getDiffClient().doMerge(branchUrl, SVNRevision.create(change - 1), branchUrl, SVNRevision.create(change), base, true, false, true, false);
     }
 
-    private WorkingCopyStatus assertSimpleStatus(String path, FileStatus.State state, boolean ood) throws ScmException
+    private WorkingCopyStatus assertSimpleStatus(String path, FileStatus.State state) throws ScmException
     {
-        return assertSimpleStatus(path, state, ood, true);
-    }
-
-    private WorkingCopyStatus assertSimpleStatus(String path, FileStatus.State state, boolean ood, boolean remote) throws ScmException
-    {
-        WorkingCopyStatus wcs;
-        if(remote)
-        {
-            wcs = wc.getStatus(context);
-        }
-        else
-        {
-            wcs = wc.getLocalStatus(context);
-        }
-
+        WorkingCopyStatus wcs = wc.getLocalStatus(context);
         assertEquals(1, wcs.getChanges().size());
         FileStatus fs = wcs.getFileStatus(path);
         assertEquals(state, fs.getState());
         assertFalse(fs.isDirectory());
-        assertEquals(ood, fs.isOutOfDate());
         return wcs;
     }
 

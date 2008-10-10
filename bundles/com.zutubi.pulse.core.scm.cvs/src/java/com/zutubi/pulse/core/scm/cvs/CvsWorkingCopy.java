@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.cvs;
 
+import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
 import com.zutubi.pulse.core.scm.ScmUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
-import com.zutubi.util.config.Config;
-import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.config.Config;
 import com.zutubi.util.io.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
@@ -39,23 +39,12 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
         return loadLocalWorkingModule(context.getBase()).equals(pieces[1]);
     }
 
-    public WorkingCopyStatus getStatus(WorkingCopyContext context) throws ScmException
-    {
-        File workingDir = context.getBase();
-        WorkingCopyStatus status = new WorkingCopyStatus(workingDir);
-        StatusHandler statusHandler = new StatusHandler(workingDir, loadLocalWorkingModule(workingDir), status);
-
-        getCore(context).status(workingDir, null, statusHandler);
-
-        return status;
-    }
-
     public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
         File workingDir = context.getBase();
         File[] files = ScmUtils.specToFiles(workingDir, spec);
         WorkingCopyStatus status = new WorkingCopyStatus(workingDir);
-        StatusHandler statusHandler = new StatusHandler(status, false);
+        StatusHandler statusHandler = new StatusHandler(workingDir, loadLocalWorkingModule(workingDir), status);
 
         getCore(context).status(workingDir, files, statusHandler);
 
@@ -169,19 +158,12 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
         private File workingDir;
         private String localWorkingModule;
         private WorkingCopyStatus status = null;
-        private boolean recordOutOfDate = true;
 
         public StatusHandler(File workingDir, String localWorkingModule, WorkingCopyStatus status)
         {
             this.workingDir = workingDir;
             this.localWorkingModule = localWorkingModule;
             this.status = status;
-        }
-
-        public StatusHandler(WorkingCopyStatus status, boolean recordOutOfDate)
-        {
-            this.status = status;
-            this.recordOutOfDate = recordOutOfDate;
         }
 
         public void fileInfoGenerated(FileInfoEvent e)
@@ -201,8 +183,6 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
             }
 
             FileStatus.State fileState = null;
-
-            boolean outOfDate = false; // is an update required?
 
             org.netbeans.lib.cvsclient.file.FileStatus fileStatus = fileInfo.getStatus();
 
@@ -225,17 +205,14 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
             else if (fileStatus == NEEDS_CHECKOUT)
             {
                 fileState = FileStatus.State.UNCHANGED;
-                outOfDate = true;
             }
             else if (fileStatus == NEEDS_MERGE)
             {
                 fileState = FileStatus.State.MODIFIED;
-                outOfDate = true;
             }
             else if (fileStatus == NEEDS_PATCH)
             {
                 fileState = FileStatus.State.UNCHANGED;
-                outOfDate = true;
             }
             else if (fileStatus == HAS_CONFLICTS)
             {
@@ -260,7 +237,6 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
                 FileStatus fs = new FileStatus(path, fileState, localFile.isDirectory());
                 fs.setTargetPath(localWorkingModule + "/" + path);
                 
-                fs.setOutOfDate(recordOutOfDate && outOfDate);
                 if (fs.isInteresting())
                 {
                     getUI().status(fs.toString());

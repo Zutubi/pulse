@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.svn;
 
+import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
 import com.zutubi.pulse.core.scm.ScmUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
-import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
 import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -144,28 +144,23 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         }
     }
 
-    public WorkingCopyStatus getStatus(WorkingCopyContext context) throws ScmException
-    {
-        return getStatus(context, true, context.getBase());
-    }
-
     public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
         File base = context.getBase();
         File[] files = ScmUtils.specToFiles(base, spec);
         if (files == null)
         {
-            return getStatus(context, false, base);
+            return getStatus(context, base);
         }
         else
         {
-            return getStatus(context, false, files);
+            return getStatus(context, files);
         }
     }
 
-    private WorkingCopyStatus getStatus(WorkingCopyContext context, boolean remote, File... files) throws ScmException
+    private WorkingCopyStatus getStatus(WorkingCopyContext context, File... files) throws ScmException
     {
-        SVNClientManager clientManager = getClientManager(context, remote);
+        SVNClientManager clientManager = getClientManager(context, false);
         StatusHandler handler = new StatusHandler(context);
 
         try
@@ -174,7 +169,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             statusClient.setEventHandler(handler);
             for (File f : files)
             {
-                statusClient.doStatus(f, true, remote, true, false, false, handler);
+                statusClient.doStatus(f, true, false, true, false, false, handler);
             }
 
             WorkingCopyStatus wcs = handler.getStatus();
@@ -426,14 +421,6 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         public void handleStatus(SVNStatus svnStatus)
         {
             FileStatus fs = convertStatus(base, configSupport, svnStatus, propertyChangedPaths);
-
-            if (svnStatus.getRemoteContentsStatus() != SVNStatusType.STATUS_NONE ||
-                    svnStatus.getRemotePropertiesStatus() != SVNStatusType.STATUS_NONE)
-            {
-                // Remote change to this file
-                fs.setOutOfDate(true);
-            }
-
             if (fs.isInteresting())
             {
                 getUI().status(fs.toString());

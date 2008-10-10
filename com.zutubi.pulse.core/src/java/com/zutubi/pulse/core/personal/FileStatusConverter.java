@@ -32,9 +32,6 @@ public class FileStatusConverter implements Converter
         writer.startNode("directory");
         context.convertAnother(status.isDirectory());
         writer.endNode();
-        writer.startNode("outOfDate");
-        context.convertAnother(status.isOutOfDate());
-        writer.endNode();
 
         for(Map.Entry<String, String> property: status.getProperties().entrySet())
         {
@@ -81,10 +78,6 @@ public class FileStatusConverter implements Converter
             else if(fieldName.equals("directory"))
             {
                 result.setDirectory((Boolean) context.convertAnother(result, boolean.class));
-            }
-            else if(fieldName.equals("outOfDate"))
-            {
-                result.setOutOfDate((Boolean) context.convertAnother(result, boolean.class));
             }
             else if(fieldName.equals("property"))
             {
