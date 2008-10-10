@@ -234,9 +234,7 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
 
             if (fileState != null)
             {
-                FileStatus fs = new FileStatus(path, fileState, localFile.isDirectory());
-                fs.setTargetPath(localWorkingModule + "/" + path);
-                
+                FileStatus fs = new FileStatus(path, fileState, localFile.isDirectory(), localWorkingModule + "/" + path);
                 if (fs.isInteresting())
                 {
                     getUI().status(fs.toString());

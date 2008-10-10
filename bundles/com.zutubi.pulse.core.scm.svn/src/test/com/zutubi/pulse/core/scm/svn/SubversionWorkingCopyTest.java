@@ -636,20 +636,20 @@ public class SubversionWorkingCopyTest extends PulseTestCase
 
     private void assertModified(WorkingCopyStatus status, String path, boolean dir)
     {
-        assertFileState(status, path, dir, FileStatus.State.MODIFIED);
+        assertFileStatus(status, path, dir, FileStatus.State.MODIFIED);
     }
 
     private void assertAdded(WorkingCopyStatus status, String path, boolean dir)
     {
-        assertFileState(status, path, dir, FileStatus.State.ADDED);
+        assertFileStatus(status, path, dir, FileStatus.State.ADDED);
     }
 
     private void assertDeleted(WorkingCopyStatus status, String path, boolean dir)
     {
-        assertFileState(status, path, dir, FileStatus.State.DELETED);
+        assertFileStatus(status, path, dir, FileStatus.State.DELETED);
     }
 
-    private void assertFileState(WorkingCopyStatus status, String path, boolean dir, FileStatus.State fileState)
+    private void assertFileStatus(WorkingCopyStatus status, String path, boolean dir, FileStatus.State fileState)
     {
         FileStatus fs = status.getFileStatus(path);
         assertNotNull(fs);

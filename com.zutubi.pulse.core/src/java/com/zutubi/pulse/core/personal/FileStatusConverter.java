@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.zutubi.pulse.core.scm.api.FileStatus;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -48,7 +49,11 @@ public class FileStatusConverter implements Converter
 
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context)
     {
-        FileStatus result = new FileStatus(null, null, false);
+        String path = null;
+        String targetPath = null;
+        FileStatus.State state = null;
+        boolean directory = false;
+        Map<String, String> properties = new HashMap<String, String>();
 
         while (reader.hasMoreChildren())
         {
@@ -56,28 +61,28 @@ public class FileStatusConverter implements Converter
             String fieldName = reader.getNodeName();
             if(fieldName.equals("path"))
             {
-                result.setPath((String) context.convertAnother(result, String.class));
+                path = reader.getValue();
             }
             else if(fieldName.equals("targetPath"))
             {
-                result.setTargetPath((String) context.convertAnother(result, String.class));
+                targetPath = reader.getValue();
             }
             else if(fieldName.equals("state"))
             {
-                String state = reader.getValue();
+                String stateString = reader.getValue();
 
                 try
                 {
-                    result.setState(FileStatus.State.valueOf(state));
+                    state = FileStatus.State.valueOf(stateString);
                 }
                 catch (IllegalArgumentException e)
                 {
-                    throw new ConversionException("Unrecognised file state '" + state + "'");
+                    throw new ConversionException("Unrecognised file state '" + stateString + "'");
                 }
             }
             else if(fieldName.equals("directory"))
             {
-                result.setDirectory((Boolean) context.convertAnother(result, boolean.class));
+                directory = Boolean.valueOf(reader.getValue());
             }
             else if(fieldName.equals("property"))
             {
@@ -99,7 +104,7 @@ public class FileStatusConverter implements Converter
                 String value = reader.getValue();
                 reader.moveUp();
 
-                result.setProperty(name, value);
+                properties.put(name, value);
             }
             else
             {
@@ -109,17 +114,22 @@ public class FileStatusConverter implements Converter
             reader.moveUp();
         }
 
-        if(result.getPath() == null)
+        if(path == null)
         {
             throw new ConversionException("Incomplete file status: missing path");
         }
 
-        if(result.getState() == null)
+        if(state == null)
         {
             throw new ConversionException("Incomplete file status: missing state");
         }
 
-        return result;
+        FileStatus status = new FileStatus(path, state, directory, targetPath);
+        for (Map.Entry<String, String> entry: properties.entrySet())
+        {
+            status.setProperty(entry.getKey(), entry.getValue());
+        }
+        return status;
     }
 
     public boolean canConvert(Class type)
