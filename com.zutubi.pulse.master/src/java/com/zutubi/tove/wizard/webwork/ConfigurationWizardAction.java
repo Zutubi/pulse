@@ -2,7 +2,6 @@ package com.zutubi.tove.wizard.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CollectionType;
@@ -12,10 +11,14 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.tove.wizard.Wizard;
 import com.zutubi.tove.wizard.WizardState;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.*;
-import com.zutubi.validation.xwork.XWorkValidationAdapter;
+import com.zutubi.validation.DelegatingValidationContext;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.ValidationManager;
 import com.zutubi.validation.i18n.MessagesTextProvider;
+import com.zutubi.validation.xwork.XWorkValidationAdapter;
 
 import java.util.Map;
 
@@ -50,6 +53,8 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
 
     private ValidationManager validationManager;
     protected ConfigurationTemplateManager configurationTemplateManager;
+
+    private ObjectFactory objectFactory;
 
     /**
      * Setter for the configuration path.
@@ -316,19 +321,24 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
         {
             try
             {
-                wizardInstance = (AbstractTypeWizard) SpringComponentContext.createBean(wizardClass);
+                wizardInstance = (AbstractTypeWizard) objectFactory.buildBean(wizardClass);
             }
             catch (Exception e)
             {
                 LOG.warning(e);
-                e.printStackTrace();
             }
         }
 
         if (wizardInstance == null)
         {
-            wizardInstance = new SingleTypeWizard();
-            SpringComponentContext.autowire(wizardInstance);
+            try
+            {
+                wizardInstance = objectFactory.buildBean(SingleTypeWizard.class);
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+            }
         }
 
         wizardInstance.setParameters(parentPath, insertPath, templateParentPath, templateParentRecord, template);
@@ -345,5 +355,10 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

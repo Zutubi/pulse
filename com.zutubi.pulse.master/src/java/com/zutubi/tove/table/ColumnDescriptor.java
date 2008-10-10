@@ -1,13 +1,15 @@
 package com.zutubi.tove.table;
 
 import com.zutubi.tove.type.CompositeType;
+import com.zutubi.util.bean.ObjectFactory;
 
 /**
  * The column descriptor represents the model used to render a column to the UI.
- *
  */
 public class ColumnDescriptor
 {
+    private ObjectFactory objectFactory;
+
     /**
      * The name of this column.
      */
@@ -45,7 +47,7 @@ public class ColumnDescriptor
     {
         try
         {
-            FormattingWrapper wrapper = new FormattingWrapper(instance, type);
+            FormattingWrapper wrapper = objectFactory.buildBean(FormattingWrapper.class, new Class[]{Object.class, CompositeType.class}, new Object[]{instance, type});
             Object value = wrapper.get(name);
             if (value != null)
             {
@@ -82,5 +84,10 @@ public class ColumnDescriptor
     public void setRequired(boolean required)
     {
         this.required = required;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

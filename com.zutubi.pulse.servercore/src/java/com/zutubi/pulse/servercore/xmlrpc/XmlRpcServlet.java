@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore.xmlrpc;
 
 import com.zutubi.util.ObjectUtils;
+import com.zutubi.util.logging.Logger;
 import org.apache.xmlrpc.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.XmlRpcServer;
 import org.apache.xmlrpc.XmlRpcWorker;
@@ -15,6 +16,8 @@ import java.io.OutputStream;
 
 public class XmlRpcServlet extends HttpServlet
 {
+    private static final Logger LOG = Logger.getLogger(XmlRpcServlet.class);
+
     protected XmlRpcServer xmlrpc = null;
 
     public void init(ServletConfig config) throws ServletException
@@ -33,7 +36,7 @@ public class XmlRpcServlet extends HttpServlet
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    LOG.warning(e);
                     return worker;
                 }
             }

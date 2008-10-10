@@ -12,6 +12,7 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.bean.ObjectFactory;
 
 /**
  *
@@ -29,6 +30,7 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
     protected ConfigurationRegistry configurationRegistry;
     protected ConfigurationTemplateManager configurationTemplateManager;
     protected ConfigurationProvider configurationProvider;
+    protected ObjectFactory objectFactory;
 
     protected Record record;
     
@@ -127,10 +129,11 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
         return record;
     }
 
-    protected void prepare()
+    protected void prepare() throws Exception
     {
         // default handling - render the page.
-        configuration = new ConfigurationUIModel(path);
+        configuration = objectFactory.buildBean(ConfigurationUIModel.class, new Class[]{String.class}, new Object[]{path});
+        configuration.analyse();
 
         if (record == null)
         {
@@ -187,5 +190,10 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

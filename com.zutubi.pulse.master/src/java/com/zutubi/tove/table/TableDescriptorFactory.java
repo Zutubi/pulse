@@ -9,6 +9,7 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.PrimitiveType;
+import com.zutubi.util.bean.ObjectFactory;
 
 /**
  * The table descriptor factory is an implementation of a descriptor factory that uses an objects type definition
@@ -20,6 +21,7 @@ public class TableDescriptorFactory
     private ActionManager actionManager;
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationProvider configurationProvider;
+    private ObjectFactory objectFactory;
     private SystemPaths systemPaths;
 
     public TableDescriptor create(String path, CollectionType collectionType)
@@ -33,7 +35,7 @@ public class TableDescriptorFactory
         {
             for (String columnName : tableAnnotation.columns())
             {
-                ColumnDescriptor cd = new ColumnDescriptor(columnName);
+                ColumnDescriptor cd = newColumnDescriptor(columnName);
                 cd.setType(type);
                 td.addColumn(cd);
             }
@@ -44,13 +46,25 @@ public class TableDescriptorFactory
             // render properties as columns.
             for (String primitivePropertyName : type.getPropertyNames(PrimitiveType.class))
             {
-                ColumnDescriptor cd = new ColumnDescriptor(primitivePropertyName);
+                ColumnDescriptor cd = newColumnDescriptor(primitivePropertyName);
                 cd.setType(type);
                 td.addColumn(cd);
             }
         }
 
         return td;
+    }
+
+    private ColumnDescriptor newColumnDescriptor(String name)
+    {
+        try
+        {
+            return objectFactory.buildBean(ColumnDescriptor.class, new Class[]{String.class}, new Object[]{name});
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to bulid internal class: " + e.getMessage(), e);
+        }
     }
 
     public void setActionManager(ActionManager actionManager)
@@ -71,5 +85,10 @@ public class TableDescriptorFactory
     public void setSystemPaths(SystemPaths systemPaths)
     {
         this.systemPaths = systemPaths;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

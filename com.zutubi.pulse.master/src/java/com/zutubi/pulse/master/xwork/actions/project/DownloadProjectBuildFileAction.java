@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
@@ -38,7 +37,6 @@ public class DownloadProjectBuildFileAction extends ProjectActionBase
         try
         {
             TypeConfiguration typeConfiguration = projectConfig.getType();
-            SpringComponentContext.autowire(typeConfiguration);
             String pulseFile = XMLUtils.prettyPrint(typeConfiguration.getPulseFile(projectConfig, null, null));
             inputStream = new StringInputStream(pulseFile);
             contentLength = pulseFile.length();

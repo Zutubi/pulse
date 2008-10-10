@@ -1,10 +1,7 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Password;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
@@ -15,6 +12,7 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.signupUserConfig")
 @Form(fieldOrder = {"login", "name", "password", "confirmPassword"})
+@Wire
 public class SignupUserConfiguration extends AbstractConfiguration implements Validateable
 {
     @Required
@@ -25,6 +23,9 @@ public class SignupUserConfiguration extends AbstractConfiguration implements Va
     private String password;
     @Password
     private String confirmPassword;
+
+    @Transient
+    private UserManager userManager;
 
     public String getLogin()
     {
@@ -68,7 +69,6 @@ public class SignupUserConfiguration extends AbstractConfiguration implements Va
 
     public void validate(ValidationContext context)
     {
-        UserManager userManager = SpringComponentContext.getBean("userManager");
         if(login != null && userManager.getUser(login) != null)
         {
             context.addFieldError("login", "login '" + login + "' is already in use; please choose another login");
@@ -81,5 +81,10 @@ public class SignupUserConfiguration extends AbstractConfiguration implements Va
                 context.addFieldError("password", "passwords do not match");
             }
         }
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

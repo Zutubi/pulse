@@ -5,7 +5,6 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.pulse.core.config.ConfigurationMap;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.config.cleanup.*;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.security.AccessManager;
@@ -45,6 +44,8 @@ public class ConfigurationTemplateManager
     private TransactionManager transactionManager;
 
     private UserTransaction userTransaction;
+
+    private WireService wireService;
 
     private ValidationManager validationManager;
     private int refreshCount = 0;
@@ -571,7 +572,7 @@ public class ConfigurationTemplateManager
         CompositeType type = typeRegistry.getType(instance.getClass());
         if(type != null && type.hasAnnotation(Wire.class, true))
         {
-            SpringComponentContext.autowire(instance);
+            wireService.wire(instance);
         }
     }
 
@@ -2421,6 +2422,11 @@ public class ConfigurationTemplateManager
     public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)
     {
         this.configurationStateManager = configurationStateManager;
+    }
+
+    public void setWireService(WireService wireService)
+    {
+        this.wireService = wireService;
     }
 
     interface Action<T>

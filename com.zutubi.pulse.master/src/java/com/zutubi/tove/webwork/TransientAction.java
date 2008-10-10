@@ -13,6 +13,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -28,6 +29,8 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
 
     protected TypeRegistry typeRegistry;
     protected ConfigurationTemplateManager configurationTemplateManager;
+
+    protected ObjectFactory objectFactory;
 
     protected Record record;
     private CompositeType type;
@@ -104,8 +107,19 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
 
     public void analyse()
     {
-        configuration = new ConfigurationUIModel(path);
-        type = (CompositeType) configuration.getType();
+        try
+        {
+            configuration = objectFactory.buildBean(ConfigurationUIModel.class, new Class[]{String.class}, new Object[]{path});
+            configuration.analyse();
+            type = (CompositeType) configuration.getType();
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+            // we can not really continue if analysis failed, information that is expected
+            // by the rest of the action will just not be here.
+            throw new RuntimeException(e);
+        }
     }
 
     public String doInput() throws Exception
@@ -122,7 +136,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
     }
 
     @SuppressWarnings({"unchecked"})
-    public String execute()
+    public String execute() throws Exception
     {
         if(isCancelSelected())
         {
@@ -188,5 +202,10 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

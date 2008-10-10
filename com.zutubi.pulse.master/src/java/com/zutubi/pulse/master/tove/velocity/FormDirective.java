@@ -1,4 +1,4 @@
-package com.zutubi.tove.velocity;
+package com.zutubi.pulse.master.tove.velocity;
 
 import com.zutubi.tove.FormDescriptor;
 import com.zutubi.tove.FormDescriptorFactory;

@@ -13,6 +13,12 @@ import java.util.*;
  * A scope holds named references and has a parent.  When looking up a
  * reference by name, if it is not found in this scope the lookup is
  * deferred to the parent.
+ *
+ * The PulseScope is an implementation of a scope that recognises 2 special
+ * sets of properties known.  The first is environment properties, identified
+ * by there env. prefix.  The second are resource properties that can be
+ * added to the environment as well as added to a specific environment property
+ * env.PATH
  */
 public class PulseScope implements Scope
 {

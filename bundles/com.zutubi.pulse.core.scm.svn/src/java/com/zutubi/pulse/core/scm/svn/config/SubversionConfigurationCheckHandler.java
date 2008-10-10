@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -11,6 +12,7 @@ import com.zutubi.pulse.core.scm.svn.SubversionClient;
  *
  */
 @SymbolicName("zutubi.subversionConfigurationCheckHandler")
+@Wire
 public class SubversionConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<SubversionConfiguration>
 {
     private ScmClientFactory scmClientFactory;

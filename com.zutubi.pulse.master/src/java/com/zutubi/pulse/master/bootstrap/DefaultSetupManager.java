@@ -462,6 +462,13 @@ public class DefaultSetupManager implements SetupManager
 
         configurationStateManager.setRecordManager(recordManager);
 
+        configurationTemplateManager.setWireService(new WireService()
+        {
+            public void wire(Object obj)
+            {
+                SpringComponentContext.autowire(obj);
+            }
+        });
         configurationTemplateManager.init();
 
         LogConfigurationManager logConfigurationManager = SpringComponentContext.getBean("logConfigurationManager");

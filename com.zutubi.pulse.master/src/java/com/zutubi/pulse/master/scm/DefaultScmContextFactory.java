@@ -17,7 +17,7 @@ public class DefaultScmContextFactory implements ScmContextFactory
 {
     private File projectsDir;
 
-    private Map<Long, ScmContextImpl> contexts = new HashMap<Long, ScmContextImpl>();
+    private final Map<Long, ScmContextImpl> contexts = new HashMap<Long, ScmContextImpl>();
 
     public ScmContext createContext(long id, ScmConfiguration config) throws ScmException
     {

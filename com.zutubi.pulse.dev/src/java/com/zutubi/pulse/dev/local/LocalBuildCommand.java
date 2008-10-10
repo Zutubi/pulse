@@ -34,12 +34,12 @@ public class LocalBuildCommand implements Command
 
     public List<String> getUsages()
     {
-        return Arrays.asList(new String[]{ "" });
+        return Arrays.asList("");
     }
 
     public List<String> getAliases()
     {
-        return Arrays.asList(new String[]{ "lo" });
+        return Arrays.asList("lo");
     }
 
     public Map<String, String> getOptions()

@@ -35,7 +35,6 @@ public class CustomVelocityManager extends VelocityManager implements EventListe
 
     public CustomVelocityManager()
     {
-        SpringComponentContext.autowire(this);
     }
 
     public Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)

@@ -1,4 +1,4 @@
-package com.zutubi.tove.velocity;
+package com.zutubi.pulse.master.tove.velocity;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -9,6 +9,7 @@ import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.webwork.ToveUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.bean.ObjectFactory;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -28,6 +29,8 @@ import java.util.Map;
 public class TableDirective extends ToveDirective
 {
     private ConfigurationTemplateManager configurationTemplateManager;
+
+    private ObjectFactory objectFactory;
 
     private static final Logger LOG = Logger.getLogger(TableDirective.class);
 
@@ -75,8 +78,7 @@ public class TableDirective extends ToveDirective
             Record data = configurationTemplateManager.getRecord(path);
 
             // generate the table descriptor based on the type of the results.
-            TableDescriptorFactory tableFactory = new TableDescriptorFactory();
-            SpringComponentContext.autowire(tableFactory);
+            TableDescriptorFactory tableFactory = objectFactory.buildBean(TableDescriptorFactory.class);
 
             TableDescriptor tableDescriptor = tableFactory.create(path, collectionType);
             Table table = tableDescriptor.instantiate(path, data);
@@ -122,5 +124,10 @@ public class TableDirective extends ToveDirective
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

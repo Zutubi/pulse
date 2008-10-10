@@ -1,12 +1,12 @@
 package com.zutubi.tove.table;
 
 import com.zutubi.config.annotations.Format;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.ColumnFormatter;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.lang.reflect.Method;
 
@@ -16,6 +16,8 @@ import java.lang.reflect.Method;
  */
 public class FormattingWrapper
 {
+    private ObjectFactory objectFactory;
+
     /**
      * The instance being wrapped.
      */
@@ -42,8 +44,7 @@ public class FormattingWrapper
             Class<Object> formatter = ConventionSupport.getFormatter(type);
             if (formatter != null)
             {
-                // FIXME: maybe this should be calling the object factory instead.
-                Object formatterInstance = SpringComponentContext.createBean(formatter);
+                Object formatterInstance = objectFactory.buildBean(formatter);
 
                 String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
                 Method getter;
@@ -77,7 +78,7 @@ public class FormattingWrapper
         }
         catch (Exception e)
         {
-//                e.printStackTrace();
+            // noop.
         }
 
         // column level formatting
@@ -115,8 +116,13 @@ public class FormattingWrapper
         }
         catch (Exception e)
         {
-//            e.printStackTrace();
+            // noop.
         }
         return null;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }
