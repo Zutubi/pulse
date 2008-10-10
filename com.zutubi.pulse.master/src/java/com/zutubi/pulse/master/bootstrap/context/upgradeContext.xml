@@ -83,7 +83,7 @@
         <property name="buildNumber" value="200013001"/>
         <property name="mappings">
             <list>
-                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.13.hbm.xml</value>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.13-mappings.hbm.xml</value>
             </list>
         </property>
     </bean>

@@ -74,12 +74,6 @@ public class WorkingCopyStatus
      */
     public List<FileStatus> getFileStatuses()
     {
-        // Odd perhaps, but being instantiated by XStream means we need to
-        // guard against null (the meaning is clear: an empty list).
-        if(fileStatuses == null)
-        {
-            fileStatuses = new LinkedList<FileStatus>();
-        }
         return Collections.unmodifiableList(fileStatuses);
     }
 
@@ -90,7 +84,7 @@ public class WorkingCopyStatus
      */
     public void addFileStatus(FileStatus status)
     {
-        getFileStatuses().add(status);
+        fileStatuses.add(status);
     }
 
     /**
