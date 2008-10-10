@@ -47,7 +47,7 @@ public class PatchArchiveTest extends PulseTestCase
         WorkingCopyStatus wcs = new WorkingCopyStatus(baseDir);
         FileStatus fs = new FileStatus(TEST_FILENAME, FileStatus.State.UNCHANGED, false);
         fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, EOLStyle.CARRIAGE_RETURN.toString());
-        wcs.add(fs);
+        wcs.addFileStatus(fs);
         
         PatchArchive archive;
         Revision revision = new Revision("test");

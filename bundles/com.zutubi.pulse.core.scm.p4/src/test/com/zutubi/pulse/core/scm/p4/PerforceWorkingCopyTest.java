@@ -120,7 +120,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
     public void testLocalStatusNoChanges() throws ScmException
     {
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(0, status.getChanges().size());
+        assertEquals(0, status.getFileStatuses().size());
     }
 
     public void testLocalStatusOpenForEdit() throws ScmException
@@ -264,7 +264,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         otherEdit();
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(0, status.getChanges().size());
+        assertEquals(0, status.getFileStatuses().size());
     }
 
     public void testLocalStatusOODAndLocalChange() throws ScmException
@@ -285,9 +285,9 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForEdit("script1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context, "//depot/bin1", "//depot/script1");
-        assertEquals(2, status.getChanges().size());
-        assertEquals("bin1", status.getChanges().get(0).getPath());
-        assertEquals("script1", status.getChanges().get(1).getPath());
+        assertEquals(2, status.getFileStatuses().size());
+        assertEquals("bin1", status.getFileStatuses().get(0).getPath());
+        assertEquals("script1", status.getFileStatuses().get(1).getPath());
     }
 
     public void testLocalStatusRestrictedToUnchangedFiles() throws ScmException
@@ -295,7 +295,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForEdit("file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context, "//depot/bin1", "//depot/script1");
-        assertEquals(0, status.getChanges().size());
+        assertEquals(0, status.getFileStatuses().size());
     }
 
     public void testLocalStatusDefaultChangelist() throws ScmException
@@ -304,9 +304,9 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForEdit("file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context, ":default");
-        assertEquals(2, status.getChanges().size());
-        assertEquals("bin1", status.getChanges().get(0).getPath());
-        assertEquals("file1", status.getChanges().get(1).getPath());
+        assertEquals(2, status.getFileStatuses().size());
+        assertEquals("bin1", status.getFileStatuses().get(0).getPath());
+        assertEquals("file1", status.getFileStatuses().get(1).getPath());
     }
 
     public void testLocalStatusChangelist() throws ScmException
@@ -317,9 +317,9 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForEdit("script1", changelist);
 
         WorkingCopyStatus status = wc.getLocalStatus(context, ":" + Long.toString(changelist));
-        assertEquals(2, status.getChanges().size());
-        assertEquals("bin1", status.getChanges().get(0).getPath());
-        assertEquals("script1", status.getChanges().get(1).getPath());
+        assertEquals(2, status.getFileStatuses().size());
+        assertEquals("bin1", status.getFileStatuses().get(0).getPath());
+        assertEquals("script1", status.getFileStatuses().get(1).getPath());
     }
 
     public void testLocalStatusChangelistNoChanges() throws ScmException
@@ -328,14 +328,14 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         openForEdit("file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context, ":" + Long.toString(changelist));
-        assertEquals(0, status.getChanges().size());
+        assertEquals(0, status.getFileStatuses().size());
     }
 
     public void testUpdateAlreadyUpToDate() throws ScmException
     {
         wc.update(context, Revision.HEAD);
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(0, status.getChanges().size());
+        assertEquals(0, status.getFileStatuses().size());
     }
 
     public void testSimpleUpdate() throws ScmException, IOException
@@ -344,7 +344,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
 
         wc.update(context, Revision.HEAD);
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(0, status.getChanges().size());
+        assertEquals(0, status.getFileStatuses().size());
     }
 
     public void testUpdateMerge() throws ScmException, IOException
@@ -434,7 +434,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
 
     private void assertChange(WorkingCopyStatus status, String path, FileStatus.State state, boolean text)
     {
-        List<FileStatus> changes = status.getChanges();
+        List<FileStatus> changes = status.getFileStatuses();
         assertEquals(1, changes.size());
         FileStatus fs = changes.get(0);
         assertEquals(path, fs.getPath());

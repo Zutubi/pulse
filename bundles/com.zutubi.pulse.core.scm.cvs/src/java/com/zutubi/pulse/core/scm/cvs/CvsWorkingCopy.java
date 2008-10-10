@@ -240,7 +240,7 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
                 if (fs.isInteresting())
                 {
                     getUI().status(fs.toString());
-                    status.add(fs);
+                    status.addFileStatus(fs);
                 }
             }
         }

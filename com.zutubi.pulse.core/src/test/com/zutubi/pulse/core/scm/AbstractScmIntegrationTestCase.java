@@ -402,8 +402,8 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
     {
         Revision y = testData.getRevision(2);
 
-        List<Changelist> changelists = client.getChanges(null, y);
-        List<Changelist> expectedChangeLists = testData.getChanges(null, y);
+        List<Changelist> changelists = client.getFileStatuses(null, y);
+        List<Changelist> expectedChangeLists = testData.getFileStatuses(null, y);
         assertChangelistsEqual(expectedChangeLists, changelists);
     }
 */
@@ -424,7 +424,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         WorkingCopyStatus status = client.getStatus(new File(workingDir, prefix + "project"));
         assertNotNull(status);
         assertTrue(status.hasChanges());
-        assertEquals(1, status.getChanges().size());
+        assertEquals(1, status.getFileStatuses().size());
 
         FileStatus fileStatus = status.getFileStatus("src/com/package.properties");
         assertNotNull(fileStatus);
@@ -463,7 +463,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         // we need to run the status within the working copy.
         WorkingCopyStatus status = client.getStatus(new File(workingDir, "integration-test"));
         assertTrue(status.hasChanges());
-        assertEquals(1, status.getChanges().size());
+        assertEquals(1, status.getFileStatuses().size());
 
         FileStatus fileStatus = status.getFileStatus("project/README.txt");
         assertNotNull(fileStatus);

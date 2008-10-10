@@ -189,7 +189,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
     {
         SVNWCClient wcc = clientManager.getWCClient();
 
-        for (FileStatus fs : wcs)
+        for (FileStatus fs : wcs.getFileStatuses())
         {
             if (fs.getState().requiresFile())
             {
@@ -416,7 +416,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             if (fs.isInteresting())
             {
                 getUI().status(fs.toString());
-                status.add(fs);
+                status.addFileStatus(fs);
             }
         }
 

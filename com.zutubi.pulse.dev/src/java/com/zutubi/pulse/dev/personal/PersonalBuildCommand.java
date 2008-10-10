@@ -8,10 +8,10 @@ import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.util.config.CommandLineConfig;
-import com.zutubi.util.config.CompositeConfig;
-import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.util.Pair;
+import com.zutubi.util.config.CompositeConfig;
+import com.zutubi.util.config.PropertiesConfig;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -141,7 +141,7 @@ public class PersonalBuildCommand implements Command
             if (statusOnly)
             {
                 WorkingCopyStatus wcs = client.getStatus(pair.first, pair.second, files);
-                if(!wcs.hasChanges())
+                if(!wcs.hasStatuses())
                 {
                     console.status("No changes found.");
                 }

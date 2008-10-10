@@ -44,7 +44,7 @@ public class PatchArchive
     public PatchArchive(Revision revision, WorkingCopyStatus status, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
     {
         this.patchFile = patchFile;
-        this.metadata = new PatchMetadata(revision, status.getChanges());
+        this.metadata = new PatchMetadata(revision, status.getFileStatuses());
 
         try
         {

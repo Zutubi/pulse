@@ -269,7 +269,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         }
         getUI().status("Status retrieved.");
 
-        if (status.hasChanges())
+        if (status.hasStatuses())
         {
             getUI().status("Creating patch archive...");
             getUI().enterContext();

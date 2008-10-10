@@ -117,7 +117,7 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
                     resolveExecutableProperty(fs, type, headType);
                 }
 
-                status.add(fs);
+                status.addFileStatus(fs);
             }
         }
     }

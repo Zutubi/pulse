@@ -1,40 +1,54 @@
 package com.zutubi.pulse.core.scm.api;
 
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+
 import java.io.File;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Used to convey the local status of a working copy.  All outstanding changes
+ * are recorded as {@link com.zutubi.pulse.core.scm.api.FileStatus} objects.
  */
-public class WorkingCopyStatus implements Iterable<FileStatus>
+public class WorkingCopyStatus
 {
-    private List<FileStatus> changes = new LinkedList<FileStatus>();
-    private transient File base;
+    private File base;
+    private List<FileStatus> fileStatuses = new LinkedList<FileStatus>();
 
-    public WorkingCopyStatus()
-    {
-    }
-
+    /**
+     * Create a new working copy status for files based at the given directory.
+     * This directory is typically the root of a working copy.  Usually it is
+     * identical to the base directory specified by
+     * {@link WorkingCopyContext#getBase()}, but it may be different for some
+     * implementations (e.g. Perforce, where the base will be the client root
+     * regardless of the working directory of the pulse command).
+     *
+     * @param base base directory under which file statuses are found
+     */
     public WorkingCopyStatus(File base)
     {
         this.base = base;
     }
 
-    public void add(FileStatus status)
+    /**
+     * @return the base directory for the status, usually the root of a working
+     *         copy
+     */
+    public File getBase()
     {
-        getChanges().add(status);
+        return base;
     }
 
-    public Iterator<FileStatus> iterator()
-    {
-        return getChanges().iterator();
-    }
-
+    /**
+     * @return true if all recorded file statuses are in a consistent state
+     *         (i.e. there are no missing files, outstanding conflicts etc)
+     */
     public boolean inConsistentState()
     {
-        for(FileStatus fs: getChanges())
+        for(FileStatus fs: getFileStatuses())
         {
             if(!fs.getState().isConsistent())
             {
@@ -45,50 +59,55 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
         return true;
     }
 
-    public List<FileStatus> getChanges()
+    /**
+     * @return true if at least one file status has been recorded: i.e. there
+     *         are local changes under the base directory
+     */
+    public boolean hasStatuses()
+    {
+        return fileStatuses.size() > 0;
+    }
+
+    /**
+     * @return file status records for all local changes found under the base
+     *         directory
+     */
+    public List<FileStatus> getFileStatuses()
     {
         // Odd perhaps, but being instantiated by XStream means we need to
         // guard against null (the meaning is clear: an empty list).
-        if(changes == null)
+        if(fileStatuses == null)
         {
-            changes = new LinkedList<FileStatus>();
+            fileStatuses = new LinkedList<FileStatus>();
         }
-        return changes;
+        return Collections.unmodifiableList(fileStatuses);
     }
 
-    public FileStatus getFileStatus(String path)
+    /**
+     * Records a new file status record for a local change.
+     *
+     * @param status the new record to add
+     */
+    public void addFileStatus(FileStatus status)
     {
-        for(FileStatus fs: changes)
+        getFileStatuses().add(status);
+    }
+
+    /**
+     * Finds an existing file status record by path, if one exists.
+     *
+     * @param path the path to find the status for
+     * @return the file status for the given path, or null if no such status
+     *         has been recorded
+     */
+    public FileStatus getFileStatus(final String path)
+    {
+        return CollectionUtils.find(fileStatuses, new Predicate<FileStatus>()
         {
-            if(fs.getPath().equals(path))
+            public boolean satisfied(FileStatus fileStatus)
             {
-                return fs;
+                return fileStatus.getPath().equals(path);
             }
-        }
-
-        return null;
-    }
-
-    public void removeFileStatus(String path)
-    {
-        Iterator<FileStatus> i = changes.iterator();
-        while(i.hasNext())
-        {
-            if(i.next().getPath().equals(path))
-            {
-                i.remove();
-                break;
-            }
-        }
-    }
-
-    public boolean hasChanges()
-    {
-        return changes.size() > 0;
-    }
-
-    public File getBase()
-    {
-        return base;
+        });
     }
 }

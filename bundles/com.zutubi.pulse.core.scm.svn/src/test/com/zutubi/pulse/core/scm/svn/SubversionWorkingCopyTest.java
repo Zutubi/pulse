@@ -155,7 +155,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     public void testGetLocalStatusNoChanges() throws Exception
     {
         WorkingCopyStatus wcs = wc.getLocalStatus(context);
-        assertEquals(0, wcs.getChanges().size());
+        assertEquals(0, wcs.getFileStatuses().size());
     }
 
     public void testGetLocalStatusEdited() throws Exception
@@ -243,7 +243,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
 
         client.doAdd(test, true, false, false, false);
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(1, status.getChanges().size());
+        assertEquals(1, status.getFileStatuses().size());
         assertAdded(status, "newdir", true);
     }
 
@@ -257,7 +257,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
 
         client.doAdd(dir, true, false, false, true);
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(2, status.getChanges().size());
+        assertEquals(2, status.getFileStatuses().size());
         assertAdded(status, "newdir", true);
         assertAdded(status, "newdir/newfile", false);
     }
@@ -272,7 +272,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
 
         client.doAdd(dir, true, false, false, false);
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(1, status.getChanges().size());
+        assertEquals(1, status.getFileStatuses().size());
         assertAdded(status, "newdir", true);
     }
 
@@ -281,7 +281,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         move("file1", "movedfile1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(2, status.getChanges().size());
+        assertEquals(2, status.getFileStatuses().size());
         assertDeleted(status, "file1", false);
         assertAdded(status, "movedfile1", false);
     }
@@ -291,7 +291,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         move("dir1", "moveddir1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(8, status.getChanges().size());
+        assertEquals(8, status.getFileStatuses().size());
         assertDeleted(status, "dir1", true);
         assertDeleted(status, "dir1/file1", false);
         assertDeleted(status, "dir1/file2", false);
@@ -307,7 +307,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         move("dir3", "moveddir3");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(10, status.getChanges().size());
+        assertEquals(10, status.getFileStatuses().size());
         assertDeleted(status, "dir3", true);
         assertDeleted(status, "dir3/file1", false);
         assertDeleted(status, "dir3/nested", true);
@@ -326,7 +326,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         edit("moveddir2/file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(6, status.getChanges().size());
+        assertEquals(6, status.getFileStatuses().size());
         assertDeleted(status, "dir2", true);
         assertDeleted(status, "dir2/file1", false);
         assertDeleted(status, "dir2/file2", false);
@@ -341,7 +341,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         delete("moveddir2/file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(6, status.getChanges().size());
+        assertEquals(6, status.getFileStatuses().size());
         assertDeleted(status, "dir2", true);
         assertDeleted(status, "dir2/file1", false);
         assertDeleted(status, "dir2/file2", false);
@@ -376,7 +376,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         long rev = branchMove("file1", "movedfile1");
         doMerge(rev);
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(2, status.getChanges().size());
+        assertEquals(2, status.getFileStatuses().size());
         assertDeleted(status, "file1", false);
         assertAdded(status, "movedfile1", false);
     }
@@ -386,7 +386,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         long rev = branchMove("dir2", "moveddir2");
         doMerge(rev);
         WorkingCopyStatus status = wc.getLocalStatus(context);
-        assertEquals(6, status.getChanges().size());
+        assertEquals(6, status.getFileStatuses().size());
         assertDeleted(status, "dir2", true);
         assertDeleted(status, "dir2/file1", false);
         assertDeleted(status, "dir2/file2", false);
@@ -423,7 +423,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         otherEdit("file1");
         WorkingCopyStatus wcs = wc.getLocalStatus(context);
-        assertEquals(0, wcs.getChanges().size());
+        assertEquals(0, wcs.getFileStatuses().size());
     }
 
     public void testGetStatusEditedOOD() throws Exception
@@ -467,7 +467,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         edit("file1");
         WorkingCopyStatus wcs = wc.getLocalStatus(context, "dir1", "script1");
-        assertEquals(0, wcs.getChanges().size());
+        assertEquals(0, wcs.getFileStatuses().size());
     }
 
     public void testGetLocalStatusRestrictedToFiles() throws Exception
@@ -476,9 +476,9 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         edit("file1");
         edit("script1");
         WorkingCopyStatus wcs = wc.getLocalStatus(context, "bin1", "script1");
-        assertEquals(2, wcs.getChanges().size());
-        assertEquals("bin1", wcs.getChanges().get(0).getPath());
-        assertEquals("script1", wcs.getChanges().get(1).getPath());
+        assertEquals(2, wcs.getFileStatuses().size());
+        assertEquals("bin1", wcs.getFileStatuses().get(0).getPath());
+        assertEquals("script1", wcs.getFileStatuses().get(1).getPath());
     }
 
     public void testGetLocalStatusRecurses() throws Exception
@@ -486,9 +486,9 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         edit("dir1/file1");
         edit("dir1/file2");
         WorkingCopyStatus wcs = wc.getLocalStatus(context, "dir1");
-        assertEquals(2, wcs.getChanges().size());
-        assertEquals("dir1/file1", wcs.getChanges().get(0).getPath());
-        assertEquals("dir1/file2", wcs.getChanges().get(1).getPath());
+        assertEquals(2, wcs.getFileStatuses().size());
+        assertEquals("dir1/file1", wcs.getFileStatuses().get(0).getPath());
+        assertEquals("dir1/file2", wcs.getFileStatuses().get(1).getPath());
     }
 
     public void testUpdateAlreadyUpToDate() throws Exception
@@ -503,7 +503,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
 
         wc.update(context, Revision.HEAD);
         WorkingCopyStatus wcs = wc.getLocalStatus(context);
-        assertEquals(0, wcs.getChanges().size());
+        assertEquals(0, wcs.getFileStatuses().size());
     }
 
     public void testUpdateConflict() throws Exception
@@ -627,7 +627,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     private WorkingCopyStatus assertSimpleStatus(String path, FileStatus.State state) throws ScmException
     {
         WorkingCopyStatus wcs = wc.getLocalStatus(context);
-        assertEquals(1, wcs.getChanges().size());
+        assertEquals(1, wcs.getFileStatuses().size());
         FileStatus fs = wcs.getFileStatus(path);
         assertEquals(state, fs.getState());
         assertFalse(fs.isDirectory());
