@@ -38,6 +38,17 @@ public class Revision
     }
 
     /**
+     * Creates a new revision based in the given revision number.  This is a
+     * convenience constructor for those scms that use numeric revisions.
+     *
+     * @param revision a numeric revision string.
+     */
+    public Revision(long revision)
+    {
+        this.revisionString = Long.toString(revision);
+    }
+
+    /**
      * @return a serialised version of the revision
      */
     public String getRevisionString()

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
-import com.zutubi.pulse.core.scm.ScmUtils;
+import com.zutubi.pulse.core.scm.api.PersonalBuildUIAwareSupport;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.util.TextUtils;
@@ -39,10 +38,10 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
         return loadLocalWorkingModule(context.getBase()).equals(pieces[1]);
     }
 
-    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
+    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... paths) throws ScmException
     {
         File workingDir = context.getBase();
-        File[] files = ScmUtils.specToFiles(workingDir, spec);
+        File[] files = pathsToFiles(workingDir, paths);
         WorkingCopyStatus status = new WorkingCopyStatus(workingDir);
         StatusHandler statusHandler = new StatusHandler(workingDir, loadLocalWorkingModule(workingDir), status);
 
@@ -128,6 +127,26 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
 
         core.setRoot(cvsRoot);
         return core;
+    }
+
+    private File[] pathsToFiles(File base, String... spec) throws ScmException
+    {
+        if(spec.length == 0)
+        {
+            return null;
+        }
+
+        File[] result = new File[spec.length];
+        for(int i = 0; i < spec.length; i++)
+        {
+            result[i] = new File(base, spec[i]);
+            if(!result[i].exists())
+            {
+                throw new ScmException("File '" + spec[i] + "' does not exist");
+            }
+        }
+
+        return result;
     }
 
     private class UpdateHandler extends CVSAdapter

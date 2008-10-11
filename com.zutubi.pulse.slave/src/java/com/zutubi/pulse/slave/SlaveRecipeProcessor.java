@@ -5,7 +5,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
 import com.zutubi.pulse.servercore.RecipeCleanup;
 import com.zutubi.pulse.servercore.ServerBootstrapper;

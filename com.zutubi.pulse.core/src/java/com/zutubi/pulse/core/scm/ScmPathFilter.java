@@ -8,11 +8,11 @@ import java.util.List;
 
 /**
  */
-public class ScmFilepathFilter implements FilepathFilter
+public class ScmPathFilter implements PathFilter
 {
     private List<String> excludedPaths = null;
 
-    public ScmFilepathFilter(List<String> excludedPaths)
+    public ScmPathFilter(List<String> excludedPaths)
     {
         if (excludedPaths != null)
         {

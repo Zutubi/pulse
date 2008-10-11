@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.scm.api.Revision;
 
 /**
  * A custom converter for writing out revisions that just folds it down to the
- * revision string.  Simple.
+ * revision string.
  */
 public class RevisionConverter implements Converter
 {

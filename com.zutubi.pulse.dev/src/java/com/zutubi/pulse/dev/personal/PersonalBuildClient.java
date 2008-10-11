@@ -3,7 +3,7 @@ package com.zutubi.pulse.dev.personal;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
-import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
+import com.zutubi.pulse.core.scm.api.PersonalBuildUIAwareSupport;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;

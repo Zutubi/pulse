@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.scm.ScmFilepathFilter;
+import com.zutubi.pulse.core.scm.ScmPathFilter;
 
 import java.util.Arrays;
 
@@ -83,7 +83,7 @@ public class ScmFilepathFilterTest extends PulseTestCase
 
     private void assertAccepts(String exclude, String path, boolean accept)
     {
-        ScmFilepathFilter filter = new ScmFilepathFilter(Arrays.asList(exclude));
+        ScmPathFilter filter = new ScmPathFilter(Arrays.asList(exclude));
         assertEquals(accept, filter.accept(path));
     }
 }

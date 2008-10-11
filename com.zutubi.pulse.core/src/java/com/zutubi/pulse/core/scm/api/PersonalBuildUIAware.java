@@ -5,7 +5,7 @@ package com.zutubi.pulse.core.scm.api;
  * {@link PersonalBuildUI}.  The UI may be used to give feedback to the user,
  * and to prompt them for input.
  *
- * @see com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport
+ * @see PersonalBuildUIAwareSupport
  */
 public interface PersonalBuildUIAware
 {

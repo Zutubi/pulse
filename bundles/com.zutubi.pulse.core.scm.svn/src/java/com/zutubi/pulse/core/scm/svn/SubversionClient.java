@@ -4,9 +4,8 @@ import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.scm.FilepathFilter;
-import com.zutubi.pulse.core.scm.NumericalRevision;
-import com.zutubi.pulse.core.scm.ScmFilepathFilter;
+import com.zutubi.pulse.core.scm.PathFilter;
+import com.zutubi.pulse.core.scm.ScmPathFilter;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -78,18 +77,8 @@ public class SubversionClient implements ScmClient
         }
         else
         {
-            return SVNRevision.create(convertToNumericalRevision(revision).getRevisionNumber());
+            return SVNRevision.create(Long.parseLong(revision.toString()));
         }
-    }
-
-    public static Revision convertRevision(NumericalRevision rev)
-    {
-        return new Revision(rev.getRevisionString());
-    }
-
-    public NumericalRevision convertToNumericalRevision(Revision rev)
-    {
-        return new NumericalRevision(rev.getRevisionString());
     }
 
     /**
@@ -337,7 +326,7 @@ public class SubversionClient implements ScmClient
             throw convertException(e);
         }
 
-        return convertRevision(new NumericalRevision(svnRevision.getNumber()));
+        return new Revision(svnRevision.getNumber());
     }
 
     private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, ScmFeedbackHandler handler) throws ScmException
@@ -418,13 +407,13 @@ public class SubversionClient implements ScmClient
     private boolean log(SVNRepository repository, long fromNumber, long toNumber, ChangeHandler handler) throws SVNException, ScmException
     {
         List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
-        FilepathFilter filter = new ScmFilepathFilter(excludedPaths);
+        PathFilter filter = new ScmPathFilter(excludedPaths);
 
         repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
         for (SVNLogEntry entry : logs)
         {
-            NumericalRevision revision = new NumericalRevision(entry.getRevision());
-            handler.startChangelist(convertRevision(revision), entry.getDate().getTime(), entry.getAuthor(), entry.getMessage());
+            Revision revision = new Revision(entry.getRevision());
+            handler.startChangelist(revision, entry.getDate().getTime(), entry.getAuthor(), entry.getMessage());
 
             Map files = entry.getChangedPaths();
 
@@ -433,7 +422,7 @@ public class SubversionClient implements ScmClient
                 SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
                 if (filter.accept(entryPath.getPath()))
                 {
-                    if (handler.handleChange(new FileChange(entryPath.getPath(), String.valueOf(revision.getRevisionNumber()), decodeAction(entryPath.getType()))))
+                    if (handler.handleChange(new FileChange(entryPath.getPath(), revision.toString(), decodeAction(entryPath.getType()))))
                     {
                         return true;
                     }
@@ -551,11 +540,11 @@ public class SubversionClient implements ScmClient
 
     public boolean hasChangedSince(Revision since) throws ScmException
     {
-        NumericalRevision latestRevision = convertToNumericalRevision(getLatestRevision(null));
-        if (latestRevision.getRevisionNumber() != (convertToNumericalRevision(since)).getRevisionNumber())
+        Revision latestRevision = getLatestRevision(null);
+        if (latestRevision != since)
         {
             ChangeDetector detector = new ChangeDetector();
-            reportChanges(detector, since, convertRevision(latestRevision));
+            reportChanges(detector, since, latestRevision);
             return detector.isChanged();
         }
         else
@@ -568,7 +557,7 @@ public class SubversionClient implements ScmClient
     {
         try
         {
-            return convertRevision(new NumericalRevision(repository.getLatestRevision()));
+            return new Revision(repository.getLatestRevision());
         }
         catch (SVNException e)
         {
@@ -740,7 +729,7 @@ public class SubversionClient implements ScmClient
                 throw new ScmException("Revision '" + revision + "' does not exist in this repository");
             }
 
-            return convertRevision(new NumericalRevision(revisionNumber));
+            return new Revision(revisionNumber);
         }
         catch(NumberFormatException e)
         {

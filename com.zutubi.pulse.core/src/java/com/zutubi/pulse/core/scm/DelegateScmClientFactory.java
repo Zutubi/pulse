@@ -2,6 +2,8 @@ package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
@@ -40,7 +42,7 @@ public class DelegateScmClientFactory implements ScmClientFactory<com.zutubi.pul
         return client;
     }
 
-    private ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration> getFactory(Object config)
+    private ScmClientFactory<ScmConfiguration> getFactory(Object config)
     {
         return factories.get(config.getClass());
     }

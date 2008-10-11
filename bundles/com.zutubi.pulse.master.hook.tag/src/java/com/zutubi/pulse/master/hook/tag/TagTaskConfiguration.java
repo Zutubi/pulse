@@ -6,7 +6,7 @@ import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;

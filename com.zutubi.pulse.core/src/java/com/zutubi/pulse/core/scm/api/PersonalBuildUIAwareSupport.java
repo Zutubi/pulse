@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.personal;
+package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.api.PersonalBuildUIAware;

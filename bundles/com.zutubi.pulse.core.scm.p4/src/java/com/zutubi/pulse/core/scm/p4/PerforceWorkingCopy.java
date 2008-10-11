@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
-import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.util.config.Config;
@@ -106,10 +104,10 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
     public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
     {
         PerforceCore core = createCore(context);
-        NumericalRevision numericalRevision = revision == null ? core.getLatestRevisionForFiles(null) : core.convertRevision(revision);
+        revision = revision == null ? core.getLatestRevisionForFiles(null) : revision;
 
         PerforceSyncHandler syncHandler = new PerforceSyncHandler(getUI());
-        core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + numericalRevision.getRevisionString());
+        core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + revision.getRevisionString());
 
         if(syncHandler.isResolveRequired())
         {
@@ -124,7 +122,7 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
 
                 if(!response.isAffirmative())
                 {
-                    return core.convertRevision(numericalRevision);
+                    return revision;
                 }
             }
 
@@ -141,7 +139,7 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
             getUI().status("Resolve complete.");
         }
 
-        return core.convertRevision(numericalRevision);
+        return revision;
     }
 
     private PerforceCore createCore(WorkingCopyContext context)

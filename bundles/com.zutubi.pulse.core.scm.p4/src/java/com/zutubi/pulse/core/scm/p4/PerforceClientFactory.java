@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;

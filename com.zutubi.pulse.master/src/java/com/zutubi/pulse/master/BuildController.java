@@ -15,7 +15,7 @@ import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;

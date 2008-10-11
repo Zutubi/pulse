@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.git.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.scm.git.GitClient;

@@ -1,11 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
-import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmCapability;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;

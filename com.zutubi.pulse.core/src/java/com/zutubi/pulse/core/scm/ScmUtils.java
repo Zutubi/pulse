@@ -2,9 +2,7 @@ package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
-import com.zutubi.pulse.core.scm.api.ScmException;
 
-import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,27 +11,16 @@ import java.util.List;
  */
 public class ScmUtils
 {
-    public static File[] specToFiles(File base, String... spec) throws ScmException
-    {
-        if(spec.length == 0)
-        {
-            return null;
-        }
-        
-        File[] result = new File[spec.length];
-        for(int i = 0; i < spec.length; i++)
-        {
-            result[i] = new File(base, spec[i]);
-            if(!result[i].exists())
-            {
-                throw new ScmException("File '" + spec[i] + "' does not exist");
-            }
-        }
-
-        return result;
-    }
-
-    public static List<Changelist> filterExcludes(List<Changelist> changelists, FilepathFilter filter)
+    /**
+     * An inplace filter that removes changes from the changelist whose paths are not
+     * matched by the filter.
+     *
+     * @param changelists the changelists whose changes are analysed
+     * @param filter the filter that determines which paths are accepted and which are filtered.
+     *
+     * @return the filtered list of changelists.
+     */
+    public static List<Changelist> filter(List<Changelist> changelists, PathFilter filter)
     {
         Iterator<Changelist> changelist = changelists.iterator();
         while (changelist.hasNext())

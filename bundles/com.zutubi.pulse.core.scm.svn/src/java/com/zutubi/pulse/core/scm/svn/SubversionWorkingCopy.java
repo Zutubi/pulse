@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.personal.PersonalBuildUIAwareSupport;
-import com.zutubi.pulse.core.scm.ScmUtils;
+import com.zutubi.pulse.core.scm.api.PersonalBuildUIAwareSupport;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
 import com.zutubi.util.config.Config;
@@ -144,10 +143,10 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         }
     }
 
-    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
+    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... paths) throws ScmException
     {
         File base = context.getBase();
-        File[] files = ScmUtils.specToFiles(base, spec);
+        File[] files = pathsToFiles(base, paths);
         if (files == null)
         {
             return getStatus(context, base);
@@ -278,6 +277,26 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         {
             throw convertException(e);
         }
+    }
+
+    private File[] pathsToFiles(File base, String... spec) throws ScmException
+    {
+        if(spec.length == 0)
+        {
+            return null;
+        }
+
+        File[] result = new File[spec.length];
+        for(int i = 0; i < spec.length; i++)
+        {
+            result[i] = new File(base, spec[i]);
+            if(!result[i].exists())
+            {
+                throw new ScmException("File '" + spec[i] + "' does not exist");
+            }
+        }
+
+        return result;
     }
 
     private ScmException convertException(SVNException e)

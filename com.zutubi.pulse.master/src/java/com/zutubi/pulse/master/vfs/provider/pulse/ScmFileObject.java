@@ -1,11 +1,8 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
-import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.api.ScmFile;
-import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.util.CollectionUtils;
