@@ -1,9 +1,6 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.tove.type.record.DefaultRecordSerialiser;
-import com.zutubi.tove.type.record.NoopRecordHandler;
-import com.zutubi.tove.type.record.Record;
-import com.zutubi.tove.type.record.RecordSerialiser;
+import com.zutubi.tove.type.record.*;
 import com.zutubi.tove.type.record.store.RecordStore;
 
 import java.io.File;
@@ -31,14 +28,14 @@ public class RecordsArchive extends AbstractArchiveableComponent
         Record export = recordStore.exportRecords();
 
         // serialise the record structure to disk.
-        RecordSerialiser serialiser = new DefaultRecordSerialiser(base);
-        serialiser.serialise("", export, true);
+        XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
+        serialiser.serialise(new File(base, "export.xml"), export, true);
     }
 
     public void restore(File base)
     {
-        RecordSerialiser serialiser = new DefaultRecordSerialiser(base);
-        Record baseRecord = serialiser.deserialise("", new NoopRecordHandler());
+        XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
+        Record baseRecord = serialiser.deserialise(new File(base, "export.xml"));
 
         recordStore.importRecords(baseRecord);
     }

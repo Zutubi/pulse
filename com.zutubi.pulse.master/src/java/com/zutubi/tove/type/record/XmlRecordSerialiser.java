@@ -12,12 +12,12 @@ import java.text.DateFormat;
 import java.util.Date;
 
 /**
- *
- *
+ * A record serialiser that takes a record and writes it to file.
+ * Nested records are written to a single file.
  */
 public class XmlRecordSerialiser
 {
-    private static final Logger LOG = Logger.getLogger(DefaultRecordSerialiser.class);
+    private static final Logger LOG = Logger.getLogger(XmlRecordSerialiser.class);
     private static final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
 
     private static final String ELEMENT_RECORD = "record";
@@ -27,10 +27,16 @@ public class XmlRecordSerialiser
     private static final String ELEMENT_ITEM = "item";
     private static final String ATTRIBUTE_NAME = "name";
 
-    // write the record to the specified file.
-    public void serialise(File file, Record record) throws RecordSerialiseException
+    /**
+     * Serialise a record to a file.
+     * @param file      the file to which the serialised record will be writen
+     * @param record    the record being serialised.
+     * @param deep      if true, the full record will be serialised. If false, will not serialise nested records.
+     * @throws RecordSerialiseException is thrown if there is a problem serialising the record.
+     */
+    public void serialise(File file, Record record, boolean deep) throws RecordSerialiseException
     {
-        Document doc = recordToDocument(record);
+        Document doc = recordToDocument(record, deep);
         try
         {
             XMLUtils.writeDocument(file, doc, false);
@@ -42,7 +48,7 @@ public class XmlRecordSerialiser
     }
 
     // read the record from the specified file.
-    public MutableRecord deserialise(File file, RecordHandler handler) throws RecordSerialiseException
+    public MutableRecord deserialise(File file) throws RecordSerialiseException
     {
         try
         {
@@ -58,9 +64,6 @@ public class XmlRecordSerialiser
                 record = new MutableRecordImpl();
             }
 
-            // depth first traversal of the record for the benefit of the handler.
-            traverse("", record, handler);
-
             return record;
         }
         catch (Exception e)
@@ -69,29 +72,19 @@ public class XmlRecordSerialiser
         }
     }
 
-    private void traverse(String path, MutableRecord record, RecordHandler handler)
-    {
-        handler.handle(path, record);
-        for (String child : record.nestedKeySet())
-        {
-            String childPath = PathUtils.getPath(path, child);
-            traverse(childPath, (MutableRecord) record.get(child), handler);
-        }
-    }
-
-    private Document recordToDocument(Record record)
+    private Document recordToDocument(Record record, boolean deep)
     {
         Element root = new Element(ELEMENT_RECORD);
         root.appendChild(new Comment("Stored by Pulse at " + FORMAT.format(new Date())));
         
         Document doc = new Document(root);
 
-        recordToDocument(record, root);
+        recordToDocument(record, root, deep);
 
         return doc;
     }
 
-    private void recordToDocument(Record record, Element root)
+    private void recordToDocument(Record record, Element root, boolean deep)
     {
         if (record != null)
         {
@@ -113,12 +106,15 @@ public class XmlRecordSerialiser
                 }
             }
 
-            for (String key : record.nestedKeySet())
+            if (deep)
             {
-                Record nested = (Record) record.get(key);
-                Element nestedElement = createElement(ELEMENT_RECORD, key);
-                root.appendChild(nestedElement);
-                recordToDocument(nested, nestedElement);
+                for (String key : record.nestedKeySet())
+                {
+                    Record nested = (Record) record.get(key);
+                    Element nestedElement = createElement(ELEMENT_RECORD, key);
+                    root.appendChild(nestedElement);
+                    recordToDocument(nested, nestedElement, deep);
+                }
             }
         }
     }

@@ -32,7 +32,7 @@ public class RecordManager implements HandleAllocator
      * The current highest handle allocated.
      */
     private AtomicLong nextHandle = new AtomicLong(UNDEFINED);
-    
+
     private RecordStore recordStore;
 
     private TransactionManager transactionManager;
@@ -65,7 +65,7 @@ public class RecordManager implements HandleAllocator
 
         stateWrapper = new RecordManagerStateTransactionalWrapper(new RecordManagerState(handleToPathMapping));
         stateWrapper.setTransactionManager(transactionManager);
-        
+
         nextHandle.set(highest[0]);
     }
 
@@ -183,7 +183,7 @@ public class RecordManager implements HandleAllocator
      * that path, but the parent must exist.
      *
      * @param path      path to store the new record at
-     * @param record the record value to store
+     * @param record    the record value to store
      */
     public synchronized void insert(final String path, final Record record)
     {
@@ -386,6 +386,11 @@ public class RecordManager implements HandleAllocator
         handler.handle(path, record);
     }
 
+    private interface RecordHandler
+    {
+        void handle(String path, Record record);
+    }
+
     /**
      *
      */
@@ -409,7 +414,7 @@ public class RecordManager implements HandleAllocator
 
         public RecordManagerState(RecordManagerState otherState)
         {
-            this.handleToPathMap  = new HashMap<Long, String>(otherState.handleToPathMap);
+            this.handleToPathMap = new HashMap<Long, String>(otherState.handleToPathMap);
         }
 
         public String getPathForHandle(long handle)
@@ -430,7 +435,7 @@ public class RecordManager implements HandleAllocator
                             "Existing path is: '" + mappedPath + "', duplicate path is: '" + path + "'");
                 }
             }
-            
+
             handleToPathMap.put(record.getHandle(), path);
             for (String key : record.nestedKeySet())
             {

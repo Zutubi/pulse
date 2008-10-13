@@ -596,7 +596,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         }
 
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
-        serialiser.serialise(file, record);
+        serialiser.serialise(file, record, true);
 
         return true;
     }
@@ -604,7 +604,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     private Record readRecord(File file)
     {
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
-        return serialiser.deserialise(file, new NoopRecordHandler());
+        return serialiser.deserialise(file);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

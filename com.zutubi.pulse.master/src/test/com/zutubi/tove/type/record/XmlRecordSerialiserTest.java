@@ -43,9 +43,9 @@ public class XmlRecordSerialiserTest extends PulseTestCase
         File f = new File(tmpDir, "record.xml");
         assertTrue(f.createNewFile());
 
-        serialiser.serialise(f, record);
+        serialiser.serialise(f, record, true);
 
-        MutableRecord deserialisedRecord = serialiser.deserialise(f, new NoopRecordHandler());
+        MutableRecord deserialisedRecord = serialiser.deserialise(f);
 
         assertEquals("a", deserialisedRecord.get("a"));
     }
@@ -61,9 +61,9 @@ public class XmlRecordSerialiserTest extends PulseTestCase
         File f = new File(tmpDir, "record.xml");
         assertTrue(f.createNewFile());
 
-        serialiser.serialise(f, record);
+        serialiser.serialise(f, record, true);
 
-        MutableRecord deserialisedRecord = serialiser.deserialise(f, new NoopRecordHandler());
+        MutableRecord deserialisedRecord = serialiser.deserialise(f);
 
         MutableRecord deserialisedChildRecord = (MutableRecord) deserialisedRecord.get("b");
         assertNotNull(deserialisedChildRecord);
@@ -75,9 +75,9 @@ public class XmlRecordSerialiserTest extends PulseTestCase
         for (int i = 0; i < 50; i++)
         {
             File f = new File(tmpDir, Integer.toString(i));
-            serialiser.serialise(f, createRandomSampleRecord());
+            serialiser.serialise(f, createRandomSampleRecord(), true);
 
-            serialiser.deserialise(f, new NoopRecordHandler());
+            serialiser.deserialise(f);
         }
     }
 
@@ -87,13 +87,29 @@ public class XmlRecordSerialiserTest extends PulseTestCase
         assertFalse(f.isFile());
 
         MutableRecord empty = new MutableRecordImpl();
-        serialiser.serialise(f, empty);
+        serialiser.serialise(f, empty, true);
 
         assertTrue(f.isFile());
 
-        MutableRecord result = serialiser.deserialise(f, new NoopRecordHandler());
+        MutableRecord result = serialiser.deserialise(f);
         assertNotNull(result);
         assertEquals(empty, result);
+    }
+
+    public void testNoDeepSerialisation() throws IOException
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("a", "a");
+        record.put("b", new MutableRecordImpl());
+
+        File f = new File(tmpDir, "record.xml");
+        assertTrue(f.createNewFile());
+
+        serialiser.serialise(f, record, false);
+
+        MutableRecord deserialisedRecord = serialiser.deserialise(f);
+
+        assertFalse(deserialisedRecord.containsKey("b"));
     }
 
     private MutableRecord createRandomSampleRecord()

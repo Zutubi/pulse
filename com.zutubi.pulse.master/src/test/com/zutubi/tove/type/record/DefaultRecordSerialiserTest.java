@@ -207,12 +207,6 @@ public class DefaultRecordSerialiserTest extends PulseTestCase
     private MutableRecord roundTrip(String path, MutableRecord record, boolean deep)
     {
         serialiser.serialise(path, record, deep);
-        return serialiser.deserialise(path, new RecordHandler()
-        {
-            public void handle(String path, Record record)
-            {
-                // noop
-            }
-        });
+        return serialiser.deserialise(path);
     }
 }
