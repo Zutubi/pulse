@@ -56,6 +56,16 @@ public class DefaultSchedulerTest extends TestCase
         assertEquals(NoopTask.class, persistentTrigger.getTaskClass());
     }
 
+    public void testScheduledState() throws SchedulingException
+    {
+        Trigger trigger = new NoopTrigger("a", "a");
+        trigger.setTaskClass(NoopTask.class);
+        scheduler.schedule(trigger);
+
+        Trigger scheduledTrigger = scheduler.getTrigger("a", "a");
+        assertTrue(scheduledTrigger.isScheduled());
+    }
+
     public void testUniqunessByNameAndGroup() throws SchedulingException
     {
         scheduler.schedule(new NoopTrigger("a", "a"));
@@ -74,24 +84,16 @@ public class DefaultSchedulerTest extends TestCase
     public void testPauseGroup() throws SchedulingException
     {
         scheduler.schedule(new NoopTrigger("a"));
-        scheduler.schedule(new NoopTrigger("b"));
-        scheduler.schedule(new NoopTrigger("c"));
 
         assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("b", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("c", Trigger.DEFAULT_GROUP).getState());
 
         scheduler.pause(Trigger.DEFAULT_GROUP);
 
         assertEquals(TriggerState.PAUSED, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.PAUSED, scheduler.getTrigger("b", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.PAUSED, scheduler.getTrigger("c", Trigger.DEFAULT_GROUP).getState());
 
         scheduler.resume(Trigger.DEFAULT_GROUP);
 
         assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("a", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("b", Trigger.DEFAULT_GROUP).getState());
-        assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("c", Trigger.DEFAULT_GROUP).getState());
 
     }
 

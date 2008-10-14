@@ -3,8 +3,12 @@ package com.zutubi.pulse.master.restore;
 import java.io.File;
 
 /**
+ * The archiveable component represents a component whose state can be
+ * exported to and imported from disk.
  *
- *
+ * The purpose of this interface is to support the backup and restore
+ * process, and so should be implemented by the components whose state
+ * is needed for the correct running of the application.
  */
 public interface ArchiveableComponent
 {
@@ -15,26 +19,28 @@ public interface ArchiveableComponent
      */
     String getName();
 
+    /**
+     * A human readable description of the component
+     *
+     * @return a human readable description.
+     */
     String getDescription();
 
     /**
-     * Backup the persistent state to the specified archive
+     * Backup the persistent state to the specified directory.
      *
-     * @param archive to write the backup information to.
+     * @param dir   the directory to write the persistent state to.
      *
      * @throws ArchiveException if the archive process encounters any problems.
      */
-    void backup(File archive) throws ArchiveException;
+    void backup(File dir) throws ArchiveException;
 
     /**
-     * Restore the persistent state from the specified archive.
+     * Restore the persistent state from the specified directory.
      *
-     * @param archive to read the backup information from.
+     * @param dir   the directory to read the persistent state from.
      *
      * @throws ArchiveException if the archive process encounters any problems.
      */
-    void restore(File archive) throws ArchiveException;
-
-//    List<RestoreTask> getRestoreTasks(File archiveComponentBase);
-
+    void restore(File dir) throws ArchiveException;
 }

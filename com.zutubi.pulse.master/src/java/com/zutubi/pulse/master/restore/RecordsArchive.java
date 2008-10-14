@@ -7,11 +7,11 @@ import java.io.File;
 
 /**
  * The records archive handles the backup and restoration of a record store.
- *
  */
 public class RecordsArchive extends AbstractArchiveableComponent
 {
     private RecordStore recordStore;
+    protected static final String ARCHIVE_FILENAME = "export.xml";
 
     public String getName()
     {
@@ -23,19 +23,23 @@ public class RecordsArchive extends AbstractArchiveableComponent
         return "The records restoration will replace the current Pulse system configuration with the archived configuration.";
     }
 
-    public void backup(File base)
+    public void backup(File dir)
     {
         Record export = recordStore.exportRecords();
 
+        File archive = new File(dir, ARCHIVE_FILENAME);
+        
         // serialise the record structure to disk.
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
-        serialiser.serialise(new File(base, "export.xml"), export, true);
+        serialiser.serialise(archive, export, true);
     }
 
-    public void restore(File base)
+    public void restore(File dir)
     {
+        File archive = new File(dir, ARCHIVE_FILENAME);
+        
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
-        Record baseRecord = serialiser.deserialise(new File(base, "export.xml"));
+        Record baseRecord = serialiser.deserialise(archive);
 
         recordStore.importRecords(baseRecord);
     }

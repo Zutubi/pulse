@@ -1,12 +1,11 @@
 package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
 
 import java.io.File;
@@ -15,10 +14,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
 
-/**
- *
- *
- */
 public class DatabaseArchiveTest extends PulseTestCase
 {
     private File tmpDir;
@@ -32,18 +27,16 @@ public class DatabaseArchiveTest extends PulseTestCase
         tmpDir = FileSystemUtils.createTempDir();
 
         dataSource = createDataSource();
-
     }
 
     protected void tearDown() throws Exception
     {
-        if (dataSource != null)
-        {
-            dataSource.close();
-        }
-        
-        removeDirectory(tmpDir);
+        closeDatasource(dataSource);
+        dataSource = null;
 
+        removeDirectory(tmpDir);
+        tmpDir = null;
+        
         super.tearDown();
     }
 
@@ -52,27 +45,24 @@ public class DatabaseArchiveTest extends PulseTestCase
         BasicDataSource dataSource = new BasicDataSource();
 
         dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUrl("jdbc:hsqldb:mem:testdb");
+        dataSource.setUrl("jdbc:hsqldb:mem:test" + System.currentTimeMillis());
         dataSource.setUsername("sa");
         dataSource.setPassword("");
 
         return dataSource;
     }
 
-    private String[] mappings = new String[]{"com/zutubi/pulse/master/restore/schema/Schema.hbm.xml"};
+    private String[] mappings = new String[]{
+            "com/zutubi/pulse/master/restore/schema/Types.hbm.xml",
+            "com/zutubi/pulse/master/restore/schema/RelatedTypes.hbm.xml"
+    };
 
     private Properties getHibernateProperties()
     {
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-//        properties.put("hibernate.show_sql", "true");
+        properties.put("hibernate.show_sql", "true");
 
-        // if we want to work through hibernates API, then we need to tell it where to get the
-        // datasource from.
-        properties.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.master.hibernate.HackyConnectionProvider");
-
-//        HackyConnectionProvider.dataSource = dataSource;
-        
         return properties;
     }
 
@@ -82,23 +72,7 @@ public class DatabaseArchiveTest extends PulseTestCase
         String[] sqlCreate = configuration.generateSchemaCreationScript(dialect);
         for (String sql : sqlCreate)
         {
-            if (sql.startsWith("create"))
-            {
-                JDBCUtils.execute(dataSource, sql);
-            }
-        }
-    }
-
-    private void createSchemaConstraints(MutableConfiguration configuration) throws SQLException
-    {
-        Dialect dialect = Dialect.getDialect(configuration.getProperties());
-        String[] sqlAlter = configuration.generateSchemaCreationScript(dialect);
-        for (String sql : sqlAlter)
-        {
-            if (sql.startsWith("alter"))
-            {
-                JDBCUtils.execute(dataSource, sql);
-            }
+            JDBCUtils.execute(dataSource, sql);
         }
     }
 
@@ -112,56 +86,51 @@ public class DatabaseArchiveTest extends PulseTestCase
 
         // SETUP THE DATABASE SCHEMA FOR TESTING.
         createSchema(configuration);
-        createSchemaConstraints(configuration);
 
         // SETUP TEST DATA.
-        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (1, 'string', '1')");
-        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (2, '', '1')");
-        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (3, null, '1')");
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, VALUE) values (1, 'string')");
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, VALUE) values (2, 'value')");
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, VALUE) values (3, 'here')");
         JDBCUtils.execute(dataSource, "insert into RELATED_TYPES (ID, TYPE) values (1, 1)");
 
-        DatabaseArchive archive = new DatabaseArchive();
-        archive.setDataSource(dataSource);
-        archive.setMappings(Arrays.asList(mappings));
-/*
-        final List<Integer> feedbackPercentages = new LinkedList<Integer>();
-        archive.setFeedback(new TaskFeedback()
-        {
-            public void setPercetageComplete(int percentage)
-            {
-                feedbackPercentages.add(percentage);
-            }
-        });
-*/
-        archive.setHibernateProperties(getHibernateProperties());
-        archive.backup(tmpDir);
+        DatabaseArchive backupArchive = new DatabaseArchive();
+        backupArchive.setMappings(Arrays.asList(mappings));
+        backupArchive.setDataSource(dataSource);
+        backupArchive.setHibernateProperties(getHibernateProperties());
 
-        assertTrue(new File(tmpDir, "export.xml").exists());
-        assertTrue(new File(tmpDir, "Schema.hbm.xml").exists());
-        assertTrue(new File(tmpDir, "tables.properties").exists());
+        backupArchive.backup(tmpDir);
 
-        Properties props = IOUtils.read(new File(tmpDir, "tables.properties"));
-        assertEquals(3, props.size());
-        assertEquals("3", props.get("TYPES"));
-        assertEquals("1", props.get("RELATED_TYPES"));
-        // third one is hibernate_unique_key.
+        assertTrue(new File(tmpDir, DatabaseArchive.EXPORT_FILENAME).exists());
+        assertTrue(new File(tmpDir, "RelatedTypes.hbm.xml").exists());
+        assertTrue(new File(tmpDir, "Types.hbm.xml").exists());
+        assertTrue(new File(tmpDir, DatabaseArchive.TRACKING_FILENAME).exists());
 
-        JDBCUtils.execute(dataSource, "SHUTDOWN");
+        Properties props = IOUtils.read(new File(tmpDir, DatabaseArchive.TRACKING_FILENAME));
+        assertEquals(3, props.size());  // 3 tables in the export
+        assertEquals("3", props.get("TYPES")); // 3 entries in the types table
+        assertEquals("1", props.get("RELATED_TYPES"));  // 1 entry in the related types table
+        assertEquals("1", props.get("hibernate_unique_key"));  // 1 entry in the hibernate unique key table.
 
+        closeDatasource(dataSource);
+
+        // create an empty datasource.
         dataSource = createDataSource();
-        
-        archive.setDataSource(dataSource);
-        archive.restore(tmpDir);
 
-/*
-        assertEquals(25, (int)feedbackPercentages.get(0));
-        assertEquals(50, (int)feedbackPercentages.get(1));
-        assertEquals(75, (int)feedbackPercentages.get(2));
-        assertEquals(99, (int)feedbackPercentages.get(3));
-*/
+        DatabaseArchive restoreArchive = new DatabaseArchive();
+        restoreArchive.setDataSource(dataSource);
+        restoreArchive.setHibernateProperties(getHibernateProperties());
+        restoreArchive.restore(tmpDir);
 
         assertEquals(3, JDBCUtils.executeCount(dataSource, "select * from TYPES"));
         assertEquals(1, JDBCUtils.executeCount(dataSource, "select * from RELATED_TYPES"));
     }
 
+    private void closeDatasource(BasicDataSource dataSource) throws SQLException
+    {
+        if (dataSource != null)
+        {
+            JDBCUtils.execute(dataSource, "SHUTDOWN");
+            dataSource.close();
+        }
+    }
 }

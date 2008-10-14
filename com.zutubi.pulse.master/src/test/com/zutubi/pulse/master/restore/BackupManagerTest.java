@@ -18,11 +18,8 @@ import com.zutubi.validation.MockValidationContext;
 import com.zutubi.validation.ValidationException;
 
 import java.io.File;
+import java.io.IOException;
 
-/**
- *
- *
- */
 public class BackupManagerTest extends PulseTestCase
 {
     private DefaultScheduler scheduler;
@@ -34,12 +31,16 @@ public class BackupManagerTest extends PulseTestCase
     private EventManager eventManager;
 
     private File tmp;
+    private File backupDir;
+    private File backupTmpDir;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
         tmp = FileSystemUtils.createTempDir();
+        backupDir = new File(tmp, "backup");
+        backupTmpDir = new File(tmp, "tmp");
 
         scheduler = new DefaultScheduler();
         scheduler.setTriggerDao(new MockTriggerDao());
@@ -64,7 +65,9 @@ public class BackupManagerTest extends PulseTestCase
         
         removeDirectory(tmp);
         tmp = null;
-        
+        backupDir = null;
+        backupTmpDir = null;
+
         super.tearDown();
     }
 
@@ -73,23 +76,31 @@ public class BackupManagerTest extends PulseTestCase
         BackupConfiguration config = configurationProvider.get(BackupConfiguration.class);
         config.setEnabled(true);
 
-        BackupManager manager = createAndStartBackupManager();
+        createAndStartBackupManager();
 
         // Ensure that the init of the backup manager registers the expected trigger.
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
         assertNotNull(trigger);
-        assertEquals(manager.DEFAULT.getCronSchedule(), trigger.getCron());
+        assertEquals(BackupManager.DEFAULT.getCronSchedule(), trigger.getCron());
         assertTrue(trigger.isScheduled());
+    }
+
+    public void testStateOfScheduledTrigger()
+    {
+        BackupConfiguration config = configurationProvider.get(BackupConfiguration.class);
+        config.setEnabled(true);
+
+        createAndStartBackupManager();
+
+        CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
     }
 
     public void testDefaultCronScheduleIsValid() throws ValidationException
     {
-        BackupManager manager = new BackupManager();
-
         MockValidationContext validationContext = new MockValidationContext();
         CronExpressionValidator v = new CronExpressionValidator();
         v.setValidationContext(validationContext);
-        v.validateStringField(manager.DEFAULT.getCronSchedule());
+        v.validateStringField(BackupManager.DEFAULT.getCronSchedule());
 
         assertFalse(validationContext.hasErrors());
     }
@@ -98,10 +109,30 @@ public class BackupManagerTest extends PulseTestCase
     {
         BackupManager manager = createAndStartBackupManager();
         
+        assertFalse(backupDir.isDirectory());
+
         manager.triggerBackup();
 
-        // is this much more than a simple delegation to the restoreManager?.  Maybe we want to place the
-        // archive in a special location / file name format?.
+        // ensure a backup was created.
+        assertEquals(1, backupDir.list().length);
+    }
+
+    // this is more of an acceptance test with an annoying dependency on timing. The individual components
+    // that make up this functionality are tested.
+    public void testCleanupOfBackupDirectory() throws IOException, InterruptedException
+    {
+        BackupManager manager = createAndStartBackupManager();
+        manager.triggerBackup();
+
+        File firstBackup = backupDir.listFiles()[0];
+        assertTrue(firstBackup.isFile());
+        
+        for (int i = 0; i < 10; i++)
+        {
+            manager.triggerBackup();
+        }
+
+        assertFalse(firstBackup.isFile());
     }
 
     public void testScheduleOnlyOnEnabled()
@@ -170,8 +201,8 @@ public class BackupManagerTest extends PulseTestCase
         manager.setScheduler(scheduler);
         manager.setEventManager(eventManager);
         manager.setConfigurationProvider(configurationProvider);
-        manager.setBackupDir(new File(tmp, "backup"));
-        manager.setTmpDirectory(new File(tmp, "tmp"));
+        manager.setBackupDir(backupDir);
+        manager.setTmpDirectory(backupTmpDir);
         manager.add(new NoopArchiveableComponent());
         manager.init();
 

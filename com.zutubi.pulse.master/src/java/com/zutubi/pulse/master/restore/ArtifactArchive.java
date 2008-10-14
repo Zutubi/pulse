@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
- *
+ * This archiveable component is to support the jabberwocky import only.  The backup and storage
+ * or artifacts needs to be handled externally due to the potential size of the artifacts.
  */
 public class ArtifactArchive extends AbstractArchiveableComponent implements FeedbackAware
 {
@@ -140,11 +140,6 @@ public class ArtifactArchive extends AbstractArchiveableComponent implements Fee
         }
     }
 
-    public void setUserPaths(MasterUserPaths paths)
-    {
-        this.paths = paths;
-    }
-
     private Map<Pair<String, String>, String> readMappings(File file) throws IOException
     {
         Map<Pair<String, String>, String> mappings = new HashMap<Pair<String, String>, String>();
@@ -187,6 +182,11 @@ public class ArtifactArchive extends AbstractArchiveableComponent implements Fee
     public void setSystemConfiguration(SystemConfiguration systemConfiguration)
     {
         this.systemConfiguration = systemConfiguration;
+    }
+
+    public void setUserPaths(MasterUserPaths paths)
+    {
+        this.paths = paths;
     }
 
     private class NonDeadDirectoryFilter implements FileFilter

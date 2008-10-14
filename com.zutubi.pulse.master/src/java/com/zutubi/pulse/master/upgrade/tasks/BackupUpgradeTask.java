@@ -21,7 +21,7 @@ public class BackupUpgradeTask extends AbstractUpgradeTask implements Configurat
 
     public String getDescription()
     {
-        return "Creates a backup of your embedded pulse database (will NOT backup an external database).";
+        return "Create a cut down PULSE_DATA snapshot prior to upgrading.";
     }
 
     public int getBuildNumber()

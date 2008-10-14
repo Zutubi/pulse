@@ -6,15 +6,9 @@ import com.zutubi.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 
-/**
- *
- *
- */
 public class KeepMostRecentXCleanupStrategyTest extends PulseTestCase
 {
     private File tmp;
-
-    private long i;
 
     protected void setUp() throws Exception
     {
@@ -70,6 +64,7 @@ public class KeepMostRecentXCleanupStrategyTest extends PulseTestCase
         File[] targets = strategy.getCleanupTargets(tmp.listFiles());
         assertNotNull(targets);
         assertEquals(1, targets.length);
+        assertEquals("backup-0", targets[0].getName());
     }
 
     public void testXEqualsZero() throws IOException
@@ -106,8 +101,6 @@ public class KeepMostRecentXCleanupStrategyTest extends PulseTestCase
     {
         File f = new File(tmp, fileName);
         f.createNewFile();
-        f.setLastModified(i * 100000);
-        i++;
     }
 
 }

@@ -6,12 +6,8 @@ import com.zutubi.pulse.master.scheduling.Trigger;
 
 import java.util.List;
 
-/**
- * <class-comment/>
- */
 public class MockTriggerDao extends MockEntityDao<Trigger> implements TriggerDao
 {
-
     public List<Trigger> findByGroup(final String group)
     {
         return findByFilter(new Filter<Trigger>()

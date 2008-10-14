@@ -29,6 +29,10 @@ public class PluginsArchive extends AbstractArchiveableComponent
         try
         {
             // this is a simple directory backup.
+            if (!base.exists() && !base.mkdirs())
+            {
+                throw new IOException("Failed to create directory: " + base.getCanonicalPath());
+            }
             FileSystemUtils.copy(base, pluginPaths.getPluginStorageDir());
         }
         catch (IOException e)
@@ -41,13 +45,27 @@ public class PluginsArchive extends AbstractArchiveableComponent
     {
         try
         {
-            // clean out the target directory prior to the restore.
+            // clean out the target directory prior to the restore.  Any old plugins will be picked
+            // up on restart and potentially started.  This could become confusing.  We are restoring
+            // a backup, so the user should expect existing data to 'go away'.
+            File storageDir = pluginPaths.getPluginStorageDir();
+            if (!storageDir.exists() && !storageDir.mkdirs())
+            {
+                throw new IOException("Failed to create directory: " + storageDir.getCanonicalPath());
+            }
+            
+            for (File f : storageDir.listFiles())
+            {
+                // we do not expect any directories here.  But, rather than running an rm -rf, lets
+                // be  alittle careful.
+                if (f.isFile())
+                {
+                    FileSystemUtils.delete(f);
+                }
+            }
 
             // this is a simple directory backup.
-            FileSystemUtils.copy(pluginPaths.getPluginStorageDir(), base);
-
-            // what about the other plugin path directories?  - the registry directory for instance.. maybe we should
-            // just merge some of these to simplify the backup restore process.
+            FileSystemUtils.copy(storageDir, base);
         }
         catch (IOException e)
         {

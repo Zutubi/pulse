@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- */
 public class ArchiveFactoryTest extends PulseTestCase
 {
     private ArchiveFactory factory;
@@ -74,6 +72,11 @@ public class ArchiveFactoryTest extends PulseTestCase
             public boolean matches(String name)
             {
                 return name.equals("sample");
+            }
+
+            public int compareTo(String nameA, String nameB)
+            {
+                return 0;
             }
         });
         Archive archive = factory.createArchive();

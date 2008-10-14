@@ -3,8 +3,7 @@ package com.zutubi.pulse.master.restore;
 import java.io.File;
 
 /**
- *
- *
+ * An implementation of the ArchiveableComponent that does nothing.
  */
 public class NoopArchiveableComponent extends AbstractArchiveableComponent
 {
@@ -20,11 +19,11 @@ public class NoopArchiveableComponent extends AbstractArchiveableComponent
 
     public void backup(File archive) throws ArchiveException
     {
-
+        // noop.
     }
 
     public void restore(File archive) throws ArchiveException
     {
-
+        // noop.
     }
 }

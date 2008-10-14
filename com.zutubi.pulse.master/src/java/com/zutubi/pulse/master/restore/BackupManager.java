@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * The backup manager is responsible for coordinating the automated backups for the system.
+ */
 public class BackupManager
 {
     private static final Logger LOG = Logger.getLogger(BackupManager.class);
@@ -30,7 +33,7 @@ public class BackupManager
     public static final String TRIGGER_GROUP = "admin";
 
     // default backup details in case no configuration is stored.
-    public BackupConfiguration DEFAULT = new BackupConfiguration();
+    static final BackupConfiguration DEFAULT = new BackupConfiguration();
 
     private ConfigurationProvider configurationProvider;
 
@@ -67,7 +70,7 @@ public class BackupManager
     protected void initialiseManager()
     {
         // initialise the automated backups with the scheduler
-       BackupConfiguration instance = configurationProvider.get(BackupConfiguration.class);
+        BackupConfiguration instance = configurationProvider.get(BackupConfiguration.class);
         if (instance.isEnabled())
         {
             // check if the trigger exists. if not, create and schedule.
@@ -162,9 +165,11 @@ public class BackupManager
 
     public void triggerBackup()
     {
-        // prior to creating backups, we need to ensure that we cleanup the existing backups.
+        // prior to creating backups, we need to ensure that we cleanup the existing backups.  Cleanups
+        // are to ensure we have enough disk space, so it is better to cleanup before creating a new backup
+        // and risk deleting early (if the backup fails) that to fail a backup before we run out of space.
         cleanupBackups();
-
+        
         try
         {
             ArchiveFactory factory = new ArchiveFactory();
@@ -193,7 +198,7 @@ public class BackupManager
         // a) mark them for deletion
         // b) delete them.
         final ArchiveNameGenerator generator = new UniqueDatestampedNameGenerator();
-        
+
         File[] candidateFilesForCleanup = backupDir.listFiles(new FilenameFilter()
         {
             public boolean accept(File dir, String name)
@@ -202,15 +207,13 @@ public class BackupManager
                 {
                     return false;
                 }
-                if (name.endsWith(".zip"))
-                {
-                    return generator.matches(name.substring(0, name.length() - 4));
-                }
-                return false;
+                return generator.matches(name);
             }
         });
 
-        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(10);
+        // the cleanup runs BEFORE the backup is generated.  So, if we want no more than 10 backups, we
+        // need the cleanup to ensure that only x - 1 exist.
+        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(9);
 
         File[] cleanupTargets = strategy.getCleanupTargets(candidateFilesForCleanup);
         if (cleanupTargets.length > 0)
@@ -219,8 +222,6 @@ public class BackupManager
             {
                 if (cleanupTarget.exists())
                 {
-                    // do we need to cater for this case? happens when the cleanup is run frequently, and a file has
-                    // been picked up for cleaning, but is then deleted.
                     File renamedCleanupTarget = new File(cleanupTarget.getParentFile(), cleanupTarget.getName() + ".delete");
                     cleanupTarget.renameTo(renamedCleanupTarget);
                 }
@@ -242,6 +243,7 @@ public class BackupManager
             {
                 try
                 {
+                    System.out.println("cleanup: " + file.getAbsolutePath());
                     FileSystemUtils.delete(file);
                 }
                 catch (IOException e)

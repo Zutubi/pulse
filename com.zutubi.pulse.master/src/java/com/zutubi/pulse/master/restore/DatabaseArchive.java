@@ -24,8 +24,9 @@ import java.util.*;
  */
 public class DatabaseArchive extends AbstractArchiveableComponent implements FeedbackAware
 {
-    private static final String EXPORT_FILENAME = "export.xml";
-
+    static final String EXPORT_FILENAME = "export.xml";
+    static final String TRACKING_FILENAME = "tables.properties";
+    
     private List<String> mappings = new LinkedList<String>();
 
     private DataSource dataSource = null;
@@ -41,9 +42,9 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
 
     public String getDescription()
     {
-        return "The database restoration process takes the 1.2.x data export and imports it into your 2.0 database. " +
-                "Please be aware that this process will reconstruct the 2.0 schema in your specified database.  " +
-                "All existing data will be replaced.";
+        return "The database restoration process takes a snapshot of the database schema and content based on " +
+                "the internal Pulse schema descriptors.  Please be aware that this process will reconstruct the " +
+                "schema in your specified database.  All existing data will be replaced.";
     }
 
     public void backup(File base) throws ArchiveException
@@ -61,7 +62,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
                 resources.add(new ClassPathResource(mapping));
             }
 
-            // need to export the configuration as part of the data export.
+            // Export the schema as part of the data export.
             for (Resource resource : resources)
             {
                 File file = new File(base, resource.getFilename());
@@ -86,8 +87,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
             transfer.addListener(new LogTableSizeTransferListener(transferedTableSizes));
             transfer.dump(configuration, dataSource, export);
 
-            writeTableSizes(transferedTableSizes, new File(base, "tables.properties"));
-
+            writeTableSizes(transferedTableSizes, new File(base, TRACKING_FILENAME));
         }
         catch (IOException e)
         {
@@ -103,7 +103,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
     {
         try
         {
-            final Map<String, Long> tableSizes = readTableSizes(new File(base, "tables.properties"));
+            final Map<String, Long> tableSizes = readTableSizes(new File(base, TRACKING_FILENAME));
 
             File export = new File(base, EXPORT_FILENAME);
             if (export.isFile())

@@ -66,6 +66,8 @@ public class MockEntityDao<T extends Entity> implements EntityDao<T>
         if (entities.contains(entity))
         {
             // update.
+            entities.remove(entity);
+            entities.add(entity);
         }
         else
         {

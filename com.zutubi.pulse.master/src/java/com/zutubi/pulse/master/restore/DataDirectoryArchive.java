@@ -7,8 +7,12 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- *
- *
+ * This implementation of the archiveable component interface takes a snapshot of the
+ * configuration contents of the PULSE_DATA directory.
+ * <ul>
+ * <li>PULSE_DATA/config/* -> base/config</li>
+ * <li>PULSE_DATA/pulse.config.properties -> base/pulse.config.properties</li>
+ * </ul>
  */
 public class DataDirectoryArchive extends AbstractArchiveableComponent
 {
@@ -50,6 +54,11 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
 
             // can not use the fsu.copy since it expects the destination directory to be empty, which
             // will not always be the case.
+            File configRoot = paths.getUserConfigRoot();
+            if (!configRoot.isDirectory() && !configRoot.mkdirs())
+            {
+                throw new IOException("Failed to create directory: " + configRoot.getCanonicalPath());
+            }
             copy(paths.getUserConfigRoot(), new File(archive, "config").listFiles());
 
             FileSystemUtils.copy(paths.getData(), new File(archive, "pulse.config.properties"));
@@ -66,7 +75,19 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
         {
             if (file.isFile())
             {
-                FileSystemUtils.copy(dest, file);
+                // does the file already exist? and if so, is it a database file?. If so, do not overwrite it.
+                File target = new File(dest, file.getName());
+                if (!target.exists())
+                {
+                    FileSystemUtils.copy(dest, file);
+                }
+                else
+                {
+                    if (!file.getName().startsWith("database"))
+                    {
+                        FileSystemUtils.copy(dest, file);
+                    }
+                }
             }
             else if (file.isDirectory())
             {
@@ -82,15 +103,18 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
 
     private void cleanup(File base) throws IOException
     {
-        for (File file : base.listFiles())
+        if (base.exists())
         {
-            if (file.isDirectory())
+            for (File file : base.listFiles())
             {
-                cleanup(file);
-            }
-            if (!file.getName().startsWith("database"))
-            {
-                FileSystemUtils.delete(file);
+                if (file.isDirectory())
+                {
+                    cleanup(file);
+                }
+                if (!file.getName().startsWith("database"))
+                {
+                    FileSystemUtils.delete(file);
+                }
             }
         }
     }

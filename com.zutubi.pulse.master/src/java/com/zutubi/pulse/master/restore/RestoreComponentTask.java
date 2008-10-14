@@ -2,19 +2,23 @@ package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.master.util.monitor.FeedbackAware;
 import com.zutubi.pulse.master.util.monitor.TaskFeedback;
+import com.zutubi.pulse.master.util.monitor.TaskException;
+import com.zutubi.pulse.master.util.monitor.Task;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * An implementation of the restore task interface that triggers the {@link ArchiveableComponent#restore(java.io.File)} 
+ * method for a single component.
  */
-public class RestoreComponentTask implements RestoreTask, FeedbackAware
+public class RestoreComponentTask implements Task, FeedbackAware
 {
     private ArchiveableComponent component;
     private File archiveBase;
+    private List<String> errorMessages = new LinkedList<String>();
+    private boolean failed;
 
     public RestoreComponentTask(ArchiveableComponent component, File archiveBase)
     {
@@ -22,9 +26,18 @@ public class RestoreComponentTask implements RestoreTask, FeedbackAware
         this.archiveBase = archiveBase;
     }
 
-    public void execute() throws ArchiveException
+    public void execute() throws TaskException
     {
-        component.restore(archiveBase);
+        try
+        {
+            component.restore(archiveBase);
+        }
+        catch (ArchiveException e)
+        {
+            failed = true;
+            addErrorMessage("Restoration failed. Cause: " + e.getMessage() + ". See logs for more details.");
+            throw new TaskException(e);
+        }
     }
 
     public String getName()
@@ -40,12 +53,17 @@ public class RestoreComponentTask implements RestoreTask, FeedbackAware
 
     public boolean hasFailed()
     {
-        return false;
+        return failed;
+    }
+
+    private void addErrorMessage(String msg)
+    {
+        errorMessages.add(msg);
     }
 
     public List<String> getErrors()
     {
-        return new LinkedList<String>();
+        return errorMessages;
     }
 
     public boolean haltOnFailure()

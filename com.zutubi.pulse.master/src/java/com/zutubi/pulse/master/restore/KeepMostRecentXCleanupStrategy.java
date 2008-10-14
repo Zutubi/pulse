@@ -3,10 +3,6 @@ package com.zutubi.pulse.master.restore;
 import java.io.File;
 import java.util.*;
 
-/**
- *
- *
- */
 public class KeepMostRecentXCleanupStrategy implements BackupCleanupStrategy
 {
     private int x = 10;
@@ -32,7 +28,7 @@ public class KeepMostRecentXCleanupStrategy implements BackupCleanupStrategy
         {
             public int compare(File o1, File o2)
             {
-                return o1.lastModified() < o2.lastModified() ? -1 : 1;
+                return o1.lastModified() < o2.lastModified() ? -1 : o1.lastModified() == o2.lastModified() ? 0 : 1;
             }
         });
 
