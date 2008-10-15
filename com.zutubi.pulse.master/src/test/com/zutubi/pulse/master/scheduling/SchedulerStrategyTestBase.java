@@ -49,20 +49,6 @@ public abstract class SchedulerStrategyTestBase extends TestCase
         assertFalse(triggerHandler.wasTriggered());
     }
 
-    public void testTriggerStates() throws SchedulingException
-    {
-        Trigger trigger = createTrigger();
-        assertEquals(TriggerState.NONE, trigger.getState());
-        scheduler.schedule(trigger);
-        assertEquals(TriggerState.SCHEDULED, trigger.getState());
-        scheduler.pause(trigger);
-        assertEquals(TriggerState.PAUSED, trigger.getState());
-        scheduler.resume(trigger);
-        assertEquals(TriggerState.SCHEDULED, trigger.getState());
-        scheduler.unschedule(trigger);
-        assertEquals(TriggerState.NONE, trigger.getState());
-    }
-
     public void testPauseTrigger() throws SchedulingException
     {
         Trigger trigger = createTrigger();

@@ -46,12 +46,12 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
     public void unschedule(Trigger trigger) throws SchedulingException
     {
-        unregister(trigger, TriggerState.NONE);
+        unregister(trigger);
     }
 
     public void pause(Trigger trigger) throws SchedulingException
     {
-        unregister(trigger, TriggerState.PAUSED);
+        unregister(trigger);
     }
 
     public void resume(Trigger trigger) throws SchedulingException
@@ -75,16 +75,14 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
         activeListenerMap.put(eventTrigger.getId(), eventListener);
         eventManager.register(eventListener);
-        trigger.setState(TriggerState.SCHEDULED);
     }
 
-    private void unregister(Trigger trigger, TriggerState newState)
+    private void unregister(Trigger trigger)
     {
         if (activeListenerMap.containsKey(trigger.getId()))
         {
             EventListener listener = activeListenerMap.remove(trigger.getId());
             eventManager.unregister(listener);
-            trigger.setState(newState);
         }
     }
 

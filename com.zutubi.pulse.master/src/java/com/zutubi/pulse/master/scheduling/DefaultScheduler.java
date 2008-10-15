@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * <class-comment/>
- */
 public class DefaultScheduler implements Scheduler, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultScheduler.class);
@@ -114,12 +111,13 @@ public class DefaultScheduler implements Scheduler, EventListener
 
     public void schedule(Trigger trigger) throws SchedulingException
     {
-        if (triggerDao.findByNameAndGroup(trigger.getName(), trigger.getGroup()) != null)
+        if (trigger.isScheduled())
         {
-            throw new SchedulingException("A trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " has already been registered.");
+            throw new SchedulingException("Trigger is already scheduled.");
         }
 
         // assosiate trigger and task so that task can be retrieved when trigger fires.
+        trigger.setState(TriggerState.SCHEDULED);
         triggerDao.save(trigger);
 
         if (started)
@@ -140,35 +138,36 @@ public class DefaultScheduler implements Scheduler, EventListener
      * @param trigger instance to be unscheduled.
      * @throws SchedulingException
      */
-    public void unschedule(Trigger trigger) throws SchedulingException
+    public void unschedule(final Trigger trigger) throws SchedulingException
     {
         assertScheduled(trigger);
+        
+        trigger.setState(TriggerState.NONE);
+        triggerDao.save(trigger);
+
         SchedulerStrategy impl = getStrategy(trigger);
         impl.unschedule(trigger);
+
         triggerDao.delete(trigger);
     }
 
     public void update(Trigger trigger) throws SchedulingException
     {
         assertScheduled(trigger);
-        SchedulerStrategy impl = getStrategy(trigger);
 
-        TriggerState requiredState = trigger.getState();
-
-        impl.unschedule(trigger);
-
-        // save changes to the trigger.
         triggerDao.save(trigger);
 
-        switch (requiredState)
+        TriggerState state = trigger.getState();
+
+        SchedulerStrategy impl = getStrategy(trigger);
+        impl.unschedule(trigger);
+
+        switch (state)
         {
             case SCHEDULED:
                 impl.schedule(trigger);
                 break;
             case PAUSED:
-                // There is a possibility that the trigger will trigger between
-                // these method calls.  Is it enough to chance the API to a single call?..
-                impl.schedule(trigger);
                 impl.pause(trigger);
                 break;
         }
@@ -189,9 +188,12 @@ public class DefaultScheduler implements Scheduler, EventListener
         {
             return;
         }
+
+        trigger.setState(TriggerState.PAUSED);
+        triggerDao.save(trigger);
+
         SchedulerStrategy impl = getStrategy(trigger);
         impl.pause(trigger);
-        triggerDao.save(trigger);
     }
 
     public void resume(String group) throws SchedulingException
@@ -209,11 +211,12 @@ public class DefaultScheduler implements Scheduler, EventListener
         {
             return;
         }
+
+        trigger.setState(TriggerState.SCHEDULED);
+        triggerDao.save(trigger);
+
         SchedulerStrategy impl = getStrategy(trigger);
         impl.resume(trigger);
-
-        // record any state change.
-        triggerDao.save(trigger);
     }
 
     public void renameProjectTriggers(long project, String name) throws SchedulingException
@@ -265,7 +268,7 @@ public class DefaultScheduler implements Scheduler, EventListener
     {
         if (!trigger.isScheduled())
         {
-            throw new SchedulingException("The trigger must be scheduled first.");
+            throw new SchedulingException("The trigger must be scheduled.");
         }
     }
 

@@ -120,7 +120,7 @@ public abstract class Trigger extends Entity implements NamedEntity
         return state;
     }
 
-    public void setState(TriggerState state)
+    void setState(TriggerState state)
     {
         this.state = state;
     }

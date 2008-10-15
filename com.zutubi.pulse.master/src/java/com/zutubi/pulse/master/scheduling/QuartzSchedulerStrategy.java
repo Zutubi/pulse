@@ -20,8 +20,6 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 
     private Scheduler quartzScheduler;
 
-    private TriggerHandler triggerHandler;
-
     public void setQuartzScheduler(Scheduler quartzScheduler)
     {
         this.quartzScheduler = quartzScheduler;
@@ -36,8 +34,13 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
+            // if trigger is not scheduled, then schedule it first before pausing.
+            org.quartz.Trigger t = getQuartzScheduler().getTrigger(Long.toString(trigger.getId()), QUARTZ_GROUP);
+            if (t == null)
+            {
+                schedule(trigger);
+            }
             getQuartzScheduler().pauseTrigger(Long.toString(trigger.getId()), QUARTZ_GROUP);
-            trigger.setState(TriggerState.PAUSED);
         }
         catch (SchedulerException e)
         {
@@ -50,7 +53,6 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         try
         {
             getQuartzScheduler().resumeTrigger(Long.toString(trigger.getId()), QUARTZ_GROUP);
-            trigger.setState(TriggerState.SCHEDULED);
         }
         catch (SchedulerException e)
         {
@@ -78,7 +80,6 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         try
         {
             getQuartzScheduler().unscheduleJob(Long.toString(trigger.getId()), QUARTZ_GROUP);
-            trigger.setState(TriggerState.NONE);
         }
         catch (SchedulerException e)
         {
@@ -100,11 +101,13 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 
     public void init(Trigger trigger) throws SchedulingException
     {
-        boolean pause = trigger.isPaused();
-        schedule(trigger);
-        if(pause)
+        if (trigger.isScheduled())
         {
-            pause(trigger);
+            schedule(trigger);
+            if(trigger.isPaused())
+            {
+                pause(trigger);
+            }
         }
     }
 
@@ -122,8 +125,6 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
             quartzTrigger.getJobDataMap().put(QuartzTaskCallbackJob.TRIGGER_PROP, trigger);
 
             getQuartzScheduler().scheduleJob(quartzTrigger);
-
-            trigger.setState(TriggerState.SCHEDULED);
         }
         catch (SchedulerException e)
         {
@@ -133,7 +134,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 
     public void setTriggerHandler(TriggerHandler handler)
     {
-        this.triggerHandler = handler;
+        // noop.
     }
 
     public boolean dependsOnProject(Trigger trigger, long projectId)

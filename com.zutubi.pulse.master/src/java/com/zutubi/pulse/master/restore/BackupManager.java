@@ -182,6 +182,10 @@ public class BackupManager
             {
                 String name = component.getName();
                 File archiveComponentBase = new File(archive.getBase(), name);
+                if (!archiveComponentBase.mkdirs())
+                {
+                    throw new ArchiveException("Failed to create new directory: " + archiveComponentBase.getAbsolutePath());
+                }
                 component.backup(archiveComponentBase);
             }
 
@@ -243,7 +247,6 @@ public class BackupManager
             {
                 try
                 {
-                    System.out.println("cleanup: " + file.getAbsolutePath());
                     FileSystemUtils.delete(file);
                 }
                 catch (IOException e)
