@@ -28,12 +28,12 @@ public class RecordsArchiveTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testUnitEmptyStore()
+    public void testUnitEmptyStore() throws ArchiveException
     {
         assertRoundTrip(new MutableRecordImpl());
     }
 
-    public void testSimpleData()
+    public void testSimpleData() throws ArchiveException
     {
         MutableRecordImpl base = new MutableRecordImpl();
         base.put("a", "b");
@@ -42,7 +42,7 @@ public class RecordsArchiveTest extends PulseTestCase
         assertRoundTrip(base);
     }
 
-    public void testNestedData()
+    public void testNestedData() throws ArchiveException
     {
         MutableRecordImpl nested = new MutableRecordImpl();
         nested.put("1", "2");
@@ -53,7 +53,7 @@ public class RecordsArchiveTest extends PulseTestCase
         assertRoundTrip(base);
     }
 
-    private void assertRoundTrip(Record base)
+    private void assertRoundTrip(Record base) throws ArchiveException
     {
         RecordStore store = mock(RecordStore.class);
         stub(store.exportRecords()).toReturn(base);

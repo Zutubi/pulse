@@ -87,4 +87,9 @@
             </list>
         </property>
     </bean>
+
+    <bean id="fixPersistentTriggerState" class="com.zutubi.pulse.master.upgrade.tasks.FixPersistentTriggerStateUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200013002"/>
+    </bean>
+
 </beans>
