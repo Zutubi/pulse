@@ -992,7 +992,7 @@ public class FileSystemUtils
             if (exit != 0)
             {
                 // Attempt to copy ourselves.
-                LOG.warning("Copy using '"+ StringUtils.join(" ", args)+"' failed, trying internal copy");
+                LOG.warning("Copy using '"+ StringUtils.join(" ", args)+"' failed ("+exit+"), trying internal copy");
                 rmdir(dest);
                 javaCopy(dest, src);
             }
