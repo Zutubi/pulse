@@ -6,13 +6,16 @@ import static com.zutubi.config.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.config.annotations.FieldType;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmCapability;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -46,7 +49,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private ConfigurationResponse configurationResponse;
     private String submitField;
 
-    private ScmClientFactory<ScmConfiguration> scmClientFactory;
+    private ScmManager scmManager;
     private ConfigurationProvider configurationProvider;
     private Configuration configuration;
 
@@ -148,7 +151,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     {
         try
         {
-            if(ScmClientUtils.getCapabilities(scm, scmClientFactory).contains(ScmCapability.REVISIONS))
+            Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(scm, scmManager);
+            if(capabilities.contains(ScmCapability.REVISIONS) && scmManager.isReady(scm))
             {
                 field.addParameter(ACTIONS, Arrays.asList("getlatest"));
                 field.addParameter(SCRIPTS, Arrays.asList("EditBuildPropertiesAction.getlatest"));
@@ -210,7 +214,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             ScmClient client = null;
             try
             {
-                client = scmClientFactory.createClient(projectConfig.getScm());
+                client = scmManager.createClient(projectConfig.getScm());
                 r = client.parseRevision(revision);
             }
             catch (ScmException e)
@@ -290,9 +294,9 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         }
     }
 
-    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientFactory = scmClientFactory;
+        this.scmManager = scmManager;
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)

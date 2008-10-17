@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.scm.git.GitClient;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 
 /**
  * not yet implemented
@@ -17,9 +18,10 @@ public class GitConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
 
     public void test(GitConfiguration configuration) throws ScmException
     {
-        GitClient client = (GitClient) scmClientFactory.createClient(configuration);
+        GitClient client = null;
         try
         {
+            client = (GitClient) scmClientFactory.createClient(configuration);
             // can check the repository details by creating a local (no checkout) clone.
             // can check for the existance of the specified branch.
             // - local clone of repository
@@ -27,7 +29,7 @@ public class GitConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
         }
         finally
         {
-            client.close();
+            ScmClientUtils.close(client);
         }
     }
 

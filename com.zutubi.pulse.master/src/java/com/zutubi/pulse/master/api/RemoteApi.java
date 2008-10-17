@@ -5,10 +5,12 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmLocation;
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmCapability;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
@@ -17,6 +19,7 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
@@ -56,7 +59,7 @@ public class RemoteApi implements com.zutubi.events.EventListener
     private BuildManager buildManager;
     private ProjectManager projectManager;
     private UserManager userManager;
-    private ScmClientFactory<ScmConfiguration> scmClientFactory;
+    private ScmManager scmManager;
 
     public RemoteApi()
     {
@@ -1558,7 +1561,7 @@ public class RemoteApi implements com.zutubi.events.EventListener
                 ScmClient client = null;
                 try
                 {
-                    client = scmClientFactory.createClient(project.getConfig().getScm());
+                    client = scmManager.createClient(project.getConfig().getScm());
                     if(client.getCapabilities().contains(ScmCapability.REVISIONS))
                     {
                         r = client.parseRevision(revision);
@@ -1604,23 +1607,26 @@ public class RemoteApi implements com.zutubi.events.EventListener
     public Hashtable<String, String> preparePersonalBuild(String token, String projectName) throws AuthenticationException, ScmException
     {
         User user = tokenManager.loginAndReturnUser(token);
+        if(!accessManager.hasPermission(userManager.getPrinciple(user), ServerPermission.PERSONAL_BUILD.toString(), null))
+        {
+            throw new AccessDeniedException("User does not have authority to submit personal build requests.");
+        }
+
+        ScmClient client = null;
         try
         {
-            if(!accessManager.hasPermission(userManager.getPrinciple(user), ServerPermission.PERSONAL_BUILD.toString(), null))
-            {
-                throw new AccessDeniedException("User does not have authority to submit personal build requests.");
-            }
-
             Project project = internalGetProject(projectName, false);
+
             Hashtable<String, String> scmDetails = new Hashtable<String, String>();
             ScmConfiguration scm = project.getConfig().getScm();
             scmDetails.put(ScmLocation.TYPE, scm.getType());
-            ScmClient client = scmClientFactory.createClient(scm);
+            client = scmManager.createClient(scm);
             scmDetails.put(ScmLocation.LOCATION, client.getLocation());
             return scmDetails;
         }
         finally
         {
+            ScmClientUtils.close(client);
             tokenManager.logoutUser();
         }
     }
@@ -1846,9 +1852,9 @@ public class RemoteApi implements com.zutubi.events.EventListener
         this.configurationSecurityManager = configurationSecurityManager;
     }
 
-    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientFactory = scmClientFactory;
+        this.scmManager = scmManager;
     }
 
     public void setAccessManager(AccessManager accessManager)

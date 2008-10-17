@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.scm;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.Pollable;
@@ -16,22 +15,23 @@ import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.TypeAdapter;
+import com.zutubi.tove.config.TypeListener;
+import com.zutubi.tove.transaction.Synchronization;
+import com.zutubi.tove.transaction.TransactionManager;
+import com.zutubi.tove.transaction.TransactionStatus;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
-public class DefaultScmManager implements ScmManager, Stoppable
+public class DefaultScmManager implements ScmManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultScmManager.class);
 
@@ -47,66 +47,151 @@ public class DefaultScmManager implements ScmManager, Stoppable
     private Scheduler scheduler;
     private ConfigurationProvider configurationProvider;
     private ThreadFactory threadFactory;
+    private TransactionManager transactionManager;
 
     private final Map<Long, Pair<Long, Revision>> waiting = new HashMap<Long, Pair<Long, Revision>>();
     private final Map<Long, Revision> latestRevisions = new HashMap<Long, Revision>();
 
-    private ThreadPoolExecutor executor = null;
+    private ThreadPoolExecutor pollingExecutor = null;
+    private ThreadPoolExecutor initialisationExecutor = null;
 
     private static final int DEFAULT_POLL_THREAD_COUNT = 10;
     private static final String PROPERTY_POLLING_THREAD_COUNT = "scm.polling.thread.count";
 
-
-    public void setScheduler(Scheduler scheduler)
-    {
-        this.scheduler = scheduler;
-    }
+    private List<Long> readyScms = new LinkedList<Long>();
 
     public void init()
     {
-        int pollThreadCount = DEFAULT_POLL_THREAD_COUNT;
-        
-        if (System.getProperties().contains(PROPERTY_POLLING_THREAD_COUNT))
+        eventManager.register(new SystemStartedListener()
         {
-            pollThreadCount = Integer.getInteger(PROPERTY_POLLING_THREAD_COUNT);
-        }
+            public void systemStarted()
+            {
+                initialise();
+            }
+        });
 
-        executor = new ThreadPoolExecutor(pollThreadCount, pollThreadCount, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);
-
-        shutdownManager.addStoppable(this);
-
-        // check if the trigger exists. if not, create and schedule.
-        Trigger trigger = scheduler.getTrigger(MONITOR_NAME, MONITOR_GROUP);
-        if (trigger != null)
+        shutdownManager.addStoppable(new Stoppable()
         {
-            return;
-        }
+            public void stop(boolean force)
+            {
+                if (pollingExecutor != null)
+                {
+                    pollingExecutor.shutdown();
+                }
+                if (initialisationExecutor != null)
+                {
+                    initialisationExecutor.shutdown();
+                }
+            }
+        });
+    }
 
-        // initialise the trigger.
-        trigger = new SimpleTrigger(MONITOR_NAME, MONITOR_GROUP, POLLING_FREQUENCY);
-        trigger.setTaskClass(MonitorScms.class);
+    private void initialise()
+    {
+        // register the configuration listener.
+        TypeListener<ScmConfiguration> listener = new TypeAdapter<ScmConfiguration>(ScmConfiguration.class)
+        {
+            public void insert(final ScmConfiguration instance)
+            {
+                // register a listener that will itself trigger the initialisation process if the transaction
+                // completed.  We can not do this in a postInsert (because we interact with the config system),
+                // and can not do this before the transaction is completed just in case we dont go ahead with the
+                // insert.
+                transactionManager.getTransaction().registerSynchronization(new Synchronization()
+                {
+                    public void postCompletion(TransactionStatus status)
+                    {
+                        if (status == TransactionStatus.COMMITTED)
+                        {
+                            initialisationExecutor.execute(new Runnable()
+                            {
+                                public void run()
+                                {
+                                    initialiseScmClient(instance);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        };
+        listener.register(configurationProvider, true);
+
+        initialiseScmPolling();
+        initialiseScmClients();
+    }
+
+    private void initialiseScmClients()
+    {
+        // initialise the thread pool to handle the scm initialisations.  The initialisation
+        // process is a long running task.
+        initialisationExecutor = new ThreadPoolExecutor(5, 10, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);
+
+        Collection<ScmConfiguration> scms = configurationProvider.getAll(ScmConfiguration.class);
+        for (final ScmConfiguration scm : scms)
+        {
+            initialisationExecutor.execute(new Runnable()
+            {
+                public void run()
+                {
+                    initialiseScmClient(scm);
+                }
+            });
+        }
+    }
+
+    private void initialiseScmClient(ScmConfiguration scm)
+    {
+        ScmClient client = null;
+        try
+        {
+            // the project is one level up.
+            ProjectConfiguration project = configurationProvider.getAncestorOfType(scm, ProjectConfiguration.class);
+
+            client = createClient(scm);
+            ScmContext context = createContext(project.getProjectId(), scm);
+
+            client.init(context);
+
+            readyScms.add(scm.getHandle());
+        }
+        catch (ScmException e)
+        {
+            LOG.warning("Failed to initialise scm: " + scm.getConfigurationPath(), e);
+        }
+        finally
+        {
+            ScmClientUtils.close(client);
+        }
+    }
+
+    private void initialiseScmPolling()
+    {
+        // initialise the thread pool that runs the scm polling.
+        int pollThreadCount = Integer.getInteger(PROPERTY_POLLING_THREAD_COUNT, DEFAULT_POLL_THREAD_COUNT);
+        pollingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(pollThreadCount, threadFactory);
 
         try
         {
-            scheduler.schedule(trigger);
+            // check if the trigger exists. if not, create and schedule.
+            Trigger trigger = scheduler.getTrigger(MONITOR_NAME, MONITOR_GROUP);
+            if (trigger == null)
+            {
+                trigger = new SimpleTrigger(MONITOR_NAME, MONITOR_GROUP, POLLING_FREQUENCY);
+                trigger.setTaskClass(MonitorScms.class);
+            }
+
+            if (!trigger.isScheduled())
+            {
+                scheduler.schedule(trigger);
+            }
         }
         catch (SchedulingException e)
         {
+            LOG.severe("Failed to schedule scm polling trigger. Cause: " + e.getMessage() + ".  " +
+                    "No scm polling is available.  See log for details.");
             LOG.severe(e);
         }
-    }
-
-    public void shutdown()
-    {
-        if (executor != null)
-        {
-            executor.shutdownNow();
-        }
-    }
-
-    public void stop(boolean force)
-    {
-        shutdown();
     }
 
     private List<ProjectConfiguration> getActiveProjects()
@@ -117,7 +202,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             {
                 ScmConfiguration scm = project.getScm();
                 // check a) sanity and b) pollability.
-                if (scm == null || !(scm instanceof Pollable))
+                if (scm == null || !(scm instanceof Pollable) || !readyScms.contains(scm.getHandle()))
                 {
                     return false;
                 }
@@ -130,16 +215,16 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     public void pollActiveScms()
     {
-        for (final ProjectConfiguration project: getActiveProjects())
+        for (final ProjectConfiguration project : getActiveProjects())
         {
-            executor.execute(new Runnable()
+            pollingExecutor.execute(new Runnable()
             {
                 public void run()
                 {
                     long start = System.currentTimeMillis();
                     process(project);
                     long end = System.currentTimeMillis();
-                    long duration = ((end - start)/Constants.SECOND);
+                    long duration = ((end - start) / Constants.SECOND);
                     LOG.info(String.format("polling scm for project %s took %s seconds.", project.getName(), duration));
 
                     // would be good to record the polling duration somewhere so that we can report on it.
@@ -147,7 +232,9 @@ public class DefaultScmManager implements ScmManager, Stoppable
             });
         }
 
-        while (executor.getActiveCount() > 0)
+        // wait until the polling is complete becore exiting.  This way we keep the
+        // polling task running, blocking it from running again until this is complete.
+        while (pollingExecutor.getActiveCount() > 0)
         {
             try
             {
@@ -156,7 +243,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
             catch (InterruptedException e)
             {
                 // noop.
-                LOG.debug(e);
             }
         }
     }
@@ -191,7 +277,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
 
             Revision previous = latestRevisions.get(projectId);
-            
+
             // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
             if (previous == null)
             {
@@ -302,6 +388,21 @@ public class DefaultScmManager implements ScmManager, Stoppable
         return true;
     }
 
+    public boolean isReady(ScmConfiguration scm)
+    {
+        return readyScms.contains(scm.getHandle());
+    }
+
+    public ScmContext createContext(long projectId, ScmConfiguration scm) throws ScmException
+    {
+        return scmContextFactory.createContext(projectId, scm);
+    }
+
+    public ScmClient createClient(ScmConfiguration config) throws ScmException
+    {
+        return scmClientFactory.createClient(config);
+    }
+
     public int getDefaultPollingInterval()
     {
         return configurationProvider.get(GlobalConfiguration.class).getScmPollingInterval();
@@ -327,7 +428,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
         this.projectManager = projectManager;
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
     }
@@ -340,5 +441,15 @@ public class DefaultScmManager implements ScmManager, Stoppable
     public void setScmContextFactory(ScmContextFactory scmContextFactory)
     {
         this.scmContextFactory = scmContextFactory;
+    }
+
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
+    }
+
+    public void setPulseTransactionManager(TransactionManager transactionManager)
+    {
+        this.transactionManager = transactionManager;
     }
 }

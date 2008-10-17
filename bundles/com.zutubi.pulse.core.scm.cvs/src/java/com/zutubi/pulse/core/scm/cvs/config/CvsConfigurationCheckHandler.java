@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 
 /**
  *
@@ -17,14 +18,15 @@ public class CvsConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
 
     public void test(CvsConfiguration configuration) throws ScmException
     {
-        CvsClient client = (CvsClient) scmClientFactory.createClient(configuration);
+        CvsClient client = null;
         try
         {
+            client = (CvsClient) scmClientFactory.createClient(configuration);
             client.testConnection();
         }
         finally
         {
-            client.close();
+            ScmClientUtils.close(client);
         }
     }
 

@@ -531,6 +531,11 @@ public class CvsClient implements ScmClient, DataCacheAware
         return listing;
     }
 
+    public void init(ScmContext context)
+    {
+        // noop - could checkout to provide browse functionality?.
+    }
+
     //---( data cache aware implementation )---
 
     public String getCacheId()

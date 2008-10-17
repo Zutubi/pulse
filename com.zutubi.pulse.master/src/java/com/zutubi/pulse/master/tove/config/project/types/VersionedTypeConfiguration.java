@@ -5,13 +5,13 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.personal.PatchArchive;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.master.scm.ScmContextFactory;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.annotations.Required;
@@ -29,9 +29,7 @@ public class VersionedTypeConfiguration extends TypeConfiguration
     @FieldAction(template = "actions/browse-scm-file")
     private String pulseFileName;
     @Transient
-    private ScmClientFactory scmClientFactory;
-
-    private ScmContextFactory scmContextFactory;
+    private ScmManager scmManager;
 
     public String getPulseFileName()
     {
@@ -45,13 +43,18 @@ public class VersionedTypeConfiguration extends TypeConfiguration
 
     public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
     {
+        if (!scmManager.isReady(projectConfig.getScm()))
+        {
+            throw new ScmException("Unable to retrieve pulse file. Scm is not ready");
+        }
+        
         ScmClient scmClient = null;
         InputStream is = null;
         try
         {
             ScmConfiguration scm = projectConfig.getScm();
-            ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), scm);
-            scmClient = scmClientFactory.createClient(scm);
+            ScmContext context = scmManager.createContext(projectConfig.getProjectId(), scm);
+            scmClient = scmManager.createClient(scm);
             is = scmClient.retrieve(context, pulseFileName, revision);
             return IOUtils.inputStreamToString(is);
         }
@@ -62,13 +65,8 @@ public class VersionedTypeConfiguration extends TypeConfiguration
         }
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientFactory = scmClientFactory;
-    }
-
-    public void setScmContextFactory(ScmContextFactory scmContextFactory)
-    {
-        this.scmContextFactory = scmContextFactory;
+        this.scmManager = scmManager;
     }
 }

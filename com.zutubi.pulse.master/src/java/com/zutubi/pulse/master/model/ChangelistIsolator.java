@@ -1,9 +1,11 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.master.scm.ScmContextFactory;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.util.Arrays;
@@ -17,8 +19,7 @@ public class ChangelistIsolator
 {
     private Map<Long, Revision> latestRequestedRevisions = new TreeMap<Long, Revision>();
     private BuildManager buildManager;
-    private ScmClientFactory scmClientFactory;
-    private ScmContextFactory scmContextFactory;
+    private ScmManager scmManager;
 
     public ChangelistIsolator(BuildManager buildManager)
     {
@@ -27,6 +28,11 @@ public class ChangelistIsolator
 
     public synchronized List<Revision> getRevisionsToRequest(ProjectConfiguration projectConfig, Project project, boolean force) throws ScmException
     {
+        if (!scmManager.isReady(projectConfig.getScm()))
+        {
+            throw new ScmException("Unable to determine revisions: scm is not ready.");
+        }
+
         List<Revision> result;
         Revision latestBuiltRevision;
 
@@ -48,8 +54,8 @@ public class ChangelistIsolator
         ScmClient client = null;
         try
         {
-            ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), projectConfig.getScm());
-            client = scmClientFactory.createClient(projectConfig.getScm());
+            ScmContext context = scmManager.createContext(projectConfig.getProjectId(), projectConfig.getScm());
+            client = scmManager.createClient(projectConfig.getScm());
             if (latestBuiltRevision == null)
             {
                 // The spec has never been built or even requested.  Just build
@@ -108,13 +114,8 @@ public class ChangelistIsolator
         this.buildManager = buildManager;
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientFactory = scmClientFactory;
-    }
-
-    public void setScmContextFactory(ScmContextFactory scmContextFactory)
-    {
-        this.scmContextFactory = scmContextFactory;
+        this.scmManager = scmManager;
     }
 }

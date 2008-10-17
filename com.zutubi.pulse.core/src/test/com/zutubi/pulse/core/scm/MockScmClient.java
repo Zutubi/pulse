@@ -139,6 +139,11 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not yet implemented.");
     }
 
+    public void init(ScmContext context)
+    {
+        // noop.
+    }
+
     public String getCacheId()
     {
         return "mock";

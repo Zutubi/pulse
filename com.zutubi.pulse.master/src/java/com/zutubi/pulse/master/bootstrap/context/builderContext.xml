@@ -29,11 +29,16 @@
         </property>
     </bean>
 
+    <bean id="scmManager" class="com.zutubi.pulse.master.scm.DefaultScmManager" autowire="byName" init-method="init" destroy-method="shutdown">
+        <property name="pulseTransactionManager">
+            <ref bean="pulseTransactionManager"/>
+        </property>
+    </bean>
+
     <bean id="projectManagerTarget" class="com.zutubi.pulse.master.model.DefaultProjectManager" autowire="byName"/>
     <bean id="projectManager" class="org.springframework.aop.framework.ProxyFactoryBean">
-        <property name="target">
-            <ref bean="projectManagerTarget"/>
-        </property>
+        <!-- specifying the target this way since using the 'target' property is causing an assertion failure. -->
+        <property name="targetName"><value>projectManagerTarget</value></property>
         <property name="interceptorNames">
             <list>
                 <value>securityInterceptor</value>
@@ -66,8 +71,6 @@
             </list>
         </property>
     </bean>
-
-    <bean id="scmManager" class="com.zutubi.pulse.master.scm.DefaultScmManager" autowire="byName" init-method="init" destroy-method="shutdown"/>
 
     <bean id="testManagerTarget" class="com.zutubi.pulse.master.model.DefaultTestManager" autowire="byName"/>
     <bean id="testManager" class="org.springframework.aop.framework.ProxyFactoryBean">

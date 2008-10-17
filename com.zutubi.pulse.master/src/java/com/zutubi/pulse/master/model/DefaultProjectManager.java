@@ -9,7 +9,6 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
@@ -28,7 +27,7 @@ import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
-import com.zutubi.pulse.master.scm.ScmContextFactory;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
@@ -65,8 +64,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private BuildManager buildManager;
     private EventManager eventManager;
     private ChangelistIsolator changelistIsolator;
-    private ScmClientFactory scmClientManager;
-    private ScmContextFactory scmContextFactory;
+    private ScmManager scmManager;
     private LicenseManager licenseManager;
     private AgentStateDao agentStateDao;
 
@@ -118,8 +116,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private void initialise()
     {
         changelistIsolator = new ChangelistIsolator(buildManager);
-        changelistIsolator.setScmClientFactory(scmClientManager);
-        changelistIsolator.setScmContextFactory(scmContextFactory);
+        changelistIsolator.setScmManager(scmManager);
 
         // register the canAddProject authorisation with the license manager.
         AddProjectAuthorisation addProjectAuthorisation = new AddProjectAuthorisation();
@@ -400,19 +397,29 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 // outstanding revisions and if so create requests for each one.
                 try
                 {
-                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(projectConfig.getScm(), scmClientManager);
+                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(projectConfig.getScm(), scmManager);
                     if(capabilities.contains(ScmCapability.REVISIONS))
                     {
-                        List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
-                        for(Revision r: revisions)
+                        if (scmManager.isReady(projectConfig.getScm()))
                         {
-                            // Note when isolating changelists we never replace existing requests
-                            requestBuildOfRevision(reason, project, r, source, false);
+                            List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
+                            for(Revision r: revisions)
+                            {
+                                // Note when isolating changelists we never replace existing requests
+                                requestBuildOfRevision(reason, project, r, source, false);
+                            }
+                        }
+                        else
+                        {
+                            LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() +
+                                    "' as the SCM does not support revisions");
+                            requestBuildFloating(reason, project, source, replaceable);
                         }
                     }
                     else
                     {
-                        LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() + "' as the SCM does not support revisions");
+                        LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() +
+                                "' as the SCM is not ready to calculate the changelists");
                         requestBuildFloating(reason, project, source, replaceable);
                     }
                 }
@@ -746,14 +753,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         configurationInjector.registerSetter(Project.class, this);
     }
 
-    public void setScmClientManager(ScmClientFactory scmClientManager)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientManager = scmClientManager;
-    }
-
-    public void setScmContextFactory(ScmContextFactory scmContextFactory)
-    {
-        this.scmContextFactory = scmContextFactory;
+        this.scmManager = scmManager;
     }
 
     public void setAccessManager(AccessManager accessManager)

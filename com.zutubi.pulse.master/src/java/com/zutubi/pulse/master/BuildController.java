@@ -15,7 +15,6 @@ import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
@@ -24,7 +23,7 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
-import com.zutubi.pulse.master.scm.ScmContextFactory;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
@@ -81,13 +80,12 @@ public class BuildController implements EventListener
     private ExecutionContext buildContext;
     private BuildHookManager buildHookManager;
 
-    private ScmClientFactory<ScmConfiguration> scmClientFactory;
+    private ScmManager scmManager;
     private ThreadFactory threadFactory;
     private ResourceManager resourceManager;
 
     private DefaultBuildLogger buildLogger;
     private RecipeDispatchService recipeDispatchService;
-    private ScmContextFactory scmContextFactory;
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -383,8 +381,14 @@ public class BuildController implements EventListener
         ScmClient client = null;
         try
         {
-            client = scmClientFactory.createClient(scm);
-            ScmContext scmContext = scmContextFactory.createContext(project.getId(), scm);
+            if (!scmManager.isReady(scm))
+            {
+                //TODO: really need to prevent this call being made when the scm is not ready.  
+                throw new ScmException("scm is not ready");
+            }
+            
+            client = scmManager.createClient(scm);
+            ScmContext scmContext = scmManager.createContext(project.getId(), scm);
             boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
             return supportsRevisions ? client.getLatestRevision(scmContext) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
         }
@@ -420,8 +424,8 @@ public class BuildController implements EventListener
         ScmClient client = null;
         try
         {
-            ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), projectConfig.getScm());
-            client = scmClientFactory.createClient(projectConfig.getScm());
+            ScmContext context = scmManager.createContext(projectConfig.getProjectId(), projectConfig.getScm());
+            client = scmManager.createClient(projectConfig.getScm());
             EOLStyle localEOL = client.getEOLPolicy(context);
             initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
         }
@@ -670,14 +674,27 @@ public class BuildController implements EventListener
             ScmConfiguration scm = projectConfig.getScm();
             Revision previousRevision = buildManager.getPreviousRevision(project);
 
-            if (previousRevision != null)
+            if (previousRevision != null && scmManager.isReady(scm))
             {
                 ScmClient client = null;
                 try
                 {
-                    ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), scm);
-                    client = scmClientFactory.createClient(scm);
-                    getChangeSince(context, client, previousRevision, revision);
+                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(scm, scmManager);
+                    if(capabilities.contains(ScmCapability.CHANGESETS))
+                    {
+                        ScmContext context = scmManager.createContext(projectConfig.getProjectId(), scm);
+                        client = scmManager.createClient(scm);
+
+                        List<Changelist> scmChanges = client.getChanges(context, previousRevision, revision);
+
+                        for (Changelist changelist : scmChanges)
+                        {
+                            PersistentChangelist persistentChangelist = new PersistentChangelist(changelist);
+                            persistentChangelist.setProjectId(buildResult.getProject().getId());
+                            persistentChangelist.setResultId(buildResult.getId());
+                            buildManager.save(persistentChangelist);
+                        }
+                    }
                 }
                 catch (ScmException e)
                 {
@@ -689,26 +706,6 @@ public class BuildController implements EventListener
                 }
             }
         }
-    }
-
-    private List<PersistentChangelist> getChangeSince(ScmContext context, ScmClient client, Revision previousRevision, Revision revision) throws ScmException
-    {
-        List<PersistentChangelist> result = new LinkedList<PersistentChangelist>();
-        if(client.getCapabilities().contains(ScmCapability.CHANGESETS))
-        {
-            List<Changelist> scmChanges = client.getChanges(context, previousRevision, revision);
-
-            for (Changelist changelist : scmChanges)
-            {
-                PersistentChangelist persistentChangelist = new PersistentChangelist(changelist);
-                persistentChangelist.setProjectId(buildResult.getProject().getId());
-                persistentChangelist.setResultId(buildResult.getId());
-                buildManager.save(persistentChangelist);
-                result.add(persistentChangelist);
-            }
-        }
-
-        return result;
     }
 
     private void scheduleTimeout(long recipeId)
@@ -922,9 +919,9 @@ public class BuildController implements EventListener
         this.serviceTokenManager = serviceTokenManager;
     }
 
-    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientFactory = scmClientFactory;
+        this.scmManager = scmManager;
     }
 
     public void setThreadFactory(ThreadFactory threadFactory)
@@ -950,11 +947,6 @@ public class BuildController implements EventListener
     public void setRecipeDispatchService(RecipeDispatchService recipeDispatchService)
     {
         this.recipeDispatchService = recipeDispatchService;
-    }
-
-    public void setScmContextFactory(ScmContextFactory scmContextFactory)
-    {
-        this.scmContextFactory = scmContextFactory;
     }
 
     private static interface BootstrapperCreator

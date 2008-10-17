@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.config.annotations.FieldAction;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
 import com.zutubi.tove.FieldDescriptor;
@@ -24,7 +24,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
     private static final Logger LOG = Logger.getLogger(ScmBrowsablePredicate.class);
 
     private FileSystemManager fileSystemManager;
-    private ScmClientFactory scmClientFactory;
+    private ScmManager scmManager;
 
     public boolean satisfied(FieldDescriptor field, FieldAction annotation)
     {
@@ -46,8 +46,8 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
                 ScmConfiguration config = projectConfigProvider.getProjectConfig().getScm();
                 if(config != null && config.isValid())
                 {
-                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(config, scmClientFactory);
-                    return capabilities.contains(ScmCapability.BROWSE);
+                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(config, scmManager);
+                    return scmManager.isReady(config) && capabilities.contains(ScmCapability.BROWSE);
                 }
             }
         }
@@ -64,8 +64,8 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
         this.fileSystemManager = fileSystemManager;
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientFactory = scmClientFactory;
+        this.scmManager = scmManager;
     }
 }

@@ -719,6 +719,11 @@ public class SubversionClient implements ScmClient
         return EOLStyle.BINARY;
     }
 
+    public void init(ScmContext context)
+    {
+        // noop.
+    }
+
     public Revision parseRevision(String revision) throws ScmException
     {
         try

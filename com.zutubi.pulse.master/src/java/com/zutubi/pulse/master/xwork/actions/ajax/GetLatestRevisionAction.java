@@ -1,10 +1,13 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmCapability;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.scm.ScmContextFactory;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
 import com.zutubi.util.TimeStamps;
 
@@ -17,8 +20,7 @@ public class GetLatestRevisionAction extends ProjectActionSupport
     private boolean successful = false;
     private String latestRevision;
     private String error;
-    private ScmClientFactory scmClientFactory;
-    private ScmContextFactory scmContextFactory;
+    private ScmManager scmManager;
 
     public boolean isSuccessful()
     {
@@ -44,42 +46,45 @@ public class GetLatestRevisionAction extends ProjectActionSupport
         }
         else
         {
-            ScmClient client = null;
-            try
+            ScmConfiguration scm = project.getConfig().getScm();
+            if (scmManager.isReady(scm))
             {
-                ScmContext context = scmContextFactory.createContext(project.getConfig().getProjectId(), project.getConfig().getScm());
-                client = scmClientFactory.createClient(project.getConfig().getScm());
-                if(client.getCapabilities().contains(ScmCapability.REVISIONS))
+                ScmClient client = null;
+                try
                 {
-                    latestRevision = client.getLatestRevision(context).getRevisionString();
-                }
-                else
-                {
-                    latestRevision = new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), getLocale())).getRevisionString();
-                }
+                    ScmContext context = scmManager.createContext(project.getConfig().getProjectId(), project.getConfig().getScm());
+                    client = scmManager.createClient(scm);
+                    if(client.getCapabilities().contains(ScmCapability.REVISIONS))
+                    {
+                        latestRevision = client.getLatestRevision(context).getRevisionString();
+                    }
+                    else
+                    {
+                        latestRevision = new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), getLocale())).getRevisionString();
+                    }
 
-                successful = true;
+                    successful = true;
+                }
+                catch (Exception e)
+                {
+                    error = e.toString();
+                }
+                finally
+                {
+                    ScmClientUtils.close(client);
+                }
             }
-            catch (Exception e)
+            else
             {
-                error = e.toString();
-            }
-            finally
-            {
-                ScmClientUtils.close(client);
+                error = "scm not ready";
             }
         }
         
         return SUCCESS;
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientFactory = scmClientFactory;
-    }
-
-    public void setScmContextFactory(ScmContextFactory scmContextFactory)
-    {
-        this.scmContextFactory = scmContextFactory;
+        this.scmManager = scmManager;
     }
 }

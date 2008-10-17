@@ -1,10 +1,12 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFile;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.master.scm.ScmContextFactory;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
@@ -26,11 +28,9 @@ public class ScmFileObject extends AbstractPulseFileObject
 {
     private static final Logger LOG = Logger.getLogger(ScmFileObject.class);
 
-    private ScmClientFactory scmClientFactory;
-
     private ScmFile scmFile;
     private List<ScmFile> scmChildren;
-    private ScmContextFactory scmContextFactory;
+    private ScmManager scmManager;
 
     public ScmFileObject(final FileName name, final AbstractFileSystem fs)
     {
@@ -77,9 +77,14 @@ public class ScmFileObject extends AbstractPulseFileObject
             try
             {
                 ScmConfiguration scm = getAncestor(ScmProvider.class).getScm();
+                if (!scmManager.isReady(scm))
+                {
+                    throw new ScmException("scm is not ready");
+                }
+
                 long projectId = getAncestor(ProjectConfigProvider.class).getProjectConfig().getProjectId();
-                ScmContext context = scmContextFactory.createContext(projectId, scm);
-                client = scmClientFactory.createClient(scm);
+                ScmContext context = scmManager.createContext(projectId, scm);
+                client = scmManager.createClient(scm);
                 scmChildren = client.browse(context, scmFile.getPath(), null);
             }
             catch (ScmException e)
@@ -124,7 +129,7 @@ public class ScmFileObject extends AbstractPulseFileObject
             ScmClient client = null;
             try
             {
-                client = scmClientFactory.createClient(getAncestor(ScmProvider.class).getScm());
+                client = scmManager.createClient(getAncestor(ScmProvider.class).getScm());
                 return client.getLocation();
             }
             catch (Exception e)
@@ -161,13 +166,8 @@ public class ScmFileObject extends AbstractPulseFileObject
         return Collections.emptyList();
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientFactory = scmClientFactory;
-    }
-
-    public void setScmContextFactory(ScmContextFactory scmContextFactory)
-    {
-        this.scmContextFactory = scmContextFactory;
+        this.scmManager = scmManager;
     }
 }

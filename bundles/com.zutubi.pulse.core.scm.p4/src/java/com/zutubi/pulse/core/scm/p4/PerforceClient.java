@@ -854,6 +854,11 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
+    public void init(ScmContext context)
+    {
+        // noop.
+    }
+
     public boolean labelExists(String client, String name) throws ScmException
     {
         PerforceCore.P4Result p4Result = this.core.runP4(null, getP4Command(COMMAND_LABELS), FLAG_CLIENT, client, COMMAND_LABELS);

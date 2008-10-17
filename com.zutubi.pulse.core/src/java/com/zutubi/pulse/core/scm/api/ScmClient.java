@@ -215,4 +215,17 @@ public interface ScmClient extends Closeable
      * @throws ScmException if the given revision is invalid
      */
     Revision parseRevision(String revision) throws ScmException;
+
+    /**
+     * The init method is a callback that is called before any of the non execution context
+     * methods.
+     *
+     * It is during this callback that any long running tasks to prepare the scms persistent
+     * working directory (on the master) can be run.
+     *
+     * @param context the scm context that will be used for subsequent calls.
+     *
+     * @throws ScmException if there is a problem
+     */
+    void init(ScmContext context) throws ScmException;
 }

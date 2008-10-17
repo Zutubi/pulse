@@ -375,6 +375,11 @@ public class GitClient implements ScmClient
         // not yet implemented.
     }
 
+    public void init(ScmContext context) throws ScmException
+    {
+        preparePersistentDirectory(context.getPersistentWorkingDir());
+    }
+
     /**
      * @see com.zutubi.pulse.core.scm.api.ScmClient#parseRevision(String)
      */

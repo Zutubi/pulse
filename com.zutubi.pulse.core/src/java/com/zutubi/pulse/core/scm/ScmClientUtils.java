@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class ScmClientUtils
 {
-    public static Set<ScmCapability> getCapabilities(ScmConfiguration config, ScmClientFactory clientFactory) throws ScmException
+    public static Set<ScmCapability> getCapabilities(ScmConfiguration config, ScmClientFactory<ScmConfiguration> clientFactory) throws ScmException
     {
         ScmClient client = null;
         try
