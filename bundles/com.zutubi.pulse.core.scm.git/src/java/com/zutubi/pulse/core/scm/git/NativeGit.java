@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
-import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
 import com.zutubi.util.Constants;
@@ -13,12 +13,12 @@ import com.zutubi.util.logging.Logger;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The native git object is a wrapper around the implementation details for running native git operations.
@@ -26,31 +26,15 @@ import java.util.logging.Level;
 public class NativeGit
 {
     private static final Logger LOG = Logger.getLogger(NativeGit.class);
+    // should this system property name mirror the package? or is that just asking for trouble.
     private static final long PROCESS_TIMEOUT = Long.getLong("pulse.git.inactivity.timeout", 300);
-    private static final String ASCII_CHARSET = "US-ASCII";
+
     /**
      * The date format used to read the 'date' field on git log output.
      */
     private final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
 
-    private ScmFeedbackHandler scmHandler;
-
     private ProcessBuilder git;
-
-    private static final String GIT = "git";
-    private static final String COMMAND_PULL = "pull";
-    private static final String COMMAND_LOG = "log";
-    private static final String COMMAND_CLONE = "clone";
-    private static final String COMMAND_CHECKOUT = "checkout";
-    private static final String COMMAND_BRANCH = "branch";
-    private static final String COMMAND_SHOW = "show";
-    private static final String CHECKOUT_OPTION_BRANCH = "-b";
-    private static final String LOG_OPTION_NAME_STATUS = "--name-status";
-    private static final String LOG_OPTION_PRETTY = "--pretty";
-    private static final String LOG_OPTION_CHANGES = "-n";
-    private static final String CLONE_OPTION_NO_CHECKOUT = "--no-checkout";
-    private static final String LOG_OPTION_REVERSE = "--reverse";
-    private static final String BRANCH_OPTION_DELETE = "-D";
 
     public NativeGit()
     {
@@ -60,7 +44,7 @@ public class NativeGit
     /**
      * Set the working directory in which the native git commands will be run.
      *
-     * @param dir working directory.
+     * @param dir working directory must exist.
      */
     public void setWorkingDirectory(File dir)
     {
@@ -71,27 +55,22 @@ public class NativeGit
         git.directory(dir);
     }
 
-    public void setScmEventHandler(ScmFeedbackHandler scmHandler)
+    public void clone(ScmFeedbackHandler handler, String repository, String dir) throws GitException
     {
-        this.scmHandler = scmHandler;
+        run(handler, GIT, COMMAND_CLONE, FLAG_NO_CHECKOUT, repository, dir);
     }
 
-    public void clone(String repository, String dir) throws ScmException
+    public void pull(ScmFeedbackHandler handler) throws GitException
     {
-        run(GIT, COMMAND_CLONE, CLONE_OPTION_NO_CHECKOUT, repository, dir);
+        run(handler, GIT, COMMAND_PULL);
     }
 
-    public void pull() throws ScmException
+    public InputStream show(String file) throws GitException
     {
-        run(GIT, COMMAND_PULL);
+        return show(REVISION_HEAD, file);
     }
 
-    public InputStream show(String file) throws ScmException
-    {
-        return show("HEAD", file);
-    }
-
-    public InputStream show(String revision, String file) throws ScmException
+    public InputStream show(String revision, String file) throws GitException
     {
         String[] commands = {GIT, COMMAND_SHOW, revision + ":" + file};
 
@@ -106,41 +85,35 @@ public class NativeGit
 
         runWithHandler(handler, null, commands);
 
-        if (handler.getExitCode() != 0)
-        {
-            throw new ScmException("Git command: " + StringUtils.join(" ", commands) + " exited " +
-                    "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
-        }
-
         return new ByteArrayInputStream(buffer.toString().getBytes());
     }
 
-    public List<GitLogEntry> log() throws ScmException
+    public List<GitLogEntry> log() throws GitException
     {
         return log(null, null, -1);
     }
 
-    public List<GitLogEntry> log(int changes) throws ScmException
+    public List<GitLogEntry> log(int changes) throws GitException
     {
         return log(null, null, changes);
     }
 
-    public List<GitLogEntry> log(String from, String to) throws ScmException
+    public List<GitLogEntry> log(String from, String to) throws GitException
     {
         return log(from, to, -1);
     }
 
-    public List<GitLogEntry> log(String from, String to, int changes) throws ScmException
+    public List<GitLogEntry> log(String from, String to, int changes) throws GitException
     {
         List<String> command = new LinkedList<String>();
         command.add(GIT);
         command.add(COMMAND_LOG);
-        command.add(LOG_OPTION_NAME_STATUS);
-        command.add(LOG_OPTION_PRETTY + "=format:%H%n%cn%n%ce%n%cd%n%s%n.");
-        command.add(LOG_OPTION_REVERSE);
+        command.add(FLAG_NAME_STATUS);
+        command.add(FLAG_PRETTY + "=format:%H%n%cn%n%cd%n%s%n.");
+        command.add(FLAG_REVERSE);
         if (changes != -1)
         {
-            command.add(LOG_OPTION_CHANGES);
+            command.add(FLAG_CHANGES);
             command.add(Integer.toString(changes));
         }
         if (from != null && to != null)
@@ -152,36 +125,30 @@ public class NativeGit
 
         runWithHandler(handler, null, command.toArray(new String[command.size()]));
 
-        if (handler.getExitCode() != 0)
-        {
-            throw new ScmException("Git command: " + StringUtils.join(" ", command) + " exited " +
-                    "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
-        }
-
         return handler.getEntries();
     }
 
-    public void checkout(String branch) throws ScmException
+    public void checkout(ScmFeedbackHandler handler, String branch) throws GitException
     {
-        run(GIT, COMMAND_CHECKOUT, branch);
-    }
-    
-    public void checkout(String branch, String localBranch) throws ScmException
-    {
-        run(GIT, COMMAND_CHECKOUT, CHECKOUT_OPTION_BRANCH, localBranch, branch);
+        run(handler, GIT, COMMAND_CHECKOUT, branch);
     }
 
-    public void deleteBranch(String branch) throws ScmException
+    public void checkout(ScmFeedbackHandler handler, String branch, String localBranch) throws GitException
     {
-        run(GIT, COMMAND_BRANCH, BRANCH_OPTION_DELETE, branch);
+        run(handler, GIT, COMMAND_CHECKOUT, FLAG_BRANCH, localBranch, branch);
     }
 
-    public void cretaeBranch(String branch) throws ScmException
+    public void deleteBranch(String branch) throws GitException
+    {
+        run(GIT, COMMAND_BRANCH, FLAG_DELETE, branch);
+    }
+
+    public void cretaeBranch(String branch) throws GitException
     {
         run(GIT, COMMAND_BRANCH, branch);
     }
 
-    public List<GitBranchEntry> branch() throws ScmException
+    public List<GitBranchEntry> branch() throws GitException
     {
         String[] command = {GIT, COMMAND_BRANCH};
 
@@ -189,29 +156,22 @@ public class NativeGit
 
         runWithHandler(handler, null, command);
 
-        if (handler.getExitCode() != 0)
-        {
-            throw new ScmException("Git command: " + StringUtils.join(" ", command) + " exited " +
-                    "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
-        }
-
         return handler.getBranches();
     }
 
-    protected void run(String... commands) throws ScmException
+    protected void run(String... commands) throws GitException
     {
-        OutputHandlerAdapter handler = new OutputHandlerAdapter();
-
-        runWithHandler(handler, null, commands);
-
-        if (handler.getExitCode() != 0)
-        {
-            throw new ScmException("Git command: " + StringUtils.join(" ", commands) + " exited " +
-                    "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
-        }
+        run(null, commands);
     }
 
-    protected void runWithHandler(final OutputHandler handler, String input, String... commands) throws ScmException
+    protected void run(ScmFeedbackHandler scmHandler, String... commands) throws GitException
+    {
+        OutputHandlerAdapter handler = new OutputHandlerAdapter(scmHandler);
+
+        runWithHandler(handler, null, commands);
+    }
+
+    protected void runWithHandler(final OutputHandler handler, String input, String... commands) throws GitException
     {
         if (LOG.isLoggable(Level.FINE))
         {
@@ -228,7 +188,7 @@ public class NativeGit
         }
         catch (IOException e)
         {
-            throw new ScmException("Could not start git process: " + e.getMessage(), e);
+            throw new GitException("Could not start git process: " + e.getMessage(), e);
         }
 
         if (input != null)
@@ -237,12 +197,12 @@ public class NativeGit
             {
                 OutputStream stdinStream = child.getOutputStream();
 
-                stdinStream.write(input.getBytes(ASCII_CHARSET));
+                stdinStream.write(input.getBytes());
                 stdinStream.close();
             }
             catch (IOException e)
             {
-                throw new ScmException("Error writing to input of git process", e);
+                throw new GitException("Error writing to input of git process", e);
             }
         }
 
@@ -281,13 +241,20 @@ public class NativeGit
                     long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / 1000;
                     if (secondsSinceActivity >= PROCESS_TIMEOUT)
                     {
-                        throw new ScmException("Timing out git process after " + secondsSinceActivity + " seconds of inactivity");
+                        throw new GitException("Timing out git process after " + secondsSinceActivity + " seconds of inactivity");
                     }
                 }
             }
             while (exitCode == null);
 
             handler.handleExitCode(exitCode);
+
+            if (exitCode != 0)
+            {
+                throw new GitException("Git command: " + StringUtils.join(" ", commands) + " exited " +
+                        "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
+            }
+
         }
         catch (InterruptedException e)
         {
@@ -295,7 +262,7 @@ public class NativeGit
         }
         catch (IOException e)
         {
-            throw new ScmException("Error reading output of git process", e);
+            throw new GitException("Error reading output of git process", e);
         }
         finally
         {
@@ -309,20 +276,31 @@ public class NativeGit
 
         void handleStderr(String line);
 
-        void handleExitCode(int code) throws ScmException;
+        void handleExitCode(int code) throws GitException;
 
         int getExitCode();
 
         String getError();
 
-        void checkCancelled() throws ScmCancelledException;
+        void checkCancelled() throws GitOperationCancelledException;
     }
 
-    private class OutputHandlerAdapter implements OutputHandler
+    private static class OutputHandlerAdapter implements OutputHandler
     {
         private int exitCode;
 
         private String error;
+
+        private ScmFeedbackHandler scmHandler;
+
+        public OutputHandlerAdapter()
+        {
+        }
+
+        public OutputHandlerAdapter(ScmFeedbackHandler scmHandler)
+        {
+            this.scmHandler = scmHandler;
+        }
 
         public void handleStdout(String line)
         {
@@ -346,7 +324,7 @@ public class NativeGit
             return error;
         }
 
-        public void handleExitCode(int code) throws ScmException
+        public void handleExitCode(int code)
         {
             this.exitCode = code;
         }
@@ -356,11 +334,18 @@ public class NativeGit
             return exitCode;
         }
 
-        public void checkCancelled() throws ScmCancelledException
+        public void checkCancelled() throws GitOperationCancelledException
         {
             if (scmHandler != null)
             {
-                scmHandler.checkCancelled();
+                try
+                {
+                    scmHandler.checkCancelled();
+                }
+                catch (ScmCancelledException e)
+                {
+                    throw new GitOperationCancelledException(e);
+                }
             }
         }
     }
@@ -370,11 +355,12 @@ public class NativeGit
      * <p/>
      *        e34da05e88de03a4aa5b10b338382f09bbe65d4b
      *        Daniel Ostermeier
-     *        daniel@zutubi.com
      *        Sun Sep 28 15:06:49 2008 +1000
      *        removed content from a.txt
      *
      *        M       a.txt
+     *
+     * This format is generated using --pretty=format:%H%n%cn%n%cd%n%s%n.
      */
     private class LogOutputHandler extends OutputHandlerAdapter
     {
@@ -398,56 +384,73 @@ public class NativeGit
          * before requesting the entries.
          *
          * @return the list of parsed git log entries.
+         *
+         * @throws GitException if there is a problem parsing the log output.
          */
-        public List<GitLogEntry> getEntries()
+        public List<GitLogEntry> getEntries() throws GitException
         {
-            if (entries == null)
+            try
             {
-                entries = new LinkedList<GitLogEntry>();
-
-                // a) splitup the individual log entries.
-                Iterator<String> i = lines.iterator();
-                while (i.hasNext())
+                if (entries == null)
                 {
-                    GitLogEntry logEntry = new GitLogEntry();
-                    List<String> raw = new LinkedList<String>();
-                    String str;
-                    logEntry.setId(str = i.next());
-                    raw.add(str);
-                    logEntry.setAuthor(str = i.next() + " <" + i.next() + ">");
-                    raw.add(str);
-                    logEntry.setDateString(str = i.next());
-                    try
-                    {
-                        logEntry.setDate(LOG_DATE_FORMAT.parse(str));
-                    }
-                    catch (ParseException e)
-                    {
-                        // noop.
-                    }
-                    raw.add(str);
+                    entries = new LinkedList<GitLogEntry>();
 
-                    String comment = "";
-                    while (!(str = i.next()).equals("."))
+                    Iterator<String> i = lines.iterator();
+                    while (i.hasNext())
                     {
-                        comment += str;
-                        raw.add(str);
-                    }
-                    logEntry.setComment(comment);
-                    raw.add(str); // dot.
+                        GitLogEntry logEntry = new GitLogEntry();
+                        List<String> raw = new LinkedList<String>();
+                        String str;
+                        raw.add(str = i.next());
+                        logEntry.setId(str);
+                        raw.add(str = i.next());
+                        logEntry.setAuthor(str);
+                        raw.add(str = i.next());
+                        logEntry.setDateString(str);
+                        try
+                        {
+                            logEntry.setDate(LOG_DATE_FORMAT.parse(str));
+                        }
+                        catch (ParseException e)
+                        {
+                            LOG.severe("Failed to parse the date: '" + str + "'");
+                        }
 
-                    // until newline or until end.
-                    while (i.hasNext() && TextUtils.stringSet(str = i.next()))
-                    {
-                        logEntry.addFileChange(str.substring(1).trim(), str.substring(0, 1));
-                        raw.add(str);
+                        String comment = "";
+                        while (!(str = i.next()).equals("."))
+                        {
+                            comment += str;
+                            raw.add(str);
+                        }
+                        logEntry.setComment(comment);
+                        raw.add(str); // dot.
+
+                        // until newline or until end.
+                        while (i.hasNext() && TextUtils.stringSet(str = i.next()))
+                        {
+                            logEntry.addFileChange(str.substring(1).trim(), str.substring(0, 1).trim());
+                            raw.add(str);
+                        }
+
+                        logEntry.setRaw(raw);
+                        entries.add(logEntry);
                     }
-                    
-                    logEntry.setRaw(raw);
-                    entries.add(logEntry);
                 }
+                return entries;
             }
-            return entries;
+            catch (Exception e)
+            {
+                // print some debugging output.
+                LOG.severe("A problem has occured whilst parsing the git log output.");
+                LOG.severe(e);
+                LOG.severe("The log output received was:");
+                for (String line : lines)
+                {
+                    LOG.severe(line);
+                }
+
+                throw new GitException(e);
+            }
         }
     }
 
@@ -459,15 +462,75 @@ public class NativeGit
     {
         private List<GitBranchEntry> branches = new LinkedList<GitBranchEntry>();
 
+        private final Pattern BRANCH_OUTPUT = Pattern.compile("\\*?\\s+(.+)");
+
         public void handleStdout(String line)
         {
-            GitBranchEntry entry = new GitBranchEntry(line.startsWith("*"), line.substring(2).trim());
-            branches.add(entry);
+            Matcher matcher = BRANCH_OUTPUT.matcher(line);
+            if (matcher.matches())
+            {
+                GitBranchEntry entry = new GitBranchEntry(line.startsWith("*"), matcher.group(1).trim());
+                branches.add(entry);
+            }
         }
 
         public List<GitBranchEntry> getBranches()
         {
             return branches;
+        }
+    }
+
+    /**
+     * Provide command line style access to running git commands for testing.
+     * @param argv command line arguments
+     * @throws IOException if an error occurs.
+     */
+    public static void main(String... argv) throws IOException
+    {
+        if (argv.length == 0)
+        {
+            System.out.println("Please enter the full git command you with to execute.");
+            return;
+        }
+
+        OutputHandlerAdapter outputHandler = new OutputHandlerAdapter()
+        {
+            public void handleStdout(String line)
+            {
+                System.out.println(line);
+            }
+
+            public void handleStderr(String line)
+            {
+                System.err.println(line);
+            }
+        };
+
+        try
+        {
+            NativeGit git = new NativeGit();
+            git.setWorkingDirectory(new File("."));
+            System.out.println(new File(".").getCanonicalPath());
+            if (!Boolean.getBoolean("skip.env"))
+            {
+                // use a tree map to provide ordering to the keys.
+                System.out.println("========= Execution Environment ============");
+                Map<String, String> env = new TreeMap<String, String>(git.git.environment());
+                for (String key : env.keySet())
+                {
+                    String value = env.get(key);
+                    System.out.println(key + "=" + value);
+                }
+                System.out.println();
+                System.out.println("========= Command output ============");
+                System.out.println(StringUtils.join(" ", argv));
+            }
+            git.runWithHandler(outputHandler, null, argv);
+        }
+        catch (GitException e)
+        {
+            System.out.println("Exit Status: " + outputHandler.getExitCode());
+            e.printStackTrace();
         }
     }
 }

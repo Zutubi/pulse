@@ -12,14 +12,11 @@ import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class GitClientTest extends PulseTestCase
@@ -44,11 +41,8 @@ public class GitClientTest extends PulseTestCase
         File repositoryBase = new File(tmp, "repo");
 
         repository = "file://" + repositoryBase.getCanonicalPath();
-//        repository = "file://c:\\tmp\\git-testing";
 
-        client = new GitClient();
-        client.setRepository(repository);
-        client.setBranch("master");
+        client = new GitClient(repository, "master");
 
         workingDir = new File(tmp, "wd");
         context = new ExecutionContext();
@@ -80,10 +74,8 @@ public class GitClientTest extends PulseTestCase
 
         assertEquals("e34da05e88de03a4aa5b10b338382f09bbe65d4b", rev.getRevisionString());
 
-        assertTrue(new File(workingDir, "a.txt").isFile());
-        assertTrue(new File(workingDir, "b.txt").isFile());
-        assertTrue(new File(workingDir, "c.txt").isFile());
-        assertTrue(new File(workingDir, ".git").isDirectory());
+        assertFiles(workingDir, "a.txt", "b.txt", "c.txt");
+        assertGitDir(workingDir);
 
         assertEquals(2, handler.getStatusMessages().size());
     }
@@ -95,10 +87,8 @@ public class GitClientTest extends PulseTestCase
 
         assertEquals("c34b545b6954b8946967c250dde7617c24a9bb4b", rev.getRevisionString());
 
-        assertTrue(new File(workingDir, "1.txt").isFile());
-        assertTrue(new File(workingDir, "2.txt").isFile());
-        assertTrue(new File(workingDir, "3.txt").isFile());
-        assertTrue(new File(workingDir, ".git").isDirectory());
+        assertFiles(workingDir, "1.txt", "2.txt", "3.txt");
+        assertGitDir(workingDir);
     }
 
     public void testCheckoutToRevision() throws ScmException, ParseException
@@ -107,10 +97,8 @@ public class GitClientTest extends PulseTestCase
 
         assertEquals("96e8d45dd7627d9e3cab980e90948e3ae1c99c62", rev.getRevisionString());
 
-        assertTrue(new File(workingDir, "a.txt").isFile());
-        assertTrue(new File(workingDir, "b.txt").isFile());
-        assertTrue(new File(workingDir, "c.txt").isFile());
-        assertTrue(new File(workingDir, ".git").isDirectory());
+        assertFiles(workingDir, "a.txt", "b.txt", "c.txt");
+        assertGitDir(workingDir);
 
         assertEquals(2, handler.getStatusMessages().size());
     }
@@ -122,7 +110,7 @@ public class GitClientTest extends PulseTestCase
 
         assertEquals("83d35b25a6b4711c4d9424c337bf82e5398756f3", rev.getRevisionString());
 
-        assertTrue(new File(workingDir, ".git").isDirectory());
+        assertGitDir(workingDir);
         assertEquals(1, workingDir.list().length);
     }
 
@@ -144,31 +132,27 @@ public class GitClientTest extends PulseTestCase
     public void testRetrieve() throws ScmException, IOException
     {
         InputStream content = client.retrieve(scmContext, "a.txt", null);
-        String data = readToString(content);
-        assertEquals("", data);
+        assertEquals("", IOUtils.inputStreamToString(content));
     }
 
     public void testRetrieveFromRevision() throws IOException, ScmException
     {
         InputStream content = client.retrieve(scmContext, "a.txt", new Revision("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112"));
-        String data = readToString(content);
-        assertEquals("content", data);
+        assertEquals("content", IOUtils.inputStreamToString(content));
     }
 
     public void testRetrieveOnBranch() throws ScmException, IOException
     {
         client.setBranch("branch");
         InputStream content = client.retrieve(scmContext, "1.txt", null);
-        String data = readToString(content);
-        assertEquals("", data);
+        assertEquals("", IOUtils.inputStreamToString(content));
     }
 
     public void testRetrieveFromRevisionOnBranch() throws ScmException, IOException
     {
         client.setBranch("branch");
         InputStream content = client.retrieve(scmContext, "1.txt", new Revision("7d61890eb55586ec99416c53c581bf561591a608"));
-        String data = readToString(content);
-        assertEquals("content", data);
+        assertEquals("content", IOUtils.inputStreamToString(content));
     }
 
     public void testUpdate() throws ScmException
@@ -200,7 +184,7 @@ public class GitClientTest extends PulseTestCase
         client.setBranch("master");
         client.checkout(context, null, handler);
         assertEquals("", IOUtils.fileToString(new File(workingDir, "a.txt")));
-        
+
         Revision rev = client.update(context, new Revision("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112"), handler);
         assertEquals("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112", rev.getRevisionString());
 
@@ -222,22 +206,23 @@ public class GitClientTest extends PulseTestCase
         Changelist changelist = changes.get(0);
         assertEquals("removed content from a.txt", changelist.getComment());
         assertEquals("e34da05e88de03a4aa5b10b338382f09bbe65d4b", changelist.getRevision().getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", changelist.getAuthor());
+        assertEquals("Daniel Ostermeier", changelist.getAuthor());
         assertEquals(1, changelist.getChanges().size());
         FileChange change = changelist.getChanges().get(0);
         assertEquals(FileChange.Action.EDIT, change.getAction());
         assertEquals("a.txt", change.getPath());
     }
 
-    private Date parse(String str) throws ParseException
+    private void assertFiles(File base, String... filenames)
     {
-        return new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z").parse(str);
+        for (String filename : filenames)
+        {
+            assertTrue(filename + " is not a file.", new File(base, filename).isFile());
+        }
     }
 
-    private String readToString(InputStream content) throws IOException
+    private void assertGitDir(File workingDir)
     {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.joinStreams(content, out);
-        return out.toString();
+        assertTrue(new File(workingDir, ".git").isDirectory());
     }
 }
