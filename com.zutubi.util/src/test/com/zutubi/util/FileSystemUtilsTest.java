@@ -670,6 +670,40 @@ public class FileSystemUtilsTest extends TestCase
         }
     }
 
+    public void testCreateLoadsOfTempFiles() throws IOException
+    {
+        // sanity check that we can actually create a batch of files quickly.
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 1000; i++)
+        {
+            FileSystemUtils.createTempFile("dir", null, tmpDir);
+        }
+        long end = System.currentTimeMillis();
+        assertTrue(end - start < 2 * Constants.SECOND);
+    }
+
+    public void testCreateTempFile() throws IOException
+    {
+        File tmp = FileSystemUtils.createTempFile("dir", null, tmpDir);
+        assertTrue(tmp.isFile());
+        assertTrue(tmp.getName().startsWith("dir"));
+        assertTrue(tmp.getName().endsWith(".tmp"));
+        assertEquals(tmpDir, tmp.getParentFile());
+    }
+
+    public void testCreateTempFilePrefixRequired() throws IOException
+    {
+        try
+        {
+            FileSystemUtils.createTempFile(null, null, (File)null);
+            fail();
+        }
+        catch (NullPointerException e)
+        {
+            // noop.
+        }
+    }
+
     private void simpleEOLTest(byte[] eol, String out) throws IOException
     {
         File test = null;

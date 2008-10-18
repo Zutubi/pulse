@@ -21,29 +21,29 @@ public class FileSystemUtils
 
     private static final int DELETE_RETRIES = 3;
 
-    public static final String NORMAL_SEPARATOR      = "/";
-    public static final char   NORMAL_SEPARATOR_CHAR = NORMAL_SEPARATOR.charAt(0);
+    public static final String NORMAL_SEPARATOR = "/";
+    public static final char NORMAL_SEPARATOR_CHAR = NORMAL_SEPARATOR.charAt(0);
 
     // Unix-style file mode values
-    
-    public static final int PERMISSION_OWNER_READ    = 0x100;
-    public static final int PERMISSION_OWNER_WRITE   = 0x080;
+
+    public static final int PERMISSION_OWNER_READ = 0x100;
+    public static final int PERMISSION_OWNER_WRITE = 0x080;
     public static final int PERMISSION_OWNER_EXECUTE = 0x040;
-    public static final int PERMISSION_GROUP_READ    = 0x020;
-    public static final int PERMISSION_GROUP_WRITE   = 0x010;
+    public static final int PERMISSION_GROUP_READ = 0x020;
+    public static final int PERMISSION_GROUP_WRITE = 0x010;
     public static final int PERMISSION_GROUP_EXECUTE = 0x008;
-    public static final int PERMISSION_OTHER_READ    = 0x004;
-    public static final int PERMISSION_OTHER_WRITE   = 0x002;
+    public static final int PERMISSION_OTHER_READ = 0x004;
+    public static final int PERMISSION_OTHER_WRITE = 0x002;
     public static final int PERMISSION_OTHER_EXECUTE = 0x001;
 
-    public static final int PERMISSION_OWNER_FULL    = PERMISSION_OWNER_READ | PERMISSION_OWNER_WRITE | PERMISSION_OWNER_EXECUTE;
-    public static final int PERMISSION_GROUP_FULL    = PERMISSION_GROUP_READ | PERMISSION_GROUP_WRITE | PERMISSION_GROUP_EXECUTE;
-    public static final int PERMISSION_OTHER_FULL    = PERMISSION_OTHER_READ | PERMISSION_OTHER_WRITE | PERMISSION_OTHER_EXECUTE;
+    public static final int PERMISSION_OWNER_FULL = PERMISSION_OWNER_READ | PERMISSION_OWNER_WRITE | PERMISSION_OWNER_EXECUTE;
+    public static final int PERMISSION_GROUP_FULL = PERMISSION_GROUP_READ | PERMISSION_GROUP_WRITE | PERMISSION_GROUP_EXECUTE;
+    public static final int PERMISSION_OTHER_FULL = PERMISSION_OTHER_READ | PERMISSION_OTHER_WRITE | PERMISSION_OTHER_EXECUTE;
 
-    public static final int PERMISSION_ALL_READ      = PERMISSION_OWNER_READ | PERMISSION_GROUP_READ | PERMISSION_OTHER_READ;
-    public static final int PERMISSION_ALL_WRITE     = PERMISSION_OWNER_WRITE | PERMISSION_GROUP_WRITE | PERMISSION_OTHER_WRITE;
-    public static final int PERMISSION_ALL_EXECUTE   = PERMISSION_OWNER_EXECUTE | PERMISSION_GROUP_EXECUTE | PERMISSION_OTHER_EXECUTE;
-    public static final int PERMISSION_ALL_FULL      = PERMISSION_OWNER_FULL | PERMISSION_GROUP_FULL | PERMISSION_OTHER_FULL;
+    public static final int PERMISSION_ALL_READ = PERMISSION_OWNER_READ | PERMISSION_GROUP_READ | PERMISSION_OTHER_READ;
+    public static final int PERMISSION_ALL_WRITE = PERMISSION_OWNER_WRITE | PERMISSION_GROUP_WRITE | PERMISSION_OTHER_WRITE;
+    public static final int PERMISSION_ALL_EXECUTE = PERMISSION_OWNER_EXECUTE | PERMISSION_GROUP_EXECUTE | PERMISSION_OTHER_EXECUTE;
+    public static final int PERMISSION_ALL_FULL = PERMISSION_OWNER_FULL | PERMISSION_GROUP_FULL | PERMISSION_OTHER_FULL;
 
     public static final boolean CP_AVAILABLE;
     public static final boolean LN_AVAILABLE;
@@ -55,14 +55,13 @@ public class FileSystemUtils
         CP_AVAILABLE = SystemUtils.unixBinaryAvailable("cp");
         LN_AVAILABLE = SystemUtils.unixBinaryAvailable("ln");
         STAT_AVAILABLE = SystemUtils.unixBinaryAvailable("stat");
-        ZIP_AVAILABLE  = SystemUtils.unixBinaryAvailable("zip");
+        ZIP_AVAILABLE = SystemUtils.unixBinaryAvailable("zip");
     }
 
     /**
      * Recursively delete a directory and its contents.
      *
      * @param dir the directory to delete
-     * 
      * @return true iff the whole directory was successfully deleted
      */
     public static boolean rmdir(File dir)
@@ -145,10 +144,10 @@ public class FileSystemUtils
     public static boolean robustDelete(File f)
     {
         boolean deleted = false;
-        for(int i = 0; i < DELETE_RETRIES; i++)
+        for (int i = 0; i < DELETE_RETRIES; i++)
         {
             deleted = f.delete();
-            if(deleted)
+            if (deleted)
             {
                 break;
             }
@@ -208,7 +207,7 @@ public class FileSystemUtils
         {
             throw new IOException("Failed to create temporary directory. Base directory does not exist: " + base.getAbsolutePath());
         }
-        
+
         File file = null;
         IOException exception = null;
         int retries = SystemUtils.IS_WINDOWS ? 3 : 0;
@@ -233,16 +232,16 @@ public class FileSystemUtils
                 // Ignore
             }
         }
-        while(retries-- > 0);
-        
-        if(exception != null)
+        while (retries-- > 0);
+
+        if (exception != null)
         {
             IOException e = new IOException(exception.getMessage());
             e.initCause(exception);
             throw e;
         }
 
-        assert(file != null);
+        assert (file != null);
         if (!file.exists())
         {
             throw new IOException("Failed to create temporary directory. Reason: File.createTempFile failed.");
@@ -256,6 +255,73 @@ public class FileSystemUtils
             throw new IOException("Failed to create temporary directory. Reason: tmpDir.mkdirs failed.");
         }
         return file;
+    }
+
+    private static final Object tmpDirLock = new Object();
+    private static File tmpDir;
+    private static File getTempDir() throws IOException
+    {
+        synchronized(tmpDirLock)
+        {
+            if (tmpDir == null)
+            {
+                File tmpFile = File.createTempFile(RandomUtils.randomString(5), "");
+                tmpDir = tmpFile.getParentFile();
+                if (!tmpDir.exists() && !tmpDir.mkdirs())
+                {
+                    throw new IOException("Failed to ensure system tmp directory exists.");
+                }
+            }
+            return tmpDir;
+        }
+    }
+
+    /**
+     * A custom implementation of the createTempFile method found on the File object.  This implementation
+     * will be slower to execute, but is more robust in its selection of unused filenames.
+     * 
+     * @param  prefix     The prefix string to be used in generating the file's
+     *                    name; must be at least three characters long
+     *
+     * @param  suffix     The suffix string to be used in generating the file's
+     *                    name; may be <code>null</code>, in which case the
+     *                    suffix <code>".tmp"</code> will be used
+     *
+     * @param  directory  The directory in which the file is to be created, or
+     *                    <code>null</code> if the default temporary-file
+     *                    directory is to be used
+     *
+     * @return  An abstract pathname denoting a newly-created empty file
+     *
+     * @throws  IOException  If a file could not be created
+     */
+    public static File createTempFile(String prefix, String suffix, File directory) throws IOException
+    {
+        // note: the speed of this implementation is based on a trade off between the speed
+        // and randomness of the filename generation
+        if (prefix == null)
+        {
+            throw new NullPointerException();
+        }
+
+        String s = (suffix == null) ? ".tmp" : suffix;
+
+        File base = (directory == null) ? getTempDir() : directory;
+
+        int i = 0;
+        int randLength = 5;
+        File tmpFile = new File(base, prefix + RandomUtils.randomString(randLength) + s);
+        while (tmpFile.isFile())
+        {
+            tmpFile = new File(base, prefix + RandomUtils.randomString(randLength) + s);
+            i++;
+            randLength = (i % 10 == 0) ? randLength + 1 : randLength; 
+        }
+        if (!tmpFile.createNewFile())
+        {
+            throw new IOException("Failed to create new file.");
+        }
+        return tmpFile;
     }
 
     public static void createDirectory(File file) throws IOException
@@ -291,18 +357,18 @@ public class FileSystemUtils
     public static boolean isSymlink(File file)
     {
         // WARNING: only detects relative symnlinks
-        if(!SystemUtils.IS_WINDOWS)
+        if (!SystemUtils.IS_WINDOWS)
         {
             // Try testing the canonical path then.
             File parent = file.getParentFile();
-            if(parent != null)
+            if (parent != null)
             {
                 try
                 {
                     String parentCanonical = parent.getCanonicalPath() + "/";
                     String fileCanonical = file.getCanonicalPath();
 
-                    if(fileCanonical.startsWith(parentCanonical))
+                    if (fileCanonical.startsWith(parentCanonical))
                     {
                         String canonicalName = fileCanonical.substring(parentCanonical.length());
                         return !canonicalName.equals(file.getName());
@@ -350,15 +416,15 @@ public class FileSystemUtils
             try
             {
                 String[] command;
-                if(SystemUtils.IS_LINUX)
+                if (SystemUtils.IS_LINUX)
                 {
-                    command = new String[] { "stat",  "-c",  "%a", file.getAbsolutePath()};
+                    command = new String[]{"stat", "-c", "%a", file.getAbsolutePath()};
                 }
                 else
                 {
-                    command = new String[] { "stat",  "-f",  "%Lp", file.getAbsolutePath()};
+                    command = new String[]{"stat", "-f", "%Lp", file.getAbsolutePath()};
                 }
-                
+
                 process = Runtime.getRuntime().exec(command);
             }
             catch (IOException e)
@@ -423,7 +489,7 @@ public class FileSystemUtils
 
     public static boolean setExecutable(File file, boolean executable)
     {
-        if(executable)
+        if (executable)
         {
             return runChmod(file, "a+x");
         }
@@ -440,9 +506,9 @@ public class FileSystemUtils
 
     public static boolean setWritable(File file, boolean writable)
     {
-        if(writable)
+        if (writable)
         {
-            if(SystemUtils.IS_WINDOWS)
+            if (SystemUtils.IS_WINDOWS)
             {
                 try
                 {
@@ -468,12 +534,12 @@ public class FileSystemUtils
 
     private static boolean runChmod(File file, String arg)
     {
-        if(!SystemUtils.IS_WINDOWS)
+        if (!SystemUtils.IS_WINDOWS)
         {
             Process p = null;
             try
             {
-                p = Runtime.getRuntime().exec(new String[] { "chmod", arg, file.getAbsolutePath()});
+                p = Runtime.getRuntime().exec(new String[]{"chmod", arg, file.getAbsolutePath()});
                 int exitCode = p.waitFor();
                 return exitCode == 0;
             }
@@ -494,18 +560,16 @@ public class FileSystemUtils
     }
 
     /**
-     *
-     * @param src  source file
-     * @param dest detination file
+     * @param src   source file
+     * @param dest  detination file
      * @param force delete the destination directory if it already exists before renaming.
-     *
      * @return true if the rename was successful, false otherwise.
      */
     public static boolean rename(File src, File dest, boolean force)
     {
         if (force && dest.exists())
         {
-            if(dest.isDirectory())
+            if (dest.isDirectory())
             {
                 rmdir(dest);
             }
@@ -618,7 +682,7 @@ public class FileSystemUtils
         return StringUtils.join(File.separator, parts);
     }
 
-    public static String composeSearchPath(String ...parts)
+    public static String composeSearchPath(String... parts)
     {
         return StringUtils.join(File.pathSeparator, parts);
     }
@@ -791,7 +855,7 @@ public class FileSystemUtils
         File tempFile = null;
         int permissions = -1;
 
-        if(preservePermissions)
+        if (preservePermissions)
         {
             permissions = getPermissions(file);
         }
@@ -812,20 +876,20 @@ public class FileSystemUtils
                 int n;
                 boolean skipNewline = false;
 
-                while((n = in.read(buffer)) > 0)
+                while ((n = in.read(buffer)) > 0)
                 {
-                    for(int i = 0; i < n; i++)
+                    for (int i = 0; i < n; i++)
                     {
                         byte b = buffer[i];
-                        switch(b)
+                        switch (b)
                         {
-                            case '\r':
+                            case'\r':
                                 out.write(eol);
                                 skipNewline = true;
                                 break;
 
-                            case '\n':
-                                if(skipNewline)
+                            case'\n':
+                                if (skipNewline)
                                 {
                                     skipNewline = false;
                                 }
@@ -836,7 +900,7 @@ public class FileSystemUtils
                                 break;
 
                             default:
-                                skipNewline = false;                                
+                                skipNewline = false;
                                 out.write(b);
                                 break;
                         }
@@ -851,21 +915,21 @@ public class FileSystemUtils
             }
 
             file.delete();
-            if(!tempFile.renameTo(file))
+            if (!tempFile.renameTo(file))
             {
                 throw new IOException("Unable to rename temporary file '" + tempFile.getAbsolutePath() + "' to '" + file.getAbsolutePath() + "'");
             }
 
-            if(permissions >= 0)
+            if (permissions >= 0)
             {
                 setPermissions(file, permissions);
             }
-            
+
             tempFile = null;
         }
         finally
         {
-            if(tempFile != null)
+            if (tempFile != null)
             {
                 tempFile.delete();
             }
@@ -875,18 +939,18 @@ public class FileSystemUtils
     /**
      * Copies source the source file(s) to the destination.  A few modes are
      * supported:
-     *
+     * <p/>
      * Single source:
-     *   File -> File: copies a file to a file, overwriting an existing dest
-     *   File -> Dir : copy file into an existing dest directory, overwriting
-     *                 any existing child file (but not existing child dir!)
-     *   Dir  -> Dir : recursive copy of directory, overwrites existing dest,
-     *                 (even if it is a file) creates dest if necessary
-     *
+     * File -> File: copies a file to a file, overwriting an existing dest
+     * File -> Dir : copy file into an existing dest directory, overwriting
+     * any existing child file (but not existing child dir!)
+     * Dir  -> Dir : recursive copy of directory, overwrites existing dest,
+     * (even if it is a file) creates dest if necessary
+     * <p/>
      * Multiple sources (must all be files):
-     *   File(s) -> Dir: copies files into existing dest dir, overwrites
-     *                   existing dest, creates dest if necessary
-     * 
+     * File(s) -> Dir: copies files into existing dest dir, overwrites
+     * existing dest, creates dest if necessary
+     *
      * @param dest destination to copy file(s) to
      * @param src  source files to be copied
      * @throws IOException on any error
@@ -932,7 +996,7 @@ public class FileSystemUtils
     public static void ensureEmptyDirectory(File dir) throws IOException
     {
         delete(dir);
-        if(!dir.mkdirs())
+        if (!dir.mkdirs())
         {
             throw new IOException("Unable to create destination directory '" + dir.getAbsolutePath() + "'");
         }
@@ -940,9 +1004,9 @@ public class FileSystemUtils
 
     private static void ensureNoDirectories(File[] files) throws IOException
     {
-        for(File f: files)
+        for (File f : files)
         {
-            if(f.isDirectory())
+            if (f.isDirectory())
             {
                 throw new IOException("Copy failed: multiple sources including an existing directory '" + f.getAbsolutePath() + "'");
             }
@@ -955,7 +1019,7 @@ public class FileSystemUtils
         //   - preserves permissions; and
         //   - is likely to be faster when it matters (i.e. large copy)
         String flags = "-pR";
-        if(SystemUtils.IS_LINUX)
+        if (SystemUtils.IS_LINUX)
         {
             flags += "d";
         }
@@ -964,7 +1028,7 @@ public class FileSystemUtils
         {
             // cp handles file->file and file->dir as expected.  Help is
             // required for dir->dir, we need to eliminate an existing dest.
-            if(src[0].isDirectory())
+            if (src[0].isDirectory())
             {
                 delete(dest);
             }
@@ -992,14 +1056,14 @@ public class FileSystemUtils
             if (exit != 0)
             {
                 // Attempt to copy ourselves.
-                LOG.warning("Copy using '"+ StringUtils.join(" ", args)+"' failed ("+exit+"), trying internal copy");
+                LOG.warning("Copy using '" + StringUtils.join(" ", args) + "' failed (" + exit + "), trying internal copy");
                 rmdir(dest);
                 javaCopy(dest, src);
             }
         }
         catch (InterruptedException e)
         {
-            IOException ioe = new IOException("Interrupted while executing '"+StringUtils.join(" ", args)+"'");
+            IOException ioe = new IOException("Interrupted while executing '" + StringUtils.join(" ", args) + "'");
             ioe.initCause(e);
             throw ioe;
         }
@@ -1014,15 +1078,15 @@ public class FileSystemUtils
 
     static void javaCopy(File dest, File... src) throws IOException
     {
-        if(src.length == 1)
+        if (src.length == 1)
         {
             File singleSource = src[0];
-            if(singleSource.isFile())
+            if (singleSource.isFile())
             {
-                if(dest.isDirectory())
+                if (dest.isDirectory())
                 {
                     dest = new File(dest, singleSource.getName());
-                    if(dest.isDirectory())
+                    if (dest.isDirectory())
                     {
                         throw new IOException("Copy failed: destination directory contains existing directory '" + dest.getAbsolutePath() + "' with same name as source file");
                     }
@@ -1031,7 +1095,7 @@ public class FileSystemUtils
                 delete(dest);
                 IOUtils.copyFile(singleSource, dest);
             }
-            else if(singleSource.isDirectory())
+            else if (singleSource.isDirectory())
             {
                 ensureEmptyDirectory(dest);
                 internalCopy(singleSource, dest);
