@@ -16,7 +16,7 @@ import com.zutubi.validation.annotations.Required;
 public class PerforceConfiguration extends PollableScmConfiguration
 {
     @Required
-    private String port;
+    private String port = "perforce:1666";
     @Required
     private String user;
     private String password;
