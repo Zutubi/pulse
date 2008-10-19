@@ -86,6 +86,8 @@ public class CvsRevision
             // noop.
         }
 
+        setRevisionString(revStr);
+
         // <author>:<branch/tag>:<date>
         if (revStr == null || revStr.indexOf(":") == -1 || revStr.substring(revStr.indexOf(":")).indexOf(":") == -1)
         {
@@ -115,7 +117,6 @@ public class CvsRevision
         try
         {
             setDate(DATE_FORMAT.parse(date));
-            setRevisionString(generateRevisionString());
             return;
         }
         catch (ParseException e)
@@ -126,7 +127,6 @@ public class CvsRevision
         try
         {
             setDate(format.parse(date));
-            setRevisionString(generateRevisionString());
             return;
         }
         catch (ParseException e)
@@ -138,8 +138,6 @@ public class CvsRevision
         {
             throw new ScmException("Invalid CVS revision '" + revStr + "' (must be a date, or <author>:<branch>:<date>)");
         }
-
-        setRevisionString(generateRevisionString());
     }
 
     private String generateRevisionString()
