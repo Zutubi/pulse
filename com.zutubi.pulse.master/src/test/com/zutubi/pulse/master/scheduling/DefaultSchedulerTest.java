@@ -4,9 +4,6 @@ import com.zutubi.pulse.master.model.persistence.TriggerDao;
 import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
 import junit.framework.TestCase;
 
-/**
- * <class-comment/>
- */
 public class DefaultSchedulerTest extends TestCase
 {
     private DefaultScheduler scheduler;
@@ -77,7 +74,7 @@ public class DefaultSchedulerTest extends TestCase
         catch (SchedulingException e)
         {
             // okay then :)
-            assertEquals(e.getMessage(), "A trigger with name a and group a has already been registered.");
+            assertEquals(e.getMessage(), "A trigger with name a and group a has already been scheduled.");
         }
     }
 
