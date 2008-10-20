@@ -24,7 +24,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
     protected ScmClient client;
     protected ExpectedTestResults testData;
     protected String prefix;
-    private ScmContextImpl context;
+    protected ScmContextImpl context;
 
     protected void setUp() throws Exception
     {

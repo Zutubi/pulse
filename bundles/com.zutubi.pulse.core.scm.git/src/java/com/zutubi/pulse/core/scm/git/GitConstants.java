@@ -7,10 +7,13 @@ import com.zutubi.util.SystemUtils;
  */
 public class GitConstants
 {
+    /**
+     * Pulse system property used to override the default git command line executable.
+     */
     public static final String PROPERTY_GIT_COMMAND = "pulse.git.command";
 
     /**
-     * The git executable
+     * The git executable, defaults to git, or git.exe on a windows system.
      */
     public static final String GIT;
     static
@@ -21,14 +24,7 @@ public class GitConstants
         }
         else
         {
-            if (SystemUtils.IS_WINDOWS)
-            {
-                GIT = "git.exe";
-            }
-            else
-            {
-                GIT = "git";
-            }
+            GIT = (SystemUtils.IS_WINDOWS) ? "git.exe" : "git";
         }
     }
 
@@ -38,6 +34,7 @@ public class GitConstants
     public static final String COMMAND_CHECKOUT = "checkout";
     public static final String COMMAND_BRANCH = "branch";
     public static final String COMMAND_SHOW = "show";
+    public static final String COMMAND_DIFF = "diff";
 
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_NAME_STATUS = "--name-status";
@@ -49,7 +46,28 @@ public class GitConstants
 
     public static final String REVISION_HEAD = "HEAD";
 
-    public static final String ACTION_EDITED =   "M";
+    /**
+     * File has conflicts after a merge
+     */
+    public static final String ACTION_UNMERGED =   "U";
+    /**
+     * File has been copied and modified
+     */
+    public static final String ACTION_COPY_MODIFIED =   "C";
+    /**
+     * File has been renamed and modified
+     */
+    public static final String ACTION_RENAME_MODIFIED =   "R";
+    /**
+     * File has been modified
+     */
+    public static final String ACTION_MODIFIED =   "M";
+    /**
+     * File has been added
+     */
     public static final String ACTION_ADDED =    "A";
+    /**
+     * File has been deleted
+     */
     public static final String ACTION_DELETED =  "D";
 }

@@ -77,7 +77,7 @@ public class GitClientTest extends PulseTestCase
         assertFiles(workingDir, "a.txt", "b.txt", "c.txt");
         assertGitDir(workingDir);
 
-        assertEquals(2, handler.getStatusMessages().size());
+        assertEquals(3, handler.getStatusMessages().size());
     }
 
     public void testCheckoutOnBranch() throws ScmException, ParseException
@@ -116,6 +116,7 @@ public class GitClientTest extends PulseTestCase
 
     public void testGetLatestRevision() throws ScmException
     {
+        client.init(scmContext);
         Revision rev = client.getLatestRevision(scmContext);
 
         assertEquals("e34da05e88de03a4aa5b10b338382f09bbe65d4b", rev.getRevisionString());
@@ -124,6 +125,7 @@ public class GitClientTest extends PulseTestCase
     public void testGetLatestRevisionOnBranch() throws ScmException
     {
         client.setBranch("branch");
+        client.init(scmContext);
         Revision rev = client.getLatestRevision(scmContext);
 
         assertEquals("c34b545b6954b8946967c250dde7617c24a9bb4b", rev.getRevisionString());
@@ -131,12 +133,14 @@ public class GitClientTest extends PulseTestCase
 
     public void testRetrieve() throws ScmException, IOException
     {
+        client.init(scmContext);
         InputStream content = client.retrieve(scmContext, "a.txt", null);
         assertEquals("", IOUtils.inputStreamToString(content));
     }
 
     public void testRetrieveFromRevision() throws IOException, ScmException
     {
+        client.init(scmContext);
         InputStream content = client.retrieve(scmContext, "a.txt", new Revision("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112"));
         assertEquals("content", IOUtils.inputStreamToString(content));
     }
@@ -144,6 +148,7 @@ public class GitClientTest extends PulseTestCase
     public void testRetrieveOnBranch() throws ScmException, IOException
     {
         client.setBranch("branch");
+        client.init(scmContext);
         InputStream content = client.retrieve(scmContext, "1.txt", null);
         assertEquals("", IOUtils.inputStreamToString(content));
     }
@@ -151,6 +156,7 @@ public class GitClientTest extends PulseTestCase
     public void testRetrieveFromRevisionOnBranch() throws ScmException, IOException
     {
         client.setBranch("branch");
+        client.init(scmContext);
         InputStream content = client.retrieve(scmContext, "1.txt", new Revision("7d61890eb55586ec99416c53c581bf561591a608"));
         assertEquals("content", IOUtils.inputStreamToString(content));
     }
@@ -159,24 +165,24 @@ public class GitClientTest extends PulseTestCase
     {
         client.setBranch("master");
         client.checkout(context, null, handler);
-        assertEquals(2, handler.getStatusMessages().size());
+        assertEquals(3, handler.getStatusMessages().size());
         assertEquals("Branch local set up to track remote branch refs/remotes/origin/master.", handler.getStatusMessages().get(1));
 
         client.update(context, null, handler);
-        assertEquals(3, handler.getStatusMessages().size());
-        assertEquals("Already up-to-date.", handler.getStatusMessages().get(2));
+        assertEquals(4, handler.getStatusMessages().size());
+        assertEquals("Already up-to-date.", handler.getStatusMessages().get(3));
     }
 
     public void testUpdateOnBranch() throws ScmException
     {
         client.setBranch("branch");
         client.checkout(context, null, handler);
-        assertEquals(2, handler.getStatusMessages().size());
+        assertEquals(3, handler.getStatusMessages().size());
         assertEquals("Branch local set up to track remote branch refs/remotes/origin/branch.", handler.getStatusMessages().get(1));
 
         client.update(context, null, handler);
-        assertEquals(3, handler.getStatusMessages().size());
-        assertEquals("Already up-to-date.", handler.getStatusMessages().get(2));
+        assertEquals(4, handler.getStatusMessages().size());
+        assertEquals("Already up-to-date.", handler.getStatusMessages().get(3));
     }
 
     public void testUpdateToRevision() throws ScmException, IOException, ParseException
@@ -194,6 +200,7 @@ public class GitClientTest extends PulseTestCase
     public void testChanges() throws ScmException
     {
         client.setBranch("master");
+        client.init(scmContext);
         List<Changelist> changes = client.getChanges(scmContext, new Revision("HEAD~2"), null);
         assertEquals(2, changes.size());
     }
@@ -201,6 +208,8 @@ public class GitClientTest extends PulseTestCase
     public void testHeadChanges() throws ScmException
     {
         client.setBranch("master");
+        client.init(scmContext);
+
         List<Changelist> changes = client.getChanges(scmContext, new Revision("HEAD~1"), new Revision("HEAD"));
         assertEquals(1, changes.size());
         Changelist changelist = changes.get(0);

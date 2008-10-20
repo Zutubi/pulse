@@ -38,6 +38,8 @@ public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
         this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master");
         this.testData = new ExpectedTestResults(revisions);
         this.prefix = ""; // hmm, this is duplicated in the expected test results instance as well.
+
+        this.client.init(context);
     }
 
     protected void tearDown() throws Exception

@@ -18,7 +18,15 @@ import java.util.*;
 public class GitClient implements ScmClient
 {
     private static final Revision HEAD = new Revision("HEAD");
+    /**
+     * The name of the local branch used by scm context operations.
+     */
     private static final String LOCAL_BRANCH_NAME = "local";
+    /**
+     * The prefix applied to temporary branch names, used when checking out
+     * a specific revision.  Temporary branches exist for the duration of the
+     * operation and are subsequently deleted.
+     */
     private static final String TMP_BRANCH_PREFIX = "tmp.";
 
     private static final Set<ScmCapability> CAPABILITIES = new HashSet<ScmCapability>();
@@ -35,11 +43,24 @@ public class GitClient implements ScmClient
     static
     {
         LOG_ACTION_MAPPINGS.put(ACTION_ADDED, FileChange.Action.ADD);
-        LOG_ACTION_MAPPINGS.put(ACTION_EDITED, FileChange.Action.EDIT);
+        LOG_ACTION_MAPPINGS.put(ACTION_MODIFIED, FileChange.Action.EDIT);
         LOG_ACTION_MAPPINGS.put(ACTION_DELETED, FileChange.Action.DELETE);
+        LOG_ACTION_MAPPINGS.put(ACTION_RENAME_MODIFIED, FileChange.Action.MOVE);
+
+        // the following two dont have direct mappings to our internal understanding
+        // of file changes.  Should we add specific actions for them?.
+        LOG_ACTION_MAPPINGS.put(ACTION_COPY_MODIFIED, FileChange.Action.UNKNOWN);
+        LOG_ACTION_MAPPINGS.put(ACTION_UNMERGED, FileChange.Action.UNKNOWN);
     }
 
+    /**
+     * The source repository from which the data will be retrieved.
+     */
     private String repository;
+
+    /**
+     * The source repositories branch name.
+     */
     private String branch;
 
     public GitClient(String repository, String branch)
@@ -48,15 +69,46 @@ public class GitClient implements ScmClient
         this.branch = branch;
     }
 
-
+    /**
+     * Prepare the local clone of the remote git repository.  This local clone will subsequently
+     * be used for browsing, checking for changes, determining changelists etc etc.
+     *
+     * @param context the scm context in which this git client will be operating.
+     * @throws ScmException if we encounter a problem
+     */
     public void init(ScmContext context) throws ScmException
     {
-        preparePersistentDirectory(context.getPersistentWorkingDir());
+        synchronized(context)
+        {
+            // at this stage, we are not overly concerned with feedback since this is running
+            // in the background, so use the default noop handler.
+            ScmFeedbackHandler handler = new ScmFeedbackAdapter();
+
+            File workingDir = context.getPersistentWorkingDir();
+
+            // git does not like to clone 'into' existing directories.
+            if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
+            {
+                throw new ScmException("Init failed. Could not delete directory: " + workingDir.getAbsolutePath());
+            }
+
+            NativeGit git = new NativeGit();
+            git.setWorkingDirectory(workingDir.getParentFile());
+            // git clone -n <repository> dir
+            git.clone(handler, repository, workingDir.getName());
+
+            // cd into git repository.
+            git.setWorkingDirectory(workingDir);
+
+            // git checkout -b local origin/<branch>
+            git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
+        }
     }
 
     public void close()
     {
-        // noop.
+        // noop.  We do not keep any processes active, and the persistent directory
+        // remains for the duration of the scm configuration.
     }
 
     public Set<ScmCapability> getCapabilities()
@@ -76,7 +128,13 @@ public class GitClient implements ScmClient
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
-        NativeGit git = new NativeGit();
+        // IMPLEMENTATION NOTE:
+        //  we can improve the speed of the checkout by running git clone -depth 1, thereby not downloading all of the
+        // repositories history.  However, given the current interaction between the scm client and pulse, the working
+        // directory created by the checkout may be used subsequently for an update, or multiple updates, as well as
+        // an update to an old revision.  This would not be possible with a restricted history repository.  So, we go
+        // with the slower checkout for now.  If users have issues with the speed of the checkout in builds, they
+        // should select an alternate checkout scheme - both CLEAN_UPDATE and INCREMENTAL_UPDATE would do the trick. 
 
         File workingDir = context.getWorkingDir();
         // Git likes to create the directory we clone into, so we need to ensure that it can do so.
@@ -85,18 +143,32 @@ public class GitClient implements ScmClient
             throw new ScmException("Checkout failed. Could not delete directory: " + workingDir.getAbsolutePath());
         }
 
+        NativeGit git = new NativeGit();
         git.setWorkingDirectory(workingDir.getParentFile());
+        // git clone -n <repository> dir
         git.clone(handler, repository, workingDir.getName());
 
+        // cd workingDir
         git.setWorkingDirectory(workingDir);
         git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
 
+        // if we are after a specific revision, check it out to a temporary branch.  This also updates
+        // the working copy to that branch.
         if (revision != null)
         {
             git.checkout(handler, revision.getRevisionString(), TMP_BRANCH_PREFIX + revision.getRevisionString());
         }
 
-        // todo: if we want to provide extra feedback on the checkout, we run the checkout and then traverse the files, reporting them all as added.
+        // feedback can be determined by using git diff with the appropriate properties.  We can not
+        // get feedback from the checkout process itself, and so any feedback generated is delayed.  
+        try
+        {
+            git.diff(handler, revision);
+        }
+        catch (GitException e)
+        {
+            // we are making a guess at a non-existant revision here.
+        }
 
         // Determine the head revision from this checkout.  This is equivalent to the evaluated version
         // revision parameter which may be a relative revision (HEAD~4 for instance).
@@ -108,6 +180,10 @@ public class GitClient implements ScmClient
     public Revision update(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         File workingDir = context.getWorkingDir();
+        if (!isGitRepository(workingDir))
+        {
+            throw new ScmException("");
+        }
 
         NativeGit git = new NativeGit();
         git.setWorkingDirectory(workingDir);
@@ -115,9 +191,19 @@ public class GitClient implements ScmClient
         // switch to the primary local checkout and update.
         git.checkout(handler, LOCAL_BRANCH_NAME);
 
-        // todo: determine the changes pulled in for the scm handler.  Get initial revision, pull, get final revision, then diff the two.
+        // - get the current revision on head.
+        // - pull
+        // - get the new revision on head
+        // - run a diff to provide feedback.
 
+        String fromRevision = git.log(1).get(0).getId();
         git.pull(handler);
+        String toRevision = git.log(1).get(0).getId();
+        if (fromRevision.compareTo(toRevision) != 0)
+        {
+            git.diff(handler, new Revision(fromRevision), new Revision(toRevision));
+        }
+
 
         // cleanup any existing tmp local branches.
         List<GitBranchEntry> branches = git.branch();
@@ -135,9 +221,7 @@ public class GitClient implements ScmClient
             git.checkout(handler, rev, TMP_BRANCH_PREFIX + rev);
         }
 
-        git.setWorkingDirectory(workingDir);
         GitLogEntry entry = git.log(1).get(0);
-
         return new Revision(entry.getId());
     }
 
@@ -147,7 +231,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(workingDir);
+            preparePersistentDirectory(context, workingDir);
 
             NativeGit git = new NativeGit();
             git.setWorkingDirectory(workingDir);
@@ -179,7 +263,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(workingDir);
+            preparePersistentDirectory(context, workingDir);
 
             NativeGit git = new NativeGit();
             git.setWorkingDirectory(workingDir);
@@ -190,12 +274,21 @@ public class GitClient implements ScmClient
         }
     }
 
-    private void preparePersistentDirectory(File workingDir) throws ScmException
+    private void preparePersistentDirectory(ScmContext context, File workingDir) throws ScmException
     {
-        ScmFeedbackHandler handler = new ScmFeedbackAdapter();
-
         NativeGit git = new NativeGit();
-        if (isGitRepository(workingDir))
+        if (!isGitRepository(workingDir))
+        {
+            try
+            {
+                throw new ScmException("Git repository not found: " + workingDir.getCanonicalPath());
+            }
+            catch (IOException e)
+            {
+                throw new ScmException("Git repository not found: " + workingDir.getAbsolutePath());
+            }
+        }
+        else
         {
             git.setWorkingDirectory(workingDir);
 
@@ -209,6 +302,8 @@ public class GitClient implements ScmClient
                }
             }
 
+            ScmFeedbackHandler handler = new ScmFeedbackAdapter();
+
             if (localBranchExists)
             {
                 git.checkout(handler, LOCAL_BRANCH_NAME);
@@ -218,20 +313,6 @@ public class GitClient implements ScmClient
             {
                 git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
             }
-        }
-        else
-        {
-            // git does not like a checkouts into existing directories - not this way anyways.
-            if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
-            {
-                throw new ScmException("Checkout failed. Could not delete directory: " + workingDir.getAbsolutePath());
-            }
-
-            git.setWorkingDirectory(workingDir.getParentFile());
-            git.clone(handler, repository, workingDir.getName());
-
-            git.setWorkingDirectory(workingDir);
-            git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
         }
     }
 
@@ -246,7 +327,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(workingDir);
+            preparePersistentDirectory(context, workingDir);
 
             if (to == null)
             {
@@ -278,7 +359,7 @@ public class GitClient implements ScmClient
 
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(workingDir);
+            preparePersistentDirectory(context, workingDir);
 
             NativeGit git = new NativeGit();
             git.setWorkingDirectory(workingDir);

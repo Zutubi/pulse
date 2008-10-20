@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.git;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.api.Revision;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
@@ -157,6 +158,27 @@ public class NativeGit
         runWithHandler(handler, null, command);
 
         return handler.getBranches();
+    }
+
+    /**
+     * The purpose of this diff implementation is purely for generating a set of status messages
+     * that identify the difference added by the specified revision
+     *
+     * @param handler the handler that will be recieving the status messages
+     * @param revision the revision of interest.  If null, HEAD is used.
+     *
+     * @throws GitException is thrown if there is an error
+     */
+    public void diff(ScmFeedbackHandler handler, Revision revision) throws GitException
+    {
+        String rev = (revision != null) ? revision.getRevisionString() : "HEAD";
+        diff(handler, new Revision(rev + "~1"), new Revision(rev));
+    }
+
+    public void diff(ScmFeedbackHandler handler, Revision revA, Revision revB) throws GitException
+    {
+        String[] command = {GIT, COMMAND_DIFF, FLAG_NAME_STATUS, revA.getRevisionString(), revB.getRevisionString()};
+        run(handler, command);
     }
 
     protected void run(String... commands) throws GitException

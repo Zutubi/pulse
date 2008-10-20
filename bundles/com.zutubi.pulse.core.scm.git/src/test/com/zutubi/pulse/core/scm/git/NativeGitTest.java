@@ -2,6 +2,8 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -138,6 +140,22 @@ public class NativeGitTest extends PulseTestCase
         git.checkout(null, "origin/branch", "local");
 
         assertTrue(IOUtils.fileToString(new File(cloneBase, "README.txt")).contains("ON BRANCH"));
+    }
+
+    public void testDiffFeedback() throws GitException
+    {
+        git.setWorkingDirectory(tmp);
+        git.clone(null, repository, "base");
+
+        git.setWorkingDirectory(new File(tmp, "base"));
+        git.diff(new ScmFeedbackHandler()
+        {
+            public void status(String message)
+            {
+                assertEquals("M\tsmiley.txt", message);
+            }
+            public void checkCancelled() throws ScmCancelledException { }
+        }, null);
     }
 
     public void testPull() throws ScmException, IOException
