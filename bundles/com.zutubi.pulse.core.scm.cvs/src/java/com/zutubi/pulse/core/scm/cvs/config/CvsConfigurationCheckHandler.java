@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs.config;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -12,6 +13,7 @@ import com.zutubi.pulse.core.scm.ScmClientUtils;
  *
  */
 @SymbolicName("zutubi.cvsConfigurationCheckHandler")
+@Wire
 public class CvsConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<CvsConfiguration>
 {
     private ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration> scmClientFactory;

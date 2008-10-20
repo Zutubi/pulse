@@ -56,7 +56,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
             final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
             // has this user been added yet?.
-            UserConfiguration user = userManager.getUserConfig(token.getName());
+            final UserConfiguration user = userManager.getUserConfig(token.getName());
             if (user == null)
             {
                 LOG.debug("User '" + token.getName() + "' does not exist, asking LDAP manager");
@@ -68,9 +68,15 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
                     }
                 });
             }
-            else
+            else if (user.isAuthenticatedViaLdap())
             {
-                setRandomPassword(user);
+                AcegiUtils.runAsSystem(new Runnable()
+                {
+                    public void run()
+                    {
+                        setRandomPassword(user);
+                    }
+                });
             }
         }
 

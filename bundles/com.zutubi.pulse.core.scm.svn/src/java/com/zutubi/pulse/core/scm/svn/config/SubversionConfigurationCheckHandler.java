@@ -9,11 +9,9 @@ import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 
 /**
- *
- *
  */
-@SymbolicName("zutubi.subversionConfigurationCheckHandler")
 @Wire
+@SymbolicName("zutubi.subversionConfigurationCheckHandler")
 public class SubversionConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<SubversionConfiguration>
 {
     private ScmClientFactory scmClientFactory;

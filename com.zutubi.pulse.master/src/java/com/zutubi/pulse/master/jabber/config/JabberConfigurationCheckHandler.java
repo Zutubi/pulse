@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.jabber.config;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.master.jabber.JabberManager;
 import org.jivesoftware.smack.XMPPException;
 
 /**
- *
- *
  */
+@Wire
 @SymbolicName("zutubi.jabberConfigurationCheckHandler")
 public class JabberConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<JabberConfiguration>
 {

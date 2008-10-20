@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.validation.annotations.Required;
@@ -10,6 +11,7 @@ import com.zutubi.validation.annotations.Required;
  *
  */
 @SymbolicName("zutubi.ldapConfigutionCheckHandler")
+@Wire
 public class LDAPConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<LDAPConfiguration>
 {
     @Required

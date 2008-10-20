@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.p4.config;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -9,6 +10,7 @@ import com.zutubi.pulse.core.scm.ScmClientUtils;
 
 /**
  */
+@Wire
 @SymbolicName("zutubi.perforceConfigurationCheckHandler")
 public class PerforceConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<PerforceConfiguration>
 {
