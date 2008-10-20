@@ -175,23 +175,17 @@ public class EntityBuildQueue
         {
             if (eventCanReplaceRequest(event, activeBuild.getEvent()))
             {
-                BuildRevision revision = activeBuild.getEvent().getRevision();
-                revision.lock();
                 try
                 {
-                    if (!revision.isFixed())
+                    BuildRevision buildRevision = event.getRevision();
+                    if (activeBuild.getController().updateRevisionIfNotFixed(buildRevision.getRevision(), buildRevision.getPulseFile()))
                     {
-                        activeBuild.getController().updateRevision(event.getRevision().getRevision(), event.getRevision().getPulseFile());
                         return true;
                     }
                 }
                 catch (BuildException e)
                 {
                     LOG.severe("Unable to update active build revision: " + e.getMessage(), e);
-                }
-                finally
-                {
-                    revision.unlock();
                 }
             }
         }

@@ -322,7 +322,7 @@ public class BuildController implements EventListener
             if (!buildRevision.isInitialised())
             {
                 buildLogger.status("Initialising build revision...");
-                updateRevision(buildRevision, null, null, true);
+                updateRevision(buildRevision, null, null);
                 buildLogger.status("Revision initialised to '" + buildRevision.getRevision().getRevisionString() + "'");
             }
         }
@@ -345,15 +345,38 @@ public class BuildController implements EventListener
      * @param pulseFile the pulse file for the revision, ignored if revision is
      *                  null (the pulse file will be obtained for the obtained
      *                  latest revision)
-     *
+     * @return true iff the revision was updated
      * @throws BuildException if the revision cannot be set due to an error
      */
-    public void updateRevision(Revision revision, String pulseFile)
+    public boolean updateRevisionIfNotFixed(Revision revision, String pulseFile)
     {
-        updateRevision(request.getRevision(), revision, pulseFile, false);
+        boolean updated = false;
+        
+        BuildRevision buildRevision = request.getRevision();
+        buildRevision.lock();
+        try
+        {
+            if (!buildRevision.isFixed())
+            {
+                updateRevision(buildRevision, revision, pulseFile);
+                updated = true;
+            }
+        }
+        finally
+        {
+            buildRevision.unlock();
+        }
+
+        if (updated)
+        {
+            buildLogger.status("Revision updated to '" + buildRevision.getRevision() + "' due to a newer build request");
+            eventManager.publish(new BuildRevisionUpdatedEvent(this, buildResult, buildRevision));
+        }
+
+        return updated;
     }
 
-    private void updateRevision(BuildRevision buildRevision, Revision revision, String pulseFile, boolean first)
+    private void updateRevision(BuildRevision buildRevision, Revision revision, String pulseFile)
     {
         if (revision == null)
         {
@@ -367,12 +390,6 @@ public class BuildController implements EventListener
         }
 
         buildRevision.update(revision, pulseFile);
-
-        if (!first)
-        {
-            buildLogger.status("Revision updated to '" + buildRevision.getRevision() + "' due to a newer build request");
-            eventManager.publish(new BuildRevisionUpdatedEvent(this, buildResult, buildRevision));
-        }
     }
 
     private Revision getLatestRevision()

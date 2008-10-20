@@ -184,7 +184,8 @@ public class BuildRevision
 
     /**
      * Update to a new revision, with the corresponding pulse file.  The
-     * revision must not be fixed.
+     * revision <strong>must not</strong> be fixed, and it <strong>must</strong>
+     * be locked when making this call.
      *
      * @param revision  the new revision to build
      * @param pulseFile the pulse file corresponding to the revision
