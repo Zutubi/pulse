@@ -28,13 +28,7 @@ public class DefaultScmContextFactory implements ScmContextFactory
                 if (!contexts.containsKey(config.getHandle()))
                 {
                     ScmContextImpl context = new ScmContextImpl();
-                    File projectDir = new File(projectsDir, String.valueOf(id));
-                    File workingDir = new File(projectDir, "scm");
-                    if (!workingDir.isDirectory() && !workingDir.mkdirs())
-                    {
-                        throw new IOException("Failed to create persistent working directory '" + workingDir.getCanonicalPath() + "'");
-                    }
-                    context.setPersistentWorkingDir(workingDir);
+                    context.setPersistentWorkingDir(getPersistentWorkingDir(id));
                     contexts.put(config.getHandle(), context);
                 }
             }
@@ -44,6 +38,19 @@ public class DefaultScmContextFactory implements ScmContextFactory
         {
             throw new ScmException("IO Failure creating scm context. " + e.getMessage(), e);
         }
+    }
+
+    private File getPersistentWorkingDir(long id) throws IOException
+    {
+        // Question: should the construction of the specific project path be done here, or via
+        // an appropriate paths object?.
+        File projectDir = new File(projectsDir, String.valueOf(id));
+        File workingDir = new File(projectDir, "scm");
+        if (!workingDir.isDirectory() && !workingDir.mkdirs())
+        {
+            throw new IOException("Failed to create persistent working directory '" + workingDir.getCanonicalPath() + "'");
+        }
+        return workingDir;
     }
 
     public void setProjectsDir(File projectsDir)

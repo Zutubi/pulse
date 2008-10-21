@@ -1,14 +1,13 @@
 package com.zutubi.pulse.master;
 
 import com.zutubi.events.Event;
-import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ResourceManager;
-import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
 import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
@@ -18,7 +17,7 @@ import java.util.List;
 
 /**
  */
-public class MasterServiceImpl implements MasterService, EventListener
+public class MasterServiceImpl implements MasterService
 {
     private ServiceTokenManager serviceTokenManager;
     private EventManager eventManager;
@@ -88,20 +87,16 @@ public class MasterServiceImpl implements MasterService, EventListener
         }
     }
 
-    public void handleEvent(Event event)
-    {
-        SpringComponentContext.autowire(this);
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{ SystemStartedEvent.class };
-    }
-
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
-        eventManager.register(this);
+        eventManager.register(new SystemStartedListener()
+        {
+            public void systemStarted()
+            {
+                SpringComponentContext.autowire(this);
+            }
+        });
     }
 
     public void setResourceManager(ResourceManager resourceManager)

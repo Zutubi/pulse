@@ -2,8 +2,6 @@ package com.zutubi.pulse.master.velocity;
 
 import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.zutubi.events.Event;
-import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -16,7 +14,7 @@ import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import org.apache.velocity.context.Context;
 
@@ -25,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  */
-public class CustomVelocityManager extends VelocityManager implements EventListener
+public class CustomVelocityManager extends VelocityManager
 {
     private ProjectManager projectManager;
     private AgentManager agentManager;
@@ -101,16 +99,12 @@ public class CustomVelocityManager extends VelocityManager implements EventListe
 
     public void setEventManager(EventManager eventManager)
     {
-        eventManager.register(this);
-    }
-
-    public void handleEvent(Event event)
-    {
-        SpringComponentContext.autowire(this);
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{SystemStartedEvent.class};
+        eventManager.register(new SystemStartedListener()
+        {
+            public void systemStarted()
+            {
+                SpringComponentContext.autowire(this);
+            }
+        });
     }
 }

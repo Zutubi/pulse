@@ -1,14 +1,12 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.events.Event;
-import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.scheduling.CronTrigger;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
@@ -50,21 +48,14 @@ public class BackupManager
     {
         // all initialisation occurs on the system started event as we need
         // to be sure the scheduler is available
-        eventManager.register(new EventListener()
+        eventManager.register(new SystemStartedListener()
         {
-            public Class[] getHandledEvents()
-            {
-                return new Class[]{SystemStartedEvent.class};
-            }
-
-            public void handleEvent(Event event)
+            public void systemStarted()
             {
                 SpringComponentContext.autowire(BackupManager.this);
-
                 initialiseManager();
             }
         });
-
     }
 
     protected void initialiseManager()

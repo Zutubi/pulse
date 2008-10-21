@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.api;
 
-import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.config.Configuration;
@@ -23,7 +22,7 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
-import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.security.AccessManager;
@@ -38,7 +37,7 @@ import java.util.*;
 /**
  * Implements a simple API for remote monitoring and control.
  */
-public class RemoteApi implements com.zutubi.events.EventListener
+public class RemoteApi
 {
     private static final Logger LOG = Logger.getLogger(RemoteApi.class);
 
@@ -1772,20 +1771,6 @@ public class RemoteApi implements com.zutubi.events.EventListener
         return build;
     }
 
-    public void handleEvent(Event evt)
-    {
-        // Rewire on startup to get the full token manager.  Maybe there is a way to delay
-        // the creation of this instance until after the context is fully initialised and
-        // hence the objectFactory.buildBean(RemoteApi.class) will return a fully wired instance?.
-        SpringComponentContext.autowire(this);
-        eventManager.unregister(this);
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{SystemStartedEvent.class};
-    }
-
     public void setTokenManager(TokenManager tokenManager)
     {
         this.tokenManager = tokenManager;
@@ -1834,7 +1819,16 @@ public class RemoteApi implements com.zutubi.events.EventListener
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
-        eventManager.register(this);
+        eventManager.register(new SystemStartedListener()
+        {
+            public void systemStarted()
+            {
+                // Rewire on startup to get the full token manager.  Maybe there is a way to delay
+                // the creation of this instance until after the context is fully initialised and
+                // hence the objectFactory.buildBean(RemoteApi.class) will return a fully wired instance?.
+                SpringComponentContext.autowire(this);
+            }
+        });
     }
 
     public void setUserManager(UserManager userManager)

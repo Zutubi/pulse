@@ -1,10 +1,8 @@
 package com.zutubi.pulse.master.scheduling;
 
-import com.zutubi.events.Event;
-import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
-import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;
@@ -12,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class DefaultScheduler implements Scheduler, EventListener
+public class DefaultScheduler implements Scheduler
 {
     private static final Logger LOG = Logger.getLogger(DefaultScheduler.class);
 
@@ -295,20 +293,13 @@ public class DefaultScheduler implements Scheduler, EventListener
 
     public void setEventManager(EventManager eventManager)
     {
-        eventManager.register(this);
-    }
-
-    public void handleEvent(Event evt)
-    {
-        if (evt instanceof SystemStartedEvent)
+        eventManager.register(new SystemStartedListener()
         {
-            start();
-        }
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{SystemStartedEvent.class};
+            public void systemStarted()
+            {
+                start();
+            }
+        });
     }
 
     public void stop(boolean force)

@@ -17,19 +17,18 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.TypeAdapter;
-import com.zutubi.tove.config.TypeListener;
-import com.zutubi.tove.transaction.Synchronization;
-import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.tove.transaction.TransactionStatus;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class DefaultScmManager implements ScmManager
 {
@@ -47,18 +46,14 @@ public class DefaultScmManager implements ScmManager
     private Scheduler scheduler;
     private ConfigurationProvider configurationProvider;
     private ThreadFactory threadFactory;
-    private TransactionManager transactionManager;
 
     private final Map<Long, Pair<Long, Revision>> waiting = new HashMap<Long, Pair<Long, Revision>>();
     private final Map<Long, Revision> latestRevisions = new HashMap<Long, Revision>();
 
     private ThreadPoolExecutor pollingExecutor = null;
-    private ThreadPoolExecutor initialisationExecutor = null;
 
     private static final int DEFAULT_POLL_THREAD_COUNT = 10;
     private static final String PROPERTY_POLLING_THREAD_COUNT = "scm.polling.thread.count";
-
-    private List<Long> readyScms = new LinkedList<Long>();
 
     public void init()
     {
@@ -78,94 +73,11 @@ public class DefaultScmManager implements ScmManager
                 {
                     pollingExecutor.shutdown();
                 }
-                if (initialisationExecutor != null)
-                {
-                    initialisationExecutor.shutdown();
-                }
             }
         });
     }
 
     private void initialise()
-    {
-        // register the configuration listener.
-        TypeListener<ScmConfiguration> listener = new TypeAdapter<ScmConfiguration>(ScmConfiguration.class)
-        {
-            public void insert(final ScmConfiguration instance)
-            {
-                // register a listener that will itself trigger the initialisation process if the transaction
-                // completed.  We can not do this in a postInsert (because we interact with the config system),
-                // and can not do this before the transaction is completed just in case we dont go ahead with the
-                // insert.
-                transactionManager.getTransaction().registerSynchronization(new Synchronization()
-                {
-                    public void postCompletion(TransactionStatus status)
-                    {
-                        if (status == TransactionStatus.COMMITTED)
-                        {
-                            initialisationExecutor.execute(new Runnable()
-                            {
-                                public void run()
-                                {
-                                    initialiseScmClient(instance);
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-        };
-        listener.register(configurationProvider, true);
-
-        initialiseScmPolling();
-        initialiseScmClients();
-    }
-
-    private void initialiseScmClients()
-    {
-        // initialise the thread pool to handle the scm initialisations.  The initialisation
-        // process is a long running task.
-        initialisationExecutor = new ThreadPoolExecutor(5, 10, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);
-
-        Collection<ScmConfiguration> scms = configurationProvider.getAll(ScmConfiguration.class);
-        for (final ScmConfiguration scm : scms)
-        {
-            initialisationExecutor.execute(new Runnable()
-            {
-                public void run()
-                {
-                    initialiseScmClient(scm);
-                }
-            });
-        }
-    }
-
-    private void initialiseScmClient(ScmConfiguration scm)
-    {
-        ScmClient client = null;
-        try
-        {
-            // the project is one level up.
-            ProjectConfiguration project = configurationProvider.getAncestorOfType(scm, ProjectConfiguration.class);
-
-            client = createClient(scm);
-            ScmContext context = createContext(project.getProjectId(), scm);
-
-            client.init(context);
-
-            readyScms.add(scm.getHandle());
-        }
-        catch (ScmException e)
-        {
-            LOG.warning("Failed to initialise scm: " + scm.getConfigurationPath(), e);
-        }
-        finally
-        {
-            ScmClientUtils.close(client);
-        }
-    }
-
-    private void initialiseScmPolling()
     {
         // initialise the thread pool that runs the scm polling.
         int pollThreadCount = Integer.getInteger(PROPERTY_POLLING_THREAD_COUNT, DEFAULT_POLL_THREAD_COUNT);
@@ -202,7 +114,7 @@ public class DefaultScmManager implements ScmManager
             {
                 ScmConfiguration scm = project.getScm();
                 // check a) sanity and b) pollability.
-                if (scm == null || !(scm instanceof Pollable) || !readyScms.contains(scm.getHandle()))
+                if (scm == null || !(scm instanceof Pollable) || !isReady(scm))
                 {
                     return false;
                 }
@@ -390,7 +302,7 @@ public class DefaultScmManager implements ScmManager
 
     public boolean isReady(ScmConfiguration scm)
     {
-        return readyScms.contains(scm.getHandle());
+        return true;
     }
 
     public ScmContext createContext(long projectId, ScmConfiguration scm) throws ScmException
@@ -446,10 +358,5 @@ public class DefaultScmManager implements ScmManager
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
-    }
-
-    public void setPulseTransactionManager(TransactionManager transactionManager)
-    {
-        this.transactionManager = transactionManager;
     }
 }

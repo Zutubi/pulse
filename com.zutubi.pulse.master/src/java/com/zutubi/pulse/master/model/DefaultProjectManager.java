@@ -129,6 +129,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         ensureDefaultProjectDefined();
     }
 
+    /**
+     * Ensure that the global template project is defined.
+     */
     private void ensureDefaultProjectDefined()
     {
         if (DefaultSetupManager.initialInstallation)
