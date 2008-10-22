@@ -670,38 +670,37 @@ public class FileSystemUtilsTest extends TestCase
         }
     }
 
-    public void testCreateLoadsOfTempFiles() throws IOException
+    public void testCreateTmpDirectory() throws IOException
     {
-        // sanity check that we can actually create a batch of files quickly.
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < 1000; i++)
-        {
-            FileSystemUtils.createTempFile("dir", null, tmpDir);
-        }
-        long end = System.currentTimeMillis();
-        assertTrue(end - start < 2 * Constants.SECOND);
+        File tmp = FileSystemUtils.createTempDir();
+        assertTrue(tmp.isDirectory());
+        assertTrue(tmp.delete());
     }
 
-    public void testCreateTempFile() throws IOException
+    public void testCreateTmpDirectoryWithPrefix() throws IOException
     {
-        File tmp = FileSystemUtils.createTempFile("dir", null, tmpDir);
-        assertTrue(tmp.isFile());
-        assertTrue(tmp.getName().startsWith("dir"));
-        assertTrue(tmp.getName().endsWith(".tmp"));
+        File tmp = FileSystemUtils.createTempDir("prefix", null);
+        assertTrue(tmp.getName().startsWith("prefix"));
+        assertFalse(tmp.getName().endsWith("null"));
+        assertTrue(tmp.isDirectory());
+        assertTrue(tmp.delete());
+    }
+
+    public void testCreateTmpDirectoryWithSuffix() throws IOException
+    {
+        File tmp = FileSystemUtils.createTempDir(null, "suffix");
+        assertTrue(tmp.getName().endsWith("suffix"));
+        assertFalse(tmp.getName().startsWith("null"));
+        assertTrue(tmp.isDirectory());
+        assertTrue(tmp.delete());
+    }
+
+    public void testCreateTmpDirectoryWithBase() throws IOException
+    {
+        File tmp = FileSystemUtils.createTempDir(null, null, tmpDir);
         assertEquals(tmpDir, tmp.getParentFile());
-    }
-
-    public void testCreateTempFilePrefixRequired() throws IOException
-    {
-        try
-        {
-            FileSystemUtils.createTempFile(null, null, (File)null);
-            fail();
-        }
-        catch (NullPointerException e)
-        {
-            // noop.
-        }
+        assertTrue(tmp.isDirectory());
+        assertTrue(tmp.delete());
     }
 
     private void simpleEOLTest(byte[] eol, String out) throws IOException

@@ -208,120 +208,40 @@ public class FileSystemUtils
             throw new IOException("Failed to create temporary directory. Base directory does not exist: " + base.getAbsolutePath());
         }
 
-        File file = null;
-        IOException exception = null;
-        int retries = SystemUtils.IS_WINDOWS ? 3 : 0;
+        if (base == null)
+        {
+            // need to determine the default tmp directory - the parent of a newly created tmp file.
+            File file = File.createTempFile(RandomUtils.randomString(5), RandomUtils.randomString(5));
+            base = file.getParentFile();
+            if (!file.delete())
+            {
+                // failing to delete does not prevent the rest of the method completing, so a warning is enough.
+            }
+        }
+
+        if (!TextUtils.stringSet(prefix))
+        {
+            prefix = "";
+        }
+        if (!TextUtils.stringSet(suffix))
+        {
+            suffix = "";
+        }
+
+        File tmp;
+        int tries = 0;
         do
         {
-            try
-            {
-                file = File.createTempFile(prefix, suffix, base);
-                break;
-            }
-            catch (IOException e)
-            {
-                exception = e;
-            }
+            tmp = new File(base, prefix + RandomUtils.randomString(7 + tries / 10) + suffix);
+            tries++;
+        }
+        while (tmp.exists());
 
-            try
-            {
-                Thread.sleep(50);
-            }
-            catch (InterruptedException e)
-            {
-                // Ignore
-            }
-        }
-        while (retries-- > 0);
-
-        if (exception != null)
-        {
-            IOException e = new IOException(exception.getMessage());
-            e.initCause(exception);
-            throw e;
-        }
-
-        assert (file != null);
-        if (!file.exists())
-        {
-            throw new IOException("Failed to create temporary directory. Reason: File.createTempFile failed.");
-        }
-        if (!file.delete())
-        {
-            throw new IOException("Failed to create temporary directory. Reason: tmpFile.delete failed.");
-        }
-        if (!file.mkdirs())
+        if (!tmp.mkdirs())
         {
             throw new IOException("Failed to create temporary directory. Reason: tmpDir.mkdirs failed.");
         }
-        return file;
-    }
-
-    private static final Object tmpDirLock = new Object();
-    private static File tmpDir;
-    private static File getTempDir() throws IOException
-    {
-        synchronized(tmpDirLock)
-        {
-            if (tmpDir == null)
-            {
-                File tmpFile = File.createTempFile(RandomUtils.randomString(5), "");
-                tmpDir = tmpFile.getParentFile();
-                if (!tmpDir.exists() && !tmpDir.mkdirs())
-                {
-                    throw new IOException("Failed to ensure system tmp directory exists.");
-                }
-            }
-            return tmpDir;
-        }
-    }
-
-    /**
-     * A custom implementation of the createTempFile method found on the File object.  This implementation
-     * will be slower to execute, but is more robust in its selection of unused filenames.
-     * 
-     * @param  prefix     The prefix string to be used in generating the file's
-     *                    name; must be at least three characters long
-     *
-     * @param  suffix     The suffix string to be used in generating the file's
-     *                    name; may be <code>null</code>, in which case the
-     *                    suffix <code>".tmp"</code> will be used
-     *
-     * @param  directory  The directory in which the file is to be created, or
-     *                    <code>null</code> if the default temporary-file
-     *                    directory is to be used
-     *
-     * @return  An abstract pathname denoting a newly-created empty file
-     *
-     * @throws  IOException  If a file could not be created
-     */
-    public static File createTempFile(String prefix, String suffix, File directory) throws IOException
-    {
-        // note: the speed of this implementation is based on a trade off between the speed
-        // and randomness of the filename generation
-        if (prefix == null)
-        {
-            throw new NullPointerException();
-        }
-
-        String s = (suffix == null) ? ".tmp" : suffix;
-
-        File base = (directory == null) ? getTempDir() : directory;
-
-        int i = 0;
-        int randLength = 5;
-        File tmpFile = new File(base, prefix + RandomUtils.randomString(randLength) + s);
-        while (tmpFile.isFile())
-        {
-            tmpFile = new File(base, prefix + RandomUtils.randomString(randLength) + s);
-            i++;
-            randLength = (i % 10 == 0) ? randLength + 1 : randLength; 
-        }
-        if (!tmpFile.createNewFile())
-        {
-            throw new IOException("Failed to create new file.");
-        }
-        return tmpFile;
+        return tmp;
     }
 
     public static void createDirectory(File file) throws IOException
