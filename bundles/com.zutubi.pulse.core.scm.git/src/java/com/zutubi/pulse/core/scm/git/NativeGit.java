@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
-import com.zutubi.pulse.core.scm.api.Revision;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
@@ -16,7 +16,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,8 +26,6 @@ import java.util.regex.Pattern;
 public class NativeGit
 {
     private static final Logger LOG = Logger.getLogger(NativeGit.class);
-    // should this system property name mirror the package? or is that just asking for trouble.
-    private static final long PROCESS_TIMEOUT = Long.getLong("pulse.git.inactivity.timeout", 300);
 
     /**
      * The date format used to read the 'date' field on git log output.
@@ -228,12 +225,10 @@ public class NativeGit
             }
         }
 
-        final AtomicBoolean activity = new AtomicBoolean(false);
         AsyncProcess async = new AsyncProcess(child, new LineHandler()
         {
             public void handle(String line, boolean error)
             {
-                activity.set(true);
                 if (error)
                 {
                     handler.handleStderr(line);
@@ -247,25 +242,11 @@ public class NativeGit
 
         try
         {
-            long lastActivityTime = System.currentTimeMillis();
-
             Integer exitCode;
             do
             {
                 handler.checkCancelled();
                 exitCode = async.waitFor(10, TimeUnit.SECONDS);
-                if (activity.getAndSet(false))
-                {
-                    lastActivityTime = System.currentTimeMillis();
-                }
-                else
-                {
-                    long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / 1000;
-                    if (secondsSinceActivity >= PROCESS_TIMEOUT)
-                    {
-                        throw new GitException("Timing out git process after " + secondsSinceActivity + " seconds of inactivity");
-                    }
-                }
             }
             while (exitCode == null);
 
@@ -276,7 +257,6 @@ public class NativeGit
                 throw new GitException("Git command: " + StringUtils.join(" ", commands) + " exited " +
                         "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
             }
-
         }
         catch (InterruptedException e)
         {
