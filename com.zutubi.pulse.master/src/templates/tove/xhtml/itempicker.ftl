@@ -25,7 +25,7 @@
         data: optionData
     });
 
-    fieldConfig.optionStore = optionStore;
+    fc.optionStore = optionStore;
 </#if>
 
     var value = [];
@@ -41,17 +41,17 @@
         data: []
     });
 
-    fieldConfig.store = store;
-    fieldConfig.value = value;
+    fc.store = store;
+    fc.value = value;
 <#if parameters.width?exists>
-    fieldConfig.width = ${parameters.width};
+    fc.width = ${parameters.width};
 </#if>
 
-    var picker = new ZUTUBI.ItemPicker(fieldConfig);
+    form.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
+
+    var picker = new ZUTUBI.ItemPicker(fc);
     form.add(picker);
     picker.on('change', updateButtons);
-
-    form.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
 }());
 
 <#include "/tove/xhtml/controlfooter.ftl" />

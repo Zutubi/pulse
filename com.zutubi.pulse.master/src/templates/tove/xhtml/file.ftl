@@ -1,15 +1,15 @@
 <#include "/tove/xhtml/controlheader.ftl" />
 
 <#if parameters.value?exists>
-    fieldConfig.value = '${parameters.value?js_string}';
+    fc.value = '${parameters.value?js_string}';
 </#if>
-fieldConfig.autoCreate = {tag: 'input', type: 'file', autocomplete: 'off'};
+fc.autoCreate = {tag: 'input', type: 'file', autocomplete: 'off'};
 <#if parameters.size?exists>
-    fieldConfig.autoCreate.size = ${parameters.size};
+    fc.autoCreate.size = ${parameters.size};
 </#if>
-fieldConfig.inputType = 'file';
-fieldConfig.width = 'auto';
+fc.inputType = 'file';
+fc.width = 'auto';
 
-form.add(new Ext.form.TextField(fieldConfig));
+form.add(new Ext.form.TextField(fc));
 
 <#include "/tove/xhtml/controlfooter.ftl" />

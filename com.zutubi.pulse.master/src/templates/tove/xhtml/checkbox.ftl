@@ -3,16 +3,16 @@
 (function()
 {
 <#if parameters.value?exists && parameters.value == "true">
-    fieldConfig.checked = true;
+    fc.checked = true;
 </#if>
-    fieldConfig.width = 14;
-    fieldConfig.autoCreate = { tag: 'input', type: 'checkbox', value: 'true', id: fieldConfig.id };
-
-    var checkbox = new Ext.form.Checkbox(fieldConfig);
-    form.add(checkbox);
-    checkbox.on('check', updateButtons);
+    fc.width = 14;
+    fc.autoCreate = { tag: 'input', type: 'checkbox', value: 'true', id: fc.id };
 
     form.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: 'false'}));
+
+    var checkbox = new Ext.form.Checkbox(fc);
+    form.add(checkbox);
+    checkbox.on('check', updateButtons);
 }());
 
 <#include "/tove/xhtml/controlfooter.ftl" />

@@ -1175,7 +1175,6 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         }
 
         this.ensureSelectionVisible();
-
     },
 
     navDown: function(ctrl)

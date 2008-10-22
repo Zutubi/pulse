@@ -591,3 +591,32 @@ var showFieldHelp = function(field)
         helpPanel.synchronise(field);
     }
 }
+
+function addFieldAnnotations(form, field, required, noOverride, inheritedFrom, overriddenOwner)
+{
+    if (required)
+    {
+        form.markRequired(field.getId(), 'field is required');
+    }
+
+    if (noOverride)
+    {
+        field.getEl().addClass('field-no-override');
+    }
+
+    if (inheritedFrom)
+    {
+        form.annotateField(field.getId(), 'inherited', window.baseUrl + '/images/inherited.gif', 'value inherited from ' + inheritedFrom);
+    }
+
+    if (overriddenOwner)
+    {
+        form.annotateField(field.getId(), 'overridden', window.baseUrl + '/images/overridden.gif', 'overrides value defined by ' + overriddenOwner);
+    }
+}
+
+function addFieldHelp(form, field, message)
+{
+    var helpEl = form.annotateField(field.getId(), 'help', window.baseUrl + '/images/help.gif', message);
+    helpEl.on('click', function() { showFieldHelp(field.getName()); });
+}

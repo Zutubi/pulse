@@ -4,11 +4,11 @@ form.on('actionfailed', function() { window.formSubmitting = false; });
     form.displayMode = true;
 </#if>
 
-var fieldConfig;
+var fc;
 
 <#list form.fields as field>
     <#assign parameters=field.parameters>
-    fieldConfig = {
+    fc = {
         width: 360
       , validateOnBlur: false
     <#if form.readOnly>
@@ -18,7 +18,12 @@ var fieldConfig;
     <#include "${parameters.type}.ftl"/>
 </#list>
 
-function handleKeypress(evt)
+function updateButtons()
+{
+    form.updateButtons();
+}
+
+function handleFieldKeypress(evt)
 {
 <#if form.readOnly>
     return true;
@@ -36,9 +41,25 @@ function handleKeypress(evt)
 </#if>
 }
 
-function updateButtons()
+function attachFieldKeyHandlers(field, submitOnEnter)
 {
-    form.updateButtons();
+    var el = field.getEl();
+    if(el)
+    {
+        if (field.getXType() == 'checkbox')
+        {
+            el = field.innerWrap;
+        }
+
+        el.set({tabindex: window.nextTabindex++ });
+
+        if (submitOnEnter)
+        {
+            el.on('keypress', function(event){ return handleFieldKeypress(event); });
+        }
+        el.on('keyup', updateButtons);
+        el.on('click', updateButtons);
+    }
 }
 
 Ext.onReady(function()
@@ -69,22 +90,7 @@ Ext.onReady(function()
     field.markInvalid(errorMessage);
     </#if>
 
-    var el = Ext.get('${field.id}');
-    if(el)
-    {
-        if (field.getXType() == 'checkbox')
-        {
-            el = field.innerWrap;
-        }
-
-        el.set({tabindex: window.nextTabindex++ });
-
-    <#if parameters.submitOnEnter?default(true)>
-        el.on('keypress', function(event){ return handleKeypress(event); });
-    </#if>
-        el.on('keyup', updateButtons);
-        el.on('click', updateButtons);
-    }
+    attachFieldKeyHandlers(field, ${parameters.submitOnEnter?default(true)?string});
 </#list>
 
 <#if !form.readOnly>

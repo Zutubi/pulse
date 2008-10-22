@@ -29,19 +29,20 @@
         data: data
     });
 
-    fieldConfig.store = store;
-    fieldConfig.value = value;
+    fc.store = store;
+    fc.value = value;
 <#if parameters.multiple?exists>
-    fieldConfig.multiple = true;
+    fc.multiple = true;
 </#if>
 <#if parameters.size?exists>
-    fieldConfig.size = ${parameters.size};
+    fc.size = ${parameters.size};
 </#if>
-    var select = new ZUTUBI.Select(fieldConfig);
-    form.add(select);
-    select.on('change', updateButtons);
 
     form.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
+
+    var select = new ZUTUBI.Select(fc);
+    form.add(select);
+    select.on('change', updateButtons);
 }());
 
 <#include "/tove/xhtml/controlfooter.ftl" />

@@ -27,27 +27,27 @@
         data: data
     });
 
-    fieldConfig.store = store;
-    fieldConfig.mode = 'local';
-    fieldConfig.hiddenName = fieldConfig.name;
-    fieldConfig.name = 'combo.' + fieldConfig.hiddenName;
-    fieldConfig.displayField = 'text';
-    fieldConfig.valueField = 'value';
-    fieldConfig.editable = false;
-    fieldConfig.forceSelection = true;
-    fieldConfig.triggerAction = 'all';
+    fc.store = store;
+    fc.mode = 'local';
+    fc.hiddenName = fc.name;
+    fc.name = 'combo.' + fc.hiddenName;
+    fc.displayField = 'text';
+    fc.valueField = 'value';
+    fc.editable = false;
+    fc.forceSelection = true;
+    fc.triggerAction = 'all';
 <#if parameters.width?exists>
-    fieldConfig.width = ${parameters.width};
+    fc.width = ${parameters.width};
 </#if>
 <#if parameters.value?exists>
-    fieldConfig.value = '${parameters.value?js_string}';
+    fc.value = '${parameters.value?js_string}';
 <#else>
     if(data.length > 0)
     {
-        fieldConfig.value = data[0][0];
+        fc.value = data[0][0];
     }
 </#if>
-    var combo = new Ext.form.ComboBox(fieldConfig);
+    var combo = new Ext.form.ComboBox(fc);
     form.add(combo);
     combo.on('select', updateButtons);
 }());

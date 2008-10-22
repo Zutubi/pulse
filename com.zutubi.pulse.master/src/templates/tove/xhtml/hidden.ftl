@@ -1,8 +1,8 @@
 <#include "/tove/xhtml/controlheader.ftl" />
 
 <#if parameters.value?exists>
-    fieldConfig.value = '${parameters.value?js_string}';
+    fc.value = '${parameters.value?js_string}';
 </#if>
-form.add(new Ext.form.Hidden(fieldConfig));
+form.add(new Ext.form.Hidden(fc));
 
 <#include "/tove/xhtml/controlfooter.ftl" />

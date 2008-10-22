@@ -5,7 +5,7 @@
     var autoCreate = { tag: 'textarea', autocomplete: 'off' };
 
 <#if parameters.cols?exists>
-    fieldConfig.width = ${parameters.cols} * 7;
+    fc.width = ${parameters.cols} * 7;
 </#if>
 <#if parameters.rows?exists>
     autoCreate.rows = ${parameters.rows};
@@ -14,11 +14,11 @@
     autoCreate.wrap = '${parameters.wrap}';
 </#if>
 <#if parameters.value?exists>
-    fieldConfig.value = '${parameters.value?js_string}';
+    fc.value = '${parameters.value?js_string}';
 </#if>
 
-    fieldConfig.autoCreate = autoCreate;
-    form.add(new Ext.form.TextField(fieldConfig));
+    fc.autoCreate = autoCreate;
+    form.add(new Ext.form.TextField(fc));
 })();
 
 <#include "/tove/xhtml/controlfooter.ftl" />
