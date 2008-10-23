@@ -1,13 +1,12 @@
 package com.zutubi.tove.type.record;
 
-import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -39,7 +38,7 @@ public class XmlRecordSerialiser
         Document doc = recordToDocument(record, deep);
         try
         {
-            XMLUtils.writeDocument(file, doc, false);
+            writeDocument(file, doc, false);
         }
         catch (IOException e)
         {
@@ -55,7 +54,7 @@ public class XmlRecordSerialiser
             MutableRecord record;
             if (file.exists())
             {
-                Document doc = XMLUtils.readDocument(file);
+                Document doc = readDocument(file);
                 record = documentToRecord(file, doc);
             }
             else
@@ -162,7 +161,7 @@ public class XmlRecordSerialiser
         {
             public void handle(String key, Element child)
             {
-                record.putMeta(key, XMLUtils.getText(child, ""));
+                record.putMeta(key, getText(child, ""));
             }
         });
 
@@ -170,7 +169,7 @@ public class XmlRecordSerialiser
         {
             public void handle(String key, Element child)
             {
-                record.put(key, XMLUtils.getText(child, ""));
+                record.put(key, getText(child, ""));
             }
         });
 
@@ -215,9 +214,70 @@ public class XmlRecordSerialiser
         String[] result = new String[items.size()];
         for (int i = 0; i < items.size(); i++)
         {
-            result[i] = XMLUtils.getText(items.get(i), "");
+            result[i] = getText(items.get(i), "");
         }
         return result;
+    }
+
+    private void writeDocument(File file, Document doc, boolean prettyPrint) throws IOException
+    {
+        BufferedOutputStream bos = null;
+        try
+        {
+            FileOutputStream fos = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fos);
+
+            Serializer serializer = new Serializer(bos);
+            if(prettyPrint)
+            {
+                serializer.setIndent(4);
+            }
+            serializer.write(doc);
+        }
+        finally
+        {
+            IOUtils.close(bos);
+        }
+    }
+
+    private String getText(Element element, String defaultValue)
+    {
+        return getText(element, defaultValue, true);
+    }
+
+    private String getText(Element element, String defaultValue, boolean trim)
+    {
+        if (element.getChildCount() > 0)
+        {
+            Node child = element.getChild(0);
+            if(child != null && child instanceof Text)
+            {
+                String value = child.getValue();
+                if(trim)
+                {
+                    value = value.trim();
+                }
+
+                return value;
+            }
+        }
+
+        return defaultValue;
+    }
+
+    private Document readDocument(File file) throws IOException, ParsingException
+    {
+        FileInputStream is = null;
+        try
+        {
+            is = new FileInputStream(file);
+            Builder builder = new Builder();
+            return builder.build(is);
+        }
+        finally
+        {
+            IOUtils.close(is);
+        }
     }
 
     private interface ElementHandler
