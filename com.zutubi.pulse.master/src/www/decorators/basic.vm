@@ -12,6 +12,9 @@
 <script type="text/javascript" src="$base/js/ext-all.js"></script>
 <script type="text/javascript" src="$base/js/main.js"></script>
 <script type="text/javascript" src="$base/js/zutubi.js"></script>
+ <script type="text/javascript">
+    window.baseUrl = '$base';
+</script>            
 <style type="text/css">
     #center
     {
