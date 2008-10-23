@@ -33,6 +33,7 @@ public class CustomVelocityManager extends VelocityManager
 
     public CustomVelocityManager()
     {
+        SpringComponentContext.autowire(this);
     }
 
     public Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
@@ -103,7 +104,7 @@ public class CustomVelocityManager extends VelocityManager
         {
             public void systemStarted()
             {
-                SpringComponentContext.autowire(this);
+                SpringComponentContext.autowire(CustomVelocityManager.this);
             }
         });
     }
