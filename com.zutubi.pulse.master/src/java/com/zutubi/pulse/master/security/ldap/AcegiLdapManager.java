@@ -2,10 +2,10 @@ package com.zutubi.pulse.master.security.ldap;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
-import com.zutubi.pulse.master.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.master.license.LicenseHolder;
-import com.zutubi.pulse.master.model.AcegiUser;
+import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;

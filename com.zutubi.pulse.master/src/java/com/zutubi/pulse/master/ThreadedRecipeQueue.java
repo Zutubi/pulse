@@ -17,7 +17,7 @@ import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentResourcesDiscoveredEvent;
 import com.zutubi.pulse.master.events.build.BuildRevisionUpdatedEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
-import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationEventListener;

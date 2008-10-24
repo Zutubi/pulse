@@ -4,10 +4,9 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
-import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -50,7 +49,7 @@ public class ConfigurationCleanupManager implements EventListener
 
     public void runCleanupTasks(RecordCleanupTask task)
     {
-        AcegiUtils.runAsSystem(task);
+        task.run();
 
         for (RecordCleanupTask subTask : task.getCascaded())
         {

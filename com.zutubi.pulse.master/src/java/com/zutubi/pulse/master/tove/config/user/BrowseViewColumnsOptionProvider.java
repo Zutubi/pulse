@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.pulse.master.model.BuildColumns;
-import com.zutubi.tove.MapOption;
-import com.zutubi.tove.MapOptionProvider;
+import com.zutubi.pulse.master.tove.handler.MapOption;
+import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 import static com.zutubi.util.CollectionUtils.asOrderedMap;
 import static com.zutubi.util.CollectionUtils.asPair;

@@ -6,7 +6,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

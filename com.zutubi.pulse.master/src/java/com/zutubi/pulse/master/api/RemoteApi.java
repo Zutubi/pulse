@@ -20,6 +20,7 @@ import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
@@ -1826,7 +1827,7 @@ public class RemoteApi
                 // Rewire on startup to get the full token manager.  Maybe there is a way to delay
                 // the creation of this instance until after the context is fully initialised and
                 // hence the objectFactory.buildBean(RemoteApi.class) will return a fully wired instance?.
-                SpringComponentContext.autowire(this);
+                SpringComponentContext.autowire(RemoteApi.this);
             }
         });
     }

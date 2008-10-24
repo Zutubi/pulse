@@ -2,12 +2,12 @@ package com.zutubi.pulse.master.tove.velocity;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.model.Table;
-import com.zutubi.tove.table.TableDescriptor;
-import com.zutubi.tove.table.TableDescriptorFactory;
+import com.zutubi.pulse.master.tove.model.Table;
+import com.zutubi.pulse.master.tove.table.TableDescriptor;
+import com.zutubi.pulse.master.tove.table.TableDescriptorFactory;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.bean.ObjectFactory;
 import freemarker.template.Configuration;

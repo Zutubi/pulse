@@ -7,7 +7,7 @@ import com.zutubi.pulse.master.database.DriverRegistry;
 import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
 import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.master.tove.config.setup.DatabaseType;
-import com.zutubi.tove.webwork.TransientAction;
+import com.zutubi.pulse.master.tove.webwork.TransientAction;
 
 import java.io.File;
 import java.util.Properties;

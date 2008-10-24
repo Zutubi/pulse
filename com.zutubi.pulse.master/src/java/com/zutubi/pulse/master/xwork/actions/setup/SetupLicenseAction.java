@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.setup.SetupLicenseConfiguration;
-import com.zutubi.tove.webwork.TransientAction;
+import com.zutubi.pulse.master.tove.webwork.TransientAction;
 
 /**
  */

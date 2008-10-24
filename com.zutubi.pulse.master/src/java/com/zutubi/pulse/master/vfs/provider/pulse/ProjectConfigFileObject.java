@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileName;

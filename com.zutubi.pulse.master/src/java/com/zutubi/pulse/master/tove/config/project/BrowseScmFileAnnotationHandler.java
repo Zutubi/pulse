@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.tove.Descriptor;
-import com.zutubi.tove.FieldDescriptor;
-import com.zutubi.tove.handler.AnnotationHandler;
+import com.zutubi.pulse.master.tove.model.Descriptor;
+import com.zutubi.pulse.master.tove.model.FieldDescriptor;
+import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.tove.type.CompositeType;
 
 import java.lang.annotation.Annotation;

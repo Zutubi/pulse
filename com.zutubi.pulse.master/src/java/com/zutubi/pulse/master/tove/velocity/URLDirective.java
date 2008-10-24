@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.velocity;
 
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
-import com.zutubi.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.velocity.context.InternalContextAdapter;

@@ -7,7 +7,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

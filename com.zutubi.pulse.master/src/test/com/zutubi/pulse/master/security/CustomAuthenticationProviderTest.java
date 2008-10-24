@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.security;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.master.model.AcegiUser;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -78,6 +77,7 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
     {
         UserConfiguration user = new UserConfiguration();
         user.setLogin("user");
+        user.setAuthenticatedViaLdap(true);
 
         stub(ldapManager.canAutoAdd()).toReturn(true);
         stub(ldapManager.authenticate(same(user.getLogin()), same("pass"), anyBoolean())).toReturn(user);

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.pulse.master.xwork.actions.DefaultAction;
-import com.zutubi.tove.ListOptionProvider;
+import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 
 import java.util.LinkedList;

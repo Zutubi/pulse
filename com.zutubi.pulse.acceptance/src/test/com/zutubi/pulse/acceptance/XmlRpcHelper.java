@@ -9,7 +9,7 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import org.apache.xmlrpc.XmlRpcClient;
 

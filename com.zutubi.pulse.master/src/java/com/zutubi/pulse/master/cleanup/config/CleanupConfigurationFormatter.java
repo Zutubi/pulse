@@ -1,12 +1,10 @@
 package com.zutubi.pulse.master.cleanup.config;
 
-import com.zutubi.tove.ConfigurationFormatter;
-
 /**
  *
  *
  */
-public class CleanupConfigurationFormatter implements ConfigurationFormatter
+public class CleanupConfigurationFormatter
 {
     public String getAfter(CleanupConfiguration config)
     {

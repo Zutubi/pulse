@@ -3,7 +3,7 @@ package com.zutubi.tove.config;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.master.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;

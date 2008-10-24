@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config;
 
 import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.tove.config.cleanup.RecordCleanupTaskSupport;
 
 /**
@@ -24,7 +25,13 @@ public abstract class DatabaseStateCleanupTaskSupport extends RecordCleanupTaskS
         {
             public void run()
             {
-                cleanupState();
+                AcegiUtils.runAsSystem(new Runnable()
+                {
+                    public void run()
+                    {
+                        cleanupState();
+                    }
+                });
             }
         });
     }

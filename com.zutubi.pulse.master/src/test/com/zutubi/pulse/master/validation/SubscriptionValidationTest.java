@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.validation;
 import com.zutubi.pulse.master.condition.NotifyConditionFactory;
 import com.zutubi.pulse.master.tove.config.user.*;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.PathUtils;
 

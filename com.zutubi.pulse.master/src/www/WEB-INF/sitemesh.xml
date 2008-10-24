@@ -19,7 +19,7 @@
 			<param name="parameter.value" value="true" />
 		</mapper>
 		<mapper class="com.opensymphony.module.sitemesh.mapper.FileDecoratorMapper"/>
-        <mapper class="com.zutubi.tove.sitemesh.mapper.ConfigDecoratorMapper">
+        <mapper class="com.zutubi.pulse.master.tove.mapper.ConfigDecoratorMapper">
             <param name="config" value="${decorators-file}" />
         </mapper>
 	</decorator-mappers>

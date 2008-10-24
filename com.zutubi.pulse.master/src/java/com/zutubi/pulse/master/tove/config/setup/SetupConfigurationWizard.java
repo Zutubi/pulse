@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.setup;
 
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
-import com.zutubi.pulse.master.model.AcegiUser;
+import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
@@ -13,13 +13,13 @@ import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfigurationSupport;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
-import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.wizard.WizardTransition;
-import com.zutubi.tove.wizard.webwork.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.wizard.WizardTransition;
+import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
 

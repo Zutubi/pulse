@@ -2,14 +2,14 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.tove.wizard.webwork.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 
 import java.util.List;
 import java.util.Map;

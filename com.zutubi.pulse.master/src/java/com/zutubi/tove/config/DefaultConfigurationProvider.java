@@ -2,8 +2,8 @@ package com.zutubi.tove.config;
 
 import com.zutubi.events.*;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
-import com.zutubi.pulse.master.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;

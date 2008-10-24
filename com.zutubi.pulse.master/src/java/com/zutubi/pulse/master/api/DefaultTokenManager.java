@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.api;
 
-import com.zutubi.pulse.master.model.AcegiUser;
+import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;

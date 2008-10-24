@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;

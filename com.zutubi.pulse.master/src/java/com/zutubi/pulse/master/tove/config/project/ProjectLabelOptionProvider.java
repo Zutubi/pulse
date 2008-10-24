@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.tove.ListOptionProvider;
+import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;

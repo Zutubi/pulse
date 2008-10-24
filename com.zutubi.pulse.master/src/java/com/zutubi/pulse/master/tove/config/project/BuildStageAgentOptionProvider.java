@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.master.tove.config.DefaultReferenceOptionProvider;
-import com.zutubi.tove.MapOption;
+import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.tove.type.TypeProperty;
 
 import java.util.Map;

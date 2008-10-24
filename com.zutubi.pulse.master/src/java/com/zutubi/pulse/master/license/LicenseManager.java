@@ -6,7 +6,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.master.bootstrap.DataResolver;
-import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.license.authorisation.Authorisation;
 import com.zutubi.pulse.master.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;

@@ -56,14 +56,14 @@
     <package name="setupconfig" namespace="/setupconfig" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="wizard" class="com.zutubi.tove.wizard.webwork.ConfigurationWizardAction">
+        <action name="wizard" class="com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction">
             <interceptor-ref name="configWizardStack"/>
             <result name="step" type="velocity">wizard.vm</result>
             <result name="input" type="velocity">wizard.vm</result>
             <result name="success" type="redirect">/setup/execute.action</result>
         </action>
 
-        <action name="check" class="com.zutubi.tove.webwork.CheckAction">
+        <action name="check" class="com.zutubi.pulse.master.tove.webwork.CheckAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="input" type="flexjson">configurationErrors</result>
             <result name="success" type="flexjson">checkResponse</result>

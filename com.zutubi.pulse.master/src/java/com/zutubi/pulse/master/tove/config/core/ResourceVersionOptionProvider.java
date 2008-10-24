@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.core;
 
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.tove.MapOption;
-import com.zutubi.tove.MapOptionProvider;
+import com.zutubi.pulse.master.tove.handler.MapOption;
+import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.Sort;
 

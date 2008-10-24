@@ -6,7 +6,7 @@ package com.zutubi.config.annotations;
  */
 public interface DefaultAnnotationHandlers
 {
-    public static final String HANDLER_PACKAGE    = "com.zutubi.tove.handler";
+    public static final String HANDLER_PACKAGE    = "com.zutubi.pulse.master.tove.handler";
 
     public static final String CONTROLLING_SELECT = HANDLER_PACKAGE + ".ControllingSelectAnnotationHandler";
     public static final String FIELD_ACTION       = HANDLER_PACKAGE + ".FieldActionAnnotationHandler";

@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.webwork.TransientAction;
+import com.zutubi.pulse.master.tove.webwork.TransientAction;
 import org.acegisecurity.AccessDeniedException;
 
 /**

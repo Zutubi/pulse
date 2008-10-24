@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.validation;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.TypeException;
 
 import java.util.List;
@@ -21,7 +21,6 @@ public abstract class AbstractValidationTestCase extends AbstractConfigurationSy
         super.setUp();
         configurationRegistry = new ConfigurationRegistry();
         configurationRegistry.setConfigurationPersistenceManager(configurationPersistenceManager);
-        configurationRegistry.setConfigurationTemplateManager(configurationTemplateManager);
         configurationRegistry.setConfigurationSecurityManager(configurationSecurityManager);
         configurationRegistry.setTypeRegistry(typeRegistry);
         configurationRegistry.setActionManager(new ActionManager());

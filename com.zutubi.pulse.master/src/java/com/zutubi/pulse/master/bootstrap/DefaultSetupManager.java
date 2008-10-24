@@ -17,6 +17,7 @@ import com.zutubi.pulse.master.restore.ArchiveException;
 import com.zutubi.pulse.master.restore.RestoreManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.servercore.bootstrap.*;
 import com.zutubi.pulse.core.util.config.EnvConfig;

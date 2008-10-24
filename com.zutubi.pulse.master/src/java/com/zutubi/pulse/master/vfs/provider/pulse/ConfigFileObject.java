@@ -7,7 +7,7 @@ import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;

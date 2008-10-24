@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
 import com.zutubi.pulse.master.tove.config.setup.RequestLicenseConfiguration;
-import com.zutubi.tove.webwork.TransientAction;
+import com.zutubi.pulse.master.tove.webwork.TransientAction;
 import com.zutubi.util.StringUtils;
 import org.apache.xmlrpc.XmlRpcClient;
 

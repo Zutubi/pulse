@@ -8,7 +8,7 @@ import com.zutubi.pulse.dev.personal.PersonalBuildClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;

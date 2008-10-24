@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.zutubi.pulse.master.agent.Agent;
-import com.zutubi.tove.model.ActionLink;
+import com.zutubi.pulse.master.tove.model.ActionLink;
 
 import java.util.LinkedList;
 import java.util.List;

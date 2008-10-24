@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.pulse.master.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.renderer.TemplateInfo;
-import com.zutubi.tove.MapOption;
-import com.zutubi.tove.MapOptionProvider;
+import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
+import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.tove.type.TypeProperty;
 
 import java.util.HashMap;

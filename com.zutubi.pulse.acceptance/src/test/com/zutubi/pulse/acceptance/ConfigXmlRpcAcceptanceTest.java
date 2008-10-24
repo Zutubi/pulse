@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
 import org.testng.annotations.AfterMethod;

@@ -26,7 +26,7 @@
 
     <bean id="handleAllocator" class="com.zutubi.tove.type.record.DelegatingHandleAllocator"/>
     <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" autowire="byName"/>
-    <bean id="configurationRegistry" class="com.zutubi.tove.config.ConfigurationRegistry" autowire="byName"/>
+    <bean id="configurationRegistry" class="com.zutubi.pulse.master.tove.config.ConfigurationRegistry" autowire="byName"/>
     <bean id="configurationExtensionManager" class="com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager" autowire="byName"/>
     <bean id="configurationPersistenceManager" class="com.zutubi.tove.config.ConfigurationPersistenceManager" autowire="byName"/>
     <bean id="configurationReferenceManager" class="com.zutubi.tove.config.ConfigurationReferenceManager" autowire="byName"/>
@@ -44,9 +44,9 @@
         </property>
     </bean>
     <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager" autowire="byName"/>
-    <bean id="stateDisplayManager" class="com.zutubi.tove.format.StateDisplayManager" autowire="byName"/>
+    <bean id="stateDisplayManager" class="com.zutubi.pulse.master.tove.format.StateDisplayManager" autowire="byName"/>
 
-    <bean id="formDescriptorFactory" class="com.zutubi.tove.FormDescriptorFactory" autowire="byName" init-method="init"/>
+    <bean id="formDescriptorFactory" class="com.zutubi.pulse.master.tove.model.FormDescriptorFactory" autowire="byName" init-method="init"/>
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean" autowire="byName"/>
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 

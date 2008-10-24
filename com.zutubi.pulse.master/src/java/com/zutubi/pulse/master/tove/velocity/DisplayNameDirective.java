@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.tove.velocity;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.velocity.AbstractDirective;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;

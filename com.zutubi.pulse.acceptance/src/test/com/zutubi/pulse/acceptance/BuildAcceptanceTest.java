@@ -9,7 +9,7 @@ import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.TextUtils;

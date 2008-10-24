@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.tove.config.user;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.wizard.TypeWizardState;
-import com.zutubi.tove.wizard.webwork.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
+import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 

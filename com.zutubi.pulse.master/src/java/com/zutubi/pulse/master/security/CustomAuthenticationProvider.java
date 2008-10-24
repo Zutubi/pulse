@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.security;
 
-import com.zutubi.pulse.master.model.AcegiUser;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;

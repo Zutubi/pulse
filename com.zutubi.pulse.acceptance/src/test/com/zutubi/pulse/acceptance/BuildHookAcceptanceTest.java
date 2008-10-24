@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
-import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.io.IOUtils;
 import org.testng.annotations.AfterMethod;

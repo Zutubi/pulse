@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.tove.ListOptionProvider;
+import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.Sort;

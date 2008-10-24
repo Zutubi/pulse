@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
-import com.zutubi.tove.webwork.CloneAction;
+import com.zutubi.pulse.master.tove.webwork.CloneAction;
 
 /**
  * Form used for cloning map items and template collection items.

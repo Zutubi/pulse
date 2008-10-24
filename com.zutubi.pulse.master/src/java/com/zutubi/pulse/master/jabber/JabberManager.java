@@ -4,7 +4,7 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.jabber.config.JabberConfiguration;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;

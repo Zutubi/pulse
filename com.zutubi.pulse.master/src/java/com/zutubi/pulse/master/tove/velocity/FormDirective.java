@@ -1,18 +1,18 @@
 package com.zutubi.pulse.master.tove.velocity;
 
-import com.zutubi.tove.FormDescriptor;
-import com.zutubi.tove.FormDescriptorFactory;
-import com.zutubi.tove.TemplateFormDecorator;
+import com.zutubi.pulse.master.tove.model.FormDescriptor;
+import com.zutubi.pulse.master.tove.model.FormDescriptorFactory;
+import com.zutubi.pulse.master.tove.model.TemplateFormDecorator;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.model.Form;
-import com.zutubi.tove.model.HiddenFieldDescriptor;
+import com.zutubi.pulse.master.tove.model.Form;
+import com.zutubi.pulse.master.tove.model.HiddenFieldDescriptor;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;

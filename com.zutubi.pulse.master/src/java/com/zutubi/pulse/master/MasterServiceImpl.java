@@ -94,7 +94,7 @@ public class MasterServiceImpl implements MasterService
         {
             public void systemStarted()
             {
-                SpringComponentContext.autowire(this);
+                SpringComponentContext.autowire(MasterServiceImpl.this);
             }
         });
     }
