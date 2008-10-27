@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.scm;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
@@ -14,17 +14,17 @@ import java.util.Map;
  * ScmClientFactory classes registered with the configuration.  This factory also handles the
  * data cache for the various client instances. 
  */
-public class DelegateScmClientFactory implements ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration>
+public class DelegateScmClientFactory implements ScmClientFactory<ScmConfiguration>
 {
     private Map<String, Map<Object, Object>> dataCaches = new HashMap<String, Map<Object, Object>>();
 
     private ObjectFactory objectFactory;
 
-    private Map<Class, ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration>> factories = new HashMap<Class, ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration>>();
+    private Map<Class, ScmClientFactory<ScmConfiguration>> factories = new HashMap<Class, ScmClientFactory<ScmConfiguration>>();
 
-    public ScmClient createClient(com.zutubi.pulse.core.scm.config.ScmConfiguration config) throws ScmException
+    public ScmClient createClient(ScmConfiguration config) throws ScmException
     {
-        ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration> factory = getFactory(config);
+        ScmClientFactory<ScmConfiguration> factory = getFactory(config);
         ScmClient client = factory.createClient(config);
         if (client instanceof DataCacheAware)
         {
@@ -49,7 +49,7 @@ public class DelegateScmClientFactory implements ScmClientFactory<com.zutubi.pul
     {
         try
         {
-            ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration> factory = objectFactory.buildBean(factoryType);
+            ScmClientFactory<ScmConfiguration> factory = objectFactory.buildBean(factoryType);
             factories.put(configType, factory);
         }
         catch (Exception e)

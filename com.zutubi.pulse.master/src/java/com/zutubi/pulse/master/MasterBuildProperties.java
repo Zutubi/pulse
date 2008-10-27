@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestResultSummary;
-import com.zutubi.pulse.core.scm.CheckoutScheme;
+import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;

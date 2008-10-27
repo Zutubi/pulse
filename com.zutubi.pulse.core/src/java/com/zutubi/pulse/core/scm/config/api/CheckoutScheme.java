@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.config.api;
 
 /**
  * Defines how the source is checked out of an SCM for a build.

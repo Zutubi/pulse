@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.util.logging.Logger;
 

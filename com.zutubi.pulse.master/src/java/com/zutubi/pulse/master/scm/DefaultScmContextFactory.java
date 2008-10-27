@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.scm;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmContext;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 
 import java.io.File;
 import java.io.IOException;

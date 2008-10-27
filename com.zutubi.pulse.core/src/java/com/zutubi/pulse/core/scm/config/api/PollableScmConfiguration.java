@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.config;
+package com.zutubi.pulse.core.scm.config.api;
 
 import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.config.annotations.StringList;

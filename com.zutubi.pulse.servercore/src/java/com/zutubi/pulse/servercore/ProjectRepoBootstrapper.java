@@ -2,7 +2,7 @@ package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;

@@ -37,7 +37,7 @@ public enum ScmCapability
      * SCMs with this capability must also support {@link #REVISIONS}.
      *
      * SCMs supporting this capabillity must have a configuration class which
-     * implements {@link com.zutubi.pulse.core.scm.config.Pollable}.
+     * implements {@link com.zutubi.pulse.core.scm.config.api.Pollable}.
      */
     POLL,
 

@@ -4,7 +4,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.git.GitClient;
 import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 
@@ -37,7 +37,7 @@ public class GitConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
         }
     }
 
-    public void setScmClientFactory(ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration> scmClientManager)
+    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientManager)
     {
         this.scmClientFactory = scmClientManager;
     }

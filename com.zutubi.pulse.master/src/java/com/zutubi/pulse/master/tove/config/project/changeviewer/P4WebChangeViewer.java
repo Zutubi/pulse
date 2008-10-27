@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.tove.config.project.changeviewer;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.util.StringUtils;
 
 /**

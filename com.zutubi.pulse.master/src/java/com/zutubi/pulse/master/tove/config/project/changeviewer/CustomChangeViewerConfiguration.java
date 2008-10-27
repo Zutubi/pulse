@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.Property;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;

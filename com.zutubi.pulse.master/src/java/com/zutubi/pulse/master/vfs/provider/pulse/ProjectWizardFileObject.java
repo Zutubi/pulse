@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.config.ConfigurationReferenceManager;

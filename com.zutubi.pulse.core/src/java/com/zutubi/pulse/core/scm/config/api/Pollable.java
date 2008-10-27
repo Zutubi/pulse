@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.config;
+package com.zutubi.pulse.core.scm.config.api;
 
 import java.util.List;
 
