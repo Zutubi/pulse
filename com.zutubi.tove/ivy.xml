@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="zutubi" module="com.zutubi.tove" status="integration">
+        <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
+            Zutubi tove library.
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <conf name="build" description="All of the packages required during the build."/>
+        <conf name="src" description="The source packages included as part of the source release"/>
+    </configurations>
+
+    <publications>
+        <artifact name="com.zutubi.tove" type="jar" conf="release, build"/>
+        <artifact name="com.zutubi.tove-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.tove-test" type="jar" conf="build"/>
+    </publications>
+
+    <dependencies>
+        <!-- external libraries -->
+        <dependency org="xom" name="xom" rev="20080314" conf="external,build,release->default"/>
+        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0" conf="external,build,release->default"/>
+        <dependency org="hibernate" name="hibernate" rev="3.1.1" conf="external,build,release->default"/>
+        <dependency org="junit" name="junit" rev="3.8.1" conf="build->default"/>
+        
+        <!-- Project module dependencies -->
+        <dependency org="zutubi" name="com.zutubi.util" rev="latest.integration" conf="release,external,build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.i18n" rev="latest.integration" conf="release,external,build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.events" rev="latest.integration" conf="release,external,build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="release,external,build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="release,external,build,src->@"/>
+
+    </dependencies>
+</ivy-module>

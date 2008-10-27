@@ -6,7 +6,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.ByteHandler;
 import com.zutubi.pulse.core.util.process.ForwardingByteHandler;

@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.tove.config.AbstractConfiguration;
 
 import java.util.Map;
 import java.util.TreeMap;

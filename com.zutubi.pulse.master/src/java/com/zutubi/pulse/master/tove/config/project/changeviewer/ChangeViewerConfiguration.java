@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
 
 /**

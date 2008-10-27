@@ -4,7 +4,7 @@ import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.tove.config.AbstractNamedConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;

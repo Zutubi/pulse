@@ -2,12 +2,9 @@ package com.zutubi.pulse.master.tove.model;
 
 import com.zutubi.config.annotations.FieldType;
 import com.zutubi.config.annotations.Handler;
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.config.Configuration;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
-import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.config.ConfigurationValidationContext;
-import com.zutubi.tove.config.ConfigurationValidatorProvider;
+import com.zutubi.tove.config.*;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.pulse.master.tove.handler.OptionAnnotationHandler;
 import com.zutubi.tove.type.*;

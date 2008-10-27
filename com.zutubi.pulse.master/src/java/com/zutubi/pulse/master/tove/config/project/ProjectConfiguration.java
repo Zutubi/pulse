@@ -9,6 +9,8 @@ import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransform
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.type.Extendable;
+import com.zutubi.tove.config.NamedConfiguration;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Url;
 
 import java.util.*;
@@ -29,7 +31,7 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private long projectId;
     /**
      * Note that we manage the name ourselves (rather than extending {@link
-     * AbstractNamedConfiguration}) so we can tag it with @NoInherit.
+     * com.zutubi.tove.config.AbstractNamedConfiguration}) so we can tag it with @NoInherit.
      */
     @NoInherit
     private String name;

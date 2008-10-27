@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.jabber.config;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.jabber.JabberManager;
 import com.zutubi.validation.annotations.Required;
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
+import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.ConfigurationCheckHandler;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.SimpleInstantiator;

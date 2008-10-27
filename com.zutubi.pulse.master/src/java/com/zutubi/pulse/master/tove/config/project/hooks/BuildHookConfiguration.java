@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.master.events.build.BuildEvent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;

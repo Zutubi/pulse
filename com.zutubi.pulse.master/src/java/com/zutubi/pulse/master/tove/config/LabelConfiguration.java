@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.tove.config.AbstractConfiguration;
 
 /**
  * Labels are used for freeform categorisation.

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.table;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.config.Configuration;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.master.tove.model.AbstractParameterised;
 import com.zutubi.pulse.master.tove.model.Descriptor;

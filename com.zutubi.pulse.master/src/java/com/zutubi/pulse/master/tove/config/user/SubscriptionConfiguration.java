@@ -4,7 +4,7 @@ import com.zutubi.config.annotations.Classification;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.validation.annotations.Required;

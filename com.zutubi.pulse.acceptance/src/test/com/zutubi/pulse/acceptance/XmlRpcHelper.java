@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.config.Configuration;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;

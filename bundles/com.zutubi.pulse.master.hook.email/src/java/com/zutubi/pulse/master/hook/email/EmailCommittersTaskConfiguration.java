@@ -6,7 +6,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.ResultNotifier;
 import com.zutubi.pulse.master.model.BuildManager;

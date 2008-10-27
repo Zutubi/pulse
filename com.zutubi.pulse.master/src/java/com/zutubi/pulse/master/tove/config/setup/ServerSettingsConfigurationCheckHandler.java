@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
+import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.validation.annotations.Required;
 

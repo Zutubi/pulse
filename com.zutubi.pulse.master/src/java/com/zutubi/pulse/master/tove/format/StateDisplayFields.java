@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.format;
 
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.ReflectionUtils;

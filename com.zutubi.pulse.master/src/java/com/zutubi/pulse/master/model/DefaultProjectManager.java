@@ -6,7 +6,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.NamedConfigurationComparator;
+import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.ScmClientUtils;

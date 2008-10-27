@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.config;
 
 import com.zutubi.config.annotations.*;
+import com.zutubi.tove.config.AbstractNamedConfiguration;
 
 import java.util.Map;
 import java.util.TreeMap;

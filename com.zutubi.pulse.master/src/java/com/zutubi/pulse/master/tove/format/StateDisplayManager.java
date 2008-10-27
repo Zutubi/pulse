@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.format;
 
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.config.Configuration;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;

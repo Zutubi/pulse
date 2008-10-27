@@ -4,6 +4,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import freemarker.ext.beans.BeanModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.*;
+import freemarker.template.Configuration;
 
 import java.util.List;
 
@@ -28,9 +29,9 @@ public class BaseNameMethod implements TemplateMethodModelEx
             else if(arg instanceof BeanModel)
             {
                 Object unwrapped = ((BeansWrapper)ObjectWrapper.BEANS_WRAPPER).unwrap((TemplateModel) args.get(0));
-                if(unwrapped instanceof com.zutubi.pulse.core.config.Configuration)
+                if(unwrapped instanceof com.zutubi.tove.config.Configuration)
                 {
-                    return getBaseName(((com.zutubi.pulse.core.config.Configuration)unwrapped).getConfigurationPath());
+                    return getBaseName(((com.zutubi.tove.config.Configuration)unwrapped).getConfigurationPath());
                 }
                 else
                 {

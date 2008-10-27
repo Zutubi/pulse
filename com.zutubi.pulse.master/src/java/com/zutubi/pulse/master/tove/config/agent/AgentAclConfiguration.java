@@ -4,7 +4,7 @@ import com.zutubi.config.annotations.ItemPicker;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.validation.annotations.Required;
 

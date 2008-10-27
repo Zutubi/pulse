@@ -4,7 +4,7 @@ import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Password;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Text;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.tove.config.AbstractConfiguration;
 
 /**
  * Transient configuration used for the login form.  The odd field names are

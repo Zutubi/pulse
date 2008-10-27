@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config;
 
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.config.Configuration;
 import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.config.ConfigurationReferenceManager;

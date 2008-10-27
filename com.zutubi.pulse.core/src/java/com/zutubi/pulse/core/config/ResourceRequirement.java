@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.config;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.tove.config.AbstractConfiguration;
 
 /**
  * Identifies a required resource for a build stage.

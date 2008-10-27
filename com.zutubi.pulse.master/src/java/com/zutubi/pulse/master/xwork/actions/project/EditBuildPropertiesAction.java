@@ -4,7 +4,7 @@ import com.opensymphony.xwork.ActionContext;
 import static com.zutubi.config.annotations.FieldParameter.ACTIONS;
 import static com.zutubi.config.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.config.annotations.FieldType;
-import com.zutubi.pulse.core.config.NamedConfigurationComparator;
+import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;

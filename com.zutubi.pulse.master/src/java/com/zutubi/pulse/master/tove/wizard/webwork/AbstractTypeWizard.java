@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.wizard.webwork;
 
 import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.config.Configuration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.ExtensionOptionProvider;
 import com.zutubi.pulse.master.tove.model.FormDescriptor;

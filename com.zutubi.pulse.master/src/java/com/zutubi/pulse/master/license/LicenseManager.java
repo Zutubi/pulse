@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.license;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.config.Configuration;
 import com.zutubi.pulse.core.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.master.bootstrap.DataResolver;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;

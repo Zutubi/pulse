@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.config.ConfigurationCreator;
+import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.ConfigurationCreator;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;

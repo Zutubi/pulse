@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;

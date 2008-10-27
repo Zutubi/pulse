@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.config;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Table;
+import com.zutubi.tove.config.AbstractNamedConfiguration;
 
 /**
  */

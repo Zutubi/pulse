@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.config.NamedConfigurationComparator;
+import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
