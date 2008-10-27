@@ -29,9 +29,9 @@ public class BaseNameMethod implements TemplateMethodModelEx
             else if(arg instanceof BeanModel)
             {
                 Object unwrapped = ((BeansWrapper)ObjectWrapper.BEANS_WRAPPER).unwrap((TemplateModel) args.get(0));
-                if(unwrapped instanceof com.zutubi.tove.config.Configuration)
+                if(unwrapped instanceof com.zutubi.tove.config.api.Configuration)
                 {
-                    return getBaseName(((com.zutubi.tove.config.Configuration)unwrapped).getConfigurationPath());
+                    return getBaseName(((com.zutubi.tove.config.api.Configuration)unwrapped).getConfigurationPath());
                 }
                 else
                 {

@@ -1,7 +1,7 @@
 package com.zutubi.tove.type;
 
 import com.zutubi.config.annotations.ID;
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.AnnotationUtils;

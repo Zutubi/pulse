@@ -1,5 +1,7 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.config.api.NamedConfiguration;
+
 /**
  * Abstract base to be extended by named configuration objects.
  */

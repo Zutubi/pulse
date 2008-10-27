@@ -6,6 +6,7 @@ import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.config.api.Configuration;
 
 /**
  * Instantiator that is used when refreshing persistent instance caches in

@@ -2,11 +2,10 @@ package com.zutubi.pulse.core.scm.svn.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Wire;
-import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 
 /**
  */
@@ -26,7 +25,10 @@ public class SubversionConfigurationCheckHandler extends ConfigurationCheckHandl
         }
         finally
         {
-            ScmClientUtils.close(client);
+            if (client != null)
+            {
+                client.close();
+            }
         }
     }
 

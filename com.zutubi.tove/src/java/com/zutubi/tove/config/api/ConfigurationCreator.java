@@ -1,4 +1,4 @@
-package com.zutubi.tove.config;
+package com.zutubi.tove.config.api;
 
 /**
  * Creators are used in place of the an actual Configuration type when a new

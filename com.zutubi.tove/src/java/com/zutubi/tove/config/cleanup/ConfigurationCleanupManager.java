@@ -3,7 +3,7 @@ package com.zutubi.tove.config.cleanup;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;

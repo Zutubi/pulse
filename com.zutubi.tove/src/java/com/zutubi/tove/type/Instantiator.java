@@ -1,6 +1,6 @@
 package com.zutubi.tove.type;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 
 /**
  * A callback interface used by types to instantiate their properties (or

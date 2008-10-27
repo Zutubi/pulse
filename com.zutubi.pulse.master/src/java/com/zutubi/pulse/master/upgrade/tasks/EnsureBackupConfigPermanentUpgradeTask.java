@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Arrays;

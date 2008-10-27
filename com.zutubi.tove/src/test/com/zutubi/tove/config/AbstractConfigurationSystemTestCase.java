@@ -2,6 +2,7 @@ package com.zutubi.tove.config;
 
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.tove.config.cleanup.ConfigurationCleanupManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.security.ActorProvider;
 import com.zutubi.tove.security.DefaultAccessManager;

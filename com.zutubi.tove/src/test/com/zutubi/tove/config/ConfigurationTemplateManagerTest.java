@@ -5,6 +5,8 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.events.AllEventListener;
 import com.zutubi.events.Event;
 import com.zutubi.tove.config.events.*;
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.security.*;
 import com.zutubi.tove.transaction.UserTransaction;
 import com.zutubi.tove.type.CompositeType;

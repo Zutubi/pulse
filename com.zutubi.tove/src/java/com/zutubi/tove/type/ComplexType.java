@@ -1,6 +1,5 @@
 package com.zutubi.tove.type;
 
-import com.zutubi.tove.config.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.util.GraphFunction;
 
@@ -20,7 +19,7 @@ public interface ComplexType extends Type
 
     /**
      * Checks if the given instance is transitively valid.  Contrast this to
-     * {@link Configuration#isValid}, which only checks the instance itself,
+     * {@link com.zutubi.tove.config.api.Configuration#isValid}, which only checks the instance itself,
      * ignoring nested instances.
      *
      * @param instance the instance to check

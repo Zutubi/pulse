@@ -9,6 +9,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;

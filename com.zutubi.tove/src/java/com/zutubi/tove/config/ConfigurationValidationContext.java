@@ -2,6 +2,7 @@ package com.zutubi.tove.config;
 
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.i18n.TextProvider;
+import com.zutubi.tove.config.api.Configuration;
 
 import java.util.*;
 

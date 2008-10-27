@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;

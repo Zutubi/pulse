@@ -1,5 +1,7 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.config.api.Configuration;
+
 /**
  */
 public interface InstanceSource

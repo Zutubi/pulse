@@ -1,6 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.UnaryProcedure;
 
 import java.util.Collection;

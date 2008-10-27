@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.webwork;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.config.ConfigurationProvider;

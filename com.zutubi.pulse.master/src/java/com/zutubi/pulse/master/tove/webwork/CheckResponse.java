@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
-import com.zutubi.tove.config.ConfigurationCheckHandler;
+import com.zutubi.tove.config.api.ConfigurationCheckHandler;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Template;
 

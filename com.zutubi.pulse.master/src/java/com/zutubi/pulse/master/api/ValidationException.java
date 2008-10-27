@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.api;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.util.GraphFunction;

@@ -5,6 +5,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 

@@ -2,6 +2,7 @@ package com.zutubi.tove.config;
 
 import com.zutubi.tove.type.Instantiator;
 import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.config.api.Configuration;
 
 /**
  * A basic interface for reference resolution.

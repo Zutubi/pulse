@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.actions.ConfigurationAction;
 import com.zutubi.tove.actions.ConfigurationActions;

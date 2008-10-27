@@ -1,6 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.tove.config.events.*;
+import com.zutubi.tove.config.api.Configuration;
 
 /**
  * A type listener is a convenient way to listen for all events that affect

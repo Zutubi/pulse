@@ -1,6 +1,6 @@
 package com.zutubi.tove.type;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.ReferenceResolver;
 

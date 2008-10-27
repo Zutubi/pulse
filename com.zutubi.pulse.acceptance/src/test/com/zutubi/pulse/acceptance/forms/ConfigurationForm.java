@@ -4,7 +4,7 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.config.annotations.Field;
 import com.zutubi.config.annotations.FieldType;
 import com.zutubi.config.annotations.Form;
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;

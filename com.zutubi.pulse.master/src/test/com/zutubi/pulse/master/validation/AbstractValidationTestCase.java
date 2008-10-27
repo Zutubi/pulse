@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.validation;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;

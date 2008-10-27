@@ -6,7 +6,7 @@ import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.config.annotations.Classification;
 import com.zutubi.config.annotations.Listing;
 import com.zutubi.i18n.Messages;
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;

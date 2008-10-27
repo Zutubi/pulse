@@ -1,6 +1,6 @@
 package com.zutubi.tove.actions;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;

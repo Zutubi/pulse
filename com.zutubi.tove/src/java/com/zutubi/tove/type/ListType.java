@@ -1,6 +1,6 @@
 package com.zutubi.tove.type;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationList;
 import com.zutubi.tove.type.record.HandleAllocator;
 import com.zutubi.tove.type.record.MutableRecord;

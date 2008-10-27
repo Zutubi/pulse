@@ -2,12 +2,11 @@ package com.zutubi.pulse.core.scm.git.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Wire;
-import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.scm.git.GitClient;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 
 /**
  * not yet implemented
@@ -31,7 +30,10 @@ public class GitConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
         }
         finally
         {
-            ScmClientUtils.close(client);
+            if (client != null)
+            {
+                client.close();
+            }
         }
     }
 

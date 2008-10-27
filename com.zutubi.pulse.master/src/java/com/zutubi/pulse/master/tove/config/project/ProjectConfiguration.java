@@ -9,7 +9,7 @@ import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransform
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.type.Extendable;
-import com.zutubi.tove.config.NamedConfiguration;
+import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Url;
 

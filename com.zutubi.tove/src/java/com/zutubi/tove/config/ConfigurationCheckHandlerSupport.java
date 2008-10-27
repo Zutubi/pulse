@@ -1,5 +1,8 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.api.ConfigurationCheckHandler;
+
 /**
  * Abstract base for configuration check handlers that supplies the standard
  * template names.

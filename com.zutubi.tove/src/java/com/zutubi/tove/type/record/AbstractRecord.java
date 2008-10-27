@@ -1,6 +1,6 @@
 package com.zutubi.tove.type.record;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Predicate;

@@ -6,6 +6,8 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;

@@ -1,6 +1,6 @@
 package com.zutubi.tove.config.events;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 
 /**

@@ -1,6 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.util.Sort;
+import com.zutubi.tove.config.api.NamedConfiguration;
 
 import java.util.Comparator;
 

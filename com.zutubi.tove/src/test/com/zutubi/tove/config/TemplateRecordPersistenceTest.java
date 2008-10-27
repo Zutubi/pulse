@@ -5,7 +5,7 @@ import com.zutubi.config.annotations.Ordered;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.events.Event;
 import com.zutubi.tove.config.AbstractNamedConfiguration;
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationList;
 import com.zutubi.tove.config.ConfigurationMap;
 import com.zutubi.tove.config.events.*;

@@ -7,6 +7,7 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.config.api.Configuration;
 
 import java.util.LinkedList;
 import java.util.List;

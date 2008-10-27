@@ -1,6 +1,6 @@
 package com.zutubi.tove.config.cleanup;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.ReflectionUtils;

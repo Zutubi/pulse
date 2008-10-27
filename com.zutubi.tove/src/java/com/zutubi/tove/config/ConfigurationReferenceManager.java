@@ -5,6 +5,7 @@ import com.zutubi.tove.config.cleanup.DefaultReferenceCleanupTaskProvider;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 import com.zutubi.tove.config.cleanup.RecordCleanupTaskSupport;
 import com.zutubi.tove.config.cleanup.ReferenceCleanupTaskProvider;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;

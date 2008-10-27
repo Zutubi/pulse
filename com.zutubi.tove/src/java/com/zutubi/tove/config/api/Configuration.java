@@ -1,4 +1,4 @@
-package com.zutubi.tove.config;
+package com.zutubi.tove.config.api;
 
 import com.zutubi.config.annotations.Transient;
 

@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmLocation;

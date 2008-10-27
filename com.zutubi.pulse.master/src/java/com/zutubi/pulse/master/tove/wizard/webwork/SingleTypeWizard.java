@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.wizard.webwork;
 
-import com.zutubi.tove.config.ConfigurationCreator;
+import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.type.CompositeType;

@@ -2,11 +2,10 @@ package com.zutubi.pulse.core.scm.p4.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Wire;
-import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 
 /**
  */
@@ -26,7 +25,10 @@ public class PerforceConfigurationCheckHandler extends ConfigurationCheckHandler
         }
         finally
         {
-            ScmClientUtils.close(client);
+            if (client != null)
+            {
+                client.close();
+            }
         }
     }
 

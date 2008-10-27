@@ -1,6 +1,6 @@
 package com.zutubi.tove;
 
-import com.zutubi.tove.config.Configuration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.Type;
 
 /**

@@ -1,7 +1,6 @@
-package com.zutubi.tove.config;
+package com.zutubi.tove.config.api;
 
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.tove.config.Configuration;
 
 /**
  * Configuration check handlers allow testing of a configuration as a distinct user action.
