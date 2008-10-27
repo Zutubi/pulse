@@ -23,7 +23,7 @@
     <dependencies>
         <!-- external libraries -->
         <dependency org="xom" name="xom" rev="20080314" conf="external,build,release->default"/>
-        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0" conf="external,build,release->default"/>
+        <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0.0" conf="external,build,release->default"/>
         <dependency org="hibernate" name="hibernate" rev="3.1.1" conf="external,build,release->default"/>
         <dependency org="junit" name="junit" rev="3.8.1" conf="build->default"/>
         

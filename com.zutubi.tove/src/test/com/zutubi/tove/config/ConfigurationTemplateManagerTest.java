@@ -655,7 +655,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MockA instance = configurationTemplateManager.getInstance("template/a$", MockA.class);
         final List<String> errors = instance.getFieldErrors("name");
         assertEquals(1, errors.size());
-        assertTrue(errors.get(0).contains("dollar sign"));
+        assertTrue(errors.get(0), errors.get(0).contains("dollar sign"));
     }
 
     public void testCachedTemplateInstancesAreValidatedAsTemplates() throws TypeException
