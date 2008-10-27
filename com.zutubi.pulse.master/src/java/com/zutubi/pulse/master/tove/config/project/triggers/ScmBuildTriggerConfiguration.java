@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.master.scheduling.EventTrigger;
 import com.zutubi.pulse.master.scheduling.ScmChangeEventFilter;
 import com.zutubi.pulse.master.scheduling.Trigger;

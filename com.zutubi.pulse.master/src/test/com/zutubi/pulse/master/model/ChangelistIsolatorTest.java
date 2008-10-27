@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.model;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.tove.annotations.Transient;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;

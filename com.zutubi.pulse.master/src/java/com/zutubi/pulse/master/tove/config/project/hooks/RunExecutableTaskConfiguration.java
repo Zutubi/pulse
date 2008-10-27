@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
-import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.ControllingCheckbox;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.VariableHelper;

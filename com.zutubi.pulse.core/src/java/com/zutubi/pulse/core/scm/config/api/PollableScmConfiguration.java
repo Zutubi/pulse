@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.config.api;
 
-import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.StringList;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wizard;
+import com.zutubi.tove.annotations.ControllingCheckbox;
+import com.zutubi.tove.annotations.StringList;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.validation.annotations.Numeric;
 
 import java.util.List;

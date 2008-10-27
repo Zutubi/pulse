@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.xwork.ActionContext;
-import static com.zutubi.config.annotations.FieldParameter.ACTIONS;
-import static com.zutubi.config.annotations.FieldParameter.SCRIPTS;
-import com.zutubi.config.annotations.FieldType;
+import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
+import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
+import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.Revision;

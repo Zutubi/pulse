@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
-import com.zutubi.config.annotations.Classification;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wire;
+import com.zutubi.tove.annotations.Classification;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.NotificationException;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;

@@ -1,6 +1,6 @@
 package com.zutubi.tove.actions;
 
-import com.zutubi.config.annotations.Permission;
+import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;

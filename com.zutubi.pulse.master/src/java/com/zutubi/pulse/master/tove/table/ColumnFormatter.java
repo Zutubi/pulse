@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.tove.table;
 /**
  * The Formatter interface.
  *
- * @see com.zutubi.config.annotations.Format
+ * @see com.zutubi.tove.annotations.Format
  */
 public interface ColumnFormatter
 {

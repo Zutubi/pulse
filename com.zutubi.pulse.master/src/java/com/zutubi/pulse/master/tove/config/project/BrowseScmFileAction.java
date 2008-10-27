@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.config.annotations.FieldAction;
-import com.zutubi.config.annotations.Handler;
+import com.zutubi.tove.annotations.FieldAction;
+import com.zutubi.tove.annotations.Handler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

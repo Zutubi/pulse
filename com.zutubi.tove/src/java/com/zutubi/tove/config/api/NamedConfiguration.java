@@ -1,6 +1,6 @@
 package com.zutubi.tove.config.api;
 
-import com.zutubi.config.annotations.ID;
+import com.zutubi.tove.annotations.ID;
 
 /**
  * Simple interface for the common case of named configuration objects.

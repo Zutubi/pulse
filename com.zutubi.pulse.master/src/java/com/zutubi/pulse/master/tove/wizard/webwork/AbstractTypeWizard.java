@@ -360,7 +360,7 @@ public abstract class AbstractTypeWizard implements Wizard
         public boolean includesField(CompositeType type, String name)
         {
             TypeProperty property = type.getProperty(name);
-            return !(property != null && property.getAnnotation(com.zutubi.config.annotations.Wizard.Ignore.class) != null);
+            return !(property != null && property.getAnnotation(com.zutubi.tove.annotations.Wizard.Ignore.class) != null);
         }
 
         public boolean validate(ValidationAware validationCallback)

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
-import com.zutubi.config.annotations.Internal;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Internal;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.master.events.build.BuildEvent;
 
 /**

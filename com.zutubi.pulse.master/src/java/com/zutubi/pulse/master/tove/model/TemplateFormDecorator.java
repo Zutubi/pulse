@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.config.annotations.NoInherit;
-import com.zutubi.config.annotations.NoOverride;
+import com.zutubi.tove.annotations.NoInherit;
+import com.zutubi.tove.annotations.NoOverride;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.TemplateRecord;

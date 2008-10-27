@@ -1,8 +1,8 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.config.annotations.NoInherit;
-import com.zutubi.config.annotations.Ordered;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.NoInherit;
+import com.zutubi.tove.annotations.Ordered;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.events.Event;
 import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.Configuration;

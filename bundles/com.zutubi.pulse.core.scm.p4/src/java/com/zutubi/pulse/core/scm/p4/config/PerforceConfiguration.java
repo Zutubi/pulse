@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.p4.config;
 
-import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.ConfigurationCheck;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
 import com.zutubi.validation.annotations.Required;

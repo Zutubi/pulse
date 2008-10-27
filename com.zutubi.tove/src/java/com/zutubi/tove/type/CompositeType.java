@@ -1,7 +1,7 @@
 package com.zutubi.tove.type;
 
-import com.zutubi.config.annotations.ExternalState;
-import com.zutubi.config.annotations.Internal;
+import com.zutubi.tove.annotations.ExternalState;
+import com.zutubi.tove.annotations.Internal;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;

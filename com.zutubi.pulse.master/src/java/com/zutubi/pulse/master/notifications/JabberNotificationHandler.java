@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.notifications;
 
-import com.zutubi.config.annotations.Form;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.validation.annotations.Required;
 
 /**

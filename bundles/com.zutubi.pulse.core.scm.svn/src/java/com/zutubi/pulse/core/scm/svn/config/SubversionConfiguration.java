@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
-import com.zutubi.config.annotations.*;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.validation.annotations.Constraint;

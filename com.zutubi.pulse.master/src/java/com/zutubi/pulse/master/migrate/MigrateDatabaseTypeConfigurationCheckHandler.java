@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.migrate;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.util.JDBCUtils;

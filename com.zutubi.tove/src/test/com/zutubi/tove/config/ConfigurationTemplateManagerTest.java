@@ -1,7 +1,7 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Reference;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.events.AllEventListener;
 import com.zutubi.events.Event;
 import com.zutubi.tove.config.events.*;

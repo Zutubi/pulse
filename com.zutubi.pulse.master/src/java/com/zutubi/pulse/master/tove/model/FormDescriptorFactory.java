@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.config.annotations.FieldType;
-import com.zutubi.config.annotations.Handler;
+import com.zutubi.tove.annotations.FieldType;
+import com.zutubi.tove.annotations.Handler;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.tove.config.*;
@@ -109,7 +109,7 @@ public class FormDescriptorFactory
             if (targetType instanceof SimpleType)
             {
                 String fieldType = FieldType.SELECT;
-                com.zutubi.config.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.config.annotations.Field.class);
+                com.zutubi.tove.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.tove.annotations.Field.class);
                 if (field != null)
                 {
                     fieldType = field.type();
@@ -155,7 +155,7 @@ public class FormDescriptorFactory
     private FieldDescriptor createField(String parentPath, String baseName, TypeProperty property, FormDescriptor form)
     {
         String fieldType = FieldType.TEXT;
-        com.zutubi.config.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.config.annotations.Field.class);
+        com.zutubi.tove.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.tove.annotations.Field.class);
         if (field != null)
         {
             fieldType = field.type();

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.config.annotations.*;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;

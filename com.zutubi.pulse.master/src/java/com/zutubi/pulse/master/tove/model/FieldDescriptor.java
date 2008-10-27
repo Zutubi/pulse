@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.model;
 
-import static com.zutubi.config.annotations.FieldParameter.*;
+import static com.zutubi.tove.annotations.FieldParameter.*;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.record.Record;

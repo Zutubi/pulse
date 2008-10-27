@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
-import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.ConfigurationCheck;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Url;

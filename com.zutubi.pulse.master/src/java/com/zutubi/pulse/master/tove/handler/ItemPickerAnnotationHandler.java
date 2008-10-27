@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.config.annotations.ItemPicker;
+import com.zutubi.tove.annotations.ItemPicker;
 
 import java.lang.annotation.Annotation;
 

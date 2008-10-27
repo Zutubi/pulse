@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.config.annotations.FieldType;
+import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.pulse.master.tove.model.ControllingCheckboxFieldDescriptor;

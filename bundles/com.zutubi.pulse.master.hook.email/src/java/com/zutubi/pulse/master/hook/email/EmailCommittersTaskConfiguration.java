@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.hook.email;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Select;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wire;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.Select;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.tove.config.AbstractConfiguration;

@@ -5,7 +5,7 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.FieldValidatorSupport;
 
 /**
- * Checks that essential (see {@link com.zutubi.config.annotations.Essential})
+ * Checks that essential (see {@link com.zutubi.tove.annotations.Essential})
  * fields are set up when the context indicates they should be checked (for
  * concrete instances when full validation takes place).
  */

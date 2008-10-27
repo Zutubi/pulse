@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.servercore.validation.annotation.SubscriptionCondition;
 
 /**

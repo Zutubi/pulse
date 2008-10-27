@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.table;
 
-import com.zutubi.config.annotations.Format;
+import com.zutubi.tove.annotations.Format;
 import com.zutubi.pulse.master.tove.table.ColumnFormatter;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.type.CompositeType;

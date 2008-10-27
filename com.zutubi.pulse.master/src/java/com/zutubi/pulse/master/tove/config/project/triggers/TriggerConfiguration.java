@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
-import com.zutubi.config.annotations.ExternalState;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Table;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.tove.annotations.ExternalState;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Table;
+import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.master.scheduling.CronTrigger;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;

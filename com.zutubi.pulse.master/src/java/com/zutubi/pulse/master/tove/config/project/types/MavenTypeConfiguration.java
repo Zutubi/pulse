@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.master.tove.config.project.BrowseScmDirAction;
 import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;

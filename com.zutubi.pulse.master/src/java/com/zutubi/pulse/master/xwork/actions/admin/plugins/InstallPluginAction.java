@@ -2,9 +2,9 @@ package com.zutubi.pulse.master.xwork.actions.admin.plugins;
 
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
-import static com.zutubi.config.annotations.FieldParameter.ACTIONS;
-import static com.zutubi.config.annotations.FieldParameter.SCRIPTS;
-import com.zutubi.config.annotations.FieldType;
+import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
+import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
+import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.TextArea;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.TextArea;
 import com.zutubi.pulse.Version;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.license.License;

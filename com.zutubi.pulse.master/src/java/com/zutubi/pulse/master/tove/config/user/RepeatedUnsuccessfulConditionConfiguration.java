@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.master.condition.NotifyConditionFactory;
 import com.zutubi.validation.annotations.Numeric;
 

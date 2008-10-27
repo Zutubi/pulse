@@ -1,6 +1,6 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.config.annotations.Reference;
+import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.config.cleanup.DefaultReferenceCleanupTaskProvider;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 import com.zutubi.tove.config.cleanup.RecordCleanupTaskSupport;

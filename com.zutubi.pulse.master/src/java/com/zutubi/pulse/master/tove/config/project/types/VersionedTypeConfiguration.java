@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.config.annotations.FieldAction;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Transient;
-import com.zutubi.config.annotations.Wire;
+import com.zutubi.tove.annotations.FieldAction;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.annotations.Wire;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.Revision;

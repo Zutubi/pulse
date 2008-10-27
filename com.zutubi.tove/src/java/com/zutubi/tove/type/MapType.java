@@ -1,6 +1,6 @@
 package com.zutubi.tove.type;
 
-import com.zutubi.config.annotations.ID;
+import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationMap;
 import com.zutubi.tove.type.record.MutableRecord;

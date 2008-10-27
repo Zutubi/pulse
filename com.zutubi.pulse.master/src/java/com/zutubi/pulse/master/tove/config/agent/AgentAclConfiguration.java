@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
-import com.zutubi.config.annotations.ItemPicker;
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Table;
+import com.zutubi.tove.annotations.ItemPicker;
+import com.zutubi.tove.annotations.Reference;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.validation.annotations.Required;

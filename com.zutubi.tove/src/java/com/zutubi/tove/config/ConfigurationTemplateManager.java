@@ -1,6 +1,6 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.config.annotations.Wire;
+import com.zutubi.tove.annotations.Wire;
 import com.zutubi.events.EventManager;
 import com.zutubi.tove.config.cleanup.*;
 import com.zutubi.tove.config.events.*;

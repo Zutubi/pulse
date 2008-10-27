@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.config.annotations.ControllingSelect;
+import com.zutubi.tove.annotations.ControllingSelect;
 
 import java.lang.annotation.Annotation;
 

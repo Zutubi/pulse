@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config;
 
-import com.zutubi.config.annotations.ConfigurationCheck;
+import com.zutubi.tove.annotations.ConfigurationCheck;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
 import com.zutubi.tove.config.api.ConfigurationCreator;

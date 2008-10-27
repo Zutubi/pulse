@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
-import com.zutubi.config.annotations.*;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.scheduling.BuildCompletedEventFilter;

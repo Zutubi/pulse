@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance.forms;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.config.annotations.Field;
-import com.zutubi.config.annotations.FieldType;
-import com.zutubi.config.annotations.Form;
+import com.zutubi.tove.annotations.Field;
+import com.zutubi.tove.annotations.FieldType;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;

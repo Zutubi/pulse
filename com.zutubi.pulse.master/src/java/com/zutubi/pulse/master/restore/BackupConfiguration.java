@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.ControllingCheckbox;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.annotations.Required;

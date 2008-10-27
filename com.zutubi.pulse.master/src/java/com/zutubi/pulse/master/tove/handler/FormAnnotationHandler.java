@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.config.annotations.Form;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.pulse.master.tove.model.FormDescriptor;
 import com.zutubi.tove.type.CompositeType;

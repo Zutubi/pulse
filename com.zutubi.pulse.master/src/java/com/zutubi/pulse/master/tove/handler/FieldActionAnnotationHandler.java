@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.config.annotations.FieldAction;
+import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.tove.type.CompositeType;
@@ -12,7 +12,7 @@ import com.zutubi.util.logging.Logger;
 import java.lang.annotation.Annotation;
 
 /**
- * Handler for the {@link com.zutubi.config.annotations.FieldAction} annotation.
+ * Handler for the {@link com.zutubi.tove.annotations.FieldAction} annotation.
  */
 public class FieldActionAnnotationHandler implements AnnotationHandler
 {

@@ -1,7 +1,7 @@
 package com.zutubi.tove.config.types;
 
-import com.zutubi.config.annotations.ID;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.ID;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.AbstractConfiguration;
 
 import java.util.List;

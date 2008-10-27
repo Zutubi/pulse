@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.group;
 
-import com.zutubi.config.annotations.*;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 import java.util.LinkedList;

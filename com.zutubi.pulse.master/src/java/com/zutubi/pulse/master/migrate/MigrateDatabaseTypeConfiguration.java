@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.migrate;
 
-import com.zutubi.config.annotations.*;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.tove.config.setup.DatabaseType;
 import com.zutubi.util.TextUtils;

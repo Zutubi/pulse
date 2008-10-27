@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.table;
 
-import com.zutubi.config.annotations.Table;
+import com.zutubi.tove.annotations.Table;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationProvider;

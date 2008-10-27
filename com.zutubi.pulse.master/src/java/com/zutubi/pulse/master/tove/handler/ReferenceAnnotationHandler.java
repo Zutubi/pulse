@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.config.annotations.Reference;
+import com.zutubi.tove.annotations.Reference;
 
 import java.lang.annotation.Annotation;
 

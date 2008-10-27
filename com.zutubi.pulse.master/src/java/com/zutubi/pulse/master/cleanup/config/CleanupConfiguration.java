@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.cleanup.config;
 
-import com.zutubi.config.annotations.*;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;

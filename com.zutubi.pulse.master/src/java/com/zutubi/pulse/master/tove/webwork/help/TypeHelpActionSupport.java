@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
-import com.zutubi.config.annotations.Form;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;

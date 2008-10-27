@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import antlr.collections.AST;
-import com.zutubi.config.annotations.*;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.master.condition.FalseNotifyCondition;
 import com.zutubi.pulse.master.condition.NotifyCondition;
 import com.zutubi.pulse.master.condition.NotifyConditionFactory;

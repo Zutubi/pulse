@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.ID;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.ID;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.tove.config.AbstractConfiguration;
 

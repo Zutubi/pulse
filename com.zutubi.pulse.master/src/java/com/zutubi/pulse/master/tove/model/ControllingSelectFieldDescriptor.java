@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.config.annotations.FieldType;
+import com.zutubi.tove.annotations.FieldType;
 
 /**
  * Describes a controlling select: i.e. a select whose selected value

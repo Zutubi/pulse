@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.TextArea;
-import com.zutubi.config.annotations.Transient;
-import com.zutubi.config.annotations.Wire;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.TextArea;
+import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.annotations.Wire;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.config.annotations.Select;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Table;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.tove.annotations.Select;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Table;
+import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.AbstractNamedConfiguration;
 
 import java.util.LinkedList;

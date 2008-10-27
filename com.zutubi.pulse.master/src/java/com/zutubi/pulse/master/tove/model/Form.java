@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.config.annotations.FieldType;
+import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.pulse.master.tove.model.AbstractParameterised;
 
 import java.util.Collections;

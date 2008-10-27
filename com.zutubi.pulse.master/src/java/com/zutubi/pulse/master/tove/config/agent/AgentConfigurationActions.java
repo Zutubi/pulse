@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
-import com.zutubi.config.annotations.Permission;
+import com.zutubi.tove.annotations.Permission;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;

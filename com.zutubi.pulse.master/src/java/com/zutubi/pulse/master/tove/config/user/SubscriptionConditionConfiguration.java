@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.AbstractConfiguration;
 
 /**

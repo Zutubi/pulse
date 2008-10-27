@@ -1,6 +1,6 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.Configuration;
 
 import java.util.*;

@@ -1,8 +1,8 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.config.annotations.ID;
-import com.zutubi.config.annotations.Internal;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.ID;
+import com.zutubi.tove.annotations.Internal;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;

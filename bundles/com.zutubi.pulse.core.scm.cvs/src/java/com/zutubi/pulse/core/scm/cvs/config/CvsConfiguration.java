@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs.config;
 
-import com.zutubi.config.annotations.*;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.validation.annotation.CvsRoot;

@@ -1,7 +1,7 @@
 package com.zutubi.tove.config.cleanup;
 
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Reference;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
 import com.zutubi.tove.type.CompositeType;
