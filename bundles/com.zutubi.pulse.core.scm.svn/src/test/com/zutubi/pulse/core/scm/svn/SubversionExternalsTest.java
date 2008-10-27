@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
@@ -213,7 +213,7 @@ public class SubversionExternalsTest extends PulseTestCase
     public void testUpdate() throws Exception
     {
         doCheckout(2);
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(checkoutDir);
         server.update(context, new Revision("5"), null);
 
@@ -225,7 +225,7 @@ public class SubversionExternalsTest extends PulseTestCase
 
     private void doCheckout(int rev) throws ScmException
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(checkoutDir);
         server.addExternalPath(".");
         server.checkout(context, new Revision(Integer.toString(rev)), new ScmFeedbackHandler()

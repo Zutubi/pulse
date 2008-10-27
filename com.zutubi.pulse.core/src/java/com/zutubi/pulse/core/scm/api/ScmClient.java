@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 
 import java.io.Closeable;
 import java.io.File;

@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.postprocessors;
 
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
-import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.SelfReference;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 

@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.model.CommandResult;

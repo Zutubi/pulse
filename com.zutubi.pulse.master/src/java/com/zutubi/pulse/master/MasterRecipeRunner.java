@@ -46,7 +46,7 @@ public class MasterRecipeRunner implements Runnable
         Bootstrapper requestBootstrapper = request.getBootstrapper();
         request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
-        ExecutionContext context = request.getContext();
+        PulseExecutionContext context = request.getContext();
         ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false));
 
         EventOutputStream outputStream = null;

@@ -77,7 +77,7 @@ public class BuildController implements EventListener
     private Scheduler quartzScheduler;
     private ServiceTokenManager serviceTokenManager;
     private BuildResult previousSuccessful;
-    private ExecutionContext buildContext;
+    private PulseExecutionContext buildContext;
     private BuildHookManager buildHookManager;
 
     private ScmManager scmManager;
@@ -133,7 +133,7 @@ public class BuildController implements EventListener
 
         buildLogger = new DefaultBuildLogger(new File(buildDir, "build.log"));
 
-        buildContext = new ExecutionContext();
+        buildContext = new PulseExecutionContext();
         MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
         MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
 
@@ -166,12 +166,12 @@ public class BuildController implements EventListener
             File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
             recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
-            ExecutionContext recipeContext = new ExecutionContext(buildContext);
+            PulseExecutionContext recipeContext = new PulseExecutionContext(buildContext);
             recipeContext.push();
             recipeContext.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
             recipeContext.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_RECIPE, stage.getRecipe());
 
-            RecipeRequest recipeRequest = new RecipeRequest(new ExecutionContext(recipeContext));
+            RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stage);
             recipeRequest.addAllResourceRequirements(resourceRequirements);
             recipeRequest.addAllProperties(projectConfig.getProperties().values());

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.engine.api;
 
 /**
  * Types that define the reference interface can be referenced anywhere within the

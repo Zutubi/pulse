@@ -28,7 +28,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         this.revision = revision;
     }
 
-    public void bootstrap(final ExecutionContext context) throws BuildException
+    public void bootstrap(final PulseExecutionContext context) throws BuildException
     {
         final RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
         if (paths.getPersistentWorkDir() == null)

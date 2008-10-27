@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.api.*;

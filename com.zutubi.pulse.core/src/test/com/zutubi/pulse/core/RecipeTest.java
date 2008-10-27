@@ -16,7 +16,7 @@ public class RecipeTest extends PulseTestCase
     private Recipe recipe;
     private DefaultEventManager eventManager;
     private RecipePaths paths;
-    private ExecutionContext context;
+    private PulseExecutionContext context;
     private File tmpDir;
 
     public RecipeTest()
@@ -42,7 +42,7 @@ public class RecipeTest extends PulseTestCase
         File outputDir = new File(tmpDir, "out");
         paths = new SimpleRecipePaths(baseDir, outputDir);
 
-        context = new ExecutionContext();
+        context = new PulseExecutionContext();
         context.setWorkingDir(paths.getBaseDir());
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
     }

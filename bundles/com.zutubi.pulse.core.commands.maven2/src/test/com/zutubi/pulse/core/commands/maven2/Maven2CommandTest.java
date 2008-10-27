@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.commands.maven2;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestBase;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
@@ -31,7 +31,7 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
 
         Maven2Command command = new Maven2Command();
         command.setGoals("compile");
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         runCommand(command, context);
         assertEquals("1.0-SNAPSHOT", context.getVersion());
     }

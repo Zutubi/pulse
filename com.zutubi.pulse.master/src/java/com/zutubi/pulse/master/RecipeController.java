@@ -3,6 +3,7 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -36,7 +37,7 @@ public class RecipeController
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeAssignmentRequest assignmentRequest;
-    private ExecutionContext recipeContext;
+    private PulseExecutionContext recipeContext;
     private RecipeResultNode previousSuccessful;
     private RecipeLogger logger;
     private RecipeResultCollector collector;
@@ -52,7 +53,7 @@ public class RecipeController
     private BuildHookManager buildHookManager;
     private RecipeDispatchService recipeDispatchService;
 
-    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, ExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager, ResourceManager resourceManager, RecipeDispatchService recipeDispatchService)
+    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, PulseExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager, ResourceManager resourceManager, RecipeDispatchService recipeDispatchService)
     {
         this.buildResult = buildResult;
         this.recipeResultNode = recipeResultNode;

@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
@@ -173,14 +174,14 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     private ExecutionContext runBasicRecipe(String recipeName) throws IOException
     {
-        ExecutionContext context = makeContext(1, recipeName);
+        PulseExecutionContext context = makeContext(1, recipeName);
         recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
         return context;
     }
 
-    private ExecutionContext makeContext(long id, String recipeName)
+    private PulseExecutionContext makeContext(long id, String recipeName)
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(paths.getBaseDir());
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
@@ -403,7 +404,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public class SimpleBootstrapper extends BootstrapperSupport
     {
-        public void bootstrap(ExecutionContext context) throws BuildException
+        public void bootstrap(PulseExecutionContext context) throws BuildException
         {
             // Do nothing.
         }
@@ -418,7 +419,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
             this.exception = exception;
         }
 
-        public void bootstrap(ExecutionContext context) throws BuildException
+        public void bootstrap(PulseExecutionContext context) throws BuildException
         {
             throw exception;
         }

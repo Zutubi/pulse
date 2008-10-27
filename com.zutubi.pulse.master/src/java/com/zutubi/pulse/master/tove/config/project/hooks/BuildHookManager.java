@@ -1,7 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
 import com.zutubi.events.Event;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.model.ResultState;
@@ -41,7 +42,7 @@ public class BuildHookManager
         if (!buildResult.isPersonal())
         {
             // generate the execution context.
-            ExecutionContext context = new ExecutionContext(be.getContext());
+            PulseExecutionContext context = new PulseExecutionContext(be.getContext());
             Project project = buildResult.getProject();
             for (BuildHookConfiguration hook : project.getConfig().getBuildHooks().values())
             {
@@ -79,7 +80,7 @@ public class BuildHookManager
         {
             public void run()
             {
-                final ExecutionContext context = new ExecutionContext();
+                final PulseExecutionContext context = new PulseExecutionContext();
                 MasterBuildProperties.addAllBuildProperties(context, result, masterLocationProvider, configurationManager);
                 if (hook.appliesTo(result))
                 {

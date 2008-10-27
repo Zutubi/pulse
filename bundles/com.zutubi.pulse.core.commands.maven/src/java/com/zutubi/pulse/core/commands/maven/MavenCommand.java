@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.commands.maven;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.MavenUtils;
 import com.zutubi.pulse.core.ProcessArtifact;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.commands.core.ExecutableCommand;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -36,7 +37,9 @@ public class MavenCommand extends ExecutableCommand
 
         try
         {
-            context.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(context.getWorkingDir()), "maven.xml"), "currentVersion"));
+            //TODO: use the context's variables to transfer this maven specific information around. 
+            PulseExecutionContext pec = (PulseExecutionContext) context;
+            pec.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(context.getWorkingDir()), "maven.xml"), "currentVersion"));
         }
         catch (PulseException e)
         {

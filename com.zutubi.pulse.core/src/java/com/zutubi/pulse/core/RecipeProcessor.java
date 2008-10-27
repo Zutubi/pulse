@@ -62,7 +62,7 @@ public class RecipeProcessor
         runningRecipe = recipeResult.getId();
         eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeResult.getStartTime()));
 
-        ExecutionContext context = request.getContext();
+        PulseExecutionContext context = request.getContext();
         long recipeStartTime = recipeResult.getStartTime();
         pushRecipeContext(context, request, testResults, recipeStartTime);
         try
@@ -189,7 +189,7 @@ public class RecipeProcessor
         }
     }
 
-    private void pushRecipeContext(ExecutionContext context, RecipeRequest request, TestSuiteResult testResults, long recipeStartTime)
+    private void pushRecipeContext(PulseExecutionContext context, RecipeRequest request, TestSuiteResult testResults, long recipeStartTime)
     {
         context.push();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
@@ -216,7 +216,7 @@ public class RecipeProcessor
         }
     }
 
-    private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context) throws BuildException
+    private PulseFile loadPulseFile(RecipeRequest request, PulseExecutionContext context) throws BuildException
     {
         context.setLabel(SCOPE_RECIPE);
         PulseScope globalScope = new PulseScope(context.getScope());

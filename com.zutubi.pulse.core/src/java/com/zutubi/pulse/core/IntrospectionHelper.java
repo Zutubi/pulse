@@ -1,5 +1,9 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.engine.api.ReferenceMap;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

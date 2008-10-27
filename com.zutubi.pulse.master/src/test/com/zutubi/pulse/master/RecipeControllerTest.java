@@ -4,7 +4,7 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
@@ -91,7 +91,7 @@ public class RecipeControllerTest extends PulseTestCase
                 return new Data(getDataDirectory());
             }
         };
-        recipeController = new RecipeController(build, rootNode, assignmentRequest, new ExecutionContext(), null, logger, resultCollector, configurationManager, new DefaultResourceManager(), mock(RecipeDispatchService.class));
+        recipeController = new RecipeController(build, rootNode, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector, configurationManager, new DefaultResourceManager(), mock(RecipeDispatchService.class));
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
         recipeController.setEventManager(new DefaultEventManager());
@@ -279,9 +279,9 @@ public class RecipeControllerTest extends PulseTestCase
         assertEquals(ResultState.SUCCESS, lastResult.getState());
     }
 
-    private ExecutionContext makeContext(String project, long id, String recipeName)
+    private PulseExecutionContext makeContext(String project, long id, String recipeName)
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, project);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeName);

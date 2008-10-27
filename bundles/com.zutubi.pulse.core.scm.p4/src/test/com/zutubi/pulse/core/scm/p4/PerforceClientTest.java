@@ -1,7 +1,8 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.BuildProperties;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
@@ -517,7 +518,7 @@ public class PerforceClientTest extends PulseTestCase
 
     private ExecutionContext createExecutionContext(File dir, String id)
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         context.setWorkingDir(dir);
         if (id != null)

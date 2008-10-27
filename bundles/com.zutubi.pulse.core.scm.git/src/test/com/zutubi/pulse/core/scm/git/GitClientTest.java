@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Changelist;
@@ -25,7 +25,7 @@ public class GitClientTest extends PulseTestCase
     private String repository;
     private GitClient client;
     private File workingDir;
-    private ExecutionContext context;
+    private PulseExecutionContext context;
     private RecordingScmFeedbackHandler handler;
     private ScmContextImpl scmContext;
 
@@ -45,7 +45,7 @@ public class GitClientTest extends PulseTestCase
         client = new GitClient(repository, "master");
 
         workingDir = new File(tmp, "wd");
-        context = new ExecutionContext();
+        context = new PulseExecutionContext();
         context.setWorkingDir(workingDir);
 
         scmContext = new ScmContextImpl();

@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class ServerBootstrapper extends BootstrapperSupport
 {
-    public void bootstrap(ExecutionContext context)
+    public void bootstrap(PulseExecutionContext context)
     {
         // ensure that the paths exist
         try

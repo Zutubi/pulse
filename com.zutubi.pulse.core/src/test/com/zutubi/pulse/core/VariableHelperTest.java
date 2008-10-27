@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.engine.api.Scope;
 
 /**
  * 

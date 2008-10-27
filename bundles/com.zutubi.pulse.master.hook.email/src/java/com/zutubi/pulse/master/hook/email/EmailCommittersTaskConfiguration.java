@@ -4,7 +4,7 @@ import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Wire;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.core.model.PersistentChangelist;

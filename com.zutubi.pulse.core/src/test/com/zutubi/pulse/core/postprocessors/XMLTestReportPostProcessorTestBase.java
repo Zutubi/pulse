@@ -1,7 +1,8 @@
 package com.zutubi.pulse.core.postprocessors;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 
@@ -29,7 +30,7 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
     {
         File outputDir = getOutputDir();
         TestSuiteResult testResults = new TestSuiteResult();
-        ExecutionContext context = new ExecutionContext();
+        ExecutionContext context = new PulseExecutionContext();
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
 

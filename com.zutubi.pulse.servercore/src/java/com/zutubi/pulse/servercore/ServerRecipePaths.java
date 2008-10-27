@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 

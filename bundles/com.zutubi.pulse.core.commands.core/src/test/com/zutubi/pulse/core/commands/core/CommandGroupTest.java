@@ -220,7 +220,7 @@ public class CommandGroupTest extends CommandTestBase
 
     private void execute(CommandGroup group, CommandResult result)
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, null));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
         context.setWorkingDir(baseDir);

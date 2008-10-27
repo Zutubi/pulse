@@ -71,7 +71,7 @@ public class SlaveRecipeProcessor
         if(masterProxy != null)
         {
             buildingRecipe.set(request.getId());
-            ExecutionContext context = request.getContext();
+            PulseExecutionContext context = request.getContext();
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(handle, masterProxy, serviceTokenManager);
             ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false));

@@ -27,18 +27,18 @@ public class RecipeRequest
     /**
      * Context for the recipe.
      */
-    private ExecutionContext context;
+    private PulseExecutionContext context;
 
     private List<ResourceRequirement> resourceRequirements = new LinkedList<ResourceRequirement>();
 
     private List<ResourceProperty> properties = new LinkedList<ResourceProperty>();
 
-    public RecipeRequest(ExecutionContext context)
+    public RecipeRequest(PulseExecutionContext context)
     {
         this(null, null, context);
     }
 
-    public RecipeRequest(Bootstrapper bootstrapper, String pulseFileSource, ExecutionContext context)
+    public RecipeRequest(Bootstrapper bootstrapper, String pulseFileSource, PulseExecutionContext context)
     {
         this.bootstrapper = bootstrapper;
         this.pulseFileSource = pulseFileSource;
@@ -93,7 +93,7 @@ public class RecipeRequest
         this.pulseFileSource = pulseFileSource;
     }
 
-    public ExecutionContext getContext()
+    public PulseExecutionContext getContext()
     {
         return context;
     }

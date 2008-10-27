@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.SelfReference;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.PostProcessor;

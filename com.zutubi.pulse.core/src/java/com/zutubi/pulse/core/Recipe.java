@@ -5,6 +5,9 @@ import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.events.CommandCommencedEvent;
 import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;
@@ -169,7 +172,7 @@ public class Recipe extends SelfReference
         }
     }
 
-    public void execute(ExecutionContext context)
+    public void execute(PulseExecutionContext context)
     {
         context.push();
         context.setLabel(LABEL_EXECUTE);
@@ -229,7 +232,7 @@ public class Recipe extends SelfReference
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    private void pushCommandContext(ExecutionContext context, Scope scope, File commandOutput)
+    private void pushCommandContext(PulseExecutionContext context, Scope scope, File commandOutput)
     {
         context.push();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());

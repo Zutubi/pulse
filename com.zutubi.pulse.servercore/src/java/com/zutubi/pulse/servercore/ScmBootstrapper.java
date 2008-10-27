@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
@@ -33,7 +34,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
         this.revision = revision;
     }
 
-    public void bootstrap(ExecutionContext context)
+    public void bootstrap(PulseExecutionContext context)
     {
         File outDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
         outDir.mkdirs();

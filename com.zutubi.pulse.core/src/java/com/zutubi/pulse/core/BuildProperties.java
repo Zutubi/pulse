@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.util.TextUtils;
 
 import java.text.SimpleDateFormat;

@@ -5,7 +5,7 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildException;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
@@ -693,7 +693,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements com.zutubi.even
         project.setConfig(projectConfig);
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
         AgentRequirements requirements = new MockAgentRequirements(type);
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, "project");
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
         RecipeRequest request = new RecipeRequest(context);

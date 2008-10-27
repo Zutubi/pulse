@@ -3,7 +3,8 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import static com.zutubi.pulse.core.BuildProperties.*;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
@@ -34,7 +35,7 @@ public class PatchBootstrapper implements Bootstrapper
         this.localEOL = localEOL;
     }
 
-    public void bootstrap(ExecutionContext context) throws BuildException
+    public void bootstrap(PulseExecutionContext context) throws BuildException
     {
         delegate.bootstrap(context);
         try

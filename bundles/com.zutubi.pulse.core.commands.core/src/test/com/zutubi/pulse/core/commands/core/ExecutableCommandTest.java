@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.commands.core;
 import com.zutubi.pulse.core.BuildException;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_BUILD_NUMBER;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.ProcessArtifact;
 import com.zutubi.pulse.core.RegexPattern;
 import com.zutubi.pulse.core.config.ResourceProperty;
@@ -260,7 +260,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
 
     public void testResourcePathsAddedToEnvironment() throws IOException
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.add(new ResourceProperty("java.bin.dir", "somedir", false, true, false));
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("echo");
@@ -372,7 +372,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     {
         if (SystemUtils.IS_WINDOWS)
         {
-            ExecutionContext context = new ExecutionContext();
+            PulseExecutionContext context = new PulseExecutionContext();
             context.add(new ResourceProperty("a<>", "b", true, false, false));
             ExecutableCommand command = new ExecutableCommand();
             command.setExe("dir");
@@ -412,7 +412,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
 
     private CommandResult runCommand(ExecutableCommand command, long buildNumber)
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildNumber));
         return super.runCommand(command, context);
     }

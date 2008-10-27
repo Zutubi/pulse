@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.events.build;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.master.model.BuildResult;
 
 /**
@@ -10,7 +10,7 @@ import com.zutubi.pulse.master.model.BuildResult;
  */
 public class PreBuildEvent extends BuildEvent
 {
-    public PreBuildEvent(Object source, BuildResult result, ExecutionContext context)
+    public PreBuildEvent(Object source, BuildResult result, PulseExecutionContext context)
     {
         super(source, result, context);
     }

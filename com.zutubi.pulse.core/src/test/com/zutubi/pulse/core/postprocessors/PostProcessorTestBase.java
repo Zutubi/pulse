@@ -2,7 +2,8 @@ package com.zutubi.pulse.core.postprocessors;
 
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
@@ -54,7 +55,7 @@ public abstract class PostProcessorTestBase extends PulseTestCase
         CommandResult commandResult = new CommandResult("test");
         commandResult.commence();
 
-        ExecutionContext context = new ExecutionContext();
+        ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
 
         pp.process(artifact, commandResult, context);

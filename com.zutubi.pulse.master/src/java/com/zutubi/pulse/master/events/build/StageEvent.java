@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.events.build;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
@@ -11,7 +11,7 @@ public class StageEvent extends BuildEvent
 {
     private RecipeResultNode stageNode;
 
-    public StageEvent(Object source, BuildResult result, RecipeResultNode stageNode, ExecutionContext context)
+    public StageEvent(Object source, BuildResult result, RecipeResultNode stageNode, PulseExecutionContext context)
     {
         super(source, result, context);
         this.stageNode = stageNode;

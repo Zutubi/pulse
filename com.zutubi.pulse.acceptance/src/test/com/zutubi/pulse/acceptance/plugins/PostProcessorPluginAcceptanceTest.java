@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.plugins;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;

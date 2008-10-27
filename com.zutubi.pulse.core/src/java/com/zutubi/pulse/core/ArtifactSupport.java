@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.annotations.Required;
 

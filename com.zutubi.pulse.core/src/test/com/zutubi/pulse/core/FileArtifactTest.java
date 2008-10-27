@@ -211,7 +211,7 @@ public class FileArtifactTest extends PulseTestCase
     private void capture(long recipeStartTime)
     {
         RecipePaths paths = new SimpleRecipePaths(tmpSourceDir, null);
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(paths.getBaseDir());
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
         if(recipeStartTime > 0)

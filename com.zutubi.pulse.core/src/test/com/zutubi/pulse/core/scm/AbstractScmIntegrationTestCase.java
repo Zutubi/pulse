@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -131,7 +131,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
 
     public void testPrepareACleanDirectory() throws ScmException, ParseException
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(workingDir);
 
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
@@ -161,7 +161,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
     {
         Revision initialRevision = testData.getRevision(0);
 
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(workingDir);
 
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
@@ -174,7 +174,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
 
         Revision requestedRevision = testData.getRevision(1);
 
-        context = new ExecutionContext();
+        context = new PulseExecutionContext();
         context.setWorkingDir(workingDir);
 
 //        Revision actualRevision = client.prepare(context, handler);
@@ -482,7 +482,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
 
     private void doCheckoutToHead() throws ScmException
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(workingDir);
 
 //        Revision revison = client.prepare(context, null);

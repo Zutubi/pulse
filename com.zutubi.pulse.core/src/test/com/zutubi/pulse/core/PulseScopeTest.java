@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;

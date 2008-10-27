@@ -7,6 +7,6 @@ public interface Bootstrapper
 {
     /**
      */
-    void bootstrap(ExecutionContext context) throws BuildException;
+    void bootstrap(PulseExecutionContext context) throws BuildException;
     void terminate();
 }

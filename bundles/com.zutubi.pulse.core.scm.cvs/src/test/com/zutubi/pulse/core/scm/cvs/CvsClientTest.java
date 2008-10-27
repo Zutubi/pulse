@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.BuildProperties;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -184,7 +184,7 @@ public class CvsClientTest extends PulseTestCase
         String modules = "unit-test, integration-test";
         CvsClient client = new CvsClient(cvsRoot, modules, null, null);
 
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(workdir);
         context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         client.checkout(context, Revision.HEAD, null);

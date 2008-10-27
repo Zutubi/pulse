@@ -4,6 +4,7 @@ import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;

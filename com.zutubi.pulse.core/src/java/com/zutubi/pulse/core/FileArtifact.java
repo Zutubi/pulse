@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.util.FileSystemUtils;
 import org.apache.tools.ant.DirectoryScanner;
 

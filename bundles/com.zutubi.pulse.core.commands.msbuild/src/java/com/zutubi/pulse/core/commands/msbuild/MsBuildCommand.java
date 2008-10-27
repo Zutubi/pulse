@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.commands.msbuild;
 
-import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.ProcessArtifact;
 import com.zutubi.pulse.core.commands.core.ExecutableCommand;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.util.TextUtils;
 import com.zutubi.validation.annotations.Required;

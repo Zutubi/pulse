@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
@@ -27,7 +27,7 @@ public class SubversionClientTest extends PulseTestCase
     private File expectedDir;
     private Process serverProcess;
     private static final String TAG_PATH = "svn://localhost/test/tags/test-tag";
-    private ExecutionContext context;
+    private PulseExecutionContext context;
 
 //    $ svn log -v svn://localhost/test
 //    ------------------------------------------------------------------------
@@ -101,7 +101,7 @@ public class SubversionClientTest extends PulseTestCase
         gotDir = new File(repoDir, "got");
         gotDir.mkdirs();
 
-        context = new ExecutionContext();
+        context = new PulseExecutionContext();
         context.setWorkingDir(gotDir);
 
         ZipUtils.extractZip(dataFile, repoDir);

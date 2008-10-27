@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.commands.maven;
 
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestBase;
 
 /**
@@ -45,7 +45,7 @@ public class MavenCommandTest extends ExecutableCommandTestBase
     {
         copyBuildFileToBaseDir("basic");
         MavenCommand command = new MavenCommand();
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         runCommand(command, context);
         assertEquals("1.0-SNAPSHOT", context.getVersion());
     }

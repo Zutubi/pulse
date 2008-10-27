@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.engine.api;
 
 import java.util.Collection;
 

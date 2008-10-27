@@ -168,7 +168,7 @@ public class LocalBuild
 
             eventManager.register(new BuildStatusPrinter(paths.getBaseDir(), paths.getOutputDir(), logStream, failureLimit));
 
-            ExecutionContext context = new ExecutionContext();
+            PulseExecutionContext context = new PulseExecutionContext();
             context.setWorkingDir(baseDir);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repository);

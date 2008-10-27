@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.api.Reference;
+
 /**
  * A simple reference that can have any type as its value.
  */

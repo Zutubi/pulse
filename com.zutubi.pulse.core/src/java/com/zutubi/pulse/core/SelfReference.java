@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.api.Reference;
+
 /**
  * A base class to simplify references that are named objects where the
  * reference value is the object itself.

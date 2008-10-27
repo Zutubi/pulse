@@ -3,6 +3,8 @@ package com.zutubi.pulse.core;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_USER;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -15,7 +17,7 @@ import java.io.OutputStream;
  * separate namespaces so that we can ensure user-defined properties do
  * not conflict with Pulse-internal properties.
  */
-public class ExecutionContext
+public class PulseExecutionContext implements ExecutionContext
 {
     // If you add a field, remember to update the copy constructor
     private MultiScopeStack scopeStack;
@@ -33,12 +35,12 @@ public class ExecutionContext
     // pass this value around as a user(?) property rather than directly implemented as a field.
     private String version = null;
 
-    public ExecutionContext()
+    public PulseExecutionContext()
     {
         scopeStack = new MultiScopeStack(NAMESPACE_INTERNAL, NAMESPACE_USER);
     }
 
-    public ExecutionContext(ExecutionContext other)
+    public PulseExecutionContext(PulseExecutionContext other)
     {
         this.scopeStack = new MultiScopeStack(other.scopeStack);
         this.workingDir = other.workingDir;
