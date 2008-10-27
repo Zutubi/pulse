@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.restore;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -13,9 +13,12 @@ import java.util.Date;
  */
 public class UniqueDatestampedNameGenerator implements ArchiveNameGenerator
 {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
-
     private Clock time = new CalendarClock();
+
+    static SimpleDateFormat getDateFormat()
+    {
+        return new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
+    }
 
     /**
      * Generate a unique filename for an archive file that will be placed into the target directory.
@@ -25,7 +28,7 @@ public class UniqueDatestampedNameGenerator implements ArchiveNameGenerator
      */
     public String newName(File target)
     {
-        final String candidateName = "archive-" + DATE_FORMAT.format(time.getDate());
+        final String candidateName = "archive-" + getDateFormat().format(time.getDate());
 
         //TODO: check latest file name, and use that as a starting point for the 'i'
         String[] names = new String[0];
@@ -95,7 +98,7 @@ public class UniqueDatestampedNameGenerator implements ArchiveNameGenerator
         {
             // date format appears to be rather liberal, it is happy to accept and correctly parse
             // dates of the format:  yyyy-MM-dd_hh-mm-ss_<someExtraNumber> as yyyy-MM-dd_hh-mm-ss. 
-            DATE_FORMAT.parse(name);
+            getDateFormat().parse(name);
             return true;
         }
         catch (ParseException e)

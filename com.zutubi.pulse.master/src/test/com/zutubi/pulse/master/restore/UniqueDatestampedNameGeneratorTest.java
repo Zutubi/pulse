@@ -35,17 +35,19 @@ public class UniqueDatestampedNameGeneratorTest extends PulseTestCase
     public void testUniqueNameGenerator() throws IOException
     {
         UniqueDatestampedNameGenerator generator = new UniqueDatestampedNameGenerator();
+        final Date date = new Date(0);
         generator.setTime(new UniqueDatestampedNameGenerator.Clock()
         {
             public Date getDate()
             {
-                return new Date(0);
+                return date;
             }
         });
 
-        assertEquals("archive-1970-01-01_10-00-00.zip", generator.newName(tmp));
-        assertTrue(new File(tmp, "archive-1970-01-01_10-00-00.zip").createNewFile());
-        assertEquals("archive-1970-01-01_10-00-00_1.zip", generator.newName(tmp));
+        String dateString = UniqueDatestampedNameGenerator.getDateFormat().format(date);
+        assertEquals("archive-" + dateString + ".zip", generator.newName(tmp));
+        assertTrue(new File(tmp, "archive-" + dateString + ".zip").createNewFile());
+        assertEquals("archive-" + dateString + "_1.zip", generator.newName(tmp));
     }
 
     public void testMatchesPicksUpMultipleCandidateNames()
@@ -59,15 +61,17 @@ public class UniqueDatestampedNameGeneratorTest extends PulseTestCase
     public void testGeneratedNameIsHigherThanAllExistingNames() throws IOException
     {
         UniqueDatestampedNameGenerator generator = new UniqueDatestampedNameGenerator();
+        final Date date = new Date(0);
         generator.setTime(new UniqueDatestampedNameGenerator.Clock()
         {
             public Date getDate()
             {
-                return new Date(0);
+                return date;
             }
         });
 
-        assertTrue(new File(tmp, "archive-1970-01-01_10-00-00_5.zip").createNewFile());
-        assertEquals("archive-1970-01-01_10-00-00_6.zip", generator.newName(tmp));
+        String dateString = UniqueDatestampedNameGenerator.getDateFormat().format(date);
+        assertTrue(new File(tmp, "archive-" + dateString + "_5.zip").createNewFile());
+        assertEquals("archive-" + dateString + "_6.zip", generator.newName(tmp));
     }
 }
