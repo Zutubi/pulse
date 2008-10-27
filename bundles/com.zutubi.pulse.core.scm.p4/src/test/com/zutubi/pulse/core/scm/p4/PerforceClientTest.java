@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;

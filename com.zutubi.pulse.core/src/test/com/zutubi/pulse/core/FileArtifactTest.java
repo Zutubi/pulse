@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import static com.zutubi.pulse.core.BuildProperties.*;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.test.PulseTestCase;

@@ -3,7 +3,7 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildException;
-import static com.zutubi.pulse.core.BuildProperties.*;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;

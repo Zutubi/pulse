@@ -5,6 +5,7 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;

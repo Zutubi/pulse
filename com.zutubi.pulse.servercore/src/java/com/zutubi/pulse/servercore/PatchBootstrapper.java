@@ -2,7 +2,7 @@ package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
-import static com.zutubi.pulse.core.BuildProperties.*;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;

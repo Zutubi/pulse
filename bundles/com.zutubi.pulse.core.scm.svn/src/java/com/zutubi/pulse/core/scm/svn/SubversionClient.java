@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.config.ResourceProperty;

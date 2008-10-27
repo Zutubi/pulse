@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.engine.api.Property;
 
 /**
  * 

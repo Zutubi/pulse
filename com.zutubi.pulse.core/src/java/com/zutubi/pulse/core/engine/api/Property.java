@@ -1,6 +1,4 @@
-package com.zutubi.pulse.core;
-
-import com.zutubi.pulse.core.engine.api.Reference;
+package com.zutubi.pulse.core.engine.api;
 
 /**
  * A simple string-valued reference.

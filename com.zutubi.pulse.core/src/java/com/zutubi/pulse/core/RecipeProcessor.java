@@ -1,7 +1,9 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.BuildProperties.*;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import static com.zutubi.pulse.core.RecipeUtils.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;

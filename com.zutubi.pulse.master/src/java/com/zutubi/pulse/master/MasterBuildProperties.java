@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master;
 
-import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.config.ResourceProperty;

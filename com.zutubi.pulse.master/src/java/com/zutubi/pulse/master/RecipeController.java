@@ -4,7 +4,9 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.core.RecipeUtils.*;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
@@ -161,7 +163,7 @@ public class RecipeController
         ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent);
         if (resourceRepository != null)
         {
-            BuildProperties.addResourceProperties(recipeContext, assignmentRequest.getResourceRequirements(), resourceRepository);
+            addResourceProperties(recipeContext, assignmentRequest.getResourceRequirements(), resourceRepository);
         }
 
         // Update the request and its context before it is sent to the agent.

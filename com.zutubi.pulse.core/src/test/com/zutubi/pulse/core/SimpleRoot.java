@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.Property;
 
 import java.util.LinkedList;
 import java.util.List;

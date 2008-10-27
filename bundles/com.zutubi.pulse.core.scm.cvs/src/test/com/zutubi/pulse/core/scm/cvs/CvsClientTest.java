@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;

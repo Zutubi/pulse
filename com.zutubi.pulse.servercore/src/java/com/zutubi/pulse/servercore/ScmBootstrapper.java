@@ -2,8 +2,9 @@ package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;

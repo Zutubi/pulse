@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.*;
-import static com.zutubi.pulse.core.BuildProperties.*;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.util.FileSystemUtils;
 

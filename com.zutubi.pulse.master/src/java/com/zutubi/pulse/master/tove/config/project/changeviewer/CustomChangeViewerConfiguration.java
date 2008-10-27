@@ -4,7 +4,7 @@ import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.Property;
+import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.scm.api.Revision;

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.make;
 
-import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
