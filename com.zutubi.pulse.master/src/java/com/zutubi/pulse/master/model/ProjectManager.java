@@ -37,6 +37,17 @@ public interface ProjectManager extends EntityManager<Project>
     @SecureResult
     List<Project> getProjects(boolean allowInvalid);
 
+    /**
+     * Return the accessible list of project instances from the given set of
+     * project ids.
+     *
+     * @param ids the list of ids uniquely identifying a project
+     * @param allowInvalid if true, invalid projects will be included in the result
+     * @return a list of project instances.
+     */
+    @SecureResult
+    List<Project> getProjects(Collection<Long> ids, boolean allowInvalid);
+
     boolean isProjectValid(Project project);
 
     int getProjectCount();

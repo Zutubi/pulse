@@ -28,10 +28,7 @@ import freemarker.template.utility.StringUtil;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Base for all actions.  Includes standard i18n, encoding, security and other
@@ -291,13 +288,11 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public CommitMessageSupport getCommitMessageSupport(PersistentChangelist changelist)
     {
         List<CommitMessageTransformerConfiguration> transformers = new LinkedList<CommitMessageTransformerConfiguration>();
-        for(long projectId: changelistDao.getAllAffectedProjectIds(changelist))
+
+        Set<Long> ids = changelistDao.getAllAffectedProjectIds(changelist);
+        for(Project project: projectManager.getProjects(ids, false))
         {
-            Project project = projectManager.getProject(projectId, false);
-            if(project != null)
-            {
-                transformers.addAll(project.getConfig().getCommitMessageTransformers().values());
-            }
+            transformers.addAll(project.getConfig().getCommitMessageTransformers().values());
         }
 
         return new CommitMessageSupport(changelist.getComment(), transformers);

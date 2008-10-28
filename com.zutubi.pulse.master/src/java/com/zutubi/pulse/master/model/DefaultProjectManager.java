@@ -6,7 +6,6 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
@@ -18,8 +17,6 @@ import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.events.build.*;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
@@ -28,13 +25,15 @@ import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.config.*;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.type.CompositeType;
@@ -49,10 +48,6 @@ import com.zutubi.util.logging.Logger;
 
 import java.util.*;
 
-/**
- * 
- *
- */
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
@@ -296,12 +291,26 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public Project getProject(long id, boolean allowInvalid)
     {
         Project project = projectDao.findById(id);
-        if (allowInvalid || project != null && configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath()))
+        if (allowInvalid || isProjectValid(project))
         {
             return project;
         }
 
         return null;
+    }
+
+    public List<Project> getProjects(Collection<Long> ids, boolean allowInvalid)
+    {
+        List<Project> result = new LinkedList<Project>();
+        for (Long id : ids)
+        {
+            Project project = projectDao.findById(id);
+            if (project != null)
+            {
+                result.add(project);
+            }
+        }
+        return (allowInvalid) ? result : filterValidProjects(result);
     }
 
     public List<Project> getProjects(boolean allowInvalid)
@@ -315,9 +324,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return result;
     }
 
+    public boolean isProjectValid(ProjectConfiguration config)
+    {
+        return config != null && configurationTemplateManager.isDeeplyValid(config.getConfigurationPath());
+    }
+
     public boolean isProjectValid(Project project)
     {
-        return project.getConfig() != null && configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath());
+        return project != null && isProjectValid(project.getConfig());
     }
 
     private List<Project> filterValidProjects(List<Project> projects)
