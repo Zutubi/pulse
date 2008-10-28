@@ -1,13 +1,14 @@
 package com.zutubi.pulse.master.bootstrap;
 
-import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.tove.config.admin.LoggingConfiguration;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.pulse.servercore.util.logging.LogConfiguration;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
-import com.zutubi.tove.config.ConfigurationEventListener;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.events.ConfigurationEvent;
-import com.zutubi.tove.config.events.PostSaveEvent;
+import com.zutubi.tove.config.TypeAdapter;
+import com.zutubi.tove.config.TypeListener;
 
 /**
  * Master implementation of the log configuration interface, which is just a
@@ -16,13 +17,43 @@ import com.zutubi.tove.config.events.PostSaveEvent;
  * started, when we have not yet got a data directory.  In this situation,
  * defaults apply.
  */
-public class MasterLogConfiguration implements LogConfiguration, ConfigurationEventListener
+public class MasterLogConfiguration implements LogConfiguration
 {
-    private static final String CONFIGURATION_PROVIDER_NAME = "configurationProvider";
+    private final LoggingConfiguration defaults = new LoggingConfiguration();
 
-    private LoggingConfiguration defaults = new LoggingConfiguration();
     private ConfigurationProvider configurationProvider;
     private LogConfigurationManager logConfigurationManager;
+
+    private EventManager eventManager;
+
+    public void init()
+    {
+        eventManager.register(new SystemStartedListener()
+        {
+            public void systemStarted()
+            {
+                // rewire to ensure all of the necessary components are available.
+                SpringComponentContext.autowire(MasterLogConfiguration.this);
+                MasterLogConfiguration.this.systemStarted();
+            }
+        });
+    }
+
+    private void systemStarted()
+    {
+        TypeListener<LoggingConfiguration> listener = new TypeAdapter<LoggingConfiguration>(LoggingConfiguration.class)
+        {
+            public void postSave(LoggingConfiguration instance, boolean nested)
+            {
+                // notify the log configuration manager of the update.
+                logConfigurationManager.applyConfig();
+            }
+        };
+        listener.register(configurationProvider, true);
+
+        // sync the logging with the current configuration.
+        logConfigurationManager.applyConfig();
+    }
 
     public String getLoggingLevel()
     {
@@ -36,7 +67,6 @@ public class MasterLogConfiguration implements LogConfiguration, ConfigurationEv
 
     private LoggingConfiguration getLoggingConfiguration()
     {
-        ConfigurationProvider configurationProvider = getConfigurationProvider();
         if(configurationProvider == null)
         {
             return defaults;
@@ -47,29 +77,18 @@ public class MasterLogConfiguration implements LogConfiguration, ConfigurationEv
         }
     }
 
-    private ConfigurationProvider getConfigurationProvider()
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        if (configurationProvider == null && SpringComponentContext.containsBean(CONFIGURATION_PROVIDER_NAME))
-        {
-            configurationProvider = SpringComponentContext.getBean(CONFIGURATION_PROVIDER_NAME);
-            if (configurationProvider != null)
-            {
-                configurationProvider.registerEventListener(this, false, false, LoggingConfiguration.class);
-            }
-        }
-        return configurationProvider;
-    }
-
-    public void handleConfigurationEvent(ConfigurationEvent event)
-    {
-        if (event instanceof PostSaveEvent)
-        {
-            logConfigurationManager.applyConfig();
-        }
+        this.configurationProvider = configurationProvider;
     }
 
     public void setLogConfigurationManager(LogConfigurationManager logConfigurationManager)
     {
         this.logConfigurationManager = logConfigurationManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

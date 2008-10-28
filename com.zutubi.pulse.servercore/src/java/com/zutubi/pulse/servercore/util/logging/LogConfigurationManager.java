@@ -35,8 +35,7 @@ public class LogConfigurationManager
 
         applyConfig();
 
-        // Ensure that the logs directory exists, before handlers try to
-        // write there.
+        // Ensure that the logs directory exists, before handlers try to write there.
         File logRoot = systemPaths.getLogRoot();
         if (!logRoot.exists() && !logRoot.mkdirs())
         {
