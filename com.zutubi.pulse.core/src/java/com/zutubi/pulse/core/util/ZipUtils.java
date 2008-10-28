@@ -524,7 +524,7 @@ public class ZipUtils
         }
     }
 
-    static void extractZip(ZipInputStream zin, File dir) throws IOException
+    public static void extractZip(ZipInputStream zin, File dir) throws IOException
     {
         ZipEntry entry;
         while ((entry = zin.getNextEntry()) != null)
@@ -549,7 +549,7 @@ public class ZipUtils
         }
     }
 
-    public static void unzip(InputStream zin, File file) throws IOException
+    private static void unzip(InputStream zin, File file) throws IOException
     {
         FileOutputStream out = null;
 
