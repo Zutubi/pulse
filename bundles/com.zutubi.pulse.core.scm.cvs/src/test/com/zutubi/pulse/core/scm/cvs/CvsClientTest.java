@@ -34,7 +34,8 @@ public class CvsClientTest extends PulseTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        cvsRoot = ":ext:daniel:4edueWX7@zutubi.com:/cvsroots/default";
+        cvsRoot = ":ext:daniel:xxxxx@zutubi.com:/cvsroots/default";
+        //":local:" + repoDir.getCanonicalPath()
 
         // cleanup the working directory.
         workdir = FileSystemUtils.createTempDir("CvsServer", "Test");
