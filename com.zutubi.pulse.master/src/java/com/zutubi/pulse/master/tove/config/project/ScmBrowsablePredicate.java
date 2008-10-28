@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.tove.annotations.FieldAction;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
+import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
-import com.zutubi.pulse.master.tove.model.FieldDescriptor;
-import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
+import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileSystemManager;
@@ -47,7 +47,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
                 if(config != null && config.isValid())
                 {
                     Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(config, scmManager);
-                    return scmManager.isReady(config) && capabilities.contains(ScmCapability.BROWSE);
+                    return capabilities.contains(ScmCapability.BROWSE);
                 }
             }
         }

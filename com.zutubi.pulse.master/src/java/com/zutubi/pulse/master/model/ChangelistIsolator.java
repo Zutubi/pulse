@@ -28,11 +28,6 @@ public class ChangelistIsolator
 
     public synchronized List<Revision> getRevisionsToRequest(ProjectConfiguration projectConfig, Project project, boolean force) throws ScmException
     {
-        if (!scmManager.isReady(projectConfig.getScm()))
-        {
-            throw new ScmException("Unable to determine revisions: scm is not ready.");
-        }
-
         List<Revision> result;
         Revision latestBuiltRevision;
 

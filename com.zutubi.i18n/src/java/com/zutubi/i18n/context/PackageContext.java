@@ -46,7 +46,6 @@ public class PackageContext implements Context
         return packageName;
     }
 
-
     public boolean equals(Object o)
     {
         if (this == o)
@@ -59,13 +58,7 @@ public class PackageContext implements Context
         }
 
         final PackageContext packageContext = (PackageContext) o;
-
-        if (packageName != null ? !packageName.equals(packageContext.packageName) : packageContext.packageName != null)
-        {
-            return false;
-        }
-
-        return true;
+        return !(packageName != null ? !packageName.equals(packageContext.packageName) : packageContext.packageName != null);
     }
 
     public int hashCode()

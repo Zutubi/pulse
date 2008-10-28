@@ -2,17 +2,17 @@ package com.zutubi.pulse.master.model;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
-import com.zutubi.tove.annotations.Transient;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.annotations.Transient;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -167,11 +167,6 @@ public class ChangelistIsolatorTest extends PulseTestCase
         isolator.setScmManager(new ScmManager()
         {
             public void pollActiveScms() { }
-
-            public boolean isReady(ScmConfiguration scm)
-            {
-                return true;
-            }
 
             public ScmContext createContext(long projectId, ScmConfiguration scm) throws ScmException
             {

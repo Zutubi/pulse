@@ -5,8 +5,8 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
@@ -15,9 +15,9 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -399,12 +399,6 @@ public class BuildController implements EventListener
         ScmClient client = null;
         try
         {
-            if (!scmManager.isReady(scm))
-            {
-                //TODO: really need to prevent this call being made when the scm is not ready.  
-                throw new ScmException("scm is not ready");
-            }
-            
             client = scmManager.createClient(scm);
             ScmContext scmContext = scmManager.createContext(project.getId(), scm);
             boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
@@ -692,7 +686,7 @@ public class BuildController implements EventListener
             ScmConfiguration scm = projectConfig.getScm();
             Revision previousRevision = buildManager.getPreviousRevision(project);
 
-            if (previousRevision != null && scmManager.isReady(scm))
+            if (previousRevision != null)
             {
                 ScmClient client = null;
                 try

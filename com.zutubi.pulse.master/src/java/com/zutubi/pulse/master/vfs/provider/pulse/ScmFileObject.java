@@ -77,10 +77,6 @@ public class ScmFileObject extends AbstractPulseFileObject
             try
             {
                 ScmConfiguration scm = getAncestor(ScmProvider.class).getScm();
-                if (!scmManager.isReady(scm))
-                {
-                    throw new ScmException("scm is not ready");
-                }
 
                 long projectId = getAncestor(ProjectConfigProvider.class).getProjectConfig().getProjectId();
                 ScmContext context = scmManager.createContext(projectId, scm);

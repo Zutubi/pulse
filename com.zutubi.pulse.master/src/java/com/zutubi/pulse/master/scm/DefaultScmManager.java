@@ -17,10 +17,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Constants;
-import com.zutubi.util.Pair;
-import com.zutubi.util.Predicate;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -108,19 +105,32 @@ public class DefaultScmManager implements ScmManager
 
     private List<ProjectConfiguration> getActiveProjects()
     {
-        return CollectionUtils.filter(projectManager.getAllProjectConfigs(false), new Predicate<ProjectConfiguration>()
+        List<Project> filteredProjects = CollectionUtils.filter(projectManager.getProjects(false), new Predicate<Project>()
         {
-            public boolean satisfied(ProjectConfiguration project)
+            public boolean satisfied(Project project)
             {
-                ScmConfiguration scm = project.getScm();
+                if (project == null || !project.getState().isInitialised())
+                {
+                    return false;
+                }
+
+                ScmConfiguration scm = project.getConfig().getScm();
                 // check a) sanity and b) pollability.
-                if (scm == null || !(scm instanceof Pollable) || !isReady(scm))
+                if (scm == null || !(scm instanceof Pollable))
                 {
                     return false;
                 }
 
                 // check c) monitoring is enabled.
                 return ((Pollable) scm).isMonitor();
+            }
+        });
+        
+        return CollectionUtils.map(filteredProjects, new Mapping<Project, ProjectConfiguration>()
+        {
+            public ProjectConfiguration map(Project project)
+            {
+                return project.getConfig();
             }
         });
     }
@@ -297,11 +307,6 @@ public class DefaultScmManager implements ScmManager
                 return false;
             }
         }
-        return true;
-    }
-
-    public boolean isReady(ScmConfiguration scm)
-    {
         return true;
     }
 

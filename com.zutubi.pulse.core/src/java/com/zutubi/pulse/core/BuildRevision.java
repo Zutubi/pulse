@@ -2,7 +2,6 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.scm.api.Revision;
 
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -40,12 +39,7 @@ public class BuildRevision
      * Must be held to update or fix this revision, or to take decisions
      * based on whether the revision is fixed.
      */
-    private Lock lock = new ReentrantLock();
-    /**
-     * Positive when {@link #lock} is locked, used to enforce locking on
-     * callers.
-     */
-    private int lockEntries = 0;
+    private ReentrantLock lock = new ReentrantLock();
 
     /**
      * Construct a new revision that will be determined lazily.
@@ -151,7 +145,6 @@ public class BuildRevision
     public void lock()
     {
         lock.lock();
-        lockEntries++;
     }
 
     /**
@@ -163,15 +156,15 @@ public class BuildRevision
     public void unlock()
     {
         lock.unlock();
-        lockEntries--;
     }
 
     /**
-     * @return true iff this revision is currently locked
+     * @return true iff this revision is currently locked by the calling
+     *         thread
      */
     public boolean isLocked()
     {
-        return lockEntries > 0;
+        return lock.isHeldByCurrentThread();
     }
 
     private void checkLocked()

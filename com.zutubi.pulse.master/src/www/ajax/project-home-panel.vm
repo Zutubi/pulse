@@ -83,15 +83,15 @@
                     <th class="content-row">
                         #wwtext("name=state")
                     </th>
-                    <td #if($project.isPaused()) class="note" #else class="content" #end>
-                        $project.state.toString().toLowerCase()&nbsp;
+                    <td #if($paused) class="note" #else class="content" #end>
+                        $project.state.toString()&nbsp;
 #auth("resource=project" "action=pause")
-            #if($project.isPaused())
+            #if($resumable)
                         <a class="unadorned" href="$base/projectState.action?projectName=$u_projectName&amp;pause=false">
                             <img style="vertical-align: top" src="$base/images/control_play_blue.gif"/>
                             #wwtext("name=resume")
                         </a>
-            #else
+            #elseif($pausable)
                         <a class="unadorned" href="$base/projectState.action?projectName=$u_projectName&amp;pause=true">
                             <img src="$base/images/control_pause_blue.gif"/>
                             #wwtext("name=pause")

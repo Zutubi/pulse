@@ -3,10 +3,6 @@ package com.zutubi.pulse.master.model.persistence.hibernate;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 
-/**
- * 
- *
- */
 public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 {
     private ProjectDao projectDao;
@@ -27,7 +23,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
     {
         Project project = new Project();
         project.setLastPollTime((long)33442);
-        project.pause();
 
         projectDao.save(project);
 

@@ -16,12 +16,17 @@ import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
-import com.zutubi.pulse.master.events.build.*;
+import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
+import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
+import com.zutubi.pulse.master.project.ProjectInitialisationService;
+import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scm.ScmManager;
@@ -30,6 +35,7 @@ import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
@@ -47,12 +53,17 @@ import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
 
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
+
+    private static final Map<Project.Transition, String> TRANSITION_TO_ACTION_MAP = new HashMap<Project.Transition, String>();
 
     private ProjectDao projectDao;
     private TestCaseIndexDao testCaseIndexDao;
@@ -68,11 +79,21 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private TypeRegistry typeRegistry;
     private ConfigurationTemplateManager configurationTemplateManager;
     private AccessManager accessManager;
+    private ProjectInitialisationService projectInitialisationService;
 
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
     private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
     private List<ProjectConfiguration> validConfigs = new LinkedList<ProjectConfiguration>();
     private Map<String, Set<ProjectConfiguration>> labelToConfigs = new HashMap<String, Set<ProjectConfiguration>>();
+
+    private ConcurrentMap<Long, ReentrantLock> projectStateLocks = new ConcurrentHashMap<Long, ReentrantLock>();
+
+    static
+    {
+        TRANSITION_TO_ACTION_MAP.put(Project.Transition.DELETE, AccessManager.ACTION_DELETE);
+        TRANSITION_TO_ACTION_MAP.put(Project.Transition.PAUSE, ProjectConfigurationActions.ACTION_PAUSE);
+        TRANSITION_TO_ACTION_MAP.put(Project.Transition.RESUME, ProjectConfigurationActions.ACTION_PAUSE);
+    }
 
     private void registerConfigListener(ConfigurationProvider configurationProvider)
     {
@@ -81,6 +102,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             public void postInsert(ProjectConfiguration instance)
             {
+                // The project instance created in this transaction needs the
+                // config wired in manually, as it was not in idToConfig when
+                // the project was created.
+                projectDao.findById(instance.getProjectId()).setConfig(instance);
                 registerProjectConfig(instance);
             }
 
@@ -119,7 +144,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         addProjectAuthorisation.setProjectManager(this);
         licenseManager.addAuthorisation(addProjectAuthorisation);
 
-        updateProjects();
+        initialiseProjects();
 
         // create default project if it is required.
         ensureDefaultProjectDefined();
@@ -138,7 +163,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 globalProject.setName(GLOBAL_PROJECT_NAME);
                 globalProject.setDescription("The global template is the base of the project template hierarchy.  Configuration shared among all projects should be added here.");
                 globalProject.setPermanent(true);
-                
+
                 // All users can view all projects by default.
                 AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_VIEW));
@@ -147,7 +172,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 // when anonymous access is explicitly enabled).
                 group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_VIEW));
-                
+
                 // Project admins can do just that
                 group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.PROJECT_ADMINS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_ADMINISTER));
@@ -160,7 +185,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 cleanupConfiguration.setUnit(CleanupUnit.BUILDS);
                 Map<String, CleanupConfiguration> cleanupMap = new HashMap<String, CleanupConfiguration>();
                 cleanupMap.put("default", cleanupConfiguration);
-                globalProject.getExtensions().put("cleanup", cleanupMap);               
+                globalProject.getExtensions().put("cleanup", cleanupMap);
 
                 CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
                 MutableRecord globalTemplate = projectType.unstantiate(globalProject);
@@ -191,14 +216,53 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    public Object getState(long id)
+    public Project getState(long id)
     {
         return projectDao.findById(id);
     }
 
-    private void updateProjects()
+    private ReentrantLock getProjectStateLock(long projectId)
     {
-        for(ProjectConfiguration config: configurationProvider.getAll(ProjectConfiguration.class))
+        ReentrantLock lock = projectStateLocks.get(projectId);
+        // If a lock already exists it will never change, so this null check is
+        // safe despite not being atomic.
+        if (lock == null)
+        {
+            // We may race with another thread to create the lock but only one
+            // will win and both will end up with the same lock.  This is why
+            // we must lookup the value in the map rather than presume ours was
+            // the one that was added.
+            projectStateLocks.putIfAbsent(projectId, new ReentrantLock());
+            lock = projectStateLocks.get(projectId);
+        }
+
+        return lock;
+    }
+
+    public boolean isProjectStateLocked(long projectId)
+    {
+        return getProjectStateLock(projectId).isHeldByCurrentThread();
+    }
+
+    public void lockProjectState(long projectId)
+    {
+        getProjectStateLock(projectId).lock();
+    }
+
+    public void unlockProjectState(long projectId)
+    {
+        getProjectStateLock(projectId).unlock();
+    }
+
+    private void initialiseProjects()
+    {
+        // Restore project states that are out of sync due to unclean shutdown.
+        for (Project project: projectDao.findAll())
+        {
+            makeStateTransition(project, Project.Transition.STARTUP);
+        }
+        
+        for (ProjectConfiguration config: configurationProvider.getAll(ProjectConfiguration.class))
         {
             registerProjectConfig(config);
         }
@@ -210,6 +274,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         idToConfig.put(projectConfig.getProjectId(), projectConfig);
         if(configurationTemplateManager.isDeeplyValid(projectConfig.getConfigurationPath()))
         {
+            initialiseProject(projectConfig);
             validConfigs.add(projectConfig);
 
             for(LabelConfiguration label: projectConfig.getLabels())
@@ -222,6 +287,19 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 }
 
                 projects.add(projectConfig);
+            }
+        }
+    }
+
+    public void initialiseProject(ProjectConfiguration projectConfig)
+    {
+        long id = projectConfig.getProjectId();
+        if (id != 0)
+        {
+            Project project = getProject(id, false);
+            if (project != null && project.getState() == Project.State.INITIAL)
+            {
+                makeStateTransition(project, Project.Transition.INITIALISE);
             }
         }
     }
@@ -390,12 +468,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public void delete(Project project)
     {
-        project = getProject(project.getId(), true);
-        if (project != null)
-        {
-            deleteProject(project);
-        }
-
+        makeStateTransition(project.getId(), Project.Transition.DELETE);
         licenseManager.refreshAuthorisations();
     }
 
@@ -418,26 +491,17 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(projectConfig.getScm(), scmManager);
                     if(capabilities.contains(ScmCapability.REVISIONS))
                     {
-                        if (scmManager.isReady(projectConfig.getScm()))
-                        {
                             List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
                             for(Revision r: revisions)
                             {
                                 // Note when isolating changelists we never replace existing requests
                                 requestBuildOfRevision(reason, project, r, source, false);
                             }
-                        }
-                        else
-                        {
-                            LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() +
-                                    "' as the SCM does not support revisions");
-                            requestBuildFloating(reason, project, source, replaceable);
-                        }
                     }
                     else
                     {
                         LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() +
-                                "' as the SCM is not ready to calculate the changelists");
+                                "' as the SCM does not support revisions");
                         requestBuildFloating(reason, project, source, replaceable);
                     }
                 }
@@ -511,26 +575,65 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return type.getPulseFile(projectConfig, revision, patch);
     }
 
-    public Project pauseProject(Project project)
+    private boolean makeStateTransition(Project project, Project.Transition transition)
     {
-        project = getProject(project.getId(), true);
-        if (project != null)
+        ensureTransitionPermission(project, transition);
+        
+        lockProjectState(project.getId());
+        try
         {
-            project.pause();
-            projectDao.save(project);
-        }
+            if (project.isTransitionValid(transition))
+            {
+                Project.State state = project.stateTransition(transition);
+                projectDao.save(project);
+                
+                switch (state)
+                {
+                    case INITIALISING:
+                    {
+                        projectInitialisationService.requestInitialisation(project.getConfig());
+                        break;
+                    }
+                    case DELETING:
+                    {
+                        deleteProject(project);
+                        break;
+                    }
+                }
 
-        return project;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        finally
+        {
+            unlockProjectState(project.getId());
+        }
     }
 
-    public void resumeProject(Project project)
+    private void ensureTransitionPermission(Project project, Project.Transition transition)
     {
-        project = getProject(project.getId(), true);
+        String actionName = TRANSITION_TO_ACTION_MAP.get(transition);
+        if (actionName == null)
+        {
+            actionName = AccessManager.ACTION_WRITE;
+        }
+
+        accessManager.ensurePermission(actionName, project);
+    }
+
+    public boolean makeStateTransition(long projectId, Project.Transition transition)
+    {
+        Project project = getProject(projectId, true);
         if (project != null)
         {
-            project.resume();
-            projectDao.save(project);
+            return makeStateTransition(project, transition);
         }
+
+        return false;
     }
 
     public void setProjectDao(ProjectDao dao)
@@ -650,20 +753,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         state.setConfig(projectConfiguration);
     }
 
-    private void handleBuildActivated(BuildActivatedEvent event)
-    {
-        AbstractBuildRequestEvent buildRequestEvent = event.getEvent();
-        if (!buildRequestEvent.isPersonal())
-        {
-            Project project = getProject(buildRequestEvent.getOwner().getId(), true);
-            if (project != null)
-            {
-                project.buildCommenced();
-                projectDao.save(project);
-            }
-        }
-    }
-
     private void handleBuildCompleted(BuildCompletedEvent event)
     {
         BuildResult buildResult = event.getBuildResult();
@@ -672,7 +761,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             Project project = getProject(buildResult.getProject().getId(), true);
             if (project != null)
             {
-                project.buildCompleted();
                 project.setBuildCount(project.getBuildCount() + 1);
                 if (buildResult.succeeded())
                 {
@@ -701,13 +789,15 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
+    private void handleInitialisationCompleted(ProjectInitialisationCompletedEvent event)
+    {
+        Project.Transition transition = event.isSuccessful() ? Project.Transition.INITIALISE_SUCCESS : Project.Transition.INITIALISE_FAILURE;
+        makeStateTransition(event.getProjectConfiguration().getProjectId(), transition);
+    }
+
     public void handleEvent(Event evt)
     {
-        if (evt instanceof BuildActivatedEvent)
-        {
-            handleBuildActivated((BuildActivatedEvent) evt);
-        }
-        else if (evt instanceof BuildCompletedEvent)
+        if (evt instanceof BuildCompletedEvent)
         {
             handleBuildCompleted((BuildCompletedEvent) evt);
         }
@@ -715,22 +805,30 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             handleRecipeAssigned((RecipeAssignedEvent) evt);
         }
+        else if (evt instanceof ProjectInitialisationCompletedEvent)
+        {
+            handleInitialisationCompleted((ProjectInitialisationCompletedEvent) evt);
+        }
         else if(evt instanceof ConfigurationEventSystemStartedEvent)
         {
             ConfigurationEventSystemStartedEvent cesse = (ConfigurationEventSystemStartedEvent) evt;
             registerConfigListener(cesse.getConfigurationProvider());
         }
-        else
+        else if (evt instanceof ConfigurationSystemStartedEvent)
         {
             initialise();
+        }
+        else
+        {
+            LOG.severe("Project manager received unexpected event, ignoring: " + evt);
         }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { BuildActivatedEvent.class,
-                             BuildCompletedEvent.class,
+        return new Class[] { BuildCompletedEvent.class,
                              RecipeAssignedEvent.class,
+                             ProjectInitialisationCompletedEvent.class,
                              ConfigurationEventSystemStartedEvent.class,
                              ConfigurationSystemStartedEvent.class };
     }
@@ -784,5 +882,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setAgentStateDao(AgentStateDao agentStateDao)
     {
         this.agentStateDao = agentStateDao;
+    }
+
+    public void setProjectInitService(ProjectInitialisationService projectInitialisationService)
+    {
+        this.projectInitialisationService = projectInitialisationService;
     }
 }

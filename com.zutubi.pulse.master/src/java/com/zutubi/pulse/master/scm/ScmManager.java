@@ -15,15 +15,4 @@ public interface ScmManager extends ScmContextFactory, ScmClientFactory<ScmConfi
      * ready, implements the pollable interface, and has monitoring enabled.
      */
     void pollActiveScms();
-
-    /**
-     * Returns true if the scm is ready to be used.  That is, if its initialisation
-     * has successfully completed.  An scm needs to be 'ready' before is ScmContext
-     * is valid and usable.
-     *
-     * @param scm configuration of the scm being queried.
-     *
-     * @return true if ready, false otherwise.
-     */
-    boolean isReady(ScmConfiguration scm);
 }

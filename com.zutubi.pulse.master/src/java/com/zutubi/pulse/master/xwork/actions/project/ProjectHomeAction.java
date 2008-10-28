@@ -17,6 +17,9 @@ public class ProjectHomeAction extends ProjectActionBase
     private int totalBuilds;
     private int successfulBuilds;
     private int failedBuilds;
+    private boolean paused;
+    private boolean pausable;
+    private boolean resumable;
     private BuildResult currentBuild;
     private List<PersistentChangelist> latestChanges;
     private List<BuildResult> recentBuilds;
@@ -41,6 +44,21 @@ public class ProjectHomeAction extends ProjectActionBase
     public int getErrorBuilds()
     {
         return totalBuilds - successfulBuilds - failedBuilds;
+    }
+
+    public boolean isPaused()
+    {
+        return paused;
+    }
+
+    public boolean isPausable()
+    {
+        return pausable;
+    }
+
+    public boolean isResumable()
+    {
+        return resumable;
     }
 
     public int getPercent(int quotient, int divisor)
@@ -109,6 +127,10 @@ public class ProjectHomeAction extends ProjectActionBase
     public String execute()
     {
         Project project = getRequiredProject();
+        
+        paused = project.getState() == Project.State.PAUSED;
+        pausable = project.isTransitionValid(Project.Transition.PAUSE);
+        resumable = project.isTransitionValid(Project.Transition.RESUME);
 
         totalBuilds = buildManager.getBuildCount(project, ResultState.getCompletedStates());
         successfulBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS});

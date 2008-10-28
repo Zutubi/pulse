@@ -221,21 +221,37 @@ public class FatController implements EventListener, Stoppable
             return;
         }
 
-        Project project = projectManager.getProject(event.getProjectConfig().getProjectId(), false);
-        if (!event.isPersonal() && project.isPaused())
-        {
-            // Ignore build requests while project is paused
-            return;
-        }
-
-        lock.lock();
+        long projectId = event.getProjectConfig().getProjectId();
+        projectManager.lockProjectState(projectId);
         try
         {
-            buildQueue.buildRequested(event);
+            Project project = projectManager.getProject(projectId, false);
+            if (!project.getState().acceptTrigger(event.isPersonal()))
+            {
+                // Ignore build requests while project is not able to be built
+                // (e.g. if it is pausing).
+                return;
+            }
+
+            lock.lock();
+            boolean newlyActive = !event.isPersonal() && buildQueue.getActiveBuildCount(project) == 0;
+            try
+            {
+                buildQueue.buildRequested(event);
+            }
+            finally
+            {
+                lock.unlock();
+            }
+
+            if (newlyActive)
+            {
+                projectManager.makeStateTransition(projectId, Project.Transition.BUILDING);
+            }
         }
         finally
         {
-            lock.unlock();
+            projectManager.unlockProjectState(projectId);
         }
     }
 
@@ -246,19 +262,44 @@ public class FatController implements EventListener, Stoppable
 
     private void handleBuildCompleted(BuildCompletedEvent event)
     {
-        lock.lock();
+        BuildResult buildResult = event.getBuildResult();
+        long projectId = buildResult.getProject().getId();
+
+        if (!buildResult.isPersonal())
+        {
+            projectManager.lockProjectState(projectId);
+        }
+
+        boolean newlyIdle = false;
         try
         {
-            final BuildResult buildResult = event.getBuildResult();
-            buildQueue.buildCompleted(buildResult.getOwner(), buildResult.getId());
-            if (buildQueue.getActiveBuildCount() == 0)
+            lock.lock();
+            try
             {
-                stoppedCondition.signalAll();
+                buildQueue.buildCompleted(event.getBuildResult().getOwner(), event.getBuildResult().getId());
+                newlyIdle = !buildResult.isPersonal() && buildQueue.getActiveBuildCount(buildResult.getProject()) == 0;
+
+                if (buildQueue.getActiveBuildCount() == 0)
+                {
+                    stoppedCondition.signalAll();
+                }
+            }
+            finally
+            {
+                lock.unlock();
             }
         }
         finally
         {
-            lock.unlock();
+            if (newlyIdle)
+            {
+                projectManager.makeStateTransition(projectId, Project.Transition.IDLE);
+            }
+
+            if (!buildResult.isPersonal())
+            {
+                projectManager.unlockProjectState(projectId);
+            }
         }
     }
 

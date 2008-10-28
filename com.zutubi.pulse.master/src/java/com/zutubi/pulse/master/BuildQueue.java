@@ -75,6 +75,17 @@ public class BuildQueue
     }
 
     /**
+     * Lookup the number of active builds for an entity.
+     *
+     * @param owner the entity to look up by
+     * @return the number of active builds for the given entity
+     */
+    public int getActiveBuildCount(Entity owner)
+    {
+        return lookupQueueForOwner(owner).getActiveBuildCount();
+    }
+
+    /**
      * @return the total number of active builds for all owners
      */
     public int getActiveBuildCount()

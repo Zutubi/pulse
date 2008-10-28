@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmLocation;
@@ -19,13 +18,14 @@ import com.zutubi.pulse.master.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.*;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
@@ -1590,13 +1590,33 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Retrieves the state of the given project.  Possible states include:
+     * <ul>
+     *   <li>initialising</li>
+     *   <li>idle</li>
+     *   <li>building</li>
+     *   <li>paused</li>
+     *   <li>initialise on idle</li>
+     *   <li>pause on idle</li>
+     * </ul>
+     * <p/>
+     * The user indicated by the token must have permission to view the
+     * project.
+     *
+     * @param token        authentication token (see {@link #login})
+     * @param projectName  name of the project to retrieve the state for
+     * @return the current project state
+     * @throws AuthenticationException if the given token is invalid
+     * @throws IllegalArgumentException if the project name is invalid
+     */
     public String getProjectState(String token, String projectName) throws AuthenticationException
     {
         tokenManager.loginUser(token);
         try
         {
             Project project = internalGetProject(projectName, true);
-            return project.getState().toString().toLowerCase();
+            return project.getState().toString();
         }
         finally
         {
@@ -1631,43 +1651,73 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Pauses the given project.  When a project is paused, new triggers are
+     * ignored.  If the project is currently building, it will be marked to
+     * pause on idle.  If it is currently initialising, this request is
+     * ignored.
+     *
+     * @param token       authentication token (see {@link #login})
+     * @param projectName name of the project to pause
+     * @return true if the project was paused (or marked for pause on idle),
+     *         false if pausing is not possible in the current project state
+     * @throws AuthenticationException if the given token is invalid
+     * @throws IllegalArgumentException if the project name is invalid
+     * @throws AccessDeniedException if the user indicated by the token does
+     *                               not have pause authority for the project
+     *
+     * @see #resumeProject(String, String)
+     */
     public boolean pauseProject(String token, String projectName) throws AuthenticationException
     {
-        try
-        {
-            tokenManager.loginUser(token);
-            Project project = internalGetProject(projectName, true);
-            if (project.isPaused())
-            {
-                return false;
-            }
-            else
-            {
-                projectManager.pauseProject(project);
-                return true;
-            }
-        }
-        finally
-        {
-            tokenManager.logoutUser();
-        }
+        return doProjectStateTransition(token, projectName, Project.Transition.PAUSE);
     }
 
+    /**
+     * Resumes the given project if it is currently paused.
+     *
+     * @param token       authentication token (see {@link #login})
+     * @param projectName name of the project to resume
+     * @return true if the project was resumed, false if resuming is not
+     *         possible in the current project state
+     * @throws AuthenticationException if the given token is invalid
+     * @throws IllegalArgumentException if the project name is invalid
+     * @throws AccessDeniedException if the user indicated by the token does
+     *                               not have pause authority for the project
+     */
     public boolean resumeProject(String token, String projectName) throws AuthenticationException
+    {
+        return doProjectStateTransition(token, projectName, Project.Transition.RESUME);
+    }
+
+    /**
+     * Requests initialisation of the given project.  This will force the
+     * project to repeat the initialisation cycle from ther beginning, even if
+     * it was already successfully initialised.  If the project is currently
+     * building, it will be marked to initialise on idle.
+     *
+     * @param token       authentication token (see {@link #login})
+     * @param projectName name of the project to initialise
+     * @return true if initialisation was requested for the project (or it was
+     *         marked initialise on idle), false if initialising is not
+     *         possible in the current project state
+     * @throws AuthenticationException if the given token is invalid
+     * @throws IllegalArgumentException if the project name is invalid
+     * @throws AccessDeniedException if the user indicated by the token does
+     *                               not have write authority for the project
+     */
+    public boolean initialiseProject(String token, String projectName) throws AuthenticationException
+    {
+        return doProjectStateTransition(token, projectName, Project.Transition.INITIALISE);
+    }
+
+    private boolean doProjectStateTransition(String token, String projectName, Project.Transition transition) throws AuthenticationException
     {
         try
         {
             tokenManager.loginUser(token);
             Project project = internalGetProject(projectName, true);
-            if (project.isPaused())
-            {
-                projectManager.resumeProject(project);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return projectManager.makeStateTransition(project.getId(), transition);
         }
         finally
         {

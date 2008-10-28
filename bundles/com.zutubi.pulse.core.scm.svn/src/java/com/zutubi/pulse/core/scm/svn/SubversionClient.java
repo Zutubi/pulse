@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.PathFilter;
 import com.zutubi.pulse.core.scm.ScmPathFilter;
 import com.zutubi.pulse.core.scm.api.*;
@@ -14,6 +14,7 @@ import com.zutubi.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -115,6 +116,7 @@ public class SubversionClient implements ScmClient
         // Initialise SVN library
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
+        FSRepositoryFactory.setup();
         SVNAdminAreaFactory.setUpgradeEnabled(false);
         
         this.url = url;

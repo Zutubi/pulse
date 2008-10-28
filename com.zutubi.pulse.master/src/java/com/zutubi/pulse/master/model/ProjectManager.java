@@ -54,13 +54,62 @@ public interface ProjectManager extends EntityManager<Project>
 
     void abortUnfinishedBuilds(Project project, String message);
 
-    @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE)
-    Project pauseProject(Project project);
+    /**
+     * Acquires a lock on the state for the given project.  The lock must be
+     * held when performing compound logic involving the project state.  The
+     * lock is exclusive and reentrant.
+     *
+     * @param projectId identifier of the project to lock the state for
+     *
+     * @see #unlockProjectState(long)
+     * @see #isProjectStateLocked(long)
+     */
+    void lockProjectState(long projectId);
 
-    @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE)
-    void resumeProject(Project project);
+    /**
+     * Releases a lock on the state for the given project.  The caller must
+     * currently hold the lock.
+     *
+     * @param projectId identifier of the project to unlock the state for
+     *
+     * @see #lockProjectState(long)
+     * @see #isProjectStateLocked(long)
+     */
+    void unlockProjectState(long projectId);
 
-    @SecureParameter(action = AccessManager.ACTION_DELETE)
+    /**
+     * Indicates if the calling thread holds the state lock for the given
+     * project.
+     *
+     * @param projectId identifier of the project to test the state lock of
+     * @return true iff the given project's state lock is held by the calling
+     *         thread
+     */
+    boolean isProjectStateLocked(long projectId);
+
+    /**
+     * Performs a state transition on a project if possible.  This is the only
+     * way that a project state should be updated, to avoid race conditions.
+     * This operation is atomic via use of the state lock: the implementation
+     * itself does the necessary locking so the caller is not required to do
+     * so.  In cases where the caller needs to inspect the state first or
+     * perform other operations atomically with the transition, however, the
+     * caller should increase the scope of the locking as required using
+     * {@link #lockProjectState(long)}.  State locks are reentrant to allow
+     * this pattern.
+     * <p/>
+     * If the project transitions into a state which requires further action,
+     * the project manager will initiate that action after updating the state.
+     * For example, making the {@link com.zutubi.pulse.master.model.Project.Transition#DELETE}
+     * transition will lead to the project state being deleted.
+     *
+     * @param projectId  identifier of the project to update
+     * @param transition the transition to make
+     * @return true iff the project was found and the transition successfully
+     *         made
+     */
+    boolean makeStateTransition(long projectId, Project.Transition transition);
+
     void delete(Project project);
 
     void save(Project project);

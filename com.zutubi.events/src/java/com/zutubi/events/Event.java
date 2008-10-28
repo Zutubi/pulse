@@ -15,6 +15,11 @@ public class Event
     protected final long id;
     protected transient List<Exception> exceptions;
 
+    /**
+     * Create a new event.
+     *
+     * @param source the source that is raising the event
+     */
     public Event(Object source)
     {
         this.source = source;

@@ -2,17 +2,19 @@ package com.zutubi.pulse.master.agent;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.events.AgentPingEvent;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
+import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * results are sent by the timeout even if the pinging thread is still
  * awaiting a response from a remote agent).
  */
-public class AgentPingService implements Stoppable
+public class AgentPingService extends BackgroundServiceSupport
 {
     public static final String PROPERTY_AGENT_PING_INTERVAL = "pulse.agent.ping.interval";
     public static final String PROPERTY_AGENT_PING_TIMEOUT = "pulse.agent.ping.timeout";
@@ -30,13 +32,15 @@ public class AgentPingService implements Stoppable
 
     private static final Logger LOG = Logger.getLogger(AgentPingService.class);
     private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
-    private final AtomicInteger nextId = new AtomicInteger(1);
-    private ExecutorService threadPool;
     private Lock inProgressLock = new ReentrantLock();
     private Set<Long> inProgress = new HashSet<Long>();
     private EventManager eventManager;
     private MasterLocationProvider masterLocationProvider;
-    private ThreadFactory threadFactory;
+
+    public AgentPingService()
+    {
+        super("Agent Ping");
+    }
 
     public static int getAgentPingInterval()
     {
@@ -46,32 +50,6 @@ public class AgentPingService implements Stoppable
     public static int getAgentPingTimeout()
     {
         return Integer.getInteger(PROPERTY_AGENT_PING_TIMEOUT, 45);
-    }
-
-    public void init()
-    {
-        threadPool = Executors.newCachedThreadPool(new ThreadFactory()
-        {
-            public Thread newThread(Runnable r)
-            {
-                Thread t = threadFactory.newThread(r);
-                t.setDaemon(true);
-                t.setName("Agent ping service worker " + nextId.getAndIncrement());
-                return t;
-            }
-        });
-    }
-
-    public void stop(boolean force)
-    {
-        if (force)
-        {
-            threadPool.shutdownNow();
-        }
-        else
-        {
-            threadPool.shutdown();
-        }
     }
 
     /**
@@ -138,6 +116,7 @@ public class AgentPingService implements Stoppable
     {
         // Directly submit the ping to the pool for execution.  Note that
         // this thread may be stuck until a network timeout.
+        ExecutorService threadPool = getExecutorService();
         final Future<SlaveStatus> future = threadPool.submit(new AgentPing(agent, agentService, masterBuildNumber, masterLocationProvider.getMasterUrl()));
 
         // Run a second thread to wait for up to the agent ping timeout for
@@ -185,10 +164,5 @@ public class AgentPingService implements Stoppable
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
-    }
-
-    public void setThreadFactory(ThreadFactory threadFactory)
-    {
-        this.threadFactory = threadFactory;
     }
 }

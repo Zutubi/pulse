@@ -23,18 +23,35 @@ class ProjectStateCleanupTask extends DatabaseStateCleanupTaskSupport
 
     public void cleanupState()
     {
-        Project project = projectManager.getProject(instance.getProjectId(), true);
-        if (project != null)
-        {
-            // We need to make sure that the project is not building first,
-            // so pause it and wait for the state to become paused.
-            project = projectManager.pauseProject(project);
-            if(project.getState() != Project.State.PAUSED)
-            {
-                throw new ToveRuntimeException("Unable to delete project as a build is running.  The project may be deleted when the build completes (consider pausing the project).");
-            }
+        long projectId = instance.getProjectId();
 
-            projectManager.delete(project);
+        projectManager.lockProjectState(projectId);
+        try
+        {
+            Project project = projectManager.getProject(projectId, true);
+            if (project != null)
+            {
+                if (project.isTransitionValid(Project.Transition.DELETE))
+                {
+                    projectManager.delete(project);
+                }
+                else
+                {
+                    Project.State state = project.getState();
+                    if (state.isBuilding())
+                    {
+                        throw new ToveRuntimeException("Unable to delete project as a build is running.  The project may be deleted when it becomes idle (consider pausing the project).");
+                    }
+                    else
+                    {
+                        throw new ToveRuntimeException("Unable to delete project while in state '" + state + "'");
+                    }
+                }
+            }
+        }
+        finally
+        {
+            projectManager.unlockProjectState(projectId);
         }
     }
 }

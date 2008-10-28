@@ -22,16 +22,7 @@ public class ProjectStateAction extends ProjectActionBase
     public String execute() throws Exception
     {
         Project project = getRequiredProject();
-
-        if (pause)
-        {
-            projectManager.pauseProject(project);
-        }
-        else
-        {
-            projectManager.resumeProject(project);
-        }
-
+        projectManager.makeStateTransition(project.getId(), pause ? Project.Transition.PAUSE : Project.Transition.RESUME);
         return SUCCESS;
     }
 }

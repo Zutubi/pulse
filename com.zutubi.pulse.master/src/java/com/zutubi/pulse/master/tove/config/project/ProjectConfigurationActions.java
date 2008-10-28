@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.tove.annotations.Permission;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
+import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.security.AccessManager;
@@ -17,6 +17,7 @@ import com.zutubi.util.logging.Logger;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Action links for the project config page.
@@ -26,6 +27,7 @@ public class ProjectConfigurationActions
     public static final String ACTION_CANCEL_BUILD         = "cancel build";
     public static final String ACTION_CONVERT_TO_CUSTOM    = "convertToCustom";
     public static final String ACTION_CONVERT_TO_VERSIONED = "convertToVersioned";
+    public static final String ACTION_INITIALISE           = "initialise";
     public static final String ACTION_PAUSE                = "pause";
     public static final String ACTION_RESUME               = "resume";
     public static final String ACTION_VIEW_SOURCE          = "view source";
@@ -48,18 +50,30 @@ public class ProjectConfigurationActions
         List<String> result = new LinkedList<String>();
         if (instance.isConcrete())
         {
-            result.add(ACTION_TRIGGER);
             result.add(ACTION_MARK_CLEAN);
             Project project = projectManager.getProject(instance.getProjectId(), true);
             if (project != null)
             {
-                if (project.isPaused())
+                Project.State state = project.getState();
+                if (state.acceptTrigger(false))
                 {
-                    result.add(ACTION_RESUME);
+                    result.add(ACTION_TRIGGER);
                 }
-                else
+
+                Set<Project.Transition> validTransitions = state.getValidTransitions().keySet();
+                if (validTransitions.contains(Project.Transition.INITIALISE))
+                {
+                    result.add(ACTION_INITIALISE);
+                }
+
+                if (validTransitions.contains(Project.Transition.PAUSE))
                 {
                     result.add(ACTION_PAUSE);
+                }
+
+                if (validTransitions.contains(Project.Transition.RESUME))
+                {
+                    result.add(ACTION_RESUME);
                 }
             }
         }
@@ -98,6 +112,12 @@ public class ProjectConfigurationActions
         return null;
     }
 
+    @Permission(AccessManager.ACTION_WRITE)
+    public void doInitialise(ProjectConfiguration projectConfig)
+    {
+        projectManager.makeStateTransition(projectConfig.getProjectId(), Project.Transition.INITIALISE);
+    }
+
     @Permission(ACTION_TRIGGER)
     public void doTrigger(ProjectConfiguration projectConfig)
     {
@@ -111,21 +131,13 @@ public class ProjectConfigurationActions
     @Permission(ACTION_PAUSE)
     public void doPause(ProjectConfiguration projectConfig)
     {
-        Project project = projectManager.getProject(projectConfig.getProjectId(), true);
-        if (project != null)
-        {
-            projectManager.pauseProject(project);
-        }
+        projectManager.makeStateTransition(projectConfig.getProjectId(), Project.Transition.PAUSE);
     }
 
     @Permission(ACTION_PAUSE)
     public void doResume(ProjectConfiguration projectConfig)
     {
-        Project project = projectManager.getProject(projectConfig.getProjectId(), true);
-        if (project != null)
-        {
-            projectManager.resumeProject(project);
-        }
+        projectManager.makeStateTransition(projectConfig.getProjectId(), Project.Transition.RESUME);
     }
 
     public void doClean(ProjectConfiguration projectConfig)

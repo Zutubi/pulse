@@ -51,7 +51,7 @@ public class EntityBuildQueue
      * Queue of builds that have not yet become active, newest first.
      */
     private List<AbstractBuildRequestEvent> queuedBuilds = new LinkedList<AbstractBuildRequestEvent>();
-    private boolean stopped = false;
+    private volatile boolean stopped = false;
 
     private ObjectFactory objectFactory;
     private MasterConfigurationManager configurationManager;

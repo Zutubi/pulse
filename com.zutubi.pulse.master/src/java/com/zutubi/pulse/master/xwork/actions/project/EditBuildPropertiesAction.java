@@ -1,11 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.xwork.ActionContext;
-import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
-import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
-import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmClient;
@@ -14,18 +11,21 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
-import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationPanel;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationResponse;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
+import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
+import com.zutubi.tove.annotations.FieldType;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.NamedConfigurationComparator;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -152,7 +152,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         try
         {
             Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(scm, scmManager);
-            if(capabilities.contains(ScmCapability.REVISIONS) && scmManager.isReady(scm))
+            if(capabilities.contains(ScmCapability.REVISIONS))
             {
                 field.addParameter(ACTIONS, Arrays.asList("getlatest"));
                 field.addParameter(SCRIPTS, Arrays.asList("EditBuildPropertiesAction.getlatest"));

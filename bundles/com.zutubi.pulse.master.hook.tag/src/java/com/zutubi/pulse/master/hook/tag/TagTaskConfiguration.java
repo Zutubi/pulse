@@ -1,12 +1,7 @@
 package com.zutubi.pulse.master.hook.tag;
 
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wire;
-import com.zutubi.tove.annotations.Transient;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
@@ -16,6 +11,11 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
 
@@ -67,12 +67,6 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         }
 
         ScmConfiguration scm = buildResult.getProject().getConfig().getScm();
-        if (!scmManager.isReady(scm))
-        {
-            LOG.warning("Can not tag build result: Scm is not ready.");
-            return;
-        }
-
         ScmClient client = null;
         try
         {
