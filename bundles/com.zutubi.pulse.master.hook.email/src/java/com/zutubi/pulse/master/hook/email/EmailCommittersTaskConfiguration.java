@@ -100,10 +100,6 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
             ResultNotifier.RenderedResult rendered = ResultNotifier.renderResult(buildResult, globalConfiguration.getBaseUrl(), buildManager, buildResultRenderer, template);
             String mimeType = buildResultRenderer.getTemplateInfo(template, buildResult.isPersonal()).getMimeType();
             String subject = rendered.getSubject();
-            if (TextUtils.stringSet(emailConfiguration.getSubjectPrefix()))
-            {
-                subject = emailConfiguration.getSubjectPrefix() + " " + subject;
-            }
 
             EmailContactConfiguration.sendMail(emails, emailConfiguration, subject, mimeType, rendered.getContent());
         }
