@@ -4,15 +4,23 @@ import com.zutubi.i18n.bundle.DefaultBundleManager;
 import com.zutubi.i18n.context.*;
 
 /**
- * <class-comment/>
+ * The Messages object is a pre-configured entry point into the I18N messages
+ * package.
+ *
+ * By default, it supports message lookups using the PackageContext and the
+ * ExtendedClassContext.
+ *
+ * Custom contexts can be supported by adding customer ContextResolvers via the
+ * <code>addResolver</code> method. 
+ *
  */
 public class Messages
 {
-    private Object context;
-
     private static DefaultMessageHandler handler;
 
     private static StaticPackageContextResolver packages;
+
+    private Object context;
 
     private Messages(Object context)
     {
@@ -39,6 +47,7 @@ public class Messages
 
             DefaultBundleManager bundleManager = new DefaultBundleManager();
             bundleManager.addResolver(new ExtendedClassContextResolver());
+            bundleManager.addResolver(new ExtendedPackageContextResolver());
             bundleManager.addResolver(packages);
             bundleManager.setContextCache(getContextCache());
             handler = new DefaultMessageHandler(bundleManager);
@@ -49,7 +58,7 @@ public class Messages
     /**
      * Add a custom resolver to the I18N bundle manager.
      * 
-     * @param resolver
+     * @param resolver instance
      */
     public static void addResolver(ContextResolver resolver)
     {
@@ -91,7 +100,7 @@ public class Messages
         }
         else
         {
-            return new ExtendedClassContext(obj);
+            return new ClassContext(obj);
         }
     }
 

@@ -1,40 +1,26 @@
 package com.zutubi.i18n.context;
 
+import com.zutubi.util.UnaryProcedure;
+
 import java.util.*;
 
 /**
- * <class-comment/>
+ * Simplar to the ClassContext resolver, this resolver implementation applies the PackageContext
+ * resolver at the end of the resolution process.
  */
-public class ExtendedClassContextResolver implements ContextResolver<ExtendedClassContext>
+public class ExtendedClassContextResolver implements ContextResolver<ClassContext>
 {
-    public String[] resolve(ExtendedClassContext context)
+    public String[] resolve(ClassContext context)
     {
-        List<String> resolvedNames = new LinkedList<String>();
+        final List<String> resolvedNames = new LinkedList<String>();
 
-        Set<Class> checked = new HashSet<Class>();
-
-        Class clazz = context.getContext();
-        while (clazz != null)
+        ClassUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
         {
-            resolvedNames.add(resourceNameFor(clazz));
-            checked.add(clazz);
-
-            // for each class, analyse the interfaces.
-            for (Class interfaceClazz : clazz.getInterfaces())
+            public void process(Class clazz)
             {
-                if (!checked.contains(interfaceClazz))
-                {
-                    resolvedNames.add(resourceNameFor(interfaceClazz));
-                    checked.add(interfaceClazz);
-                }
+                resolvedNames.add(resourceNameFor(clazz));
             }
-
-            clazz = clazz.getSuperclass();
-        }
-
-        // now look at the packages of the base class.
-        PackageContextResolver packageResolver = new PackageContextResolver();
-        resolvedNames.addAll(Arrays.asList(packageResolver.resolve(new PackageContext(context.getContext()))));
+        });
 
         return resolvedNames.toArray(new String[resolvedNames.size()]);
     }
@@ -44,8 +30,8 @@ public class ExtendedClassContextResolver implements ContextResolver<ExtendedCla
         return clazz.getName().replace('.', '/');
     }
 
-    public Class<ExtendedClassContext> getContextType()
+    public Class<ClassContext> getContextType()
     {
-        return ExtendedClassContext.class;
+        return ClassContext.class;
     }
 }

@@ -4,6 +4,7 @@ import com.zutubi.i18n.context.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Closeable;
 import java.util.*;
 
 /**
@@ -15,7 +16,7 @@ public class DefaultBundleManager implements BundleManager
 
     private ContextCache cache;
 
-    private Map<Class<? extends Context>, ContextResolver> resolvers = new HashMap<Class<? extends Context>, ContextResolver>();
+    private final Map<Class<? extends Context>, List<ContextResolver>> resolvers = new HashMap<Class<? extends Context>, List<ContextResolver>>();
 
     private ContextLoader defaultLoader = new DefaultContextLoader();
 
@@ -30,7 +31,16 @@ public class DefaultBundleManager implements BundleManager
 
     public void addResolver(ContextResolver resolver)
     {
-        resolvers.put(resolver.getContextType(), resolver);
+        synchronized(resolvers)
+        {
+            Class clazz = resolver.getContextType();
+            if (!resolvers.containsKey(clazz))
+            {
+                resolvers.put(clazz, new LinkedList<ContextResolver>());
+            }
+            List<ContextResolver> list = resolvers.get(clazz);
+            list.add(resolver);
+        }
     }
 
     public List<ResourceBundle> getBundles(Context context, Locale locale)
@@ -42,13 +52,19 @@ public class DefaultBundleManager implements BundleManager
 
         List<ResourceBundle> bundles = new LinkedList<ResourceBundle>();
 
-        String[] bundleNames = resolvers.get(context.getClass()).resolve(context);
+        List<String> bundleNames = new LinkedList<String>();
+        for (ContextResolver resolver : resolvers.get(context.getClass()))
+        {
+            bundleNames.addAll(Arrays.asList(resolver.resolve(context)));
+        }
+
+        bundleNames = filterDuplicates(bundleNames);
+
         for (String bundleName : bundleNames)
         {
             List<String> candidateNames = factory.expand(bundleName, locale);
             for (String candidateName : candidateNames)
             {
-                // TODO: the resource stream lookup will vary based for plugins.
                 InputStream input = null;
                 try
                 {
@@ -64,17 +80,7 @@ public class DefaultBundleManager implements BundleManager
                 }
                 finally
                 {
-                    if (input != null)
-                    {
-                        try
-                        {
-                            input.close();
-                        }
-                        catch (IOException e)
-                        {
-                            // noop.
-                        }
-                    }
+                    close(input);
                 }
             }
         }
@@ -83,6 +89,36 @@ public class DefaultBundleManager implements BundleManager
 
         return bundles;
 
+    }
+
+    private List<String> filterDuplicates(List<String> bundleNames)
+    {
+        Set<String> seen = new HashSet<String>();
+        List<String> filteredNames = new LinkedList<String>();
+        for (String name : bundleNames)
+        {
+            if (!seen.contains(name))
+            {
+                seen.add(name);
+                filteredNames.add(name);
+            }
+        }
+        return filteredNames;
+    }
+
+    private void close(Closeable closeable)
+    {
+        if (closeable != null)
+        {
+            try
+            {
+                closeable.close();
+            }
+            catch (IOException e)
+            {
+                // noop.
+            }
+        }
     }
 
     private ContextLoader getContextLoader(Context context)

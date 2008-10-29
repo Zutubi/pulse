@@ -8,7 +8,6 @@ import java.util.List;
 /**
  * <class-comment/>
  */
-
 public class BaseResourceBundleFactory implements ResourceBundleFactory
 {
     private static final Expander expander = new Expander();

@@ -22,5 +22,6 @@
 
     <dependencies>
         <dependency org="junit" name="junit" rev="3.8.1" conf="build->default"/>
+        <dependency org="zutubi" name="com.zutubi.util" rev="latest.integration" conf="release,build,src->@"/>
     </dependencies>
 </ivy-module>

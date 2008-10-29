@@ -5,7 +5,8 @@ import java.util.Locale;
 /**
  * <class-comment/>
  */
-public class ThreadLocale {
+public class ThreadLocale
+{
     // true if thread local storage should be used
     private boolean thread = true;
 
@@ -14,8 +15,10 @@ public class ThreadLocale {
     // store a locale for each thread with
     // a thread local object. Thread locals store
     // a different value for each thread.
-    private ThreadLocal<Locale> threadLocal = new ThreadLocal<Locale>() {
-        protected Locale initialValue() {
+    private ThreadLocal<Locale> threadLocal = new ThreadLocal<Locale>()
+    {
+        protected Locale initialValue()
+        {
             return Locale.getDefault();
         }
     };
@@ -25,7 +28,8 @@ public class ThreadLocale {
      *
      * @param thread true if the locale is thread local
      */
-    public void setThread(boolean thread) {
+    public void setThread(boolean thread)
+    {
         this.thread = thread;
     }
 
@@ -35,10 +39,14 @@ public class ThreadLocale {
      *
      * @return current locale
      */
-    public Locale get() {
-        if (thread) {
+    public Locale get()
+    {
+        if (thread)
+        {
             return threadLocal.get();
-        } else {
+        }
+        else
+        {
             return locale;
         }
     }
@@ -49,10 +57,14 @@ public class ThreadLocale {
      *
      * @param locale locale to use
      */
-    public void set(Locale locale) {
-        if (thread) {
+    public void set(Locale locale)
+    {
+        if (thread)
+        {
             threadLocal.set(locale);
-        } else {
+        }
+        else
+        {
             this.locale = locale;
         }
     }

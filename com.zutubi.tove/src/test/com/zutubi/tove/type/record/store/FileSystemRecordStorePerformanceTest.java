@@ -57,7 +57,7 @@ public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
             records.add(createSampleRecord(3, 5));
         }
 
-        failAfterXTime(1000, new Runnable()
+        failAfterXTime(1100, new Runnable()
         {
             public void run()
             {
@@ -79,7 +79,7 @@ public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
             records.add(createSampleRecord(3, 5));
         }
 
-        failAfterXTime(1000, new Runnable()
+        failAfterXTime(1100, new Runnable()
         {
             public void run()
             {
