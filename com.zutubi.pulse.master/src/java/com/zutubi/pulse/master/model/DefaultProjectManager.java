@@ -294,13 +294,16 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void initialiseProject(ProjectConfiguration projectConfig)
     {
         long id = projectConfig.getProjectId();
-        if (id != 0)
+        Project project = getProject(id, false);
+        if (project == null)
         {
-            Project project = getProject(id, false);
-            if (project != null && project.getState() == Project.State.INITIAL)
-            {
-                makeStateTransition(project, Project.Transition.INITIALISE);
-            }
+            LOG.severe("Unexpected missing project instance for id '" + id + "'");
+            return;
+        }
+
+        if (project.getState() == Project.State.INITIAL)
+        {
+            makeStateTransition(project, Project.Transition.INITIALISE);
         }
     }
 
