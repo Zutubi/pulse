@@ -12,6 +12,8 @@ import java.io.PrintStream;
  */
 public class ConsoleUI implements PersonalBuildUI
 {
+    private static final String ECHO_PROPERTY = "pulse.echo.passwords";
+
     public enum Verbosity
     {
         QUIET,
@@ -130,8 +132,8 @@ public class ConsoleUI implements PersonalBuildUI
 
     public String passwordPrompt(String question)
     {
-        String result = passwordReader.readPassword(question + ": ");
-        if(result == null)
+        String result = passwordReader.readPassword(question + ": ", Boolean.getBoolean(ECHO_PROPERTY));
+        if (result == null)
         {
             fatal("Unable to prompt for password");
         }
