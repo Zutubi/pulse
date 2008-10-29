@@ -231,7 +231,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(context, workingDir);
+            preparePersistentDirectory(workingDir);
 
             NativeGit git = new NativeGit();
             git.setWorkingDirectory(workingDir);
@@ -263,7 +263,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(context, workingDir);
+            preparePersistentDirectory(workingDir);
 
             NativeGit git = new NativeGit();
             git.setWorkingDirectory(workingDir);
@@ -274,7 +274,7 @@ public class GitClient implements ScmClient
         }
     }
 
-    private void preparePersistentDirectory(ScmContext context, File workingDir) throws ScmException
+    private void preparePersistentDirectory(File workingDir) throws ScmException
     {
         NativeGit git = new NativeGit();
         if (!isGitRepository(workingDir))
@@ -327,7 +327,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(context, workingDir);
+            preparePersistentDirectory(workingDir);
 
             if (to == null)
             {
@@ -359,7 +359,7 @@ public class GitClient implements ScmClient
 
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(context, workingDir);
+            preparePersistentDirectory(workingDir);
 
             NativeGit git = new NativeGit();
             git.setWorkingDirectory(workingDir);
