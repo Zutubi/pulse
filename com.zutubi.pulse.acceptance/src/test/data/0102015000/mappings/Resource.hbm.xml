@@ -14,7 +14,7 @@
         <map name="properties" lazy="false" table="RESOURCE_VERSION_PROPERTIES">
             <key column="RESOURCE_VERSION_ID"/>
             <index type="string" column="PROPERTY_NAME"/>
-            <composite-element class="com.zutubi.pulse.core.config.ResourceProperty">
+            <composite-element class="com.zutubi.pulse.core.engine.api.ResourceProperty">
                 <property name="name" column="NAME" type="string" length="1023" not-null="true"/>
                 <property name="value" column="VALUE" type="string" length="1023"/>
                 <property name="addToEnvironment" column="ADD_TO_ENVIRONMENT" type="boolean"/>
@@ -42,7 +42,7 @@
         <map name="properties" lazy="false" table="RESOURCE_PROPERTIES" cascade="all">
             <key column="RESOURCE_VERSION_ID"/>
             <index type="string" column="PROPERTY_NAME"/>
-            <composite-element class="com.zutubi.pulse.core.config.ResourceProperty">
+            <composite-element class="com.zutubi.pulse.core.engine.api.ResourceProperty">
                 <property name="name" column="NAME" type="string" length="1023" not-null="true"/>
                 <property name="value" column="VALUE" type="string" length="1023" not-null="true"/>
                 <property name="addToEnvironment" column="ADD_TO_ENVIRONMENT" type="boolean"/>

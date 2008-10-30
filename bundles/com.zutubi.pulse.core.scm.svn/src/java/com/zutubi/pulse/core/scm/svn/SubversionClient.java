@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.scm.PathFilter;
 import com.zutubi.pulse.core.scm.ScmPathFilter;
 import com.zutubi.pulse.core.scm.api.*;
@@ -695,7 +695,7 @@ public class SubversionClient implements ScmClient
 
     private void addPropertiesToContext(ExecutionContext context) throws ScmException
     {
-        PulseScope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
+        Scope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
         scope.add(new ResourceProperty("svn.url", url));
     }
 

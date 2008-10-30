@@ -1,15 +1,15 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.Configuration;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import org.apache.xmlrpc.XmlRpcClient;
 
@@ -326,7 +326,7 @@ public class XmlRpcHelper
 
     public Hashtable<String, Object> createProperty(String name, String value, boolean resolveVariables, boolean addToEnvironment, boolean addToPath)
     {
-        Hashtable<String, Object> property = createEmptyConfig(ResourceProperty.class);
+        Hashtable<String, Object> property = createEmptyConfig(ResourcePropertyConfiguration.class);
         property.put("name", name);
         property.put("value", value);
         property.put("resolveVariables", resolveVariables);

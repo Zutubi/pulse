@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.resources;
 
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;

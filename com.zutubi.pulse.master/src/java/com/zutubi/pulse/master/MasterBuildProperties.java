@@ -1,9 +1,8 @@
 package com.zutubi.pulse.master;
 
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestResultSummary;
@@ -13,6 +12,7 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 
 import java.io.File;
 import java.util.Date;
@@ -26,9 +26,9 @@ public class MasterBuildProperties extends BuildProperties
 {
     public static void addProjectProperties(ExecutionContext context, ProjectConfiguration projectConfiguration)
     {
-        for(ResourceProperty property: projectConfiguration.getProperties().values())
+        for(ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
         {
-            context.add(property);
+            context.add(property.asResourceProperty());
         }
     }
 
@@ -126,9 +126,9 @@ public class MasterBuildProperties extends BuildProperties
             BuildStageConfiguration stage = result.getProject().getConfig().getStage(node.getStageName());
             if (stage != null)
             {
-                for(ResourceProperty property: stage.getProperties().values())
+                for(ResourcePropertyConfiguration property: stage.getProperties().values())
                 {
-                    context.add(property);
+                    context.add(property.asResourceProperty());
                 }
             }
 

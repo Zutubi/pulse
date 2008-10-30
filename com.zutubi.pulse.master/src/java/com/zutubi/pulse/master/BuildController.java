@@ -6,6 +6,7 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
@@ -32,10 +33,7 @@ import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
-import com.zutubi.util.Constants;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.TimeStamps;
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -156,10 +154,10 @@ public class BuildController implements EventListener
 
     private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode)
     {
-        for (BuildStageConfiguration stage : projectConfig.getStages().values())
+        for (BuildStageConfiguration stageConfig : projectConfig.getStages().values())
         {
-            RecipeResult recipeResult = new RecipeResult(stage.getRecipe());
-            RecipeResultNode childResultNode = new RecipeResultNode(stage, recipeResult);
+            RecipeResult recipeResult = new RecipeResult(stageConfig.getRecipe());
+            RecipeResultNode childResultNode = new RecipeResultNode(stageConfig, recipeResult);
             resultNode.addChild(childResultNode);
             buildManager.save(resultNode);
 
@@ -170,17 +168,17 @@ public class BuildController implements EventListener
             PulseExecutionContext recipeContext = new PulseExecutionContext(buildContext);
             recipeContext.push();
             recipeContext.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
-            recipeContext.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_RECIPE, stage.getRecipe());
+            recipeContext.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_RECIPE, stageConfig.getRecipe());
 
             RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
-            List<ResourceRequirement> resourceRequirements = getResourceRequirements(stage);
+            List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);
             recipeRequest.addAllResourceRequirements(resourceRequirements);
-            recipeRequest.addAllProperties(projectConfig.getProperties().values());
-            recipeRequest.addAllProperties(stage.getProperties().values());
+            recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
+            recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
 
-            RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stage), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
+            RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
-            RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
+            RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stageConfig.getHandle());
             RecipeController rc = new RecipeController(buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector, configurationManager, resourceManager, recipeDispatchService);
             rc.setRecipeQueue(recipeQueue);
             rc.setBuildManager(buildManager);
@@ -192,6 +190,17 @@ public class BuildController implements EventListener
             rcNode.add(child);
             pendingRecipes++;
         }
+    }
+
+    private Collection<? extends ResourceProperty> asResourceProperties(Collection<ResourcePropertyConfiguration> resourcePropertyConfigurations)
+    {
+        return CollectionUtils.map(resourcePropertyConfigurations, new Mapping<ResourcePropertyConfiguration, ResourceProperty>()
+        {
+            public ResourceProperty map(ResourcePropertyConfiguration config)
+            {
+                return config.asResourceProperty();
+            }
+        });
     }
 
     private AgentRequirements getAgentRequirements(BuildStageConfiguration stage)

@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.engine.api;
 
-import com.zutubi.pulse.core.engine.api.Reference;
-
 import java.util.Collection;
 
 /**
@@ -91,4 +89,9 @@ public interface Scope extends ReferenceMap
      * @return a copy of this entire scope chain
      */
     Scope copy();
+
+
+    void add(Collection<? extends ResourceProperty> properties);
+
+    void add(ResourceProperty resourceProperty);
 }

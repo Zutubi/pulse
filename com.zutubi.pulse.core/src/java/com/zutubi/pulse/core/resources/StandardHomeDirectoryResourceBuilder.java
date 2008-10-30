@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.resources;
 
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import static com.zutubi.pulse.core.resources.StandardHomeDirectoryConstants.*;
 import com.zutubi.util.FileSystemUtils;

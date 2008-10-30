@@ -10,7 +10,7 @@ import java.io.File;
 
 /**
  */
-public class ExecutionContextTest extends PulseTestCase
+public class PulseExecutionContextTest extends PulseTestCase
 {
     public void testInternalProperty()
     {
@@ -150,7 +150,7 @@ public class ExecutionContextTest extends PulseTestCase
 
     public void testGetScope()
     {
-        ExecutionContext context = makeNonTrivialContext();
+        PulseExecutionContext context = makeNonTrivialContext();
 
         PulseScope scope = context.getScope();
         assertEquals("ip", scope.getReferenceValue("iparent", String.class));

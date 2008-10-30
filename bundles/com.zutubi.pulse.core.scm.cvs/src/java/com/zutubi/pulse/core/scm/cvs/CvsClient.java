@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.scm.DataCacheAware;
 import com.zutubi.pulse.core.scm.ScmPathFilter;
 import com.zutubi.pulse.core.scm.ScmUtils;
@@ -200,7 +200,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         //TODO: nor what will happen to that scope - how long it will survivie since it is the leaf.
         //TODO: Going to the scope manually for backward compatibility until the above concern is resolved.
         
-        PulseScope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
+        Scope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
         scope.add(new ResourceProperty("cvs.root", root));
         if (branch != null)
         {

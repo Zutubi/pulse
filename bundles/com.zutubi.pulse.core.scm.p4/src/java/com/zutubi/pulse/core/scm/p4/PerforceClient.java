@@ -1,10 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Property;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
-import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
@@ -703,7 +700,7 @@ public class PerforceClient extends CachingScmClient
 
     private void addPropertiesToContext(ExecutionContext context) throws ScmException
     {
-        PulseScope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
+        Scope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
 
         for (Map.Entry<String, String> entry : core.getEnv().entrySet())
         {

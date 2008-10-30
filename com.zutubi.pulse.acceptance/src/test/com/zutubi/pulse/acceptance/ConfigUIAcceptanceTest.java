@@ -2,12 +2,12 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -777,7 +777,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     private void insertProperty(String projectPath, String name) throws Exception
     {
-        Hashtable<String, Object> property = xmlRpcHelper.createEmptyConfig(ResourceProperty.class);
+        Hashtable<String, Object> property = xmlRpcHelper.createEmptyConfig(ResourcePropertyConfiguration.class);
         property.put("name", name);
         xmlRpcHelper.insertConfig(getPropertiesPath(projectPath), property);
     }

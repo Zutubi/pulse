@@ -1,12 +1,11 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.tove.annotations.*;
+import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -32,7 +31,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     private AgentConfiguration agent;
     private String recipe;
     @Ordered
-    private Map<String, ResourceProperty> properties = new HashMap<String, ResourceProperty>();
+    private Map<String, ResourcePropertyConfiguration> properties = new HashMap<String, ResourcePropertyConfiguration>();
     private List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
 
     @Transient
@@ -67,17 +66,17 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
         this.recipe = recipe;
     }
 
-    public Map<String, ResourceProperty> getProperties()
+    public Map<String, ResourcePropertyConfiguration> getProperties()
     {
         return this.properties;
     }
 
-    public void setProperties(Map<String, ResourceProperty> properties)
+    public void setProperties(Map<String, ResourcePropertyConfiguration> properties)
     {
         this.properties = properties;
     }
 
-    public ResourceProperty getProperty(String name)
+    public ResourcePropertyConfiguration getProperty(String name)
     {
         return this.properties.get(name);
     }

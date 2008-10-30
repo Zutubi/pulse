@@ -1,17 +1,8 @@
-package com.zutubi.pulse.core.config;
+package com.zutubi.pulse.core.engine.api;
 
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Table;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
-
-/**
- */
-@Form(fieldOrder = { "name", "value", "addToEnvironment", "addToPath", "resolveVariables" })
-@Table(columns = {"name", "value"})
-@SymbolicName("zutubi.resourceProperty")
-public class ResourceProperty extends AbstractNamedConfiguration
+public class ResourceProperty
 {
+    private String name;
     private String value;
     private boolean addToEnvironment = false;
     private boolean addToPath = false;
@@ -28,7 +19,7 @@ public class ResourceProperty extends AbstractNamedConfiguration
 
     public ResourceProperty(String name, String value, boolean addToEnvironment, boolean addToPath, boolean resolveVariables)
     {
-        super(name);
+        this.name = name;
         this.value = value;
         this.addToEnvironment = addToEnvironment;
         this.addToPath = addToPath;
@@ -38,6 +29,16 @@ public class ResourceProperty extends AbstractNamedConfiguration
     public ResourceProperty copy()
     {
         return new ResourceProperty(getName(), value, addToEnvironment, addToPath, resolveVariables);
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     public String getValue()

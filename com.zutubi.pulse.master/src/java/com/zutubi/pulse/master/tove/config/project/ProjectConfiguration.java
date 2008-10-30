@@ -46,7 +46,7 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private TypeConfiguration type;
 
     @Ordered
-    private Map<String, ResourceProperty> properties = new LinkedHashMap<String, ResourceProperty>();
+    private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
 
     private BuildOptionsConfiguration options = new BuildOptionsConfiguration();
 
@@ -120,17 +120,17 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
         this.scm = scm;
     }
 
-    public Map<String, ResourceProperty> getProperties()
+    public Map<String, ResourcePropertyConfiguration> getProperties()
     {
         return properties;
     }
 
-    public void setProperties(Map<String, ResourceProperty> properties)
+    public void setProperties(Map<String, ResourcePropertyConfiguration> properties)
     {
         this.properties = properties;
     }
 
-    public ResourceProperty getProperty(String name)
+    public ResourcePropertyConfiguration getProperty(String name)
     {
         return properties.get(name);
     }

@@ -28,7 +28,7 @@
         <bag name="properties" cascade="all,delete-orphan" lazy="false">
             <cache usage="read-write"/>
             <key column="SPECIFICATION_ID"/>
-            <one-to-many class="com.zutubi.pulse.core.config.ResourceProperty"/>
+            <one-to-many class="com.zutubi.pulse.core.engine.api.ResourceProperty"/>
         </bag>
     </class>
 
@@ -100,7 +100,7 @@
         </subclass>
     </class>
 
-    <class name="com.zutubi.pulse.core.config.ResourceProperty" table="RESOURCE_PROPERTY">
+    <class name="com.zutubi.pulse.core.engine.api.ResourceProperty" table="RESOURCE_PROPERTY">
         <cache usage="read-write"/>
         
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">

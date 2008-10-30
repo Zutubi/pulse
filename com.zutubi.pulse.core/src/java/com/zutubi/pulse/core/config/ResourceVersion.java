@@ -4,6 +4,7 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.tove.config.AbstractConfiguration;
 
 import java.util.Map;

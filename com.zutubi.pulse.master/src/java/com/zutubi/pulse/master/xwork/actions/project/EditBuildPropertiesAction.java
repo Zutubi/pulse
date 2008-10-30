@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
@@ -14,6 +13,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
@@ -43,7 +43,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
     private String formSource;
     private String revision;
-    private List<ResourceProperty> properties;
+    private List<ResourcePropertyConfiguration> properties;
     private boolean ajax;
     private ConfigurationPanel newPanel;
     private ConfigurationResponse configurationResponse;
@@ -63,7 +63,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         return formSource;
     }
 
-    public List<ResourceProperty> getProperties()
+    public List<ResourcePropertyConfiguration> getProperties()
     {
         return properties;
     }
@@ -110,7 +110,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private void renderForm() throws IOException, TemplateException
     {
         Project project = getRequiredProject();
-        properties = new ArrayList<ResourceProperty>(project.getConfig().getProperties().values());
+        properties = new ArrayList<ResourcePropertyConfiguration>(project.getConfig().getProperties().values());
         Collections.sort(properties, new NamedConfigurationComparator());
 
         Form form = new Form("form", "edit.build.properties", (ajax ? "aaction/" : "") + "editBuildProperties.action");
@@ -127,7 +127,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         form.add(field);
 
-        for(ResourceProperty property: properties)
+        for(ResourcePropertyConfiguration property: properties)
         {
             field = new Field(FieldType.TEXT, PROPERTY_PREFIX + property.getName());
             field.setLabel(property.getName());
@@ -277,7 +277,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             if(name.startsWith(PROPERTY_PREFIX))
             {
                 String propertyName = name.substring(PROPERTY_PREFIX.length());
-                ResourceProperty property = projectConfig.getProperty(propertyName);
+                ResourcePropertyConfiguration property = projectConfig.getProperty(propertyName);
                 if(property != null)
                 {
                     Object value = parameters.get(name);

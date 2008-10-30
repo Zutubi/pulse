@@ -6,7 +6,7 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_BUILD_NU
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.ProcessArtifact;
 import com.zutubi.pulse.core.RegexPattern;
-import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;

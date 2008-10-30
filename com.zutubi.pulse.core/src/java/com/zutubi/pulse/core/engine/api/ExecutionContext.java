@@ -1,8 +1,5 @@
 package com.zutubi.pulse.core.engine.api;
 
-import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.config.ResourceProperty;
-
 import java.io.File;
 import java.io.OutputStream;
 
@@ -32,7 +29,7 @@ public interface ExecutionContext
 
     <T> T getValue(String name, Class<T> type);
 
-    PulseScope getScope();
+    Scope getScope();
 
     void add(String namespace, Reference reference);
 

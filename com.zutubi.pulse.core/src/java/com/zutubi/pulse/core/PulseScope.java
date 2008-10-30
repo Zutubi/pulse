@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.api.Property;

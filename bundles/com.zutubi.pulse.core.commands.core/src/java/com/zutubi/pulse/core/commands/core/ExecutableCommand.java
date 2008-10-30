@@ -393,7 +393,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         buffer.append("Resources: (via scope)").append(separator);
         buffer.append("----------------------").append(separator);
 
-        PulseScope scope = context.getScope();
+        PulseScope scope = (PulseScope) context.getScope();
         if (scope.getEnvironment().size() > 0)
         {
             for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
@@ -469,7 +469,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
             }
             else
             {
-                exeFile = SystemUtils.findInPath(exe, context.getScope().getPathDirectories());
+                exeFile = SystemUtils.findInPath(exe, ((PulseScope)context.getScope()).getPathDirectories());
                 if (exeFile != null)
                 {
                     binary = exeFile.getAbsolutePath();
@@ -545,7 +545,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         Map<String, String> childEnvironment = builder.environment();
         // Implicit PULSE_* varialbes come first: anything explicit
         // should override them.
-        for(Reference reference: context.getScope().getReferences(String.class))
+        for(Reference reference: ((PulseScope)context.getScope()).getReferences(String.class))
         {
             if(acceptableName(reference.getName()))
             {
@@ -554,7 +554,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         }
 
         // Now things defined on the scope.
-        context.getScope().applyEnvironment(childEnvironment);
+        ((PulseScope)context.getScope()).applyEnvironment(childEnvironment);
 
         // Finally things defined on the command
         for (Environment setting : env)
