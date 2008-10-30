@@ -1,12 +1,7 @@
 package com.zutubi.pulse.master.hook.email;
 
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Select;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wire;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.ResultNotifier;
 import com.zutubi.pulse.master.model.BuildManager;
@@ -21,9 +16,16 @@ import com.zutubi.pulse.master.tove.config.project.hooks.CompatibleHooks;
 import com.zutubi.pulse.master.tove.config.project.hooks.ManualBuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.PostBuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.Select;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
@@ -117,7 +119,16 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
             }
         }
 
-        return emails;
+        final List<String> filtered = new LinkedList<String>();
+        CollectionUtils.filter(emails, new Predicate<String>()
+        {
+            public boolean satisfied(String s)
+            {
+                return !filtered.contains(s);
+            }
+        }, filtered);
+
+        return filtered;
     }
 
     public void setBuildResultRenderer(BuildResultRenderer buildResultRenderer)

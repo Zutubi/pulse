@@ -1,6 +1,8 @@
 package com.zutubi.i18n.context;
 
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 import java.util.*;
 
@@ -23,17 +25,15 @@ public class ExtendedPackageContextResolver implements ContextResolver<ClassCont
             }
         });
 
-        // filter duplicates.
-        Set<String> seen = new HashSet<String>();
-        List<String> filteredNames = new LinkedList<String>();
-        for (String name : resolvedNames)
+        final List<String> filteredNames = new LinkedList<String>();
+        CollectionUtils.filter(resolvedNames, new Predicate<String>()
         {
-            if (!name.equals(PackageContextResolver.BUNDLE_NAME) && !seen.contains(name))
+            public boolean satisfied(String s)
             {
-                seen.add(name);
-                filteredNames.add(name);
+                return !filteredNames.contains(s) && s.compareTo(PackageContextResolver.BUNDLE_NAME) != 0;
             }
-        }
+        }, filteredNames);
+
         // move the base package to the END of the list.
         filteredNames.add(PackageContextResolver.BUNDLE_NAME);
         
