@@ -6,8 +6,8 @@ import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.RemoteService;
 import com.zutubi.pulse.servercore.SystemInfo;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 
 import java.io.File;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.master.model.ResourceManager;
+import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
 import java.util.*;
@@ -59,11 +59,11 @@ public class BrowseResourcesAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        Map<String, List<Resource>> resources = resourceManager.findAll();
-        for(Map.Entry<String, List<Resource>> entry: resources.entrySet())
+        Map<String, List<ResourceConfiguration>> resources = resourceManager.findAll();
+        for(Map.Entry<String, List<ResourceConfiguration>> entry: resources.entrySet())
         {
-            List<Resource> agentResources = entry.getValue();
-            for (Resource resource: agentResources)
+            List<ResourceConfiguration> agentResources = entry.getValue();
+            for (ResourceConfiguration resource: agentResources)
             {
                 Map<String, Set<String>> versions = allResources.get(resource.getName());
 
@@ -80,17 +80,17 @@ public class BrowseResourcesAction extends ActionSupport
         return SUCCESS;
     }
 
-    private void mergeVersions(String agent, Resource resource, Map<String, Set<String>> versions)
+    private void mergeVersions(String agent, ResourceConfiguration resource, Map<String, Set<String>> versions)
     {
         mergeVersion(agent, "", versions, resource);
 
-        for(ResourceVersion version: resource.getVersions().values())
+        for(ResourceVersionConfiguration version: resource.getVersions().values())
         {
             mergeVersion(agent, version.getValue(), versions, resource);
         }
     }
 
-    private void mergeVersion(String agent, String version, Map<String, Set<String>> versions, Resource resource)
+    private void mergeVersion(String agent, String version, Map<String, Set<String>> versions, ResourceConfiguration resource)
     {
         Set<String> agents = versions.get(version);
         if(agents == null)

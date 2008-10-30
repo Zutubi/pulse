@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourceVersionConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.TextUtils;
@@ -92,14 +92,14 @@ public class ResourceXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private String insertVersion(String resourceName, String versionName) throws Exception
     {
-        Hashtable<String, Object> version = xmlRpcHelper.createDefaultConfig(ResourceVersion.class);
+        Hashtable<String, Object> version = xmlRpcHelper.createDefaultConfig(ResourceVersionConfiguration.class);
         version.put("value", versionName);
         return xmlRpcHelper.insertConfig(PathUtils.getPath(resourcesPath, resourceName, "versions"), version);
     }
 
     private String insertResource(String resourceName) throws Exception
     {
-        Hashtable<String, Object> resource = xmlRpcHelper.createDefaultConfig(Resource.class);
+        Hashtable<String, Object> resource = xmlRpcHelper.createDefaultConfig(ResourceConfiguration.class);
         resource.put("name", resourceName);
         return xmlRpcHelper.insertConfig(resourcesPath, resource);
     }

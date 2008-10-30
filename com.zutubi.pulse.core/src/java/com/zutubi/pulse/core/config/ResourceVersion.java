@@ -1,22 +1,15 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.ID;
-import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.tove.config.AbstractConfiguration;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
  */
-@Form(fieldOrder = {"value"})
-@SymbolicName("zutubi.resourceVersion")
-public class ResourceVersion extends AbstractConfiguration
+public class ResourceVersion
 {
-    @ID
     private String value;
     private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
 

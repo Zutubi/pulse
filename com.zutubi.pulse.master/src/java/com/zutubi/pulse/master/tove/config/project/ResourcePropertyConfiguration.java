@@ -38,6 +38,11 @@ public class ResourcePropertyConfiguration extends AbstractNamedConfiguration
         this.resolveVariables = resolveVariables;
     }
 
+    public ResourcePropertyConfiguration(ResourceProperty p)
+    {
+        this(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath(), p.getResolveVariables());
+    }
+
     public ResourcePropertyConfiguration copy()
     {
         return new ResourcePropertyConfiguration(getName(), value, addToEnvironment, addToPath, resolveVariables);

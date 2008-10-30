@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class AgentResourceRepository implements ResourceRepository
 
     public Resource getResource(String name)
     {
-        return agentConfig.getResources().get(name);
+        return agentConfig.getResources().get(name).asResource();
     }
 
     public List<String> getResourceNames()
@@ -55,7 +56,7 @@ public class AgentResourceRepository implements ResourceRepository
         return new LinkedList<String>(agentConfig.getResources().keySet());
     }
 
-    public Map<String, Resource> getAll()
+    public Map<String, ResourceConfiguration> getAll()
     {
         return agentConfig.getResources();
     }

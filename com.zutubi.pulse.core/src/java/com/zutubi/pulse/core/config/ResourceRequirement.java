@@ -46,4 +46,19 @@ public class ResourceRequirement
     {
         return (resource == null ? "?" : resource) + ":" + (!defaultVersion ? version : "[default]");
     }
+
+    public void setResource(String resource)
+    {
+        this.resource = resource;
+    }
+
+    public void setVersion(String version)
+    {
+        this.version = version;
+    }
+
+    public void setDefaultVersion(boolean defaultVersion)
+    {
+        this.defaultVersion = defaultVersion;
+    }
 }

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
+import com.zutubi.pulse.master.SlaveProxyFactory;
+import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.tove.config.api.NamedConfiguration;
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Numeric;
@@ -34,7 +34,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     @Numeric(min = 1)
     private int port = 8090;
     private boolean allowPersonalBuilds = true;
-    private Map<String, Resource> resources;
+    private Map<String, ResourceConfiguration> resources;
     private List<AgentAclConfiguration> permissions = new LinkedList<AgentAclConfiguration>();
 
     @Transient
@@ -100,12 +100,12 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
         this.agentStateId = agentStateId;
     }
 
-    public Map<String, Resource> getResources()
+    public Map<String, ResourceConfiguration> getResources()
     {
         return resources;
     }
 
-    public void setResources(Map<String, Resource> resources)
+    public void setResources(Map<String, ResourceConfiguration> resources)
     {
         this.resources = resources;
     }

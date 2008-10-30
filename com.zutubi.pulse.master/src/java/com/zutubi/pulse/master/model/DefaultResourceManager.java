@@ -4,11 +4,11 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourceVersionConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
@@ -28,8 +28,8 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
 
     private Map<Long, AgentResourceRepository> agentRepositories = new TreeMap<Long, AgentResourceRepository>();
     private ConfigurationProvider configurationProvider;
-    private Map<Long, Resource> resourcesByHandle = new HashMap<Long, Resource>();
-    private Map<Long, ResourceVersion> resourceVersionsByHandle = new HashMap<Long, ResourceVersion>();
+    private Map<Long, ResourceConfiguration> resourcesByHandle = new HashMap<Long, ResourceConfiguration>();
+    private Map<Long, ResourceVersionConfiguration> resourceVersionsByHandle = new HashMap<Long, ResourceVersionConfiguration>();
 
     private void registerConfigListeners(ConfigurationProvider configurationProvider)
     {
@@ -55,9 +55,9 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         };
         agentListener.register(configurationProvider, true);
 
-        TypeListener<Resource> resourceListener = new TypeAdapter<Resource>(Resource.class)
+        TypeListener<ResourceConfiguration> resourceListener = new TypeAdapter<ResourceConfiguration>(ResourceConfiguration.class)
         {
-            public void save(Resource instance, boolean nested)
+            public void save(ResourceConfiguration instance, boolean nested)
             {
                 if (!nested)
                 {
@@ -65,17 +65,17 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
                 }
             }
 
-            public void postInsert(Resource instance)
+            public void postInsert(ResourceConfiguration instance)
             {
                 addResource(instance);
             }
 
-            public void postDelete(Resource instance)
+            public void postDelete(ResourceConfiguration instance)
             {
                 removeResource(instance);
             }
 
-            public void postSave(Resource instance, boolean nested)
+            public void postSave(ResourceConfiguration instance, boolean nested)
             {
                 // Replaces the existing as it is stored by the (unchanging)
                 // handle.
@@ -84,9 +84,9 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         };
         resourceListener.register(configurationProvider, true);
 
-        TypeListener<ResourceVersion> resourceVersionListener = new TypeAdapter<ResourceVersion>(ResourceVersion.class)
+        TypeListener<ResourceVersionConfiguration> resourceVersionListener = new TypeAdapter<ResourceVersionConfiguration>(ResourceVersionConfiguration.class)
         {
-            public void save(ResourceVersion instance, boolean nested)
+            public void save(ResourceVersionConfiguration instance, boolean nested)
             {
                 if (!nested)
                 {
@@ -94,17 +94,17 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
                 }
             }
 
-            public void postInsert(ResourceVersion instance)
+            public void postInsert(ResourceVersionConfiguration instance)
             {
                 addResourceVersion(instance);
             }
 
-            public void postDelete(ResourceVersion instance)
+            public void postDelete(ResourceVersionConfiguration instance)
             {
                 removeResourceVersion(instance);
             }
 
-            public void postSave(ResourceVersion instance, boolean nested)
+            public void postSave(ResourceVersionConfiguration instance, boolean nested)
             {
                 // Replaces the existing as it is stored by the (unchanging)
                 // handle.
@@ -116,12 +116,12 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
 
     public void init()
     {
-        for (Resource resource : configurationProvider.getAll(Resource.class))
+        for (ResourceConfiguration resource : configurationProvider.getAll(ResourceConfiguration.class))
         {
             addResource(resource);
         }
 
-        for (ResourceVersion resourceVersion : configurationProvider.getAll(ResourceVersion.class))
+        for (ResourceVersionConfiguration resourceVersion : configurationProvider.getAll(ResourceVersionConfiguration.class))
         {
             addResourceVersion(resourceVersion);
         }
@@ -132,19 +132,19 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         }
     }
 
-    private void addResource(Resource resource)
+    private void addResource(ResourceConfiguration resource)
     {
         resourcesByHandle.put(resource.getHandle(), resource);
     }
 
-    private void removeResource(Resource resource)
+    private void removeResource(ResourceConfiguration resource)
     {
         resourcesByHandle.remove(resource.getHandle());
     }
 
-    private void updateResource(Resource resource)
+    private void updateResource(ResourceConfiguration resource)
     {
-        Resource oldResource = resourcesByHandle.get(resource.getHandle());
+        ResourceConfiguration oldResource = resourcesByHandle.get(resource.getHandle());
         if (oldResource != null)
         {
             String oldName = oldResource.getName();
@@ -164,26 +164,26 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         }
     }
 
-    private void addResourceVersion(ResourceVersion resourceVersion)
+    private void addResourceVersion(ResourceVersionConfiguration resourceVersion)
     {
         resourceVersionsByHandle.put(resourceVersion.getHandle(), resourceVersion);
     }
 
-    private void removeResourceVersion(ResourceVersion resourceVersion)
+    private void removeResourceVersion(ResourceVersionConfiguration resourceVersion)
     {
         resourceVersionsByHandle.remove(resourceVersion.getHandle());
     }
 
-    private void updateResourceVersion(ResourceVersion resourceVersion)
+    private void updateResourceVersion(ResourceVersionConfiguration resourceVersion)
     {
-        ResourceVersion oldVersion = resourceVersionsByHandle.get(resourceVersion.getHandle());
+        ResourceVersionConfiguration oldVersion = resourceVersionsByHandle.get(resourceVersion.getHandle());
         if (oldVersion != null)
         {
             String oldValue = oldVersion.getValue();
             String newValue = resourceVersion.getValue();
             if (!oldValue.equals(newValue))
             {
-                Resource owningResource = configurationProvider.getAncestorOfType(resourceVersion, Resource.class);
+                ResourceConfiguration owningResource = configurationProvider.getAncestorOfType(resourceVersion, ResourceConfiguration.class);
                 String resourceName = owningResource.getName();
                 for (ResourceRequirementConfiguration requirement : configurationProvider.getAll(ResourceRequirementConfiguration.class))
                 {
@@ -218,7 +218,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         return getAgentRepository(agent.getConfig());
     }
 
-    public void addDiscoveredResources(final String agentPath, final List<Resource> discoveredResources)
+    public void addDiscoveredResources(final String agentPath, final List<ResourceConfiguration> discoveredResources)
     {
         // Go direct to the config system.  We don't want to mess with our
         // cache here at all, because:
@@ -232,9 +232,9 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
                 AgentConfiguration config = configurationProvider.get(agentPath, AgentConfiguration.class);
                 if(config != null)
                 {
-                    for (Resource r : discoveredResources)
+                    for (ResourceConfiguration r : discoveredResources)
                     {
-                        Map<String, Resource> agentResources = config.getResources();
+                        Map<String, ResourceConfiguration> agentResources = config.getResources();
                         addResource(agentPath, r, agentResources.get(r.getName()));
 
                         // Lookup again, we just change this agent.
@@ -247,7 +247,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         });
     }
 
-    private void addResource(String agentPath, Resource discoveredResource, Resource existingResource)
+    private void addResource(String agentPath, ResourceConfiguration discoveredResource, ResourceConfiguration existingResource)
     {
         if (existingResource == null)
         {
@@ -274,8 +274,8 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
                 }
                 else
                 {
-                    ResourceVersion version = discoveredResource.getVersion(versionStr);
-                    ResourceVersion existingVersion = existingResource.getVersion(versionStr);
+                    ResourceVersionConfiguration version = discoveredResource.getVersion(versionStr);
+                    ResourceVersionConfiguration existingVersion = existingResource.getVersion(versionStr);
 
                     for (String propertyName: version.getProperties().keySet())
                     {
@@ -299,12 +299,12 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         }
     }
 
-    public Map<String, List<Resource>> findAll()
+    public Map<String, List<ResourceConfiguration>> findAll()
     {
-        Map<String, List<Resource>> allResources = new HashMap<String, List<Resource>>();
+        Map<String, List<ResourceConfiguration>> allResources = new HashMap<String, List<ResourceConfiguration>>();
         for (AgentResourceRepository repo : agentRepositories.values())
         {
-            allResources.put(repo.getAgentConfig().getName(), new LinkedList<Resource>(repo.getAll().values()));
+            allResources.put(repo.getAgentConfig().getName(), new LinkedList<ResourceConfiguration>(repo.getAll().values()));
         }
 
         return allResources;

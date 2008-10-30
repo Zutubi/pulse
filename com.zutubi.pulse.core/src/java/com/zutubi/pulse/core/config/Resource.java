@@ -1,26 +1,18 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * A resource is something that is required by a build.  It may be an
- * external tool, a certain operating system, or some virtual concept.
- */
-@Form(fieldOrder = { "name", "defaultVersion" })
-@Table(columns = {"name", "defaultVersion"})
-@SymbolicName("zutubi.resource")
-public class Resource extends AbstractNamedConfiguration
+public class Resource
 {
     private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
  
-    @Select(optionProvider = "ResourceVersionOptionProvider")
     private String defaultVersion;
     private Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
+
+    private String name;
 
     public Resource()
     {
@@ -30,6 +22,16 @@ public class Resource extends AbstractNamedConfiguration
     public Resource(String name)
     {
         setName(name);
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     public boolean hasVersion(String value)
@@ -42,7 +44,6 @@ public class Resource extends AbstractNamedConfiguration
         return versions.get(id);
     }
 
-    @Wizard.Ignore
     public String getDefaultVersion()
     {
         return defaultVersion;
@@ -109,7 +110,6 @@ public class Resource extends AbstractNamedConfiguration
         versions.put(v.getValue(), v);
     }
 
-    @Transient
     public int getTotalPropertyCount()
     {
         int count = properties.size();
@@ -121,7 +121,6 @@ public class Resource extends AbstractNamedConfiguration
         return count;
     }
 
-    @Transient
     public int getEmptyVersionCount()
     {
         int count = 0;

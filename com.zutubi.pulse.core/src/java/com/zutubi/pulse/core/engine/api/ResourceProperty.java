@@ -55,4 +55,29 @@ public class ResourceProperty
     {
         return resolveVariables;
     }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public void setValue(String value)
+    {
+        this.value = value;
+    }
+
+    public void setAddToEnvironment(boolean addToEnvironment)
+    {
+        this.addToEnvironment = addToEnvironment;
+    }
+
+    public void setAddToPath(boolean addToPath)
+    {
+        this.addToPath = addToPath;
+    }
+
+    public void setResolveVariables(boolean resolveVariables)
+    {
+        this.resolveVariables = resolveVariables;
+    }
 }

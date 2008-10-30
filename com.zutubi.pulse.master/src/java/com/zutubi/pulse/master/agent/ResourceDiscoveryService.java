@@ -7,7 +7,10 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentResourcesDiscoveredEvent;
 import com.zutubi.pulse.master.model.ResourceManager;
+import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -57,7 +60,14 @@ public class ResourceDiscoveryService implements EventListener
                 try
                 {
                     List<Resource> resources = agent.getService().discoverResources();
-                    resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resources);
+                    List<ResourceConfiguration> resourceConfigurations = CollectionUtils.map(resources, new Mapping<Resource, ResourceConfiguration>()
+                    {
+                        public ResourceConfiguration map(Resource resource)
+                        {
+                            return new ResourceConfiguration(resource);
+                        }
+                    });
+                    resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resourceConfigurations);
                     eventManager.publish(new AgentResourcesDiscoveredEvent(this, agent));
                 }
                 catch (Exception e)
