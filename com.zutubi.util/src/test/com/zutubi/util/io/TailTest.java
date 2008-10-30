@@ -31,131 +31,193 @@ public class TailTest extends TestCase
 
     public void testCustomLines() throws IOException
     {
-        generateAndTail(100, 5);
+        singleFileHelper(100, 5);
     }
 
     public void testZeroLines() throws IOException
     {
-        generateAndTail(100, 0);
+        singleFileHelper(100, 0);
     }
 
     public void testMoreLinesThanInFile() throws IOException
     {
-        generateAndTail(5, 10);
+        singleFileHelper(5, 10);
     }
 
     public void testZeroLengthFile() throws IOException
     {
-        generateAndTail(0, 10);
+        singleFileHelper(0, 10);
     }
 
     public void testLineLengthFourUnderEstimate() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE - 4);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE - 4);
     }
 
     public void testLineLengthThreeUnderEstimate() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE - 3);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE - 3);
     }
 
     public void testLineLengthTwoUnderEstimate() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE - 2);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE - 2);
     }
 
     public void testLineLengthOneUnderEstimate() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE - 1);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE - 1);
     }
 
     public void testLineLengthEqualsEstimate() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE);
     }
 
     public void testLineLengthOneOverEstimate() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE + 1);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE + 1);
     }
 
     public void testLineLengthTwoOverEstimate() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE + 2);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE + 2);
     }
 
     public void testLineLengthThreeOverEstimate() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE + 3);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE + 3);
     }
 
     public void testLineLengthFourOverEstimate() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE + 4);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE + 4);
     }
 
     public void testLineLengthFourUnderChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 - 4);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 - 4);
     }
 
     public void testLineLengthThreeUnderChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 - 3);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 - 3);
     }
 
     public void testLineLengthTwoUnderChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 - 2);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 - 2);
     }
 
     public void testLineLengthOneUnderChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 - 1);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 - 1);
     }
 
     public void testLineLengthEqualToChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10);
     }
 
     public void testLineLengthOneOverChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 + 1);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 + 1);
     }
 
     public void testLineLengthTwoOverChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 + 2);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 + 2);
     }
 
     public void testLineLengthThreeOverChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 + 3);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 + 3);
     }
 
     public void testLineLengthFourOverChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 + 4);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 10 + 4);
     }
 
     public void testLineLengthGreaterThanToChunkSize() throws IOException
     {
-        generateAndTail(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 11);
+        singleFileHelper(20, 10, Tail.ESTIMATED_BYTES_PER_LINE * 11);
     }
 
-    private void generateAndTail(int lineCount, int tailLines) throws IOException
+    public void testTwoFilesHalfRequired() throws IOException
     {
-        generateAndTail(lineCount, tailLines, 0);
+        multipleFileHelper(2, 20, 10);
     }
 
-    private void generateAndTail(int lineCount, int tailLines, long lineLength) throws IOException
+    public void testTwoFilesExactlyOneRequired() throws IOException
     {
-        File f = generateTestFile(lineCount, lineLength);
-        Tail tail = new Tail(f, tailLines);
+        multipleFileHelper(2, 20, 20);
+    }
+
+    public void testTwoFilesJustMoreThanOneRequired() throws IOException
+    {
+        multipleFileHelper(2, 20, 21);
+    }
+
+    public void testTwoFilesOneAndAHalfRequired() throws IOException
+    {
+        multipleFileHelper(2, 20, 30);
+    }
+
+    public void testTwoFilesTwoRequired() throws IOException
+    {
+        multipleFileHelper(2, 20, 40);
+    }
+
+    public void testThreeFilesHalfRequired() throws IOException
+    {
+        multipleFileHelper(3, 20, 10);
+    }
+
+    public void testThreeFilesJustUnderTwoRequired() throws IOException
+    {
+        multipleFileHelper(3, 20, 39);
+    }
+
+    public void testThreeFilesExactlyTwoRequired() throws IOException
+    {
+        multipleFileHelper(3, 20, 40);
+    }
+
+    public void testThreeFilesJustOverTwoRequired() throws IOException
+    {
+        multipleFileHelper(3, 20, 41);
+    }
+    
+    public void testThreeFilesTwoAndAHalfRequired() throws IOException
+    {
+        multipleFileHelper(3, 20, 50);
+    }
+
+    private void singleFileHelper(int lineCount, int tailLines) throws IOException
+    {
+        singleFileHelper(lineCount, tailLines, 0);
+    }
+
+    private void singleFileHelper(int lineCount, int tailLines, long lineLength) throws IOException
+    {
+        File f = generateTestFile(lineCount, lineLength, 0);
+        Tail tail = new Tail(tailLines, f);
         assertEquals(getExpectedTail(lineCount, tailLines, lineLength), tail.getTail());
     }
 
+    private void multipleFileHelper(int fileCount, int linesPerFile, int tailLines) throws IOException
+    {
+        File[] files = new File[fileCount];
+        for (int i = 0; i < fileCount; i++)
+        {
+            files[i] = generateTestFile(linesPerFile, 0, i * linesPerFile);
+        }
+
+        Tail tail = new Tail(tailLines, files);
+        assertEquals(getExpectedTail(fileCount * linesPerFile, tailLines, 0), tail.getTail());
+
+    }
     private String getExpectedTail(int lineCount, int tailLines, long lineLength)
     {
         if (tailLines > lineCount)
@@ -184,10 +246,10 @@ public class TailTest extends TestCase
      */
     private File generateTestFile(long lineCount) throws IOException
     {
-        return generateTestFile(lineCount, 0);
+        return generateTestFile(lineCount, 0, 0);
     }
 
-    private File generateTestFile(long lineCount, long lineLength) throws IOException
+    private File generateTestFile(long lineCount, long lineLength, long offset) throws IOException
     {
         File file = createRandomFile();
 
@@ -197,7 +259,7 @@ public class TailTest extends TestCase
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
             for (long l = 0; l < lineCount; l++)
             {
-                out.write(getLine(l, lineLength));
+                out.write(getLine(l + offset, lineLength));
                 out.newLine();
             }
         }

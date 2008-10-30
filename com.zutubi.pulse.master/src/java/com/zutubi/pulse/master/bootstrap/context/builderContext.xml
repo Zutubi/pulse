@@ -33,6 +33,8 @@
 
     <bean id="projectInitialisationService" class="com.zutubi.pulse.master.project.ProjectInitialisationService" autowire="byName" init-method="init"/>
 
+    <bean id="projectLoggerManager" class="com.zutubi.pulse.master.project.ProjectLoggerManager" autowire="byName"/>
+
     <bean id="projectManagerTarget" class="com.zutubi.pulse.master.model.DefaultProjectManager" autowire="byName"/>
     <bean id="projectManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <!-- specifying the target this way since using the 'target' property is causing an assertion failure. -->

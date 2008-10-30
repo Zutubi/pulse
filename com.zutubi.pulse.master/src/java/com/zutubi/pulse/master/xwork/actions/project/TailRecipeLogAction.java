@@ -116,7 +116,7 @@ public class TailRecipeLogAction extends StageActionBase
     {
         try
         {
-            Tail tail = new Tail(recipeLog, maxLines);
+            Tail tail = new Tail(maxLines, recipeLog);
             this.tail = tail.getTail();
         }
         catch (IOException e)

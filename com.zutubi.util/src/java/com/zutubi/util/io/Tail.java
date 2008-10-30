@@ -1,5 +1,7 @@
 package com.zutubi.util.io;
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
@@ -9,56 +11,82 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Implementation for efficiently reading lines from the end of a file, similar
- * to the unix tail utility.
+ * Implementation for efficiently reading lines from the end of a file set,
+ * similar to the unix tail utility.  A file set is conceptually a single file
+ * formed by the concatenation of the files in the order given (so the tail is
+ * read starting from the last file given and working backwards through the
+ * set).
  */
 public class Tail
 {
     static final int DEFAULT_LINE_COUNT = 10;
     static final int ESTIMATED_BYTES_PER_LINE = 500;
 
-    private File file;
+    private File[] files;
     private int maxLines;
 
     /**
      * Create tailer that will return a default number of lines from the end of
-     * the given file.
+     * the given file set.
      *
-     * @param file the file to tail
+     * @param files file set to tail, read in the reverse of the order given
      */
-    public Tail(File file)
+    public Tail(File... files)
     {
-        this(file, DEFAULT_LINE_COUNT);
+        this(DEFAULT_LINE_COUNT, files);
     }
 
     /**
      * Create tailer that will return up to the given number of lines from the
-     * end of the given file.
+     * end of the given file set.
      *
-     * @param file     the file to tail
+     * @param files    file set to tail, read in the reverse of the order given
      * @param maxLines the maximum number of lines to read
      */
-    public Tail(File file, int maxLines)
+    public Tail(int maxLines, File... files)
     {
-        this.file = file;
         this.maxLines = maxLines;
+        this.files = files;
+        CollectionUtils.reverse(this.files);
     }
 
     /**
-     * Reads the tail of the file, up to our line limit, and returns the result
-     * as a single string.  Line separators are normalised to newlines.
+     * Reads the tail of the file set, up to our line limit, and returns the
+     * result as a single string.  Line separators are normalised to newlines.
      * <p/>
      * This method may be called multiple times, each call will independently
-     * open the file to read the lines.
+     * open the file set to read the lines.
      *
-     * @return up to our maximum lines from the tail of our file
-     * @throws IOException if there is an error reading the file
+     * @return up to our maximum lines from the tail of our file set
+     * @throws IOException if there is an error reading the files
      */
     public String getTail() throws IOException
     {
+        int totalLines = 0;
+        String result = "";
+        for (File f: files)
+        {
+            if (totalLines == maxLines)
+            {
+                break;
+            }
+
+            Pair<Integer, String> countAndTail = getTail(f, maxLines - totalLines);
+            if (countAndTail.first > 0)
+            {
+                result = countAndTail.second + result;
+                totalLines += countAndTail.first;
+            }
+        }
+
+        return result;
+    }
+
+    private Pair<Integer, String> getTail(File file, int maxLines) throws IOException
+    {
         if (maxLines == 0 || file.length() == 0)
         {
-            return "";
+            return new Pair<Integer, String>(0, "");
         }
         
         final int CHUNK_SIZE = ESTIMATED_BYTES_PER_LINE * maxLines;
@@ -99,7 +127,7 @@ public class Tail
                 accumulatedLines = accumulatedLines.subList(accumulatedLines.size() - maxLines, accumulatedLines.size());
             }
 
-            return StringUtils.join("\n", accumulatedLines) + "\n";
+            return new Pair<Integer, String>(accumulatedLines.size(), StringUtils.join("\n", accumulatedLines) + "\n");
         }
         finally
         {
@@ -131,7 +159,7 @@ public class Tail
         }
     }
 
-    public List<String> extractLines(byte[] chunk, int length)
+    private List<String> extractLines(byte[] chunk, int length)
     {
         List<String> lines = new LinkedList<String>();
         int offset = 0;

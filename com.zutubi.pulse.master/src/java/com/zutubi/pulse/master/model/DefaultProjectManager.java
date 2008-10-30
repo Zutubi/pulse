@@ -887,7 +887,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         this.agentStateDao = agentStateDao;
     }
 
-    public void setProjectInitService(ProjectInitialisationService projectInitialisationService)
+    public void setProjectInitialisationService(ProjectInitialisationService projectInitialisationService)
     {
         this.projectInitialisationService = projectInitialisationService;
     }

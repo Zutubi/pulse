@@ -310,4 +310,19 @@ public class CollectionUtils
             f.process(t);
         }
     }
+
+    /**
+     * In-place reversal of the elements of an object array.
+     *
+     * @param array the array to reverse
+     */
+    public static void reverse(Object[] array)
+    {
+        for (int i = 0, j = array.length - 1; i < j; i++, j--)
+        {
+            Object temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
 }

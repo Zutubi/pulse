@@ -162,7 +162,8 @@ public class FileSystemUtils
                 }
                 catch (InterruptedException e)
                 {
-                    // Ignore
+                    // Just pass it on.
+                    Thread.currentThread().interrupt();
                 }
             }
         }
