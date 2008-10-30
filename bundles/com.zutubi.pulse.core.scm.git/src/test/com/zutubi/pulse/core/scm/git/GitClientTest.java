@@ -3,10 +3,7 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
-import com.zutubi.pulse.core.scm.api.Changelist;
-import com.zutubi.pulse.core.scm.api.FileChange;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -116,7 +113,7 @@ public class GitClientTest extends PulseTestCase
 
     public void testGetLatestRevision() throws ScmException
     {
-        client.init(scmContext);
+        client.init(scmContext, new ScmFeedbackAdapter());
         Revision rev = client.getLatestRevision(scmContext);
 
         assertEquals("e34da05e88de03a4aa5b10b338382f09bbe65d4b", rev.getRevisionString());
@@ -125,7 +122,7 @@ public class GitClientTest extends PulseTestCase
     public void testGetLatestRevisionOnBranch() throws ScmException
     {
         client.setBranch("branch");
-        client.init(scmContext);
+        client.init(scmContext, new ScmFeedbackAdapter());
         Revision rev = client.getLatestRevision(scmContext);
 
         assertEquals("c34b545b6954b8946967c250dde7617c24a9bb4b", rev.getRevisionString());
@@ -133,14 +130,14 @@ public class GitClientTest extends PulseTestCase
 
     public void testRetrieve() throws ScmException, IOException
     {
-        client.init(scmContext);
+        client.init(scmContext, new ScmFeedbackAdapter());
         InputStream content = client.retrieve(scmContext, "a.txt", null);
         assertEquals("", IOUtils.inputStreamToString(content));
     }
 
     public void testRetrieveFromRevision() throws IOException, ScmException
     {
-        client.init(scmContext);
+        client.init(scmContext, new ScmFeedbackAdapter());
         InputStream content = client.retrieve(scmContext, "a.txt", new Revision("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112"));
         assertEquals("content", IOUtils.inputStreamToString(content));
     }
@@ -148,7 +145,7 @@ public class GitClientTest extends PulseTestCase
     public void testRetrieveOnBranch() throws ScmException, IOException
     {
         client.setBranch("branch");
-        client.init(scmContext);
+        client.init(scmContext, new ScmFeedbackAdapter());
         InputStream content = client.retrieve(scmContext, "1.txt", null);
         assertEquals("", IOUtils.inputStreamToString(content));
     }
@@ -156,7 +153,7 @@ public class GitClientTest extends PulseTestCase
     public void testRetrieveFromRevisionOnBranch() throws ScmException, IOException
     {
         client.setBranch("branch");
-        client.init(scmContext);
+        client.init(scmContext, new ScmFeedbackAdapter());
         InputStream content = client.retrieve(scmContext, "1.txt", new Revision("7d61890eb55586ec99416c53c581bf561591a608"));
         assertEquals("content", IOUtils.inputStreamToString(content));
     }
@@ -200,7 +197,7 @@ public class GitClientTest extends PulseTestCase
     public void testChanges() throws ScmException
     {
         client.setBranch("master");
-        client.init(scmContext);
+        client.init(scmContext, new ScmFeedbackAdapter());
         List<Changelist> changes = client.getChanges(scmContext, new Revision("HEAD~2"), null);
         assertEquals(2, changes.size());
     }
@@ -208,7 +205,7 @@ public class GitClientTest extends PulseTestCase
     public void testHeadChanges() throws ScmException
     {
         client.setBranch("master");
-        client.init(scmContext);
+        client.init(scmContext, new ScmFeedbackAdapter());
 
         List<Changelist> changes = client.getChanges(scmContext, new Revision("HEAD~1"), new Revision("HEAD"));
         assertEquals(1, changes.size());

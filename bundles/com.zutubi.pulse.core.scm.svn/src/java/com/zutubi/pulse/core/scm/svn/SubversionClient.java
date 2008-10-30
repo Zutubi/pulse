@@ -4,8 +4,6 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
-import com.zutubi.pulse.core.scm.api.PathFilter;
-import com.zutubi.pulse.core.scm.api.ExcludePathFilter;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -226,6 +224,11 @@ public class SubversionClient implements ScmClient
     //=======================================================================
     // ScmClient interface
     //=======================================================================
+
+    public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // noop
+    }
 
     public void close()
     {
@@ -719,11 +722,6 @@ public class SubversionClient implements ScmClient
     public EOLStyle getEOLPolicy(ScmContext context)
     {
         return EOLStyle.BINARY;
-    }
-
-    public void init(ScmContext context)
-    {
-        // noop.
     }
 
     public Revision parseRevision(String revision) throws ScmException

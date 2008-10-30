@@ -1,11 +1,14 @@
 package com.zutubi.pulse.master.project;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCommencedEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
+import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
@@ -57,7 +60,19 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                     cleanupScmDirectoryIfRequired(scmContext.getPersistentWorkingDir());
 
                     scmClient = scmManager.createClient(scmConfiguration);
-                    scmClient.init(scmContext);
+                    scmClient.init(scmContext, new ScmFeedbackHandler()
+                    {
+                        public void status(String message)
+                        {
+                            eventManager.publish(new ProjectStatusEvent(ProjectInitialisationService.this, projectConfiguration, message));
+                        }
+
+                        public void checkCancelled() throws ScmCancelledException
+                        {
+                            // not cancellable
+                        }
+                    });
+                    
                     completedEvent = new ProjectInitialisationCompletedEvent(ProjectInitialisationService.this, projectConfiguration, true, null);
                 }
                 catch (Exception e)

@@ -33,6 +33,11 @@ public class MockScmClient implements ScmClient, DataCacheAware
         this.throwError = throwError;
     }
 
+    public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // noop
+    }
+
     public void close()
     {
     }
@@ -137,11 +142,6 @@ public class MockScmClient implements ScmClient, DataCacheAware
     public Revision parseRevision(String revision) throws ScmException
     {
         throw new RuntimeException("Method not yet implemented.");
-    }
-
-    public void init(ScmContext context)
-    {
-        // noop.
     }
 
     public String getCacheId()

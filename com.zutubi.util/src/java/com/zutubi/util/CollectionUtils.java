@@ -325,4 +325,22 @@ public class CollectionUtils
             array[j] = temp;
         }
     }
+
+    /**
+     * Creates a list holding count elements with the given value.
+     *
+     * @param value value to use for all list elements
+     * @param count number of list elements to add
+     * @return a list with count elements of value
+     */
+    public static <T> List<T> times(T value, int count)
+    {
+        List<T> result = new LinkedList<T>();
+        while (count-- > 0)
+        {
+            result.add(value);
+        }
+
+        return result;
+    }
 }

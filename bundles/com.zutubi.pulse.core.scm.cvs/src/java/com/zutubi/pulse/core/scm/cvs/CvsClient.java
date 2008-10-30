@@ -5,8 +5,6 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.scm.DataCacheAware;
-import com.zutubi.pulse.core.scm.api.ExcludePathFilter;
-import com.zutubi.pulse.core.scm.api.ScmUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
@@ -90,6 +88,11 @@ public class CvsClient implements ScmClient, DataCacheAware
     public void setExcludedPaths(List<String> excluded)
     {
         this.excludedPaths = excluded;
+    }
+
+    public void init(ScmContext context, ScmFeedbackHandler handler)
+    {
+        // noop - could checkout to provide browse functionality?.
     }
 
     public void close()
@@ -529,11 +532,6 @@ public class CvsClient implements ScmClient, DataCacheAware
         }
 
         return listing;
-    }
-
-    public void init(ScmContext context)
-    {
-        // noop - could checkout to provide browse functionality?.
     }
 
     //---( data cache aware implementation )---

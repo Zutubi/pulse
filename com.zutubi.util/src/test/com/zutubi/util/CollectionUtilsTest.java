@@ -2,6 +2,8 @@ package com.zutubi.util;
 
 import junit.framework.TestCase;
 
+import java.util.List;
+
 public class CollectionUtilsTest extends TestCase
 {
     public void testReverseEmpty()
@@ -63,5 +65,36 @@ public class CollectionUtilsTest extends TestCase
         assertSame(c, fourEls[1]);
         assertSame(b, fourEls[2]);
         assertSame(a, fourEls[3]);
+    }
+
+    public void testTimesZero()
+    {
+        timesHelper(0);
+    }
+
+    public void testTimesOne()
+    {
+        timesHelper(1);
+    }
+
+    public void testTimesTwo()
+    {
+        timesHelper(2);
+    }
+
+    public void testTimesMany()
+    {
+        timesHelper(20);
+    }
+
+    private void timesHelper(int count)
+    {
+        Object o = new Object();
+        List<Object> list = CollectionUtils.times(o, count);
+        assertEquals(count, list.size());
+        for (Object p: list)
+        {
+            assertSame(o, p);
+        }
     }
 }

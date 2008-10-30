@@ -1,8 +1,10 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.engine.api.*;
-import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.CachingScmClient;
+import com.zutubi.pulse.core.scm.CachingScmFile;
+import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
@@ -481,6 +483,11 @@ public class PerforceClient extends CachingScmClient
         this.core.setEnv(ENV_CLIENT, resolveClient(null, false));
     }
 
+    public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // noop
+    }
+
     public void close()
     {
     }
@@ -841,11 +848,6 @@ public class PerforceClient extends CachingScmClient
         {
             deleteClient(clientName);
         }
-    }
-
-    public void init(ScmContext context)
-    {
-        // noop.
     }
 
     public boolean labelExists(String client, String name) throws ScmException

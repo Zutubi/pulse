@@ -15,6 +15,23 @@ import java.util.Set;
 public interface ScmClient extends Closeable
 {
     /**
+     * The init method is a callback that is called before any of the methods that receive
+     * an SCM context.  It is called once when a project is initialised.  It may be called
+     * again for the same project if the user chooses to manually reinitialise, in which
+     * case the previous SCM persistent directory will have already been cleaned up, but
+     * any other external artifacts from an earlier initialisation may still exist.
+     *
+     * It is during this callback that any long running tasks to prepare the SCM's
+     * persistent working directory (on the master) can be run.
+     *
+     * @param context the scm context that will be used for subsequent calls.
+     * @param handler handler for receipt of feedback during long-running initialisation
+     *
+     * @throws ScmException if there is a problem
+     */
+    void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException;
+
+    /**
      * Must be called to release resources when this client is not longer
      * required.  No other methods may be called after closing.
      */
@@ -215,17 +232,4 @@ public interface ScmClient extends Closeable
      * @throws ScmException if the given revision is invalid
      */
     Revision parseRevision(String revision) throws ScmException;
-
-    /**
-     * The init method is a callback that is called before any of the non execution context
-     * methods.
-     *
-     * It is during this callback that any long running tasks to prepare the scms persistent
-     * working directory (on the master) can be run.
-     *
-     * @param context the scm context that will be used for subsequent calls.
-     *
-     * @throws ScmException if there is a problem
-     */
-    void init(ScmContext context) throws ScmException;
 }

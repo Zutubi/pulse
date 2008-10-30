@@ -2,8 +2,9 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
 import com.zutubi.pulse.core.scm.ExpectedTestResults;
-import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackAdapter;
 import com.zutubi.pulse.core.util.ZipUtils;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
         this.testData = new ExpectedTestResults(revisions);
         this.prefix = ""; // hmm, this is duplicated in the expected test results instance as well.
 
-        this.client.init(context);
+        this.client.init(context, new ScmFeedbackAdapter());
     }
 
     protected void tearDown() throws Exception

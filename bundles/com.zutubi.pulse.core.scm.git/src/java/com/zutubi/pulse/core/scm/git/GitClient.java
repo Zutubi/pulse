@@ -76,14 +76,10 @@ public class GitClient implements ScmClient
      * @param context the scm context in which this git client will be operating.
      * @throws ScmException if we encounter a problem
      */
-    public void init(ScmContext context) throws ScmException
+    public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
         synchronized(context)
         {
-            // at this stage, we are not overly concerned with feedback since this is running
-            // in the background, so use the default noop handler.
-            ScmFeedbackHandler handler = new ScmFeedbackAdapter();
-
             File workingDir = context.getPersistentWorkingDir();
 
             // git does not like to clone 'into' existing directories.
@@ -95,13 +91,17 @@ public class GitClient implements ScmClient
             NativeGit git = new NativeGit();
             git.setWorkingDirectory(workingDir.getParentFile());
             // git clone -n <repository> dir
+            handler.status("Initialising clone of git repository '" + repository + "'...");
             git.clone(handler, repository, workingDir.getName());
+            handler.status("Repository cloned.");
 
             // cd into git repository.
             git.setWorkingDirectory(workingDir);
 
             // git checkout -b local origin/<branch>
+            handler.status("Creating local checkout...");
             git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
+            handler.status("Checkout complete.");
         }
     }
 

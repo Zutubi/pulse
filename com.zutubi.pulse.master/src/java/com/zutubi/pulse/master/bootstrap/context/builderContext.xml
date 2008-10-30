@@ -172,6 +172,7 @@
                 <ref bean="jabberManager"/>
                 <ref bean="jettyManager"/>
                 <ref bean="projectInitialisationService"/>
+                <ref bean="projectLoggerManager"/>
                 <ref bean="databaseConsole"/>
             </list>
         </property>
