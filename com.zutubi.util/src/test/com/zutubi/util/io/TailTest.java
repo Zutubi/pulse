@@ -169,6 +169,11 @@ public class TailTest extends TestCase
         multipleFileHelper(2, 20, 40);
     }
 
+    public void testTwoFilesOverTwoRequired() throws IOException
+    {
+        multipleFileHelper(2, 20, 50);
+    }
+
     public void testThreeFilesHalfRequired() throws IOException
     {
         multipleFileHelper(3, 20, 10);
@@ -192,6 +197,16 @@ public class TailTest extends TestCase
     public void testThreeFilesTwoAndAHalfRequired() throws IOException
     {
         multipleFileHelper(3, 20, 50);
+    }
+
+    public void testThreeFilesThreeRequired() throws IOException
+    {
+        multipleFileHelper(3, 20, 60);
+    }
+
+    public void testThreeFilesExactlyOverThreeRequired() throws IOException
+    {
+        multipleFileHelper(3, 20, 70);
     }
 
     private void singleFileHelper(int lineCount, int tailLines) throws IOException
