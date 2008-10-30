@@ -1,7 +1,6 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.scm.ScmPathFilter;
 
 import java.util.Arrays;
 
@@ -9,7 +8,7 @@ import java.util.Arrays;
  * Note: we don't exhaustively test wildcards: we assume Ant works.  We do,
  * however, do a few trivial tests, then test for our special cases.
  */
-public class ScmFilepathFilterTest extends PulseTestCase
+public class ExcludePathFilterTest extends PulseTestCase
 {
     public void testIdentical()
     {
@@ -83,7 +82,7 @@ public class ScmFilepathFilterTest extends PulseTestCase
 
     private void assertAccepts(String exclude, String path, boolean accept)
     {
-        ScmPathFilter filter = new ScmPathFilter(Arrays.asList(exclude));
+        ExcludePathFilter filter = new ExcludePathFilter(Arrays.asList(exclude));
         assertEquals(accept, filter.accept(path));
     }
 }

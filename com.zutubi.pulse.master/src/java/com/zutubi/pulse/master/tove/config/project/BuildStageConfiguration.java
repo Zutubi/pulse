@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -32,7 +31,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     private String recipe;
     @Ordered
     private Map<String, ResourcePropertyConfiguration> properties = new HashMap<String, ResourcePropertyConfiguration>();
-    private List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
+    private List<ResourceRequirementConfiguration> requirements = new LinkedList<ResourceRequirementConfiguration>();
 
     @Transient
     private ObjectFactory objectFactory;
@@ -81,12 +80,12 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
         return this.properties.get(name);
     }
 
-    public List<ResourceRequirement> getRequirements()
+    public List<ResourceRequirementConfiguration> getRequirements()
     {
         return requirements;
     }
 
-    public void setRequirements(List<ResourceRequirement> requirements)
+    public void setRequirements(List<ResourceRequirementConfiguration> requirements)
     {
         this.requirements = requirements;
     }

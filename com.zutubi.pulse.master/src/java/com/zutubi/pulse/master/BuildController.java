@@ -217,9 +217,20 @@ public class BuildController implements EventListener
     {
         // get the list of resource requirements for the project AND the particular stage we are running.
         List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
-        requirements.addAll(projectConfig.getRequirements());
-        requirements.addAll(node.getRequirements());
+        requirements.addAll(asResourceRequirements(projectConfig.getRequirements()));
+        requirements.addAll(asResourceRequirements(node.getRequirements()));
         return requirements;
+    }
+
+    private Collection<? extends ResourceRequirement> asResourceRequirements(List<ResourceRequirementConfiguration> requirements)
+    {
+        return CollectionUtils.map(requirements, new Mapping<ResourceRequirementConfiguration, ResourceRequirement>()
+        {
+            public ResourceRequirement map(ResourceRequirementConfiguration config)
+            {
+                return config.asResourceRequirement();
+            }
+        });
     }
 
     public void handleEvent(Event evt)

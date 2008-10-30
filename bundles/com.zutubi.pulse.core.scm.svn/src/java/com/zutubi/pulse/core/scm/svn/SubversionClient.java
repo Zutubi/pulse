@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
-import com.zutubi.pulse.core.scm.PathFilter;
-import com.zutubi.pulse.core.scm.ScmPathFilter;
+import com.zutubi.pulse.core.scm.api.PathFilter;
+import com.zutubi.pulse.core.scm.api.ExcludePathFilter;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -409,7 +409,7 @@ public class SubversionClient implements ScmClient
     private boolean log(SVNRepository repository, long fromNumber, long toNumber, ChangeHandler handler) throws SVNException, ScmException
     {
         List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
-        PathFilter filter = new ScmPathFilter(excludedPaths);
+        PathFilter filter = new ExcludePathFilter(excludedPaths);
 
         repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
         for (SVNLogEntry entry : logs)

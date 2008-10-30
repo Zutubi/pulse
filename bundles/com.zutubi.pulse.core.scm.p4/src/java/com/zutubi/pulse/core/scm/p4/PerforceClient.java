@@ -55,23 +55,14 @@ public class PerforceClient extends CachingScmClient
             {
                 String commandLine = templateClient.substring(1);
 
-                PulseScope scope = new PulseScope();
-                String revisionSpec;
-                if(revision == null)
-                {
-                    revisionSpec = "#head";
-                }
-                else
-                {
-                    revisionSpec = "@" + revision.getRevisionString();
-                }
-
-                scope.add(new Property("revision.spec", revisionSpec));
+                HashReferenceMap referenceMap = new HashReferenceMap();
+                String revisionSpec = (revision == null) ?  "#head" : "@" + revision.getRevisionString();
+                referenceMap.add(new Property("revision.spec", revisionSpec));
 
                 Process p;
                 try
                 {
-                    List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
+                    List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, referenceMap, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
                     p = Runtime.getRuntime().exec(command.toArray(new String[command.size()]));
                 }
                 catch(Exception e)
@@ -344,7 +335,7 @@ public class PerforceClient extends CachingScmClient
         String comment = getChangelistComment(lines, affectedFilesIndex);
 
         Revision revision = new Revision(Long.toString(number));
-        ScmPathFilter filter = new ScmPathFilter(excludedPaths);
+        ExcludePathFilter filter = new ExcludePathFilter(excludedPaths);
         List<FileChange> changes = new LinkedList<FileChange>();
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {

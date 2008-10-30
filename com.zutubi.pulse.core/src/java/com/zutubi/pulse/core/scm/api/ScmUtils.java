@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
@@ -13,7 +13,7 @@ public class ScmUtils
 {
     /**
      * An inplace filter that removes changes from the changelist whose paths are not
-     * matched by the filter.
+     * accepted by the filter.
      *
      * @param changelists the changelists whose changes are analysed
      * @param filter the filter that determines which paths are accepted and which are filtered.

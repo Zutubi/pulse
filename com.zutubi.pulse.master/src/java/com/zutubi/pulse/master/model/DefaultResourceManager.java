@@ -5,15 +5,15 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.master.agent.Agent;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
@@ -151,11 +151,11 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
             String newName = resource.getName();
             if (!oldName.equals(newName))
             {
-                for (ResourceRequirement requirement : configurationProvider.getAll(ResourceRequirement.class))
+                for (ResourceRequirementConfiguration requirement : configurationProvider.getAll(ResourceRequirementConfiguration.class))
                 {
                     if (requirement.getResource().equals(oldName))
                     {
-                        ResourceRequirement clone = configurationProvider.deepClone(requirement);
+                        ResourceRequirementConfiguration clone = configurationProvider.deepClone(requirement);
                         clone.setResource(newName);
                         configurationProvider.save(clone);
                     }
@@ -185,11 +185,11 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
             {
                 Resource owningResource = configurationProvider.getAncestorOfType(resourceVersion, Resource.class);
                 String resourceName = owningResource.getName();
-                for (ResourceRequirement requirement : configurationProvider.getAll(ResourceRequirement.class))
+                for (ResourceRequirementConfiguration requirement : configurationProvider.getAll(ResourceRequirementConfiguration.class))
                 {
                     if (requirement.getResource().equals(resourceName) && requirement.getVersion().equals(oldValue))
                     {
-                        ResourceRequirement clone = configurationProvider.deepClone(requirement);
+                        ResourceRequirementConfiguration clone = configurationProvider.deepClone(requirement);
                         clone.setVersion(newValue);
                         configurationProvider.save(clone);
                     }

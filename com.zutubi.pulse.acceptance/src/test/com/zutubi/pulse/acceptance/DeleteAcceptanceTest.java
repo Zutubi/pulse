@@ -2,13 +2,13 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
@@ -393,7 +393,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         String parentReqsPath = PathUtils.getPath(parentPath, "requirements");
         String childReqsPath = PathUtils.getPath(childPath, "requirements");
-        Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirement.class);
+        Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirementConfiguration.class);
         req.put("resource", "foo");
         String parentReqPath = xmlRpcHelper.insertConfig(parentReqsPath, req);
         String baseName = PathUtils.getBaseName(parentReqPath);
@@ -424,7 +424,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         String parentReqsPath = PathUtils.getPath(parentPath, "requirements");
         String childReqsPath = PathUtils.getPath(childPath, "requirements");
-        Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirement.class);
+        Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirementConfiguration.class);
         req.put("resource", "foo");
         String parentReqPath = xmlRpcHelper.insertConfig(parentReqsPath, req);
         String baseName = PathUtils.getBaseName(parentReqPath);

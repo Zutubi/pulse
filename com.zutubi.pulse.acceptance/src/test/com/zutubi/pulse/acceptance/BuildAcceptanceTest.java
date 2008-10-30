@@ -7,9 +7,9 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.TextUtils;
@@ -267,7 +267,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private Hashtable<String, Object> createRequiredResource(String resource, String version) throws Exception
     {
-        Hashtable<String, Object> requirement = xmlRpcHelper.createDefaultConfig(ResourceRequirement.class);
+        Hashtable<String, Object> requirement = xmlRpcHelper.createDefaultConfig(ResourceRequirementConfiguration.class);
         requirement.put("resource", resource);
         if (TextUtils.stringSet(version))
         {

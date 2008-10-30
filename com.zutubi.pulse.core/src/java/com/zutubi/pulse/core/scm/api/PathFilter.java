@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.api;
 
 /**
  * <class-comment/>

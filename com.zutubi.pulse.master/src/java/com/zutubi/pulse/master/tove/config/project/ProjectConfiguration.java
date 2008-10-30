@@ -1,16 +1,15 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.pulse.core.config.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
-import com.zutubi.tove.type.Extendable;
-import com.zutubi.tove.config.api.NamedConfiguration;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.NamedConfiguration;
+import com.zutubi.tove.type.Extendable;
 import com.zutubi.validation.annotations.Url;
 
 import java.util.*;
@@ -53,7 +52,7 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     @Ordered
     private Map<String, BuildStageConfiguration> stages = new LinkedHashMap<String, BuildStageConfiguration>();
 
-    private List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
+    private List<ResourceRequirementConfiguration> requirements = new LinkedList<ResourceRequirementConfiguration>();
 
     private List<LabelConfiguration> labels = new LinkedList<LabelConfiguration>();
 
@@ -165,12 +164,12 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
         this.options = options;
     }
 
-    public List<ResourceRequirement> getRequirements()
+    public List<ResourceRequirementConfiguration> getRequirements()
     {
         return requirements;
     }
 
-    public void setRequirements(List<ResourceRequirement> requirements)
+    public void setRequirements(List<ResourceRequirementConfiguration> requirements)
     {
         this.requirements = requirements;
     }

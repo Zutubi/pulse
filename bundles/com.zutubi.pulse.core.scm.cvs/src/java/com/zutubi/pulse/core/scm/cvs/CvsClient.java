@@ -5,8 +5,8 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.scm.DataCacheAware;
-import com.zutubi.pulse.core.scm.ScmPathFilter;
-import com.zutubi.pulse.core.scm.ScmUtils;
+import com.zutubi.pulse.core.scm.api.ExcludePathFilter;
+import com.zutubi.pulse.core.scm.api.ScmUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
@@ -379,7 +379,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         List<Changelist> changes = analyser.extractChangelists(info, branch);
 
         // process excludes from the changelist.
-        changes = ScmUtils.filter(changes, new ScmPathFilter(excludedPaths));
+        changes = ScmUtils.filter(changes, new ExcludePathFilter(excludedPaths));
         if (changes.size() == 0)
         {
             return changes;
