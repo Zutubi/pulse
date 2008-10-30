@@ -704,12 +704,10 @@ public class PerforceClient extends CachingScmClient
 
         for (Map.Entry<String, String> entry : core.getEnv().entrySet())
         {
-            ResourceProperty resourceProperty = new ResourceProperty(entry.getKey(), entry.getValue());
-            resourceProperty.setAddToEnvironment(true);
+            ResourceProperty resourceProperty = new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false);
             scope.add(resourceProperty);
         }
-        ResourceProperty resourceProperty = new ResourceProperty("P4CLIENT", getClientName(context.getString("scm.bootstrap.id")));
-        resourceProperty.setAddToEnvironment(true);
+        ResourceProperty resourceProperty = new ResourceProperty("P4CLIENT", getClientName(context.getString("scm.bootstrap.id")), true, false, false);
         scope.add(resourceProperty);
     }
 

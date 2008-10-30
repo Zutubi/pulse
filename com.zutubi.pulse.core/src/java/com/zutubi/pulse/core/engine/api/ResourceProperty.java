@@ -36,19 +36,9 @@ public class ResourceProperty
         return name;
     }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
     public String getValue()
     {
         return value;
-    }
-
-    public void setValue(String value)
-    {
-        this.value = value;
     }
 
     public boolean getAddToEnvironment()
@@ -56,28 +46,13 @@ public class ResourceProperty
         return addToEnvironment;
     }
 
-    public void setAddToEnvironment(boolean addToEnvironment)
-    {
-        this.addToEnvironment = addToEnvironment;
-    }
-
     public boolean getAddToPath()
     {
         return addToPath;
     }
 
-    public void setAddToPath(boolean addToPath)
-    {
-        this.addToPath = addToPath;
-    }
-
     public boolean getResolveVariables()
     {
         return resolveVariables;
-    }
-
-    public void setResolveVariables(boolean resolveVariables)
-    {
-        this.resolveVariables = resolveVariables;
     }
 }
