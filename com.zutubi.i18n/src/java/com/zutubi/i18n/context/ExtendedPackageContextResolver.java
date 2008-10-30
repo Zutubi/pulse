@@ -1,10 +1,12 @@
 package com.zutubi.i18n.context;
 
-import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.zutubi.util.ReflectionUtils;
+import com.zutubi.util.UnaryProcedure;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This context resolver navigates the context's class hierarchy and
@@ -17,7 +19,7 @@ public class ExtendedPackageContextResolver implements ContextResolver<ClassCont
         final List<String> resolvedNames = new LinkedList<String>();
         final PackageContextResolver packageResolver = new PackageContextResolver();
 
-        ClassUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
+        ReflectionUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
         {
             public void process(Class clazz)
             {
@@ -25,16 +27,10 @@ public class ExtendedPackageContextResolver implements ContextResolver<ClassCont
             }
         });
 
-        final List<String> filteredNames = new LinkedList<String>();
-        CollectionUtils.filter(resolvedNames, new Predicate<String>()
-        {
-            public boolean satisfied(String s)
-            {
-                return !filteredNames.contains(s) && s.compareTo(PackageContextResolver.BUNDLE_NAME) != 0;
-            }
-        }, filteredNames);
+        List<String> filteredNames = CollectionUtils.unique(resolvedNames);
 
         // move the base package to the END of the list.
+        filteredNames.remove(PackageContextResolver.BUNDLE_NAME);
         filteredNames.add(PackageContextResolver.BUNDLE_NAME);
         
         return filteredNames.toArray(new String[filteredNames.size()]);

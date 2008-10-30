@@ -327,6 +327,27 @@ public class CollectionUtils
     }
 
     /**
+     * Return a copy of the list c that has duplicates.
+     *
+     * @param l the list from which duplicates will be removed.
+     *
+     * @return the copy of the list with duplicates removed.
+     */
+    public static <T> List<T> unique(List<T> l)
+    {
+        final List<T> filtered = new LinkedList<T>();
+        CollectionUtils.filter(l, new Predicate<T>()
+        {
+            public boolean satisfied(T t)
+            {
+                return !filtered.contains(t);
+            }
+        }, filtered);
+
+        return filtered;
+    }
+
+    /**
      * Creates a list holding count elements with the given value.
      *
      * @param value value to use for all list elements

@@ -2,7 +2,9 @@ package com.zutubi.util;
 
 import junit.framework.TestCase;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedList;
 
 public class CollectionUtilsTest extends TestCase
 {
@@ -65,6 +67,38 @@ public class CollectionUtilsTest extends TestCase
         assertSame(c, fourEls[1]);
         assertSame(b, fourEls[2]);
         assertSame(a, fourEls[3]);
+    }
+
+    public void testUniqueStrings()
+    {
+        List<String> result = CollectionUtils.unique(Arrays.asList("a", "a", "b", "c"));
+        assertEquals(3, result.size());
+        assertEquals("a", result.get(0));
+        assertEquals("b", result.get(1));
+        assertEquals("c", result.get(2));
+    }
+
+    public void testUniqueObjects()
+    {
+        Object o = new Object();
+        List<Object> result = CollectionUtils.unique(Arrays.asList(new Object(), new Object(), o, o));
+        assertEquals(3, result.size());
+        assertEquals(o, result.get(2));
+    }
+
+    public void testUniqueEmpty()
+    {
+        List<Object> result = CollectionUtils.unique(new LinkedList<Object>());
+        assertEquals(0, result.size());
+    }
+
+    public void testUniqueContainsNull()
+    {
+        List<String> result = CollectionUtils.unique(Arrays.asList("a", null, null, "c"));
+        assertEquals(3, result.size());
+        assertEquals("a", result.get(0));
+        assertEquals(null, result.get(1));
+        assertEquals("c", result.get(2));
     }
 
     public void testTimesZero()

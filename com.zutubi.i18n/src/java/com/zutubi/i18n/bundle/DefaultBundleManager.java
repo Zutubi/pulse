@@ -1,10 +1,11 @@
 package com.zutubi.i18n.bundle;
 
 import com.zutubi.i18n.context.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Closeable;
 import java.util.*;
 
 /**
@@ -51,14 +52,20 @@ public class DefaultBundleManager implements BundleManager
         }
 
         List<ResourceBundle> bundles = new LinkedList<ResourceBundle>();
-
+        List<ContextResolver> resolvers = new LinkedList<ContextResolver>();
         List<String> bundleNames = new LinkedList<String>();
-        for (ContextResolver resolver : resolvers.get(context.getClass()))
+
+        synchronized(this.resolvers)
+        {
+            resolvers.addAll(this.resolvers.get(context.getClass()));
+        }
+        
+        for (ContextResolver resolver : resolvers)
         {
             bundleNames.addAll(Arrays.asList(resolver.resolve(context)));
         }
 
-        bundleNames = filterDuplicates(bundleNames);
+        bundleNames = CollectionUtils.unique(bundleNames);
 
         for (String bundleName : bundleNames)
         {
@@ -80,7 +87,7 @@ public class DefaultBundleManager implements BundleManager
                 }
                 finally
                 {
-                    close(input);
+                    IOUtils.close(input);
                 }
             }
         }
@@ -89,36 +96,6 @@ public class DefaultBundleManager implements BundleManager
 
         return bundles;
 
-    }
-
-    private List<String> filterDuplicates(List<String> bundleNames)
-    {
-        Set<String> seen = new HashSet<String>();
-        List<String> filteredNames = new LinkedList<String>();
-        for (String name : bundleNames)
-        {
-            if (!seen.contains(name))
-            {
-                seen.add(name);
-                filteredNames.add(name);
-            }
-        }
-        return filteredNames;
-    }
-
-    private void close(Closeable closeable)
-    {
-        if (closeable != null)
-        {
-            try
-            {
-                closeable.close();
-            }
-            catch (IOException e)
-            {
-                // noop.
-            }
-        }
     }
 
     private ContextLoader getContextLoader(Context context)
@@ -131,7 +108,7 @@ public class DefaultBundleManager implements BundleManager
         this.cache = cache;
     }
 
-    public void clear()
+    public void clearContextCache()
     {
         this.cache.clear();
     }

@@ -91,7 +91,7 @@ public class DefaultMessageHandler implements MessageHandler
 
     public void clear()
     {
-        bundleManager.clear();
+        bundleManager.clearContextCache();
     }
 
     private LocaleManager localeManager()

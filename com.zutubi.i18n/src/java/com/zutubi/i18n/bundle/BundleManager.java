@@ -34,5 +34,5 @@ public interface BundleManager
     /**
      * Clear the context cache.
      */
-    void clear();
+    void clearContextCache();
 }

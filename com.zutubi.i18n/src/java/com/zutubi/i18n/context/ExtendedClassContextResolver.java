@@ -1,11 +1,12 @@
 package com.zutubi.i18n.context;
 
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.ReflectionUtils;
 
 import java.util.*;
 
 /**
- * Simplar to the ClassContext resolver, this resolver implementation applies the PackageContext
+ * Similar to the ClassContext resolver, this resolver implementation applies the PackageContext
  * resolver at the end of the resolution process.
  */
 public class ExtendedClassContextResolver implements ContextResolver<ClassContext>
@@ -14,7 +15,7 @@ public class ExtendedClassContextResolver implements ContextResolver<ClassContex
     {
         final List<String> resolvedNames = new LinkedList<String>();
 
-        ClassUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
+        ReflectionUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
         {
             public void process(Class clazz)
             {

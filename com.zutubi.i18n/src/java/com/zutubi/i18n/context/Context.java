@@ -11,7 +11,7 @@ import java.io.InputStream;
 public interface Context
 {
     /**
-     * Retrieve the name resource from within this context.  This method
+     * Retrieve the named resource from within this context.  This method
      * is used by the default context loader implementation to load a
      * resource.
      *

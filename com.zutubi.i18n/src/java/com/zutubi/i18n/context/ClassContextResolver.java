@@ -1,6 +1,7 @@
 package com.zutubi.i18n.context;
 
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.ReflectionUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class ClassContextResolver implements ContextResolver<ClassContext>
     {
         final List<String> resolvedNames = new LinkedList<String>();
 
-        ClassUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
+        ReflectionUtils.traverse(context.getContext(), new UnaryProcedure<Class>()
         {
             public void process(Class clazz)
             {

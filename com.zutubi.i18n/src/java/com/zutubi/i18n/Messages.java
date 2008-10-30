@@ -7,11 +7,11 @@ import com.zutubi.i18n.context.*;
  * The Messages object is a pre-configured entry point into the I18N messages
  * package.
  *
- * By default, it supports message lookups using the PackageContext and the
- * ExtendedClassContext.
+ * By default, it supports message lookups using the {@link com.zutubi.i18n.context.PackageContext} and the
+ * {@link com.zutubi.i18n.context.ClassContext}.
  *
- * Custom contexts can be supported by adding customer ContextResolvers via the
- * <code>addResolver</code> method. 
+ * Custom contexts can be supported by adding customer {@link com.zutubi.i18n.context.ContextResolver} via the
+ * {@link #addResolver(com.zutubi.i18n.context.ContextResolver)} method.
  *
  */
 public class Messages
