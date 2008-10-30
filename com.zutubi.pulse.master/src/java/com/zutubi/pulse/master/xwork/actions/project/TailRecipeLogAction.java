@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.util.io.Tail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -115,10 +116,7 @@ public class TailRecipeLogAction extends StageActionBase
     {
         try
         {
-            Tail tail = new Tail();
-            tail.setFile(recipeLog);
-            tail.setMaxLines(maxLines);
-
+            Tail tail = new Tail(recipeLog, maxLines);
             this.tail = tail.getTail();
         }
         catch (IOException e)
