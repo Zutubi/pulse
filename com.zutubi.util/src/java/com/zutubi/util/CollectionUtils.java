@@ -335,14 +335,16 @@ public class CollectionUtils
      */
     public static <T> List<T> unique(List<T> l)
     {
+        final Set<T> seen = new HashSet<T>();
         final List<T> filtered = new LinkedList<T>();
-        CollectionUtils.filter(l, new Predicate<T>()
+        for (T t : l)
         {
-            public boolean satisfied(T t)
+            if (!seen.contains(t))
             {
-                return !filtered.contains(t);
+                seen.add(t);
+                filtered.add(t);
             }
-        }, filtered);
+        }
 
         return filtered;
     }

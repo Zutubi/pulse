@@ -22,10 +22,9 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
@@ -119,16 +118,7 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
             }
         }
 
-        final List<String> filtered = new LinkedList<String>();
-        CollectionUtils.filter(emails, new Predicate<String>()
-        {
-            public boolean satisfied(String s)
-            {
-                return !filtered.contains(s);
-            }
-        }, filtered);
-
-        return filtered;
+        return CollectionUtils.unique(emails);
     }
 
     public void setBuildResultRenderer(BuildResultRenderer buildResultRenderer)
