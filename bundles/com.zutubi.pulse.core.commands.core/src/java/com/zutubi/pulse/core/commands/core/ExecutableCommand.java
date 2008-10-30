@@ -484,7 +484,11 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         {
             for (Arg arg : args)
             {
-                command.add(arg.getText());
+                // filter out empty strings from the command line.
+                if (TextUtils.stringSet(arg.getText()))
+                {
+                    command.add(arg.getText());
+                }
             }
         }
         return command;
