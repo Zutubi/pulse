@@ -36,6 +36,7 @@
                 <ref local="addAllowPersonalBuilds"/>
                 <ref local="ensureBackupConfigPermanent"/>
                 <ref local="collapseRevisionRefactor"/>
+                <ref local="projectLifecycle"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -92,4 +93,7 @@
         <property name="buildNumber" value="200013002"/>
     </bean>
 
+    <bean id="projectLifecycle" class="com.zutubi.pulse.master.upgrade.tasks.ProjectLifecycleUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200013003"/>
+    </bean>
 </beans>
