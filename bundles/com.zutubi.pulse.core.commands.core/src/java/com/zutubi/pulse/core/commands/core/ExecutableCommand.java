@@ -480,17 +480,11 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         List<String> command = new LinkedList<String>();
         command.add(binary);
 
-        if (args != null)
+        for (Arg arg : args)
         {
-            for (Arg arg : args)
-            {
-                // filter out empty strings from the command line.
-                if (TextUtils.stringSet(arg.getText()))
-                {
-                    command.add(arg.getText());
-                }
-            }
+            command.add(arg.getText());
         }
+
         return command;
     }
 
@@ -622,10 +616,13 @@ public class ExecutableCommand extends CommandSupport implements Validateable
      */
     public void setArgs(String args)
     {
-        for (String arg : args.split(" "))
+        for (String arg : args.split(" +"))
         {
-            Arg a = createArg();
-            a.setText(arg);
+            if (TextUtils.stringSet(arg))
+            {
+                Arg a = createArg();
+                a.setText(arg);
+            }
         }
     }
 

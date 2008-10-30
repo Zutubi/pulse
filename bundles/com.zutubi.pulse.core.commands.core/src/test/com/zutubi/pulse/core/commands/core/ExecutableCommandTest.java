@@ -399,6 +399,29 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         assertEquals(ResultState.ERROR, result.getState());
     }
 
+    public void testArgumentCreationEmptyString()
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setArgs("");
+        assertEquals(0, command.getArgs().size());
+    }
+
+    public void testArgumentCreationWhitespaceString()
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setArgs("  ");
+        assertEquals(0, command.getArgs().size());
+    }
+
+    public void testArgumentCreationTrimsWhitespace()
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setArgs("  a   b ");
+        assertEquals(2, command.getArgs().size());
+        assertEquals("a", command.getArgs().get(0).getText());
+        assertEquals("b", command.getArgs().get(1).getText());
+    }
+
     private CommandResult statusMappingHelper(int exitCode, int mappedCode, ResultState mappedStatus) throws Exception
     {
         ExecutableCommand command = new ExecutableCommand();
