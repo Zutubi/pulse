@@ -335,18 +335,10 @@ public class CollectionUtils
      */
     public static <T> List<T> unique(List<T> l)
     {
-        final Set<T> seen = new HashSet<T>();
-        final List<T> filtered = new LinkedList<T>();
-        for (T t : l)
-        {
-            if (!seen.contains(t))
-            {
-                seen.add(t);
-                filtered.add(t);
-            }
-        }
-
-        return filtered;
+        // sets by definition are unique, and so will do the processing for us.
+        LinkedHashSet<T> seen = new LinkedHashSet<T>();
+        seen.addAll(l);
+        return new LinkedList<T>(seen);
     }
 
     /**

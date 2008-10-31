@@ -71,34 +71,32 @@ public class CollectionUtilsTest extends TestCase
 
     public void testUniqueStrings()
     {
-        List<String> result = CollectionUtils.unique(Arrays.asList("a", "a", "b", "c"));
-        assertEquals(3, result.size());
-        assertEquals("a", result.get(0));
-        assertEquals("b", result.get(1));
-        assertEquals("c", result.get(2));
-    }
-
-    public void testUniqueObjects()
-    {
-        Object o = new Object();
-        List<Object> result = CollectionUtils.unique(Arrays.asList(new Object(), new Object(), o, o));
-        assertEquals(3, result.size());
-        assertEquals(o, result.get(2));
+        assertUnique(Arrays.asList("a", "b", "c"), Arrays.asList("a", "b", "b", "c"));
     }
 
     public void testUniqueEmpty()
     {
-        List<Object> result = CollectionUtils.unique(new LinkedList<Object>());
-        assertEquals(0, result.size());
+        assertUnique(new LinkedList<Object>(), new LinkedList<Object>());
     }
 
     public void testUniqueContainsNull()
     {
-        List<String> result = CollectionUtils.unique(Arrays.asList("a", null, null, "c"));
-        assertEquals(3, result.size());
-        assertEquals("a", result.get(0));
-        assertEquals(null, result.get(1));
-        assertEquals("c", result.get(2));
+        assertUnique(Arrays.asList("a", null, "c"), Arrays.asList("a", null, null, "c"));
+    }
+
+    public void testUniqueOrderMaintained()
+    {
+        assertUnique(Arrays.asList("c", "1", "a", "5", "2", "x", "n"), Arrays.asList("c", "1", "a", "c", "1", "5", "2", "x", "n", "a"));
+    }
+
+    private <T> void assertUnique(List<T> expected, List<T> test)
+    {
+        List<T> result = CollectionUtils.unique(test);
+        assertEquals(expected.size(), result.size());
+        for (int i = 0; i < expected.size(); i++)
+        {
+            assertEquals(expected.get(i), result.get(i));
+        }
     }
 
     public void testTimesZero()
