@@ -95,7 +95,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
             }
             catch (RuntimeException e)
             {
-                fail("Could not contact Selenium Server");
+                fail(e.getMessage());
             }
             catch (Exception e)
             {
@@ -137,7 +137,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
                 {
                     // success.
                     agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
-                    assertFalse(200000000 == agentBuild.intValue());
+                    assertFalse(200000000 == agentBuild);
                     return;
                 }
             }

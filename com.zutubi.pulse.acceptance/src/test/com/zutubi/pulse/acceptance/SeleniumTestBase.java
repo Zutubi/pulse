@@ -173,6 +173,18 @@ public class SeleniumTestBase extends TestCase
             ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, name, template);
             hierarchyPage.waitFor();
             hierarchyPage.assertPresent();
+
+            if (!template)
+            {
+                try
+                {
+                    xmlRpcHelper.waitForProjectToInitialise(name);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -208,18 +220,6 @@ public class SeleniumTestBase extends TestCase
         AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
         antState.waitFor();
         antState.finishFormElements(null, "build.xml", null, null);
-
-        if (!template)
-        {
-            try
-            {
-                xmlRpcHelper.waitForProjectToInitialise(name);
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
 
         return antState;
     }

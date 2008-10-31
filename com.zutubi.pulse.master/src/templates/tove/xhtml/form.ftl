@@ -26,20 +26,20 @@ width of its contents.  Floating it works, but hurts other things.
     var ${form.name} = function()
     {
         var form = new ZUTUBI.FormPanel({
-            method: 'POST'
-            , formName: '${form.name?js_string}'
-            , waitMsgTarget: 'nested-layout'
-            , border: false
-            , labelWidth: 'hello'
-            , items: [{
+            method: 'POST',
+<#if form.fileUpload>
+            fileUpload: true,
+</#if>
+            formName: '${form.name?js_string}',
+            waitMsgTarget: 'nested-layout',
+            border: false,
+            labelWidth: '-',
+            items: [{
                 xtype: 'hidden',
                 id: '${form.name?js_string}.submitField',
                 name: 'submitField',
                 value: 'h'
             }]
-<#if form.fileUpload>
-            , fileUpload: true
-</#if>
         });
 
         function submitForm(value)

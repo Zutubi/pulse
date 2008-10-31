@@ -9,11 +9,11 @@ var fc;
 <#list form.fields as field>
     <#assign parameters=field.parameters>
     fc = {
-        width: 360
-      , validateOnBlur: false
     <#if form.readOnly>
-      , disabled: true
+        disabled: true,
     </#if>
+        width: 360,
+        validateOnBlur: false
     };
     <#include "${parameters.type}.ftl"/>
 </#list>

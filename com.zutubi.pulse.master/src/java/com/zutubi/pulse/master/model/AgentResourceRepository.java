@@ -48,7 +48,15 @@ public class AgentResourceRepository implements ResourceRepository
 
     public Resource getResource(String name)
     {
-        return agentConfig.getResources().get(name).asResource();
+        ResourceConfiguration resourceConfig = agentConfig.getResources().get(name);
+        if (resourceConfig == null)
+        {
+            return null;
+        }
+        else
+        {
+            return resourceConfig.asResource();
+        }
     }
 
     public List<String> getResourceNames()

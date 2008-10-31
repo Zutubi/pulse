@@ -47,7 +47,8 @@ public class EnumDeserialiser extends AbstractDeserializer
             }
         }
 
-        Class enumClazz = null;
+        clazz = checkRenames(clazz);
+        Class enumClazz;
         try
         {
             enumClazz = Class.forName(clazz);
@@ -58,6 +59,17 @@ public class EnumDeserialiser extends AbstractDeserializer
         }
 
         return Enum.valueOf(enumClazz, value);
+    }
+
+    private String checkRenames(String clazz)
+    {
+        if (clazz.equals("com.zutubi.pulse.services.UpgradeState"))
+        {
+            // Between 2.0.13 and 2.0.14 we repackaged things.
+            return "com.zutubi.pulse.servercore.services.UpgradeState";
+        }
+
+        return clazz;
     }
 }
 

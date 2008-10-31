@@ -5,4 +5,4 @@
 </#if>
 form.add(new Ext.form.Hidden(fc));
 
-<#include "/tove/xhtml/controlfooter.ftl" />
+<#-- No footer for hidden fields -->
