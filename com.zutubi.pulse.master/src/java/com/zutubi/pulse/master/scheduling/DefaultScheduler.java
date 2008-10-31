@@ -109,10 +109,13 @@ public class DefaultScheduler implements Scheduler
 
     public void schedule(Trigger trigger) throws SchedulingException
     {
-        Trigger existingTrigger = triggerDao.findByNameAndGroup(trigger.getName(), trigger.getGroup());
-        if (existingTrigger != null && existingTrigger.isScheduled())
+        if (!trigger.isPersistent())
         {
-            throw new SchedulingException("A trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " has already been scheduled.");
+            Trigger existingTrigger = triggerDao.findByNameAndGroup(trigger.getName(), trigger.getGroup());
+            if (existingTrigger != null)
+            {
+                throw new SchedulingException("A trigger with name " + trigger.getName() + " and group " + trigger.getGroup() + " has already been scheduled.");
+            }
         }
 
         if (trigger.isScheduled())
