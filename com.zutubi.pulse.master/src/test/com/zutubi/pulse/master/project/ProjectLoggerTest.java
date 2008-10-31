@@ -33,6 +33,8 @@ public class ProjectLoggerTest extends PulseTestCase
     {
         IOUtils.close(logger);
         removeDirectory(tempDir);
+        logger = null;
+        tempDir = null;
         super.tearDown();
     }
 
@@ -40,6 +42,7 @@ public class ProjectLoggerTest extends PulseTestCase
     {
         logMessage(TEST_MESSAGE);
         logger.close();
+        // Null out to prevent second close in tearDown.
         logger = null;
 
         String written = IOUtils.fileToString(new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0)));

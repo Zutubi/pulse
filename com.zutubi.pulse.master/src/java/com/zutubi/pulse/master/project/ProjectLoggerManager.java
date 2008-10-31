@@ -34,39 +34,33 @@ public class ProjectLoggerManager implements EventListener, Stoppable
      * @param projectId identifier of the project to retrieve the logger for
      * @return the logger for the given project
      */
-    public ProjectLogger getLogger(long projectId)
+    public synchronized ProjectLogger getLogger(long projectId)
     {
-        synchronized(this)
+        ProjectLogger logger = idToLogger.get(projectId);
+        if (logger == null)
         {
-            ProjectLogger logger = idToLogger.get(projectId);
-            if (logger == null)
+            File dir = new File(projectRoot, Long.toString(projectId));
+            if (!dir.exists())
             {
-                File dir = new File(projectRoot, Long.toString(projectId));
-                if (!dir.exists())
-                {
-                    dir.mkdirs();
-                }
-                
-                logger = new ProjectLogger(dir, SIZE_LIMIT);
-                idToLogger.put(projectId, logger);
+                dir.mkdirs();
             }
 
-            return logger;
+            logger = new ProjectLogger(dir, SIZE_LIMIT);
+            idToLogger.put(projectId, logger);
         }
+
+        return logger;
     }
 
-    public void handleEvent(Event event)
+    public synchronized void handleEvent(Event event)
     {
-        synchronized(this)
+        if (stopped)
         {
-            if (stopped)
-            {
-                return;
-            }
-            
-            ProjectEvent pe = (ProjectEvent) event;
-            getLogger(pe.getProjectConfiguration().getProjectId()).log(pe);
+            return;
         }
+
+        ProjectEvent pe = (ProjectEvent) event;
+        getLogger(pe.getProjectConfiguration().getProjectId()).log(pe);
     }
 
     public Class[] getHandledEvents()
@@ -74,17 +68,14 @@ public class ProjectLoggerManager implements EventListener, Stoppable
         return new Class[] { ProjectEvent.class };
     }
 
-    public void stop(boolean force)
+    public synchronized void stop(boolean force)
     {
-        synchronized(this)
-        {
-            stopped = true;
-            eventManager.unregister(this);
+        stopped = true;
+        eventManager.unregister(this);
 
-            for (ProjectLogger logger: idToLogger.values())
-            {
-                IOUtils.close(logger);
-            }
+        for (ProjectLogger logger: idToLogger.values())
+        {
+            IOUtils.close(logger);
         }
     }
 
