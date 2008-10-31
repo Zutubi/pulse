@@ -57,22 +57,30 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                 {
                     ScmConfiguration scmConfiguration = projectConfiguration.getScm();
                     ScmContext scmContext = scmManager.createContext(projectConfiguration.getProjectId(), scmConfiguration);
-                    cleanupScmDirectoryIfRequired(scmContext.getPersistentWorkingDir());
-
-                    scmClient = scmManager.createClient(scmConfiguration);
-                    scmClient.init(scmContext, new ScmFeedbackHandler()
+                    scmContext.lock();
+                    try
                     {
-                        public void status(String message)
-                        {
-                            eventManager.publish(new ProjectStatusEvent(ProjectInitialisationService.this, projectConfiguration, message));
-                        }
+                        cleanupScmDirectoryIfRequired(scmContext.getPersistentWorkingDir());
 
-                        public void checkCancelled() throws ScmCancelledException
+                        scmClient = scmManager.createClient(scmConfiguration);
+                        scmClient.init(scmContext, new ScmFeedbackHandler()
                         {
-                            // not cancellable
-                        }
-                    });
-                    
+                            public void status(String message)
+                            {
+                                eventManager.publish(new ProjectStatusEvent(ProjectInitialisationService.this, projectConfiguration, message));
+                            }
+
+                            public void checkCancelled() throws ScmCancelledException
+                            {
+                                // not cancellable
+                            }
+                        });
+                    }
+                    finally
+                    {
+                        scmContext.unlock();
+                    }
+
                     completedEvent = new ProjectInitialisationCompletedEvent(ProjectInitialisationService.this, projectConfiguration, true, null);
                 }
                 catch (Exception e)

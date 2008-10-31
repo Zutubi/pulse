@@ -20,10 +20,13 @@ public interface ScmClient extends Closeable
      * again for the same project if the user chooses to manually reinitialise, in which
      * case the previous SCM persistent directory will have already been cleaned up, but
      * any other external artifacts from an earlier initialisation may still exist.
-     *
+     * <p/>
      * It is during this callback that any long running tasks to prepare the SCM's
      * persistent working directory (on the master) can be run.
-     *
+     * <p/>
+     * Note that exclusive access to the passed context is guaranteed for the duration
+     * of this call.
+     * 
      * @param context the scm context that will be used for subsequent calls.
      * @param handler handler for receipt of feedback during long-running initialisation
      *

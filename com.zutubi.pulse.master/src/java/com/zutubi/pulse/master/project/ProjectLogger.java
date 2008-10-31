@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.project.events.ProjectEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCommencedEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
+import com.zutubi.pulse.master.scm.ScmChangeEvent;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.Tail;
@@ -82,7 +83,12 @@ public class ProjectLogger implements Closeable
                 write("Project initialisation failed" + pice.getError() == null ? "" : (": " + pice.getError()));
             }
         }
-        else
+        else if (event instanceof ScmChangeEvent)
+        {
+            ScmChangeEvent sce = (ScmChangeEvent) event;
+            write("SCM change detected, new revision: " + sce.getNewRevision().getRevisionString());
+        }
+        else if (event instanceof ProjectStatusEvent)
         {
             write(((ProjectStatusEvent) event).getMessage());
         }

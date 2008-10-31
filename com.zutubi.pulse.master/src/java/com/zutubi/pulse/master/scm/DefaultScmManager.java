@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.scm.config.api.Pollable;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scheduling.SimpleTrigger;
@@ -143,13 +144,7 @@ public class DefaultScmManager implements ScmManager
             {
                 public void run()
                 {
-                    long start = System.currentTimeMillis();
                     process(project);
-                    long end = System.currentTimeMillis();
-                    long duration = ((end - start) / Constants.SECOND);
-                    LOG.info(String.format("polling scm for project %s took %s seconds.", project.getName(), duration));
-
-                    // would be good to record the polling duration somewhere so that we can report on it.
                 }
             });
         }
@@ -185,6 +180,7 @@ public class DefaultScmManager implements ScmManager
                 return;
             }
 
+            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Polling SCM for changes..."));
             // set the poll time.
             project.setLastPollTime(now);
             projectManager.save(project);
@@ -194,7 +190,9 @@ public class DefaultScmManager implements ScmManager
             client = scmClientFactory.createClient(projectConfig.getScm());
             if (!latestRevisions.containsKey(projectId))
             {
-                latestRevisions.put(projectId, client.getLatestRevision(context));
+                Revision revision = client.getLatestRevision(context);
+                latestRevisions.put(projectId, revision);
+                eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Retrieved initial revision: " + revision.getRevisionString() + " (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
                 return;
             }
 
@@ -203,7 +201,9 @@ public class DefaultScmManager implements ScmManager
             // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
             if (previous == null)
             {
-                latestRevisions.put(projectId, client.getLatestRevision(context));
+                Revision revision = client.getLatestRevision(context);
+                latestRevisions.put(projectId, revision);
+                eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Forced initial revision: " + revision.getRevisionString() + " (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
                 return;
             }
 
@@ -220,14 +220,20 @@ public class DefaultScmManager implements ScmManager
                         if (latest != null)
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
+                            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Changes detected during quiet period, restarting wait..."));
                             waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
                             // there have been no commits during the 'quiet period', trigger a change.
+                            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Quiet period completed without additional changes."));
                             sendScmChangeEvent(projectConfig, lastChange, previous);
                             waiting.remove(projectId);
                         }
+                    }
+                    else
+                    {
+                        eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Still within quiet period."));
                     }
                 }
                 else
@@ -237,6 +243,7 @@ public class DefaultScmManager implements ScmManager
                     {
                         if (pollable.getQuietPeriod() != 0)
                         {
+                            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Changes detected, starting quiet period wait..."));
                             waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
@@ -254,14 +261,13 @@ public class DefaultScmManager implements ScmManager
                     sendScmChangeEvent(projectConfig, latest, previous);
                 }
             }
+
+            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "SCM polling completed (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
         }
         catch (ScmException e)
         {
-            // there has been a problem communicating with one of the scms. Log the
-            // warning and move on.
-            // This needs to be brought to the attention of the user since its likely to
-            // be the result of a configuration problem.
-            LOG.warning(e.getMessage(), e);
+            eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Error polling SCM: " + e.getMessage()));
+            LOG.debug(e);
         }
         finally
         {

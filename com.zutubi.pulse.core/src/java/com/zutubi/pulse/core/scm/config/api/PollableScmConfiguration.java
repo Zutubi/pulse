@@ -6,6 +6,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.validation.annotations.Numeric;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -39,7 +40,7 @@ public abstract class PollableScmConfiguration extends ScmConfiguration implemen
 
     @StringList
     @Wizard.Ignore
-    private List<String> filterPaths;
+    private List<String> filterPaths = new LinkedList<String>();
 
     public boolean isMonitor()
     {

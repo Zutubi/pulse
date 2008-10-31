@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the {@link com.zutubi.pulse.core.scm.api.ScmClient} interface for the
@@ -78,31 +79,28 @@ public class GitClient implements ScmClient
      */
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
-        synchronized(context)
+        File workingDir = context.getPersistentWorkingDir();
+
+        // git does not like to clone 'into' existing directories.
+        if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
         {
-            File workingDir = context.getPersistentWorkingDir();
-
-            // git does not like to clone 'into' existing directories.
-            if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
-            {
-                throw new ScmException("Init failed. Could not delete directory: " + workingDir.getAbsolutePath());
-            }
-
-            NativeGit git = new NativeGit();
-            git.setWorkingDirectory(workingDir.getParentFile());
-            // git clone -n <repository> dir
-            handler.status("Initialising clone of git repository '" + repository + "'...");
-            git.clone(handler, repository, workingDir.getName());
-            handler.status("Repository cloned.");
-
-            // cd into git repository.
-            git.setWorkingDirectory(workingDir);
-
-            // git checkout -b local origin/<branch>
-            handler.status("Creating local checkout...");
-            git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
-            handler.status("Checkout complete.");
+            throw new ScmException("Init failed. Could not delete directory: " + workingDir.getAbsolutePath());
         }
+
+        NativeGit git = new NativeGit();
+        git.setWorkingDirectory(workingDir.getParentFile());
+        // git clone -n <repository> dir
+        handler.status("Initialising clone of git repository '" + repository + "'...");
+        git.clone(handler, repository, workingDir.getName());
+        handler.status("Repository cloned.");
+
+        // cd into git repository.
+        git.setWorkingDirectory(workingDir);
+
+        // git checkout -b local origin/<branch>
+        handler.status("Creating local checkout...");
+        git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
+        handler.status("Checkout complete.");
     }
 
     public void close()
@@ -227,7 +225,8 @@ public class GitClient implements ScmClient
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
-        synchronized (context)
+        context.tryLock(120, TimeUnit.SECONDS);
+        try
         {
             File workingDir = context.getPersistentWorkingDir();
 
@@ -245,6 +244,10 @@ public class GitClient implements ScmClient
                 return git.show(revision.getRevisionString(), path);
             }
         }
+        finally
+        {
+            context.unlock();
+        }
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
@@ -259,7 +262,8 @@ public class GitClient implements ScmClient
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
-        synchronized (context)
+        context.tryLock(120, TimeUnit.SECONDS);
+        try
         {
             File workingDir = context.getPersistentWorkingDir();
 
@@ -271,6 +275,10 @@ public class GitClient implements ScmClient
             GitLogEntry entry = git.log(1).get(0);
 
             return new Revision(entry.getId());
+        }
+        finally
+        {
+            context.unlock();
         }
     }
 
@@ -323,7 +331,8 @@ public class GitClient implements ScmClient
 
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        synchronized (context)
+        context.tryLock(120, TimeUnit.SECONDS);
+        try
         {
             File workingDir = context.getPersistentWorkingDir();
 
@@ -346,11 +355,16 @@ public class GitClient implements ScmClient
             }
             return revisions;
         }
+        finally
+        {
+            context.unlock();
+        }
     }
 
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        synchronized (context)
+        context.tryLock(120, TimeUnit.SECONDS);
+        try
         {
             if (to == null)
             {
@@ -391,6 +405,10 @@ public class GitClient implements ScmClient
             }
 
             return changelists;
+        }
+        finally
+        {
+            context.unlock();
         }
     }
 

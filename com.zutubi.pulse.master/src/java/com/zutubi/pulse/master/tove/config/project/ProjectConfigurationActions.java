@@ -47,6 +47,8 @@ public class ProjectConfigurationActions
 
     public List<String> getActions(ProjectConfiguration instance)
     {
+        // Templates are considered initialised
+        boolean initialised = true;
         List<String> result = new LinkedList<String>();
         if (instance.isConcrete())
         {
@@ -59,6 +61,8 @@ public class ProjectConfigurationActions
                 {
                     result.add(ACTION_TRIGGER);
                 }
+
+                initialised = state.isInitialised();
 
                 Set<Project.Transition> validTransitions = state.getValidTransitions().keySet();
                 if (validTransitions.contains(Project.Transition.INITIALISE))
@@ -78,7 +82,7 @@ public class ProjectConfigurationActions
             }
         }
 
-        if(canConvertType(instance))
+        if(initialised && canConvertType(instance))
         {
             if(!(instance.getType() instanceof CustomTypeConfiguration))
             {
