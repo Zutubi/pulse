@@ -2,15 +2,10 @@ package com.zutubi.i18n.bundle;
 
 import junit.framework.TestCase;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Arrays;
 
-import com.zutubi.i18n.bundle.Expander;
-
-/**
- * <class-comment/>
- */
 public class ExpanderTest extends TestCase
 {
     private Expander expander;

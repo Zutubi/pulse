@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.core.model.PersistentChangelist" table="BUILD_CHANGELIST" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="revisionString" type="string" length="255">
+            <column name="REVISION_STRING" index="idx_changelist_revision_string"/>
+        </property>
+
+        <property name="time" type="long">
+            <column name="TIME" index="idx_changelist_revision_date"/>
+        </property>
+
+        <property name="author" type="string" length="255">
+            <column name="AUTHOR" index="idx_changelist_revision_author"/>
+        </property>
+
+        <property name="comment" column="COMMENT" type="string" length="4096"/>
+
+        <property name="hash" type="string" length="255">
+            <column name="HASH" index="idx_changelist_hash"/>
+        </property>
+
+        <list name="changes" cascade="all,delete-orphan" lazy="true">
+            <key column="CHANGELIST_ID"/>
+            <index column="ORDINAL"/>
+            <one-to-many class="com.zutubi.pulse.core.model.PersistentFileChange"/>
+        </list>
+
+        <property name="projectId" type="long">
+            <column name="PROJECT_ID" index="idx_changelist_project_id"/>
+        </property>
+
+        <property name="resultId" type="long">
+            <column name="RESULT_ID" index="idx_changelist_result_id"/>
+        </property>
+    </class>
+
+    <class name="com.zutubi.pulse.core.model.PersistentFileChange" table="BUILD_FILE_CHANGE" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="actionName" column="ACTION" type="string" length="255"/>
+
+        <property name="filename" column="FILENAME" type="string" length="4095"/>
+
+        <property name="revisionString" column="REVISION_STRING" type="string" length="4095"/>
+    </class>
+</hibernate-mapping>

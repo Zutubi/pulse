@@ -1,15 +1,11 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmFile;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNURL;
 
@@ -31,7 +27,7 @@ public class SubversionClientTest extends PulseTestCase
     private File expectedDir;
     private Process serverProcess;
     private static final String TAG_PATH = "svn://localhost/test/tags/test-tag";
-    private ExecutionContext context;
+    private PulseExecutionContext context;
 
 //    $ svn log -v svn://localhost/test
 //    ------------------------------------------------------------------------
@@ -105,7 +101,7 @@ public class SubversionClientTest extends PulseTestCase
         gotDir = new File(repoDir, "got");
         gotDir.mkdirs();
 
-        context = new ExecutionContext();
+        context = new PulseExecutionContext();
         context.setWorkingDir(gotDir);
 
         ZipUtils.extractZip(dataFile, repoDir);
@@ -234,13 +230,13 @@ public class SubversionClientTest extends PulseTestCase
         Changelist changelist = changes.get(0);
         assertEquals("3", changelist.getRevision().getRevisionString());
         assertEquals(1, changelist.getChanges().size());
-        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getFilename());
-        assertEquals(Change.Action.ADD, changelist.getChanges().get(0).getAction());
+        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getPath());
+        assertEquals(FileChange.Action.ADD, changelist.getChanges().get(0).getAction());
         changelist = changes.get(1);
         assertEquals("4", changelist.getRevision().getRevisionString());
         assertEquals(1, changelist.getChanges().size());
-        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getFilename());
-        assertEquals(Change.Action.DELETE, changelist.getChanges().get(0).getAction());
+        assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getPath());
+        assertEquals(FileChange.Action.DELETE, changelist.getChanges().get(0).getAction());
     }
 
     public void testRevisionsSince() throws ScmException
@@ -300,7 +296,7 @@ public class SubversionClientTest extends PulseTestCase
 
     private void assertRevision(File dir, int revision) throws IOException
     {
-        File dataFile = getTestDataFile("server-core", Integer.toString(revision), "zip");
+        File dataFile = getTestDataFile("com.zutubi.pulse.servercore", Integer.toString(revision), "zip");
         ZipUtils.extractZip(dataFile, expectedDir);
         assertDirectoriesEqual(new File(new File(expectedDir, "test"), "trunk"), dir);
     }
@@ -321,6 +317,6 @@ public class SubversionClientTest extends PulseTestCase
 
     private static Revision createRevision(long rev)
     {
-        return new Revision(null, null, null, Long.toString(rev));
+        return new Revision(Long.toString(rev));
     }
 }

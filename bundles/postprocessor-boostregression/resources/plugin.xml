@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.2"?>
-<plugin>
-    <extension point="com.zutubi.pulse.core.postprocessors">
-        <post-processor name="boost-regression.pp" display-name="boost regression XML report processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.BoostRegressionPostProcessor"/>
-    </extension>
-</plugin>

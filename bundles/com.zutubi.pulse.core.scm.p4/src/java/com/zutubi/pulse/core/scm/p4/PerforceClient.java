@@ -1,19 +1,15 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.Property;
-import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.BuildProperties;
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.engine.api.*;
+import com.zutubi.pulse.core.scm.CachingScmClient;
+import com.zutubi.pulse.core.scm.CachingScmFile;
+import com.zutubi.pulse.core.scm.ScmFileCache;
+import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.process.AsyncProcess;
-import com.zutubi.pulse.util.process.BufferingCharHandler;
+import com.zutubi.pulse.core.util.process.AsyncProcess;
+import com.zutubi.pulse.core.util.process.BufferingCharHandler;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -47,12 +43,12 @@ public class PerforceClient extends CachingScmClient
         this.excludedPaths = filteredPaths;
     }
 
-    private String resolveClient(NumericalRevision revision) throws ScmException
+    private String resolveClient(Revision revision) throws ScmException
     {
         return resolveClient(revision, true);
     }
 
-    private String resolveClient(NumericalRevision revision, boolean cache) throws ScmException
+    private String resolveClient(Revision revision, boolean cache) throws ScmException
     {
         String resolved;
         if (resolvedClient == null)
@@ -61,23 +57,14 @@ public class PerforceClient extends CachingScmClient
             {
                 String commandLine = templateClient.substring(1);
 
-                PulseScope scope = new PulseScope();
-                String revisionSpec;
-                if(revision == null)
-                {
-                    revisionSpec = "#head";
-                }
-                else
-                {
-                    revisionSpec = "@" + revision.getRevisionString();
-                }
-
-                scope.add(new Property("revision.spec", revisionSpec));
+                HashReferenceMap referenceMap = new HashReferenceMap();
+                String revisionSpec = (revision == null) ?  "#head" : "@" + revision.getRevisionString();
+                referenceMap.add(new Property("revision.spec", revisionSpec));
 
                 Process p;
                 try
                 {
-                    List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
+                    List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, referenceMap, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
                     p = Runtime.getRuntime().exec(command.toArray(new String[command.size()]));
                 }
                 catch(Exception e)
@@ -121,7 +108,7 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    private void createClient(String clientName, File toDirectory, NumericalRevision revision) throws ScmException
+    private void createClient(String clientName, File toDirectory, Revision revision) throws ScmException
     {
         core.createClient(resolveClient(revision), clientName, toDirectory);
     }
@@ -154,7 +141,7 @@ public class PerforceClient extends CachingScmClient
 //        }
 //    }
 
-    private String updateClient(String id, File toDirectory, NumericalRevision revision) throws ScmException
+    private String updateClient(String id, File toDirectory, Revision revision) throws ScmException
     {
         if (toDirectory == null)
         {
@@ -198,10 +185,10 @@ public class PerforceClient extends CachingScmClient
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
-        return core.convertRevision(getLatestRevision((String)null));
+        return getLatestRevision((String)null);
     }
 
-    private NumericalRevision getLatestRevision(String clientName) throws ScmException
+    private Revision getLatestRevision(String clientName) throws ScmException
     {
         boolean cleanup = false;
 
@@ -222,11 +209,6 @@ public class PerforceClient extends CachingScmClient
                 deleteClient(clientName);
             }
         }
-    }
-
-    private Revision convertRevision(NumericalRevision rev)
-    {
-        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
     }
 
     public void populate(ScmFileCache.CacheItem item) throws ScmException
@@ -354,28 +336,28 @@ public class PerforceClient extends CachingScmClient
 
         String comment = getChangelistComment(lines, affectedFilesIndex);
 
-        Revision revision = new Revision(user, comment, date, Long.toString(number));
-        ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
-        Changelist changelist = new Changelist(revision);
-
+        Revision revision = new Revision(Long.toString(number));
+        ExcludePathFilter filter = new ExcludePathFilter(excludedPaths);
+        List<FileChange> changes = new LinkedList<FileChange>();
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
-            Change change = getChangelistChange(lines[i]);
-            if (filter.accept(change.getFilename()))
+            FileChange change = getChangelistChange(lines[i]);
+            if (filter.accept(change.getPath()))
             {
-                changelist.addChange(change);
+                changes.add(change);
             }
         }
 
         // if all of the changes have been filtered out, then there is no changelist so we return null.
-        if (changelist.getChanges().size() == 0)
+        if (changes.isEmpty())
         {
             return null;
         }
-        return changelist;
+
+        return new Changelist(revision, date.getTime(), user, comment, changes);
     }
 
-    private Change getChangelistChange(String line) throws ScmException
+    private FileChange getChangelistChange(String line) throws ScmException
     {
         // ... <depot file>#<revision> <action>
         Pattern re = Pattern.compile("\\.\\.\\. (.+)#([0-9]+) (.+)");
@@ -383,7 +365,7 @@ public class PerforceClient extends CachingScmClient
 
         if (matcher.matches())
         {
-            return new Change(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
+            return new FileChange(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
         }
         else
         {
@@ -391,47 +373,46 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public static Change.Action decodeAction(String action)
+    public static FileChange.Action decodeAction(String action)
     {
         if (action.equals("add") || action.equals("added as") || action.equals("refreshing"))
         {
-            return Change.Action.ADD;
+            return FileChange.Action.ADD;
         }
         else if (action.equals("branch"))
         {
-            return Change.Action.BRANCH;
+            return FileChange.Action.BRANCH;
         }
         else if (action.equals("delete") || action.equals("deleted as"))
         {
-            return Change.Action.DELETE;
+            return FileChange.Action.DELETE;
         }
         else if (action.equals("edit") || action.equals("updating"))
         {
-            return Change.Action.EDIT;
+            return FileChange.Action.EDIT;
         }
         else if (action.equals("integrate"))
         {
-            return Change.Action.INTEGRATE;
+            return FileChange.Action.INTEGRATE;
         }
         else
         {
-            return Change.Action.UNKNOWN;
+            return FileChange.Action.UNKNOWN;
         }
     }
 
-    private Revision sync(String id, File toDirectory, Revision revision, ScmEventHandler handler, boolean force) throws ScmException
+    private Revision sync(String id, File toDirectory, Revision revision, ScmFeedbackHandler handler, boolean force) throws ScmException
     {
-        NumericalRevision numericalRevision = core.convertRevision(revision);
-        String clientName = updateClient(id, toDirectory, numericalRevision);
+        String clientName = updateClient(id, toDirectory, revision);
 
         try
         {
-            if (numericalRevision == null)
+            if (revision == null)
             {
-                numericalRevision = getLatestRevision(clientName);
+                revision = getLatestRevision(clientName);
             }
 
-            long number = numericalRevision.getRevisionNumber();
+            long number = Long.valueOf(revision.toString());
             PerforceCheckoutHandler perforceHandler = new PerforceCheckoutHandler(force, handler);
 
             if (force)
@@ -451,7 +432,7 @@ public class PerforceClient extends CachingScmClient
             }
         }
 
-        return convertRevision(numericalRevision);
+        return revision;
     }
 
     private String getChangelistComment(String[] lines, int affectedFilesIndex)
@@ -502,6 +483,11 @@ public class PerforceClient extends CachingScmClient
         this.core.setEnv(ENV_CLIENT, resolveClient(null, false));
     }
 
+    public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // noop
+    }
+
     public void close()
     {
     }
@@ -535,7 +521,7 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         addPropertiesToContext(context);
         return sync(context.getString("scm.bootstrap.id"), context.getWorkingDir(), revision, handler, true);
@@ -543,7 +529,7 @@ public class PerforceClient extends CachingScmClient
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
-        String clientName = updateClient(null, null, core.convertRevision(revision));
+        String clientName = updateClient(null, null, revision);
 
         try
         {
@@ -599,14 +585,13 @@ public class PerforceClient extends CachingScmClient
 
         String clientName = updateClient(null, null, null);
 
-        NumericalRevision numericalTo = core.convertRevision(to);
-        if (numericalTo == null)
+        if (to == null)
         {
-            numericalTo = getLatestRevision(clientName);
+            to = getLatestRevision(clientName);
         }
 
-        long start = core.convertRevision(from).getRevisionNumber() + 1;
-        long end = numericalTo.getRevisionNumber();
+        long start = Long.valueOf(from.toString()) + 1;
+        long end = Long.valueOf(to.toString());
 
         try
         {
@@ -617,11 +602,11 @@ public class PerforceClient extends CachingScmClient
 
                 while (matcher.find())
                 {
-                    NumericalRevision revision = new NumericalRevision(Long.parseLong(matcher.group(1)));
-                    Changelist list = getChangelist(clientName, revision.getRevisionNumber());
+                    Revision revision = new Revision(matcher.group(1));
+                    Changelist list = getChangelist(clientName, Long.valueOf(revision.toString()));
                     if (list != null)
                     {
-                        result.add(0, core.convertRevision(revision));
+                        result.add(0, revision);
 
                         if (changes != null)
                         {
@@ -645,8 +630,8 @@ public class PerforceClient extends CachingScmClient
         try
         {
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
-            long latestRevision = core.getLatestRevisionForFiles(clientName, root).getRevisionNumber();
-            long sinceRevision = core.convertRevision(since).getRevisionNumber();
+            long latestRevision = Long.valueOf(core.getLatestRevisionForFiles(clientName, root).toString());
+            long sinceRevision = Long.valueOf(since.toString());
             if (latestRevision > sinceRevision)
             {
                 if (excludedPaths != null && excludedPaths.size() > 0)
@@ -682,7 +667,7 @@ public class PerforceClient extends CachingScmClient
         return false;
     }
 
-    public Revision update(ExecutionContext context, Revision rev, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         addPropertiesToContext(context);
         sync(context.getString("scm.bootstrap.id"), context.getWorkingDir(), rev, handler, false);
@@ -691,7 +676,7 @@ public class PerforceClient extends CachingScmClient
 
     public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
-        String clientName = updateClient(null, null, core.convertRevision(revision));
+        String clientName = updateClient(null, null, revision);
         try
         {
             if (!labelExists(clientName, name))
@@ -713,16 +698,14 @@ public class PerforceClient extends CachingScmClient
 
     private void addPropertiesToContext(ExecutionContext context) throws ScmException
     {
-        PulseScope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
+        Scope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
 
         for (Map.Entry<String, String> entry : core.getEnv().entrySet())
         {
-            ResourceProperty resourceProperty = new ResourceProperty(entry.getKey(), entry.getValue());
-            resourceProperty.setAddToEnvironment(true);
+            ResourceProperty resourceProperty = new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false);
             scope.add(resourceProperty);
         }
-        ResourceProperty resourceProperty = new ResourceProperty("P4CLIENT", getClientName(context.getString("scm.bootstrap.id")));
-        resourceProperty.setAddToEnvironment(true);
+        ResourceProperty resourceProperty = new ResourceProperty("P4CLIENT", getClientName(context.getString("scm.bootstrap.id")), true, false, false);
         scope.add(resourceProperty);
     }
 
@@ -735,9 +718,9 @@ public class PerforceClient extends CachingScmClient
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
-    public FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException
+    public EOLStyle getEOLPolicy(ScmContext context) throws ScmException
     {
-        final FileStatus.EOLStyle[] eol = new FileStatus.EOLStyle[]{FileStatus.EOLStyle.NATIVE};
+        final EOLStyle[] eol = new EOLStyle[]{EOLStyle.NATIVE};
 
         core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
         {
@@ -748,19 +731,19 @@ public class PerforceClient extends CachingScmClient
                     String ending = line.substring(8).trim();
                     if (ending.equals("local"))
                     {
-                        eol[0] = FileStatus.EOLStyle.NATIVE;
+                        eol[0] = EOLStyle.NATIVE;
                     }
                     else if (ending.equals("unix") || ending.equals("share"))
                     {
-                        eol[0] = FileStatus.EOLStyle.LINEFEED;
+                        eol[0] = EOLStyle.LINEFEED;
                     }
                     else if (ending.equals("mac"))
                     {
-                        eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN;
+                        eol[0] = EOLStyle.CARRIAGE_RETURN;
                     }
                     else if (ending.equals("win"))
                     {
-                        eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED;
+                        eol[0] = EOLStyle.CARRIAGE_RETURN_LINEFEED;
                     }
                 }
             }
@@ -801,7 +784,7 @@ public class PerforceClient extends CachingScmClient
         //    ... ... otherAction0 edit
         //    ... ... otherChange0 38
         //    ... ... otherOpen 1
-        String clientName = updateClient(null, null, core.convertRevision(repoRevision));
+        String clientName = updateClient(null, null, repoRevision);
         try
         {
             File f = new File(clientRoot.getAbsoluteFile(), path);
@@ -854,7 +837,7 @@ public class PerforceClient extends CachingScmClient
                 long revisionNumber = Long.parseLong(revision);
                 // Run a quick check to ensure that the change exists.
                 core.runP4(true, null, getP4Command(COMMAND_CHANGE), FLAG_CLIENT, clientName, COMMAND_CHANGE, FLAG_OUTPUT, revision);
-                return core.convertRevision(new NumericalRevision(revisionNumber));
+                return new Revision(revisionNumber);
             }
             catch (NumberFormatException e)
             {
@@ -897,21 +880,21 @@ public class PerforceClient extends CachingScmClient
         try
         {
             PerforceClient client = new PerforceClient("localhost:1666", "jsankey", "", "pulse-demo");
-            client.retrieve(null, "file", new Revision(null, null, null, "2"));
-            List<Changelist> cls = client.getChanges(null, new Revision(null, null, null, "2"), new Revision(null, null, null, "6"));
+            client.retrieve(null, "file", new Revision("2"));
+            List<Changelist> cls = client.getChanges(null, new Revision("2"), new Revision("6"));
 
             for (Changelist l : cls)
             {
                 System.out.println("Changelist:");
                 System.out.println("  Revision: " + l.getRevision());
-                System.out.println("  Date    : " + l.getDate());
-                System.out.println("  User    : " + l.getUser());
+                System.out.println("  Date    : " + new Date(l.getTime()));
+                System.out.println("  Author  : " + l.getAuthor());
                 System.out.println("  Comment : " + l.getComment());
                 System.out.println("  Files   : " + l.getRevision());
 
-                for (Change c : l.getChanges())
+                for (FileChange c : l.getChanges())
                 {
-                    System.out.println("    " + c.getFilename() + "#" + c.getRevisionString() + " - " + c.getAction());
+                    System.out.println("    " + c.getPath() + "#" + c.getRevisionString() + " - " + c.getAction());
                 }
             }
         }

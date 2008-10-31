@@ -1,6 +1,8 @@
 package com.zutubi.i18n.bundle;
 
 import com.zutubi.i18n.context.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +17,7 @@ public class DefaultBundleManager implements BundleManager
 
     private ContextCache cache;
 
-    private Map<Class<? extends Context>, ContextResolver> resolvers = new HashMap<Class<? extends Context>, ContextResolver>();
+    private final Map<Class<? extends Context>, List<ContextResolver>> resolvers = new HashMap<Class<? extends Context>, List<ContextResolver>>();
 
     private ContextLoader defaultLoader = new DefaultContextLoader();
 
@@ -30,7 +32,16 @@ public class DefaultBundleManager implements BundleManager
 
     public void addResolver(ContextResolver resolver)
     {
-        resolvers.put(resolver.getContextType(), resolver);
+        synchronized(resolvers)
+        {
+            Class clazz = resolver.getContextType();
+            if (!resolvers.containsKey(clazz))
+            {
+                resolvers.put(clazz, new LinkedList<ContextResolver>());
+            }
+            List<ContextResolver> list = resolvers.get(clazz);
+            list.add(resolver);
+        }
     }
 
     public List<ResourceBundle> getBundles(Context context, Locale locale)
@@ -41,14 +52,26 @@ public class DefaultBundleManager implements BundleManager
         }
 
         List<ResourceBundle> bundles = new LinkedList<ResourceBundle>();
+        List<ContextResolver> resolvers = new LinkedList<ContextResolver>();
+        List<String> bundleNames = new LinkedList<String>();
 
-        String[] bundleNames = resolvers.get(context.getClass()).resolve(context);
+        synchronized(this.resolvers)
+        {
+            resolvers.addAll(this.resolvers.get(context.getClass()));
+        }
+        
+        for (ContextResolver resolver : resolvers)
+        {
+            bundleNames.addAll(Arrays.asList(resolver.resolve(context)));
+        }
+
+        bundleNames = CollectionUtils.unique(bundleNames);
+
         for (String bundleName : bundleNames)
         {
             List<String> candidateNames = factory.expand(bundleName, locale);
             for (String candidateName : candidateNames)
             {
-                // TODO: the resource stream lookup will vary based for plugins.
                 InputStream input = null;
                 try
                 {
@@ -64,17 +87,7 @@ public class DefaultBundleManager implements BundleManager
                 }
                 finally
                 {
-                    if (input != null)
-                    {
-                        try
-                        {
-                            input.close();
-                        }
-                        catch (IOException e)
-                        {
-                            // noop.
-                        }
-                    }
+                    IOUtils.close(input);
                 }
             }
         }
@@ -95,7 +108,7 @@ public class DefaultBundleManager implements BundleManager
         this.cache = cache;
     }
 
-    public void clear()
+    public void clearContextCache()
     {
         this.cache.clear();
     }

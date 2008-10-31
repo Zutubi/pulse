@@ -1,0 +1,88 @@
+#helpTag("Changelist+View")
+#authorisationTags($principle)
+#if($buildResult)
+    #buildTags($buildResult.project $buildResult)
+#elseif($project)
+    #projectTags($project)
+#end
+<html>
+<head>
+    <title>#wwtext("name=changelist") $changelist.revision</title>
+</head>
+<body>
+#if($buildResult)
+    #buildTabs($buildResult "changes")
+#elseif($project)
+    #projectTabs("home")
+#else
+    #dashboardTabs("homepage")
+#end
+
+    <h1>:: #wwtext("name=changelist") $changelist.revision ::</h1>
+
+    <table class="content">
+        #headingRow("changelist.details" 2)
+        #dynamicLinkRow("changelist.revision" $changelist.revision $action.getChangeUrl())
+        #dynamicRow("changelist.who" $changelist.author)
+        <tr>
+            #contentRowHeading("changelist.when")
+            #dateCell($changelist)
+        </tr>
+        <tr>
+            #contentRowHeading("changelist.comment")
+            <td class="content-wrap"><pre>$action.getCommitMessageSupport($changelist).wrap(80)</pre></td>
+        </tr>
+    </table>
+
+    <table class="content">
+       #headingRow("changelist.builds" 4)
+       <tr>
+           #contentHeading("project" 1)
+           #contentHeading("build.id" 1)
+           #contentHeading("status" 2)
+        </tr>
+#foreach($result in $buildResults)
+        <tr>
+            <td class="content"><a href="$urls.projectHome($result.project)">$!webwork.htmlEncode($result.project.name)</a></td>
+
+            #set($result = $latestBuilds.get($index))
+
+            #dynamicRightLinkCell($result.number "$urls.build($result)")
+            #statusCell($result true)
+        </tr>
+#end
+    </table>
+    
+    <table class="content">
+        #headingRow("changelist.files" 4)
+        <tr>
+            #contentHeading("changelist.file" 1)
+            #contentHeading("changelist.revision" 1)
+            #contentHeading("changelist.action" 1)
+#if($action.haveChangeViewer())
+            #contentHeading("changelist.links" 1)
+#end
+        </tr>
+#foreach($file in $changelist.changes)
+    $action.updateUrls($file)
+        <tr>
+            #dynamicCell($file.filename)
+            #dynamicRightLinkCell($file.revisionString $action.getFileViewUrl())
+            #dynamicCell($file.action.getPrettyString())
+#if($action.haveChangeViewer())
+            <td class="content">
+    #if($action.getFileViewUrl())
+                <a class="unadorned" href="$action.getFileViewUrl()" title="view"><img alt="view" src="$base/images/page.gif"/></a>
+    #end
+    #if($action.getFileDownloadUrl())
+                <a class="unadorned" href="$action.getFileDownloadUrl()" title="download"><img alt="download" src="$base/images/page_put.gif"/></a>
+    #end
+    #if($action.getFileDiffUrl())
+                <a class="unadorned" href="$action.getFileDiffUrl()" title="diff"><img alt="diff" src="$base/images/page_diff.gif"/></a>
+    #end
+            </td>
+#end
+        </tr>
+#end
+    </table>
+</html>

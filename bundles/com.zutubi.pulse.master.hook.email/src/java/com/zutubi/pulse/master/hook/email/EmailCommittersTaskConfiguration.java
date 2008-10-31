@@ -1,27 +1,28 @@
 package com.zutubi.pulse.master.hook.email;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Select;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wire;
-import com.zutubi.pulse.ResultNotifier;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.renderer.BuildResultRenderer;
-import com.zutubi.pulse.tove.config.admin.EmailConfiguration;
-import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.tove.config.project.hooks.BuildHookTaskConfiguration;
-import com.zutubi.pulse.tove.config.project.hooks.CompatibleHooks;
-import com.zutubi.pulse.tove.config.project.hooks.ManualBuildHookConfiguration;
-import com.zutubi.pulse.tove.config.project.hooks.PostBuildHookConfiguration;
-import com.zutubi.pulse.tove.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.master.ResultNotifier;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.renderer.BuildResultRenderer;
+import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookTaskConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.CompatibleHooks;
+import com.zutubi.pulse.master.tove.config.project.hooks.ManualBuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.PostBuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.Select;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.validation.annotations.Required;
@@ -41,7 +42,7 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
 {
     @Required
     private String emailDomain;
-    @Select(optionProvider = "com.zutubi.pulse.tove.config.user.SubscriptionTemplateOptionProvider")
+    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.user.SubscriptionTemplateOptionProvider")
     private String template;
     private boolean ignorePulseUsers;
 
@@ -100,10 +101,6 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
             ResultNotifier.RenderedResult rendered = ResultNotifier.renderResult(buildResult, globalConfiguration.getBaseUrl(), buildManager, buildResultRenderer, template);
             String mimeType = buildResultRenderer.getTemplateInfo(template, buildResult.isPersonal()).getMimeType();
             String subject = rendered.getSubject();
-            if (TextUtils.stringSet(emailConfiguration.getSubjectPrefix()))
-            {
-                subject = emailConfiguration.getSubjectPrefix() + " " + subject;
-            }
 
             EmailContactConfiguration.sendMail(emails, emailConfiguration, subject, mimeType, rendered.getContent());
         }
@@ -112,16 +109,16 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
     private List<String> getEmails(BuildResult result)
     {
         List<String> emails = new LinkedList<String>();
-        for (Changelist change : buildManager.getChangesForBuild(result))
+        for (PersistentChangelist change : buildManager.getChangesForBuild(result))
         {
-            String user = change.getUser();
+            String user = change.getAuthor();
             if (TextUtils.stringSet(user) && (!ignorePulseUsers || userManager.getUser(user) == null))
             {
                 emails.add(StringUtils.join("@", true, user, emailDomain));
             }
         }
 
-        return emails;
+        return CollectionUtils.unique(emails);
     }
 
     public void setBuildResultRenderer(BuildResultRenderer buildResultRenderer)

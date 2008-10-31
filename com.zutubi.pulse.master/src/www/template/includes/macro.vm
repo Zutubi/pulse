@@ -1,0 +1,2326 @@
+##
+## Outputs security / credentials content tgs for permissions related uses.
+##
+#macro(authorisationTags $user)
+    #if($user)
+        <content tag="user.name">$user.name</content>
+        <content tag="user.login">$user.login</content>
+    #end
+#end
+
+##
+## Outputs a sitemesh tag for context-sensitive help
+##
+#macro(helpTag $path)
+    <content tag="helpPage">$path</content>
+#end
+
+##
+## Outputs sitemesh content tags for the project links on the header bar
+##
+#macro(projectTags $project)
+    <content tag="selectedTab">projects</content>
+#end
+
+##
+## Outputs sitemesh content tags for user links on the header bar
+##
+#macro(userTags $user)
+    <content tag="personalBuild">true</content>
+    <content tag="selectedTab">dashboard</content>
+#end
+
+##
+## Outputs sitemesh content tags for build links on the header bar
+##
+#macro(buildTags $project $buildResult)
+#if($buildResult.user)
+    #userTags($buildResult.user)
+#else
+    #projectTags($project)
+#end
+    <content tag="buildNumber">$buildResult.number</content>
+#end
+
+##
+## Outputs sitemesh content tags for stage links on the header bar
+##
+#macro(stageTags $buildResult)
+    #buildTags($buildResult.project $buildResult)
+    <content tag="h_stageName">$h_stageName</content>
+    <content tag="u_stageName">$u_stageName</content>
+#end
+
+##
+## Outputs sitemesh content tags for the agent links on the header bar
+##
+#macro(agentTags)
+    <content tag="selectedTab">agents</content>
+#end
+
+##
+## Outputs a project heading
+##        
+#macro(projectName $project)
+    :: <a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a> ::
+#end
+
+##
+## Outputs a tab header bar, with the javascript necessary to control the
+## tab selection.
+##
+#macro(tabBar $tabNames)
+    <script language="JavaScript" type="text/javascript">
+        function Tab(htmlId)
+       {
+            this.elementId = htmlId;
+            var selected = false;
+            var self = this;
+
+            /*
+             * Shows or hides this page depending on whether the visible
+             * tab id matches this objects id.
+             *
+             * @param visibleTabId the id of the tab that was selected
+             */
+            this.updateVisibility = function(visibleTabId)
+            {
+                var thElement = document.getElementById('tab_header_' + self.elementId);
+                var tcElement = document.getElementById('tab_contents_' + self.elementId);
+
+                if(!selected && visibleTabId == self.elementId)
+                {
+                    thElement.className = "active";
+                    tcElement.style.display = "block";
+                    self.selected = true;
+                }
+                else
+                {
+                    thElement.className = "inactive";
+                    tcElement.style.display = "none";
+                    self.selected = false;
+                }
+            }
+        }
+
+        var pageTabs = new Array(3);
+
+    #foreach($name in $tabNames)
+        #set($index = $velocityCount - 1)
+        pageTabs[$index] = new Tab("$name");
+    #end
+
+        function chooseTab(selectedTab)
+        {
+            for(i in pageTabs)
+            {
+                pageTabs[i].updateVisibility(selectedTab);
+            }
+
+            return false;
+        }
+
+    </script>
+
+    <ul id="innernav">
+    #foreach($name in $tabNames)
+        <li><a id="tab_header_$name" href="#" onclick="chooseTab('$name')" class="inactive">#wwtext("name=${name}.tab")</a></li>
+    #end
+    </ul>
+    <span class="hidden">ie workaround</span>
+#end
+
+##
+## Selects the given tab
+##
+#macro(selectTab $name)
+    <script language="JavaScript" type="text/javascript">
+        chooseTab("$name");
+    </script>
+#end
+
+##
+## Outputs a div to open a tab page
+##
+#macro(openTab $name)
+    <div id="tab_contents_$name">
+#end
+
+##
+## Closes off a tab page
+##
+#macro(closeTab)
+    </div>
+#end
+
+##
+## Opens a list of tabs
+##
+#macro(openTabs)
+<div id="tabbar">
+    <ul id="innernav">
+#end
+
+##
+## Closes a list of tabs
+##
+#macro(closeTabs)
+    </ul>
+    <div class="clear"></div>
+</div>
+#end
+
+##
+## A single tab
+##
+#macro(tabItem $id $name $url $selected)
+    <li>
+        <a id="$id" href="$url"
+    #if($selected == $name)
+            class="active"
+    #else
+            class="inactive"
+    #end
+          >
+            #wwtext("name=${name}.tab")
+        </a>
+    </li>
+#end
+
+##
+## Shows a project tab of the given name with the given action name
+##
+#macro(projectTab $name $selected)
+    #tabItem("tab.project.$name" $name "$urls.project($u_projectName)${name}/" $selected)
+#end
+
+##
+## Shows the tab bar for project pages with the given tab selected.
+##
+#macro(projectTabs $selected)
+    #openTabs()
+        #projectTab("home" $selected)
+        #projectTab("reports" $selected)
+        #projectTab("history" $selected)
+        #projectTab("log" $selected)
+    #closeTabs()
+#end
+
+##
+## Shows a build tab of the given name with the given action name
+##
+#macro(buildTab $result $name $selected)
+    #tabItem("tab.build.$name" $name "$urls.build($result)$name/" $selected)
+#end
+
+##
+## Shows the tab bar for build pages with the given tab selected.
+##
+#macro(buildTabs $result $selected)
+    #openTabs()
+        #buildTab($result "summary" $selected)
+        #buildTab($result "details" $selected)
+        #buildTab($result "changes" $selected)
+        #buildTab($result "tests" $selected)
+        #buildTab($result "file" $selected)
+        #buildTab($result "artifacts" $selected)
+#if($action.hasPermission("view source", $result.project))
+        #buildTab($result "wc" $selected)
+#end
+    #closeTabs()
+#end
+
+##
+## Shows a server tab of the given name with the given action name
+##
+#macro(serverTab $name $selected)
+    #tabItem("tab.server.$name" $name "$urls.server()$name/" $selected)
+#end
+
+##
+## Shows the tab bar for project pages with the given tab selected.
+##
+#macro(serverTabs $selected)
+    #openTabs()
+        #serverTab("activity" $selected)
+        #serverTab("messages" $selected)
+        #serverTab("info" $selected)
+    #closeTabs()
+#end
+
+##
+## Shows an agent tab of the given name with the given action name
+##
+#macro(agentTab $name $selected)
+    #tabItem("tab.agent.$name" $name "$urls.agent($agent)$name/" $selected)
+#end
+
+##
+## Shows the tab bar for server pages with the given tab selected.
+##
+#macro(agentTabs $selected)
+    #openTabs()
+        #agentTab("status" $selected)
+        #agentTab("messages" $selected)
+        #agentTab("info" $selected)
+    #closeTabs()
+#end
+
+##
+## Shows an admin tab of the given name with the given action name
+##
+#macro(adminTab $name $action $selected)
+    #tabItem("tab.administration.$name" $name "${action}" $selected)
+#end
+
+##
+## Shows the tab bar for admin pages with the given tab selected.
+##
+#macro(adminTabs $selected)
+    #openTabs()
+        #adminTab("projects" "$base/admin/projects/" $selected)
+        #adminTab("agents" "$base/admin/agents/" $selected)
+#auth("action=ADMINISTER")
+        #adminTab("settings" "$base/admin/settings/" $selected)
+        #adminTab("users" "$base/admin/users" $selected)
+        #adminTab("groups" "$base/admin/groups" $selected)
+        #adminTab("plugins" "$base/admin/plugins/" $selected)
+#end
+#closeTabs()
+#end
+
+##
+## Shows a dashboard tab of the given name with the given action name
+##
+#macro(dashboardTab $name $action $selected)
+    #tabItem("tab.dashboard.$name" $name "${action}" $selected)
+#end
+
+##
+## Shows the tab bar for dashboard pages with the given tab selected.
+##
+#macro(dashboardTabs $selected)
+    #openTabs()
+        #dashboardTab("homepage" "$base/dashboard/home/" $selected)
+        #dashboardTab("my-builds" "$base/dashboard/my/" $selected)
+        #dashboardTab("preferences" "$base/dashboard/preferences/" $selected)
+    #closeTabs()
+#end
+
+##
+## Outputs an image tag with alt key looked up
+##
+#macro(image $src $altKey)
+    <img src="$src" alt="$action.getText('$altKey')"/>
+#end
+
+##
+## Outputs a heading row for a content table with an action, restricted to specific roles
+##
+#macro(restrictedHeadingRow $key $span $role $actionKey $url $image $id)
+    <tr>
+        <th class="heading" colspan="$span">
+    #auth("action=$role")
+            <span class="action">
+                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="$base/images/$image"/>#wwtext("name=$actionKey")</a>
+            </span>
+    #end
+            #wwtext("name=$key")
+        </th>
+    </tr>
+#end
+
+##
+## Outputs a heading row for a content table
+##
+#macro(headingRow $key $span)
+    <tr>
+        <th class="heading" colspan="$span">
+            #wwtext("name=$key")
+        </th>
+    </tr>
+#end
+
+##
+## Outputs an information row for a content table
+##
+#macro(noteRow $key $span)
+    <tr>
+        <th class="note" colspan="$span">#wwtext("name=$key")</th>
+    </tr>
+#end
+
+#macro(rssHeadingRow $key $span $rssEnabled $rssUrl $rssId)
+<tr>
+    <th class="heading" #if($span > 1) colspan="$span" #end>
+        <span class="action">
+        #if($rssEnabled == "true")
+            <a class="unadorned" #if($rssId != "")id="$rssId"#end href="$rssUrl"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+        #end
+        </span>
+        #wwtext("name=$key")
+    </th>
+</tr>
+#end
+
+##
+## Outputs a heading cell for a content table
+##
+#macro(contentHeading $key $span)
+    <th class="content" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
+#end
+
+##
+## Outputs a row heading cell for a content table
+##
+#macro(contentRowHeading $key)
+    <th class="content-row">#wwtext("name=$key")</th>
+#end
+
+##
+## Outputs a regular cell for a content table
+##
+#macro(contentCell $key)
+    <td class="content">#wwtext("name=$key")</td>
+#end
+
+#macro(contentClassCell $key)
+    <td class="$cssClass">#wwtext("name=$key")</td>
+#end
+
+##
+## Outputs a static cell for a content table
+##
+#macro(staticCell $cc)
+    <td class="content">$cc</td>
+#end
+
+#macro(staticClassCell $cc)
+    <td class="$cssClass">$cc</td>
+#end
+
+##
+## Outputs a right-aligned cell for a content table
+##
+#macro(rightCell $cc)
+    <td class="content-right">$cc</td>
+#end
+
+##
+## Outputs a heading cell for a content table with the given dynamic content,
+## which should be escaped
+##
+#macro(dynamicHeading $content)
+    <th class="content-row">$!webwork.htmlEncode($content)</th>
+#end
+
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped and is allowed to wrap.
+##
+#macro(wrapCell $content)
+    <td class="content-wrap">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs a cell for a content table with the given static content, which
+## is be allowed to wrap.
+##
+#macro(staticWrapCell $key)
+    <td class="content-wrap">#wwtext("name=$key")</td>
+#end
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped, with a row span.
+##
+#macro(dynamicCellSpan $content $span)
+    <td class="content" rowspan="$span">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped
+##
+#macro(dynamicCell $content)
+    <td class="content">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped with an id.
+##
+#macro(dynamicIdCell $id $content)
+    <td id='#id($id)' class="content">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped, with a link to somewhere and right justified...
+##
+#macro(dynamicRightLinkCell $content $url)
+    <td class="content-right">
+    #if($url)
+        <a href="$url">
+    #end
+            $!webwork.htmlEncode($content)
+    #if($url)
+        </a>
+    #end
+     </td>
+#end
+
+#macro(dynamicRightLinkClassCell $content $url)
+    <td class="${cssClass}-right">
+    #if($url)
+        <a href="$url">
+    #end
+            $!webwork.htmlEncode($content)
+    #if($url)
+        </a>
+    #end
+     </td>
+#end
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped, with a link to somewhere...
+##
+#macro(dynamicLinkCell $content $url)
+    <td class="content">
+    #if($url)
+        <a href="$url">
+    #end
+            $!webwork.htmlEncode($content)
+    #if($url)
+        </a>
+    #end
+     </td>
+#end
+
+##
+## Outputs a name:value pair row where the value needs to be escaped, with a link
+##
+#macro(dynamicLinkRow $key $value $url)
+    <tr>
+        <th class="content-row" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
+        #dynamicLinkCell($value $url)
+    </tr>
+#end
+
+##
+## Outputs a name:value pair row where the value needs to be escaped
+##
+#macro(dynamicRow $key $value)
+    <tr>
+        <th class="content-row" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
+        #dynamicCell($value)
+    </tr>
+#end
+
+##
+## Outputs a content row with two-keyed values, the second allowed to wrap
+##
+#macro(docRow $nameKey $descKey)
+    <tr>
+        #contentRowHeading($nameKey)
+        #staticWrapCell($descKey)
+    </tr>
+#end
+
+##
+## Outputs a name:value pair row from a property; both name and value need to
+## be escaped.
+##
+#macro(propertyRow $property)
+    <tr>
+        #dynamicHeading($property.key)
+        #dynamicCell($property.value)
+    </tr>
+#end
+
+##
+## Outputs an action cell with an id
+##
+#macro(actionCellId $actionKey $url $image $id $span)
+    <td class="content"
+#if($span)
+        colspan="$span"
+#end
+    >
+        <a href="$url"
+#if($id)
+           id="$id"
+#end
+        >
+            <img alt="$action.getText($actionKey)" src="$base/images/$image"/>
+            #wwtext("name=$actionKey")
+        </a>
+    </td>
+#end
+
+##
+## Outputs an action cell for a content table with an image.
+##
+#macro(actionCell $actionKey $url $image)
+    #actionCellId($actionKey $url $image false false)
+#end
+
+##
+## Outputs an action cell with an image, and link title but no text
+##
+#macro(actionCellTitle $id $titleKey $url $image)
+    <td class="content">
+        <a id="$id" class="unadorned" href="$url" title="$action.getText($titleKey)"><img alt="$action.getText($titleKey)" src="$base/images/$image"/></a>
+    </td>
+#end
+
+##
+## Outputs a link cell for a content table
+##
+#macro(linkCell $id $key $url)
+    <td class="content">
+        <a id="$id" href="$url">#wwtext("name=$key")</a>
+    </td>
+#end
+
+##
+## Outputs an edit cell for a content table with a  row span
+##
+#macro(editCellSpan $url $id $span)
+    #actionCellId("configure" $url "pencil.gif" $id $span)
+#end
+
+##
+## Outputs a table cell with class based on $cssClass
+##
+#macro(classCell $content)
+    <td class="$cssClass">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs a right aligned table cell with class based on $cssClass
+##
+#macro(rightClassCell $content)
+    <td class="${cssClass}-right">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Shared by date cell macros
+##
+#macro(dateCellContent $entity $date $time)
+    <a href="#" class="unadorned" title="$date" onclick="toggleDisplay('${entity.id}_time'); toggleDisplay('${entity.id}_date'); return false;">
+        <img alt="toggle format" src="$base/images/calendar.gif"/>
+    </a>
+    <span id="${entity.id}_time">$time</span>
+    <span id="${entity.id}_date" style="display: none">$date</span>
+#end
+
+##
+## Outputs a timestamp cell with class based on $cssClass
+##
+#macro(dateClassCell $result)
+    <td class="$cssClass">
+        #dateCellContent($result $result.stamps.getPrettyStartDate($locale) $result.stamps.prettyStartTime)
+    </td>
+#end
+
+##
+## Outputs a plain date cell with toggling.  $entity must have .id (unique),
+## .prettyDate and .prettyTime.
+##
+#macro(dateCell $entity)
+    <td class="content">
+        #dateCellContent($entity $entity.getPrettyDate($locale) $entity.prettyTime)
+    </td>
+#end
+
+##
+## Outputs a content row for the tail of a content table
+##
+#macro(contentRow $key $span)
+    <tr>
+        <td class="content" colspan="$span">
+            #wwtext("name=$key")
+        </td>
+    </tr>
+#end
+
+##
+## Outputs an add row for the tail of a content table
+##
+#macro(addRow $key $span $url $id)
+    <tr>
+        <td class="add" colspan="$span">
+            <a #if($id != "") id="$id"#end href="$url"><img alt="add" src="$base/images/add.gif"/> #wwtext("name=$key")</a>
+        </td>
+    </tr>
+#end
+
+##
+## Outputs a build/project status cell
+##
+#macro(statusCell $result $showAnimated)
+    #if($result.succeeded() && $result.warningFeatureCount > 0)
+        <td class="warning">
+            #statusImage($result $showAnimated)
+        </td>
+        <td #if($result.number) id='#id("${result.ownerName}.build.${result.number}.status")' #end class="warning">
+            $result.state.prettyString
+        </td>
+    #else
+        <td class="$result.state.string">
+            #statusImage($result $showAnimated)
+        </td>
+        <td #if($result.number) id='#id("${result.ownerName}.build.${result.number}.status")' #end class="$result.state.string">
+            $result.state.prettyString
+        </td>
+    #end
+#end
+
+#macro(statusImage $result $showAnimated)
+    #if($result.succeeded())
+        #if($result.warningFeatureCount > 0)
+            <img alt="warning" src="$base/images/error.gif"/>
+        #else
+            <img alt="success" src="$base/images/accept.gif"/>
+        #end
+    #elseif($result.inProgress())
+        #if($showAnimated)
+            <img alt="in progress" src="$base/images/inprogress.gif"/>
+        #else
+            <img alt="in progress" src="$base/images/cog.gif"/>
+        #end
+    #elseif($result.terminating())
+        <img alt="terminating" src="$base/images/stop.gif"/>
+    #elseif($result.pending())
+        <img alt="pending" src="$base/images/hourglass.gif"/>
+    #elseif($result.errored() || $result.failed())
+        <img alt="failure" src="$base/images/exclamation.gif"/>
+    #else
+        &nbsp;
+    #end
+#end
+
+##
+##
+##
+#macro(assignGlobalResultCssClass $result)
+    #if($result.succeeded() && $result.warningFeatureCount > 0)
+        #set($cssClass = "warning")
+    #else
+        #set($cssClass = $result.state.string)
+    #end
+#end
+
+#macro(showHideButton $category $id $align)
+    <a href="#" class="unadorned" id="${id}_link" onclick="showHideFloat('$category', '$id', '$align'); return false"><img alt="actions" id="${id}_button" class="popdown floating-widget" src="$base/images/default/s.gif"/></a>
+#end
+
+#macro(aggregateResultCell $changelist $myProjects)
+    #set ($selectedResult = "n")
+    #set ($changelistResults = $action.getChangelistResults($changelist))
+    #foreach($result in $changelistResults)
+        #if ($selectedResult == "n")
+            #set($selectedResult = $result)
+        #end
+        #if (!$result.succeeded())
+            #set($selectedResult = $result)
+        #end
+    #end
+
+    #if($myProjects)
+        #set($changeId = "${changelist.id}_projects")
+    #else
+        #set($changeId = "${changelist.id}")
+    #end
+
+    <td id="${changeId}_cell" class="$selectedResult.state.string">
+        #if($selectedResult.succeeded())
+            <img alt="success" src="$base/images/accept.gif"/>
+        #elseif($selectedResult.inProgress())
+            <img alt="in progress" src="$base/images/inprogress.gif"/>
+        #elseif($selectedResult.terminating())
+            <img alt="terminating" src="$base/images/stop.gif"/>
+        #elseif($selectedResult.pending())
+            <img alt="pending" src="$base/images/hourglass.gif"/>
+        #elseif($selectedResult.errored() || $selectedResult.failed())
+            <img alt="failure" src="$base/images/exclamation.gif"/>
+        #else
+            &nbsp;
+        #end
+        #if ($selectedResult == "n")
+            #wwtext("builds.none")
+        #else
+            $selectedResult.state.prettyString
+            #showHideButton("builds" "${changeId}" "tr-br?")
+            <div id="$changeId" style="display: none">
+            <table class="content" style="margin: 0">
+                <tr>
+                    <th class="heading" colspan="4">
+                        <span class="action">
+                            <a href="#" onclick="showHideFloat('builds', '$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                        </span>
+                        #wwtext("name=build.results")
+                    </th>
+                </tr>
+                <tr>
+                    #contentHeading("project" 1)
+                    #contentHeading("build id" 1)
+                    #contentHeading("status" 2)
+                </tr>
+            #foreach($result in $changelistResults)
+                <tr>
+                #set($result = $action.getResult($id))
+                    <td class="content"><a href="$urls.projectHome($result.project)">$!webwork.htmlEncode($result.project.name)</a></td>
+                    #assignGlobalResultCssClass($result)
+                    #dynamicRightLinkCell($result.number "$urls.build($result)")
+                    #statusCell($result true)
+                </tr>
+            #end
+        #end
+        </table>
+        </div>
+    </td>
+#end
+
+##
+##
+##
+#macro(commitCommentCell $changelist $id_suffix)
+    #set($changeId = "${changelist.id}_comment_${id_suffix}")
+    <td class="content" id="${changeId}_cell">
+
+    #set($commitMessageSupport = $action.getCommitMessageSupport($changelist))
+
+    #if ($commitMessageSupport.length > 60)
+        $commitMessageSupport.trim(60)
+        #showHideButton("comments" "${changeId}" "tr-br?")
+        <div id="$changeId" style="display: none">
+            <table class="content" style="margin: 0">
+                <tr>
+                    <th class="heading" colspan="5">
+                        <span class="action">
+                            <a href="#" onclick="showHideFloat('comments', '$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                        </span>
+                        #wwtext("name=change.comment")
+                    </th>
+                </tr>
+                <tr>
+                    <td><pre>$commitMessageSupport.wrap(80)</pre></td>
+                </tr>
+            </table>
+        </div>
+    #else
+        $commitMessageSupport.wrap(80)
+    #end
+    </td>
+#end
+
+##
+## Outputs a result test summary cell
+##
+#macro(testResultsCell $build $recipe $result)
+    #if($result.succeeded() && $result.warningFeatureCount > 0)
+        <td class="warning">
+    #else
+        <td class="$result.state.string">
+    #end
+    
+    #set($summary = $result.testSummary)
+    #if($summary.total == 0)
+        #wwtext("name=tests.none")
+    #else
+        #if($recipe)
+            <a href="$urls.stageTests($build, $recipe)">
+        #else
+            <a href="$urls.buildTests($build)">
+        #end
+        #if($summary.allPassed())
+            $action.getText("tests.all.passed", ["$summary.total"])
+        #else
+            $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
+        #end
+        </a>
+    #end
+    </td>
+#end
+
+##
+## Outputs an owner cell for a build request or result
+##
+#macro(ownerCell $rr $cssClass)
+    #if($rr.personal)
+        <td class="$cssClass">
+            <img alt="personal" src="$base/images/user.gif"/>
+            $!webwork.htmlEncode($rr.owner.config.login)
+        </td>
+    #else
+        <td class="$cssClass">
+            <a href="$urls.projectHome($rr.owner)">
+                $!webwork.htmlEncode($rr.owner.name)
+            </a>
+         </td>
+    #end
+#end
+
+##
+## Outputs an elapsed cell for a result, with progress bar if there is an
+## estimated time remaining.
+##
+#macro(elapsedCell $result)
+    #if($result.stamps.hasEstimatedTimeRemaining())
+        #set($percentComplete = $result.stamps.estimatedPercentComplete)
+        #set($percentRemaining = 100 - $percentComplete)
+        <td class="content">
+            #if($percentComplete > 0)<img class="centre" title="$result.stamps.prettyElapsed (${percentComplete}%) elapsed" src="$base/images/box-elapsed.gif" height="10" width="$percentComplete"/>#end#if($percentRemaining > 0)<img class="centre" title="$result.stamps.prettyEstimatedTimeRemaining (${percentRemaining}%) remaining" src="$base/images/box-remaining.gif" height="10" width="$percentRemaining"/>#end
+        </td>
+    #else
+        #classCell($result.stamps.prettyElapsed)
+    #end
+#end
+
+##
+## Outputs an action cell for viewing a build result
+##
+#macro(viewCell $project $result)
+    <td class="content">
+        <a id="summary-#uce($project.name)-${result.number}" href="$urls.build($result)" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing the details for a build
+##
+#macro(logCell $project $result)
+    <td class="content">
+        <a id="details-#uce($project.name)-${result.number}" href="$urls.buildDetails($result)" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing the details for a build
+##
+#macro(buildLogCell $project $result)
+    <td class="content">
+        <a id="log-#uce($project.name)-${result.number}" href="$urls.buildLog($result)" class="unadorned" title="view log"><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log") </a>
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing changes for a build
+##
+#macro(changesCell $project $result)
+    #set($url = "$urls.buildChanges($result)")
+    <td class="content">
+        <a id="changes-#uce($project.name)-${result.number}" href="$url" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing artifacts for a build
+##
+#macro(artifactsCell $project $result)
+    <td class="content">
+        <a id="artifacts-#uce($project.name)-${result.number}" href="$urls.buildArtifacts($result)" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing the working copy for a build
+##
+#macro(workingCopyCell $project $result $multiProject)
+    #if($action.hasPermission("view source", $project))
+        <td class="content">
+            <a href="$urls.buildWorkingCopy($result)" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
+        </td>
+    #elseif($multiProject)
+        <td class="content">
+            &nbsp;
+        </td>
+    #end
+#end
+
+##
+## Header row for recipe summary
+##
+#macro(recipeSummaryHeader)
+    <tr>
+        #contentHeading("stage.name" 1)
+        #contentHeading("stage.recipe" 1)
+        #contentHeading("stage.host" 1)
+        #contentHeading("build.status" 2)
+        #contentHeading("build.tests" 1)
+        #contentHeading("build.when" 1)
+        #contentHeading("build.elapsed" 1)
+        #contentHeading("actions" 1)
+    </tr>
+#end
+
+##
+## Shows direct error and warning messages on a result in table cells
+##
+#macro(directMessages $result $span)
+    #if($result.hasDirectMessages($errorLevel))
+                    <tr>
+                        <td class="error" colspan="$span">
+                            <ul>
+        #foreach($feature in $result.getFeatures($errorLevel))
+                                <li class="error">$!webwork.htmlEncode($feature.summary)</li>
+        #end
+                            </ul>
+                        </td>
+                    </tr>
+    #end
+    #if($result.hasDirectMessages($warningLevel))
+                    <tr>
+                        <td class="warning" colspan="$span">
+                            <ul>
+        #foreach($feature in $result.getFeatures($warningLevel))
+                                <li class="warning">$!webwork.htmlEncode($feature.summary)</li>
+        #end
+                            </ul>
+                        </td>
+                    </tr>
+    #end
+#end
+
+##
+## Shows a summary for a recipe result
+##
+#macro(recipeSummary $resultNode $build $detailedView $showAnimated)
+    <tr>
+        #set($id = $resultNode.id)
+        #set($recipe = $resultNode.result)
+        #assignGlobalResultCssClass($recipe)
+    #if($detailedView)
+        <td class="content">
+            <a href="#" onclick="selectNode('$resultNode.id'); return false">
+                $!webwork.htmlEncode($resultNode.stageName)
+            </a>
+        </td>
+    #else
+        #dynamicLinkCell($resultNode.stageName "$urls.stageDetails($build, $resultNode)")
+    #end
+        #dynamicCell($recipe.recipeNameSafe)
+        #dynamicIdCell("${build.project.name}.build.${build.number}.stage.${resultNode.stageName}.agent" $resultNode.hostSafe)
+        #statusCell($recipe $showAnimated)
+        #testResultsCell($build $resultNode $recipe)
+        #dateClassCell($recipe)
+        #elapsedCell($recipe)
+        <td class="content">
+            <a href="$urls.stageLogs($build, $resultNode)" class="unadorned" title="view log""><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log")  </a>
+        </td>
+    </tr>
+#end
+
+##
+## Shows summaries for all commands in a recipe
+##
+#macro(recipeCommands $resultNode $build)
+#if($recipe.commandResults.size() > 0)
+    #set($recipe = $resultNode.result)
+    <table class="content">
+        #headingRow("commands" 6)
+        <tr>
+            #contentHeading("command.name" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+        </tr>
+    #foreach($command in $recipe.commandResults)
+        <tr>
+            #assignGlobalResultCssClass($command)
+            <td class="content">
+                <a href="#" onclick="selectNode('$command.id'); return false;">
+                    $!webwork.htmlEncode($command.commandName)
+                </a>
+            </td>
+            #statusCell($command true)
+            #dateClassCell($command)
+            #elapsedCell($command)
+        </tr>
+    #end
+    </table>
+#end
+#end
+
+##
+## Outputs list items for messages of a given level directly on the given result
+##
+#macro(resultMessageItems $result $level)
+    #if($result.hasDirectMessages($level))
+        #foreach($feature in $result.getFeatures($level))
+    <li class="$level.toString().toLowerCase()">
+            $!webwork.htmlEncode($feature.summary)
+    </li>
+        #end
+    #end
+#end
+
+##
+## Summarises the messages of a given level on a file artifact
+##
+#macro(fileArtifactMessageSummary $build $recipe $command $fileArtifact $level $showHeader)
+    #if($fileArtifact.hasMessages($level))
+        #if($showHeader)
+    <li class="header">#wwtext("name=artifact") :: $!webwork.htmlEncode("$fileArtifact.path")
+        #end
+        <ul>
+        #set($trimmedFileArtifactFeatures = false)
+        #set($fileArtifactFeatures = $fileArtifact.getFeatures($level))
+        #if($recipe.completed())  ## Not sure why we are using this, but it has the desired effect of only trimming when showing the summary.
+            #if($fileArtifactFeatures.size() > 100)
+                #set($fileArtifactFeatures = $fileArtifactFeatures.subList(0, 100))
+                #set($trimmedFileArtifactFeatures = true)
+            #end
+        #end
+        #foreach($feature in $fileArtifactFeatures)
+            <li class="$level.toString().toLowerCase()">
+            #if($feature.hasContext())
+                <span class="context">
+                #foreach($line in $feature.summaryLines)
+                    #if($velocityCount == $feature.lineOffset())
+                </span>
+                <span class="feature">
+                    $action.plainToHtml($line)<br/>
+                </span>
+                <span class="context">
+                    #else
+                $action.plainToHtml($line)<br/>
+                    #end
+                #end
+                </span>
+            #else
+                $action.plainToHtml($feature.summary)<br/>
+            #end
+            #if($recipe.completed())
+                <a class="unadorned" href="$urls.commandArtifacts($build, $command)${fileArtifact.pathUrl}#${feature.lineNumber}">
+                    <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
+                </a>
+            #end
+            </li>
+        #end
+        #if($trimmedFileArtifactFeatures)
+            <li>
+                #wwtext("name=trimmed.features")
+                <a class="unadorned" href="$urls.commandArtifacts($build, $command)${fileArtifact.pathUrl}">
+                      <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
+                </a>
+            </li>
+        #end
+        </ul>
+        #if($showHeader)
+    </li>
+        #end
+    #end
+#end
+
+##
+## Summarises the messages of a given level on an artifact into a nested list
+##
+#macro(artifactMessageSummary $build  $recipe $command $artifact $level $showHeader)
+    #if($artifact.hasMessages($level))
+        #foreach($fileArtifact in $artifact.children)
+            #fileArtifactMessageSummary($build $recipe $command $fileArtifact $level $showHeader)
+        #end
+    #end
+#end
+
+##
+## Summarises the messages of a given level on a command result into a nested list
+##
+#macro(commandMessageSummary $build $recipeResult $commandResult $level)
+    #if($commandResult.hasMessages($level))
+        #resultMessageItems($commandResult $level)
+        #foreach($artifact in $commandResult.artifacts)
+            #artifactMessageSummary($build $recipeResult $commandResult $artifact $level true)
+        #end
+    #end
+#end
+
+##
+## Summarises the messages of a given level on a recipe result into a nested list
+##
+#macro(recipeMessageSummary $build $recipeResult $level $top)
+    #if($recipeResult.hasMessages($level))
+        #if($top)
+            <h4>#wwtext("name=${level.toString().toLowerCase()}.messages")</h4>
+            <ul class="$level.toString().toLowerCase()">
+        #end
+
+        #resultMessageItems($recipeResult $level)
+        #foreach($commandResult in $recipeResult.commandResults)
+            #if($commandResult.hasMessages($level))
+                <li class="header">#wwtext("name=command") :: $!webwork.htmlEncode("$commandResult.commandName")
+                    <ul>
+                    #commandMessageSummary($build $recipeResult $commandResult $level)
+                    </ul>
+                </li>
+            #end
+        #end
+
+        #if($top)
+            </ul>
+        #end
+    #end
+#end
+
+##
+## Summarises the messages of a given level on a recipe result node into a nested list
+##
+#macro(nodeMessageSummary $build $node $level)
+    #if($node.hasMessages($level))
+        <li class="header">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stageName) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")
+            <ul>
+            #recipeMessageSummary($build $node.result $level false)
+            #foreach($child in $node.children)
+                #nodeMessageSummary($build $child $level)
+            #end
+            </ul>
+        </li>
+    #end
+#end
+
+##
+## Summarises the messages of a given level on a build result into a nested list
+##
+#macro(buildMessageSummary $buildResult $level)
+    #if($buildResult.hasMessages($level))
+        <h3>#wwtext("name=${level.toString().toLowerCase()}.messages")</h3>
+        <ul class="$level.toString().toLowerCase()">
+        #resultMessageItems($buildResult $level)
+        #foreach($node in $buildResult.root.children)
+            #nodeMessageSummary($buildResult $node $level)
+        #end
+        </ul>
+    #end
+#end
+
+##
+## Shows features of all levels for the given artifact
+##
+#macro(fileArtifactFeatures $build $recipe $result $fileArtifact)
+    #foreach($level in $featureLevels)
+        #if($fileArtifact.hasMessages($level))
+    <ul class="$level.toString().toLowerCase()">
+        <li class="header">$level.toString().toLowerCase() #wwtext("name=features")
+        #fileArtifactMessageSummary($build $recipe $result $fileArtifact $level false)
+        </li>
+    </ul>
+        #end
+    #end
+#end
+
+##
+## Shows an artifact that is a single file
+##
+#macro(commandFileArtifact $artifact $fileArtifact $build $recipe $result $showFeatures $showArtifactLink)
+    <li class="file-artifact">
+    #set($trimmedPath = $artifact.trimmedPath($fileArtifact))
+    #if($showArtifactLink)
+        <a href="$base/view/$result.id/${artifact.id}/${fileArtifact.pathUrl}">$trimmedPath</a>
+        #if($fileArtifact.canDecorate())
+            [<a href="$urls.commandArtifacts($build, $result)$fileArtifact.pathUrl">decorated</a>]
+        #end
+    #else
+        $trimmedPath
+    #end
+    #if($showFeatures)
+        #fileArtifactFeatures($build $recipe $result $fileArtifact)
+    #end
+    </li>
+#end
+
+##
+## Shows an artifact that is multi file, and possibly too many to display
+##
+#macro(commandMultiArtifact $artifact $build $recipe $result $showFeatures $showArtifactLink)
+    #set($hasIndex = $artifact.hasIndexFile())
+    #if($hasIndex)
+        <li class="report-artifact">
+    #else
+        <li class="dir-artifact"><span class="open-folder" id="art_${artifact.id}_header" onclick="toggleFolderList('art_${artifact.id}');">
+    #end
+    #if($hasIndex && $showArtifactLink)
+        <a href="$base/view/$result.id/$artifact.id/$action.escapeSpaces($artifact.name)/">
+    #end
+            $!webwork.htmlEncode($artifact.name)
+    #if($hasIndex && $showArtifactLink)
+        </a>
+    #else
+        </span>
+    #end
+
+    #if($showArtifactLink)
+        <a class="unadorned" href="downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="$base/images/compress.gif"></a>
+    #end
+
+    #if(!$hasIndex)
+        <ul id="art_${artifact.id}">
+        #foreach($fileArtifact in $artifact.children)
+            #commandFileArtifact($artifact $fileArtifact $build $recipe $result $showFeatures $showArtifactLink)
+        #end
+        </ul>
+    #end
+    </li>
+#end
+
+##
+## Shows a list of artifacts for a command
+##
+#macro(commandArtifacts $build $recipe $result $showFeatures $showArtifactLink)
+    <ul class="artifact" id="${commandResult.id}_artifacts">
+    #foreach($artifact in $result.artifacts)
+        #commandMultiArtifact($artifact $build $recipe $result $showFeatures $showArtifactLink)
+    #end
+    </ul>
+#end
+
+##
+## Shows a nested list of artifacts for each command in a recipe
+##
+#macro(recipeArtifacts $build $result $top)
+    #if($result.hasArtifacts())
+        #if($top)
+    <ul class="artifact">
+        #end
+        #foreach($commandResult in $result.commandResults)
+            #if($commandResult.hasArtifacts())
+        <li class="artifact"><span class="expanded-list" id="${commandResult.id}_artifacts_header" onclick="toggleList('${commandResult.id}_artifacts');">#wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)</span>
+            #commandArtifacts($build $result $commandResult false $result.completed())
+        </li>
+            #end
+        #end
+        #if($top)
+    </ul>
+        #end
+    #else
+    <p>
+        #wwtext("name=artifacts.none")
+    </p>
+    #end
+#end
+
+##
+## Shows a nested list of artifacts for a recipe result node
+##
+#macro(recipeNodeArtifacts $build $node)
+    #if($node.hasArtifacts())
+        <li class="artifact"><span class="expanded-list" id="${node.result.id}_artifacts_header" onclick="toggleList('${node.result.id}_artifacts');">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stageName) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")</span>
+            <ul class="artifact" id="${node.result.id}_artifacts">
+            #recipeArtifacts($build $node.result false)
+            #foreach($child in $node.children)
+                #recipeNodeArtifacts($build $child)
+            #end
+            </ul>
+        </li>
+    #end
+
+#end
+
+##
+## Shows a nested list of artifacts for the build result
+##
+#macro(buildArtifacts $result)
+    #if($result.hasArtifacts())
+    <ul class="artifact" id="${result.id}_artifacts">
+        #foreach($node in $result.root.children)
+            #recipeNodeArtifacts($result $node)
+        #end
+    </ul>
+    #else
+    <p>
+        #wwtext("name=artifacts.none")
+    </p>
+    #end
+#end
+
+#macro(buildTestFailures $buildResult)
+    #if($buildResult.completed() && $buildResult.hasBrokenTests())
+    <h2 class="section">#wwtext("name=failed.tests")</h2>
+        #foreach($recipeNode in $buildResult.root.children)
+            #if($recipeNode.hasBrokenTests())
+    <table class="fill-content">
+        <tr>
+            <th class="heading" colspan="5">
+                #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stageName) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
+            </th>
+        </tr>
+        #set($excess = $recipeNode.result.excessFailureCount)
+        #if($excess > 0)
+            #noteRow($action.getText("test.excess.failures", [$excess]) 5)
+        #end
+        <tr>
+            #contentHeading("test.name" 1)
+            #contentHeading("test.status" 2)
+            #contentHeading("test.details" 1)
+            #contentHeading("test.duration" 1)
+        </tr>
+        #showRecipeTestFailures($buildResult $recipeNode)
+    </table>
+            #end
+        #end
+    #end
+#end
+
+
+##
+## Shows the main build result view (shared with project current build)
+##
+#macro(showBuild $buildResult $projectHome $detailedView)
+    <table id="build.summary" class="content">
+        <tr>
+            <th class="heading" colspan="$summaryColumns.getTotalSpan($project)">
+#if($loggedInUser && $projectHome)
+                <span class="action">
+                    <a class="unadorned" href="#" id="columns-popup-link-project.summary" onclick="summaryPopup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+                </span>
+#end
+                #wwtext("name=build.summary")
+            </th>
+        </tr>
+        #buildTableHeading($summaryColumns $project)
+        #buildTableRow($buildResult $summaryColumns false)
+    #if($detailedView)
+        #directMessages($buildResult $summaryColumns.getTotalSpan($project))
+    #end
+    </table>
+
+    #if($buildResult.root.children.size() > 0)
+    <table class="content">
+        #headingRow("build.stages" 9)
+        #recipeSummaryHeader()
+        #foreach($recipeNode in $buildResult.root.children)
+        #recipeSummary($recipeNode $buildResult $detailedView true)
+        #end
+    </table>
+    #end
+
+    #if(!$detailedView && !$projectHome)
+        #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
+    <h2 class="section">#wwtext("name=build.features")</h2>
+    #buildMessageSummary($buildResult $errorLevel)
+    #buildMessageSummary($buildResult $warningLevel)
+        #end
+        #buildTestFailures($buildResult)
+    #end
+#end
+
+<!--- quartz trigger state -->
+#macro( renderQuartzTriggerState $state)
+    #if ($state == -1)<span style='color:black;'>none</span>#end
+    #if ($state == 0)<span style='color:blue;'>normal</span>#end
+    #if ($state == 1)<span style='color:orange;'>paused</span>#end
+    #if ($state == 2)<span style='color:green;'>complete</span>#end
+    #if ($state == 3)<span style='color:red;'>error</span>#end
+    #if ($state == 4)<span style='color:red;'>blocked</span>#end
+#end
+
+#macro( renderTriggerState $state)
+    #if ($state.ordinal() == 0)<span style='color:blue;'>active</span>#end
+    #if ($state.ordinal() == 1)<span style='color:black;'>none</span>#end
+    #if ($state.ordinal() == 2)<span style='color:orange;'>paused</span>#end
+#end
+
+##
+## Shows a table row with pages and previous/next etc links.  Pager should be
+## an instance of paging support.
+##
+#macro(pagingRow $url $extraParams $pager)
+    #if($pager.pageCount > 1)
+        #set($nextPage = $pager.startPage + 1)
+        #set($previousPage = $pager.startPage - 1)
+        #set($lastPage = $pager.pageCount - 1)
+                <tr>
+                    <td class="content-centre">
+        #if($pager.startPage > 0)
+                        <a href="${url}0/${extraParams}" id="page.latest" class="unadorned">
+        #end
+                            #image("$base/images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
+        #if($pager.startPage > 0)
+                        </a>
+        #end
+                    </td>
+                    <td class="content-centre">
+        #if($pager.startPage > 0)
+                        <a href="${url}$previousPage/${extraParams}" id="page.previous" class="unadorned">
+        #end
+                            #image("$base/images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
+        #if($pager.startPage > 0)
+                        </a>
+        #end
+                    </td>
+                    <td class="content-centre">
+        #foreach($pageIndex in [$pager.pageRangeStart..$pager.pageRangeEnd])
+            #set($pageNumber = $pageIndex + 1)
+                        &nbsp;
+            #if($pageIndex != $pager.startPage)
+                        <a href="${url}$pageIndex/${extraParams}" id="page.$pageNumber">
+            #end
+                            $pageNumber#if($pageIndex != $pager.startPage)</a>#end
+        #end
+                        &nbsp;
+                    </td>
+                    <td class="content-centre">
+        #if($pager.startPage < $lastPage)
+                        <a href="${url}$nextPage/${extraParams}" id="page.next" class="unadorned">
+        #end
+                            #wwtext("name=page.older") #image("$base/images/resultset_next.gif" "page.older")
+        #if($pager.startPage < $lastPage)
+                        </a>
+        #end
+                    </td>
+                    <td class="content-centre">
+        #if($pager.startPage < $lastPage)
+                        <a href="${url}$lastPage/${extraParams}" id="page.oldest" class="unadorned">
+        #end
+                            #wwtext("name=page.oldest") #image("$base/images/resultset_last.gif" "page.oldest")
+        #if($pager.startPage < $lastPage)
+                        </a>
+        #end
+                    </td>
+                </tr>
+    #end
+#end
+
+##
+## Shows a test status cell for a broken case.
+##
+#macro(brokenTestStatusCell $test $key)
+    <td class="test-failure">
+    #if($test.wasBrokenPreviously())
+        <img alt="broken test" src="$base/images/exclamation-bw.gif"/>
+    #else
+        <img alt="broken test" src="$base/images/exclamation.gif"/>
+    #end
+    </td>
+    <td class="test-failure">
+        #wwtext("name=$key")
+        #if($test.wasBrokenPreviously())
+            <br/>(<a href="$urls.build($buildResult.project, $test.brokenNumber.toString())">#wwtext("name=test.broken.since") $test.brokenNumber</a>)
+        #end
+    </td>
+#end
+
+##
+## Outputs a status cell for a test result
+##
+#macro(testStatusCell $test)
+    #if($test.errors > 0)
+        #brokenTestStatusCell($test "test.error")
+    #elseif($test.failures > 0)
+        #brokenTestStatusCell($test "test.failure")
+    #elseif($tests.total == 0)
+    <td>
+        <img alt="success" src="$base/images/none_blue.gif"/>
+    </td>
+    <td>
+        #wwtext("name=test.none")
+    </td>
+    #else
+    <td class="success">
+        <img alt="success" src="$base/images/accept.gif"/>
+    </td>
+    <td class="success">
+        #wwtext("name=test.passed")
+        #if($test.fixed)
+            <br/>(#wwtext("name=test.fixed"))
+        #end
+    </td>
+    #end
+#end
+
+##
+## Shows a single test with any nested tests (if it is a suite).
+##
+#macro(showTest $recipe $test $indent $showPassed $parent)
+    #if($showPassed || $test.hasBrokenTests())
+        #if($test.hasBrokenTests())
+            #set($cssClass = "test-failure")
+        #else
+            #set($cssClass = "success")
+        #end
+        #set($rowId = "test${parent}_${test.id}")
+        <tr id="$rowId"
+        #if($test.isSuite() && $showPassed)
+            class="suite" onmouseover="getElement('$rowId').className = 'suite-hover';" onmouseout="getElement('$rowId').className = 'suite';" onclick="toggleTests('$rowId', successfulShowing['$recipe.id']);"
+        #end
+        >
+            <td
+        #if($test.isSuite() && $showPassed)
+                class="$cssClass content-nowrap collapse"
+        #else
+                class="$cssClass content-nowrap"
+        #end
+            >
+                 ${indent}$!webwork.htmlEncode($test.name)
+             </td>
+            #testStatusCell($test)
+        #if($test.isSuite())
+            #staticCell($action.getText("test.suite.details", ["$test.total", "$test.errors", "$test.failures"]))
+        #else
+            #if($test.message)
+            <td class="content-wrap">
+                $action.plainToHtml($test.message)
+            </td>
+            #else
+                #contentCell("empty.cell")
+            #end
+        #end
+            <td class="content" width="10%">
+                $!webwork.htmlEncode($test.prettyDuration)
+            </td>
+        </tr>
+
+        #if($test.isSuite())
+            #set($newparent = "${parent}_${test.id}")
+            #foreach($child in $test.children)
+                #showTest($recipe $child "$indent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $showPassed "$newparent")
+            #end
+        #end
+    #end
+#end
+
+#macro(showTestCaseFailure $recipe $test $indent)
+    <tr>
+        <td class="test-failure content-nowrap">
+             ${indent}$!webwork.htmlEncode($test.name)
+        </td>
+        #testStatusCell($test) 
+    #if($test.message)
+        <td class="content-wrap">
+            $action.plainToHtml($test.message)
+        </td>
+    #else
+        #contentCell("empty.cell")
+    #end
+        <td class="content" width="10%">
+            $!webwork.htmlEncode($test.prettyDuration)
+        </td>
+    </tr>
+#end
+
+##
+## Shows a test suite with any nested tests.
+##
+#macro(showTestSuiteFailures $build $recipe $test $indent)
+    ## Yes, this is insane, but velocity does not have locals, so there is no
+    ## pure velocity way (that I know of) to implement the path construction
+    #set($path = $action.pushSuite($test))
+
+    <tr>
+        <td class="test-failure content-nowrap">
+             ${indent}<a href='$urls.stageTests($build, $recipe)$action.urlEncode($path)'>$!webwork.htmlEncode($test.name)</a>
+         </td>
+        #contentCell("empty.cell")
+        #contentCell("empty.cell")
+        #contentCell("empty.cell")
+        <td class="content" width="10%">
+            $!webwork.htmlEncode($test.prettyDuration)
+        </td>
+    </tr>
+
+    #foreach($child in $test.suites)
+        #showTestSuiteFailures($build $recipe $child "${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+    #end
+    #foreach($child in $test.cases)
+        #showTestCaseFailure($recipe $child "${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+    #end
+
+    $action.popSuite()
+#end
+
+##
+## Shows the test summary view for all tests in the given recipe.
+##
+#macro(showRecipeTestFailures $build $recipe)
+    #if($recipe.result.failedTestResults)
+        #foreach($child in $recipe.result.failedTestResults.suites)
+            #showTestSuiteFailures($build $recipe $child "")
+        #end
+        #foreach($child in $recipe.result.failedTestResults.cases)
+            #showTestCaseFailure($recipe $child "")
+        #end
+    #end
+#end
+
+##
+## Inserts javascript for an auto-updating panel.  Assumes we don't care
+## about errors.
+##
+#macro(updater $url $panelId $user)
+    ## We should be able to use Updater.setAutoRefresh but for some reason it
+    ## gives aborted transactions after a few refreshes (no idea why as yet).
+    #if($refreshInterval || $user.preferences.refreshingEnabled)
+        Ext.onReady(function() {
+            var task = {
+                run: function(){
+                    var updater = new Ext.Updater('$panelId');
+                    updater.showLoadIndicator = false;
+                    updater.update({
+                        url: '$url',
+                        scripts: true
+                    });
+                },
+                interval: 1000 * #if($refreshInterval) $refreshInterval #else $user.preferences.refreshInterval #end
+            }
+            var runner = new Ext.util.TaskRunner();
+            runner.start(task);
+        });
+    #end
+#end
+
+##
+## Shows a directory listing on a browsing page
+##
+#macro(showDirectoryListing $root $url $dirAction $fileAction)
+    <table class="content">
+        #headingRow("$action.getText('path') :: ${root}/$!webwork.htmlEncode($displayPath)" 4)
+        <tr>
+            <td class="image">&nbsp;</td>
+            #contentHeading("name" 1)
+            #contentHeading("type" 1)
+    #if($showSizes)
+            #contentHeading("size" 1)
+    #end
+    #if($fileAction || $dirAction)
+            #contentHeading("actions" 1)
+    #end
+        </tr>
+#foreach($entry in $entries)
+        <tr>
+    #if($entry.isDirectory())
+            <td class="image">
+                <img src="$base/images/folder.gif"/>
+            </td>
+            #dynamicLinkCell($entry.name "${url}path=$action.urlEncode($entry.path)")
+            #contentCell($entry.mimeType)
+    #elseif(!$dirAction)
+            <td class="image">
+                <img src="$base/images/page.gif"/>
+            </td>
+        #if($fileAction)
+            #dynamicCell($!webwork.htmlEncode($entry.name))
+        #else
+            #dynamicLinkCell($entry.name "${url}path=$action.urlEncode($entry.path)")
+        #end
+            #contentCell($entry.mimeType)
+    #end
+    #if($showSizes)
+            <td class="content-right">
+        #if($entry.isDirectory())
+                &nbsp;
+        #else
+                $entry.prettySize
+        #end
+            </td>
+    #end
+    #if($entry.isDirectory())
+        #if($dirAction && $entry.name != "..")
+            <td class="content">
+                <a href="#" onclick="${dirAction}('$entry.path'); return false;">#wwtext("name=select")</a>
+            </td>
+        #elseif($fileAction)
+            #contentCell("empty.cell")
+        #end
+    #elseif(!$dirAction)
+        #if($fileAction)
+            <td class="content">
+                <a href="#" onclick="${fileAction}('$entry.path'); return false;">#wwtext("name=select")</a>
+            </td>
+        #end
+    #end
+        </tr>
+#end
+    </table>
+#end
+
+##
+## Shows a server (log) message
+##
+#macro(serverMessage $record)
+    <table class="fill-content">
+    #if($action.isError($record))
+        #set($image = "exclamation")
+        #set($cssClass = "error")
+    #elseif($action.isWarning($record))
+        #set($image = "error")
+        #set($cssClass = "warning")
+    #else
+        #set($image = "information")
+        #set($cssClass = "info")
+    #end
+        <tr>
+            <td class="$cssClass" width="26%">$action.getPrettyDate($record.millis) ($action.getPrettyTime($record.millis))</td>
+            <td class="$cssClass" width="9%"><img alt="failure" src="$base/images/${image}.gif"/> $record.level.toString().toLowerCase()</td>
+            <td class="$cssClass" width="9%">#wwtext("name=count") :: $record.count</td>
+            <td class="$cssClass">$!webwork.htmlEncode("$record.sourceClassName :: $record.sourceMethodName")</td>
+        </tr>
+    #if($record.message)
+        <tr>
+            <td class="content-large" colspan="4">
+                <pre>$!webwork.htmlEncode($record.message)</pre>
+            </td>
+        </tr>
+    #end
+    #if($action.hasThrowable($record))
+        <tr>
+            <td class="content-large" colspan="4">
+                <pre>$!webwork.htmlEncode($record.stackTrace))</pre>
+            </td>
+        </tr>
+    #end
+    </table>
+#end
+
+##
+## Shows a test summary table for a result
+##
+#macro(testSummaryTable $summary)
+##    <h2 class="section">#wwtext("name=test.summary")</h2>
+
+    <table class="fill-content">
+        #headingRow("test.summary" 6)
+        <tr>
+            #contentHeading("test.status" 2)
+            #contentHeading("test.total" 1)
+            #contentHeading("test.failures" 1)
+            #contentHeading("test.errors" 1)
+            #contentHeading("test.success.rate" 1)
+        </tr>
+        <tr>
+            #testStatusCell($summary)
+            #rightCell($summary.total)
+            #rightCell($summary.failures)
+            #rightCell($summary.errors)
+            #rightCell("${summary.successRate}%")
+        </tr>
+    </table>
+#end
+
+#macro(buildTableColumns $buildColumns $idSuffix)
+    <div style="display: none">
+        <table>
+            <tr id="build-table-${idSuffix}">
+    #foreach($key in $buildColumns.columns)
+                <th class="content" id="build-header-${key}-${idSuffix}"></th>
+    #end
+            </tr>
+        </table>
+    </div>
+#end
+
+##
+## Outputs the table headers a build results table (but not the row tags).
+##
+#macro(buildTableHeaders $buildColumns $project)
+    #foreach($key in $buildColumns.columns)
+        #if($project)
+            #set($colspan = $buildColumns.getSpan($key, $project))
+        #else
+            #set($colspan = $buildColumns.getSpan($key))
+        #end
+        <th class="content" #if($colspan > 1) colspan="$colspan" #end>#wwtext("name=build.$key")</th>
+    #end
+#end
+
+##
+## Outputs the heading row for a build results table
+##
+#macro(buildTableHeading $buildColumns $project)
+    <tr>
+        #buildTableHeaders($buildColumns $project)
+    </tr>
+#end
+
+##
+## Outputs cells for a build result in a table of results, based on the given
+## column configuration, but without the row tags.
+##
+#macro(buildTableCells $buildResult $columns $multiProject)
+    #assignGlobalResultCssClass($buildResult)
+    #foreach($key in $columns.columns)
+        #buildTableCell($buildResult $columns $key $multiProject)
+    #end
+#end
+
+##
+## Outputs a row for a build result in a table of results, based on the given
+## column configuration.
+##
+#macro(buildTableRow $buildResult $columns $multiProject)
+    <tr>
+        #buildTableCells($buildResult $columns $multiProject)
+    </tr>
+#end
+
+##
+## Outputs a project cell for a build result table.
+##
+#macro(projectCell $project)
+    <td class="content">
+        <a href="$urls.projectHome($project)" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+    </td>
+#end
+
+#macro(projectClassCell $project)
+    <td class="$cssClass">
+        <a href="$urls.projectHome($project)" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+    </td>
+#end
+
+##
+## Outputs a single build result cell, based on the given column key
+##
+#macro(buildTableCell $buildResult $columns $key $multiProject)
+    #set($project = $buildResult.project)
+    #if($key == "id")
+        <td class="content-right" id='#id("${buildResult.ownerName}.build.${buildResult.number}.id")'>
+            <a href="$urls.build($buildResult)">$buildResult.number</a>
+        </td>
+    #elseif($key == "project")
+        #projectClassCell($project)
+    #elseif($key == "status")
+        #statusCell($buildResult true)
+    #elseif($key == "reason")
+        #classCell($buildResult.reason.summary)
+    #elseif($key == "tests")
+        #testResultsCell($buildResult false $buildResult)
+    #elseif($key == "owner")
+        #ownerCell($buildResult $cssClass)
+    #elseif($key == "rev")
+        #if($buildResult.personal)
+            #staticClassCell("personal")
+        #elseif($buildResult.revision)
+            $action.updateChangeUrl($project, $buildResult.revision)
+            #dynamicRightLinkClassCell($buildResult.revision $action.getChangeUrl())
+        #else
+            #contentClassCell("revision.none")
+        #end
+    #elseif($key == "version")
+        #if($buildResult.version)
+            #classCell($buildResult.version)
+        #else
+            #classCell("none")
+        #end
+    #elseif($key == "when")
+        #dateClassCell($buildResult)
+    #elseif($key == "elapsed")
+        #elapsedCell($buildResult)
+    #elseif($key == "actions")
+        #viewCell($project $buildResult)
+        #logCell($project $buildResult)
+        #changesCell($project $buildResult)
+        #artifactsCell($project $buildResult)
+        #workingCopyCell($project $buildResult $multiProject)
+        #buildLogCell($project $buildResult)
+    #elseif($key == "warnings")
+        #rightClassCell($buildResult.warningFeatureCount)
+    #elseif($key == "errors")
+        #rightClassCell($buildResult.errorFeatureCount)
+    #else
+        <td class="content">unknown column '$key'</td>
+    #end
+#end
+
+##
+## Shows build elapsed info either as a progress bar or as time elapsed if
+## no progress can be calculated.
+##
+#macro(elapsedValue $buildResult)
+    #if($buildResult.stamps.hasEstimatedTimeRemaining())
+        #set($percentComplete = $buildResult.stamps.estimatedPercentComplete)
+        #set($percentRemaining = 100 - $percentComplete)
+        #if($percentComplete > 0)<img class="centre" title="$buildResult.stamps.prettyElapsed (${percentComplete}%) elapsed" src="$base/images/box-elapsed.gif" height="10" width="$percentComplete"/>#end#if($percentRemaining > 0)<img class="centre" title="$buildResult.stamps.prettyEstimatedTimeRemaining (${percentRemaining}%) remaining" src="$base/images/box-remaining.gif" height="10" width="$percentRemaining"/>#end
+    #else
+        $buildResult.stamps.prettyElapsed
+    #end
+#end
+
+##
+## Outputs the value of a build column, labelled where necessary, for
+## presentation in a horizontal layout with no defined table columns/headers.
+##
+#macro(buildColumnValue $buildResult $key)
+    #set($project = $buildResult.project)
+    #if($key == "id")
+        <a href="$urls.build($buildResult)">build $buildResult.number</a>
+    #elseif($key == "project")
+        <a href="$urls.projectHome($project)">project: #html($project.name)</a>
+    #elseif($key == "status")
+        #if($buildResult.succeeded() && $buildResult.warningFeatureCount > 0)
+            #set($statusClass = "warning")
+        #else
+            #set($statusClass ="$buildResult.state.string")
+        #end
+        <span id='#id("${buildResult.ownerName}.build.${buildResult.number}.status")' class="$statusClass">
+            #statusImage($buildResult true)
+            #if($buildResult.inProgress())
+                #elapsedValue($buildResult)
+            #else
+                $buildResult.state.prettyString
+            #end
+        </span>
+    #elseif($key == "reason")
+        why: $buildResult.reason.summary
+    #elseif($key == "tests")
+        #set($summary = $buildResult.testSummary)
+        tests:
+        #if($summary.total == 0)
+            #wwtext("name=tests.none")
+        #else
+            <a href="$urls.buildTests($buildResult)">
+            #if($summary.allPassed())
+                $action.getText("tests.all.passed", ["$summary.total"])
+            #else
+                $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
+            #end
+            </a>
+        #end
+    #elseif($key == "owner")
+        #if($rr.personal)
+            <img alt="personal" src="$base/images/user.gif"/>
+            #html($buildResult.owner.config.login)
+        #else
+            <a href="$urls.projectHome($buildResult.owner)">
+                #html($buildResult.owner.name)
+            </a>
+        #end
+    #elseif($key == "rev")
+            rev:
+        #if($buildResult.personal)
+            personal
+        #elseif($buildResult.revision)
+            $action.updateChangeUrl($project, $buildResult.revision)
+            #set($changeUrl = $action.getChangeUrl())
+            #if($changeUrl)
+            <a href="$changeUrl">
+            #end
+                #html($buildResult.revision)
+            #if($changeUrl)
+            </a>
+            #end
+        #else
+            none
+        #end
+    #elseif($key == "version")
+        version:
+        #if($buildResult.version)
+            #html($buildResult.version)
+        #else
+            none
+        #end
+    #elseif($key == "when")
+        when:
+        #dateCellContent($buildResult $buildResult.stamps.getPrettyStartDate($locale) $buildResult.stamps.prettyStartTime)
+    #elseif($key == "elapsed")
+        #if($buildResult.completed())
+            time: $buildResult.stamps.prettyElapsed
+        #else
+            remaining: $buildResult.stamps.prettyEstimatedTimeRemaining
+        #end
+    #elseif($key == "actions")
+        <a href="$urls.build($buildResult)" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
+        <a href="$urls.buildDetails($buildResult)" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
+        <a href="$urls.buildChanges($buildResult)" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
+        <a href="$urls.buildArtifacts($buildResult)" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
+        #if($action.hasPermission("view source", $project))
+        <a href="$urls.buildWorkingCopy($buildResult)" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
+        #end
+    #elseif($key == "warnings")
+        warnings: $buildResult.warningFeatureCount
+    #elseif($key == "errors")
+        errors: $buildResult.errorFeatureCount
+    #end
+#end
+
+##
+## Outputs a checkbox for configuring a build table column
+##
+#macro(buildColumnCheckbox $key $idSuffix $popupName)
+    <td>
+        <input type="checkbox" id="build-column-${key}-${idSuffix}" onclick="${popupName}.addRemoveBuildColumn('$key', '$idSuffix');"/>
+    </td>
+    <td>
+        <label for="build-column-${key}-${idSuffix}">#wwtext("name=build.$key")</label>
+    </td>
+#end
+
+##
+## Outputs HTML for a build columns popup window
+##
+#macro(buildColumnsPopup $idSuffix $popupName)
+    <div id="column-arrow-$idSuffix" style="z-index: 102; display: none; position: absolute">
+        <img src="$base/images/arrow_down_small.gif"/>
+    </div>
+
+    <div id="columns-popup-$idSuffix" class="floating" style="display: none;">
+        <table class="content" style="margin: 0">
+            <tr id="columns-popup-handle-$idSuffix">
+                <th class="heading" colspan="1">
+                    #wwtext("name=build.columns.configure")
+                </th>
+            </tr>
+            <tr>
+                <td style="padding-top: 0">
+                    <h3 class="popup">#wwtext("name=build.columns.order")</h3>
+                    <table>
+                        <tr id="build-header-row-$idSuffix">
+                        </tr>
+                    </table>
+
+                    <h3 class="popup">#wwtext("name=build.columns.select")</h3>
+                    <table class="build-columns">
+                        <tr>
+                            #buildColumnCheckbox("id" $idSuffix $popupName)
+                            #buildColumnCheckbox("project" $idSuffix $popupName)
+                            #buildColumnCheckbox("status" $idSuffix $popupName)
+                            #buildColumnCheckbox("rev" $idSuffix $popupName)
+                            #buildColumnCheckbox("reason" $idSuffix $popupName)
+                        </tr>
+                        <tr>
+                            #buildColumnCheckbox("tests" $idSuffix $popupName)
+                            #buildColumnCheckbox("when" $idSuffix $popupName)
+                            #buildColumnCheckbox("elapsed" $idSuffix $popupName)
+                            #buildColumnCheckbox("owner" $idSuffix $popupName)
+                            #buildColumnCheckbox("version" $idSuffix $popupName)
+                        </tr>
+                        <tr>
+                            #buildColumnCheckbox("warnings" $idSuffix $popupName)
+                            #buildColumnCheckbox("errors" $idSuffix $popupName)
+                            #buildColumnCheckbox("actions" $idSuffix $popupName)
+                        </tr>
+                    </table>
+
+                    <div class="popup-actions">
+                        <a href="#" class="unadorned" onclick="${popupName}.applyBuildColumns(); return false;">
+                            <img alt="accept" src="$base/images/accept.gif"/>
+                            #wwtext("name=build.columns.apply")
+                        </a>
+                        &nbsp;
+                        <a href="#" class="unadorned" onclick="${popupName}.cancelBuildColumns(); return false;">
+                            <img alt="cancel" src="$base/images/cancel.gif"/>
+                            #wwtext("name=build.columns.cancel")
+                        </a>
+                    </div>
+
+                    <div id="columns-popup-error-$idSuffix" style="display: none; color: #e33;">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+#end
+
+#macro(pluginStateImage $plugin)
+    #if($plugin.disabled || $plugin.disabling)
+        #set($image = "exclamation-bw.gif")
+    #elseif($plugin.enabled)
+        #set($image = "accept.gif")
+    #elseif($plugin.uninstalling)
+        #set($image = "delete.gif")
+    #elseif($plugin.upgrading)
+        #set($image = "arrow-refresh.gif")
+    #end
+
+    <img alt="plugin state" src="$base/images/$image"/>
+#end
+
+#macro(pluginLink $plugin)
+    <a id="select:$plugin.id" href="#" onclick="selectPlugin('$plugin.id'); return false;">
+        $!webwork.htmlEncode($plugin.name)
+    </a>
+#end
+
+#macro(pluginDisable $plugin)
+    <img alt="disable" src="$base/images/cancel.gif"/> <a href="#" id="disable:$plugin.id" onclick="pluginAction('$plugin.id', 'disable'); return false;">#wwtext("name=plugin.disable")</a>
+#end
+
+#macro(pluginEnable $plugin)
+    <img alt="enable" src="$base/images/accept.gif"/> <a href="#" id="enable:$plugin.id" onclick="pluginAction('$plugin.id', 'enable'); return false;">#wwtext("name=plugin.enable")</a>
+#end
+
+#macro(pluginUninstall $plugin)
+    <img alt="delete" src="$base/images/delete.gif"/> <a href="#" id="uninstall:$plugin.id" onclick="pluginAction('$plugin.id', 'uninstall'); return false;">#wwtext("name=plugin.uninstall")</a>
+#end
+
+#macro(checkForm $path $type $formName $namespace)
+    <div id="check.frame" class="frame">
+        #i18nexists("key=test.heading" "context=$type.symbolicName")<h3 class="config-header">#i18n("key=test.heading" "context=$type.symbolicName")</h3>#end
+        #i18nexists("key=test.description" "context=$type.symbolicName")<p class="config-description">#i18n("key=test.description" "context=$type.symbolicName")</p>#end
+        <p class="config-check-result" id="check.result" style="display: none">
+        </p>
+        <div class="config-container">
+            #checkform("path=$path" "symbolicName=$type.symbolicName" "mainFormName=$formName" "checkFormName=checkform" "namespace=$namespace")
+        </div>
+        <script type="text/javascript">
+            ## Used for Selenium testing
+            checkComplete = false;
+            checkOK = true;
+
+            var frameEl = Ext.get('nested-layout');
+            var checkEl = Ext.get('check.result');
+            checkEl.enableDisplayMode();
+
+            checkform.on('beforeaction', function(form, action)
+            {
+                checkComplete = false;
+                frameEl.mask('Checking configuration...');
+                return true;
+            });
+
+            checkform.on('actioncomplete', function(form, action)
+            {
+                frameEl.unmask();
+                checkEl.setVisible(true, true);
+                checkEl.update(action.result.panel, true);
+                checkOK = action.result.checkSucceeded;
+                checkComplete = true;
+            });
+
+            checkform.on('actionfailed', function(form, action)
+            {
+                frameEl.unmask();
+
+                var message;
+                if(action.failureType == Ext.form.Action.SERVER_INVALID)
+                {
+                    message = 'unable to check configuration due to validation errors';
+                }
+                else
+                {
+                    message = 'unable to contact Pulse to run check';
+                }
+
+                checkEl.setVisible(true, true);
+                checkEl.update('<img src="$base/images/exclamation.gif" alt="error"/> <span class="config-check-failure">' + message + '</span>', true);
+                checkOK = false;
+                checkComplete = true;
+            });
+        </script>
+    </div>
+#end
+
+#macro(standardFormEvents $formName)
+    <script type="text/javascript">
+        ${formName}.on('actioncomplete', function(form, action)
+        {
+            handleConfigurationResponse(action.result);
+        });
+        ${formName}.on('actionfailed', function(form, action)
+        {
+            if(action.failureType == Ext.form.Action.SERVER_INVALID)
+            {
+                form.handleActionErrors(action.result.actionErrors);
+            }
+            else
+            {
+                showStatus('unable to contact pulse server', 'failure');
+            }
+        });
+    </script>
+#end
+
+#macro(taskProgressUI $monitor)
+
+<table style="width: 540px; margin: 20px;">
+    <tr>
+        <!-- Task list (left side) -->
+        <td style="vertical-align: top;">
+            <ul id="restore-tasks">
+#foreach($task in $monitor.tasks)
+#set($taskIndex = $velocityCount - 1)
+#if($monitor.completedTasks > $taskIndex)
+    #set($taskProgress = $monitor.getProgress($task))
+    #if($taskProgress.failed)
+        #set($taskClass = "task-failed")
+    #elseif($taskProgress.aborted)
+        #set($taskClass = "task-aborted")
+    #elseif($taskProgress.successful)
+        #set($taskClass = "task-successful")
+    #end
+#elseif($monitor.completedTasks == $taskIndex)
+    #set($taskClass = "task-inprogress")
+#else
+    #set($taskClass = "task-pending")
+#end
+                <li class="$taskClass"><pre>$task.name</pre></li>
+#end
+            </ul>
+        </td>
+
+        <!-- Current task progress (right side) -->
+
+#if($monitor.finished)
+
+        #if($monitor.successful)
+            #set($barClass = "okaybar")
+        #elseif ($monitor.failed)
+            #set($barClass = "errorbar")
+        #elseif ($monitor.error)
+            #set($barClass = "errorbar")
+        #end
+
+        <td style="width: 100%; border: solid 1px #dde; padding: 10px; vertical-align:top">
+            <table id="task-progress">
+                <tr>
+                    <th>Task Progress:</th>
+                    <td class="stretch">
+                        <table width="100%">
+                            <tr>
+                                <td width="100%" class="$barClass">100%</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+#else
+
+    #set($currentTask = $monitor.currentTask)
+    #set($currentFeedback = $monitor.currentTaskProgress)
+    #set($percentageComplete = $currentFeedback.percentageComplete)
+    #set($percentageRemaining = 100 - $percentageComplete)
+
+        <td style="width: 100%; border: solid 1px #dde; padding: 10px; vertical-align:top">
+            <table id="task-progress">
+                <tr>
+                    <th>Task Progress:</th>
+                    <td class="stretch">
+                        <table width="100%">
+                            <tr>
+                                #if ($percentageComplete > 0)
+                                    <td width="$percentageComplete%" class="okaybar">#if($percentageComplete >= 50) $percentageComplete% #else &nbsp; #end</td>
+                                #end
+                                #if ($percentageComplete < 100)
+                                    <td width="$percentageRemaining%" class="clearbar">#if($percentageComplete >= 0 && $percentageComplete < 50) $percentageComplete% #else &nbsp; #end</td>
+                                #end
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Elapsed time:</th>
+                    <td class="stretch">$currentFeedback.elapsedTimePretty</td>
+                </tr>
+                <tr>
+                    <th>Estimated time:</th>
+                    <td class="stretch">$currentFeedback.estimatedTimePretty</td>
+                </tr>
+                <tr>
+                    <th>Status message:</th>
+                    <td class="stretch">$currentFeedback.statusMessage</td>
+                </tr>
+            </table>
+        </td>
+#end
+
+    </tr>
+</table>
+<p>
+    <strong>Total Elapsed Time</strong>: $monitor.elapsedTimePretty
+</p>
+
+#end        

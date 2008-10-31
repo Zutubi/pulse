@@ -5,27 +5,21 @@
 
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
  * The log analyser helps process the cvs log output.
- *
- * @author Daniel Ostermeier
  */
 public class LogInformationAnalyser
 {
@@ -189,25 +183,20 @@ public class LogInformationAnalyser
             }
 
             CvsRevision rev = new CvsRevision(lastChange.getAuthor(), lastChange.getTag(), lastChange.getMessage(), lastChange.getDate());
-            Changelist changelist = new Changelist(CvsClient.convertRevision(rev));
-            for (Revision change : localChanges)
-            {
-                changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));
-            }
+            Changelist changelist = new Changelist(
+                    CvsClient.convertRevision(rev),
+                    lastChange.getDate().getTime(),
+                    lastChange.getAuthor(),
+                    lastChange.getMessage(),
+                    CollectionUtils.map(localChanges, new Mapping<Revision, FileChange>()
+                    {
+                        public FileChange map(Revision revision)
+                        {
+                            return new FileChange(revision.getFilename(), revision.getRevision(), revision.getAction());
+                        }
+                    })
+            );
             changelists.add(changelist);
-            
-            // CIB-1627: need some logging. We do not expect this to be null, but have had cases where this is so.  Not exactly
-            // sure what should be done until we see some examples of this.
-            if (changelist.getDate() == null)
-            {
-                com.zutubi.pulse.core.model.Revision revision = changelist.getRevision();
-                LOG.warning("Unexpected changelist date 'null'");
-                LOG.warning("  - author: " + revision.getAuthor());
-                LOG.warning("  - branch: " + revision.getBranch());
-                LOG.warning("  - comment: " + revision.getComment());
-                LOG.warning("  - revision string: " + revision.getRevisionString());
-            }
-
         }
 
         return changelists;
@@ -361,17 +350,17 @@ public class LogInformationAnalyser
             return filename;
         }
 
-        public Change.Action getAction()
+        public FileChange.Action getAction()
         {
             if (log.getAddedLines() == 0 && log.getRemovedLines() == 0)
             {
                 if (!log.getState().equalsIgnoreCase("dead"))
                 {
-                    return Change.Action.ADD;
+                    return FileChange.Action.ADD;
                 }
-                return Change.Action.DELETE;
+                return FileChange.Action.DELETE;
             }
-            return Change.Action.EDIT;
+            return FileChange.Action.EDIT;
         }
 
     }

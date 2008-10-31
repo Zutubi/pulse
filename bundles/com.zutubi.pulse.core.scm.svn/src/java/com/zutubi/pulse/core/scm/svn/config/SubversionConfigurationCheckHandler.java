@@ -1,15 +1,15 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
+import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 
 /**
- *
- *
  */
+@Wire
 @SymbolicName("zutubi.subversionConfigurationCheckHandler")
 public class SubversionConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<SubversionConfiguration>
 {
@@ -17,14 +17,18 @@ public class SubversionConfigurationCheckHandler extends ConfigurationCheckHandl
 
     public void test(SubversionConfiguration configuration) throws ScmException
     {
-        SubversionClient client = (SubversionClient) scmClientFactory.createClient(configuration);
+        SubversionClient client = null;
         try
         {
+            client = (SubversionClient) scmClientFactory.createClient(configuration);
             client.testConnection();
         }
         finally
         {
-            client.close();
+            if (client != null)
+            {
+                client.close();
+            }
         }
     }
 

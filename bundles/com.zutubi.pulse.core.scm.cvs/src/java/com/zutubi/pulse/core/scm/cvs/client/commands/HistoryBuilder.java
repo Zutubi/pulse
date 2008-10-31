@@ -5,7 +5,7 @@
 
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import org.netbeans.lib.cvsclient.command.Builder;
 
 import java.util.*;

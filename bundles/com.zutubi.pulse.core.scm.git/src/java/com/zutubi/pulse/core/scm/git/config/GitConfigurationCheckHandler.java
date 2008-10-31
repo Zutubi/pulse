@@ -1,15 +1,17 @@
 package com.zutubi.pulse.core.scm.git.config;
 
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.git.GitClient;
+import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 
 /**
  * not yet implemented
  */
+@Wire
 @SymbolicName("zutubi.gitConfigurationCheckHandler")
 public class GitConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<GitConfiguration>
 {
@@ -17,9 +19,10 @@ public class GitConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
 
     public void test(GitConfiguration configuration) throws ScmException
     {
-        GitClient client = (GitClient) scmClientFactory.createClient(configuration);
+        GitClient client = null;
         try
         {
+            client = (GitClient) scmClientFactory.createClient(configuration);
             // can check the repository details by creating a local (no checkout) clone.
             // can check for the existance of the specified branch.
             // - local clone of repository
@@ -27,11 +30,14 @@ public class GitConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
         }
         finally
         {
-            client.close();
+            if (client != null)
+            {
+                client.close();
+            }
         }
     }
 
-    public void setScmClientFactory(ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration> scmClientManager)
+    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientManager)
     {
         this.scmClientFactory = scmClientManager;
     }

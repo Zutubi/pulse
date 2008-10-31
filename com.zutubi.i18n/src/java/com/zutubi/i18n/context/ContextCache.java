@@ -1,13 +1,12 @@
 package com.zutubi.i18n.context;
 
-import com.zutubi.i18n.context.Context;
-
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.List;
 
 /**
- * <class-comment/>
+ * A ContextCache is a cache that holds mappings between a context, locale
+ * and the associated list of resource bundles. 
  */
 public interface ContextCache
 {

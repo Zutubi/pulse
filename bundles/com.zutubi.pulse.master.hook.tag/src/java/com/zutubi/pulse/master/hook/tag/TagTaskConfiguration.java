@@ -1,20 +1,21 @@
 package com.zutubi.pulse.master.hook.tag;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wire;
-import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.VariableHelper;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.ScmCapability;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.tove.config.project.hooks.*;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmCapability;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.tove.config.project.hooks.*;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
 
@@ -33,7 +34,8 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
     private String tag;
     private boolean moveExisting;
 
-    private ScmClientFactory<ScmConfiguration> scmClientFactory;
+    @Transient
+    private ScmManager scmManager;
 
     public String getTag()
     {
@@ -60,14 +62,16 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         Revision revision = buildResult.getRevision();
         if(revision == null)
         {
+            LOG.warning("Can not tag build result: No revision available.");
             return;
         }
 
+        ScmConfiguration scm = buildResult.getProject().getConfig().getScm();
         ScmClient client = null;
         try
         {
             String tagName = VariableHelper.replaceVariables(tag, context.getScope(), VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
-            client = scmClientFactory.createClient(buildResult.getProject().getConfig().getScm());
+            client = scmManager.createClient(scm);
             if(client.getCapabilities().contains(ScmCapability.TAG))
             {
                 client.tag(context, revision, tagName, moveExisting);
@@ -83,9 +87,9 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         }
     }
 
-    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
+    public void setScmManager(ScmManager scmManager)
     {
-        this.scmClientFactory = scmClientFactory;
+        this.scmManager = scmManager;
     }
 }
 

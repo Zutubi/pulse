@@ -1,17 +1,17 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.BuildProperties;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.scm.DataCacheAware;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.IOUtils;
@@ -19,12 +19,7 @@ import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -95,6 +90,11 @@ public class CvsClient implements ScmClient, DataCacheAware
         this.excludedPaths = excluded;
     }
 
+    public void init(ScmContext context, ScmFeedbackHandler handler)
+    {
+        // noop - could checkout to provide browse functionality?.
+    }
+
     public void close()
     {
     }
@@ -108,7 +108,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     /**
      * Returns the unique identifier for this scm server. For CVS servers, this is the cvs root.
      *
-     * @see com.zutubi.pulse.core.scm.ScmClient#getUid()
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getUid()
      */
     public String getUid()
     {
@@ -203,7 +203,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         //TODO: nor what will happen to that scope - how long it will survivie since it is the leaf.
         //TODO: Going to the scope manually for backward compatibility until the above concern is resolved.
         
-        PulseScope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
+        Scope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
         scope.add(new ResourceProperty("cvs.root", root));
         if (branch != null)
         {
@@ -242,9 +242,9 @@ public class CvsClient implements ScmClient, DataCacheAware
         }
     }
 
-    public FileStatus.EOLStyle getEOLPolicy(ScmContext context)
+    public EOLStyle getEOLPolicy(ScmContext context)
     {
-        return FileStatus.EOLStyle.BINARY;
+        return EOLStyle.BINARY;
     }
 
     public Revision getRevision(String revision) throws ScmException
@@ -265,7 +265,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         return convertRevision(cvsRevision);
     }
 
-    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         if (revision == Revision.HEAD)
         {
@@ -293,7 +293,7 @@ public class CvsClient implements ScmClient, DataCacheAware
      * @param context
      * @param handler
      */
-    public Revision update(ExecutionContext context, Revision rev, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         assertRevisionArgValid(rev);
         writePropertiesToContext(context);
@@ -375,11 +375,14 @@ public class CvsClient implements ScmClient, DataCacheAware
         
         LogInformationAnalyser analyser = new LogInformationAnalyser(getUid(), CVSRoot.parse(root));
 
-        String branch = (from != null) ? from.getBranch() : (to != null) ? to.getBranch() : null;
+        CvsRevision cvsFrom = convertRevision(from);
+        CvsRevision cvsTo = convertRevision(to);
+
+        String branch = (from != null) ? cvsFrom.getBranch() : (to != null) ? cvsTo.getBranch() : null;
         List<Changelist> changes = analyser.extractChangelists(info, branch);
 
         // process excludes from the changelist.
-        changes = ScmUtils.filterExcludes(changes, new ScmFilepathFilter(excludedPaths));
+        changes = ScmUtils.filter(changes, new ExcludePathFilter(excludedPaths));
         if (changes.size() == 0)
         {
             return changes;
@@ -389,30 +392,39 @@ public class CvsClient implements ScmClient, DataCacheAware
         List<Changelist> fixedChangelists = new LinkedList<Changelist>();
         for (Changelist changelist : changes)
         {
-            Changelist fixedChangelist = new Changelist(changelist.getRevision());
-            for (Change change : changelist.getChanges())
-            {
-                // a) strip off the leading /.
-                String filename = change.getFilename();
-                if (filename.startsWith("/"))
-                {
-                    filename = filename.substring(1);
-                }
-                // b) strip off the 'Attic' for dead files.  This may catch valid directories, but that is a less frequent case.
-                if (filename.contains("/Attic/"))
-                {
-                    // looking for the attic parent directory...
-                    // use the scmfile object to simplify the extraction of the 'Attic'
-                    ScmFile file = new ScmFile(filename);
-                    if (file.getParent() != null && file.getParent().endsWith("/Attic"))
+            Changelist fixedChangelist = new Changelist(
+                    changelist.getRevision(),
+                    changelist.getTime(),
+                    changelist.getAuthor(),
+                    changelist.getComment(),
+                    CollectionUtils.map(changelist.getChanges(), new Mapping<FileChange, FileChange>()
                     {
-                        file = new ScmFile(file.getParentFile().getParentFile(), file.getName());
-                        filename = file.getPath();
-                    }
-                }
-                Change fixedChange = new Change(filename, change.getRevisionString(), change.getAction());
-                fixedChangelist.addChange(fixedChange);
-            }
+                        public FileChange map(FileChange change)
+                        {
+                            // a) strip off the leading /.
+                            String filename = change.getPath();
+                            if (filename.startsWith("/"))
+                            {
+                                filename = filename.substring(1);
+                            }
+                            // b) strip off the 'Attic' for dead files.  This may catch valid directories, but that is a less frequent case.
+                            if (filename.contains("/Attic/"))
+                            {
+                                // looking for the attic parent directory...
+                                // use the scmfile object to simplify the extraction of the 'Attic'
+                                ScmFile file = new ScmFile(filename);
+                                if (file.getParent() != null && file.getParent().endsWith("/Attic"))
+                                {
+                                    file = new ScmFile(file.getParentFile().getParentFile(), file.getName());
+                                    filename = file.getPath();
+                                }
+                            }
+
+                            return new FileChange(filename, change.getRevisionString(), change.getAction());
+                        }
+                    })
+            );
+
             fixedChangelists.add(fixedChangelist);
         }
 
@@ -430,28 +442,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
         List<Changelist> changes = getChanges(null, from, to);
-        Collections.sort(changes, new Comparator<Changelist>()
-        {
-            public int compare(Changelist o1, Changelist o2)
-            {
-                // filter null dates to the start, although we need to work out what no
-                // date means in a revision...
-                Date d1 = o1.getDate();
-                Date d2 = o2.getDate();
-                if (d1 == null)
-                {
-                    return (d2 == null)? 0 : -1;
-                }
-                else
-                {
-                    if (d2 == null)
-                    {
-                        return 1;
-                    }
-                    return d1.compareTo(o2.getDate());
-                }
-            }
-        });
+        Collections.sort(changes);
 
         List<Revision> result = new LinkedList<Revision>();
         for(Changelist c: changes)
@@ -472,7 +463,8 @@ public class CvsClient implements ScmClient, DataCacheAware
      */
     public boolean hasChangedSince(Revision since) throws ScmException
     {
-        if (since.getDate() == null)
+        CvsRevision cvsSince = convertRevision(since);
+        if (cvsSince.getDate() == null)
         {
             throw new IllegalArgumentException("since revision date can not be null.");
         }
@@ -612,7 +604,14 @@ public class CvsClient implements ScmClient, DataCacheAware
         {
             return null;
         }
-        return new CvsRevision(revision.getAuthor(), revision.getBranch(), revision.getComment(), revision.getDate());
+        try
+        {
+            return new CvsRevision(revision.getRevisionString());
+        }
+        catch (ScmException e)
+        {
+            return null;
+        }
     }
 
     public static Revision convertRevision(CvsRevision revision)
@@ -621,9 +620,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         {
             return null;
         }
-        Revision newRevision = new Revision(revision.getAuthor(), revision.getComment(), revision.getDate(), revision.getRevisionString());
-        newRevision.setBranch(revision.getBranch());
-        return newRevision;
+        return new Revision(revision.getRevisionString());
     }
 
     /**

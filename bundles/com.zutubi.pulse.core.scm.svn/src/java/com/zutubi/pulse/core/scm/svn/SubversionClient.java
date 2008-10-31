@@ -1,20 +1,18 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.BuildProperties;
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -78,18 +76,8 @@ public class SubversionClient implements ScmClient
         }
         else
         {
-            return SVNRevision.create(convertToNumericalRevision(revision).getRevisionNumber());
+            return SVNRevision.create(Long.parseLong(revision.toString()));
         }
-    }
-
-    public static Revision convertRevision(NumericalRevision rev)
-    {
-        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
-    }
-
-    public NumericalRevision convertToNumericalRevision(Revision rev)
-    {
-        return new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
     }
 
     /**
@@ -98,20 +86,20 @@ public class SubversionClient implements ScmClient
      * @param type the action type as returned by the server
      * @return the corresponding Action value
      */
-    private Change.Action decodeAction(char type)
+    private FileChange.Action decodeAction(char type)
     {
         switch (type)
         {
             case'A':
-                return Change.Action.ADD;
+                return FileChange.Action.ADD;
             case'D':
-                return Change.Action.DELETE;
+                return FileChange.Action.DELETE;
             case'M':
-                return Change.Action.EDIT;
+                return FileChange.Action.EDIT;
             case'R':
-                return Change.Action.MOVE;
+                return FileChange.Action.MOVE;
             default:
-                return Change.Action.UNKNOWN;
+                return FileChange.Action.UNKNOWN;
         }
     }
 
@@ -126,6 +114,7 @@ public class SubversionClient implements ScmClient
         // Initialise SVN library
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
+        FSRepositoryFactory.setup();
         SVNAdminAreaFactory.setUpgradeEnabled(false);
         
         this.url = url;
@@ -149,7 +138,7 @@ public class SubversionClient implements ScmClient
      * Creates a new SVNServer using the given location and default credentials.
      *
      * @param url the url of the SVN repository
-     * @throws com.zutubi.pulse.core.scm.ScmException on error
+     * @throws com.zutubi.pulse.core.scm.api.ScmException on error
      */
     public SubversionClient(String url) throws ScmException
     {
@@ -236,6 +225,11 @@ public class SubversionClient implements ScmClient
     // ScmClient interface
     //=======================================================================
 
+    public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // noop
+    }
+
     public void close()
     {
         if (repository != null)
@@ -306,7 +300,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         addPropertiesToContext(context);
 
@@ -337,10 +331,10 @@ public class SubversionClient implements ScmClient
             throw convertException(e);
         }
 
-        return convertRevision(new NumericalRevision(svnRevision.getNumber()));
+        return new Revision(svnRevision.getNumber());
     }
 
-    private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, ScmEventHandler handler) throws ScmException
+    private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, ScmFeedbackHandler handler) throws ScmException
     {
         List<ExternalDefinition> externals = getExternals(revision);
         for (ExternalDefinition external : externals)
@@ -350,7 +344,7 @@ public class SubversionClient implements ScmClient
                 handler.status("Processing external '" + external.path + "'");
             }
 
-            update(new File(toDirectory, FileSystemUtils.denormaliseSeparators(external.path)), convertRevision(revision), client);
+            update(new File(toDirectory, FileSystemUtils.localiseSeparators(external.path)), convertRevision(revision), client);
 
             if (handler != null)
             {
@@ -418,14 +412,13 @@ public class SubversionClient implements ScmClient
     private boolean log(SVNRepository repository, long fromNumber, long toNumber, ChangeHandler handler) throws SVNException, ScmException
     {
         List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
-        FilepathFilter filter = new ScmFilepathFilter(excludedPaths);
+        PathFilter filter = new ExcludePathFilter(excludedPaths);
 
         repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
         for (SVNLogEntry entry : logs)
         {
-            NumericalRevision revision = new NumericalRevision(entry.getAuthor(), entry.getMessage(), entry.getDate(), entry.getRevision());
-            Changelist list = new Changelist(convertRevision(revision));
-            handler.handle(list);
+            Revision revision = new Revision(entry.getRevision());
+            handler.startChangelist(revision, entry.getDate().getTime(), entry.getAuthor(), entry.getMessage());
 
             Map files = entry.getChangedPaths();
 
@@ -434,7 +427,7 @@ public class SubversionClient implements ScmClient
                 SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
                 if (filter.accept(entryPath.getPath()))
                 {
-                    if (handler.handle(new Change(entryPath.getPath(), String.valueOf(revision.getRevisionNumber()), decodeAction(entryPath.getType()))))
+                    if (handler.handleChange(new FileChange(entryPath.getPath(), revision.toString(), decodeAction(entryPath.getType()))))
                     {
                         return true;
                     }
@@ -539,13 +532,7 @@ public class SubversionClient implements ScmClient
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
         List<Changelist> changes = getChanges(null, from, to);
-        Collections.sort(changes, new Comparator<Changelist>()
-        {
-            public int compare(Changelist o1, Changelist o2)
-            {
-                return o1.getDate().compareTo(o2.getDate());
-            }
-        });
+        Collections.sort(changes);
 
         List<Revision> result = new LinkedList<Revision>();
         for (Changelist change : changes)
@@ -558,11 +545,11 @@ public class SubversionClient implements ScmClient
 
     public boolean hasChangedSince(Revision since) throws ScmException
     {
-        NumericalRevision latestRevision = convertToNumericalRevision(getLatestRevision(null));
-        if (latestRevision.getRevisionNumber() != (convertToNumericalRevision(since)).getRevisionNumber())
+        Revision latestRevision = getLatestRevision(null);
+        if (latestRevision != since)
         {
             ChangeDetector detector = new ChangeDetector();
-            reportChanges(detector, since, convertRevision(latestRevision));
+            reportChanges(detector, since, latestRevision);
             return detector.isChanged();
         }
         else
@@ -575,7 +562,7 @@ public class SubversionClient implements ScmClient
     {
         try
         {
-            return convertRevision(new NumericalRevision(repository.getLatestRevision()));
+            return new Revision(repository.getLatestRevision());
         }
         catch (SVNException e)
         {
@@ -625,7 +612,7 @@ public class SubversionClient implements ScmClient
         return result;
     }
 
-    public Revision update(ExecutionContext context, Revision rev, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         addPropertiesToContext(context);
         // CIB-610: cleanup before update in case WC is locked.
@@ -711,7 +698,7 @@ public class SubversionClient implements ScmClient
 
     private void addPropertiesToContext(ExecutionContext context) throws ScmException
     {
-        PulseScope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
+        Scope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
         scope.add(new ResourceProperty("svn.url", url));
     }
 
@@ -732,9 +719,9 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public FileStatus.EOLStyle getEOLPolicy(ScmContext context)
+    public EOLStyle getEOLPolicy(ScmContext context)
     {
-        return FileStatus.EOLStyle.BINARY;
+        return EOLStyle.BINARY;
     }
 
     public Revision parseRevision(String revision) throws ScmException
@@ -747,7 +734,7 @@ public class SubversionClient implements ScmClient
                 throw new ScmException("Revision '" + revision + "' does not exist in this repository");
             }
 
-            return convertRevision(new NumericalRevision(revisionNumber));
+            return new Revision(revisionNumber);
         }
         catch(NumberFormatException e)
         {
@@ -761,34 +748,19 @@ public class SubversionClient implements ScmClient
 
     private static class ChangeEventHandler implements ISVNEventHandler
     {
-        private ScmEventHandler handler;
+        private ScmFeedbackHandler handler;
 
-        public ChangeEventHandler(ScmEventHandler handler)
+        public ChangeEventHandler(ScmFeedbackHandler handler)
         {
             this.handler = handler;
         }
 
         public void handleEvent(SVNEvent event, double progress)
         {
-            Change.Action action = null;
-
             SVNEventAction svnAction = event.getAction();
-            if (svnAction == SVNEventAction.UPDATE_ADD)
+            if (svnAction != null)
             {
-                action = Change.Action.ADD;
-            }
-            else if (svnAction == SVNEventAction.UPDATE_DELETE)
-            {
-                action = Change.Action.DELETE;
-            }
-            else if (svnAction == SVNEventAction.UPDATE_UPDATE)
-            {
-                action = Change.Action.EDIT;
-            }
-
-            if (action != null)
-            {
-                handler.fileChanged(new Change(event.getPath(), null, action));
+                handler.status(svnAction.toString() + " " + event.getPath());
             }
         }
 
@@ -807,32 +779,40 @@ public class SubversionClient implements ScmClient
 
     private interface ChangeHandler
     {
-        void handle(Changelist list);
+        void startChangelist(Revision revision, long time, String author, String message);
 
-        boolean handle(Change change);
+        boolean handleChange(FileChange change);
 
         void complete();
     }
 
-    private class ChangelistAccumulator implements ChangeHandler
+    private static class ChangelistAccumulator implements ChangeHandler
     {
         private List<Changelist> changelists = new LinkedList<Changelist>();
-        private Changelist current;
+        private List<FileChange> currentChanges = null;
+        private Revision currentRevision;
+        private long currentTime;
+        private String currentAuthor;
+        private String currentMessage;
 
         public List<Changelist> getChangelists()
         {
             return changelists;
         }
 
-        public void handle(Changelist list)
+        public void startChangelist(Revision revision, long time, String author, String message)
         {
             checkCurrent();
-            current = list;
+            currentChanges = new LinkedList<FileChange>();
+            currentRevision = revision;
+            currentTime = time;
+            currentAuthor = author;
+            currentMessage = message;
         }
 
-        public boolean handle(Change change)
+        public boolean handleChange(FileChange change)
         {
-            current.addChange(change);
+            currentChanges.add(change);
             return false;
         }
 
@@ -843,9 +823,8 @@ public class SubversionClient implements ScmClient
 
         private void checkCurrent()
         {
-            if (current != null && current.getChanges().size() > 0)
+            if (currentChanges != null && !currentChanges.isEmpty())
             {
-                String currentRevision = current.getRevision().getRevisionString();
                 for (Changelist list : changelists)
                 {
                     if (list.getRevision().getRevisionString().equals(currentRevision))
@@ -855,12 +834,12 @@ public class SubversionClient implements ScmClient
                     }
                 }
 
-                changelists.add(current);
+                changelists.add(new Changelist(currentRevision, currentTime, currentAuthor, currentMessage, currentChanges));
             }
         }
     }
 
-    private class ChangeDetector implements ChangeHandler
+    private static class ChangeDetector implements ChangeHandler
     {
         private boolean changed = false;
 
@@ -869,11 +848,11 @@ public class SubversionClient implements ScmClient
             return changed;
         }
 
-        public void handle(Changelist list)
+        public void startChangelist(Revision revision, long time, String author, String message)
         {
         }
 
-        public boolean handle(Change change)
+        public boolean handleChange(FileChange change)
         {
             changed = true;
             return true;

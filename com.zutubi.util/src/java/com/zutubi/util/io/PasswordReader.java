@@ -6,15 +6,22 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
+ * Utility class to read a password from the console.  Uses JVM support if
+ * available (Java 6), and falls back on a workaround if not.
  */
 public class PasswordReader
 {
-    private static final String ECHO_PROPERTY = "pulse.echo.passwords";
-
     private BufferedReader reader;
     private Object console;
     private Method readPasswordMethod;
 
+    /**
+     * Wraps the given reader with a utility for reading passwords.
+     *
+     * @param reader reader to wrap, which should be the same reader used for
+     *               reading other input -- note that the reader is not used
+     *               if JVM support for reading passwords is available
+     */
     public PasswordReader(BufferedReader reader)
     {
         this.reader = reader;
@@ -32,9 +39,17 @@ public class PasswordReader
         }
     }
 
-    public String readPassword(String prompt)
+    /**
+     * Reads a password from standard input.
+     *
+     * @param prompt a string to print to standard output to prompt the user
+     * @param echo   if true, the password typed will be echoed, otherwise it
+     *               will be hidden
+     * @return the entered password string
+     */
+    public String readPassword(String prompt, boolean echo)
     {
-        if (echo())
+        if (echo)
         {
             System.out.print(prompt);
             try
@@ -46,6 +61,7 @@ public class PasswordReader
                 return null;
             }
         }
+        else
         {
             if (readPasswordMethod == null)
             {
@@ -70,12 +86,6 @@ public class PasswordReader
         }
     }
 
-    private boolean echo()
-    {
-        String property = System.getProperty(ECHO_PROPERTY);
-        return property != null && Boolean.valueOf(property);
-    }
-
     private String maskedPassword(String prompt)
     {
         EraserThread eraserThread = new EraserThread(prompt);
@@ -98,7 +108,7 @@ public class PasswordReader
 
     private class EraserThread implements Runnable
     {
-        private boolean run;
+        private volatile boolean run;
 
         /**
          * @param prompt the prompt displayed to the user

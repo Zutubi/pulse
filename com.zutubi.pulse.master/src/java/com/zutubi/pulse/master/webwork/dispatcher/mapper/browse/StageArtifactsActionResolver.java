@@ -1,0 +1,20 @@
+package com.zutubi.pulse.master.webwork.dispatcher.mapper.browse;
+
+import com.zutubi.pulse.master.webwork.dispatcher.mapper.ActionResolver;
+import com.zutubi.pulse.master.webwork.dispatcher.mapper.ActionResolverSupport;
+
+/**
+ */
+public class StageArtifactsActionResolver extends ActionResolverSupport
+{
+    public StageArtifactsActionResolver(String stage)
+    {
+        super("viewBuildArtifacts");
+        addParameter("stageName", stage);
+    }
+
+    public ActionResolver getChild(String name)
+    {
+        return new CommandArtifactsActionResolver(name);
+    }
+}

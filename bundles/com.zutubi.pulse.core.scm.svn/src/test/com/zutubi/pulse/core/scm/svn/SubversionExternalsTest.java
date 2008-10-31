@@ -1,13 +1,11 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -215,7 +213,7 @@ public class SubversionExternalsTest extends PulseTestCase
     public void testUpdate() throws Exception
     {
         doCheckout(2);
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(checkoutDir);
         server.update(context, new Revision("5"), null);
 
@@ -227,19 +225,14 @@ public class SubversionExternalsTest extends PulseTestCase
 
     private void doCheckout(int rev) throws ScmException
     {
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(checkoutDir);
         server.addExternalPath(".");
-        server.checkout(context, new Revision(Integer.toString(rev)), new ScmEventHandler()
+        server.checkout(context, new Revision(Integer.toString(rev)), new ScmFeedbackHandler()
         {
             public void status(String message)
             {
                 System.out.println(message);
-            }
-
-            public void fileChanged(Change change)
-            {
-                System.out.println(change.toString());
             }
 
             public void checkCancelled() throws ScmCancelledException
@@ -251,19 +244,19 @@ public class SubversionExternalsTest extends PulseTestCase
     private void assertChange(Changelist changelist, String revision, String... paths)
     {
         assertEquals(revision, changelist.getRevision().getRevisionString());
-        List<Change> changes = changelist.getChanges();
-        Collections.sort(changes, new Comparator<Change>()
+        List<FileChange> changes = changelist.getChanges();
+        Collections.sort(changes, new Comparator<FileChange>()
         {
-            public int compare(Change o1, Change o2)
+            public int compare(FileChange o1, FileChange o2)
             {
-                return o1.getFilename().compareTo(o2.getFilename());
+                return o1.getPath().compareTo(o2.getPath());
             }
         });
         
         for(int i = 0; i < paths.length; i++)
         {
-            Change change = changes.get(i);
-            assertEquals(paths[i], change.getFilename());
+            FileChange change = changes.get(i);
+            assertEquals(paths[i], change.getPath());
         }
     }
 
@@ -290,7 +283,7 @@ public class SubversionExternalsTest extends PulseTestCase
             for(Changelist list: changelists)
             {
                 System.out.println(list.getRevision().getRevisionString() + ": " + list.getComment());
-                for(Change change: list.getChanges())
+                for(FileChange change: list.getChanges())
                 {
                     System.out.println("    " + change.toString());
                 }
@@ -304,6 +297,6 @@ public class SubversionExternalsTest extends PulseTestCase
 
     private static Revision createRevision(long rev)
     {
-        return new Revision(null, null, null, Long.toString(rev));
+        return new Revision(Long.toString(rev));
     }
 }

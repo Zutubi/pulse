@@ -1,13 +1,13 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
-import com.zutubi.pulse.core.scm.ScmEventHandler;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.cvs.client.commands.*;
 import com.zutubi.pulse.core.scm.cvs.client.util.CvsUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.Constants;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -102,7 +102,7 @@ public class CvsCore
         return version.getVersion();
     }
 
-    public void update(File workingDirectory, CvsRevision revision, ScmEventHandler handler) throws ScmException
+    public void update(File workingDirectory, CvsRevision revision, ScmFeedbackHandler handler) throws ScmException
     {
         UpdateListener listener = null;
         if (handler != null)
@@ -178,12 +178,12 @@ public class CvsCore
         }
     }
 
-    public void checkout(File workdir, String module, CvsRevision revision, ScmEventHandler handler) throws ScmException
+    public void checkout(File workdir, String module, CvsRevision revision, ScmFeedbackHandler handler) throws ScmException
     {
         checkout(workdir, module, revision, true, handler);
     }
 
-    public void checkout(File workdir, String module, CvsRevision revision, boolean recursive, ScmEventHandler handler) throws ScmException
+    public void checkout(File workdir, String module, CvsRevision revision, boolean recursive, ScmFeedbackHandler handler) throws ScmException
     {
         CheckoutCommand checkout = new CheckoutCommand();
         checkout.setModule(module);
@@ -204,7 +204,7 @@ public class CvsCore
         CheckoutListener listener = null;
         if (handler != null)
         {
-            listener = new CheckoutListener(handler);
+            listener = new CheckoutListener(handler, workdir);
         }
         
         if (!executeCommand(checkout, workdir, listener))

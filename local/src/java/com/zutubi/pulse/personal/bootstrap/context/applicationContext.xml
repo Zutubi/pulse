@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
-    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml"/>
-
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
-    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
-</beans>

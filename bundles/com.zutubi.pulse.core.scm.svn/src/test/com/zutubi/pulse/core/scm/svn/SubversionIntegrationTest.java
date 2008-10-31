@@ -1,7 +1,10 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
+import com.zutubi.pulse.core.scm.ExpectedTestResults;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.Revision;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -14,11 +17,11 @@ public class SubversionIntegrationTest extends AbstractScmIntegrationTestCase
 
 //    private ExpectedTestResults testData;
 
-    private static final Revision FIRST_REVISION = SubversionClient.convertRevision(new NumericalRevision(2));
-    private static final Revision SECOND_REVISION = SubversionClient.convertRevision(new NumericalRevision(3));
-    private static final Revision THIRD_REVISION = SubversionClient.convertRevision(new NumericalRevision(4));
-    private static final Revision FOURTH_REVISION = SubversionClient.convertRevision(new NumericalRevision(5));
-    private static final Revision FIFTH_REVISION = SubversionClient.convertRevision(new NumericalRevision(6));
+    private static final Revision FIRST_REVISION = new Revision("2");
+    private static final Revision SECOND_REVISION = new Revision("3");
+    private static final Revision THIRD_REVISION = new Revision("4");
+    private static final Revision FOURTH_REVISION = new Revision("5");
+    private static final Revision FIFTH_REVISION = new Revision("6");
 
     protected void setUp() throws Exception
     {

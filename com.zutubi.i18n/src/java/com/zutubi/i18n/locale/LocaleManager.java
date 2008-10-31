@@ -9,8 +9,8 @@ import java.util.Locale;
  */
 public class LocaleManager
 {
-    private static LocaleManager manager = new LocaleManager();
-    private static ThreadLocale locale = new ThreadLocale();
+    private final static LocaleManager manager = new LocaleManager();
+    private final static ThreadLocale locale = new ThreadLocale();
 
     public static LocaleManager getManager()
     {
@@ -23,7 +23,7 @@ public class LocaleManager
      *
      * @param locale locale to set
      */
-    public void setThreadLocale(Locale locale)
+    public synchronized void setThreadLocale(Locale locale)
     {
         LocaleManager.locale.setThread(true);
         LocaleManager.locale.set(locale);
@@ -34,7 +34,7 @@ public class LocaleManager
      *
      * @param locale locale to set
      */
-    public void setLocale(Locale locale)
+    public synchronized void setLocale(Locale locale)
     {
         LocaleManager.locale.setThread(false);
         LocaleManager.locale.set(locale);
@@ -45,7 +45,7 @@ public class LocaleManager
      *
      * @return currently used locale
      */
-    public Locale getLocale()
+    public synchronized Locale getLocale()
     {
         return locale.get();
     }

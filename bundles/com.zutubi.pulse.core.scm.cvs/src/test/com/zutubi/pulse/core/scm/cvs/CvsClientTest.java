@@ -1,11 +1,12 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.util.FileSystemUtils;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
@@ -33,7 +34,8 @@ public class CvsClientTest extends PulseTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        cvsRoot = ":ext:daniel:4edueWX7@zutubi.com:/cvsroots/default";
+        cvsRoot = ":ext:daniel:xxxxx@zutubi.com:/cvsroots/default";
+        //":local:" + repoDir.getCanonicalPath()
 
         // cleanup the working directory.
         workdir = FileSystemUtils.createTempDir("CvsServer", "Test");
@@ -171,93 +173,11 @@ public class CvsClientTest extends PulseTestCase
 
     public void testGetRevision() throws ScmException, ParseException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("author:BRANCH:20070201-01:02:33");
+        CvsRevision revision = new CvsRevision("author:BRANCH:20070201-01:02:33");
         assertEquals("author", revision.getAuthor());
         assertEquals("BRANCH", revision.getBranch());
         assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
-    }
-
-    public void testGetRevisionNoAuthor() throws ScmException, ParseException
-    {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision(":BRANCH:20070201-01:02:33");
-        assertNull(revision.getAuthor());
-        assertEquals("BRANCH", revision.getBranch());
-        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
-    }
-
-    public void testGetRevisionNoBranch() throws ScmException, ParseException
-    {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("author::20070201-01:02:33");
-        assertEquals("author", revision.getAuthor());
-        assertNull(revision.getBranch());
-        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
-    }
-
-    public void testGetRevisionDateOnly() throws ScmException, ParseException
-    {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("20070201-01:02:33");
-        assertNull(revision.getAuthor());
-        assertNull(revision.getBranch());
-        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
-    }
-
-    public void testGetRevisionDayOnly() throws ScmException, ParseException
-    {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("20070201");
-        assertNull(revision.getAuthor());
-        assertNull(revision.getBranch());
-        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-00:00:00"), revision.getDate());
-    }
-
-    public void testGetRevisionTooManyPieces() throws ScmException, ParseException
-    {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        try
-        {
-            cvsClient.parseRevision("1:2:3:4:5:6:7");
-            fail();
-        }
-        catch (ScmException e)
-        {
-            assertEquals("Invalid CVS revision '1:2:3:4:5:6:7' (must be a date, or <author>:<branch>:<date>)", e.getMessage());
-        }
-    }
-
-    public void testGetRevisionInvalidDate() throws ScmException, ParseException
-    {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        try
-        {
-            cvsClient.parseRevision("baddate");
-            fail();
-        }
-        catch (ScmException e)
-        {
-            assertEquals("Invalid CVS revision 'baddate' (must be a date, or <author>:<branch>:<date>)", e.getMessage());
-        }
-    }
-
-    public void testGetRevisionForHead() throws ScmException
-    {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("::");
-        assertNull(revision.getAuthor());
-        assertNull(revision.getBranch());
-        assertNull(revision.getDate());
-    }
-
-    public void testGetRevisionBranchOnly() throws ScmException
-    {
-        CvsClient client = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = client.parseRevision(":BRANCH:");
-        assertNull(revision.getAuthor());
-        assertEquals("BRANCH", revision.getBranch());
-        assertNull(revision.getDate());
+        assertEquals("author:BRANCH:20070201-01:02:33", revision.getRevisionString());
     }
 
     public void testMultipleModules() throws ScmException
@@ -265,8 +185,9 @@ public class CvsClientTest extends PulseTestCase
         String modules = "unit-test, integration-test";
         CvsClient client = new CvsClient(cvsRoot, modules, null, null);
 
-        ExecutionContext context = new ExecutionContext();
+        PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(workdir);
+        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         client.checkout(context, Revision.HEAD, null);
 
         assertTrue(new File(workdir, "unit-test").isDirectory());

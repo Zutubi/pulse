@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+
+    <!--
+    Need to be careful with name of the bean so that it does not clash with the 'other' transaction manager.
+    -->
+    <bean id="migrationManager" class="com.zutubi.pulse.master.migrate.MigrationManager"/>
+
+    <import resource="classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateMappingsContext.xml"/>
+
+</beans>

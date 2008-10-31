@@ -1,0 +1,70 @@
+package com.zutubi.pulse.core.scm;
+
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.util.bean.ObjectFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * An implementation of the ScmClientFactory that delegates the creation of the clients to the
+ * ScmClientFactory classes registered with the configuration.  This factory also handles the
+ * data cache for the various client instances. 
+ */
+public class DelegateScmClientFactory implements ScmClientFactory<ScmConfiguration>
+{
+    private Map<String, Map<Object, Object>> dataCaches = new HashMap<String, Map<Object, Object>>();
+
+    private ObjectFactory objectFactory;
+
+    private Map<Class, ScmClientFactory<ScmConfiguration>> factories = new HashMap<Class, ScmClientFactory<ScmConfiguration>>();
+
+    public ScmClient createClient(ScmConfiguration config) throws ScmException
+    {
+        ScmClientFactory<ScmConfiguration> factory = getFactory(config);
+        ScmClient client = factory.createClient(config);
+        if (client instanceof DataCacheAware)
+        {
+            DataCacheAware aware = (DataCacheAware) client;
+            String key = aware.getCacheId();
+            if (!dataCaches.containsKey(key))
+            {
+                dataCaches.put(key, new HashMap<Object, Object>());
+            }
+            Map<Object, Object> cache = dataCaches.get(key);
+            aware.setCache(cache);
+        }
+        return client;
+    }
+
+    private ScmClientFactory<ScmConfiguration> getFactory(Object config)
+    {
+        return factories.get(config.getClass());
+    }
+
+    public void register(Class configType, Class<? extends ScmClientFactory> factoryType) throws ScmException
+    {
+        try
+        {
+            ScmClientFactory<ScmConfiguration> factory = objectFactory.buildBean(factoryType);
+            factories.put(configType, factory);
+        }
+        catch (Exception e)
+        {
+            throw new ScmException(e);
+        }
+    }
+
+    public void unregister(Class configType)
+    {
+        factories.remove(configType);
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
+}

@@ -11,6 +11,11 @@ public class PackageContext implements Context
 
     public PackageContext(String packageName)
     {
+        if (packageName == null)
+        {
+            throw new NullPointerException("packageName is required");
+        }
+
         this.packageName = packageName;
     }
 
@@ -46,7 +51,6 @@ public class PackageContext implements Context
         return packageName;
     }
 
-
     public boolean equals(Object o)
     {
         if (this == o)
@@ -59,24 +63,16 @@ public class PackageContext implements Context
         }
 
         final PackageContext packageContext = (PackageContext) o;
-
-        if (packageName != null ? !packageName.equals(packageContext.packageName) : packageContext.packageName != null)
-        {
-            return false;
-        }
-
-        return true;
+        return packageName.equals(packageContext.packageName);
     }
 
     public int hashCode()
     {
-        return packageName != null ? packageName.hashCode() : 0;
+        return packageName.hashCode();
     }
 
     public String toString()
     {
         return "<" + packageName + ">";
     }
-
-
 }

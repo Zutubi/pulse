@@ -1,13 +1,12 @@
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.util.List;
-
-import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
-import com.zutubi.pulse.core.scm.ScmException;
 
 /**
  *

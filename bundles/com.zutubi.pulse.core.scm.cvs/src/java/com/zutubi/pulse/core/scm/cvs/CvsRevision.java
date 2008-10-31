@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -37,6 +36,7 @@ public class CvsRevision
     {
         this(author, comment, date);
         setBranch(tag);
+        setRevisionString(generateRevisionString());
     }
 
     public CvsRevision(String author, String comment, Date date)
@@ -86,6 +86,8 @@ public class CvsRevision
             // noop.
         }
 
+        setRevisionString(revStr);
+
         // <author>:<branch/tag>:<date>
         if (revStr == null || revStr.indexOf(":") == -1 || revStr.substring(revStr.indexOf(":")).indexOf(":") == -1)
         {
@@ -115,7 +117,6 @@ public class CvsRevision
         try
         {
             setDate(DATE_FORMAT.parse(date));
-            setRevisionString(generateRevisionString());
             return;
         }
         catch (ParseException e)
@@ -126,7 +127,6 @@ public class CvsRevision
         try
         {
             setDate(format.parse(date));
-            setRevisionString(generateRevisionString());
             return;
         }
         catch (ParseException e)
@@ -138,8 +138,6 @@ public class CvsRevision
         {
             throw new ScmException("Invalid CVS revision '" + revStr + "' (must be a date, or <author>:<branch>:<date>)");
         }
-
-        setRevisionString(generateRevisionString());
     }
 
     private String generateRevisionString()
@@ -156,32 +154,6 @@ public class CvsRevision
     public boolean isHead()
     {
         return getAuthor() == null && getBranch() == null && getComment() == null && getDate() == null;
-    }
-
-    public int compareTo(Revision r)
-    {
-        // First try basing on time
-        if (getDate() != null && r.getDate() != null)
-        {
-            int result = getDate().compareTo(getDate());
-            if (result != 0)
-            {
-                return result;
-            }
-        }
-        if (getDate() == null && r.getDate() == null)
-        {
-            return 0;
-        }
-        if (getDate() == null)
-        {
-            return 1;
-        }
-        if (r.getDate() == null)
-        {
-            return -1;
-        }
-        return 0;
     }
 
     public String getAuthor()

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.external.jira;
 
-import com.zutubi.pulse.committransformers.CommitMessageSupport;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.tove.config.project.commit.CommitMessageTransformerConfiguration;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
+import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 
 import java.util.Arrays;
 

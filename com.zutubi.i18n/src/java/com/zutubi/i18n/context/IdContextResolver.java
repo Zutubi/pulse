@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * <class-comment/>
+ * The IdContextResolver uses ids to lookup pre-configured bundlenames.
  */
 public class IdContextResolver implements ContextResolver<IdContext>
 {

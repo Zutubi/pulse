@@ -1,17 +1,18 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.scm.RecordingScmEventHandler;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class NativeGitTest extends PulseTestCase
@@ -47,7 +48,7 @@ public class NativeGitTest extends PulseTestCase
     public void testClone() throws ScmException, IOException
     {
         git.setWorkingDirectory(tmp);
-        git.clone(new RecordingScmEventHandler(), repository, "base");
+        git.clone(new RecordingScmFeedbackHandler(), repository, "base");
 
         File cloneBase = new File(tmp, "base");
         assertTrue(new File(cloneBase, ".git").isDirectory());
@@ -59,7 +60,7 @@ public class NativeGitTest extends PulseTestCase
 
     public void testCloneStatusMessages() throws ScmException
     {
-        RecordingScmEventHandler handler = new RecordingScmEventHandler();
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         git.setWorkingDirectory(tmp);
         git.clone(handler,  repository, "base");
 
@@ -86,10 +87,7 @@ public class NativeGitTest extends PulseTestCase
         List<GitLogEntry> entries = git.log("HEAD^", "HEAD");
         assertEquals(1, entries.size());
         GitLogEntry entry = entries.get(0);
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", entry.getAuthor());
         assertEquals("78be6b2f12399ea2332a5148440086913cb910fb", entry.getId());
-        assertEquals("update", entry.getComment());
-        assertEquals(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z").parse("Fri Sep 12 11:30:12 2008 +1000"), entry.getDate());
     }
 
     public void testLogCount() throws ScmException, ParseException
@@ -101,10 +99,7 @@ public class NativeGitTest extends PulseTestCase
         List<GitLogEntry> entries = git.log(1);
         assertEquals(1, entries.size());
         GitLogEntry entry = entries.get(0);
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", entry.getAuthor());
         assertEquals("78be6b2f12399ea2332a5148440086913cb910fb", entry.getId());
-        assertEquals("update", entry.getComment());
-        assertEquals(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z").parse("Fri Sep 12 11:30:12 2008 +1000"), entry.getDate());
     }
 
     public void testBranchOnOriginalRepository() throws ScmException
@@ -139,12 +134,28 @@ public class NativeGitTest extends PulseTestCase
         File cloneBase = new File(tmp, "base");
         git.setWorkingDirectory(cloneBase);
         git.checkout(null, "master");
-        
+
         assertFalse(IOUtils.fileToString(new File(cloneBase, "README.txt")).contains("ON BRANCH"));
-        
+
         git.checkout(null, "origin/branch", "local");
 
         assertTrue(IOUtils.fileToString(new File(cloneBase, "README.txt")).contains("ON BRANCH"));
+    }
+
+    public void testDiffFeedback() throws GitException
+    {
+        git.setWorkingDirectory(tmp);
+        git.clone(null, repository, "base");
+
+        git.setWorkingDirectory(new File(tmp, "base"));
+        git.diff(new ScmFeedbackHandler()
+        {
+            public void status(String message)
+            {
+                assertEquals("M\tsmiley.txt", message);
+            }
+            public void checkCancelled() throws ScmCancelledException { }
+        }, null);
     }
 
     public void testPull() throws ScmException, IOException

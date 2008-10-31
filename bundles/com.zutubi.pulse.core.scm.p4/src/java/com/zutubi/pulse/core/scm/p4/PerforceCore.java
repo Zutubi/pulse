@@ -1,12 +1,11 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.NumericalRevision;
-import com.zutubi.pulse.core.scm.ScmCancelledException;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.util.process.AsyncProcess;
-import com.zutubi.pulse.util.process.LineHandler;
+import com.zutubi.pulse.core.util.process.AsyncProcess;
+import com.zutubi.pulse.core.util.process.LineHandler;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -55,16 +54,6 @@ public class PerforceCore
         //   Change <number> on <date> by <user>@<client>
         changesPattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
         lineSplitterPattern = Pattern.compile("\r?\n");
-    }
-
-    public Revision convertRevision(NumericalRevision rev)
-    {
-        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
-    }
-
-    public NumericalRevision convertRevision(Revision rev)
-    {
-        return rev == null ? null : new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
     }
 
     public Map<String, String> getEnv()
@@ -271,7 +260,7 @@ public class PerforceCore
         return info;
     }
 
-    public NumericalRevision getLatestRevisionForFiles(String clientName, String... files) throws ScmException
+    public Revision getLatestRevisionForFiles(String clientName, String... files) throws ScmException
     {
         List<String> args = new ArrayList<String>(8 + files.length);
 
@@ -299,11 +288,11 @@ public class PerforceCore
 
         if (matcher.find())
         {
-            return new NumericalRevision(Long.parseLong(matcher.group(1)));
+            return new Revision(matcher.group(1));
         }
         else
         {
-            return new NumericalRevision(0);
+            return new Revision(0);
         }
     }
 

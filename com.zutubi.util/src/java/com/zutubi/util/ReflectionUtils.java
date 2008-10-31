@@ -146,4 +146,34 @@ public class ReflectionUtils
 
         return false;
     }
+
+    /**
+     * Traverse the classes class hierarchy.  For each class class, the interfaces directly implemented
+     * by that class are also traversed.  Note that this does not include interfaces implemented by interfaces.
+     *
+     * @param clazz     the class being traversed.
+     * @param c         the procedure to be executed for each new Class encountered during the traversal.
+     */
+    public static void traverse(Class clazz, UnaryProcedure<Class> c)
+    {
+        Set<Class> checked = new HashSet<Class>();
+
+        while (clazz != null)
+        {
+            c.process(clazz);
+            checked.add(clazz);
+
+            // for each class, analyse the interfaces.
+            for (Class interfaceClazz : clazz.getInterfaces())
+            {
+                if (!checked.contains(interfaceClazz))
+                {
+                    c.process(interfaceClazz);
+                    checked.add(interfaceClazz);
+                }
+            }
+
+            clazz = clazz.getSuperclass();
+        }
+    }
 }

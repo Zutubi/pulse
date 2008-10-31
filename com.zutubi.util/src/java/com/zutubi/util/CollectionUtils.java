@@ -310,4 +310,52 @@ public class CollectionUtils
             f.process(t);
         }
     }
+
+    /**
+     * In-place reversal of the elements of an object array.
+     *
+     * @param array the array to reverse
+     */
+    public static void reverse(Object[] array)
+    {
+        for (int i = 0, j = array.length - 1; i < j; i++, j--)
+        {
+            Object temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+
+    /**
+     * Return a copy of the list c that has duplicates.
+     *
+     * @param l the list from which duplicates will be removed.
+     *
+     * @return the copy of the list with duplicates removed.
+     */
+    public static <T> List<T> unique(List<T> l)
+    {
+        // sets by definition are unique, and so will do the processing for us.
+        LinkedHashSet<T> seen = new LinkedHashSet<T>();
+        seen.addAll(l);
+        return new LinkedList<T>(seen);
+    }
+
+    /**
+     * Creates a list holding count elements with the given value.
+     *
+     * @param value value to use for all list elements
+     * @param count number of list elements to add
+     * @return a list with count elements of value
+     */
+    public static <T> List<T> times(T value, int count)
+    {
+        List<T> result = new LinkedList<T>();
+        while (count-- > 0)
+        {
+            result.add(value);
+        }
+
+        return result;
+    }
 }

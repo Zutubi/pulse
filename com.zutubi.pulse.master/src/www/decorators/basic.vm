@@ -1,0 +1,39 @@
+<!-- page properties are specified using <content tag="selectedTab">navigate</content> -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>:: pulse :: #if ($title) $title #end</title>
+<link rel="shortcut icon" href="$base/favicon.ico">
+<link rel="icon" type="image/png" href="$base/favicon.png">
+<link rel="stylesheet" type="text/css" href="$base/css/ext-all.css"></link>
+<link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"></link>
+<link href="$base/css/form.css" rel="stylesheet" type="text/css" media="screen"></link>
+<script type="text/javascript" src="$base/js/ext-base.js"></script>
+<script type="text/javascript" src="$base/js/ext-all.js"></script>
+<script type="text/javascript" src="$base/js/main.js"></script>
+<script type="text/javascript" src="$base/js/zutubi.js"></script>
+ <script type="text/javascript">
+    window.baseUrl = '$base';
+</script>            
+<style type="text/css">
+    #center
+    {
+        margin: 0;
+        text-align: center;
+    }
+</style>
+		$head
+</head>
+<body>
+    <div class="content" id="nested-layout">
+        <table width="100%">
+            <tr>
+                <td align="center" style="padding: 12px;">$body</td>
+            </tr>
+        </table>
+    </div>
+    <div id="south" style="border-top: none">
+        <strong>:: pulse ($version_number #$build_number) ::</strong> copyright &copy; 2005-2008 zutubi pty ltd
+    </div>
+</body>
+</html>

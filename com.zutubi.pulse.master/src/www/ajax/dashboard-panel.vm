@@ -1,0 +1,116 @@
+#macro(buildsTable $project $showHideLink $firstTable)
+    #set($recentBuilds = $action.getLatestBuilds($project))
+#if($showHideLink)
+        <tr id='#id("project_$project.name")'>
+#else
+        <tr id='#id("group_${group.name}_project_${project.name}")'>
+#end
+            <th class="heading" colspan="$columns.totalSpan">
+#if($firstTable)            
+                <span class="action">
+                    <a class="unadorned" href="#" id="columns-popup-link-my.projects" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+    #if($showHideLink)
+                    <a id='#id("hide_project_$project.name")' href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
+    #end
+                </span>
+#end
+                <a href="$urls.projectHome($project)" id="home_$!webwork.htmlEncode($project.name)">
+                    <img alt="home" src="$base/images/house.gif">
+                    $!webwork.htmlEncode($project.name)
+                </a>
+            </th>
+        </tr>
+        #buildTableHeading($columns false)
+#if($recentBuilds.size() > 0)
+    #foreach($buildResult in $recentBuilds)
+        #buildTableRow($buildResult $columns true)
+    #end
+#else
+        <tr>
+            <td class="content" colspan="$columns.totalSpan">#wwtext("name=never.built")
+        </tr>
+#end
+#end
+
+#macro(changesTable $titleKey $changelists $showWho $source)
+    <table class="content">
+        #headingRow($titleKey 6)
+        <tr>
+            #contentHeading("change.revision" 1)
+    #if($showWho)
+            #contentHeading("change.who" 1)
+    #end
+            #contentHeading("change.when" 1)
+            #contentHeading("change.comment" 1)
+            #contentHeading("build.results" 1)
+            #contentHeading("actions" 1)
+        </tr>
+    #if($changelists.size() > 0)
+        #foreach($changelist in $changelists)
+            #set($index = $velocityCount - 1)
+            $action.updateChangeUrl($changelist)
+        <tr>
+            #dynamicRightLinkCell($changelist.revision $action.getChangeUrl())
+    #if($showWho)
+            #dynamicCell($changelist.author)
+    #end
+            #dateCell($changelist)
+            #commitCommentCell($changelist $source)
+            #aggregateResultCell($changelist $showWho)
+            #linkCell("view.$changelist.id" "view" "$base/dashboard/changes/$changelist.id/")
+        </tr>
+        #end
+    #else
+        <tr>
+            <td class="content" colspan="6">#wwtext("name=no.changes")</td>
+        </tr>
+    #end
+    </table>
+#end
+
+#foreach($contact in $contactPointsWithErrors)
+<p class="note">
+    Your contact point '#html($contact)' has caused a notification error. View its <a href="$base/dashboard/preferences/contacts/#uce($contact)/">configuration</a> for details.
+</p>
+#end
+
+<h2 class="section">#wwtext("name=my.projects")
+#if($rssEnabled)
+    <a class="unadorned" href="$base/rss.action?userId=$principle.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+#end
+</h2>
+
+#set($firstTable = true)
+#foreach($group in $shownGroups)
+    <table class="content" id='#id("group_$group.name")'>
+        <tr>
+            <th class="group" colspan="$columns.totalSpan">
+                <span class="action">
+                    <a id='#id("hide_group_$group.name")' href="$base/user/hideDashboardGroup.action?groupName=#uce($group.name)" class="unadorned">X</a>
+                </span>
+                $!webwork.htmlEncode($group.name)
+            </th>
+        </tr>
+    #foreach($project in $group.projects)
+        #buildsTable($project false $firstTable)
+        #set($firstTable = false)
+    #end
+    </table>
+#end
+    <table class="content">
+#foreach($project in $shownProjects)
+        #buildsTable($project true true)
+#end
+    </table>
+
+#if($dashboardConfig.showMyChanges)
+    <h2 class="section">#wwtext("name=my.changes")</h2>
+    #changesTable("my.latest.changes" $changelists false "my")
+#end
+
+#if($dashboardConfig.showProjectChanges)
+    <h2 class="section">#wwtext("name=project.changes")</h2>
+    #changesTable("my.project.changes" $projectChangelists true "project")
+#end
+
+#buildTableColumns($columns "my.projects")

@@ -1,16 +1,13 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.NumericalRevision;
-import com.zutubi.pulse.core.scm.ScmChangeAccumulator;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmFile;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -81,13 +78,12 @@ public class PerforceClientTest extends PulseTestCase
     public void testCheckoutHead() throws Exception
     {
         getServer("depot-client");
-        List<Change> changes = checkoutChanges(null, workDir, null, 8);
+        List<String> statuses = checkoutChanges(null, workDir, null, 8);
 
-        assertEquals(10, changes.size());
+        assertEquals(10, statuses.size());
         for (int i = 0; i < 10; i++)
         {
-            Change change = changes.get(i);
-            assertEquals(Change.Action.ADD, change.getAction());
+            String status = statuses.get(i);
 
             // Foolish of me to create file10 which ruins lexical ordering :|
             int number;
@@ -104,7 +100,8 @@ public class PerforceClientTest extends PulseTestCase
                 number = i;
             }
 
-            assertEquals(String.format("//depot/file%d", number), change.getFilename());
+            String re = String.format("//depot/file%d#[1-9][0-9]* - added as.*", number);
+            assertTrue("Status '" + status + "' does not match expected format '" + re + "'", status.matches(re));
         }
 
         checkDirectory("checkoutHead");
@@ -114,10 +111,7 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer("depot-client");
 
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(workDir);
-
-        Revision revision = client.checkout(context, createRevision(1), null);
+        Revision revision = client.checkout(createExecutionContext(workDir, null), createRevision(1), null);
         assertEquals("1", revision.getRevisionString());
         checkDirectory("checkoutRevision");
     }
@@ -149,16 +143,16 @@ public class PerforceClientTest extends PulseTestCase
         assertEquals(6, changes.size());
         Changelist list = changes.get(1);
         assertEquals("Delete and edit files in depot2.", list.getComment());
-        assertEquals("test-user", list.getUser());
+        assertEquals("test-user", list.getAuthor());
         assertEquals("3", list.getRevision().getRevisionString());
-        List<Change> changedFiles = list.getChanges();
+        List<FileChange> changedFiles = list.getChanges();
         assertEquals(2, changedFiles.size());
-        Change file1 = changedFiles.get(0);
-        assertEquals("//depot2/file1", file1.getFilename());
-        assertEquals(Change.Action.EDIT, file1.getAction());
-        Change file10 = changedFiles.get(1);
-        assertEquals("//depot2/file10", file10.getFilename());
-        assertEquals(Change.Action.DELETE, file10.getAction());
+        FileChange file1 = changedFiles.get(0);
+        assertEquals("//depot2/file1", file1.getPath());
+        assertEquals(FileChange.Action.EDIT, file1.getAction());
+        FileChange file10 = changedFiles.get(1);
+        assertEquals("//depot2/file10", file10.getPath());
+        assertEquals(FileChange.Action.DELETE, file10.getAction());
     }
 
     public void testGetChangesRestrictedToView() throws Exception
@@ -211,7 +205,6 @@ public class PerforceClientTest extends PulseTestCase
             assertTrue(f.isFile());
             assertEquals("file" + (i + 1), f.getName());
             assertEquals("depot2/file" + (i + 1), f.getPath());
-            assertEquals("text/plain", f.getMimeType());
         }
 
         f = files.get(9);
@@ -332,45 +325,32 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer("depot-client");
 
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(workDir);
-        context.addString("scm.bootstrap.id", "my-id");
-        
-        Revision got = client.checkout(context, createRevision(1), null);
+        Revision got = client.checkout(createExecutionContext(workDir, "my-id"), createRevision(1), null);
         assertEquals("1", got.getRevisionString());
         checkDirectory("checkoutRevision");
 
-        List<Change> changes = updateChanges("my-id", workDir, createRevision(8));
+        List<String> statuses = updateChanges("my-id", workDir, createRevision(8));
         checkDirectory("checkoutHead");
-        assertEquals(1, changes.size());
-        Change change = changes.get(0);
-        assertEquals("//depot/file2", change.getFilename());
-        assertEquals(Change.Action.EDIT, change.getAction());
+        assertEquals(1, statuses.size());
+        assertTrue(statuses.get(0).startsWith("//depot/file2#2 - updating"));
     }
 
     public void testUpdateSameRevision() throws ScmException, IOException
     {
         getServer("depot-client");
 
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(workDir);
-        context.addString("scm.bootstrap.id", "my-id");
+        client.checkout(createExecutionContext(workDir, "my-id"), null, null);
 
-        client.checkout(context, null, null);
-
-        List<Change> changes = updateChanges("my-id", workDir, null);
+        List<String> statuses = updateChanges("my-id", workDir, null);
         checkDirectory("checkoutHead");
-        assertEquals(0, changes.size());
+        assertEquals(0, statuses.size());
     }
 
     public void testMultiUpdates() throws ScmException, IOException
     {
         getServer(TEST_CLIENT);
 
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(workDir);
-
-        client.checkout(context, createRevision(1), null);
+        client.checkout(createExecutionContext(workDir, null), createRevision(1), null);
 
         for(int i = 2; i <= 8; i++)
         {
@@ -403,13 +383,6 @@ public class PerforceClientTest extends PulseTestCase
         assertNull(client.getFileRevision("//depot2/file10", createRevision(4)));
     }
 
-    public void testGetRevision() throws ScmException
-    {
-        getServer(TEST_CLIENT);
-        NumericalRevision rev = convertRevision(client.parseRevision("3"));
-        assertEquals(3, rev.getRevisionNumber());
-    }
-
     public void testGetRevisionLatest() throws ScmException
     {
         getServer(TEST_CLIENT);
@@ -421,10 +394,10 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetRevisionPostLatest() throws ScmException
     {
         getServer(TEST_CLIENT);
-        NumericalRevision latest = convertRevision(client.getLatestRevision(null));
+        Revision latest = client.getLatestRevision(null);
         try
         {
-            client.parseRevision(Long.toString(latest.getRevisionNumber() + 1));
+            client.parseRevision(Long.toString(Long.valueOf(latest.toString()) + 1));
             fail();
         }
         catch (ScmException e)
@@ -526,36 +499,37 @@ public class PerforceClientTest extends PulseTestCase
         return new File(getPulseRoot(), FileSystemUtils.composeFilename("bundles", "com.zutubi.pulse.core.scm.p4", "src", "test", "com", "zutubi", "pulse", "core", "scm", "p4", "data"));
     }
 
-    private List<Change> checkoutChanges(String id, File dir, Revision revision, long expectedRevision) throws ScmException
+    private List<String> checkoutChanges(String id, File dir, Revision revision, long expectedRevision) throws ScmException
     {
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(dir);
-        context.addString("scm.bootstrap.id", id);
-
-        ScmChangeAccumulator accumulator = new ScmChangeAccumulator();
-        Revision rev = client.checkout(context, revision, accumulator);
+        ExecutionContext context = createExecutionContext(dir, id);
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
+        Revision rev = client.checkout(context, revision, handler);
         assertEquals(expectedRevision, (long)Long.valueOf(rev.getRevisionString()));
-        return accumulator.getChanges();
+        return handler.getStatusMessages();
     }
 
-    private List<Change> updateChanges(String id, File dir, Revision revision) throws ScmException
+    private List<String> updateChanges(String id, File dir, Revision revision) throws ScmException
     {
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(dir);
-        context.addString("scm.bootstrap.id", id);
+        ExecutionContext context = createExecutionContext(dir, id);
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
+        client.update(context, revision, handler);
+        return handler.getStatusMessages();
+    }
 
-        ScmChangeAccumulator accumulator = new ScmChangeAccumulator();
-        client.update(context, revision, accumulator);
-        return accumulator.getChanges();
+    private ExecutionContext createExecutionContext(File dir, String id)
+    {
+        PulseExecutionContext context = new PulseExecutionContext();
+        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
+        context.setWorkingDir(dir);
+        if (id != null)
+        {
+            context.addString("scm.bootstrap.id", id);
+        }
+        return context;
     }
 
     private Revision createRevision(long rev)
     {
-        return new Revision(null, null, null, Long.toString(rev));
-    }
-
-    private NumericalRevision convertRevision(Revision rev)
-    {
-        return new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+        return new Revision(Long.toString(rev));
     }
 }

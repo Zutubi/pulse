@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="setupManager" class="com.zutubi.pulse.master.bootstrap.DefaultSetupManager" autowire="byName">
+        <property name="configContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/configContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/transactionContext.xml</value>
+            </list>
+        </property>
+        <property name="migrationContext">
+            <list>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/migrationContext.xml</value>
+            </list>
+        </property>
+        <property name="dataContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/databaseContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/recordContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/cacheContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml</value>
+            </list>
+        </property>
+        <property name="restoreContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/restoreContext.xml</value>
+            </list>
+        </property>
+        <property name="licenseContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/licenseContext.xml</value>
+            </list>
+        </property>
+        <property name="upgradeContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/upgradeContext.xml</value>
+            </list>
+        </property>
+        <property name="setupContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/userContext.xml</value>
+            </list>
+        </property>
+        <property name="startupContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/schedulingContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/builderContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/securityContext.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--
+    this spring object factory will ensure that WebWork Actions are autowired, required each
+    time the spring context is updated
+    -->
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+
+</beans>

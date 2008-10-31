@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+    <extension point="com.zutubi.pulse.core.commands">
+        <command name="command" class="com.zutubi.pulse.core.commands.core.CommandGroup"/>
+        <command name="executable" class="com.zutubi.pulse.core.commands.core.ExecutableCommand"/>
+        <command name="print" class="com.zutubi.pulse.core.commands.core.PrintCommand"/>
+        <command name="sleep" class="com.zutubi.pulse.core.commands.core.SleepCommand"/>
+        <command name="resource" class="com.zutubi.pulse.core.ResourceReference"/>
+    </extension>
+    <extension point="com.zutubi.pulse.core.postprocessors">
+        <post-processor name="post-processor" class="com.zutubi.pulse.core.commands.core.PostProcessorGroup"/>
+        <post-processor name="junit.pp" display-name="JUnit XML report processor"
+                        default-fragment="true" class="com.zutubi.pulse.core.commands.core.JUnitReportPostProcessor"/>
+        <post-processor name="junitee.pp" display-name="JUnitEE XML report processor"
+                        default-fragment="true" class="com.zutubi.pulse.core.commands.core.JUnitEEReportPostProcessor"/>
+        <post-processor name="junit-summary.pp" display-name="JUnit summary output processor"
+                        default-fragment="true" class="com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessor"/>
+        <post-processor name="regex-test.pp" display-name="Regular expression test processor"
+                        default-fragment="false" class="com.zutubi.pulse.core.commands.core.RegexTestPostProcessor"/>
+        <post-processor name="regex.pp" display-name="Regular expression processor"
+                        default-fragment="false" class="com.zutubi.pulse.core.commands.core.RegexPostProcessor"/>
+    </extension>
+</plugin>

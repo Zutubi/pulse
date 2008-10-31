@@ -1,33 +1,24 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.scm.WorkingCopy;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.WorkingCopyStatus;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.personal.PersonalBuildUI;
+import com.zutubi.pulse.core.scm.api.*;
 
 /**
  * to be implemented.
  */
 public class GitWorkingCopy implements WorkingCopy
 {
-    public boolean matchesLocation(String location) throws ScmException
+    public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException
     {
         return false;
     }
 
-    public WorkingCopyStatus getLocalStatus(String... spec) throws ScmException
+    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
         return null;
     }
 
-    public Revision update() throws ScmException
+    public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
     {
         return null;
-    }
-
-    public void setUI(PersonalBuildUI ui)
-    {
-
     }
 }

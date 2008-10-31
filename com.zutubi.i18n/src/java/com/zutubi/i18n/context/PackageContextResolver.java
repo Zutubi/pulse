@@ -8,6 +8,8 @@ import java.util.LinkedList;
  */
 public class PackageContextResolver implements ContextResolver<PackageContext>
 {
+    protected static final String BUNDLE_NAME = "package";
+
     public String[] resolve(PackageContext context)
     {
         String packageName = context.getContext().replace('.', '/');
@@ -16,7 +18,7 @@ public class PackageContextResolver implements ContextResolver<PackageContext>
 
         while (packageName.length() > 0)
         {
-            resolvedNames.add(packageName + "/package");
+            resolvedNames.add(packageName + "/" + BUNDLE_NAME);
             if (packageName.indexOf('/') == -1)
             {
                 break;
@@ -24,7 +26,7 @@ public class PackageContextResolver implements ContextResolver<PackageContext>
             packageName = packageName.substring(0, packageName.lastIndexOf('/'));
         }
 
-        resolvedNames.add("package");
+        resolvedNames.add(BUNDLE_NAME);
 
         return resolvedNames.toArray(new String[resolvedNames.size()]);
     }

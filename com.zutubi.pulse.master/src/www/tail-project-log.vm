@@ -1,0 +1,89 @@
+#helpTag("Project")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=project") $project.name</title>
+    <script type="text/javascript">
+        #updater("$base/ajax/tailProjectLogPanel.action?projectName=${u_projectName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle)
+
+        Ext.onReady(function() {
+            var form = new Ext.form.FormPanel({
+                labelWidth: 200,
+                labelAlign: 'right',
+                method: 'POST',
+                border: false,
+                items: [{
+                    layout: 'column',
+                    border: false,
+                    items: [{
+                        columnWidth: .4,
+                        layout: 'form',
+                        border: false,
+                        items: [{
+                            xtype: 'textfield',
+                            name: 'maxLines',
+                            fieldLabel: '$action.getText("tail.max.lines")',
+                            value: '$maxLines',
+                            width: 50
+                        }]
+                    }, {
+                        columnWidth: .4,
+                        layout: 'form',
+                        border: false,
+                        items: [{
+                            xtype: 'textfield',
+                            name: 'refreshInterval',
+                            fieldLabel: '$action.getText("tail.refresh.interval")',
+                            value: '$refreshInterval',
+                            width: 50
+                        }]
+                    }, {
+                        columnWidth: .2,
+                        xtype: 'panel',
+                        border: false,
+                        items: [{
+                            xtype: 'button',
+                            text: 'update',
+                            listeners: {
+                                click: function() {
+                                    form.getForm().el.dom.submit();
+                                }
+                            }
+                        }]
+                    }]
+                }]
+            });
+
+            form.on('afterlayout', function() {
+                this.getForm().el.dom.action = '${urls.projectLog($project)}';
+
+                new Ext.KeyNav(this.getForm().getEl(), {
+                    'enter': function(e) {
+                        this.getForm().el.dom.submit();
+                    },
+                    'scope': this
+                });
+            }, form, {single: true});
+
+
+            form.render("params-form");
+        });
+    </script>
+</head>
+<body>
+    #projectTabs("log")
+
+    <div class="config-panel">
+        <h3 class="config-header config-header-small">$action.getText("tail.settings")</h3>
+        <div class="config-container" id="params-form">
+        </div>
+    </div>
+
+    <h3 class="heading">#wwtext("name=project.tail.box") <!--#if($logExists) &nbsp;<a href="$urls.projectLog($project)raw/true/"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=project.full.log")</a> #end --></h3>
+    <div class="box">
+        <div id="panel">
+            #parse("ajax/tail-log-panel.vm")
+        </div>
+    </div>
+</html>

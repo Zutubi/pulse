@@ -3,7 +3,8 @@ package com.zutubi.i18n.context;
 import java.io.InputStream;
 
 /**
- * <class-comment/>
+ * The default implementation of the context loader simply delegates the
+ * loading to the contexts getResourceAsStream method.
  */
 public class DefaultContextLoader implements ContextLoader
 {
