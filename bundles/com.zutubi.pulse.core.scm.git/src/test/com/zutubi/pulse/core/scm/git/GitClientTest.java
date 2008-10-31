@@ -26,7 +26,7 @@ public class GitClientTest extends PulseTestCase
     private RecordingScmFeedbackHandler handler;
     private ScmContextImpl scmContext;
     
-    private static final String TEST_AUTHOR = "Daniel Ostermeier <daniel@zutubi.com>";
+    private static final String TEST_AUTHOR = "Daniel Ostermeier";
 
     protected void setUp() throws Exception
     {
