@@ -37,6 +37,7 @@
                 <ref local="ensureBackupConfigPermanent"/>
                 <ref local="collapseRevisionRefactor"/>
                 <ref local="projectLifecycle"/>
+                <ref local="triggerRepackaging"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -95,5 +96,9 @@
 
     <bean id="projectLifecycle" class="com.zutubi.pulse.master.upgrade.tasks.ProjectLifecycleUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200013003"/>
+    </bean>
+
+    <bean id="triggerRepackaging" class="com.zutubi.pulse.master.upgrade.tasks.TriggerRepackagingUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200013004"/>
     </bean>
 </beans>
