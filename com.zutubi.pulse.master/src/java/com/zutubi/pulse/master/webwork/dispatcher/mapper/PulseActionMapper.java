@@ -203,6 +203,7 @@ public class PulseActionMapper implements ActionMapper
         //   <project>/               - project tabs
         //     home/                  - (default)
         //     reports/
+        //     log/
         //     builds/                - (history)
         //       <build id>/          - build tabs
         //         summary/           - (default)

@@ -15,6 +15,7 @@ public class BrowseProjectActionResolver extends StaticMapActionResolver
         addMapping("home", new ParameterisedActionResolver("currentBuild"));
         addMapping("reports", new ParameterisedActionResolver("projectReports"));
         addMapping("history", new PagedActionResolver("history"));
+        addMapping("log", new ProjectLogActionResolver());
         addMapping("builds", new ProjectBuildsActionResolver());
         addMapping("changes", new ChangelistsActionResolver());
         addMapping("actions", new ProjectActionsActionResolver());

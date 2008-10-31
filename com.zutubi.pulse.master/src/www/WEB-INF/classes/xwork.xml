@@ -172,6 +172,15 @@
             </result>
         </action>
 
+        <action name="tailProjectLog" class="com.zutubi.pulse.master.xwork.actions.project.TailProjectLogAction">
+            <interceptor-ref name="completeStack"/>
+            <result name="tail" type="velocity">/tail-project-log.vm</result>
+            <result name="raw" type="stream">
+                <param name="contentType">text/plain</param>
+                <param name="contentDisposition">filename="project.log"</param>
+            </result>
+        </action>
+
         <action name="viewChangelist" class="com.zutubi.pulse.master.xwork.actions.project.ViewChangelistAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-changelist.vm</result>
@@ -429,6 +438,10 @@
         </action>
 
         <action name="tailBuildLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailBuildLogAction">
+            <result name="tail" type="velocity">tail-log-panel.vm</result>
+        </action>
+
+        <action name="tailProjectLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailProjectLogAction">
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 

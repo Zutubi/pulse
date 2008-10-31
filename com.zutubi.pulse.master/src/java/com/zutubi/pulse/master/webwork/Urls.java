@@ -143,6 +143,11 @@ public class Urls
         return project(project) + "history/";
     }
 
+    public String projectLog(Object project)
+    {
+        return project(project) + "log/";
+    }
+
     public String projectChanges(Object project)
     {
         return project(project) + "changes/";

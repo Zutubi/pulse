@@ -21,9 +21,9 @@ public class TailRecipeLogAction extends StageActionBase
     private static final int LINE_COUNT = 30;
 
     protected boolean raw = false;
-    private int maxLines = -1;
+    protected int maxLines = -1;
     private int refreshInterval = -1;
-    private String tail = "";
+    protected String tail = "";
     protected MasterConfigurationManager configurationManager;
     protected boolean logExists;
     private FileInputStream inputStream;

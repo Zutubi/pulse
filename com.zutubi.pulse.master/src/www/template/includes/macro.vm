@@ -202,6 +202,7 @@
         #projectTab("home" $selected)
         #projectTab("reports" $selected)
         #projectTab("history" $selected)
+        #projectTab("log" $selected)
     #closeTabs()
 #end
 
