@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -10,7 +10,6 @@ import com.zutubi.tove.config.AbstractConfiguration;
 
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.HashMap;
 
 @Form(fieldOrder = {"value"})
 @SymbolicName("zutubi.resourceVersion")
@@ -91,7 +90,7 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
     {
         ResourceVersion v = new ResourceVersion(getValue());
 
-        Map<String, ResourceProperty> properties = new HashMap<String, ResourceProperty>();
+        Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
         for (String key : getProperties().keySet())
         {
             properties.put(key, getProperties().get(key).asResourceProperty());

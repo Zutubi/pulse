@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.AbstractNamedConfiguration;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -169,14 +168,14 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
         Resource r = new Resource(getName());
         r.setDefaultVersion(getDefaultVersion());
 
-        Map<String, ResourceProperty> properties = new HashMap<String, ResourceProperty>();
+        Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
         for (String key : getProperties().keySet())
         {
             properties.put(key, getProperties().get(key).asResourceProperty());
         }
         r.setProperties(properties);
 
-        Map<String, ResourceVersion> versions = new HashMap<String, ResourceVersion>();
+        Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
         for (String key : getVersions().keySet())
         {
             versions.put(key, getVersions().get(key).asResourceVersion());
