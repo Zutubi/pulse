@@ -40,6 +40,7 @@
                         <li>#actionLink("home-#uce($project.name)" "home.tab" "$urls.projectHome($project)" "house.gif")</li>
                         <li>#actionLink("reports-#uce($project.name)" "reports.tab" "$urls.projectReports($project)" "chart_bar.gif")</li>
                         <li>#actionLink("history-#uce($project.name)" "history.tab" "$urls.projectHistory($project)" "time.gif")</li>
+                        <li>#actionLink("log-#uce($project.name)" "log.tab" "$urls.projectLog($project)" "script.gif")</li>
                         <li>#actionLink("config-#uce($project.name)" "configuration.tab" "$base/admin/projects/#uce($project.name)/" "pencil.gif")</li>
             #if($action.hasPermission("trigger", $project))
                         <li>#actionLink("trigger-#uce($project.name)" "project.trigger" "$base/triggerBuild.action?projectName=#uce($project.name)" "lightning.gif")</li>
