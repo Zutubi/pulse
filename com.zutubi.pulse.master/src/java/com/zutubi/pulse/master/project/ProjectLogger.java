@@ -11,6 +11,7 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -24,7 +25,7 @@ public class ProjectLogger implements Closeable
 
     // A static DateTime is safe as loggers are thread safe via mutual
     // exclusion.
-    private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     static final String NAME_PATTERN = "project.%d.log";
 
     private int sizeLimit;

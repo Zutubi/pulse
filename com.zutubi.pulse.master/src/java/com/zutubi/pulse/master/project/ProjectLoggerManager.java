@@ -41,7 +41,13 @@ public class ProjectLoggerManager implements EventListener, Stoppable
             ProjectLogger logger = idToLogger.get(projectId);
             if (logger == null)
             {
-                logger = new ProjectLogger(new File(projectRoot, Long.toString(projectId)), SIZE_LIMIT);
+                File dir = new File(projectRoot, Long.toString(projectId));
+                if (!dir.exists())
+                {
+                    dir.mkdirs();
+                }
+                
+                logger = new ProjectLogger(dir, SIZE_LIMIT);
                 idToLogger.put(projectId, logger);
             }
 

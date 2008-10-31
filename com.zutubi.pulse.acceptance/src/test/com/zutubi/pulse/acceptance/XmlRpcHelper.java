@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
@@ -280,7 +281,34 @@ public class XmlRpcHelper
         project.put("type", type);
         project.put("stages", stages);
 
-        return call("insertTemplatedConfig", "projects/" + parent, project, template);
+        String path = call("insertTemplatedConfig", "projects/" + parent, project, template);
+        if (!template)
+        {
+            waitForProjectToInitialise(name);
+        }
+
+        return path;
+    }
+
+    public void waitForProjectToInitialise(String name) throws Exception
+    {
+        long startTime = System.currentTimeMillis();
+        Project.State state;
+        while (true)
+        {
+            String stateString = call("getProjectState", name);
+            state = Project.State.valueOf(stateString.replace(' ', '_').toUpperCase());
+            if (state.isInitialised())
+            {
+                break;
+            }
+
+            Thread.sleep(10);
+            if (System.currentTimeMillis() - startTime > 30000)
+            {
+                throw new RuntimeException("Timed out waiting for project '" + name + "' to init");
+            }
+        }
     }
 
     public String insertTrivialProject(String name, boolean template) throws Exception

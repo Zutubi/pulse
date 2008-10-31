@@ -25,7 +25,7 @@ public class ProjectLoggerTest extends PulseTestCase
         tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
 
         // 19 for the timestamp prefix
-        int lineLength = 19 + TEST_MESSAGE.length() + LINE_SEPARATOR.length();
+        int lineLength = 21 + TEST_MESSAGE.length() + LINE_SEPARATOR.length();
         logger = new ProjectLogger(tempDir, lineLength * LINE_LIMIT);
     }
 
