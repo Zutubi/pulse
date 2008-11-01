@@ -89,8 +89,8 @@ public class MultipleFileInputStreamTest extends BaseIOTestCase
     public void testReadContent() throws IOException
     {
         multipleFileHelper(1, 10, 10);
-        assertRead(10 + lsl, "0---------" + ls);
-        assertRead(90 +  9 * lsl, "1---------" + ls +
+        assertBufferedRead(10 + lsl, "0---------" + ls);
+        assertBufferedRead(90 +  9 * lsl, "1---------" + ls +
                 "2---------" + ls +"3---------" + ls +
                 "4---------" + ls +"5---------" + ls +
                 "6---------" + ls +"7---------" + ls +
@@ -100,10 +100,99 @@ public class MultipleFileInputStreamTest extends BaseIOTestCase
     public void testReadContentAcrossFiles() throws IOException
     {
         multipleFileHelper(4, 1, 1);
-        assertRead(4 + 4 * lsl, "0" + ls + "1" + ls + "2" + ls + "3" + ls);
+        assertBufferedRead(4 + 4 * lsl, "0" + ls + "1" + ls + "2" + ls + "3" + ls);
     }
 
-    private void assertRead(int readbuffer, String expected) throws IOException
+    public void testReadZeroData() throws IOException
+    {
+        File f = createRandomFile();
+        input = new MultipleFileInputStream(f);
+        assertEquals(-1, input.read());
+    }
+
+    public void testRead() throws IOException
+    {
+        multipleFileHelper(1, 1, 1);
+        assertRead("0" + ls);
+    }
+
+    public void testReadAcrossFileBoundry() throws IOException
+    {
+        multipleFileHelper(3, 1, 1);
+        assertRead("0" + ls + "1" + ls + "2" + ls);
+    }
+
+    public void testReadAcrossEmptyFiles() throws IOException
+    {
+        File[] files = new File[4];
+        files[0] = generateTestFile(1, 1, 0);
+        files[1] = generateTestFile(1, 1, 1);
+        files[2] = createRandomFile();
+        files[3] = generateTestFile(1, 1, 2);
+        input = new MultipleFileInputStream(files);
+
+        assertRead("0" + ls + "1" + ls + "2" + ls);
+    }
+
+    public void testBufferedReadAcrossFilesWithEmptyFile() throws IOException
+    {
+        File[] files = new File[4];
+        files[0] = generateTestFile(1, 1, 0);
+        files[1] = generateTestFile(1, 1, 1);
+        files[2] = createRandomFile();
+        files[3] = generateTestFile(1, 1, 2);
+        input = new MultipleFileInputStream(files);
+
+        String expected = "0" + ls + "1" + ls + "2" + ls;
+        assertBufferedRead(expected.length(), expected);
+    }
+
+    public void testBufferedReadAcrossFilesWithEmptyFileAtStart() throws IOException
+    {
+        File[] files = new File[4];
+        files[0] = createRandomFile();
+        files[1] = generateTestFile(1, 1, 0);
+        files[2] = generateTestFile(1, 1, 1);
+        files[3] = generateTestFile(1, 1, 2);
+        input = new MultipleFileInputStream(files);
+
+        String expected = "0" + ls + "1" + ls + "2" + ls;
+        assertBufferedRead(expected.length(), expected);
+    }
+
+    public void testBufferedReadAcrossFilesWithEmptyFileAtEnd() throws IOException
+    {
+        File[] files = new File[4];
+        files[0] = generateTestFile(1, 1, 0);
+        files[1] = generateTestFile(1, 1, 1);
+        files[2] = generateTestFile(1, 1, 2);
+        files[3] = createRandomFile();
+        input = new MultipleFileInputStream(files);
+
+        String expected = "0" + ls + "1" + ls + "2" + ls;
+        assertBufferedRead(expected.length(), expected);
+    }
+
+    private void assertRead(String expected) throws IOException
+    {
+        for (byte b : expected.getBytes())
+        {
+            assertEquals((int) b, input.read());
+        }
+        assertEquals(-1, input.read());
+    }
+
+    public void testCreateWithZeroFiles() throws IOException
+    {
+        input = new MultipleFileInputStream();
+    }
+
+    public void testCreateWithNullFiles() throws IOException
+    {
+        input = new MultipleFileInputStream(null, null);
+    }
+
+    private void assertBufferedRead(int readbuffer, String expected) throws IOException
     {
         byte[] b = new byte[readbuffer];
         assertEquals(expected.length(), input.read(b));

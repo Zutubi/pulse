@@ -70,7 +70,7 @@ public abstract class BaseIOTestCase extends TestCase
         return builder.toString();
     }
 
-    private File createRandomFile() throws IOException
+    protected File createRandomFile() throws IOException
     {
         String randomName = RandomUtils.randomString(10);
         File file = new File(tmp, randomName);

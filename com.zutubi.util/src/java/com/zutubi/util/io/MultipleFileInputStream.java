@@ -1,5 +1,8 @@
 package com.zutubi.util.io;
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+
 import java.io.*;
 
 /**
@@ -33,11 +36,19 @@ public class MultipleFileInputStream extends InputStream
      */
     public MultipleFileInputStream(File... files) throws IOException
     {
-        this.files = files;
-        this.sizes = new long[files.length];
-        for (int i = 0; i < files.length; i++)
+        // filter nulls.
+        this.files = CollectionUtils.filterToArray(files, new Predicate<File>()
         {
-            File f = files[i];
+            public boolean satisfied(File file)
+            {
+                return file != null;
+            }
+        });
+
+        this.sizes = new long[this.files.length];
+        for (int i = 0; i < this.files.length; i++)
+        {
+            File f = this.files[i];
             if (!f.isFile())
             {
                 throw new FileNotFoundException(f.getCanonicalPath() + " is not a file.");
@@ -45,7 +56,10 @@ public class MultipleFileInputStream extends InputStream
             sizes[i] = f.length();
         }
 
-        fis = new FileInputStream(this.files[index]);
+        if (this.files.length > 0)
+        {
+            fis = new FileInputStream(this.files[index]);
+        }
     }
 
     public int read() throws IOException
@@ -100,21 +114,22 @@ public class MultipleFileInputStream extends InputStream
 
         while (read != len)
         {
-            if (fis.available() > 0)
-            {
-                throw new IOException();
-            }
-
-            if (!openNextFile())
-            {
-                return read;
-            }
-
             // open next file and read some more until the buffer is full.
             int newOff = off + read;
             int newLen = len - read;
 
-            read = read + fis.read(b, newOff, newLen);
+            int newread = fis.read(b, newOff, newLen);
+            if (newread != -1)
+            {
+                read = read + newread;
+            }
+            else
+            {
+                if (!openNextFile())
+                {
+                    return read;
+                }
+            }
         }
 
         return read;
@@ -172,10 +187,8 @@ public class MultipleFileInputStream extends InputStream
 
         index++;
 
-        // if no more files, break.
         if (index < files.length)
         {
-            // open the new.
             fis = new FileInputStream(files[index]);
             return true;
         }
