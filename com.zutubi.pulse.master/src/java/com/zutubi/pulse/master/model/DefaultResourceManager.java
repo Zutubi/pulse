@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.model;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -279,17 +278,9 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
 
                     for (String propertyName: version.getProperties().keySet())
                     {
-                        try
+                        if (!existingVersion.hasProperty(propertyName))
                         {
-                            if (!existingVersion.hasProperty(propertyName))
-                            {
-                                existingVersion.addProperty(version.getProperty(propertyName));
-                            }
-                        }
-                        catch (FileLoadException e)
-                        {
-                            // should never happen.
-                            LOG.severe(e);
+                            existingVersion.addProperty(version.getProperty(propertyName));
                         }
                     }
                 }

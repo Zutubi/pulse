@@ -6,8 +6,9 @@ import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.AbstractNamedConfiguration;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * A resource is something that is required by a build.  It may be an
@@ -18,11 +19,12 @@ import java.util.TreeMap;
 @SymbolicName("zutubi.resource")
 public class ResourceConfiguration  extends AbstractNamedConfiguration
 {
-    private Map<String, ResourcePropertyConfiguration> properties = new TreeMap<String, ResourcePropertyConfiguration>();
+    @Ordered
+    private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
 
     @Select(optionProvider = "ResourceVersionOptionProvider")
     private String defaultVersion;
-    private Map<String, ResourceVersionConfiguration> versions = new TreeMap<String, ResourceVersionConfiguration>();
+    private Map<String, ResourceVersionConfiguration> versions = new HashMap<String, ResourceVersionConfiguration>();
 
     public ResourceConfiguration()
     {
@@ -40,17 +42,17 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
         this.defaultVersion = resource.getDefaultVersion();
 
         // properties
-        for (String key : resource.getProperties().keySet())
+        for (ResourceProperty rp : resource.getProperties().values())
         {
-            ResourcePropertyConfiguration rpc = new ResourcePropertyConfiguration(resource.getProperty(key));
-            properties.put(key, rpc);
+            ResourcePropertyConfiguration rpc = new ResourcePropertyConfiguration(rp);
+            addProperty(rpc);
         }
 
         // versions.
-        for (String key : resource.getVersions().keySet())
+        for (ResourceVersion rv : resource.getVersions().values())
         {
-            ResourceVersionConfiguration rvc = new ResourceVersionConfiguration(resource.getVersion(key));
-            versions.put(key, rvc);
+            ResourceVersionConfiguration rvc = new ResourceVersionConfiguration(rv);
+            add(rvc);
         }
     }
 
@@ -100,7 +102,7 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
         return properties;
     }
 
-    public void setProperties(Map<String, ResourcePropertyConfiguration> properties)
+    private void setProperties(Map<String, ResourcePropertyConfiguration> properties)
     {
         this.properties = properties;
     }
@@ -168,19 +170,15 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
         Resource r = new Resource(getName());
         r.setDefaultVersion(getDefaultVersion());
 
-        Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
-        for (String key : getProperties().keySet())
+        for (ResourcePropertyConfiguration rpc : getProperties().values())
         {
-            properties.put(key, getProperties().get(key).asResourceProperty());
+            r.addProperty(rpc.asResourceProperty());
         }
-        r.setProperties(properties);
 
-        Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
-        for (String key : getVersions().keySet())
+        for (ResourceVersionConfiguration rvc : getVersions().values())
         {
-            versions.put(key, getVersions().get(key).asResourceVersion());
+            r.add(rvc.asResourceVersion());
         }
-        r.setVersions(versions);
 
         return r;
     }

@@ -3,15 +3,15 @@ package com.zutubi.pulse.core.config;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  */
 public class ResourceVersion
 {
     private String value;
-    private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
+    private Map<String, ResourceProperty> properties = new LinkedHashMap<String, ResourceProperty>();
 
     public ResourceVersion()
     {

@@ -2,15 +2,15 @@ package com.zutubi.pulse.core.config;
 
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class Resource
 {
-    private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
+    private Map<String, ResourceProperty> properties = new LinkedHashMap<String, ResourceProperty>();
  
     private String defaultVersion;
-    private Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
+    private Map<String, ResourceVersion> versions = new LinkedHashMap<String, ResourceVersion>();
 
     private String name;
 

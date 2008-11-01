@@ -1,15 +1,16 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.ID;
+import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.AbstractConfiguration;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 @Form(fieldOrder = {"value"})
 @SymbolicName("zutubi.resourceVersion")
@@ -17,7 +18,8 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
 {
     @ID
     private String value;
-    private Map<String, ResourcePropertyConfiguration> properties = new TreeMap<String, ResourcePropertyConfiguration>();
+    @Ordered
+    private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
 
     public ResourceVersionConfiguration()
     {
@@ -34,10 +36,10 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
         this.value = v.getValue();
 
         // properties
-        for (String key : v.getProperties().keySet())
+        for (ResourceProperty rp : v.getProperties().values())
         {
-            ResourcePropertyConfiguration rpc = new ResourcePropertyConfiguration(v.getProperty(key));
-            properties.put(key, rpc);
+            ResourcePropertyConfiguration rpc = new ResourcePropertyConfiguration(rp);
+            addProperty(rpc);
         }
     }
 
@@ -56,7 +58,7 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
         return properties;
     }
 
-    public void setProperties(Map<String, ResourcePropertyConfiguration> properties)
+    private void setProperties(Map<String, ResourcePropertyConfiguration> properties)
     {
         this.properties = properties;
     }
@@ -71,12 +73,12 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
         return properties.get(name);
     }
 
-    public void addProperty(ResourcePropertyConfiguration p) throws FileLoadException
+    public void addProperty(ResourcePropertyConfiguration p)
     {
         String name = p.getName();
         if (hasProperty(name))
         {
-            throw new FileLoadException("Property with name '" + name + "' already exists with value '" + properties.get(name).getValue() + "'");
+            throw new IllegalArgumentException("Property with name '" + name + "' already exists with value '" + properties.get(name).getValue() + "'");
         }
         properties.put(name, p);
     }
@@ -90,12 +92,17 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
     {
         ResourceVersion v = new ResourceVersion(getValue());
 
-        Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
-        for (String key : getProperties().keySet())
+        for (ResourcePropertyConfiguration rpc : getProperties().values())
         {
-            properties.put(key, getProperties().get(key).asResourceProperty());
+            try
+            {
+                v.addProperty(rpc.asResourceProperty());
+            }
+            catch (FileLoadException e)
+            {
+                // not going to happen.
+            }
         }
-        v.setProperties(properties);
 
         return v;
     }
