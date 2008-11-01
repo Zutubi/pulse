@@ -58,7 +58,7 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
         return properties;
     }
 
-    private void setProperties(Map<String, ResourcePropertyConfiguration> properties)
+    public void setProperties(Map<String, ResourcePropertyConfiguration> properties)
     {
         this.properties = properties;
     }

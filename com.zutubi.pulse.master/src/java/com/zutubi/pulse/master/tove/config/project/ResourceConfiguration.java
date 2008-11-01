@@ -102,7 +102,7 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
         return properties;
     }
 
-    private void setProperties(Map<String, ResourcePropertyConfiguration> properties)
+    public void setProperties(Map<String, ResourcePropertyConfiguration> properties)
     {
         this.properties = properties;
     }
