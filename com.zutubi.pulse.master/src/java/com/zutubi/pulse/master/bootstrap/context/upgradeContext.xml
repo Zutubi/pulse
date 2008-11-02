@@ -38,6 +38,7 @@
                 <ref local="collapseRevisionRefactor"/>
                 <ref local="projectLifecycle"/>
                 <ref local="triggerRepackaging"/>
+                <ref local="triggerState"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -100,5 +101,9 @@
 
     <bean id="triggerRepackaging" class="com.zutubi.pulse.master.upgrade.tasks.TriggerRepackagingUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200013004"/>
+    </bean>
+
+    <bean id="triggerState" class="com.zutubi.pulse.master.upgrade.tasks.TriggerStateUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200013005"/>
     </bean>
 </beans>

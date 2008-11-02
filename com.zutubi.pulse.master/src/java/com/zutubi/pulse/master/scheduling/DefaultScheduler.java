@@ -20,7 +20,7 @@ public class DefaultScheduler implements Scheduler
 
     private TriggerDao triggerDao;
 
-    private boolean started = false;
+    private volatile boolean started = false;
 
     /**
      * Register a scheduling strategy that will be used to handle a specific trigger type.
