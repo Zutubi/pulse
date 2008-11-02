@@ -1,11 +1,12 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
-import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -14,7 +15,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -190,10 +190,8 @@ public class NativeGit
 
     protected void runWithHandler(final OutputHandler handler, String input, String... commands) throws GitException
     {
-        if (LOG.isLoggable(Level.FINE))
-        {
-            LOG.fine(StringUtils.join(" ", commands));
-        }
+        String commandLine = StringUtils.join(" ", commands);
+        handler.handleCommandLine(commandLine);
 
         Process child;
 
@@ -252,14 +250,8 @@ public class NativeGit
 
             if (exitCode != 0)
             {
-                throw new GitException("Git command: " + StringUtils.join(" ", commands) + " exited " +
-                        "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
-            }
-
-            if (exitCode != 0)
-            {
-                throw new GitException("Git command: " + StringUtils.join(" ", commands) + " exited " +
-                        "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
+                throw new GitException("Git command: " + commandLine + " exited " +
+                        "with non zero exit code: " + handler.getExitCode() + ".");
             }
         }
         catch (InterruptedException e)
@@ -278,6 +270,8 @@ public class NativeGit
 
     interface OutputHandler
     {
+        void handleCommandLine(String line);
+
         void handleStdout(String line);
 
         void handleStderr(String line);
@@ -286,17 +280,12 @@ public class NativeGit
 
         int getExitCode();
 
-        String getError();
-
         void checkCancelled() throws GitOperationCancelledException;
     }
 
     private static class OutputHandlerAdapter implements OutputHandler
     {
         private int exitCode;
-
-        private String error;
-
         private ScmFeedbackHandler scmHandler;
 
         public OutputHandlerAdapter()
@@ -306,6 +295,14 @@ public class NativeGit
         public OutputHandlerAdapter(ScmFeedbackHandler scmHandler)
         {
             this.scmHandler = scmHandler;
+        }
+
+        public void handleCommandLine(String line)
+        {
+            if (scmHandler != null)
+            {
+                scmHandler.status(">> " + line);
+            }
         }
 
         public void handleStdout(String line)
@@ -318,16 +315,10 @@ public class NativeGit
 
         public void handleStderr(String line)
         {
-            if (!TextUtils.stringSet(error))
+            if (scmHandler != null)
             {
-                error = "";
+                scmHandler.status(line);
             }
-            error = error + line + Constants.LINE_SEPARATOR;
-        }
-
-        public String getError()
-        {
-            return error;
         }
 
         public void handleExitCode(int code)

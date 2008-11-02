@@ -2,8 +2,6 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
-import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -64,8 +62,8 @@ public class NativeGitTest extends PulseTestCase
         git.setWorkingDirectory(tmp);
         git.clone(handler,  repository, "base");
 
-        assertEquals(1, handler.getStatusMessages().size());
-        String message = handler.getStatusMessages().get(0);
+        assertEquals(2, handler.getStatusMessages().size());
+        String message = handler.getStatusMessages().get(1);
         assertTrue(message.startsWith("Initialized empty Git repository"));
     }
 
@@ -148,14 +146,11 @@ public class NativeGitTest extends PulseTestCase
         git.clone(null, repository, "base");
 
         git.setWorkingDirectory(new File(tmp, "base"));
-        git.diff(new ScmFeedbackHandler()
-        {
-            public void status(String message)
-            {
-                assertEquals("M\tsmiley.txt", message);
-            }
-            public void checkCancelled() throws ScmCancelledException { }
-        }, null);
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
+        git.diff(handler, null);
+        List<String> messages = handler.getStatusMessages();
+        assertEquals(2, messages.size());
+        assertEquals("M\tsmiley.txt", messages.get(1));
     }
 
     public void testPull() throws ScmException, IOException

@@ -158,22 +158,18 @@ public class GitClient implements ScmClient
             git.checkout(handler, revision.getRevisionString(), TMP_BRANCH_PREFIX + revision.getRevisionString());
         }
 
-        // feedback can be determined by using git diff with the appropriate properties.  We can not
-        // get feedback from the checkout process itself, and so any feedback generated is delayed.  
-        try
+        List<GitLogEntry> logs = git.log(2);
+        if (logs.size() > 1)
         {
+            // When this is not the initial revision (which has no previous revision to diff against),
+            // feedback can be determined by using git diff with the appropriate properties.  We can not
+            // get feedback from the checkout process itself, and so any feedback generated is delayed.
             git.diff(handler, revision);
-        }
-        catch (GitException e)
-        {
-            // we are making a guess at a non-existant revision here.
         }
 
         // Determine the head revision from this checkout.  This is equivalent to the evaluated version
         // revision parameter which may be a relative revision (HEAD~4 for instance).
-        GitLogEntry entry = git.log(1).get(0);
-
-        return new Revision(entry.getId());
+        return new Revision(logs.get(logs.size() - 1).getId());
     }
 
     public Revision update(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
