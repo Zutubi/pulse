@@ -6,27 +6,28 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.util.io.PropertiesWriter;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.DriverRegistry;
 import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.migrate.MigrationManager;
-import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.restore.ArchiveException;
 import com.zutubi.pulse.master.restore.RestoreManager;
-import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
+import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.servercore.bootstrap.*;
-import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.io.PropertiesWriter;
 import com.zutubi.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -477,28 +478,34 @@ public class DefaultSetupManager implements SetupManager
         logConfigurationManager.init();
     }
 
-    public void requestUpgradeComplete(boolean changes)
+    public void requestUpgradeComplete(final boolean changes)
     {
-        if (changes)
+        AcegiUtils.runAsSystem(new Runnable()
         {
-            printConsoleMessage("Upgrade complete.");
-        }
-        databaseConsole.postUpgradeHook(changes);
+            public void run()
+            {
+                if (changes)
+                {
+                    printConsoleMessage("Upgrade complete.");
+                }
+                databaseConsole.postUpgradeHook(changes);
 
-        // Remove the upgrade context from the ComponentContext stack / namespace.
-        // They are no longer required.
-        SpringComponentContext.pop();
-        loadContexts(setupContexts);
+                // Remove the upgrade context from the ComponentContext stack / namespace.
+                // They are no longer required.
+                SpringComponentContext.pop();
+                loadContexts(setupContexts);
 
-        if (isSetupRequired())
-        {
-            printConsoleMessage("Database empty, requesting setup via web UI...");
-            state = SetupState.SETUP;
-            initialInstallation = true;
-            showPrompt();
-            return;
-        }
-        requestSetupComplete(false);
+                if (isSetupRequired())
+                {
+                    printConsoleMessage("Database empty, requesting setup via web UI...");
+                    state = SetupState.SETUP;
+                    initialInstallation = true;
+                    showPrompt();
+                    return;
+                }
+                requestSetupComplete(false);
+            }
+        });
     }
 
     public void requestSetupComplete(boolean setupWizard)
