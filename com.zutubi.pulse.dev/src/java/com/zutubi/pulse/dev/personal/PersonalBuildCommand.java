@@ -196,7 +196,7 @@ public class PersonalBuildCommand implements Command
     {
         processArguments(argv);
 
-        DevBootstrapManager.startup("com/zutubi/pulse/personal/bootstrap/context/applicationContext.xml");
+        DevBootstrapManager.startup("com/zutubi/pulse/dev/personal/bootstrap/context/applicationContext.xml");
         try
         {
             CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);

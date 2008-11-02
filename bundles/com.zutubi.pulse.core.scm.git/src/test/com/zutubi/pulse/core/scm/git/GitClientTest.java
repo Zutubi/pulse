@@ -165,7 +165,7 @@ public class GitClientTest extends PulseTestCase
         client.setBranch("master");
         client.checkout(context, null, handler);
         assertEquals(7, handler.getStatusMessages().size());
-        assertEquals("Branch local set up to track remote branch refs/remotes/origin/master.", handler.getStatusMessages().get(4));
+        assertTrue(handler.getStatusMessages().contains("Branch local set up to track remote branch refs/remotes/origin/master."));
 
         client.update(context, null, handler);
         assertEquals(11, handler.getStatusMessages().size());
@@ -177,7 +177,7 @@ public class GitClientTest extends PulseTestCase
         client.setBranch("branch");
         client.checkout(context, null, handler);
         assertEquals(7, handler.getStatusMessages().size());
-        assertEquals("Branch local set up to track remote branch refs/remotes/origin/branch.", handler.getStatusMessages().get(4));
+        assertTrue(handler.getStatusMessages().contains("Branch local set up to track remote branch refs/remotes/origin/branch."));
 
         client.update(context, null, handler);
         assertEquals(11, handler.getStatusMessages().size());
