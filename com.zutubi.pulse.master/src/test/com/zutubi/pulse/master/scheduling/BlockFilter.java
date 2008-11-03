@@ -10,9 +10,4 @@ public class BlockFilter implements EventTriggerFilter
     {
         return false;
     }
-
-    public boolean dependsOnProject(Trigger trigger, long projectId)
-    {
-        return false;
-    }
 }

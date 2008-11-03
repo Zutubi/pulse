@@ -96,25 +96,6 @@ public class EventSchedulerStrategy implements SchedulerStrategy
         this.triggerHandler = triggerHandler;
     }
 
-    public boolean dependsOnProject(Trigger trigger, long projectId)
-    {
-        Class<? extends EventTriggerFilter> filterClass = ((EventTrigger)trigger).getFilterClass();
-        if(filterClass != null)
-        {
-            try
-            {
-                EventTriggerFilter filter = objectFactory.buildBean(filterClass);
-                return filter.dependsOnProject(trigger, projectId);
-            }
-            catch (Exception e)
-            {
-                LOG.severe("Unable to construct event filter of type '" + filterClass.getName() + "': " + e.getMessage(), e);
-            }
-        }
-        
-        return false;
-    }
-
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;

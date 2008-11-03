@@ -246,20 +246,6 @@ public class DefaultScheduler implements Scheduler
         }
     }
 
-    public void unscheduleAllTriggers(long project) throws SchedulingException
-    {
-        List<Trigger> triggers = triggerDao.findAll();
-        for(Trigger trigger: triggers)
-        {
-            SchedulerStrategy impl = getStrategy(trigger);
-            if(trigger.getProject() == project || impl.dependsOnProject(trigger, project))
-            {
-                impl.unschedule(trigger);
-                triggerDao.delete(trigger);                
-            }
-        }
-    }
-
     /**
      * Retrieve the first registered strategy that is able to handle this trigger.
      *

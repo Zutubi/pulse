@@ -19,14 +19,4 @@ public interface EventTriggerFilter
      * @return true iff this filter accepts this event
      */
     boolean accept(Trigger trigger, Event event, TaskExecutionContext context);
-
-    /**
-     * Returns true if the trigger is based upon the given project.  This
-     * does not include triggers for the project itself.
-     *
-     * @param trigger the trigger to test
-     * @param projectId id of the project to test
-     * @return true iff the given trigger depends on the given project
-     */
-    boolean dependsOnProject(Trigger trigger, long projectId);
 }

@@ -265,8 +265,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     /**
      * Only for use by Acegi.  Calling this method directly is dangerous, as
-     * the returned details are not fully initialised!  Use #getUserDetails
-     * instead.
+     * the returned details are not fully initialised!
      *
      * @param username login of the user to retrieve
      * @return the user details for the given login

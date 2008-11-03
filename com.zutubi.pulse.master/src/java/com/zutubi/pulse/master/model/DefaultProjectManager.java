@@ -443,15 +443,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void deleteProject(Project entity)
     {
-        try
-        {
-            scheduler.unscheduleAllTriggers(entity.getId());
-        }
-        catch (SchedulingException e)
-        {
-            LOG.warning("Unable to unschedule triggers for project '" + entity.getId() + "'", e);
-        }
-        
         buildManager.deleteAllBuilds(entity);
 
         // Remove test case index

@@ -39,12 +39,6 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
         return accept;
     }
 
-    public boolean dependsOnProject(Trigger trigger, long projectId)
-    {
-        Long triggerProject = (Long) trigger.getDataMap().get(PARAM_PROJECT);
-        return triggerProject != null && triggerProject == projectId;
-    }
-
     private boolean checkProject(Map<Serializable, Serializable> dataMap, BuildCompletedEvent event)
     {
         Long projectId = (Long) dataMap.get(PARAM_PROJECT);
