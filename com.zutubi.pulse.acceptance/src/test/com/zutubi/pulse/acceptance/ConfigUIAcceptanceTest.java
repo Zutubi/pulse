@@ -144,7 +144,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.setFormElement("url", "svn://localhost:9999/foo");
         CheckForm checkForm = new CheckForm(form);
-        checkForm.checkAndAssertResult(false, "Connection refused");
+        checkForm.checkAndAssertResult(false, "connection refused");
     }
 
     public void testCheckFormValidationFailure() throws Exception
