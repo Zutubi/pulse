@@ -31,6 +31,6 @@
         <dependency org="testng" name="testng" rev="5.8" conf="external,build->default"/>
         <dependency org="javax" name="script-api" rev="1.0" conf="external,build->default"/>
         <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="external,build->default"/>
-        <dependency org="svnkit" name="svnkit" rev="1.1.4p1" conf="external,build,release,bundled_3rd_party->default"/>
+        <dependency org="svnkit" name="svnkit" rev="1.2.0" conf="external,build,release,bundled_3rd_party->default"/>
     </dependencies>
 </ivy-module>
