@@ -8,9 +8,8 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
@@ -100,7 +99,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testVersion() throws Exception
     {
-        ExecutionContext context = runBasicRecipe("version");
+        PulseExecutionContext context = runBasicRecipe("version");
         assertRecipeCommenced(1, "version");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -172,7 +171,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertNoMoreEvents();
     }
 
-    private ExecutionContext runBasicRecipe(String recipeName) throws IOException
+    private PulseExecutionContext runBasicRecipe(String recipeName) throws IOException
     {
         PulseExecutionContext context = makeContext(1, recipeName);
         recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));

@@ -125,7 +125,7 @@ public class PulseExecutionContextTest extends PulseTestCase
         context.setVersion("ver");
         context.setWorkingDir(new File("foo"));
 
-        ExecutionContext copy = new PulseExecutionContext(context);
+        PulseExecutionContext copy = new PulseExecutionContext(context);
         assertEquals("ip", copy.getString(NAMESPACE_INTERNAL, "iparent"));
         assertEquals("ic", copy.getString(NAMESPACE_INTERNAL, "ichild"));
         assertEquals("p", copy.getString("parent"));

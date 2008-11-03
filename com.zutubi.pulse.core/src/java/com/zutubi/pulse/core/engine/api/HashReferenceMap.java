@@ -3,6 +3,9 @@ package com.zutubi.pulse.core.engine.api;
 import java.util.Collection;
 import java.util.HashMap;
 
+/**
+ * An implementation of the ReferenceMap interface backed by a {@link java.util.HashMap}
+ */
 public class HashReferenceMap implements ReferenceMap
 {
     private HashMap<String, Reference> references = new HashMap<String, Reference>();

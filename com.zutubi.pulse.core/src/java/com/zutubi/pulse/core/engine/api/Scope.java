@@ -90,7 +90,6 @@ public interface Scope extends ReferenceMap
      */
     Scope copy();
 
-
     void add(Collection<? extends ResourceProperty> properties);
 
     void add(ResourceProperty resourceProperty);
