@@ -17,6 +17,7 @@ import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.type.record.PathUtils;

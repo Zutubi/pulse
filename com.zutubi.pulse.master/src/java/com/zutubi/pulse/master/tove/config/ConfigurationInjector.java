@@ -1,4 +1,4 @@
-package com.zutubi.tove.config;
+package com.zutubi.pulse.master.tove.config;
 
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.type.Type;
