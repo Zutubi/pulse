@@ -2,14 +2,14 @@
 <project version="4" relativePaths="false">
   <component name="RunManager" selected="Application.Pulse Master">
     <configuration default="false" name="Pulse Master" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.command.StartCommand" />
-      <option name="VM_PARAMETERS" value="-Xmx1024m -Dbootstrap=com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml -XX:+HeapDumpOnOutOfMemoryError" />
+      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand" />
+      <option name="VM_PARAMETERS" value="-Xmx1024m -Dbootstrap=com/zutubi/pulse/master/bootstrap/ideaBootstrapContext.xml -XX:+HeapDumpOnOutOfMemoryError" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
       <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="pulse-master" />
+      <module name="com.zutubi.pulse.master" />
       <RunnerSettings RunnerId="Debug">
         <option name="DEBUG_PORT" value="2051" />
         <option name="TRANSPORT" value="0" />
@@ -21,14 +21,14 @@
       </method>
     </configuration>
     <configuration default="false" name="Pulse Slave" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.command.StartCommand" />
-      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml" />
-      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.servercore.cli.StartCommand" />
+      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/slave/bootstrap/ideaBootstrapContext.xml" />
+      <option name="PROGRAM_PARAMETERS" value="-p 8890" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
       <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="slave" />
+      <module name="com.zutubi.pulse.slave" />
       <RunnerSettings RunnerId="Debug">
         <option name="DEBUG_PORT" value="1804" />
         <option name="TRANSPORT" value="0" />
@@ -41,6 +41,30 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
+    <configuration default="false" name="SetupAcceptanceTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <pattern value="com.zutubi.pulse.acceptance.*" />
+      <module name="com.zutubi.pulse.acceptance" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="com.zutubi.pulse.acceptance" />
+      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.acceptance.SetupAcceptanceTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <RunnerSettings RunnerId="Profile ">
+        <option name="myExternalizedOptions" value="&#13;&#10;additional-options=&#13;&#10;snapshots-dir=&#13;&#10;" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
   </component>
 </project>
-
