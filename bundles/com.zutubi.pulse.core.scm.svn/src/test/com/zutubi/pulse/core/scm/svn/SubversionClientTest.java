@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
@@ -15,13 +16,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * 
- *
- */
 public class SubversionClientTest extends PulseTestCase
 {
-    private SubversionClient server;
+    private static final String MODULE_PATH = "bundles/com.zutubi.pulse.core.scm.svn";
+
+    private SubversionClient client;
     private File tmpDir;
     private File gotDir;
     private File expectedDir;
@@ -90,7 +89,7 @@ public class SubversionClientTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        File dataFile = getTestDataFile("bundles/com.zutubi.pulse.core.scm.svn", "data", "zip");
+        File dataFile = getTestDataFile(MODULE_PATH, "data", "zip");
         tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
         File repoDir = new File(tmpDir, "repo");
         repoDir.mkdirs();
@@ -102,21 +101,22 @@ public class SubversionClientTest extends PulseTestCase
         gotDir.mkdirs();
 
         context = new PulseExecutionContext();
+        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         context.setWorkingDir(gotDir);
 
         ZipUtils.extractZip(dataFile, repoDir);
-        serverProcess = Runtime.getRuntime().exec("svnserve --foreground -dr " + repoDir.getAbsolutePath());
+        serverProcess = Runtime.getRuntime().exec("svnserve --foreground -dr .", null, repoDir);
 
         waitForServer(3690);
 
-        server = new SubversionClient("svn://localhost/test/trunk", "jsankey", "password");
+        client = new SubversionClient("svn://localhost/test/trunk", "jsankey", "password");
     }
 
     protected void tearDown() throws Exception
     {
-        ScmClientUtils.close(server);
+        ScmClientUtils.close(client);
         context = null;
-        server = null;
+        client = null;
         serverProcess.destroy();
         serverProcess.waitFor();
         removeDirectory(tmpDir);
@@ -125,12 +125,12 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testGetLatestRevision() throws ScmException
     {
-        assertEquals("8", server.getLatestRevision(null).getRevisionString());
+        assertEquals("8", client.getLatestRevision(null).getRevisionString());
     }
 
     public void testList() throws ScmException
     {
-        List<ScmFile> files = server.browse(null, "afolder", null);
+        List<ScmFile> files = client.browse(null, "afolder", null);
         assertEquals(2, files.size());
         assertEquals("f1", files.get(0).getName());
         assertEquals("f2", files.get(1).getName());
@@ -140,7 +140,7 @@ public class SubversionClientTest extends PulseTestCase
     {
         try
         {
-            server.browse(null, "nosuchfile", null);
+            client.browse(null, "nosuchfile", null);
             fail();
         }
         catch (ScmException e)
@@ -151,7 +151,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testTag() throws ScmException, IOException
     {
-        server.tag(null, createRevision(1), TAG_PATH, false);
+        client.tag(null, createRevision(1), TAG_PATH, false);
 
         SubversionClient confirmServer = null;
 
@@ -176,14 +176,14 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testMoveTag() throws ScmException, IOException
     {
-        server.tag(null, createRevision(1), TAG_PATH, false);
-        server.tag(null, createRevision(8), TAG_PATH, true);
+        client.tag(null, createRevision(1), TAG_PATH, false);
+        client.tag(null, createRevision(8), TAG_PATH, true);
         assertTaggedRev8();
     }
 
     public void testMoveTagNonExistant() throws ScmException, IOException
     {
-        server.tag(null, createRevision(8), TAG_PATH, true);
+        client.tag(null, createRevision(8), TAG_PATH, true);
         assertTaggedRev8();
     }
 
@@ -211,10 +211,10 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testUnmovableTag() throws ScmException
     {
-        server.tag(null, createRevision(1), TAG_PATH, false);
+        client.tag(null, createRevision(1), TAG_PATH, false);
         try
         {
-            server.tag(null, createRevision(8), TAG_PATH, false);
+            client.tag(null, createRevision(8), TAG_PATH, false);
             fail();
         }
         catch (ScmException e)
@@ -225,7 +225,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testChangesSince() throws ScmException
     {
-        List<Changelist> changes = server.getChanges(null, createRevision(2), null);
+        List<Changelist> changes = client.getChanges(null, createRevision(2), null);
         assertEquals(2, changes.size());
         Changelist changelist = changes.get(0);
         assertEquals("3", changelist.getRevision().getRevisionString());
@@ -241,7 +241,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testRevisionsSince() throws ScmException
     {
-        List<Revision> revisions = server.getRevisions(null, createRevision(2), null);
+        List<Revision> revisions = client.getRevisions(null, createRevision(2), null);
         assertEquals(2, revisions.size());
         assertEquals("3", revisions.get(0).getRevisionString());
         assertEquals("4", revisions.get(1).getRevisionString());
@@ -249,34 +249,35 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testRevisionsSinceLatestInFiles() throws ScmException
     {
-        List<Revision> revisions = server.getRevisions(null, createRevision(6), null);
+        List<Revision> revisions = client.getRevisions(null, createRevision(6), null);
         assertEquals(0, revisions.size());
     }
 
     public void testRevisionsSincePastHead() throws ScmException
     {
-        List<Revision> revisions = server.getRevisions(null, createRevision(9), null);
+        List<Revision> revisions = client.getRevisions(null, createRevision(9), null);
         assertEquals(0, revisions.size());
     }
 
     public void testCheckout() throws ScmException, IOException
     {
-        server.checkout(context, null, null);
-        assertRevision(gotDir, 1);
+        client.checkout(context, null, null);
+        assertRevision(gotDir, 8);
     }
 
     public void testUpdate() throws ScmException, IOException
     {
-        server.checkout(context, null, null);
-        server.update(context, null, null);
-        assertRevision(gotDir, 4);
+        client.checkout(context, createRevision(1), null);
+        assertRevision(gotDir, 1);
+        client.update(context, null, null);
+        assertRevision(gotDir, 8);
     }
 
     public void testMultiUpdate() throws ScmException, IOException
     {
-        server.checkout(context, null, null);
-        server.update(context, null, null);
-        server.update(context, null, null);
+        client.checkout(context, createRevision(1), null);
+        client.update(context, createRevision(4), null);
+        client.update(context, createRevision(8), null);
         assertRevision(gotDir, 8);
     }
 
@@ -286,7 +287,7 @@ public class SubversionClientTest extends PulseTestCase
         try
         {
             server = new SubversionClient("https://svn.apache.org/repos/asf", "anonymous", "");
-            assertFalse(server.pathExists(createRevision(1), SVNURL.parseURIEncoded("https://svn.apache.org/repos/asf/nosuchpath/")));
+            assertFalse(server.pathExists(SVNURL.parseURIEncoded("https://svn.apache.org/repos/asf/nosuchpath/")));
         }
         finally
         {
@@ -296,7 +297,7 @@ public class SubversionClientTest extends PulseTestCase
 
     private void assertRevision(File dir, int revision) throws IOException
     {
-        File dataFile = getTestDataFile("com.zutubi.pulse.servercore", Integer.toString(revision), "zip");
+        File dataFile = getTestDataFile(MODULE_PATH, Integer.toString(revision), "zip");
         ZipUtils.extractZip(dataFile, expectedDir);
         assertDirectoriesEqual(new File(new File(expectedDir, "test"), "trunk"), dir);
     }

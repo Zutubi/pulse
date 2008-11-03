@@ -15,6 +15,7 @@ import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
+import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.*;
@@ -39,7 +40,7 @@ public class SubversionClient implements ScmClient
      */
     private List<String> externalsPaths = new LinkedList<String>();
     private boolean verifyExternals = true;
-    private List<String> excludedPaths;
+    private List<String> excludedPaths = new LinkedList<String>();
     private SVNRepository repository;
     private ISVNAuthenticationManager authenticationManager;
     private String uid;
@@ -196,7 +197,7 @@ public class SubversionClient implements ScmClient
 
     private boolean getStoreFlag()
     {
-        ISVNOptions options = SVNWCUtil.createDefaultOptions(null, true);
+        DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(null, true);
         return options.isAuthStorageEnabled();
     }
 
@@ -323,7 +324,7 @@ public class SubversionClient implements ScmClient
 
         try
         {
-            updateClient.doCheckout(repository.getLocation(), context.getWorkingDir(), svnRevision, svnRevision, true);
+            updateClient.doCheckout(repository.getLocation(), context.getWorkingDir(), svnRevision, svnRevision, SVNDepth.INFINITY, false);
             updateExternals(context.getWorkingDir(), revision, updateClient, handler);
         }
         catch (SVNException e)
@@ -449,14 +450,14 @@ public class SubversionClient implements ScmClient
                 for (String externalsPath : externalsPaths)
                 {
                     SVNURL url = repository.getLocation().appendPath(externalsPath, false);
-                    SVNPropertyData data = wcClient.doGetProperty(url, SVNProperty.EXTERNALS, SVNRevision.HEAD, convertRevision(revision), false);
+                    SVNPropertyData data = wcClient.doGetProperty(url, SVNProperty.EXTERNALS, SVNRevision.HEAD, convertRevision(revision));
                     if (data == null)
                     {
                         LOG.warning("Configured externals path '" + externalsPath + "' for URL '" + repository.getLocation().toString() + "' does not exist or does not have svn:externals property set: ignoring.");
                     }
                     else
                     {
-                        addExternalsFromProperty(StringUtils.join("/", true, true, externalsPath, data.getValue()), result);
+                        addExternalsFromProperty(StringUtils.join("/", true, true, externalsPath, data.getValue().getString()), result);
                     }
                 }
             }
@@ -641,7 +642,7 @@ public class SubversionClient implements ScmClient
     {
         try
         {
-            client.doUpdate(workDir, rev, true);
+            client.doUpdate(workDir, rev, SVNDepth.INFINITY, false, false);
         }
         catch (SVNException e)
         {
@@ -649,8 +650,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    // should the revision be used here???
-    boolean pathExists(Revision revision, SVNURL path) throws SVNException
+    boolean pathExists(SVNURL path) throws SVNException
     {
         SVNRepository repo = SVNRepositoryFactory.create(path);
         repo.setAuthenticationManager(authenticationManager);
@@ -673,7 +673,7 @@ public class SubversionClient implements ScmClient
         {
             SVNURL svnUrl = SVNURL.parseURIDecoded(name);
 
-            if (pathExists(revision, svnUrl))
+            if (pathExists(svnUrl))
             {
                 if (moveExisting)
                 {
@@ -688,7 +688,9 @@ public class SubversionClient implements ScmClient
             }
 
             SVNCopyClient copyClient = new SVNCopyClient(authenticationManager, null);
-            copyClient.doCopy(repository.getLocation(), convertRevision(revision), svnUrl, false, "[pulse] applying tag");
+            SVNRevision copyRevision = convertRevision(revision);
+            SVNCopySource[] copySources = new SVNCopySource[]{new SVNCopySource(SVNRevision.UNDEFINED, copyRevision, repository.getLocation())};
+            copyClient.doCopy(copySources, svnUrl, false, true, true, "[pulse] applying tag", null);
         }
         catch (SVNException e)
         {
@@ -757,10 +759,103 @@ public class SubversionClient implements ScmClient
 
         public void handleEvent(SVNEvent event, double progress)
         {
-            SVNEventAction svnAction = event.getAction();
-            if (svnAction != null)
+            SVNEventAction action = event.getAction();
+            if (action != null)
             {
-                handler.status(svnAction.toString() + " " + event.getPath());
+                if (action == SVNEventAction.UPDATE_EXTERNAL)
+                {
+                    handler.status("Fetching external item into '" + event.getFile().getAbsolutePath() + "'");
+                    if (event.getRevision() > 0)
+                    {
+                        handler.status("External at revision " + event.getRevision());
+                    }
+                }
+                else if (action == SVNEventAction.ADD)
+                {
+                    handler.status("A     " + event.getFile());
+                }
+                else if (action == SVNEventAction.DELETE)
+                {
+                    handler.status("D     " + event.getFile());
+                }
+                else if (action == SVNEventAction.LOCKED)
+                {
+                    handler.status("L     " + event.getFile());
+                }
+                else if (action == SVNEventAction.LOCK_FAILED)
+                {
+                    handler.status("failed to lock    " + event.getFile());
+                }
+                else
+                {
+                    String pathChangeType = getPathChangeType(event, action);
+                    String propertiesChangeType = getPropertiesChangeType(event);
+                    String lockLabel = getLockType(event);
+                    handler.status(pathChangeType + propertiesChangeType + lockLabel + "       " + event.getFile().getPath());
+                }
+            }
+        }
+
+        private String getPathChangeType(SVNEvent event, SVNEventAction action)
+        {
+            if (action == SVNEventAction.UPDATE_ADD)
+            {
+                return "A";
+            }
+            else if (action == SVNEventAction.UPDATE_DELETE)
+            {
+                return "D";
+            }
+            else if (action == SVNEventAction.UPDATE_UPDATE)
+            {
+                SVNStatusType contentsStatus = event.getContentsStatus();
+                if (contentsStatus == SVNStatusType.CHANGED)
+                {
+                    return "U";
+                }
+                else if (contentsStatus == SVNStatusType.CONFLICTED)
+                {
+                    return "C";
+                }
+                else if (contentsStatus == SVNStatusType.MERGED)
+                {
+                    return "G";
+                }
+            }
+
+            return " ";
+        }
+
+        private String getPropertiesChangeType(SVNEvent event)
+        {
+            SVNStatusType propertiesStatus = event.getPropertiesStatus();
+            if (propertiesStatus == SVNStatusType.CHANGED)
+            {
+                return "U";
+            }
+            else if (propertiesStatus == SVNStatusType.CONFLICTED)
+            {
+                return "C";
+            }
+            else if (propertiesStatus == SVNStatusType.MERGED)
+            {
+                return "G";
+            }
+            else
+            {
+                return " ";
+            }
+        }
+
+        private String getLockType(SVNEvent event)
+        {
+            if (event.getLockStatus() == SVNStatusType.LOCK_UNLOCKED)
+            {
+                return "B";
+            }
+            else
+            {
+                return " ";
             }
         }
 
@@ -827,7 +922,7 @@ public class SubversionClient implements ScmClient
             {
                 for (Changelist list : changelists)
                 {
-                    if (list.getRevision().getRevisionString().equals(currentRevision))
+                    if (list.getRevision().getRevisionString().equals(currentRevision.getRevisionString()))
                     {
                         // We have already seen this log entry in another external
                         return;

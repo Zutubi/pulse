@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  */
@@ -215,6 +217,7 @@ public class SubversionExternalsTest extends PulseTestCase
         doCheckout(2);
         PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(checkoutDir);
+        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         server.update(context, new Revision("5"), null);
 
         assertFile("file1", "edited bundle file1\n");
@@ -227,6 +230,7 @@ public class SubversionExternalsTest extends PulseTestCase
     {
         PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(checkoutDir);
+        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         server.addExternalPath(".");
         server.checkout(context, new Revision(Integer.toString(rev)), new ScmFeedbackHandler()
         {
@@ -244,7 +248,7 @@ public class SubversionExternalsTest extends PulseTestCase
     private void assertChange(Changelist changelist, String revision, String... paths)
     {
         assertEquals(revision, changelist.getRevision().getRevisionString());
-        List<FileChange> changes = changelist.getChanges();
+        List<FileChange> changes = new LinkedList<FileChange>(changelist.getChanges());
         Collections.sort(changes, new Comparator<FileChange>()
         {
             public int compare(FileChange o1, FileChange o2)

@@ -5,10 +5,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
-import org.tmatesoft.svn.core.SVNCancelException;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNNodeKind;
-import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
@@ -168,7 +165,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             statusClient.setEventHandler(handler);
             for (File f : files)
             {
-                statusClient.doStatus(f, true, false, true, false, false, handler);
+                statusClient.doStatus(f, SVNRevision.HEAD, SVNDepth.INFINITY, false, true, false, false, handler, null);
             }
 
             WorkingCopyStatus wcs = handler.getStatus();
@@ -192,17 +189,17 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         {
             if (fs.getState().requiresFile())
             {
-                SVNPropertyData property = wcc.doGetProperty(new File(wcs.getBase(), fs.getPath()), SVN_PROPERTY_EOL_STYLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
+                SVNPropertyData property = wcc.doGetProperty(new File(wcs.getBase(), fs.getPath()), SVN_PROPERTY_EOL_STYLE, SVNRevision.WORKING, SVNRevision.WORKING);
                 if (property != null)
                 {
-                    fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, convertEOLStyle(property.getValue()));
+                    fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, convertEOLStyle(property.getValue().getString()));
                 }
             }
 
             if (fs.getState() == FileStatus.State.ADDED)
             {
                 // For new files, check for svn:executable
-                SVNPropertyData property = wcc.doGetProperty(new File(wcs.getBase(), fs.getPath()), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
+                SVNPropertyData property = wcc.doGetProperty(new File(wcs.getBase(), fs.getPath()), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING);
                 if (property != null)
                 {
                     fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "true");
@@ -214,8 +211,8 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         for (String path : propertyChangedPaths)
         {
             FileStatus fs = wcs.getFileStatus(path);
-            SVNPropertyData baseProperty = wcc.doGetProperty(new File(wcs.getBase(), path), SVN_PROPERTY_EXECUTABLE, SVNRevision.BASE, SVNRevision.BASE, false);
-            SVNPropertyData workingProperty = wcc.doGetProperty(new File(wcs.getBase(), path), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
+            SVNPropertyData baseProperty = wcc.doGetProperty(new File(wcs.getBase(), path), SVN_PROPERTY_EXECUTABLE, SVNRevision.BASE, SVNRevision.BASE);
+            SVNPropertyData workingProperty = wcc.doGetProperty(new File(wcs.getBase(), path), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING);
 
             if (baseProperty == null)
             {
@@ -270,7 +267,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         try
         {
             SVNRevision svnRevision = revision == null ? SVNRevision.HEAD : SVNRevision.parse(revision.getRevisionString());
-            long rev = updateClient.doUpdate(context.getBase(), svnRevision, true);
+            long rev = updateClient.doUpdate(context.getBase(), svnRevision, SVNDepth.INFINITY, false, false);
             return new Revision(Long.toString(rev));
         }
         catch (SVNException e)
@@ -362,7 +359,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         {
             fileState = FileStatus.State.INCOMPLETE;
         }
-        else if (contentsStatus == SVNStatusType.STATUS_MERGED)
+        else if (contentsStatus == SVNStatusType.MERGED)
         {
             fileState = FileStatus.State.MERGED;
         }
@@ -493,22 +490,22 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             }
             else if (action == SVNEventAction.ADD)
             {
-                getUI().status("A     " + event.getPath());
+                getUI().status("A     " + event.getFile().getPath());
                 return;
             }
             else if (action == SVNEventAction.DELETE)
             {
-                getUI().status("D     " + event.getPath());
+                getUI().status("D     " + event.getFile().getPath());
                 return;
             }
             else if (action == SVNEventAction.LOCKED)
             {
-                getUI().status("L     " + event.getPath());
+                getUI().status("L     " + event.getFile().getPath());
                 return;
             }
             else if (action == SVNEventAction.LOCK_FAILED)
             {
-                getUI().status("Failed to lock: " + event.getPath());
+                getUI().status("Failed to lock: " + event.getFile().getPath());
                 return;
             }
 
@@ -539,7 +536,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
                 lockLabel = "B";
             }
 
-            String message = pathChangeType + propertiesChangeType + lockLabel + "       " + event.getPath();
+            String message = pathChangeType + propertiesChangeType + lockLabel + "       " + event.getFile().getPath();
             if(message.trim().length() > 0)
             {
                 getUI().status(message);
