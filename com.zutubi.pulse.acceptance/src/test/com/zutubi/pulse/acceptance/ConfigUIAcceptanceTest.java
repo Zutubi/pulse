@@ -438,7 +438,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ListPage listPage = new ListPage(selenium, urls, triggersPath);
         listPage.goTo();
-        assertTextNotPresent("order");
+        assertFalse(listPage.isOrderColumnPresent(2));
         listPage.assertItemPresent("t1", null);
         listPage.assertItemPresent("t2", null);
         listPage.assertActionsNotPresent("t1", ACTION_UP, ACTION_DOWN);
@@ -453,7 +453,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         login(random, "");
         ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
         listPage.goTo();
-        assertTextNotPresent("order");
+        assertFalse(listPage.isOrderColumnPresent(2));
         listPage.assertItemPresent("p1", null);
         listPage.assertItemPresent("p2", null);
         listPage.assertItemPresent("p3", null);

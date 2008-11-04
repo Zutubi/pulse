@@ -14,6 +14,8 @@ import com.zutubi.tove.type.record.PathUtils;
  */
 public class ListPage extends ConfigPage
 {
+    private static final String HEADER_ORDER = "order";
+
     public static final String ACTION_CLONE = "clone";
     public static final String ACTION_VIEW  = "view";
 
@@ -117,6 +119,13 @@ public class ListPage extends ConfigPage
     public void clickRestore(String baseName)
     {
         clickRefreshingAction(baseName, "restore");
+    }
+
+    public boolean isOrderColumnPresent(int summaryColumnCount)
+    {
+        // The order column comes directly after the summary columns if
+        // present, so its index is the same as the summary column count.
+        return HEADER_ORDER.equals(SeleniumUtils.getCellContents(selenium, IDs.COLLECTION_TABLE, 1, summaryColumnCount));
     }
 
     public void clickUp(String baseName)

@@ -27,7 +27,8 @@ public class HibernateSessionInterceptor implements Interceptor
 
     }
 
-    public String intercept(ActionInvocation invocation) throws Exception {
+    public String intercept(ActionInvocation invocation) throws Exception
+    {
         String result = null;
 
         before(invocation);
