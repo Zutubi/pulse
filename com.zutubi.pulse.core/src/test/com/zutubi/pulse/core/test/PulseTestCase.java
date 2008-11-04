@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.test;
 
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.io.IOUtils;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
@@ -120,6 +120,7 @@ public abstract class PulseTestCase extends TestCase
      * @throws junit.framework.AssertionFailedError
      *          if the given directories
      *          differ
+     * @throws java.io.IOException if there is an error comparing two files
      */
     protected static void assertDirectoriesEqual(File dir1, File dir2) throws IOException
     {
@@ -176,6 +177,7 @@ public abstract class PulseTestCase extends TestCase
      * @param file1 the first file to compare
      * @param file2 the second file to compare
      * @throws AssertionFailedError if the contents of the files differ
+     * @throws java.io.IOException if there is an error reading the files
      */
     protected static void assertFilesEqual(File file1, File file2) throws IOException
     {
@@ -317,7 +319,7 @@ public abstract class PulseTestCase extends TestCase
         assertTrue("'" + b + "' does not end with '" + a + "'", b.endsWith(a));
     }
 
-    protected void waitForServer(int port) throws IOException
+    protected void waitForServer(int port) throws IOException, InterruptedException
     {
         int retries = 0;
 
@@ -333,13 +335,7 @@ public abstract class PulseTestCase extends TestCase
             {
                 if (retries++ < 10)
                 {
-                    try
-                    {
-                        Thread.sleep(100);
-                    }
-                    catch (InterruptedException e1)
-                    {
-                    }
+                    Thread.sleep(100);
                 }
                 else
                 {

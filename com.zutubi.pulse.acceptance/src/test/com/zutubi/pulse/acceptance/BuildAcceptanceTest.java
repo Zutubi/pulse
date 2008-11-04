@@ -4,20 +4,39 @@ import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.browse.BuildChangesPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.pages.browse.ViewChangelistPage;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.tmatesoft.svn.core.SVNCommitInfo;
+import org.tmatesoft.svn.core.SVNDepth;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
+import org.tmatesoft.svn.core.wc.SVNClientManager;
+import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc.SVNUpdateClient;
+import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -27,6 +46,10 @@ import java.util.Vector;
 @Test(dependsOnGroups = {"init.*"})
 public class BuildAcceptanceTest extends SeleniumTestBase
 {
+    private static final String CHANGE_AUTHOR = "pulse";
+    private static final String CHANGE_COMMENT = "Edit build file.";
+    private static final String CHANGE_FILENAME = "build.xml";
+
     private static final String LOCATOR_ENV_ARTIFACT = "link=env.txt";
 
     @BeforeMethod
@@ -58,6 +81,80 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         addProject(random, true);
 
         triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+    }
+
+    public void testChangesBetweenBuilds() throws Exception
+    {
+        // Run an initial build
+        addProject(random, true);
+        xmlRpcHelper.runBuild(random, 30000);
+
+        // Commit a change to the repository.  Note monitoring the SCM is
+        // disabled for these projects, so no chance of a build being started
+        // by this change.
+        String revisionString = editAndCommitBuildFile();
+        int buildNumber = xmlRpcHelper.runBuild(random, 30000);
+
+        // Check the changes tab.
+        loginAsAdmin();
+        BuildChangesPage changesPage = new BuildChangesPage(selenium, urls, random, buildNumber);
+        changesPage.goTo();
+        assertEquals(BuildChangesPage.formatChangesHeader(buildNumber), changesPage.getChangesHeader());
+
+        List<Changelist> changelists = changesPage.getChangelists();
+        assertEquals(1, changelists.size());
+        assertBuildFileChangelist(changelists.get(0), revisionString);
+        
+        // Check the changelist view too.
+        List<Long> changeIds = changesPage.getChangeIds();
+        assertEquals(1, changeIds.size());
+        ViewChangelistPage changelistPage = new ViewChangelistPage(selenium, urls, random, buildNumber, changeIds.get(0), revisionString);
+        changelistPage.goTo();
+        assertBuildFileChangelist(changelistPage.getChangelist(), revisionString);
+    }
+
+    private String editAndCommitBuildFile() throws IOException, SVNException
+    {
+        SVNRepositoryFactoryImpl.setup();
+        File wcDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        try
+        {
+            DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
+            BasicAuthenticationManager authenticationManager = new BasicAuthenticationManager(CHANGE_AUTHOR, CHANGE_AUTHOR);
+            SVNUpdateClient updateClient = new SVNUpdateClient(authenticationManager, options);
+            updateClient.doCheckout(SVNURL.parseURIDecoded(Constants.TRIVIAL_PROJECT_REPOSITORY), wcDir, SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNDepth.INFINITY, false);
+
+            File buildFile = new File(wcDir, CHANGE_FILENAME);
+            assertTrue(buildFile.exists());
+            FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
+                    "<project default=\"default\">\n" +
+                    "    <target name=\"default\">\n" +
+                    "        <echo message=\"" + random + "\"/>\n" +
+                    "    </target>\n" +
+                    "</project>");
+
+            SVNClientManager clientManager = SVNClientManager.newInstance(options, authenticationManager);
+            SVNCommitInfo commitInfo = clientManager.getCommitClient().doCommit(new File[]{buildFile}, true, CHANGE_COMMENT, null, null, false, false, SVNDepth.EMPTY);
+            return Long.toString(commitInfo.getNewRevision());
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(wcDir);
+        }
+    }
+
+    private void assertBuildFileChangelist(Changelist changelist, String revisionString)
+    {
+        assertEquals(revisionString, changelist.getRevision().getRevisionString());
+        assertEquals(CHANGE_AUTHOR, changelist.getAuthor());
+        assertEquals(CHANGE_COMMENT, changelist.getComment());
+
+        List<FileChange> fileChanges = changelist.getChanges();
+        assertEquals(1, fileChanges.size());
+        FileChange fileChange = fileChanges.get(0);
+        assertTrue(fileChange.getPath().endsWith(CHANGE_FILENAME));
+        assertEquals(revisionString, fileChange.getRevisionString());
+        assertEquals(FileChange.Action.EDIT, fileChange.getAction());
     }
 
     public void testAgentBuild() throws Exception

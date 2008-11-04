@@ -56,6 +56,11 @@ public class PersistentFileChange extends Entity
         this.revisionString = revisionString;
     }
 
+    public FileChange.Action getAction()
+    {
+        return FileChange.Action.valueOf(actionName);
+    }
+
     public String getActionName()
     {
         return actionName;

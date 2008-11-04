@@ -18,9 +18,9 @@
     #dashboardTabs("homepage")
 #end
 
-    <h1>:: #wwtext("name=changelist") $changelist.revision ::</h1>
+    <h1 id='#id("changelist.${changelist.revision}")'>:: #wwtext("name=changelist") $changelist.revision ::</h1>
 
-    <table class="content">
+    <table id="changelist.details" class="content">
         #headingRow("changelist.details" 2)
         #dynamicLinkRow("changelist.revision" $changelist.revision $action.getChangeUrl())
         #dynamicRow("changelist.who" $changelist.author)
@@ -53,7 +53,7 @@
 #end
     </table>
     
-    <table class="content">
+    <table id="changelist.files" class="content">
         #headingRow("changelist.files" 4)
         <tr>
             #contentHeading("changelist.file" 1)
@@ -65,10 +65,10 @@
         </tr>
 #foreach($file in $changelist.changes)
     $action.updateUrls($file)
-        <tr>
+        <tr id="changelist.file.${velocityCount}">
             #dynamicCell($file.filename)
             #dynamicRightLinkCell($file.revisionString $action.getFileViewUrl())
-            #dynamicCell($file.action.getPrettyString())
+            #dynamicCell($file.action.toString())
 #if($action.haveChangeViewer())
             <td class="content">
     #if($action.getFileViewUrl())

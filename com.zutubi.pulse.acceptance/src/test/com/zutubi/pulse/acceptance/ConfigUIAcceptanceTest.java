@@ -522,7 +522,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         scmPage.waitFor();
         SubversionForm subversionForm = new SubversionForm(selenium);
         subversionForm.waitFor();
-        subversionForm.assertFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, null, null, null, null, null, null, null, null);
+        subversionForm.assertFormElements(Constants.TRIVIAL_PROJECT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     private void addInheritingProject(String parentName, String childName)

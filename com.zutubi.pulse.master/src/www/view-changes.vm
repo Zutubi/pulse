@@ -32,7 +32,7 @@
     </tr>
 #end
 
-    <table class="content">
+    <table id='#id("${buildResult.ownerName}-build-${buildResult.number}-changes")' class="content">
         #headingRow("changes.revisions" 2)
         #revisionCell("changes.build.revision" $buildResult false)
 #if(!$buildResult.userRevision)
@@ -48,10 +48,11 @@
     #else
         #set($title = $action.getText("changes.in.build", [$buildResult.number]))
     #end
-    <table class="content">
+    <table id="changelist.summaries" class="content">
         #headingRow($title 5)
     #foreach($change in $changelists)
-        <tr>
+        #set($changeIndex = $velocityCount)
+        <tr id="change.${changeIndex}">
             #contentHeading("change.revision" 1)
             #contentHeading("change.who" 1)
             #contentHeading("change.when" 1)
@@ -80,7 +81,7 @@
             #end
             #foreach($i in [0..$limit])
                 #set($file = $change.changes.get($i))
-                    <li>$!webwork.htmlEncode($file.filename) #$file.revisionString - $file.action.getPrettyString()</li>
+                    <li id="change.${changeIndex}.file.${velocityCount}">$!webwork.htmlEncode($file.filename) #$file.revisionString - $file.action.toString()</li>
             #end
             #if($remaining > 0)
                     <li>... ($remaining #wwtext("name=changes.more.files"))</li>

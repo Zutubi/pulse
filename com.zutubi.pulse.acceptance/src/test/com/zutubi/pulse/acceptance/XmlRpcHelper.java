@@ -263,7 +263,7 @@ public class XmlRpcHelper
     public String insertSimpleProject(String name, String parent, boolean template) throws Exception
     {
         Hashtable<String, Object> scm = createEmptyConfig("zutubi.subversionConfig");
-        scm.put("url", "svn://localhost:3088/accept/trunk/triviant");
+        scm.put("url", Constants.TRIVIAL_PROJECT_REPOSITORY);
         scm.put("checkoutScheme", "CLEAN_CHECKOUT");
         scm.put("monitor", false);
 
@@ -452,6 +452,15 @@ public class XmlRpcHelper
         return (Boolean)call("deleteBuild", projectName, number);
     }
 
+    /**
+     * Triggers a build of the given project and waits for up to timeout
+     * milliseconds for it to complete.
+     *
+     * @param projectName name of the project to trigger
+     * @param timeout     maximum number of milliseconds to wait for the build
+     * @return the build number
+     * @throws Exception on any error
+     */
     public int runBuild(String projectName, long timeout) throws Exception
     {
         int number = getNextBuildNumber(projectName);

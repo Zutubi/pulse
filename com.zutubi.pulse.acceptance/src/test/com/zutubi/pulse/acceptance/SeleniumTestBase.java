@@ -50,7 +50,7 @@ public class SeleniumTestBase extends TestCase
         xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", Integer.parseInt(port), "/xmlrpc"));
         baseUrl = "http://localhost:" + port + "/";
         urls = new Urls("");
-        random = RandomUtils.randomString(10);
+        random = getName() + "-" + RandomUtils.randomString(10);
 
         String browser = SeleniumUtils.getSeleniumBrowserProperty();
         
@@ -211,7 +211,7 @@ public class SeleniumTestBase extends TestCase
 
         AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
         subversionState.waitFor();
-        subversionState.nextFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, "CLEAN_CHECKOUT");
+        subversionState.nextFormElements(Constants.TRIVIAL_PROJECT_REPOSITORY, null, null, null, null, "CLEAN_CHECKOUT");
 
         SelectTypeState projectTypeState = new SelectTypeState(selenium);
         projectTypeState.waitFor();

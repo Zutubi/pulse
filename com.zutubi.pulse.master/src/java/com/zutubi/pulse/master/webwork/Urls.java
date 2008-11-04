@@ -253,6 +253,11 @@ public class Urls
         return buildChanges(build) + Long.toString(id) + "/";
     }
 
+    public String buildChangelist(Object project, String number, long id)
+    {
+        return buildChanges(project, number) + Long.toString(id) + "/";
+    }
+
     public String buildTests(BuildResult build)
     {
         return build(build) + "tests/";

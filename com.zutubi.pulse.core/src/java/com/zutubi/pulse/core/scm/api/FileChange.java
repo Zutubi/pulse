@@ -1,5 +1,8 @@
 package com.zutubi.pulse.core.scm.api;
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+
 /**
  * Represents a change to a single file as part of a larger Changelist.  For
  * example, the file may have been edited, added or deleted.
@@ -18,7 +21,7 @@ public class FileChange
          */
         ADD
         {
-            public String getPrettyString()
+            public String toString()
             {
                 return "added";
             }
@@ -28,7 +31,7 @@ public class FileChange
          */
         BRANCH
         {
-            public String getPrettyString()
+            public String toString()
             {
                 return "branched";
             }
@@ -38,7 +41,7 @@ public class FileChange
          */
         DELETE
         {
-            public String getPrettyString()
+            public String toString()
             {
                 return "deleted";
             }
@@ -48,7 +51,7 @@ public class FileChange
          */
         EDIT
         {
-            public String getPrettyString()
+            public String toString()
             {
                 return "edited";
             }
@@ -58,7 +61,7 @@ public class FileChange
          */
         INTEGRATE
         {
-            public String getPrettyString()
+            public String toString()
             {
                 return "integrated";
             }
@@ -68,7 +71,7 @@ public class FileChange
          */
         MERGE
         {
-            public String getPrettyString()
+            public String toString()
             {
                 return "merged";
             }
@@ -78,7 +81,7 @@ public class FileChange
          */
         MOVE
         {
-            public String getPrettyString()
+            public String toString()
             {
                 return "moved";
             }
@@ -88,13 +91,36 @@ public class FileChange
          */
         UNKNOWN
         {
-            public String getPrettyString()
+            public String toString()
             {
                 return "unknown";
             }
         };
 
-        public abstract String getPrettyString();
+        /**
+         * Inverse of toString: converts the given string back to an action.
+         *
+         * @param s string to convert
+         * @return corresponding action
+         * @throws IllegalArgumentException if the string matches no action
+         */
+        public static Action fromString(final String s)
+        {
+            Action found = CollectionUtils.find(Action.values(), new Predicate<Action>()
+            {
+                public boolean satisfied(Action action)
+                {
+                    return action.toString().equals(s);
+                }
+            });
+
+            if (found == null)
+            {
+                throw new IllegalArgumentException("No action found matching '" + s + "'");
+            }
+
+            return found;
+        }
     }
 
     private String path;
@@ -218,11 +244,11 @@ public class FileChange
         buffer.append(path);
         if (revisionString != null)
         {
-            buffer.append("#").append(revisionString);
+            buffer.append(" #").append(revisionString);
         }
         if (action != null)
         {
-            buffer.append("-").append(action.toString());
+            buffer.append(" - ").append(action.toString());
         }
         return buffer.toString();
     }

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -59,7 +59,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> createdScm = (Hashtable<String, Object>) createdProject.get("scm");
         assertNotNull(createdScm);
         assertEquals("zutubi.subversionConfig", createdScm.get(SYMBOLIC_NAME_KEY));
-        assertEquals("svn://localhost:3088/accept/trunk/triviant", createdScm.get("url"));
+        assertEquals(Constants.TRIVIAL_PROJECT_REPOSITORY, createdScm.get("url"));
         assertEquals("CLEAN_CHECKOUT", createdScm.get("checkoutScheme"));
         assertEquals(false, createdScm.get("monitor"));
 
