@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.core;
 
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
@@ -25,7 +25,7 @@ public class ResourceVersionOptionProvider extends MapOptionProvider
         List<String> resourceVersions = new LinkedList<String>();
         if(instance != null)
         {
-            resourceVersions.addAll(((Resource) instance).getVersions().keySet());
+            resourceVersions.addAll(((ResourceConfiguration) instance).getVersions().keySet());
         }
         Collections.sort(resourceVersions, new Sort.StringComparator());
 
