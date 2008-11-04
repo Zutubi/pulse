@@ -3,9 +3,9 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerInfoPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerMessagesPage;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Acceptance tests for the server section of the reporting UI.
@@ -64,7 +64,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         ServerMessagesPage page = new ServerMessagesPage(selenium, urls);
         page.goTo();
 
-        assertTextPresent("100 messages found");
+        assertEquals("100 messages found", page.getMessagesCountText());
         page.assertPagingLinks(10);
         page = page.clickPage(5);
         page.waitFor();

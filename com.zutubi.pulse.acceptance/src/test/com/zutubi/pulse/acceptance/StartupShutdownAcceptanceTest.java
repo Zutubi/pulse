@@ -9,11 +9,11 @@ import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.config.Config;
-import com.zutubi.util.config.FileConfig;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.config.Config;
+import com.zutubi.util.config.FileConfig;
 import org.apache.commons.cli.ParseException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -22,9 +22,6 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * <class-comment/>
- */
 @Test
 public class StartupShutdownAcceptanceTest extends PulseTestCase
 {

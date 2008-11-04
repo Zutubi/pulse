@@ -10,6 +10,8 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class ServerMessagesPage extends SeleniumPage
 {
+    private static final String ID_MESSAGES_COUNT = "messages.count";
+
     private int page = 1;
 
     public ServerMessagesPage(Selenium selenium, Urls urls)
@@ -48,7 +50,6 @@ public class ServerMessagesPage extends SeleniumPage
             {
                 SeleniumUtils.assertElementPresent(selenium, pageId);
             }
-
         }
 
         if(page == 1)
@@ -83,5 +84,11 @@ public class ServerMessagesPage extends SeleniumPage
     {
         selenium.click(getPageId(page));
         return new ServerMessagesPage(selenium, urls, page);
+    }
+
+    public String getMessagesCountText()
+    {
+        SeleniumUtils.waitForElementId(selenium, ID_MESSAGES_COUNT);
+        return selenium.getText(ID_MESSAGES_COUNT);
     }
 }

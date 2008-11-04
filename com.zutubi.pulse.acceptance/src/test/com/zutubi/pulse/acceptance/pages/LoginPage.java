@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages;
 
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -31,6 +32,11 @@ public class LoginPage extends SeleniumPage
     public boolean isSignupPresent()
     {
         return selenium.isElementPresent(SIGNUP_ID);
+    }
+
+    public void waitForSignup()
+    {
+        SeleniumUtils.waitForElementId(selenium, SIGNUP_ID);
     }
 
     public SignupForm clickSignup()

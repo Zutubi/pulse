@@ -64,7 +64,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
         LoginPage loginPage = new LoginPage(selenium, urls);
         loginPage.goTo();
-        assertTrue(loginPage.isSignupPresent());
+        loginPage.waitForSignup();
 
         SignupForm form = loginPage.clickSignup();
         form.waitFor();
