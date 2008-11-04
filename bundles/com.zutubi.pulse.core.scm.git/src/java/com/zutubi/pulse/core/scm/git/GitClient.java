@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Implementation of the {@link com.zutubi.pulse.core.scm.api.ScmClient} interface for the
@@ -20,6 +20,10 @@ public class GitClient implements ScmClient
 {
     private static final Revision HEAD = new Revision("HEAD");
 
+    /**
+     * Timeout for acquiring the ScmContext lock.
+     */
+    private static final int DEFAULT_TIMEOUT = 120;
     /**
      * The name of the local branch used by scm context operations.
      */
@@ -222,7 +226,7 @@ public class GitClient implements ScmClient
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
-        context.tryLock(120, TimeUnit.SECONDS);
+        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
             File workingDir = context.getPersistentWorkingDir();
@@ -259,7 +263,7 @@ public class GitClient implements ScmClient
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
-        context.tryLock(120, TimeUnit.SECONDS);
+        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
             File workingDir = context.getPersistentWorkingDir();
@@ -328,7 +332,7 @@ public class GitClient implements ScmClient
 
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        context.tryLock(120, TimeUnit.SECONDS);
+        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
             File workingDir = context.getPersistentWorkingDir();
@@ -360,7 +364,7 @@ public class GitClient implements ScmClient
 
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        context.tryLock(120, TimeUnit.SECONDS);
+        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
             if (to == null)
