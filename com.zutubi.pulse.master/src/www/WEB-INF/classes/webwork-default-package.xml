@@ -44,6 +44,7 @@
             <interceptor name="cancel" class="com.zutubi.pulse.master.xwork.interceptor.CancelWorkflowInterceptor"/>
             <interceptor name="prototypeWizard" class="com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardInterceptor"/>
             <interceptor name="ajax" class="com.zutubi.pulse.master.xwork.interceptor.AjaxInterceptor"/>
+            <interceptor name="noCache" class="com.zutubi.pulse.master.xwork.interceptor.NoCacheInterceptor"/>
             <interceptor name="errorHanding" class="com.zutubi.pulse.master.xwork.interceptor.ErrorHandlingInterceptor"/>
             <interceptor name="configErrorHandling" class="com.zutubi.pulse.master.xwork.interceptor.ConfigErrorHandlingInterceptor"/>
             <interceptor name="hibernateSession" class="com.zutubi.pulse.master.xwork.interceptor.HibernateSessionInterceptor"/>
@@ -102,6 +103,7 @@
                 <interceptor-ref name="workflow">
                     <param name="excludeMethods">input,back,cancel</param>
                 </interceptor-ref>
+                <interceptor-ref name="noCache"/>
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
 

@@ -7,6 +7,9 @@ import com.opensymphony.xwork.interceptor.AroundInterceptor;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * An interceptor that sets headers on HTTP responses to stop the browser from
+ * caching returned page fragments, or even storing them at all (so they do not
+ * interfere with the back button).
  */
 public class AjaxInterceptor extends AroundInterceptor
 {
