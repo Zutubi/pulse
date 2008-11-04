@@ -1667,7 +1667,8 @@
                 interval: 1000 * #if($refreshInterval) $refreshInterval #else $user.preferences.refreshInterval #end
             }
             var runner = new Ext.util.TaskRunner();
-            runner.start(task);
+            ## Tasks run immediately on start, so delay starting by one interval.
+            setTimeout(function() { runner.start(task); }, task.interval);
         });
     #end
 #end

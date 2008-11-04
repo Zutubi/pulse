@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -111,10 +112,13 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         // Request the build and wait for it to complete
         TestPersonalBuildUI ui = requestPersonalBuild();
 
+        List<String> warnings = ui.getWarnings();
+        assertTrue("Got warnings: " + StringUtils.join("; ", warnings), warnings.isEmpty());
+        List<String> errors = ui.getErrors();
+        assertTrue("Got errors: " + StringUtils.join("; ", errors), errors.isEmpty());
+
         assertTrue(ui.getStatuses().size() > 0);
         assertTrue(ui.isPatchAccepted());
-        assertEquals(0, ui.getWarnings().size());
-        assertEquals(0, ui.getErrors().size());
 
         long buildNumber = ui.getBuildNumber();
         MyBuildsPage myBuildsPage = new MyBuildsPage(selenium, urls);

@@ -607,9 +607,19 @@ public class StringUtils
         return result.toString();
     }
 
-    public static String join(String separator, Collection<String> parts)
+    /**
+     * Equivalent to {@link #join(String, String[])}, converts the given
+     * collection to an array to make the call.
+     *
+     * @param glue  glue used to join each part
+     * @param parts parts to join
+     * @return the joined string
+     *
+     * @see #join(String, String[])
+     */
+    public static String join(String glue, Collection<String> parts)
     {
-        return join(separator, parts.toArray(new String[parts.size()]));
+        return join(glue, parts.toArray(new String[parts.size()]));
     }
 
     public static String join(char glue, boolean glueCheck, boolean skipEmpty, String... pieces)

@@ -93,7 +93,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         form.assertFormPresent();
         assertFormFieldNotEmpty("zfid.data");
 
-        String defaultDataDir = "data"; //form.getFormValues()[0];
+        String defaultDataDir = "data";
 
         form.nextFormElements("");
         assertTextPresent("pulse data directory requires a value");
