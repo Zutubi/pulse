@@ -119,7 +119,11 @@ public class SubversionClientTest extends PulseTestCase
         client = null;
         serverProcess.destroy();
         serverProcess.waitFor();
+        serverProcess = null;
         removeDirectory(tmpDir);
+        tmpDir = null;
+        expectedDir = null;
+        gotDir = null;
         super.tearDown();
     }
 

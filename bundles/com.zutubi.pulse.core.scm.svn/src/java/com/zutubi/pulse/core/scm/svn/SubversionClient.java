@@ -14,8 +14,8 @@ import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
+import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.*;
@@ -750,6 +750,17 @@ public class SubversionClient implements ScmClient
 
     private static class ChangeEventHandler implements ISVNEventHandler
     {
+        private static final String LABEL_NONE       = " ";
+        private static final String LABEL_ADD        = "A";
+        private static final String LABEL_DELETE     = "D";
+        private static final String LABEL_CHANGED    = "U";
+        private static final String LABEL_CONFLICTED = "C";
+        private static final String LABEL_MERGED     = "G";
+        private static final String LABEL_LOCKED     = "L";
+        private static final String LABEL_UNLOCKED   = "B";
+
+        private static final String FORMAT_STATUS = "%s%s%s  %s";
+
         private ScmFeedbackHandler handler;
 
         public ChangeEventHandler(ScmFeedbackHandler handler)
@@ -770,92 +781,83 @@ public class SubversionClient implements ScmClient
                         handler.status("External at revision " + event.getRevision());
                     }
                 }
-                else if (action == SVNEventAction.ADD)
-                {
-                    handler.status("A     " + event.getFile());
-                }
-                else if (action == SVNEventAction.DELETE)
-                {
-                    handler.status("D     " + event.getFile());
-                }
-                else if (action == SVNEventAction.LOCKED)
-                {
-                    handler.status("L     " + event.getFile());
-                }
-                else if (action == SVNEventAction.LOCK_FAILED)
-                {
-                    handler.status("failed to lock    " + event.getFile());
-                }
                 else
                 {
-                    String pathChangeType = getPathChangeType(event, action);
-                    String propertiesChangeType = getPropertiesChangeType(event);
-                    String lockLabel = getLockType(event);
-                    handler.status(pathChangeType + propertiesChangeType + lockLabel + "       " + event.getFile().getPath());
+                    String pathChangeLabel;
+                    String propertiesChangeLabel = LABEL_NONE;
+                    String lockLabel = LABEL_NONE;
+
+                    if (action == SVNEventAction.ADD)
+                    {
+                        pathChangeLabel = LABEL_ADD;
+                    }
+                    else if (action == SVNEventAction.DELETE)
+                    {
+                        pathChangeLabel = LABEL_DELETE;
+                    }
+                    else if (action == SVNEventAction.LOCKED)
+                    {
+                        pathChangeLabel = LABEL_LOCKED;
+                    }
+                    else if (action == SVNEventAction.LOCK_FAILED)
+                    {
+                        // Does not fit formatting, but this should not happen and
+                        // if it does then obvious output is good anyway.
+                        pathChangeLabel = "Failed to lock";
+                    }
+                    else
+                    {
+                        pathChangeLabel = getPathChangeType(action, event.getContentsStatus());
+                        propertiesChangeLabel = convertStatusType(event.getPropertiesStatus());
+                        lockLabel = convertStatusType(event.getLockStatus());
+                    }
+
+                    handler.status(String.format(FORMAT_STATUS, pathChangeLabel, propertiesChangeLabel, lockLabel, event.getFile().getPath()));
                 }
             }
         }
 
-        private String getPathChangeType(SVNEvent event, SVNEventAction action)
+        private String getPathChangeType(SVNEventAction action, SVNStatusType contentsStatus)
         {
             if (action == SVNEventAction.UPDATE_ADD)
             {
-                return "A";
+                return LABEL_ADD;
             }
             else if (action == SVNEventAction.UPDATE_DELETE)
             {
-                return "D";
+                return LABEL_DELETE;
             }
             else if (action == SVNEventAction.UPDATE_UPDATE)
             {
-                SVNStatusType contentsStatus = event.getContentsStatus();
-                if (contentsStatus == SVNStatusType.CHANGED)
-                {
-                    return "U";
-                }
-                else if (contentsStatus == SVNStatusType.CONFLICTED)
-                {
-                    return "C";
-                }
-                else if (contentsStatus == SVNStatusType.MERGED)
-                {
-                    return "G";
-                }
-            }
-
-            return " ";
-        }
-
-        private String getPropertiesChangeType(SVNEvent event)
-        {
-            SVNStatusType propertiesStatus = event.getPropertiesStatus();
-            if (propertiesStatus == SVNStatusType.CHANGED)
-            {
-                return "U";
-            }
-            else if (propertiesStatus == SVNStatusType.CONFLICTED)
-            {
-                return "C";
-            }
-            else if (propertiesStatus == SVNStatusType.MERGED)
-            {
-                return "G";
+                return convertStatusType(contentsStatus);
             }
             else
             {
-                return " ";
+                return LABEL_NONE;
             }
         }
 
-        private String getLockType(SVNEvent event)
+        private static String convertStatusType(SVNStatusType status)
         {
-            if (event.getLockStatus() == SVNStatusType.LOCK_UNLOCKED)
+            if (status == SVNStatusType.CHANGED)
             {
-                return "B";
+                return LABEL_CHANGED;
+            }
+            else if (status == SVNStatusType.CONFLICTED)
+            {
+                return LABEL_CONFLICTED;
+            }
+            else if (status == SVNStatusType.MERGED)
+            {
+                return LABEL_MERGED;
+            }
+            else if (status == SVNStatusType.LOCK_UNLOCKED)
+            {
+                return LABEL_UNLOCKED;
             }
             else
             {
-                return " ";
+                return LABEL_NONE;
             }
         }
 
