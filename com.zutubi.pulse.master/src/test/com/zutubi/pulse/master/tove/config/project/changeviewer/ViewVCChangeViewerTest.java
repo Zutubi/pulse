@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.MockConfigurationProvider;
+import com.zutubi.tove.config.api.Configuration;
 
 /**
  */
@@ -48,36 +48,36 @@ public class ViewVCChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc?rev=1412&view=rev", viewer.getChangesetURL(new Revision("1412")));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc?rev=1412&view=rev", viewer.getChangelistURL(new Revision("1412")));
     }
 
     public void testGetFileViewURL()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact.html?rev=1412&view=markup", viewer.getFileViewURL("/trunk/viewvc.org/contact.html", "1412"));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact.html?rev=1412&view=markup", viewer.getFileViewURL("/trunk/viewvc.org/contact.html", new Revision(12345), "1412"));
     }
 
     public void testGetFileDownloadURL()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/*checkout*/viewvc/trunk/viewvc.org/contact.html?rev=1412", viewer.getFileDownloadURL("/trunk/viewvc.org/contact.html", "1412"));
+        assertEquals("http://viewvc.tigris.org/source/browse/*checkout*/viewvc/trunk/viewvc.org/contact.html?rev=1412", viewer.getFileDownloadURL("/trunk/viewvc.org/contact.html", new Revision(12345), "1412"));
     }
 
     public void testGetFileDiffURL()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact.html?r1=1411&r2=1412", viewer.getFileDiffURL("/trunk/viewvc.org/contact.html", "1412"));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact.html?r1=1411&r2=1412", viewer.getFileDiffURL("/trunk/viewvc.org/contact.html", new Revision(12345), "1412"));
     }
 
     public void testGetFileViewURLSpecial()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact+this%20number.html?rev=1412&view=markup", viewer.getFileViewURL("/trunk/viewvc.org/contact+this number.html", "1412"));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact+this%20number.html?rev=1412&view=markup", viewer.getFileViewURL("/trunk/viewvc.org/contact+this number.html", new Revision(12345), "1412"));
     }
 
     public void testGetFileDownloadURLSpecial()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/*checkout*/viewvc/trunk/viewvc.org/contact+this%20number.html?rev=1412", viewer.getFileDownloadURL("/trunk/viewvc.org/contact+this number.html", "1412"));
+        assertEquals("http://viewvc.tigris.org/source/browse/*checkout*/viewvc/trunk/viewvc.org/contact+this%20number.html?rev=1412", viewer.getFileDownloadURL("/trunk/viewvc.org/contact+this number.html", new Revision(12345), "1412"));
     }
 
     public void testGetFileDiffURLSpecial()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact+this%20number.html?r1=1411&r2=1412", viewer.getFileDiffURL("/trunk/viewvc.org/contact+this number.html", "1412"));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact+this%20number.html?r1=1411&r2=1412", viewer.getFileDiffURL("/trunk/viewvc.org/contact+this number.html", new Revision(12345), "1412"));
     }
 }

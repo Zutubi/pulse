@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.MockConfigurationProvider;
+import com.zutubi.tove.config.api.Configuration;
 
 /**
  */
@@ -48,36 +48,36 @@ public class TracChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getChangesetURL(new Revision("3673")));
+        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getChangelistURL(new Revision("3673")));
     }
 
     public void testGetFileViewURL()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673", viewer.getFileViewURL("/trunk/INSTALL", "3673"));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673", viewer.getFileViewURL("/trunk/INSTALL", new Revision(12345), "3673"));
     }
 
     public void testGetFileDownloadURL()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL", "3673"));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL", new Revision(12345), "3673"));
     }
 
     public void testGetFileDiffURL()
     {
-        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%403673&old=trunk%2FINSTALL%403672", viewer.getFileDiffURL("/trunk/INSTALL", "3673"));
+        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%403673&old=trunk%2FINSTALL%403672", viewer.getFileDiffURL("/trunk/INSTALL", new Revision(12345), "3673"));
     }
 
     public void testGetFileViewURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673", viewer.getFileViewURL("/trunk/INSTALL+this please", "3673"));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673", viewer.getFileViewURL("/trunk/INSTALL+this please", new Revision(12345), "3673"));
     }
 
     public void testGetFileDownloadURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL+this please", "3673"));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL+this please", new Revision(12345), "3673"));
     }
 
     public void testGetFileDiffURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%2Bthis+please%403673&old=trunk%2FINSTALL%2Bthis+please%403672", viewer.getFileDiffURL("/trunk/INSTALL+this please", "3673"));
+        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%2Bthis+please%403673&old=trunk%2FINSTALL%2Bthis+please%403672", viewer.getFileDiffURL("/trunk/INSTALL+this please", new Revision(12345), "3673"));
     }
 }

@@ -64,7 +64,7 @@
 #end
         </tr>
 #foreach($file in $changelist.changes)
-    $action.updateUrls($file)
+    $action.updateUrls($changelist, $file)
         <tr id="changelist.file.${velocityCount}">
             #dynamicCell($file.filename)
             #dynamicRightLinkCell($file.revisionString $action.getFileViewUrl())

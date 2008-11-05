@@ -113,12 +113,13 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         TestPersonalBuildUI ui = requestPersonalBuild();
 
         List<String> warnings = ui.getWarnings();
-        assertTrue("Got warnings: " + StringUtils.join("; ", warnings), warnings.isEmpty());
+        assertTrue("Got warnings: " + StringUtils.join("\n", warnings), warnings.isEmpty());
         List<String> errors = ui.getErrors();
-        assertTrue("Got errors: " + StringUtils.join("; ", errors), errors.isEmpty());
+        assertTrue("Got errors: " + StringUtils.join("\n", errors), errors.isEmpty());
 
-        assertTrue(ui.getStatuses().size() > 0);
-        assertTrue(ui.isPatchAccepted());
+        List<String> statuses = ui.getStatuses();
+        assertTrue(statuses.size() > 0);
+        assertTrue("Patch not accepted given status:\n" + StringUtils.join("\n", statuses), ui.isPatchAccepted());
 
         long buildNumber = ui.getBuildNumber();
         MyBuildsPage myBuildsPage = new MyBuildsPage(selenium, urls);

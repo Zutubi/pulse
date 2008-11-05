@@ -1,15 +1,15 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wire;
 import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
+import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
@@ -29,7 +29,9 @@ import java.util.TimeZone;
 public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 {
     private static final String PROPERTY_REVISION = "revision";
+    private static final String PROPERTY_CHANGE_REVISION = "change.revision";
     private static final String PROPERTY_PREVIOUS_REVISION = "previous.revision";
+    private static final String PROPERTY_PREVIOUS_CHANGE_REVISION = "previous.change.revision";
     private static final String PROPERTY_AUTHOR = "author";
     private static final String PROPERTY_BRANCH = "branch";
     private static final String PROPERTY_PATH = "path";
@@ -117,43 +119,38 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
                 return TextUtils.stringSet(fileViewURL);
             case VIEW_FILE_DIFF:
                 return TextUtils.stringSet(fileDiffURL);
-            case VIEW_CHANGESET:
+            case VIEW_CHANGELIST:
                 return TextUtils.stringSet(changesetURL);
             default:
                 return false;
         }
     }
 
-    public String getDetails()
-    {
-        return "custom";
-    }
-
-    public String getChangesetURL(Revision revision)
+    public String getChangelistURL(Revision revision)
     {
         return resolveURL(changesetURL, revision);
     }
 
-    public String getFileViewURL(String path, String revision)
+    public String getFileViewURL(String path, Revision changelistRevision, String fileRevision)
     {
-        return resolveFileURL(fileViewURL, path, revision);
+        return resolveFileURL(fileViewURL, path, changelistRevision, fileRevision);
     }
 
-    public String getFileDownloadURL(String path, String revision)
+    public String getFileDownloadURL(String path, Revision changelistRevision, String fileRevision)
     {
-        return resolveFileURL(fileDownloadURL, path, revision);
+        return resolveFileURL(fileDownloadURL, path, changelistRevision, fileRevision);
     }
 
-    public String getFileDiffURL(String path, String revision)
+    public String getFileDiffURL(String path, Revision changelistRevision, String fileRevision)
     {
         ScmConfiguration config = lookupScmConfiguration();
-        String previous = config.getPreviousRevision(revision);
+        String previous = config.getPreviousRevision(fileRevision);
         if (previous == null)
         {
             return null;
         }
         
-        return resolveFileURL(fileDiffURL, path, revision);
+        return resolveFileURL(fileDiffURL, path, changelistRevision, fileRevision);
     }
 
     private String resolveURL(String url, Revision revision)
@@ -195,7 +192,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         return null;
     }
 
-    private String resolveFileURL(String url, String path, String revision)
+    private String resolveFileURL(String url, String path, Revision changelistRevision, String fileRevision)
     {
         if(TextUtils.stringSet(url))
         {
@@ -203,15 +200,22 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
             scope.add(new Property(PROPERTY_PATH, StringUtils.urlEncodePath(path)));
             scope.add(new Property(PROPERTY_PATH_RAW, path));
             scope.add(new Property(PROPERTY_PATH_FORM, StringUtils.formUrlEncode(path)));
-            scope.add(new Property(PROPERTY_REVISION, revision));
+            scope.add(new Property(PROPERTY_REVISION, fileRevision));
+            scope.add(new Property(PROPERTY_CHANGE_REVISION, changelistRevision.getRevisionString()));
 
             ScmConfiguration config = lookupScmConfiguration();
-            String previous = config.getPreviousRevision(revision);
-            if(previous != null)
+            String previousFileRevision = config.getPreviousRevision(fileRevision);
+            if(previousFileRevision != null)
             {
-                scope.add(new Property(PROPERTY_PREVIOUS_REVISION, previous));
+                scope.add(new Property(PROPERTY_PREVIOUS_REVISION, previousFileRevision));
             }
-            
+
+            String previousChangelistRevision = config.getPreviousRevision(changelistRevision.getRevisionString());
+            if(previousChangelistRevision != null)
+            {
+                scope.add(new Property(PROPERTY_PREVIOUS_CHANGE_REVISION, previousChangelistRevision));
+            }
+
             try
             {
                 return VariableHelper.replaceVariables(url, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);

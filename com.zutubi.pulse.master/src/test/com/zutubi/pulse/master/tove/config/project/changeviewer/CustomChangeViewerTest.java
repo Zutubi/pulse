@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.MockConfigurationProvider;
+import com.zutubi.tove.config.api.Configuration;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -58,48 +58,48 @@ public class CustomChangeViewerTest extends PulseTestCase
         viewer.setChangesetURL("${revision} ${author} ${branch} ${time.pulse} ${time.fisheye} ${unknown}");
         Revision rev = new Revision("author:branch:" + DATE_STRING);
         Date date = CustomChangeViewerConfiguration.PULSE_DATE_FORMAT.parse(DATE_STRING);
-        assertEquals("author:branch:19700101-10:00:01 author branch " + DATE_STRING + " " + CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format(date) + " ${unknown}", viewer.getChangesetURL(rev));
+        assertEquals("author:branch:19700101-10:00:01 author branch " + DATE_STRING + " " + CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format(date) + " ${unknown}", viewer.getChangelistURL(rev));
     }
 
     public void testGetFileViewURL()
     {
-        viewer.setFileViewURL("http://hello${path}?r=${revision}");
-        assertEquals("http://hello/my/path?r=10", viewer.getFileViewURL("/my/path", "10"));
+        viewer.setFileViewURL("http://hello${path}?r=${revision}/${change.revision}");
+        assertEquals("http://hello/my/path?r=10/99", viewer.getFileViewURL("/my/path", new Revision(99), "10"));
     }
 
     public void testGetFileDownloadURL()
     {
-        viewer.setFileDownloadURL("http://hello${path}?r=${revision}&format=raw");
-        assertEquals("http://hello/my/path?r=10&format=raw", viewer.getFileDownloadURL("/my/path", "10"));
+        viewer.setFileDownloadURL("http://hello${path}?r=${revision}/${change.revision}&format=raw");
+        assertEquals("http://hello/my/path?r=10/22&format=raw", viewer.getFileDownloadURL("/my/path", new Revision(22), "10"));
     }
 
     public void testGetFileDiffURL()
     {
-        viewer.setFileDiffURL("http://hello${path}?r=${revision}&p=${previous.revision}");
-        assertEquals("http://hello/my/path?r=10&p=9", viewer.getFileDiffURL("/my/path", "10"));
+        viewer.setFileDiffURL("http://hello${path}?r=${revision}/${change.revision}&p=${previous.revision}/${previous.change.revision}");
+        assertEquals("http://hello/my/path?r=10/111&p=9/110", viewer.getFileDiffURL("/my/path", new Revision(111), "10"));
     }
 
     public void testGetFileViewURLSpecial()
     {
         viewer.setFileViewURL("http://hello${path}?r=${revision}");
-        assertEquals("http://hello/my/path+special%20chars?r=10", viewer.getFileViewURL("/my/path+special chars", "10"));
+        assertEquals("http://hello/my/path+special%20chars?r=10", viewer.getFileViewURL("/my/path+special chars", new Revision(111111), "10"));
     }
 
     public void testGetFileDownloadURLSpecial()
     {
         viewer.setFileDownloadURL("http://hello${path}?r=${revision}&format=raw");
-        assertEquals("http://hello/my/path+special%20chars?r=10&format=raw", viewer.getFileDownloadURL("/my/path+special chars", "10"));
+        assertEquals("http://hello/my/path+special%20chars?r=10&format=raw", viewer.getFileDownloadURL("/my/path+special chars", new Revision(111111), "10"));
     }
 
     public void testGetFileDiffURLSpecial()
     {
         viewer.setFileDiffURL("http://hello${path}?r=${revision}&p=${previous.revision}");
-        assertEquals("http://hello/my/path+special%20chars?r=10&p=9", viewer.getFileDiffURL("/my/path+special chars", "10"));
+        assertEquals("http://hello/my/path+special%20chars?r=10&p=9", viewer.getFileDiffURL("/my/path+special chars", new Revision(111111), "10"));
     }
 
     public void testFilePropertiesSpecial()
     {
         viewer.setFileDiffURL("${path} ${path.raw} ${path.form}");
-        assertEquals("/my/path+special%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL("/my/path+special chars", "10"));
+        assertEquals("/my/path+special%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL("/my/path+special chars", new Revision(111111), "10"));
     }
 }

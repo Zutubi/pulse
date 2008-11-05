@@ -154,9 +154,9 @@ public class ViewChangelistAction extends ActionSupport
     public String getChangeUrl()
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
-        if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_CHANGESET))
+        if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_CHANGELIST))
         {
-            return changeViewer.getChangesetURL(changelist.getRevision());
+            return changeViewer.getChangelistURL(changelist.getRevision());
         }
 
         return null;
@@ -177,19 +177,19 @@ public class ViewChangelistAction extends ActionSupport
         return fileDiffUrl;
     }
 
-    public void updateUrls(PersistentFileChange change)
+    public void updateUrls(PersistentChangelist changelist, PersistentFileChange change)
     {
-        updateFileViewUrl(change);
-        updateFileDownloadUrl(change);
-        updateFileDiffUrl(change);
+        updateFileViewUrl(changelist, change);
+        updateFileDownloadUrl(changelist, change);
+        updateFileDiffUrl(changelist, change);
     }
 
-    public void updateFileViewUrl(PersistentFileChange change)
+    public void updateFileViewUrl(PersistentChangelist changelist, PersistentFileChange change)
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
         if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE))
         {
-            fileViewUrl = changeViewer.getFileViewURL(change.getFilename(), change.getRevisionString());
+            fileViewUrl = changeViewer.getFileViewURL(change.getFilename(), changelist.getRevision(), change.getRevisionString());
         }
         else
         {
@@ -197,12 +197,12 @@ public class ViewChangelistAction extends ActionSupport
         }
     }
 
-    public void updateFileDownloadUrl(PersistentFileChange change)
+    public void updateFileDownloadUrl(PersistentChangelist changelist, PersistentFileChange change)
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
         if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.DOWNLOAD_FILE))
         {
-            fileDownloadUrl = changeViewer.getFileDownloadURL(change.getFilename(), change.getRevisionString());
+            fileDownloadUrl = changeViewer.getFileDownloadURL(change.getFilename(), changelist.getRevision(), change.getRevisionString());
         }
         else
         {
@@ -210,7 +210,7 @@ public class ViewChangelistAction extends ActionSupport
         }
     }
 
-    public void updateFileDiffUrl(PersistentFileChange change)
+    public void updateFileDiffUrl(PersistentChangelist changelist, PersistentFileChange change)
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
         if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE_DIFF))
@@ -220,7 +220,7 @@ public class ViewChangelistAction extends ActionSupport
                 String previous = scm.getPreviousRevision(change.getRevisionString());
                 if (previous != null)
                 {
-                    fileDiffUrl = changeViewer.getFileDiffURL(change.getFilename(), change.getRevisionString());
+                    fileDiffUrl = changeViewer.getFileDiffURL(change.getFilename(), changelist.getRevision(), change.getRevisionString());
                     return;
                 }
             }

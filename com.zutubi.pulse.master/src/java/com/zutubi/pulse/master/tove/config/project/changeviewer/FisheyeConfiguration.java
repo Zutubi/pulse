@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerUtils.*;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 
@@ -18,6 +18,8 @@ import java.util.Map;
 @SymbolicName("zutubi.fisheyeChangeViewerConfig")
 public class FisheyeConfiguration extends BasePathChangeViewer
 {
+    static final String TYPE_CVS = "cvs";
+
     /**
      * Useful when configured against Perforce.  In this case the paths in
      * Pulse are full depot paths, but Fisheye expects a shorter form:
@@ -47,29 +49,29 @@ public class FisheyeConfiguration extends BasePathChangeViewer
         this.pathStripPrefix = pathStripPrefix;
     }
 
-    public String getDetails()
-    {
-        return "Fisheye [" + getBaseURL() + "]";
-    }
-
-    public String getChangesetURL(Revision revision)
+    public String getChangelistURL(Revision revision)
     {
         return StringUtils.join("/", true, true, getBaseURL(), "changelog", getProjectPath(), "?cs=" + getChangesetString(revision));
     }
 
-    public String getFileViewURL(String path, String revision)
+    public String getFileViewURL(String path, Revision changelistRevision, String fileRevision)
     {
+        ScmConfiguration scm = lookupScmConfiguration();
+        String revision = chooseRevision(scm, changelistRevision, fileRevision);
         return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(stripPathPrefix(path)) + "?r=" + revision);
     }
 
-    public String getFileDownloadURL(String path, String revision)
+    public String getFileDownloadURL(String path, Revision changelistRevision, String fileRevision)
     {
+        ScmConfiguration scm = lookupScmConfiguration();
+        String revision = chooseRevision(scm, changelistRevision, fileRevision);
         return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision, getProjectPath(), StringUtils.urlEncodePath(stripPathPrefix(path)));
     }
 
-    public String getFileDiffURL(String path, String revision)
+    public String getFileDiffURL(String path, Revision changelistRevision, String fileRevision)
     {
         ScmConfiguration scm = lookupScmConfiguration();
+        String revision = chooseRevision(scm, changelistRevision, fileRevision);
         String previousRevision = scm.getPreviousRevision(revision);
         if(previousRevision == null)
         {
@@ -77,6 +79,18 @@ public class FisheyeConfiguration extends BasePathChangeViewer
         }
 
         return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(stripPathPrefix(path)) + "?r1=" + previousRevision + "&r2=" + revision);
+    }
+
+    private String chooseRevision(ScmConfiguration scm, Revision changelistRevision, String fileRevision)
+    {
+        if (isCVS(scm))
+        {
+            return fileRevision;
+        }
+        else
+        {
+            return changelistRevision.getRevisionString();
+        }
     }
 
     private String stripPathPrefix(String path)
@@ -92,7 +106,7 @@ public class FisheyeConfiguration extends BasePathChangeViewer
     private String getChangesetString(Revision revision)
     {
         ScmConfiguration scm = lookupScmConfiguration();
-        if (scm.getType().equals("cvs"))
+        if (isCVS(scm))
         {
             Map<String, Object> properties = getRevisionProperties(revision);
             if (properties.containsKey(PROPERTY_AUTHOR) &&
@@ -104,5 +118,10 @@ public class FisheyeConfiguration extends BasePathChangeViewer
         }
 
         return revision.getRevisionString();
+    }
+
+    private boolean isCVS(ScmConfiguration scm)
+    {
+        return scm.getType().equals(TYPE_CVS);
     }
 }
