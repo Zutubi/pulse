@@ -41,7 +41,7 @@ public abstract class ChangeViewerConfiguration extends AbstractConfiguration
      * Indicates if the change viewer supports a given capability.  Not all
      * viewers will support all methods on this interface -- indicating this
      * via capabilities allows Pulse to avoid asking the viewer for details it
-     * oes not support.
+     * does not support.
      *
      * @param capability the capability to check for
      * @return true if this viewer supports the given capability

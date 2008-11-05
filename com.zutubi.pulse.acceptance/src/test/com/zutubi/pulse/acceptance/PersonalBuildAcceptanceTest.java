@@ -94,9 +94,12 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     {
         // Edit the build.xml file so we have an outstanding change
         File buildFile = new File(workingCopyDir, "build.xml");
-        String fileContents = IOUtils.fileToString(buildFile);
-        fileContents = fileContents.replaceAll("sleep", "nosuchcommand");
-        FileSystemUtils.createFile(buildFile, fileContents);
+        FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
+                "<project default=\"" + random + "\">\n" +
+                "    <target name=\"" + random + "\">\n" +
+                "        <nosuchcommand/>\n" +
+                "    </target>\n" +
+                "</project>");
     }
 
     private void editStageToRunOnAgent(String agent) throws Exception
