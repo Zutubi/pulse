@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.util.logging;
 
 import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +17,21 @@ import java.util.logging.Level;
  */
 public class LogUtils
 {
+    private static final List<Level> predefined = new LinkedList<Level>();
+
+    static
+    {
+        predefined.add(Level.ALL);
+        predefined.add(Level.CONFIG);
+        predefined.add(Level.FINE);
+        predefined.add(Level.FINER);
+        predefined.add(Level.FINEST);
+        predefined.add(Level.INFO);
+        predefined.add(Level.OFF);
+        predefined.add(Level.SEVERE);
+        predefined.add(Level.WARNING);
+    }
+
     public static String getString(Properties config, String key, String defaultValue)
     {
         if (!config.containsKey(key))
@@ -49,7 +65,34 @@ public class LogUtils
         {
             return defaultValue;
         }
-        return Level.parse(config.getProperty(key));
+        try
+        {
+            return Level.parse(config.getProperty(key));
+        }
+        catch (IllegalArgumentException e)
+        {
+            System.err.println("Failed to parse log level for '" + key + "' using default Level.parse().  " +
+                    "Reverting to custom parse.");
+
+            // CIB-766.  Still have not been able to determine what the root cause of this is.
+            String value = config.getProperty(key);
+            if (!TextUtils.stringSet(value))
+            {
+                return defaultValue;
+            }
+
+            value = value.trim();
+            for (Level l : predefined)
+            {
+                if (value.compareToIgnoreCase(l.getName()) == 0)
+                {
+                    return l;
+                }
+            }
+
+            System.err.println("Failed to parse log level for '" + key + "', value '" + value + "'. " + e.getMessage());
+            return defaultValue;
+        }
     }
 
     public static Filter getFilter(Properties config, String key, Filter defaultValue)
@@ -94,7 +137,7 @@ public class LogUtils
         }
         catch (Exception e)
         {
-            return defaultValue;            
+            return defaultValue;
         }
     }
 
@@ -103,10 +146,9 @@ public class LogUtils
      * treats it as a comma separated list of values.  These values are returned in a list.  If the key
      * is not found in the properties, or does not refer to a value, the defaultValue is returned.
      *
-     * @param config is the properties instance from which the list of values is retrieved.
-     * @param key is the name of the property being retrieved.
+     * @param config       is the properties instance from which the list of values is retrieved.
+     * @param key          is the name of the property being retrieved.
      * @param defaultValue is the default value, returned if no suitable value is value can be retrieved.
-     *
      * @return a list of strings, representing the individual values of the comma separated list.
      */
     public static List<String> getList(Properties config, String key, List<String> defaultValue)
