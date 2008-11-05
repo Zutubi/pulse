@@ -3,22 +3,21 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ValidationAware;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.zutubi.tove.annotations.Classification;
-import com.zutubi.tove.annotations.Listing;
 import com.zutubi.i18n.Messages;
-import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
-import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
-import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.tove.config.ConfigurationSecurityManager;
-import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.pulse.master.tove.freemarker.BaseNameMethod;
 import com.zutubi.pulse.master.tove.freemarker.GetTextMethod;
 import com.zutubi.pulse.master.tove.freemarker.ValidIdMethod;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.model.Form;
+import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
+import com.zutubi.tove.annotations.Classification;
+import com.zutubi.tove.annotations.Listing;
+import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.TemplateNode;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
@@ -96,6 +95,14 @@ public class ToveUtils
             }
 
             String[] parameterValue = parameters.get(propertyName);
+            parameterValue = CollectionUtils.mapToArray(parameterValue, new Mapping<String, String>()
+            {
+                public String map(String s)
+                {
+                    return s.trim();
+                }
+            }, new String[parameterValue.length]);
+            
             if (parameterValue == null)
             {
                 parameterValue = parameters.get(propertyName + ".default");
