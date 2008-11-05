@@ -242,8 +242,8 @@
 #else
     #set($helpPage = "Home")
 #end
-                  <a class="unadorned" href="$helpUrl/$helpPage">
-                      <img alt="help" src="$base/images/help.gif"/>
+                  <a class="unadorned" href="$helpUrl/$helpPage" target="_pulsemanual">
+                      <img alt="help" src="$base/images/manual.gif"/>
                   </a>
               </td>
             </tr>
