@@ -13,20 +13,10 @@ public class GitConstants
     public static final String PROPERTY_GIT_COMMAND = "pulse.git.command";
 
     /**
-     * The git executable, defaults to git, or git.exe on a windows system.
+     * The default git executable, usually "git" but "git.exe" on a windows
+     * system.  May be overridden with a system property.
      */
-    public static final String GIT;
-    static
-    {
-        if (System.getProperties().contains(PROPERTY_GIT_COMMAND))
-        {
-            GIT = System.getProperty(PROPERTY_GIT_COMMAND);
-        }
-        else
-        {
-            GIT = (SystemUtils.IS_WINDOWS) ? "git.exe" : "git";
-        }
-    }
+    public static final String DEFAULT_GIT = SystemUtils.IS_WINDOWS ? "git.exe" : "git";
 
     public static final String COMMAND_PULL = "pull";
     public static final String COMMAND_LOG = "log";

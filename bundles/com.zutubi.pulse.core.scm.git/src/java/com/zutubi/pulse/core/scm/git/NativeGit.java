@@ -53,12 +53,12 @@ public class NativeGit
 
     public void clone(ScmFeedbackHandler handler, String repository, String dir) throws GitException
     {
-        run(handler, GIT, COMMAND_CLONE, FLAG_NO_CHECKOUT, repository, dir);
+        run(handler, getGitCommand(), COMMAND_CLONE, FLAG_NO_CHECKOUT, repository, dir);
     }
 
     public void pull(ScmFeedbackHandler handler) throws GitException
     {
-        run(handler, GIT, COMMAND_PULL);
+        run(handler, getGitCommand(), COMMAND_PULL);
     }
 
     public InputStream show(String file) throws GitException
@@ -68,7 +68,7 @@ public class NativeGit
 
     public InputStream show(String revision, String file) throws GitException
     {
-        String[] commands = {GIT, COMMAND_SHOW, revision + ":" + file};
+        String[] commands = {getGitCommand(), COMMAND_SHOW, revision + ":" + file};
 
         final StringBuffer buffer = new StringBuffer();
         OutputHandlerAdapter handler = new OutputHandlerAdapter()
@@ -102,7 +102,7 @@ public class NativeGit
     public List<GitLogEntry> log(String from, String to, int changes) throws GitException
     {
         List<String> command = new LinkedList<String>();
-        command.add(GIT);
+        command.add(getGitCommand());
         command.add(COMMAND_LOG);
         command.add(FLAG_NAME_STATUS);
         command.add(FLAG_PRETTY + "=format:%H%n%cn%n%cd%n%s%n.");
@@ -126,27 +126,27 @@ public class NativeGit
 
     public void checkout(ScmFeedbackHandler handler, String branch) throws GitException
     {
-        run(handler, GIT, COMMAND_CHECKOUT, branch);
+        run(handler, getGitCommand(), COMMAND_CHECKOUT, branch);
     }
 
     public void checkout(ScmFeedbackHandler handler, String branch, String localBranch) throws GitException
     {
-        run(handler, GIT, COMMAND_CHECKOUT, FLAG_BRANCH, localBranch, branch);
+        run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_BRANCH, localBranch, branch);
     }
 
     public void deleteBranch(String branch) throws GitException
     {
-        run(GIT, COMMAND_BRANCH, FLAG_DELETE, branch);
+        run(getGitCommand(), COMMAND_BRANCH, FLAG_DELETE, branch);
     }
 
     public void cretaeBranch(String branch) throws GitException
     {
-        run(GIT, COMMAND_BRANCH, branch);
+        run(getGitCommand(), COMMAND_BRANCH, branch);
     }
 
     public List<GitBranchEntry> branch() throws GitException
     {
-        String[] command = {GIT, COMMAND_BRANCH};
+        String[] command = {getGitCommand(), COMMAND_BRANCH};
 
         BranchOutputHandler handler = new BranchOutputHandler();
 
@@ -172,7 +172,7 @@ public class NativeGit
 
     public void diff(ScmFeedbackHandler handler, Revision revA, Revision revB) throws GitException
     {
-        String[] command = {GIT, COMMAND_DIFF, FLAG_NAME_STATUS, revA.getRevisionString(), revB.getRevisionString()};
+        String[] command = {getGitCommand(), COMMAND_DIFF, FLAG_NAME_STATUS, revA.getRevisionString(), revB.getRevisionString()};
         run(handler, command);
     }
 
@@ -266,6 +266,17 @@ public class NativeGit
         {
             async.destroy();
         }
+    }
+
+    protected String getGitCommand()
+    {
+        String git = System.getProperty(PROPERTY_GIT_COMMAND);
+        if (git == null)
+        {
+            git = DEFAULT_GIT;
+        }
+
+        return git;
     }
 
     interface OutputHandler

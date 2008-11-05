@@ -43,6 +43,34 @@ public class NativeGitTest extends PulseTestCase
         super.tearDown();
     }
 
+    public void testSystemPropertyPickedUp()
+    {
+        final String INVALID_COMMAND = "thereisnosuchcommand";
+
+        String previousValue = System.getProperty(GitConstants.PROPERTY_GIT_COMMAND);
+        System.setProperty(GitConstants.PROPERTY_GIT_COMMAND, INVALID_COMMAND);
+        try
+        {
+            git.log();
+            fail("Git should not run when a bad command is set");
+        }
+        catch (GitException e)
+        {
+            assertTrue("Message '" + e.getMessage() + "' does not contain the invalid command", e.getMessage().contains(INVALID_COMMAND));
+        }
+        finally
+        {
+            if (previousValue == null)
+            {
+                System.clearProperty(GitConstants.PROPERTY_GIT_COMMAND);
+            }
+            else
+            {
+                System.setProperty(GitConstants.PROPERTY_GIT_COMMAND, previousValue);
+            }
+        }
+    }
+
     public void testClone() throws ScmException, IOException
     {
         git.setWorkingDirectory(tmp);
