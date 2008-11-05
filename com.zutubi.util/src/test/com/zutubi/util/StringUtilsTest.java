@@ -1,6 +1,6 @@
 package com.zutubi.util;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  */
-public class StringUtilsTest extends TestCase
+public class StringUtilsTest extends ZutubiTestCase
 {
     public void testTrimStringShort()
     {

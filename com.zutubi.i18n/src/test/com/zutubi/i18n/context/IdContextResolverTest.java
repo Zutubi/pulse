@@ -1,8 +1,8 @@
 package com.zutubi.i18n.context;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
-public class IdContextResolverTest extends TestCase
+public class IdContextResolverTest extends ZutubiTestCase
 {
     private IdContextResolver resolver;
 

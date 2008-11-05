@@ -11,7 +11,7 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.ExceptionWrappingRunnable;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.net.URL;
 import java.util.Collections;
@@ -21,7 +21,7 @@ import java.util.Vector;
 /**
  * Helper base class for web UI acceptance tests that use Selenium.
  */
-public class SeleniumTestBase extends TestCase
+public class SeleniumTestBase extends ZutubiTestCase
 {
     /**
      * Shared agent used for simple single-agent builds.  Makes it easier to

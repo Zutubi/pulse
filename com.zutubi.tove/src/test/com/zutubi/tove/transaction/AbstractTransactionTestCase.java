@@ -1,9 +1,9 @@
 package com.zutubi.tove.transaction;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.AssertionFailedError;
 
-public class AbstractTransactionTestCase extends TestCase
+public class AbstractTransactionTestCase extends ZutubiTestCase
 {
     protected void executeOnSeparateThreadAndWait(final Runnable r)
     {

@@ -1,6 +1,6 @@
 package com.zutubi.i18n;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.i18n.bundle.DefaultBundleManager;
 import com.zutubi.i18n.context.PackageContextResolver;
 import com.zutubi.i18n.context.ClassContextResolver;
@@ -14,7 +14,7 @@ import java.util.Locale;
 /**
  * <class-comment/>
  */
-public class DefaultMessageHandlerTest extends TestCase
+public class DefaultMessageHandlerTest extends ZutubiTestCase
 {
     private DefaultBundleManager manager;
     private DefaultMessageHandler handler;

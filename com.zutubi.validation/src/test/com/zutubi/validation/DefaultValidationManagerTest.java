@@ -5,7 +5,7 @@ import com.zutubi.validation.mock.MockAnimal;
 import com.zutubi.validation.mock.MockWallet;
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
 import com.zutubi.validation.providers.ReflectionValidatorProvider;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * <class-comment/>
  */
-public class DefaultValidationManagerTest extends TestCase
+public class DefaultValidationManagerTest extends ZutubiTestCase
 {
     private DefaultValidationManager validationManager;
     private ValidationContext validationContext;

@@ -3,14 +3,14 @@ package com.zutubi.validation.validators;
 import com.zutubi.validation.DelegatingValidationContext;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.InMemoryTextProvider;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 
 /**
  * <class-comment/>
  */
-public class FieldValidatorSupportTest extends TestCase
+public class FieldValidatorSupportTest extends ZutubiTestCase
 {
     private InMemoryTextProvider textProvider;
     private DelegatingValidationContext validationContext;

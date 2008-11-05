@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
 
@@ -12,7 +12,7 @@ import java.util.TimeZone;
 /**
  * <class comment/>
  */
-public class CvsAcceptanceTest extends TestCase
+public class CvsAcceptanceTest extends ZutubiTestCase
 {
     private static final SimpleDateFormat LOCAL_DATE;
     private static final SimpleDateFormat SERVER_DATE;

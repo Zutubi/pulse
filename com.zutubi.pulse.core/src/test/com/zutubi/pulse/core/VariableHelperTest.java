@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +13,7 @@ import com.zutubi.pulse.core.engine.api.Property;
  * 
  *
  */
-public class VariableHelperTest extends TestCase
+public class VariableHelperTest extends ZutubiTestCase
 {
 
     private Scope scope = null;

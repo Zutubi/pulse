@@ -1,6 +1,6 @@
 package com.zutubi.i18n.context;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.ResourceBundle;
 import java.util.Locale;
@@ -12,7 +12,7 @@ import com.zutubi.i18n.bundle.BaseResourceBundle;
 /**
  * <class-comment/>
  */
-public class DefaultContextCacheTest extends TestCase
+public class DefaultContextCacheTest extends ZutubiTestCase
 {
     private DefaultContextCache cache;
     private Context context;

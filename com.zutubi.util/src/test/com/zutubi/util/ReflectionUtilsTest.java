@@ -1,16 +1,18 @@
 package com.zutubi.util;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Arrays;
 import java.util.HashSet;
 
-/**
- */
-public class ReflectionUtilsTest extends TestCase
+import com.zutubi.util.bean.BeanUtils;
+import com.zutubi.util.bean.BeanException;
+
+public class ReflectionUtilsTest extends ZutubiTestCase
 {
     private Method noParams;
     private Method oneParam;
@@ -419,5 +421,244 @@ public class ReflectionUtilsTest extends TestCase
 
     public static class InheritedChildImpl extends ChildImpl
     {
+    }
+
+    public void testGetQualifiedNameDirectField() throws NoSuchFieldException
+    {
+        getQualifiedNameFieldHelper(GetQualifiedName.class, "directInt");
+    }
+
+    public void testGetQualifiedNameInheritedField() throws NoSuchFieldException
+    {
+        getQualifiedNameFieldHelper(SuperGetQualifiedName.class, "inheritedInt");
+    }
+
+    public void testGetQualifiedNameInterfaceField() throws NoSuchFieldException
+    {
+        getQualifiedNameFieldHelper(IGetQualifiedName.class, "interfaceInt");
+    }
+
+    public void testGetQualifiedNameDirectMethod() throws NoSuchMethodException
+    {
+        getQualifiedNameMethodHelper(GetQualifiedName.class, "directMethod");
+    }
+
+    public void testGetQualifiedNameInheritedMethod() throws NoSuchMethodException
+    {
+        getQualifiedNameMethodHelper(SuperGetQualifiedName.class, "inheritedMethod");
+    }
+
+    public void testGetQualifiedNameOverriddenMethod() throws NoSuchMethodException
+    {
+        getQualifiedNameMethodHelper(GetQualifiedName.class, "overriddenMethod");
+    }
+
+    public void testGetQualifiedNameInterfaceMethod() throws NoSuchMethodException
+    {
+        getQualifiedNameMethodHelper(GetQualifiedName.class, "interfaceMethod");
+    }
+
+    private void getQualifiedNameFieldHelper(Class<?> expectedQualifyingClass, String fieldName) throws NoSuchFieldException
+    {
+        assertEquals(expectedQualifyingClass.getName() + "." + fieldName, ReflectionUtils.getQualifiedName(GetQualifiedName.class.getField(fieldName)));
+    }
+
+    private void getQualifiedNameMethodHelper(Class<?> expectedQualifyingClass, String methodName) throws NoSuchMethodException
+    {
+        assertEquals(expectedQualifyingClass.getName() + "." + methodName, ReflectionUtils.getQualifiedName(GetQualifiedName.class.getMethod(methodName)));
+    }
+
+    public static interface IGetQualifiedName
+    {
+        int interfaceInt = 0;
+
+        void interfaceMethod();
+    }
+
+    public static class SuperGetQualifiedName
+    {
+        public int inheritedInt = 0;
+
+        public void inheritedMethod()
+        {
+
+        }
+
+        public void overriddenMethod()
+        {
+
+        }
+    }
+
+    public static class GetQualifiedName extends SuperGetQualifiedName implements IGetQualifiedName
+    {
+        public int directInt;
+
+        public void directMethod()
+        {
+        }
+
+        public void interfaceMethod()
+        {
+        }
+
+
+        public void overriddenMethod()
+        {
+        }
+    }
+
+    public void testIsFinalStaticNonFinalField() throws NoSuchFieldException
+    {
+        isFinalFieldHelper(false, "staticNonFinalInt");
+    }
+
+    public void testIsFinalStaticFinalField() throws NoSuchFieldException
+    {
+        isFinalFieldHelper(true, "staticFinalInt");
+    }
+
+    public void testIsFinalNonFinalField() throws NoSuchFieldException
+    {
+        isFinalFieldHelper(false, "nonFinalInt");
+    }
+
+    public void testIsFinalFinalField() throws NoSuchFieldException
+    {
+        isFinalFieldHelper(true, "finalInt");
+    }
+
+    private void isFinalFieldHelper(boolean expectedResult, String fieldName) throws NoSuchFieldException
+    {
+        assertEquals(expectedResult, ReflectionUtils.isFinal(IsFinal.class.getField(fieldName)));
+    }
+
+    public void testIsFinalFinalMethod() throws NoSuchMethodException
+    {
+        isFinalMethodHelper(true, "finalMethod");
+    }
+
+    public void testIsFinalNonFinalMethod() throws NoSuchMethodException
+    {
+        isFinalMethodHelper(false, "nonFinalMethod");
+    }
+
+    private void isFinalMethodHelper(boolean expectedResult, String methodName) throws NoSuchMethodException
+    {
+        assertEquals(expectedResult, ReflectionUtils.isFinal(IsFinal.class.getMethod(methodName)));
+    }
+
+    public static class IsFinal
+    {
+        public static int staticNonFinalInt = 1;
+        public static final int staticFinalInt = 1;
+
+        public int nonFinalInt = 1;
+        public final int finalInt = 1;
+
+        public void nonFinalMethod()
+        {
+        }
+
+        public final void finalMethod()
+        {
+        }
+    }
+
+    public void testSetFieldPublicField() throws NoSuchFieldException, BeanException
+    {
+        setFieldHelper(SetFieldValue.class.getDeclaredField("publicField"));
+    }
+
+    public void testSetFieldProtectedField() throws NoSuchFieldException, BeanException
+    {
+        setFieldHelper(SetFieldValue.class.getDeclaredField("protectedField"));
+    }
+
+    public void testSetFieldPrivateField() throws NoSuchFieldException, BeanException
+    {
+        setFieldHelper(SetFieldValue.class.getDeclaredField("privateField"));
+    }
+
+    public void testSetFieldInheritedPublicField() throws NoSuchFieldException, BeanException
+    {
+        setFieldHelper(SuperSetFieldValue.class.getDeclaredField("inheritedPublicField"));
+    }
+
+    public void testSetFieldInheritedProtectedField() throws NoSuchFieldException, BeanException
+    {
+        setFieldHelper(SuperSetFieldValue.class.getDeclaredField("inheritedProtectedField"));
+    }
+
+    public void testSetFieldInheritedPrivateField() throws NoSuchFieldException, BeanException
+    {
+        setFieldHelper(SuperSetFieldValue.class.getDeclaredField("inheritedPrivateField"));
+    }
+
+    public void testSetFieldFinalField() throws NoSuchFieldException
+    {
+        try
+        {
+            ReflectionUtils.setFieldValue(new SetFieldValue(), SetFieldValue.class.getDeclaredField("publicFinalField"), new Object());
+            fail("Should not be able to set final field");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("Cannot set final field 'com.zutubi.util.ReflectionUtilsTest$SetFieldValue.publicFinalField', even if it succeeds it may have no effect due to compiler optimisations", e.getMessage());
+        }
+    }
+    
+    private void setFieldHelper(Field field) throws BeanException
+    {
+        SetFieldValue instance = new SetFieldValue();
+        Object value = new Object();
+        ReflectionUtils.setFieldValue(instance, field, value);
+        assertSame(value, BeanUtils.getProperty(field.getName(), instance));
+    }
+
+    public static class SuperSetFieldValue
+    {
+        private Object inheritedPrivateField = null;
+        protected Object inheritedProtectedField;
+        public Object inheritedPublicField;
+
+        public Object getInheritedPrivateField()
+        {
+            return inheritedPrivateField;
+        }
+
+        public Object getInheritedProtectedField()
+        {
+            return inheritedProtectedField;
+        }
+
+        public Object getInheritedPublicField()
+        {
+            return inheritedPublicField;
+        }
+    }
+
+    public static class SetFieldValue extends SuperSetFieldValue
+    {
+        private Object privateField = null;
+        protected Object protectedField;
+        public Object publicField;
+
+        public final Object publicFinalField = new Object();
+
+        public Object getPrivateField()
+        {
+            return privateField;
+        }
+
+        public Object getProtectedField()
+        {
+            return protectedField;
+        }
+
+        public Object getPublicField()
+        {
+            return publicField;
+        }
     }
 }

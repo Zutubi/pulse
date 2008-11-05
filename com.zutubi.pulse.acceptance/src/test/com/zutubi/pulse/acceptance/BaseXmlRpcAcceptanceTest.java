@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.util.RandomUtils;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.net.URL;
 import java.util.Vector;
@@ -14,7 +14,7 @@ import org.testng.annotations.AfterMethod;
  * simple functions for logging in and out and calling the API with a
  * token.
  */
-public class BaseXmlRpcAcceptanceTest extends TestCase
+public class BaseXmlRpcAcceptanceTest extends ZutubiTestCase
 {
     public static final String SYMBOLIC_NAME_KEY = XmlRpcHelper.SYMBOLIC_NAME_KEY;
 

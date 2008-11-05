@@ -5,7 +5,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.DefaultObjectFactory;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  */
-public class ConfigurationActionsTest extends TestCase
+public class ConfigurationActionsTest extends ZutubiTestCase
 {
     private ActionManager a = null;
 

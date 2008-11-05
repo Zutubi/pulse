@@ -1,6 +1,6 @@
 package com.zutubi.util;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.Constants;
 import com.zutubi.util.TimeStamps;
 
@@ -8,7 +8,7 @@ import com.zutubi.util.TimeStamps;
  *
  *
  */
-public class TimeStampsTest extends TestCase
+public class TimeStampsTest extends ZutubiTestCase
 {
     public void testPrettyEstimated()
     {

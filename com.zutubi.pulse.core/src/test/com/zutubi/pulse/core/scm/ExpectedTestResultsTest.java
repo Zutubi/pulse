@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmFile;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
  *
  *
  */
-public class ExpectedTestResultsTest extends TestCase
+public class ExpectedTestResultsTest extends ZutubiTestCase
 {
     // need to verify that the expected test results are what we actually expect.
 

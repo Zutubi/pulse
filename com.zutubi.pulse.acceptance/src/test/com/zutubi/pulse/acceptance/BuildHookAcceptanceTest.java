@@ -51,7 +51,6 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     @AfterMethod
     protected void tearDown() throws Exception
     {
-        logout();
         xmlRpcHelper.logout();
         FileSystemUtils.rmdir(tempDir);
         super.tearDown();

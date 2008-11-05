@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.hibernate.HibernateUtils;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import nu.xom.ParsingException;
 
 import javax.sql.DataSource;
@@ -20,7 +20,7 @@ import java.util.Properties;
  *
  *
  */
-public class TransferAPITest extends TestCase
+public class TransferAPITest extends ZutubiTestCase
 {
     protected void setUp() throws Exception
     {

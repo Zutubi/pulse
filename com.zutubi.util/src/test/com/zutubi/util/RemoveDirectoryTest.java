@@ -1,14 +1,14 @@
 package com.zutubi.util;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
  */
-public class RemoveDirectoryTest extends TestCase
+public class RemoveDirectoryTest extends ZutubiTestCase
 {
     public void testRemoveNonExistant()
     {

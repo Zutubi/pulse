@@ -40,7 +40,7 @@ import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.tove.config.MockConfigurationProvider;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 import java.util.*;
@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  */
-public class ThreadedRecipeQueueTest extends TestCase implements com.zutubi.events.EventListener
+public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutubi.events.EventListener
 {
     private static final String PULSE_FILE = "<xml version=\"1.0\"><project default-recipe=\"default\"><recipe name=\"default\"/></project>";
 

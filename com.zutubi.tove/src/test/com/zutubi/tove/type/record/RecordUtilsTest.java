@@ -1,8 +1,8 @@
 package com.zutubi.tove.type.record;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
-public class RecordUtilsTest extends TestCase
+public class RecordUtilsTest extends ZutubiTestCase
 {
     public void testIsSimpleNull()
     {

@@ -2,7 +2,7 @@ package com.zutubi.tove.config;
 
 import com.zutubi.util.Sort;
 import com.zutubi.tove.config.api.Configuration;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  */
-public class DefaultInstanceCacheTest extends TestCase
+public class DefaultInstanceCacheTest extends ZutubiTestCase
 {
     private DefaultInstanceCache cache;
 

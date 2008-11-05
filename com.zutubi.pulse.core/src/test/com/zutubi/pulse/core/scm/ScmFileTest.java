@@ -1,13 +1,13 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.scm.api.ScmFile;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  *
  *
  */
-public class ScmFileTest extends TestCase
+public class ScmFileTest extends ZutubiTestCase
 {
     protected void setUp() throws Exception
     {

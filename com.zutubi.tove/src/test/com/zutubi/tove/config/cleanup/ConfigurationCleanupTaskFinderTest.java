@@ -3,14 +3,14 @@ package com.zutubi.tove.config.cleanup;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
  */
-public class ConfigurationCleanupTaskFinderTest extends TestCase
+public class ConfigurationCleanupTaskFinderTest extends ZutubiTestCase
 {
     private ObjectFactory objectFactory;
 

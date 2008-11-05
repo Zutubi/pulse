@@ -3,14 +3,14 @@ package com.zutubi.validation.providers;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.mock.MockWallet;
 import com.zutubi.validation.validators.ValidateableValidator;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 
 /**
  * <class-comment/>
  */
-public class ReflectionValidatorProviderTest extends TestCase
+public class ReflectionValidatorProviderTest extends ZutubiTestCase
 {
     private ReflectionValidatorProvider provider;
 

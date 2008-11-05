@@ -8,13 +8,13 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.tove.type.record.store.InMemoryRecordStore;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
 
 /**
  */
-public class ConfigurationPersistenceManagerTest extends TestCase
+public class ConfigurationPersistenceManagerTest extends ZutubiTestCase
 {
     private ConfigurationPersistenceManager manager = null;
     private TypeRegistry typeRegistry = null;

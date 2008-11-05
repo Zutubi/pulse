@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  */
-public abstract class AbstractScmIntegrationTestCase extends TestCase
+public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
 {
     protected File workingDir;
     protected File tmp;

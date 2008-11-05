@@ -1,12 +1,12 @@
 package com.zutubi.tove.type.record;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  *
  *
  */
-public class MutableRecordImplTest extends TestCase
+public class MutableRecordImplTest extends ZutubiTestCase
 {
     public void testEqualsEmpty()
     {

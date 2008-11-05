@@ -1,13 +1,13 @@
 package com.zutubi.i18n.error;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.i18n.mock.MockErrors;
 import com.zutubi.i18n.mock.MockInvalidErrors;
 
 /**
  * <class-comment/>
  */
-public class ErrorsTest extends TestCase
+public class ErrorsTest extends ZutubiTestCase
 {
     protected void setUp() throws Exception
     {

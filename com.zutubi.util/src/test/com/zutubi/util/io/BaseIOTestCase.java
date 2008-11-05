@@ -2,11 +2,11 @@ package com.zutubi.util.io;
 
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.FileSystemUtils;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.*;
 
-public abstract class BaseIOTestCase extends TestCase
+public abstract class BaseIOTestCase extends ZutubiTestCase
 {
     protected File tmp;
 

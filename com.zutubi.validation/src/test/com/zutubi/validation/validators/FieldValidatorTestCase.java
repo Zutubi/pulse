@@ -1,6 +1,6 @@
 package com.zutubi.validation.validators;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationAwareSupport;
 import com.zutubi.validation.DelegatingValidationContext;
@@ -9,7 +9,7 @@ import com.zutubi.validation.i18n.InMemoryTextProvider;
 /**
  * <class-comment/>
  */
-public abstract class FieldValidatorTestCase extends TestCase
+public abstract class FieldValidatorTestCase extends ZutubiTestCase
 {
     protected ValidationAwareSupport validationAware;
     protected InMemoryTextProvider textProvider;

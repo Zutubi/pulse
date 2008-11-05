@@ -1,11 +1,11 @@
 package com.zutubi.util;
 
 import com.zutubi.util.CircularBuffer;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  */
-public class CircularBufferTest extends TestCase
+public class CircularBufferTest extends ZutubiTestCase
 {
     private CircularBuffer<String> buffer;
 

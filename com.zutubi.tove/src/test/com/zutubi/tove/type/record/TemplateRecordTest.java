@@ -1,12 +1,12 @@
 package com.zutubi.tove.type.record;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Set;
 
 /**
  */
-public class TemplateRecordTest extends TestCase
+public class TemplateRecordTest extends ZutubiTestCase
 {
     public void testMetaKeySet()
     {

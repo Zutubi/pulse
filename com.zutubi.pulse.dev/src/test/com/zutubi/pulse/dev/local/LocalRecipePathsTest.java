@@ -1,13 +1,13 @@
 package com.zutubi.pulse.dev.local;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 
 /**
  * <class-comment/>
  */
-public class LocalRecipePathsTest extends TestCase
+public class LocalRecipePathsTest extends ZutubiTestCase
 {
 
     public LocalRecipePathsTest(String testName)

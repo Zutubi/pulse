@@ -1,6 +1,6 @@
 package com.zutubi.tove.type.record;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  *
  *
  */
-public class RecordQueriesTest extends TestCase
+public class RecordQueriesTest extends ZutubiTestCase
 {
     private MutableRecord base;
     private RecordQueries queries;

@@ -1,6 +1,6 @@
 package com.zutubi.util;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -10,7 +10,7 @@ import java.util.Random;
  *
  *
  */
-public class RandomUtilsTest extends TestCase
+public class RandomUtilsTest extends ZutubiTestCase
 {
     public void testRandomnessOfSecureRandom() throws NoSuchAlgorithmException
     {

@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.license;
 
 import com.zutubi.events.DefaultEventManager;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  *
  *
  */
-public class LicenseManagerTest extends TestCase
+public class LicenseManagerTest extends ZutubiTestCase
 {
     private LicenseManager licenseManager;
 

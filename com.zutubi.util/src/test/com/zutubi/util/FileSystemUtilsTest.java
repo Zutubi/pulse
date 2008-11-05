@@ -3,7 +3,7 @@ package com.zutubi.util;
 import com.zutubi.util.io.IOUtils;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.*;
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  */
-public class FileSystemUtilsTest extends TestCase
+public class FileSystemUtilsTest extends ZutubiTestCase
 {
     private File tmpDir;
     private Copier[] copiers;

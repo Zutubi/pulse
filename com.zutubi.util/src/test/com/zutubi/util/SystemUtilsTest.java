@@ -1,6 +1,6 @@
 package com.zutubi.util;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 
 /**
  */
-public class SystemUtilsTest extends TestCase
+public class SystemUtilsTest extends ZutubiTestCase
 {
     public void testFindInPathNonExistant()
     {

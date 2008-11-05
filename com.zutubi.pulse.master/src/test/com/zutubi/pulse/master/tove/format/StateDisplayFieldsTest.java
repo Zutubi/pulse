@@ -4,7 +4,7 @@ import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.DefaultObjectFactory;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  */
-public class StateDisplayFieldsTest extends TestCase
+public class StateDisplayFieldsTest extends ZutubiTestCase
 {
     private DefaultObjectFactory objectFactory = new DefaultObjectFactory();
 

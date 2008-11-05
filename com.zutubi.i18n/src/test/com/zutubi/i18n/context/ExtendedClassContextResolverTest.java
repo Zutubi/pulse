@@ -1,13 +1,13 @@
 package com.zutubi.i18n.context;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.i18n.mock.MockBook;
 import com.zutubi.i18n.mock.MockSubClass;
 
 /**
  * <class-comment/>
  */
-public class ExtendedClassContextResolverTest extends TestCase
+public class ExtendedClassContextResolverTest extends ZutubiTestCase
 {
     private ExtendedClassContextResolver resolver;
 

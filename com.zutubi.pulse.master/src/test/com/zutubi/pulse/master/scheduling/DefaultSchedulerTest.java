@@ -2,9 +2,9 @@ package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
 import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
-public class DefaultSchedulerTest extends TestCase
+public class DefaultSchedulerTest extends ZutubiTestCase
 {
     private DefaultScheduler scheduler;
     private TestTriggerHandler triggerHandler;

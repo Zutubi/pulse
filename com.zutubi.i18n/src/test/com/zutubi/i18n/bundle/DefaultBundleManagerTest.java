@@ -1,6 +1,6 @@
 package com.zutubi.i18n.bundle;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.i18n.context.*;
 import com.zutubi.i18n.mock.MockClass;
 import com.zutubi.i18n.mock.MockSubClass;
@@ -12,7 +12,7 @@ import java.util.Locale;
 /**
  * <class-comment/>
  */
-public class DefaultBundleManagerTest extends TestCase
+public class DefaultBundleManagerTest extends ZutubiTestCase
 {
     private DefaultBundleManager bundleManager;
     private Locale locale;

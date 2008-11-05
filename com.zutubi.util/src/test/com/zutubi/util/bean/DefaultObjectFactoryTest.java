@@ -1,8 +1,8 @@
 package com.zutubi.util.bean;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
-public class DefaultObjectFactoryTest extends TestCase
+public class DefaultObjectFactoryTest extends ZutubiTestCase
 {
     private static final String TEST_STRING = "hello";
     private static final int    TEST_INT    = 1110098734;

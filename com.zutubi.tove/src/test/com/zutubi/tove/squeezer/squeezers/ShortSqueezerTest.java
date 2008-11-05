@@ -1,11 +1,11 @@
 package com.zutubi.tove.squeezer.squeezers;
 
 import com.zutubi.tove.squeezer.SqueezeException;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  */
-public class ShortSqueezerTest extends TestCase
+public class ShortSqueezerTest extends ZutubiTestCase
 {
     private ShortSqueezer squeezer;
 

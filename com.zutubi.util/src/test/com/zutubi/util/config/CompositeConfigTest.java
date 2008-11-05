@@ -1,9 +1,9 @@
 package com.zutubi.util.config;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
-public class CompositeConfigTest extends TestCase
+public class CompositeConfigTest extends ZutubiTestCase
 {
     public CompositeConfigTest()
     {

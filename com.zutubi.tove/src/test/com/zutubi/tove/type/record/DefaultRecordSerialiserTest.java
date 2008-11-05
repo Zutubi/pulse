@@ -1,7 +1,7 @@
 package com.zutubi.tove.type.record;
 
 import com.zutubi.util.FileSystemUtils;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  */
-public class DefaultRecordSerialiserTest extends TestCase
+public class DefaultRecordSerialiserTest extends ZutubiTestCase
 {
     private File tmpDir;
     private DefaultRecordSerialiser serialiser;

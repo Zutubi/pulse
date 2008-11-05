@@ -2,12 +2,12 @@ package com.zutubi.util.io;
 
 import com.zutubi.util.FileSystemUtils;
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.*;
 import java.util.Properties;
 
-public class PropertiesWriterTest extends TestCase
+public class PropertiesWriterTest extends ZutubiTestCase
 {
     private File tmpDir = null;
     private File config;

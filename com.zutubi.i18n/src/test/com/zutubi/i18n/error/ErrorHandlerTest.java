@@ -1,11 +1,11 @@
 package com.zutubi.i18n.error;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  * <class-comment/>
  */
-public class ErrorHandlerTest extends TestCase
+public class ErrorHandlerTest extends ZutubiTestCase
 {
     private ErrorHandler handler;
 

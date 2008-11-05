@@ -4,7 +4,7 @@ import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Map;
  *
  *
  */
-public class TypeRegistryTest extends TestCase
+public class TypeRegistryTest extends ZutubiTestCase
 {
     private TypeRegistry typeRegistry;
 

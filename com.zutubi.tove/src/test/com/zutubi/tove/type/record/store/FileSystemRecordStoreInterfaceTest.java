@@ -5,10 +5,6 @@ import com.zutubi.tove.transaction.TransactionManager;
 
 import java.io.File;
 
-/**
- *
- *
- */
 public class FileSystemRecordStoreInterfaceTest extends AbstractRecordStoreInterfaceTestCase
 {
     private File persistentDirectory;
@@ -22,9 +18,8 @@ public class FileSystemRecordStoreInterfaceTest extends AbstractRecordStoreInter
 
     protected void tearDown() throws Exception
     {
-        super.tearDown();
-
         assertTrue(FileSystemUtils.rmdir(persistentDirectory));
+        super.tearDown();
     }
 
     public RecordStore createRecordStore() throws Exception

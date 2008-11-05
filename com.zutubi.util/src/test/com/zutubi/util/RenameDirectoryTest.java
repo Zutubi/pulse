@@ -1,7 +1,7 @@
 package com.zutubi.util;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * Test case for the rename functionality of the FileSystemUtils.
  */
-public class RenameDirectoryTest extends TestCase
+public class RenameDirectoryTest extends ZutubiTestCase
 {
 
     private File tmpDir = null;

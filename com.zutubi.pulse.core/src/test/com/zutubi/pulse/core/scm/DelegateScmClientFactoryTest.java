@@ -4,13 +4,13 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
 import com.zutubi.util.bean.DefaultObjectFactory;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  *
  *
  */
-public class DelegateScmClientFactoryTest extends TestCase
+public class DelegateScmClientFactoryTest extends ZutubiTestCase
 {
     private DelegateScmClientFactory factory;
 

@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.master.transfer.jdbc.HibernateTransferSource;
 import com.zutubi.pulse.master.transfer.jdbc.HibernateTransferTarget;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import java.io.ByteArrayInputStream;
@@ -17,7 +17,7 @@ import java.util.Properties;
  *
  *
  */
-public class ExportImportSanityTest extends TestCase
+public class ExportImportSanityTest extends ZutubiTestCase
 {
     public void testExports() throws IOException, TransferException
     {

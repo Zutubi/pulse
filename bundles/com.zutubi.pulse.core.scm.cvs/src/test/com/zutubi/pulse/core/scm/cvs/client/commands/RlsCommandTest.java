@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.cvs.client.commands;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
 
@@ -12,7 +12,7 @@ import java.util.List;
  *
  *
  */
-public class RlsCommandTest extends TestCase
+public class RlsCommandTest extends ZutubiTestCase
 {
     private CvsCore core;
 

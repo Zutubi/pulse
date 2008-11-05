@@ -4,7 +4,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  *
  *
  */
-public class FormDescriptorFactoryTest extends TestCase
+public class FormDescriptorFactoryTest extends ZutubiTestCase
 {
     private TypeRegistry typeRegistry;
     private FormDescriptorFactory descriptorFactory;

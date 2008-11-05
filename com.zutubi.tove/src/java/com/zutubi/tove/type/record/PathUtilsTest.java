@@ -1,10 +1,10 @@
 package com.zutubi.tove.type.record;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  */
-public class PathUtilsTest extends TestCase
+public class PathUtilsTest extends ZutubiTestCase
 {
     public void testPrefixMatchesSimpleMatch()
     {

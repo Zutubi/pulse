@@ -103,25 +103,33 @@ public class SeleniumUtils
 
     private static void refreshUntil(Selenium selenium, long timeout, Condition condition, String conditionText)
     {
+        selenium.setBrowserLogLevel("debug");
         long startTime = System.currentTimeMillis();
-        while(!condition.satisfied())
+        try
+        {
+            while(!condition.satisfied())
         {
             if(System.currentTimeMillis() - startTime > timeout)
-            {
-                throw new SeleniumException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText);
-            }
+                {
+                    throw new SeleniumException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText);
+                }
 
-            try
-            {
-                Thread.sleep(1000);
-            }
-            catch (InterruptedException e)
-            {
-                throw new SeleniumException(e);
-            }
+                try
+                {
+                    Thread.sleep(1000);
+                }
+                catch (InterruptedException e)
+                {
+                    throw new SeleniumException(e);
+                }
 
-            selenium.refresh();
-            selenium.waitForPageToLoad("10000");
+                selenium.refresh();
+                selenium.waitForPageToLoad("10000");
+            }
+        }
+        finally
+        {
+            selenium.setBrowserLogLevel("info");
         }
     }
 

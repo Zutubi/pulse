@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.velocity;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
@@ -9,7 +9,7 @@ import java.io.StringWriter;
 /**
  * <class-comment/>
  */
-public abstract class VelocityDirectiveTestCase extends TestCase
+public abstract class VelocityDirectiveTestCase extends ZutubiTestCase
 {
     private VelocityEngine velocity;
 

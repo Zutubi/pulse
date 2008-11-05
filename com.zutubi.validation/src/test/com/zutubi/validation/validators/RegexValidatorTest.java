@@ -1,6 +1,6 @@
 package com.zutubi.validation.validators;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 

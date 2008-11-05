@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.committransformers;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  * <class comment/>
  */
-public class CommitMessageBuilderTest extends TestCase
+public class CommitMessageBuilderTest extends ZutubiTestCase
 {
     public void testReplaceLiteral()
     {

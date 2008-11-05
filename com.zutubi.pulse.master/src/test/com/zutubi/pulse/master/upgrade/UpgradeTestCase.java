@@ -2,13 +2,13 @@ package com.zutubi.pulse.master.upgrade;
 
 import com.zutubi.pulse.master.util.monitor.JobListener;
 import com.zutubi.pulse.master.util.monitor.Task;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class UpgradeTestCase extends TestCase
+public abstract class UpgradeTestCase extends ZutubiTestCase
 {
     protected static class UpgradeableComponentAdapter implements UpgradeableComponent, JobListener<UpgradeTaskAdapter>
     {

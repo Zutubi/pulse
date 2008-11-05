@@ -1,12 +1,12 @@
 package com.zutubi.events;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class AsynchronousDelegatingListenerTest extends TestCase
+public class AsynchronousDelegatingListenerTest extends ZutubiTestCase
 {
     private Semaphore eventSemaphore = new Semaphore(0);
     private Semaphore doneSemaphore = new Semaphore(0);

@@ -2,13 +2,13 @@ package com.zutubi.tove.type;
 
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.RecordManager;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  *
  *
  */
-public abstract class TypeTestCase extends TestCase
+public abstract class TypeTestCase extends ZutubiTestCase
 {
     protected TypeRegistry typeRegistry;
     protected RecordManager recordManager;

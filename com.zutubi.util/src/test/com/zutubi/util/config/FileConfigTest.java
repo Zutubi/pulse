@@ -2,13 +2,13 @@ package com.zutubi.util.config;
 
 import com.zutubi.util.io.IOUtils;
 import junit.framework.Assert;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-public class FileConfigTest extends TestCase
+public class FileConfigTest extends ZutubiTestCase
 {
     private Config config = null;
     private File testProperties;

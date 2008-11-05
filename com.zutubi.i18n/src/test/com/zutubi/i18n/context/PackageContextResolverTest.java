@@ -1,11 +1,11 @@
 package com.zutubi.i18n.context;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  * <class-comment/>
  */
-public class PackageContextResolverTest extends TestCase
+public class PackageContextResolverTest extends ZutubiTestCase
 {
     private PackageContextResolver resolver;
 

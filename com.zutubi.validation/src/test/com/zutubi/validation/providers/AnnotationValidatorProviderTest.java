@@ -4,14 +4,14 @@ import com.zutubi.validation.Validator;
 import com.zutubi.validation.annotations.*;
 import com.zutubi.validation.mock.*;
 import com.zutubi.validation.validators.*;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 
 /**
  * <class-comment/>
  */
-public class AnnotationValidatorProviderTest extends TestCase
+public class AnnotationValidatorProviderTest extends ZutubiTestCase
 {
     private AnnotationValidatorProvider provider;
 

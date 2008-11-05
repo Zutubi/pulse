@@ -1,12 +1,12 @@
 package com.zutubi.tove.squeezer.squeezers;
 
 import com.zutubi.tove.squeezer.SqueezeException;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  * <class-comment/>
  */
-public class IntegerSqueezerTest extends TestCase
+public class IntegerSqueezerTest extends ZutubiTestCase
 {
     private IntegerSqueezer squeezer;
 

@@ -3,13 +3,13 @@ package com.zutubi.pulse.master.upgrade.tasks;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.util.Map;
 
-public class PathRecordLocatorTest extends TestCase
+public class PathRecordLocatorTest extends ZutubiTestCase
 {
     private static final String INVALID_PATH = "invalid";
     private static final String VALID_PATH   = "valid";

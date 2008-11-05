@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.scheduling;
 
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  * <class-comment/>
  */
-public abstract class SchedulerStrategyTestBase extends TestCase
+public abstract class SchedulerStrategyTestBase extends ZutubiTestCase
 {
     protected SchedulerStrategy scheduler = null;
     protected TestTriggerHandler triggerHandler = null;

@@ -4,7 +4,7 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 /**
  * Base class for test cases.
  */
-public abstract class PulseTestCase extends TestCase
+public abstract class PulseTestCase extends ZutubiTestCase
 {
     public PulseTestCase()
     {
