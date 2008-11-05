@@ -95,14 +95,6 @@ public class ToveUtils
             }
 
             String[] parameterValue = parameters.get(propertyName);
-            parameterValue = CollectionUtils.mapToArray(parameterValue, new Mapping<String, String>()
-            {
-                public String map(String s)
-                {
-                    return s.trim();
-                }
-            }, new String[parameterValue.length]);
-            
             if (parameterValue == null)
             {
                 parameterValue = parameters.get(propertyName + ".default");
@@ -111,6 +103,14 @@ public class ToveUtils
                     continue;
                 }
             }
+
+            parameterValue = CollectionUtils.mapToArray(parameterValue, new Mapping<String, String>()
+            {
+                public String map(String s)
+                {
+                    return s.trim();
+                }
+            }, new String[parameterValue.length]);            
 
             if (Collection.class.isAssignableFrom(property.getClazz()))
             {
