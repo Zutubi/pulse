@@ -6,6 +6,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.logging.Logger;
 import junit.framework.Assert;
 
 /**
@@ -13,6 +14,8 @@ import junit.framework.Assert;
  */
 public class SeleniumUtils
 {
+    private static final Logger LOG = Logger.getLogger(SeleniumUtils.class);
+
     public static final int DEFAULT_TIMEOUT = 30000;
 
     public static void waitForVariable(Selenium selenium, String variable, long timeout)
@@ -27,7 +30,7 @@ public class SeleniumUtils
 
     public static String evalVariable(Selenium selenium, String variable)
     {
-        return selenium.getEval("selenium.browserbot.getCurrentWindow()." + variable);       
+        return selenium.getEval("selenium.browserbot.getCurrentWindow()." + variable);
     }
 
     public static void waitForElementId(Selenium selenium, String id)
@@ -103,33 +106,32 @@ public class SeleniumUtils
 
     private static void refreshUntil(Selenium selenium, long timeout, Condition condition, String conditionText)
     {
-        selenium.setBrowserLogLevel("debug");
         long startTime = System.currentTimeMillis();
-        try
+        while (!condition.satisfied())
         {
-            while(!condition.satisfied())
-        {
-            if(System.currentTimeMillis() - startTime > timeout)
-                {
-                    throw new SeleniumException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText);
-                }
+            if (System.currentTimeMillis() - startTime > timeout)
+            {
+                throw new SeleniumException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText);
+            }
 
-                try
-                {
-                    Thread.sleep(1000);
-                }
-                catch (InterruptedException e)
-                {
-                    throw new SeleniumException(e);
-                }
+            try
+            {
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e)
+            {
+                throw new SeleniumException(e);
+            }
 
-                selenium.refresh();
+            selenium.refresh();
+            try
+            {
                 selenium.waitForPageToLoad("10000");
             }
-        }
-        finally
-        {
-            selenium.setBrowserLogLevel("info");
+            catch (Exception e)
+            {
+                LOG.warning(e);
+            }
         }
     }
 
