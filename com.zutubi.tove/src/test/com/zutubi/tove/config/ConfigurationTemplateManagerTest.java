@@ -1366,11 +1366,27 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         try
         {
             configurationTemplateManager.save(a);
+            fail();
         }
         catch (IllegalArgumentException e)
         {
             assertEquals("Attempt to change readOnly property 'a' from 'A' to 'B' is not allowed.", e.getMessage());
         }
+    }
+
+    public void testConfigWithReadOnlyFieldCanBePersistedIfNoChangeOccurs() throws TypeException
+    {
+        CompositeType type = typeRegistry.register(ReadOnlyFieldA.class);
+
+        configurationPersistenceManager.register("readOnlyFields", new MapType(type, typeRegistry));
+
+        ReadOnlyFieldA a = new ReadOnlyFieldA("id", "A");
+
+        String path = configurationTemplateManager.insert("readOnlyFields", a);
+        a = (ReadOnlyFieldA) configurationTemplateManager.getInstance(path);
+        a.setA("A");
+
+        configurationTemplateManager.save(a);
     }
 
     private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException

@@ -1253,7 +1253,7 @@ public class ConfigurationTemplateManager
                 boolean different = false;
                 if (existingValue != null)
                 {
-                    if (!existingRecord.equals(newValue))
+                    if (!existingValue.equals(newValue))
                     {
                         different = true;
                     }
