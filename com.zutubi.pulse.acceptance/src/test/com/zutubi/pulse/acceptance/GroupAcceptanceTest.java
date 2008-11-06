@@ -1,46 +1,30 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.GroupForm;
+import com.zutubi.pulse.acceptance.forms.admin.BuiltinGroupForm;
+import com.zutubi.pulse.acceptance.pages.admin.GroupsPage;
 import com.zutubi.pulse.acceptance.pages.admin.HierarchyPage;
-import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.tove.type.record.PathUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 
 /**
  * Test for user groups.
  */
-@Test(dependsOnGroups = {"init.*"})
 public class GroupAcceptanceTest extends SeleniumTestBase
 {
-
-    @BeforeMethod
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    @AfterMethod
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testCreateEmptyGroup()
     {
         loginAsAdmin();
-        
-        ListPage groupsPage = new ListPage(selenium, urls, ConfigurationRegistry.GROUPS_SCOPE);
-        groupsPage.goTo();
-        groupsPage.clickAdd();
 
-        GroupForm form = new GroupForm(selenium);
-        form.waitFor();
+        GroupsPage groupsPage = new GroupsPage(selenium, urls);
+        groupsPage.goTo();
+
+        GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, null, null);
 
         waitForElement(getGroupPath(random));
@@ -71,12 +55,10 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         logout();
 
         loginAsAdmin();
-        ListPage groupsPage = new ListPage(selenium, urls, ConfigurationRegistry.GROUPS_SCOPE);
+        GroupsPage groupsPage = new GroupsPage(selenium, urls);
         groupsPage.goTo();
-        groupsPage.clickAdd();
 
-        GroupForm form = new GroupForm(selenium);
-        form.waitFor();
+        GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, null, ServerPermission.CREATE_PROJECT.toString());
         waitForElement(getGroupPath(random));
         form.waitFor();
@@ -107,12 +89,10 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         }
 
         loginAsAdmin();
-        ListPage groupsPage = new ListPage(selenium, urls, ConfigurationRegistry.GROUPS_SCOPE);
+        GroupsPage groupsPage = new GroupsPage(selenium, urls);
         groupsPage.goTo();
-        groupsPage.clickAdd();
 
-        GroupForm form = new GroupForm(selenium);
-        form.waitFor();
+        GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, userHandle, null);
         waitForElement(getGroupPath(random));
         logout();
@@ -133,6 +113,44 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         login(login, "");
         globalPage.goTo();
         assertTrue(globalPage.isAddPresent());
+        logout();
+    }
+
+    public void testAllUsersGroupNameIsReadOnly()
+    {
+        loginAsAdmin();
+
+        GroupsPage groupsPage = new GroupsPage(selenium, urls);
+        groupsPage.goTo();
+
+        // a) ensure only view link is available for all users group.
+        groupsPage.assertActionsNotPresent(ALL_USERS_GROUP_NAME, "clone", "delete");
+
+        // b) go to form, ensure name is not editable.
+        // click view or groups/name
+        BuiltinGroupForm form = groupsPage.clickViewBuiltinGroupAndWait("all.users");
+        form.assertFormPresent();
+        assertFalse(form.isEditable("name"));
+
+        logout();
+    }
+
+    public void testAnonymousUserGroupNameIsReadOnly()
+    {
+        loginAsAdmin();
+
+        GroupsPage groupsPage = new GroupsPage(selenium, urls);
+        groupsPage.goTo();
+
+        // a) ensure only view link is available for all users group.
+        groupsPage.assertActionsNotPresent(ANONYMOUS_USERS_GROUP_NAME, "clone", "delete");
+
+        // b) go to form, ensure name is not editable.
+        // click view or groups/name
+        BuiltinGroupForm form = groupsPage.clickViewBuiltinGroupAndWait("anonymous.users");
+        form.assertFormPresent();
+        assertFalse(form.isEditable("name"));
+
         logout();
     }
 

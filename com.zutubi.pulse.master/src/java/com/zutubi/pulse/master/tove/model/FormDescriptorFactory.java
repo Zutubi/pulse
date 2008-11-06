@@ -217,6 +217,11 @@ public class FormDescriptorFactory
     {
         handleAnnotations(type, fd, property.getAnnotations());
 
+        if (!property.isWriteable())
+        {
+            fd.addParameter("readOnly", true);
+        }
+
         if (fd instanceof TextFieldDescriptor)
         {
             Numeric numeric = AnnotationUtils.findAnnotation(property.getAnnotations(), Numeric.class);

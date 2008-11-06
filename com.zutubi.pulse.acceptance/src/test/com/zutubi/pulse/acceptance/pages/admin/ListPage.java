@@ -23,7 +23,7 @@ public class ListPage extends ConfigPage
     public static final String ANNOTATION_OVERRIDDEN = "overridden";
     public static final String ANNOTATION_HIDDEN     = "hidden";
 
-    private static final String ADD_LINK = "map:add";
+    protected static final String ADD_LINK = "map:add";
     
     private String path;
 

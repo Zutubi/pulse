@@ -2,6 +2,8 @@ package com.zutubi.tove.config;
 
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.ReadOnly;
+import com.zutubi.tove.annotations.ID;
 import com.zutubi.events.AllEventListener;
 import com.zutubi.events.Event;
 import com.zutubi.tove.config.events.*;
@@ -101,7 +103,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             configurationTemplateManager.insert("sample/a/mock", b);
             fail();
         }
-        catch(IllegalArgumentException e)
+        catch (IllegalArgumentException e)
         {
             assertEquals("Invalid insertion path 'sample/a/mock': record already exists (use save to modify)", e.getMessage());
         }
@@ -552,7 +554,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a = configurationTemplateManager.getInstance(path, MockA.class);
         a = configurationTemplateManager.deepClone(a);
         configurationTemplateManager.save(a);
-        
+
         savedRecord = configurationTemplateManager.getRecord(path);
         assertEquals("value", savedRecord.getMeta("testkey"));
     }
@@ -789,7 +791,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         insertInherited();
         assertTrue(configurationTemplateManager.canDelete("template/mock/mock"));
     }
-    
+
     public void testCanDeleteInheritedMapItem() throws TypeException
     {
         assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(insertInherited(), "cs/cee")));
@@ -833,7 +835,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             configurationTemplateManager.delete(path);
             fail();
         }
-        catch(IllegalArgumentException e)
+        catch (IllegalArgumentException e)
         {
             assertEquals("Cannot delete instance at path 'sample/mock': marked permanent", e.getMessage());
         }
@@ -869,7 +871,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             configurationTemplateManager.delete("sample/nope");
             fail();
         }
-        catch(IllegalArgumentException e)
+        catch (IllegalArgumentException e)
         {
             assertEquals("No such path 'sample/nope'", e.getMessage());
         }
@@ -1349,6 +1351,28 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[2], "cs", "hideme")));
     }
 
+    public void testAttemptToChangeReadOnlyFieldRejected() throws TypeException
+    {
+        CompositeType type = typeRegistry.register(ReadOnlyFieldA.class);
+
+        configurationPersistenceManager.register("readOnlyFields", new MapType(type, typeRegistry));
+
+        ReadOnlyFieldA a = new ReadOnlyFieldA("id", "A");
+
+        String path = configurationTemplateManager.insert("readOnlyFields", a);
+        a = (ReadOnlyFieldA) configurationTemplateManager.getInstance(path);
+        a.setA("B");
+
+        try
+        {
+            configurationTemplateManager.save(a);
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("Attempt to change readOnly property 'a' from 'A' to 'B' is not allowed.", e.getMessage());
+        }
+    }
+
     private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException
     {
         MutableRecord record = typeA.unstantiate(parent);
@@ -1606,6 +1630,46 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         public MockReferee(String name)
         {
             super(name);
+        }
+    }
+
+    @SymbolicName("readOnlyFieldA")
+    public static class ReadOnlyFieldA extends AbstractConfiguration
+    {
+        @ReadOnly
+        private String a;
+
+        @ID
+        private String id;
+
+        public ReadOnlyFieldA()
+        {
+        }
+
+        public ReadOnlyFieldA(String id, String a)
+        {
+            this.a = a;
+            this.id = id;
+        }
+
+        public void setA(String a)
+        {
+            this.a = a;
+        }
+
+        public String getA()
+        {
+            return a;
+        }
+
+        public void setId(String id)
+        {
+            this.id = id;
+        }
+
+        public String getId()
+        {
+            return id;
         }
     }
 

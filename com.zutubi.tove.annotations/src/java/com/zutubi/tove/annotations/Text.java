@@ -23,10 +23,19 @@ public @interface Text
      */
     public static final int DEFAULT_size = 0;
 
+    public static final boolean DEFAULT_readOnly = false;
+
     /**
      * The size of the rendered text field.
      * 
      * @return number of columns to be displayed.
      */
     public int size() default DEFAULT_size;
+
+    /**
+     * Mark the field as readonly for the UI.
+     *
+     * @return true if the field is readonly, false otherwise.
+     */
+    public boolean readOnly() default DEFAULT_readOnly;
 }

@@ -1,16 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.*;
 
@@ -19,20 +16,17 @@ import java.util.*;
  * tests deal with specific configuration types, this test just concentrates
  * on the general capabilities and boundaries of the config functions.
  */
-@Test(dependsOnGroups = "init.*", groups = "xmlrpc")
 public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private static final String TEST_PROJECT_NAME = "config-xml-rpc";
     private static final String TEST_PROJECT_PATH = "projects/config-xml-rpc";
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         logout();

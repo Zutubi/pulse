@@ -11,6 +11,8 @@ var fc;
     fc = {
     <#if form.readOnly>
         disabled: true,
+    <#elseif parameters.readOnly?default(false)>
+        disabled: true,
     </#if>
         width: 360,
         validateOnBlur: false

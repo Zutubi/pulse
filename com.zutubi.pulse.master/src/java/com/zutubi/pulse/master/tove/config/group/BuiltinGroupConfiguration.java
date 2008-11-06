@@ -1,15 +1,13 @@
 package com.zutubi.pulse.master.tove.config.group;
 
-import com.zutubi.tove.annotations.Classification;
-import com.zutubi.tove.annotations.Internal;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.annotations.*;
 
 /**
  */
 @SymbolicName("zutubi.builtinGroupConfig")
 @Internal
 @Classification(single = "group")
+@Form(fieldOrder = {"name", "serverPermissions"})
 public class BuiltinGroupConfiguration extends AbstractGroupConfiguration
 {
     @Internal
@@ -23,6 +21,17 @@ public class BuiltinGroupConfiguration extends AbstractGroupConfiguration
     {
         super(name);
         this.role = role;
+    }
+
+    @ReadOnly // we do not want people accidentally renaming the built in group names.
+    public String getName()
+    {
+        return super.getName();
+    }
+
+    public void setName(String name)
+    {
+        super.setName(name);
     }
 
     public String getRole()

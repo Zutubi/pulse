@@ -87,6 +87,11 @@ public abstract class SeleniumForm
         return selenium.isElementPresent(getFieldId(fieldName) + "." + annotation);
     }
 
+    public boolean isEditable(String fieldName)
+    {
+        return selenium.isEditable(getFieldId(fieldName));
+    }
+
     public boolean isMarkedRequired(String fieldName)
     {
         return isAnnotationPresent(fieldName, "required");

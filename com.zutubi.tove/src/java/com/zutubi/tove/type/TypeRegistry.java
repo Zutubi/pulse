@@ -1,8 +1,8 @@
 package com.zutubi.tove.type;
 
 import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.HandleAllocator;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
@@ -11,7 +11,6 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
@@ -191,28 +190,28 @@ public class TypeRegistry
 
             for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
             {
-                Method readMethod = descriptor.getReadMethod();
-                if(readMethod == null)
-                {
-                    // We only hook up readable properties
-                    continue;
-                }
-
                 DefinedTypeProperty property = new DefinedTypeProperty();
                 property.setName(descriptor.getName());
-                property.setGetter(readMethod);
+                property.setGetter(descriptor.getReadMethod());
                 property.setSetter(descriptor.getWriteMethod());
+
+                if (!property.isReadable())
+                {
+                    // we only hook up readable properties.
+                    continue;
+                }
 
                 // extract annotations for this property, from the getter, setter
                 property.setAnnotations(AnnotationUtils.annotationsFromProperty(descriptor, true));
 
+                // skip properties marked as transient.
                 if(property.getAnnotation(Transient.class) != null)
                 {
                     continue;
                 }
                 
                 // analyse the java type
-                java.lang.reflect.Type type = readMethod.getGenericReturnType();
+                java.lang.reflect.Type type = descriptor.getReadMethod().getGenericReturnType();
 
                 if (type instanceof Class)
                 {
@@ -222,10 +221,10 @@ public class TypeRegistry
                     {
                         property.setType(simpleType);
                     }
-                    else
+                    else // is not a simple type.
                     {
                         CompositeType compositeType = classMapping.get(clazz);
-                        if (compositeType == null)
+                        if (compositeType == null) // type has not yet been registered, do so now.
                         {
                             compositeType = register(clazz, handler);
                         }
@@ -237,7 +236,6 @@ public class TypeRegistry
                 {
                     if (type instanceof ParameterizedType)
                     {
-                        // have we seen this class yet?
                         ParameterizedType parameterizedType = (ParameterizedType) type;
                         Class clazz = (Class) parameterizedType.getRawType();
 
@@ -257,6 +255,7 @@ public class TypeRegistry
                             continue;
                         }
 
+                        // have we seen this class yet?
                         if (classMapping.containsKey(valueClass))
                         {
                             collectionType = checkReferenceType(property, classMapping.get(valueClass));

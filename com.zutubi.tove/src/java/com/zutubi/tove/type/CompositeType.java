@@ -50,7 +50,6 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
-
     public CompositeType(Class<? extends Configuration> type, String symbolicName) throws TypeException
     {
         super(type, symbolicName);

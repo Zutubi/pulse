@@ -88,12 +88,6 @@ public class ToveUtils
         {
             String propertyName = property.getName();
 
-            // this is a read only property.
-            if (!property.isWriteable())
-            {
-                continue;
-            }
-
             String[] parameterValue = parameters.get(propertyName);
             if (parameterValue == null)
             {

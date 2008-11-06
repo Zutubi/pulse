@@ -1193,6 +1193,9 @@ public class ConfigurationTemplateManager
 
                 CompositeType type = typeRegistry.getType(record.getSymbolicName());
 
+                // check readonly fields have not been altered.
+                ensureReadOnlyFieldsUnaltered(type, existingRecord, record);
+
                 MutableRecord newRecord = updateRecord(existingRecord, record, type);
                 boolean updated = true;
                 if (newPath.equals(path))
@@ -1235,6 +1238,40 @@ public class ConfigurationTemplateManager
                 return newPath;
             }
         });
+    }
+
+    private void ensureReadOnlyFieldsUnaltered(CompositeType type, Record existingRecord, MutableRecord record)
+    {
+        for (TypeProperty property : type.getProperties())
+        {
+            if (!property.isWriteable())
+            {
+                // ensure that the old and new values are the same.
+                String propertyName = property.getName();
+                Object existingValue = existingRecord.get(propertyName);
+                Object newValue = record.get(propertyName);
+                boolean different = false;
+                if (existingValue != null)
+                {
+                    if (!existingRecord.equals(newValue))
+                    {
+                        different = true;
+                    }
+                }
+                else
+                {
+                    if (newValue != null)
+                    {
+                        different = true;
+                    }
+                }
+                if (different)
+                {
+                    throw new IllegalArgumentException("Attempt to change readOnly property " +
+                            "'"+propertyName+"' from '"+existingValue+"' to '"+newValue+"' is not allowed.");
+                }
+            }
+        }
     }
 
     void updateCollectionReferences(CollectionType collectionType, String collectionPath, String oldKey, String newKey)
