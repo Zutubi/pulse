@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
+import com.zutubi.pulse.acceptance.forms.admin.BuildOptionsForm;
+import com.zutubi.pulse.acceptance.forms.admin.SpecifyBuildPropertiesForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
@@ -18,9 +20,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -43,7 +42,6 @@ import java.util.Vector;
  * An acceptance test that adds a very simple project and runs a build as a
  * sanity test.
  */
-@Test(dependsOnGroups = {"init.*"})
 public class BuildAcceptanceTest extends SeleniumTestBase
 {
     private static final String CHANGE_AUTHOR = "pulse";
@@ -52,23 +50,21 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private static final String LOCATOR_ENV_ARTIFACT = "link=env.txt";
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
 
         Vector<String> agents = xmlRpcHelper.getConfigListing(ConfigurationRegistry.AGENTS_SCOPE);
-        for(String agent: agents)
+        for (String agent : agents)
         {
-            if(!agent.equals(AgentManager.GLOBAL_AGENT_NAME) && !agent.equals(AgentManager.MASTER_AGENT_NAME))
+            if (!agent.equals(AgentManager.GLOBAL_AGENT_NAME) && !agent.equals(AgentManager.MASTER_AGENT_NAME))
             {
                 xmlRpcHelper.deleteConfig(PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, agent));
             }
         }
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();
@@ -104,7 +100,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         List<Changelist> changelists = changesPage.getChangelists();
         assertEquals(1, changelists.size());
         assertBuildFileChangelist(changelists.get(0), revisionString);
-        
+
         // Check the changelist view too.
         List<Long> changeIds = changesPage.getChangeIds();
         assertEquals(1, changeIds.size());
@@ -334,13 +330,98 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         selenium.click("id=" + logLinkId);
         selenium.waitForPageToLoad("10000");
 
-        assertTextPresent("tail of build log");        
+        assertTextPresent("tail of build log");
+    }
+
+    public void testManualTriggerBuildWithPrompt() throws Exception
+    {
+        loginAsAdmin();
+        ensureProject(random);
+
+        // add the pname=pvalue property to the build.
+        xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
+
+        // edit the build options, setting prompt to true.
+        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
+        configPage.goTo();
+
+        BuildOptionsForm form = configPage.clickBuildOptions();
+        form.applyFormElements("false", "true", "false", "0");
+
+        // trigger a build
+        ProjectHomePage home = new ProjectHomePage(selenium, urls, random);
+        home.goTo();
+        home.triggerBuild();
+
+        // we should be prompted for a revision and a pname value.
+        SpecifyBuildPropertiesForm sbpf = new SpecifyBuildPropertiesForm(selenium);
+        sbpf.waitFor();
+        sbpf.assertFormPresent();
+        
+        // leave the revision blank
+        sbpf.triggerFormElements("");
+
+        // next page is the project homepage.
+        waitForBuildOnProjectHomePage(random, AgentManager.MASTER_AGENT_NAME);
+    }
+
+
+    /**
+     * Check that the prompted property values that in a manual build are added to the build,
+     * but do not change the project configuration.
+     *  
+     * @throws Exception on error.
+     */
+    public void testManualTriggerBuildWithPromptAllowsPropertyValueOverride() throws Exception
+    {
+        loginAsAdmin();
+        ensureProject(random);
+
+        // add the pname=pvalue property to the build.
+        xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
+
+        // edit the build options, setting prompt to true.
+        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
+        configPage.goTo();
+
+        BuildOptionsForm form = configPage.clickBuildOptions();
+        form.applyFormElements("false", "true", "false", "0");
+
+        // trigger a build
+        ProjectHomePage home = new ProjectHomePage(selenium, urls, random);
+        home.goTo();
+        home.triggerBuild();
+
+        // we should be prompted for a revision and a pname value.
+        SpecifyBuildPropertiesForm sbpf = new SpecifyBuildPropertiesForm(selenium, "pname");
+        sbpf.waitFor();
+        // leave the revision blank, update pname to qvalue.
+        sbpf.triggerFormElements("", "qvalue");
+
+        // next page is the project homepage.
+        waitForBuildOnProjectHomePage(random, AgentManager.MASTER_AGENT_NAME);
+
+        // verify that the correct property value was used in the build.
+        assertEnvironment(random, 1, "pname=qvalue", "PULSE_PNAME=qvalue");
+
+        // go back to the properties page and ensure that the value is pvalue.
+        ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(random));
+        propertiesPage.goTo();
+        propertiesPage.waitFor();
+
+        propertiesPage.assertCellContent(0, 0, "pname");
+        propertiesPage.assertCellContent(0, 1, "pvalue");
+    }
+
+    private String getPropertiesPath(String projectName)
+    {
+        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "properties");
     }
 
     private void assertEnvironment(String projectName, int buildId, String... envs)
     {
         goToEnv(projectName, buildId);
-        for(String env: envs)
+        for (String env : envs)
         {
             assertTextPresent(env);
         }
@@ -380,7 +461,15 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         ProjectHomePage home = new ProjectHomePage(selenium, urls, projectName);
         home.goTo();
         home.triggerBuild();
+
+        waitForBuildOnProjectHomePage(projectName, agent);
+    }
+
+    private void waitForBuildOnProjectHomePage(String projectName, String agent)
+    {
+        ProjectHomePage home = new ProjectHomePage(selenium, urls, projectName);
         home.waitFor();
+
         String statusId = IDs.buildStatusCell(projectName, 1);
         SeleniumUtils.refreshUntilElement(selenium, statusId, 30000);
         SeleniumUtils.refreshUntilText(selenium, statusId, "success", 30000);

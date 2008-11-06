@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.pulse.acceptance.forms.admin.BuildOptionsForm;
 
 /**
  * The page shown when looking at a project in the configuration view.
@@ -40,5 +41,16 @@ public class ProjectConfigPage extends CompositePage
     {
         selenium.click(super.getHierarchyLocator());
         return new ProjectHierarchyPage(selenium, urls, project, template);
+    }
+
+    public BuildOptionsForm clickBuildOptions()
+    {
+        clickComposite("options", "build options");
+
+        BuildOptionsForm form = new BuildOptionsForm(selenium);
+        form.waitFor();
+        form.assertFormPresent();
+        
+        return form;
     }
 }

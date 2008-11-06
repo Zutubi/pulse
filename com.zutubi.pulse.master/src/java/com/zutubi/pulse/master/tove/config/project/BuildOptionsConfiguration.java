@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Numeric;
 
@@ -8,6 +9,7 @@ import com.zutubi.validation.annotations.Numeric;
  * Generic build options that don't warrant their own category.
  */
 @SymbolicName("zutubi.buildOptionsConfig")
+@Form(fieldOrder = {"isolateChangelists", "prompt", "retainWorkingCopy", "timeout"})
 public class BuildOptionsConfiguration extends AbstractConfiguration
 {
     public static final int TIMEOUT_NEVER = 0;

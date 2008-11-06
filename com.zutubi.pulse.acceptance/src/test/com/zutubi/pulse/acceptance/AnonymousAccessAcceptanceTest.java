@@ -8,9 +8,6 @@ import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -18,7 +15,6 @@ import java.util.Vector;
 
 /**
  */
-@Test(dependsOnGroups = {"init.*"})
 public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 {
     private static final String ANONYMOUS_GROUP_PATH = "groups/anonymous users";
@@ -33,14 +29,12 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
     private static final String SIGNUP_INPUT_ACTION = "signup!input.action";
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

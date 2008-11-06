@@ -198,14 +198,10 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         Project project = getRequiredProject();
 
         // Ensure we are allowed to change the project configuration.
-        getProjectManager().checkWrite(project);
         ProjectConfiguration projectConfig = configurationProvider.deepClone(project.getConfig());
         mapProperties(projectConfig);
-        String path = configurationProvider.save(projectConfig);
 
-        // Look up the config again with the change, and also rewire it to
-        // the state.
-        projectConfig = configurationProvider.get(path, ProjectConfiguration.class);
+        // Rewire the now cloned instance of the projectConfiguration to the project state.
         project.setConfig(projectConfig);
 
         Revision r = null;
