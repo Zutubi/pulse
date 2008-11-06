@@ -1,16 +1,15 @@
 package com.zutubi.util;
 
+import com.zutubi.util.bean.BeanException;
+import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.List;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
-
-import com.zutubi.util.bean.BeanUtils;
-import com.zutubi.util.bean.BeanException;
+import java.util.List;
 
 public class ReflectionUtilsTest extends ZutubiTestCase
 {
@@ -607,7 +606,15 @@ public class ReflectionUtilsTest extends ZutubiTestCase
             assertEquals("Cannot set final field 'com.zutubi.util.ReflectionUtilsTest$SetFieldValue.publicFinalField', even if it succeeds it may have no effect due to compiler optimisations", e.getMessage());
         }
     }
-    
+
+    public void testSetFieldPreservesAccessibility() throws NoSuchFieldException, BeanException
+    {
+        Field field = SetFieldValue.class.getDeclaredField("privateField");
+        assertFalse(field.isAccessible());
+        ReflectionUtils.setFieldValue(new SetFieldValue(), field, new Object());
+        assertFalse(field.isAccessible());
+    }
+
     private void setFieldHelper(Field field) throws BeanException
     {
         SetFieldValue instance = new SetFieldValue();

@@ -284,9 +284,11 @@ public class ReflectionUtils
             throw new IllegalArgumentException("Cannot set final field '" + getQualifiedName(field) + "', even if it succeeds it may have no effect due to compiler optimisations");
         }
 
+        boolean clearAccessible = false;
         if (!field.isAccessible())
         {
             field.setAccessible(true);
+            clearAccessible = true;
         }
 
         try
@@ -296,6 +298,13 @@ public class ReflectionUtils
         catch (IllegalAccessException e)
         {
             throw new IllegalArgumentException("Field '" + getQualifiedName(field) + "' cannot be set despite ensuring accessibility");
+        }
+        finally
+        {
+            if (clearAccessible)
+            {
+                field.setAccessible(false);
+            }
         }
     }
 }
