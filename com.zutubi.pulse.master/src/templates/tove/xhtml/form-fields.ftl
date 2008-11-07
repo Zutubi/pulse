@@ -9,9 +9,7 @@ var fc;
 <#list form.fields as field>
     <#assign parameters=field.parameters>
     fc = {
-    <#if form.readOnly>
-        disabled: true,
-    <#elseif parameters.readOnly?default(false)>
+    <#if form.readOnly || parameters.readOnly?default(false)>
         disabled: true,
     </#if>
         width: 360,
