@@ -247,12 +247,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         return EOLStyle.BINARY;
     }
 
-    public Revision getRevision(String revision) throws ScmException
-    {
-        return parseRevision(revision);
-    }
-
-    public Revision parseRevision(String revision) throws ScmException
+    public Revision parseRevision(ScmContext context, String revision) throws ScmException
     {
         CvsRevision cvsRevision = new CvsRevision(revision);
         if(cvsRevision.getBranch() == null)
@@ -263,6 +258,37 @@ public class CvsClient implements ScmClient, DataCacheAware
         }
         
         return convertRevision(cvsRevision);
+    }
+
+    public Revision getPreviousRevision(ScmContext context, Revision revision, boolean isFile) throws ScmException
+    {
+        if (!isFile)
+        {
+            // No way to easily get the previous simulated changelist revision.
+            return null;
+        }
+
+        String revisionString = revision.getRevisionString();
+        int index = revisionString.lastIndexOf(".");
+        if(index != -1)
+        {
+            String end = revisionString.substring(index + 1);
+            try
+            {
+                long last = Long.parseLong(end);
+                if(last > 1)
+                {
+                    String start = revisionString.substring(0, index + 1);
+                    return new Revision(start + Long.toString(last - 1));
+                }
+            }
+            catch(NumberFormatException e)
+            {
+                // Fall through.
+            }
+        }
+
+        return null;
     }
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
@@ -286,13 +312,6 @@ public class CvsClient implements ScmClient, DataCacheAware
         return revision;
     }
 
-    /**
-     * Update the working directory to the specified revision.  It is required that the working
-     * directory has a local checkout that can be updated.
-     *
-     * @param context
-     * @param handler
-     */
     public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         assertRevisionArgValid(rev);
@@ -373,7 +392,7 @@ public class CvsClient implements ScmClient, DataCacheAware
             info.addAll(core.rlog(module, convertRevision(from), convertRevision(to)));
         }
         
-        LogInformationAnalyser analyser = new LogInformationAnalyser(getUid(), CVSRoot.parse(root));
+        LogInformationAnalyser analyser = new LogInformationAnalyser(CVSRoot.parse(root));
 
         CvsRevision cvsFrom = convertRevision(from);
         CvsRevision cvsTo = convertRevision(to);
@@ -420,7 +439,7 @@ public class CvsClient implements ScmClient, DataCacheAware
                                 }
                             }
 
-                            return new FileChange(filename, change.getRevisionString(), change.getAction());
+                            return new FileChange(filename, change.getRevision(), change.getAction());
                         }
                     })
             );
@@ -453,14 +472,6 @@ public class CvsClient implements ScmClient, DataCacheAware
         return result;
     }
 
-    /**
-     * This method checks to see if there have been any changes to the scm system since the
-     * specified revision.
-     *
-     * @param since
-     * @return true if a change has been detected, false otherwise.
-     * @throws ScmException
-     */
     public boolean hasChangedSince(Revision since) throws ScmException
     {
         CvsRevision cvsSince = convertRevision(since);
@@ -549,6 +560,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     /**
      * Configure the temporary space root. This defaults to the users temporary directories.
      *
+     * @param file directory to use for temporary space
      */
     public void setTemporarySpace(File file)
     {
@@ -558,7 +570,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     /**
      * Check that the module is valid.
      *
-     * @throws ScmException
+     * @throws ScmException on error
      */
     private void checkModuleIsValid() throws ScmException
     {
@@ -624,13 +636,9 @@ public class CvsClient implements ScmClient, DataCacheAware
     }
 
     /**
-     * Throw an IllegalArgumentException if either of the following are true:
-     * <ul>
-     * <li>The revision is null</li>
-     * <li>The revision is not of type CvsRevision</li>
-     * </ul>
+     * Throw an IllegalArgumentException if the revision is null.
      *
-     * @param r
+     * @param r the revision to check
      */
     private void assertRevisionArgValid(Revision r)
     {

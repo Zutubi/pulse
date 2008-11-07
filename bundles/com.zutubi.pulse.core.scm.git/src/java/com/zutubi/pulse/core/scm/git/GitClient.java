@@ -397,7 +397,7 @@ public class GitClient implements ScmClient
                         action = LOG_ACTION_MAPPINGS.get(file.getAction());
                     }
 
-                    FileChange change = new FileChange(file.getName(), entry.getId(), action);
+                    FileChange change = new FileChange(file.getName(), new Revision(entry.getId()), action);
                     changes.add(change);
                 }
 
@@ -429,13 +429,21 @@ public class GitClient implements ScmClient
         // not yet implemented.
     }
 
-    public Revision parseRevision(String revision) throws ScmException
+    public Revision parseRevision(ScmContext context, String revision) throws ScmException
     {
+        // FIXME this is not validating anything as it should.
         if (!TextUtils.stringSet(revision))
         {
             throw new ScmException("Unexpected git revision format: '" + revision + "'");
         }
         return new Revision(revision);
+    }
+
+    public Revision getPreviousRevision(ScmContext context, Revision fileRevision, boolean isFile) throws ScmException
+    {
+        // The previous revision is in fact revision^.  However, we should
+        // return the actual SHA this is resolved as.
+        return null;
     }
 
     public void setRepository(String repository)

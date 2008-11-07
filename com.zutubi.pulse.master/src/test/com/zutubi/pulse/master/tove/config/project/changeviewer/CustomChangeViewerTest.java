@@ -1,49 +1,35 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.tove.config.MockConfigurationProvider;
-import com.zutubi.tove.config.api.Configuration;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 
 public class CustomChangeViewerTest extends PulseTestCase
 {
+    private static final Revision CHANGE_REVISION          = new Revision("2345");
+    private static final Revision PREVIOUS_CHANGE_REVISION = new Revision("2344");
+    private static final String   FILE_PATH                = "/my/path";
+    private static final Revision FILE_REVISION            = new Revision("123");
+    private static final Revision PREVIOUS_FILE_REVISION   = new Revision("122");
+
     private CustomChangeViewerConfiguration viewer;
+    private ScmClient mockScmClient;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        final ProjectConfiguration project = new ProjectConfiguration();
-        project.setScm(new ScmConfiguration()
-        {
-            public String getType()
-            {
-                return "mock";
-            }
+        mockScmClient = mock(ScmClient.class);
+        stub(mockScmClient.getPreviousRevision((ScmContext) anyObject(), same(CHANGE_REVISION), eq(false))).toReturn(PREVIOUS_CHANGE_REVISION);
+        stub(mockScmClient.getPreviousRevision((ScmContext) anyObject(), same(FILE_REVISION), eq(true))).toReturn(PREVIOUS_FILE_REVISION);
 
-            public String getPreviousRevision(String revision)
-            {
-                long number = Long.valueOf(revision);
-                if (number > 0)
-                {
-                    return String.valueOf(number - 1);
-                }
-                return null;
-            }
-        });
         viewer = new CustomChangeViewerConfiguration();
-        viewer.setConfigurationProvider(new MockConfigurationProvider()
-        {
-            public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
-            {
-                return (T) project;
-            }
-        });
     }
 
     protected void tearDown() throws Exception
@@ -58,48 +44,59 @@ public class CustomChangeViewerTest extends PulseTestCase
         viewer.setChangesetURL("${revision} ${author} ${branch} ${time.pulse} ${time.fisheye} ${unknown}");
         Revision rev = new Revision("author:branch:" + DATE_STRING);
         Date date = CustomChangeViewerConfiguration.PULSE_DATE_FORMAT.parse(DATE_STRING);
-        assertEquals("author:branch:19700101-10:00:01 author branch " + DATE_STRING + " " + CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format(date) + " ${unknown}", viewer.getChangelistURL(rev));
+        assertEquals("author:branch:19700101-10:00:01 author branch " + DATE_STRING + " " + CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format(date) + " ${unknown}", viewer.getRevisionURL(rev));
     }
 
-    public void testGetFileViewURL()
+    public void testGetFileViewURL() throws ScmException
     {
         viewer.setFileViewURL("http://hello${path}?r=${revision}/${change.revision}");
-        assertEquals("http://hello/my/path?r=10/99", viewer.getFileViewURL("/my/path", new Revision(99), "10"));
+        assertEquals("http://hello/my/path?r=123/2345", viewer.getFileViewURL(getContext(), getFileChange(FILE_PATH)));
     }
 
-    public void testGetFileDownloadURL()
+    public void testGetFileDownloadURL() throws ScmException
     {
         viewer.setFileDownloadURL("http://hello${path}?r=${revision}/${change.revision}&format=raw");
-        assertEquals("http://hello/my/path?r=10/22&format=raw", viewer.getFileDownloadURL("/my/path", new Revision(22), "10"));
+        assertEquals("http://hello/my/path?r=123/2345&format=raw", viewer.getFileDownloadURL(getContext(), getFileChange(FILE_PATH)));
     }
 
-    public void testGetFileDiffURL()
+    public void testGetFileDiffURL() throws ScmException
     {
         viewer.setFileDiffURL("http://hello${path}?r=${revision}/${change.revision}&p=${previous.revision}/${previous.change.revision}");
-        assertEquals("http://hello/my/path?r=10/111&p=9/110", viewer.getFileDiffURL("/my/path", new Revision(111), "10"));
+        assertEquals("http://hello/my/path?r=123/2345&p=122/2344", viewer.getFileDiffURL(getContext(), getFileChange(FILE_PATH)));
     }
 
-    public void testGetFileViewURLSpecial()
+    public void testGetFileViewURLSpecial() throws ScmException
     {
         viewer.setFileViewURL("http://hello${path}?r=${revision}");
-        assertEquals("http://hello/my/path+special%20chars?r=10", viewer.getFileViewURL("/my/path+special chars", new Revision(111111), "10"));
+        assertEquals("http://hello/my/path+special%20chars?r=123", viewer.getFileViewURL(getContext(), getFileChange("/my/path+special chars")));
     }
 
-    public void testGetFileDownloadURLSpecial()
+    public void testGetFileDownloadURLSpecial() throws ScmException
     {
         viewer.setFileDownloadURL("http://hello${path}?r=${revision}&format=raw");
-        assertEquals("http://hello/my/path+special%20chars?r=10&format=raw", viewer.getFileDownloadURL("/my/path+special chars", new Revision(111111), "10"));
+        assertEquals("http://hello/my/path+special%20chars?r=123&format=raw", viewer.getFileDownloadURL(getContext(), getFileChange("/my/path+special chars")));
     }
 
-    public void testGetFileDiffURLSpecial()
+    public void testGetFileDiffURLSpecial() throws ScmException
     {
         viewer.setFileDiffURL("http://hello${path}?r=${revision}&p=${previous.revision}");
-        assertEquals("http://hello/my/path+special%20chars?r=10&p=9", viewer.getFileDiffURL("/my/path+special chars", new Revision(111111), "10"));
+        assertEquals("http://hello/my/path+special%20chars?r=123&p=122", viewer.getFileDiffURL(getContext(), getFileChange("/my/path+special chars")));
     }
 
-    public void testFilePropertiesSpecial()
+    public void testFilePropertiesSpecial() throws ScmException
     {
         viewer.setFileDiffURL("${path} ${path.raw} ${path.form}");
-        assertEquals("/my/path+special%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL("/my/path+special chars", new Revision(111111), "10"));
+        assertEquals("/my/path+special%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL(getContext(), getFileChange("/my/path+special chars")));
+    }
+
+    private ChangeContext getContext()
+    {
+        Changelist changelist = new Changelist(CHANGE_REVISION, 0, null, null, Collections.<FileChange>emptyList());
+        return new ChangeContextImpl(changelist, null, mockScmClient, null);
+    }
+
+    private FileChange getFileChange(String filePath)
+    {
+        return new FileChange(filePath, FILE_REVISION, FileChange.Action.EDIT);
     }
 }

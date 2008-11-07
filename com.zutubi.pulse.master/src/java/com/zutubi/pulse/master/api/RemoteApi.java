@@ -1561,10 +1561,11 @@ public class RemoteApi
                 ScmClient client = null;
                 try
                 {
-                    client = scmManager.createClient(project.getConfig().getScm());
+                    ScmConfiguration scm = project.getConfig().getScm();
+                    client = scmManager.createClient(scm);
                     if(client.getCapabilities().contains(ScmCapability.REVISIONS))
                     {
-                        r = client.parseRevision(revision);
+                        r = client.parseRevision(scmManager.createContext(project.getId(), scm), revision);
                     }
                     else
                     {

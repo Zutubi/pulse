@@ -365,7 +365,7 @@ public class PerforceClient extends CachingScmClient
 
         if (matcher.matches())
         {
-            return new FileChange(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
+            return new FileChange(matcher.group(1), new Revision(matcher.group(2)), decodeAction(matcher.group(3)));
         }
         else
         {
@@ -827,7 +827,7 @@ public class PerforceClient extends CachingScmClient
 
     }
 
-    public Revision parseRevision(String revision) throws ScmException
+    public Revision parseRevision(ScmContext context, String revision) throws ScmException
     {
         String clientName = updateClient(null, null, null);
         try
@@ -847,6 +847,18 @@ public class PerforceClient extends CachingScmClient
         finally
         {
             deleteClient(clientName);
+        }
+    }
+
+    public Revision getPreviousRevision(ScmContext context, Revision revision, boolean isFile) throws ScmException
+    {
+        try
+        {
+            return revision.getPreviousNumericalRevision();
+        }
+        catch (NumberFormatException e)
+        {
+            throw new ScmException("Invalid revision '" + revision.getRevisionString() + "': " + e.getMessage());
         }
     }
 
@@ -894,7 +906,7 @@ public class PerforceClient extends CachingScmClient
 
                 for (FileChange c : l.getChanges())
                 {
-                    System.out.println("    " + c.getPath() + "#" + c.getRevisionString() + " - " + c.getAction());
+                    System.out.println("    " + c.getPath() + "#" + c.getRevision().getRevisionString() + " - " + c.getAction());
                 }
             }
         }

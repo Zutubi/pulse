@@ -134,14 +134,14 @@ public class MockScmClient implements ScmClient, DataCacheAware
         return EOLStyle.BINARY;
     }
 
-    public Revision getRevision(String revision) throws ScmException
-    {
-        return parseRevision(revision);
-    }
-
-    public Revision parseRevision(String revision) throws ScmException
+    public Revision parseRevision(ScmContext context, String revision) throws ScmException
     {
         throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public Revision getPreviousRevision(ScmContext context, Revision fileRevision, boolean isFile) throws ScmException
+    {
+        throw new RuntimeException("Method not yet implemented");
     }
 
     public String getCacheId()

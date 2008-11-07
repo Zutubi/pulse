@@ -56,6 +56,24 @@ public class Revision
         return revisionString;
     }
 
+    /**
+     * Convenience method to return the previous revision when this revision is
+     * numerical.
+     *
+     * @return the previous numerical revision, or null if this is revision 1
+     * @throws NumberFormatException if our revision string cannot be parsed as
+     *         a lon 
+     */
+    public Revision getPreviousNumericalRevision()
+    {
+        long number = Long.valueOf(revisionString);
+        if(number > 0)
+        {
+            return new Revision(String.valueOf(number - 1));
+        }
+        return null;
+    }
+
     public boolean equals(Object o)
     {
         if (this == o)

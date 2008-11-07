@@ -4,13 +4,12 @@ import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
-import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 
@@ -48,8 +47,6 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     private String fileDownloadURL;
     private String fileDiffURL;
     
-    private ConfigurationProvider configurationProvider;
-
     static
     {
         // fisheye presents its change set ids using GMT times.  By setting the date format timezone to
@@ -119,38 +116,37 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
                 return TextUtils.stringSet(fileViewURL);
             case VIEW_FILE_DIFF:
                 return TextUtils.stringSet(fileDiffURL);
-            case VIEW_CHANGELIST:
+            case VIEW_REVISION:
                 return TextUtils.stringSet(changesetURL);
             default:
                 return false;
         }
     }
 
-    public String getChangelistURL(Revision revision)
+    public String getRevisionURL(Revision revision)
     {
         return resolveURL(changesetURL, revision);
     }
 
-    public String getFileViewURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileViewURL(ChangeContext context, FileChange fileChange) throws ScmException
     {
-        return resolveFileURL(fileViewURL, path, changelistRevision, fileRevision);
+        return resolveFileURL(fileViewURL, context, fileChange);
     }
 
-    public String getFileDownloadURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDownloadURL(ChangeContext context, FileChange fileChange) throws ScmException
     {
-        return resolveFileURL(fileDownloadURL, path, changelistRevision, fileRevision);
+        return resolveFileURL(fileDownloadURL, context, fileChange);
     }
 
-    public String getFileDiffURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDiffURL(ChangeContext context, FileChange fileChange) throws ScmException
     {
-        ScmConfiguration config = lookupScmConfiguration();
-        String previous = config.getPreviousRevision(fileRevision);
+        Revision previous = context.getPreviousFileRevision(fileChange);
         if (previous == null)
         {
             return null;
         }
         
-        return resolveFileURL(fileDiffURL, path, changelistRevision, fileRevision);
+        return resolveFileURL(fileDiffURL, context, fileChange);
     }
 
     private String resolveURL(String url, Revision revision)
@@ -192,28 +188,38 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         return null;
     }
 
-    private String resolveFileURL(String url, String path, Revision changelistRevision, String fileRevision)
+    private String resolveFileURL(String url, ChangeContext context, FileChange fileChange) throws ScmException
     {
-        if(TextUtils.stringSet(url))
+        if (TextUtils.stringSet(url))
         {
             PulseScope scope = new PulseScope();
-            scope.add(new Property(PROPERTY_PATH, StringUtils.urlEncodePath(path)));
-            scope.add(new Property(PROPERTY_PATH_RAW, path));
-            scope.add(new Property(PROPERTY_PATH_FORM, StringUtils.formUrlEncode(path)));
-            scope.add(new Property(PROPERTY_REVISION, fileRevision));
-            scope.add(new Property(PROPERTY_CHANGE_REVISION, changelistRevision.getRevisionString()));
+            scope.add(new Property(PROPERTY_PATH, StringUtils.urlEncodePath(fileChange.getPath())));
+            scope.add(new Property(PROPERTY_PATH_RAW, fileChange.getPath()));
+            scope.add(new Property(PROPERTY_PATH_FORM, StringUtils.formUrlEncode(fileChange.getPath())));
+            scope.add(new Property(PROPERTY_REVISION, fileChange.getRevision().getRevisionString()));
+            scope.add(new Property(PROPERTY_CHANGE_REVISION, context.getChangelist().getRevision().getRevisionString()));
 
-            ScmConfiguration config = lookupScmConfiguration();
-            String previousFileRevision = config.getPreviousRevision(fileRevision);
-            if(previousFileRevision != null)
+            // Quick check to see if there is a chance we need to calculate the
+            // previous revision.  May have false positives, but that is OK, we
+            // just want to avoid expensive revision calc's if possible.
+            if (url.contains(PROPERTY_PREVIOUS_REVISION))
             {
-                scope.add(new Property(PROPERTY_PREVIOUS_REVISION, previousFileRevision));
+                Revision previousFileRevision = context.getPreviousFileRevision(fileChange);
+                if (previousFileRevision != null)
+                {
+                    scope.add(new Property(PROPERTY_PREVIOUS_REVISION, previousFileRevision.getRevisionString()));
+                }
             }
 
-            String previousChangelistRevision = config.getPreviousRevision(changelistRevision.getRevisionString());
-            if(previousChangelistRevision != null)
+            // Another quick check to avoid most unnecessary previous revision
+            // calls.
+            if (url.contains(PROPERTY_PREVIOUS_CHANGE_REVISION))
             {
-                scope.add(new Property(PROPERTY_PREVIOUS_CHANGE_REVISION, previousChangelistRevision));
+                Revision previousChangelistRevision = context.getPreviousChangelistRevision();
+                if (previousChangelistRevision != null)
+                {
+                    scope.add(new Property(PROPERTY_PREVIOUS_CHANGE_REVISION, previousChangelistRevision.getRevisionString()));
+                }
             }
 
             try
@@ -264,16 +270,4 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
             throw new IllegalArgumentException(e.getMessage(), e);
         }
     }
-
-    protected ScmConfiguration lookupScmConfiguration()
-    {
-        ProjectConfiguration project = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
-        return project.getScm();
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
-    }
-
 }

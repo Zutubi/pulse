@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.BuildOptionsForm;
+import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.SpecifyBuildPropertiesForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
@@ -12,10 +12,12 @@ import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.browse.ViewChangelistPage;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
+import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.FileSystemUtils;
@@ -109,6 +111,38 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertBuildFileChangelist(changelistPage.getChangelist(), revisionString);
     }
 
+    public void testChangeViewerLinks() throws Exception
+    {
+        final String FISHEYE_BASE = "http://fisheye";
+        final String FISHEYE_PROJECT = "project";
+
+        String projectPath = addProject(random, true);
+        Hashtable<String, Object> changeViewer = xmlRpcHelper.createDefaultConfig(FisheyeConfiguration.class);
+        changeViewer.put("baseURL", FISHEYE_BASE);
+        changeViewer.put("projectPath", FISHEYE_PROJECT);
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "changeViewer"), changeViewer);
+
+        xmlRpcHelper.runBuild(random, 30000);
+        String revisionString = editAndCommitBuildFile();
+        int buildNumber = xmlRpcHelper.runBuild(random, 30000);
+
+        String changelistLink = FISHEYE_BASE + "/changelog/" + FISHEYE_PROJECT + "/?cs=" + revisionString;
+
+        BuildChangesPage changesPage = new BuildChangesPage(selenium, urls, random, buildNumber);
+        changesPage.goTo();
+        SeleniumUtils.assertLinkToPresent(selenium, changelistLink);
+
+        ViewChangelistPage changelistPage = new ViewChangelistPage(selenium, urls, random, buildNumber, changesPage.getChangeIds().get(0), revisionString);
+        changelistPage.goTo();
+
+        String prefixPart = FISHEYE_BASE + "/browse/";
+        String filePart = FISHEYE_PROJECT + "/accept/trunk/triviant/" + CHANGE_FILENAME;
+        SeleniumUtils.assertLinkToPresent(selenium, changelistLink);
+        SeleniumUtils.assertLinkToPresent(selenium, prefixPart + filePart + "?r=" + revisionString);
+        SeleniumUtils.assertLinkToPresent(selenium, prefixPart + "~raw,r=" + revisionString + "/" + filePart);
+        SeleniumUtils.assertLinkToPresent(selenium, prefixPart + filePart + "?r1=" + new Revision(revisionString).getPreviousNumericalRevision() + "&r2=" + revisionString);
+    }
+
     private String editAndCommitBuildFile() throws IOException, SVNException
     {
         SVNRepositoryFactoryImpl.setup();
@@ -149,7 +183,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertEquals(1, fileChanges.size());
         FileChange fileChange = fileChanges.get(0);
         assertTrue(fileChange.getPath().endsWith(CHANGE_FILENAME));
-        assertEquals(revisionString, fileChange.getRevisionString());
+        assertEquals(revisionString, fileChange.getRevision().getRevisionString());
         assertEquals(FileChange.Action.EDIT, fileChange.getAction());
     }
 

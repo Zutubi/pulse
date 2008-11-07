@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -192,5 +192,11 @@ public class CvsClientTest extends PulseTestCase
 
         assertTrue(new File(workdir, "unit-test").isDirectory());
         assertTrue(new File(workdir, "integration-test").isDirectory());
+    }
+
+    public void testGetPreviousFileRevision() throws ScmException
+    {
+        CvsClient client = new CvsClient(cvsRoot, "unit-test", "", "");
+        assertEquals("1.3", client.getPreviousRevision(null, new Revision("1.4"), true));
     }
 }

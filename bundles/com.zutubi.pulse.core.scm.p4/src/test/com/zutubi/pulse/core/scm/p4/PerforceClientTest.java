@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.*;
@@ -387,7 +387,7 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer(TEST_CLIENT);
         Revision latest = client.getLatestRevision(null);
-        Revision rev = client.parseRevision(latest.getRevisionString());
+        Revision rev = client.parseRevision(null, latest.getRevisionString());
         assertEquals(latest.getRevisionString(), rev.getRevisionString());
     }
 
@@ -397,7 +397,7 @@ public class PerforceClientTest extends PulseTestCase
         Revision latest = client.getLatestRevision(null);
         try
         {
-            client.parseRevision(Long.toString(Long.valueOf(latest.toString()) + 1));
+            client.parseRevision(null, Long.toString(Long.valueOf(latest.toString()) + 1));
             fail();
         }
         catch (ScmException e)
@@ -411,7 +411,7 @@ public class PerforceClientTest extends PulseTestCase
         getServer(TEST_CLIENT);
         try
         {
-            client.parseRevision("bullet");
+            client.parseRevision(null, "bullet");
             fail();
         }
         catch (ScmException e)

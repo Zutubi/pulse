@@ -49,7 +49,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         String cvsRoot = ":ext:daniel:xxxxx@zutubi.com:/cvsroots/default";
         cvs = new CvsCore();
         cvs.setRoot(CVSRoot.parse(cvsRoot));
-        analyser = new LogInformationAnalyser("test", CVSRoot.parse(cvsRoot));
+        analyser = new LogInformationAnalyser(CVSRoot.parse(cvsRoot));
     }
 
     protected void tearDown() throws Exception
@@ -75,7 +75,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         FileChange change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.EDIT, change.getAction());
-        assertEquals("1.2", change.getRevisionString());
+        assertEquals("1.2", change.getRevision().getRevisionString());
         changelist = changes.get(1);
         assertEquals("daniel", changelist.getAuthor());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
@@ -84,7 +84,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.DELETE, change.getAction());
-        assertEquals("1.3", change.getRevisionString());
+        assertEquals("1.3", change.getRevision().getRevisionString());
     }
 
     public void testChangeDetails() throws Exception
@@ -104,7 +104,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         FileChange change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.ADD, change.getAction());
-        assertEquals("1.1", change.getRevisionString());
+        assertEquals("1.1", change.getRevision().getRevisionString());
         changelist = changes.get(1);
         assertEquals("daniel", changelist.getAuthor());
         assertEquals("file1.txt modified by author a\n", changelist.getComment());
@@ -113,7 +113,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.EDIT, change.getAction());
-        assertEquals("1.2", change.getRevisionString());
+        assertEquals("1.2", change.getRevision().getRevisionString());
         changelist = changes.get(2);
         assertEquals("daniel", changelist.getAuthor());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
@@ -122,7 +122,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getPath());
         assertEquals(FileChange.Action.DELETE, change.getAction());
-        assertEquals("1.3", change.getRevisionString());
+        assertEquals("1.3", change.getRevision().getRevisionString());
         changelist = changes.get(3);
         assertEquals("daniel", changelist.getAuthor());
         assertEquals("file2.txt checked in by author a\n", changelist.getComment());
@@ -131,7 +131,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/file2.txt", change.getPath());
         assertEquals(FileChange.Action.ADD, change.getAction());
-        assertEquals("1.1", change.getRevisionString());
+        assertEquals("1.1", change.getRevision().getRevisionString());
     }
 
     public void testChangesByDifferentAuthors() throws Exception
@@ -345,7 +345,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
     {
         assertEndsWith(file, change.getPath());
         assertEquals(action, change.getAction());
-        assertEquals(revision, change.getRevisionString());
+        assertEquals(revision, change.getRevision().getRevisionString());
     }
 
     private static void assertValidChangeSets(List<Changelist> changelists)
@@ -365,7 +365,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         {
             assertFalse(filenames.containsKey(change.getPath()));
             filenames.put(change.getPath(), change.getPath());
-            assertNotNull(change.getRevisionString());
+            assertNotNull(change.getRevision().getRevisionString());
             assertNotNull(change.getAction());
         }
     }

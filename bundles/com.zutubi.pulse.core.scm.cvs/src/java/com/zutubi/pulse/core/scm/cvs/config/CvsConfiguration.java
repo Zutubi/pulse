@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.cvs.config;
 
-import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.validation.annotation.CvsRoot;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -74,29 +74,5 @@ public class CvsConfiguration extends PollableScmConfiguration
     public String getType()
     {
         return CvsClient.TYPE;
-    }
-
-    public String getPreviousRevision(String revision)
-    {
-        int index = revision.lastIndexOf(".");
-        if(index != -1)
-        {
-            String end = revision.substring(index + 1);
-            try
-            {
-                long last = Long.parseLong(end);
-                if(last > 1)
-                {
-                    String start = revision.substring(0, index + 1);
-                    return start + Long.toString(last - 1);
-                }
-            }
-            catch(NumberFormatException e)
-            {
-                // Fall through.
-            }
-        }
-
-        return null;
     }
 }

@@ -2,23 +2,35 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
-import com.zutubi.pulse.core.scm.api.FileChange;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeContext;
+import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeContextImpl;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.util.*;
 
 /**
+ * Action to display information about a single changelist.  This action does
+ * not fit cleanly into our hierarchy as it can be accessed from multiple
+ * locations, even for a single changelist.
  */
 public class ViewChangelistAction extends ActionSupport
 {
+    private static final Logger LOG = Logger.getLogger(ViewChangelistAction.class);
+
     private long id;
     private PersistentChangelist changelist;
     private BuildManager buildManager;
@@ -40,13 +52,11 @@ public class ViewChangelistAction extends ActionSupport
      */
     private List<BuildResult> buildResults;
 
-    private boolean changeViewerInitialised;
-    private ChangeViewerConfiguration changeViewer;
-    private ScmConfiguration scm;
+    private boolean changeViewerFound;
+    private String changeUrl;
+    private List<FileModel> fileModels = new LinkedList<FileModel>();
 
-    private String fileViewUrl;
-    private String fileDownloadUrl;
-    private String fileDiffUrl;
+    private ScmManager scmManager;
 
     public long getId()
     {
@@ -103,143 +113,29 @@ public class ViewChangelistAction extends ActionSupport
         return changelist;
     }
 
-    public ChangeViewerConfiguration getChangeViewer()
+    public List<BuildResult> getBuildResults()
     {
-        if (!changeViewerInitialised)
-        {
-            changeViewerInitialised = true;
-
-            Project p = project;
-            if (buildResult != null)
-            {
-                p = buildResult.getProject();
-            }
-
-            if (!getViewerFromProject(p))
-            {
-                for (long id : changelistDao.getAllAffectedProjectIds(changelist))
-                {
-                    p = projectManager.getProject(id, false);
-                    if (getViewerFromProject(p))
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        return changeViewer;
+        return buildResults;
     }
 
-    private boolean getViewerFromProject(Project p)
+    public boolean isChangeViewerFound()
     {
-        if (p != null)
-        {
-            ProjectConfiguration projectConfig = p.getConfig();
-            if (projectConfig != null && projectConfig.getChangeViewer() != null && projectConfig.getScm() != null)
-            {
-                changeViewer = projectConfig.getChangeViewer();
-                scm = projectConfig.getScm();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean haveChangeViewer()
-    {
-        return getChangeViewer() != null;
+        return changeViewerFound;
     }
 
     public String getChangeUrl()
     {
-        ChangeViewerConfiguration changeViewer = getChangeViewer();
-        if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_CHANGELIST))
-        {
-            return changeViewer.getChangelistURL(changelist.getRevision());
-        }
-
-        return null;
+        return changeUrl;
     }
 
-    public String getFileViewUrl()
+    public BuildManager getBuildManager()
     {
-        return fileViewUrl;
+        return buildManager;
     }
 
-    public String getFileDownloadUrl()
+    public List<FileModel> getFileModels()
     {
-        return fileDownloadUrl;
-    }
-
-    public String getFileDiffUrl()
-    {
-        return fileDiffUrl;
-    }
-
-    public void updateUrls(PersistentChangelist changelist, PersistentFileChange change)
-    {
-        updateFileViewUrl(changelist, change);
-        updateFileDownloadUrl(changelist, change);
-        updateFileDiffUrl(changelist, change);
-    }
-
-    public void updateFileViewUrl(PersistentChangelist changelist, PersistentFileChange change)
-    {
-        ChangeViewerConfiguration changeViewer = getChangeViewer();
-        if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE))
-        {
-            fileViewUrl = changeViewer.getFileViewURL(change.getFilename(), changelist.getRevision(), change.getRevisionString());
-        }
-        else
-        {
-            fileViewUrl = null;
-        }
-    }
-
-    public void updateFileDownloadUrl(PersistentChangelist changelist, PersistentFileChange change)
-    {
-        ChangeViewerConfiguration changeViewer = getChangeViewer();
-        if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.DOWNLOAD_FILE))
-        {
-            fileDownloadUrl = changeViewer.getFileDownloadURL(change.getFilename(), changelist.getRevision(), change.getRevisionString());
-        }
-        else
-        {
-            fileDownloadUrl = null;
-        }
-    }
-
-    public void updateFileDiffUrl(PersistentChangelist changelist, PersistentFileChange change)
-    {
-        ChangeViewerConfiguration changeViewer = getChangeViewer();
-        if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE_DIFF))
-        {
-            if (diffableAction(change.asChange().getAction()))
-            {
-                String previous = scm.getPreviousRevision(change.getRevisionString());
-                if (previous != null)
-                {
-                    fileDiffUrl = changeViewer.getFileDiffURL(change.getFilename(), changelist.getRevision(), change.getRevisionString());
-                    return;
-                }
-            }
-        }
-
-        fileDiffUrl = null;
-    }
-
-    private boolean diffableAction(FileChange.Action action)
-    {
-        switch (action)
-        {
-            case EDIT:
-            case INTEGRATE:
-            case MERGE:
-                return true;
-            default:
-                return false;
-        }
+        return fileModels;
     }
 
     public void setChangelist(PersistentChangelist changelist)
@@ -269,7 +165,7 @@ public class ViewChangelistAction extends ActionSupport
 
         Set<Long> buildIds = changelistDao.getAllAffectedResultIds(changelist);
         buildResults = new LinkedList<BuildResult>();
-        for(Long id: buildIds)
+        for (Long id : buildIds)
         {
             buildResults.add(buildManager.getBuildResult(id));
         }
@@ -289,7 +185,174 @@ public class ViewChangelistAction extends ActionSupport
             }
         });
 
+        ProjectConfiguration projectWithViewer = getProjectWithChangeViewer();
+        if (projectWithViewer == null)
+        {
+            // No need to create ChangeContext and all which that entails.
+            createSimpleFileModels();
+        }
+        else
+        {
+            createLinkedFileModels(projectWithViewer);
+        }
+
         return SUCCESS;
+    }
+
+    private ProjectConfiguration getProjectWithChangeViewer()
+    {
+        Project p = project;
+        if (buildResult != null)
+        {
+            p = buildResult.getProject();
+        }
+
+        if (hasChangeViewer(p))
+        {
+            return p.getConfig();
+        }
+
+        for (long id : changelistDao.getAllAffectedProjectIds(changelist))
+        {
+            p = projectManager.getProject(id, false);
+            if (hasChangeViewer(p))
+            {
+                return p.getConfig();
+            }
+        }
+
+        return null;
+    }
+
+    private boolean hasChangeViewer(Project p)
+    {
+        if (p != null)
+        {
+            ProjectConfiguration projectConfig = p.getConfig();
+            return projectConfig != null && projectConfig.getChangeViewer() != null && projectConfig.getScm() != null;
+        }
+        return false;
+    }
+
+    private void createSimpleFileModels()
+    {
+        CollectionUtils.map(changelist.getChanges(), new Mapping<PersistentFileChange, FileModel>()
+        {
+            public FileModel map(PersistentFileChange persistentFileChange)
+            {
+                return new FileModel(persistentFileChange.asChange());
+            }
+        }, fileModels);
+    }
+
+    private void createLinkedFileModels(ProjectConfiguration projectWithViewer)
+    {
+        ScmConfiguration scmConfiguration = projectWithViewer.getScm();
+        final ChangeViewerConfiguration changeViewer = projectWithViewer.getChangeViewer();
+        ScmClient scmClient = null;
+        try
+        {
+            ScmContext scmContext = scmManager.createContext(projectWithViewer.getProjectId(), scmConfiguration);
+            scmClient = scmManager.createClient(scmConfiguration);
+            final ChangeContext context = new ChangeContextImpl(changelist.asChangelist(), scmConfiguration, scmClient, scmContext);
+
+            changeViewerFound = true;
+            changeUrl = getChangeUrl(changeViewer, changelist.getRevision());
+
+            CollectionUtils.map(changelist.getChanges(), new Mapping<PersistentFileChange, FileModel>()
+            {
+                public FileModel map(PersistentFileChange persistentFileChange)
+                {
+                    FileChange change = persistentFileChange.asChange();
+                    try
+                    {
+                        return new FileModel(
+                                persistentFileChange.asChange(),
+                                getFileViewUrl(changeViewer, context, change),
+                                getFileDownloadUrl(changeViewer, context, change),
+                                getFileDiffUrl(changeViewer, context, change)
+                        );
+                    }
+                    catch (ScmException e)
+                    {
+                        LOG.warning(e);
+                        return new FileModel(persistentFileChange.asChange());
+                    }
+                }
+            }, fileModels);
+        }
+        catch (ScmException e)
+        {
+            LOG.warning(e);
+
+            // Fall back on a page with no change viewer links.
+            changeViewerFound = false;
+            fileModels.clear();
+            createSimpleFileModels();
+        }
+        finally
+        {
+            IOUtils.close(scmClient);
+        }
+    }
+
+    private String getChangeUrl(ChangeViewerConfiguration changeViewer, Revision revision)
+    {
+        if (changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_REVISION))
+        {
+            return changeViewer.getRevisionURL(revision);
+        }
+
+        return null;
+    }
+
+    private String getFileViewUrl(ChangeViewerConfiguration changeViewer, ChangeContext context, FileChange change) throws ScmException
+    {
+        if (changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE))
+        {
+            return changeViewer.getFileViewURL(context, change);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public String getFileDownloadUrl(ChangeViewerConfiguration changeViewer, ChangeContext context, FileChange change) throws ScmException
+    {
+        if (changeViewer.hasCapability(ChangeViewerConfiguration.Capability.DOWNLOAD_FILE))
+        {
+            return changeViewer.getFileDownloadURL(context, change);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public String getFileDiffUrl(ChangeViewerConfiguration changeViewer, ChangeContext context, FileChange change) throws ScmException
+    {
+        if (changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE_DIFF) && diffableAction(change.getAction()))
+        {
+            return changeViewer.getFileDiffURL(context, change);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private boolean diffableAction(FileChange.Action action)
+    {
+        switch (action)
+        {
+            case EDIT:
+            case INTEGRATE:
+            case MERGE:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public void setBuildManager(BuildManager buildManager)
@@ -297,8 +360,59 @@ public class ViewChangelistAction extends ActionSupport
         this.buildManager = buildManager;
     }
 
-    public List<BuildResult> getBuildResults()
+    public void setScmManager(ScmManager scmManager)
     {
-        return buildResults;
+        this.scmManager = scmManager;
+    }
+
+    public static class FileModel
+    {
+        private FileChange fileChange;
+        private String viewUrl;
+        private String downloadUrl;
+        private String diffUrl;
+
+        public FileModel(FileChange fileChange)
+        {
+            this.fileChange = fileChange;
+        }
+
+        public FileModel(FileChange fileChange, String viewUrl, String downloadUrl, String diffUrl)
+        {
+            this.fileChange = fileChange;
+            this.viewUrl = viewUrl;
+            this.downloadUrl = downloadUrl;
+            this.diffUrl = diffUrl;
+        }
+
+        public String getPath()
+        {
+            return fileChange.getPath();
+        }
+
+        public Revision getRevision()
+        {
+            return fileChange.getRevision();
+        }
+
+        public FileChange.Action getAction()
+        {
+            return fileChange.getAction();
+        }
+
+        public String getViewUrl()
+        {
+            return viewUrl;
+        }
+
+        public String getDownloadUrl()
+        {
+            return downloadUrl;
+        }
+
+        public String getDiffUrl()
+        {
+            return diffUrl;
+        }
     }
 }

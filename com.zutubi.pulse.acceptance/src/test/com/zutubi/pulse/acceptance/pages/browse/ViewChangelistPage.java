@@ -77,7 +77,7 @@ public class ViewChangelistPage extends SeleniumPage
         {
             fileChanges.add(new FileChange(
                     SeleniumUtils.getCellContents(selenium, ID_FILES_TABLE, i + 2, 0),
-                    SeleniumUtils.getCellContents(selenium, ID_FILES_TABLE, i + 2, 1),
+                    new Revision(SeleniumUtils.getCellContents(selenium, ID_FILES_TABLE, i + 2, 1)),
                     FileChange.Action.fromString(SeleniumUtils.getCellContents(selenium, ID_FILES_TABLE, i + 2, 2))
             ));
         }

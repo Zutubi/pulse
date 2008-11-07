@@ -227,12 +227,40 @@ public interface ScmClient extends Closeable
      * and thus should be validated.  If it is invalid, an SCMException
      * should be thrown.
      * <p/>
+     * Implementations may choose to support both explicit revisions and
+     * symbolic ones (such as tags).  The more formats supported the greater
+     * the flexibility for the user when specifying a revision to build.
+     * <p/>
      * Required for {@link ScmCapability#REVISIONS}.
      *
+     * @param context  defines the scm context in which the operation is being run
      * @param revision revision input string to be converted into an actual
      *                 revision
      * @return a valid revision derived from the string
      * @throws ScmException if the given revision is invalid
      */
-    Revision parseRevision(String revision) throws ScmException;
+    Revision parseRevision(ScmContext context, String revision) throws ScmException;
+
+    /**
+     * Calculates the previous revision for a revision.  The revision may have
+     * come from a changelist or a file change as indicate by the isFile
+     * parameter.  Implementations may return null if there is no previous
+     * revision or the SCM does not have the capability.
+     * <p/>
+     * Note that returning symbolic revisions may not have the intended affect,
+     * where possible the previous revision should be resolved to its canonical
+     * form.
+     * <p/>
+     * Required for {@link ScmCapability#CHANGESETS}.
+     *
+     * @param context  defines the scm context in which the operation is being
+     *                 run
+     * @param revision the revision to retrieve the previous revision for
+     * @param isFile   if true, the revision comes from a {@link FileChange},
+     *                 otherwise it comes from a {@link Changelist}
+     * @return the previous revision in the same form, or null if it does not
+     *         exist or is not supported
+     * @throws ScmException on any error
+     */
+    Revision getPreviousRevision(ScmContext context, Revision revision, boolean isFile) throws ScmException;
 }

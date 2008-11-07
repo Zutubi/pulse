@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.scm.p4.config;
 
+import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
+import com.zutubi.pulse.core.scm.p4.PerforceClient;
 import com.zutubi.tove.annotations.ConfigurationCheck;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
-import com.zutubi.pulse.core.scm.p4.PerforceClient;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -66,15 +66,5 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public String getType()
     {
         return PerforceClient.TYPE;
-    }
-
-    public String getPreviousRevision(String revision)
-    {
-        long number = Long.valueOf(revision);
-        if(number > 0)
-        {
-            return String.valueOf(number - 1);
-        }
-        return null;
     }
 }

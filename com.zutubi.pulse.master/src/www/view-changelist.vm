@@ -22,7 +22,7 @@
 
     <table id="changelist.details" class="content">
         #headingRow("changelist.details" 2)
-        #dynamicLinkRow("changelist.revision" $changelist.revision $action.getChangeUrl())
+        #dynamicLinkRow("changelist.revision" $changelist.revision $changeUrl)
         #dynamicRow("changelist.who" $changelist.author)
         <tr>
             #contentRowHeading("changelist.when")
@@ -59,26 +59,25 @@
             #contentHeading("changelist.file" 1)
             #contentHeading("changelist.revision" 1)
             #contentHeading("changelist.action" 1)
-#if($action.haveChangeViewer())
+#if($changeViewerFound)
             #contentHeading("changelist.links" 1)
 #end
         </tr>
-#foreach($file in $changelist.changes)
-    $action.updateUrls($changelist, $file)
+#foreach($file in $fileModels)
         <tr id="changelist.file.${velocityCount}">
-            #dynamicCell($file.filename)
-            #dynamicRightLinkCell($file.revisionString $action.getFileViewUrl())
+            #dynamicCell($file.path)
+            #dynamicRightLinkCell($file.revision.revisionString $file.viewUrl)
             #dynamicCell($file.action.toString())
-#if($action.haveChangeViewer())
+#if($changeViewerFound)
             <td class="content">
-    #if($action.getFileViewUrl())
-                <a class="unadorned" href="$action.getFileViewUrl()" title="view"><img alt="view" src="$base/images/page.gif"/></a>
+    #if($file.viewUrl)
+                <a class="unadorned" href="$file.viewUrl" title="view"><img alt="view" src="$base/images/page.gif"/></a>
     #end
-    #if($action.getFileDownloadUrl())
-                <a class="unadorned" href="$action.getFileDownloadUrl()" title="download"><img alt="download" src="$base/images/page_put.gif"/></a>
+    #if($file.downloadUrl)
+                <a class="unadorned" href="$file.downloadUrl" title="download"><img alt="download" src="$base/images/page_put.gif"/></a>
     #end
-    #if($action.getFileDiffUrl())
-                <a class="unadorned" href="$action.getFileDiffUrl()" title="diff"><img alt="diff" src="$base/images/page_diff.gif"/></a>
+    #if($file.diffUrl)
+                <a class="unadorned" href="$file.diffUrl" title="diff"><img alt="diff" src="$base/images/page_diff.gif"/></a>
     #end
             </td>
 #end

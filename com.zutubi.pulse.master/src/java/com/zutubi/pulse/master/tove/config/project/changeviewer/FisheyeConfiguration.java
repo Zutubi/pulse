@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerUtils.*;
 import com.zutubi.tove.annotations.Form;
@@ -49,48 +51,55 @@ public class FisheyeConfiguration extends BasePathChangeViewer
         this.pathStripPrefix = pathStripPrefix;
     }
 
-    public String getChangelistURL(Revision revision)
+    public String getRevisionURL(Revision revision)
     {
         return StringUtils.join("/", true, true, getBaseURL(), "changelog", getProjectPath(), "?cs=" + getChangesetString(revision));
     }
 
-    public String getFileViewURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileViewURL(ChangeContext context, FileChange fileChange)
     {
-        ScmConfiguration scm = lookupScmConfiguration();
-        String revision = chooseRevision(scm, changelistRevision, fileRevision);
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(stripPathPrefix(path)) + "?r=" + revision);
+        Revision revision = chooseRevision(context, fileChange);
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), pathPart(fileChange) + "?r=" + revision);
     }
 
-    public String getFileDownloadURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDownloadURL(ChangeContext context, FileChange fileChange)
     {
-        ScmConfiguration scm = lookupScmConfiguration();
-        String revision = chooseRevision(scm, changelistRevision, fileRevision);
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision, getProjectPath(), StringUtils.urlEncodePath(stripPathPrefix(path)));
+        Revision revision = chooseRevision(context, fileChange);
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision, getProjectPath(), pathPart(fileChange));
     }
 
-    public String getFileDiffURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDiffURL(ChangeContext context, FileChange fileChange) throws ScmException
     {
-        ScmConfiguration scm = lookupScmConfiguration();
-        String revision = chooseRevision(scm, changelistRevision, fileRevision);
-        String previousRevision = scm.getPreviousRevision(revision);
-        if(previousRevision == null)
+        Revision revision = chooseRevision(context, fileChange);
+        Revision previousRevision = useFileRevision(context) ? context.getPreviousFileRevision(fileChange) : context.getPreviousChangelistRevision();
+        if (previousRevision == null)
         {
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(stripPathPrefix(path)) + "?r1=" + previousRevision + "&r2=" + revision);
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), pathPart(fileChange) + "?r1=" + previousRevision + "&r2=" + revision);
     }
 
-    private String chooseRevision(ScmConfiguration scm, Revision changelistRevision, String fileRevision)
+    private Revision chooseRevision(ChangeContext context, FileChange fileChange)
     {
-        if (isCVS(scm))
+        if (useFileRevision(context))
         {
-            return fileRevision;
+            return fileChange.getRevision();
         }
         else
         {
-            return changelistRevision.getRevisionString();
+            return context.getChangelist().getRevision();
         }
+    }
+
+    private boolean useFileRevision(ChangeContext context)
+    {
+        return isCVS(context.getScmConfiguration());
+    }
+
+    private String pathPart(FileChange fileChange)
+    {
+        return StringUtils.urlEncodePath(stripPathPrefix(fileChange.getPath()));
     }
 
     private String stripPathPrefix(String path)

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
-import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.annotations.Required;
 
@@ -96,16 +96,6 @@ public class SubversionConfiguration extends PollableScmConfiguration
     public String getType()
     {
         return SubversionClient.TYPE;
-    }
-
-    public String getPreviousRevision(String revision)
-    {
-        long number = Long.valueOf(revision);
-        if(number > 0)
-        {
-            return String.valueOf(number - 1);
-        }
-        return null;
     }
 
     public List<String> getExternalMonitorPaths()

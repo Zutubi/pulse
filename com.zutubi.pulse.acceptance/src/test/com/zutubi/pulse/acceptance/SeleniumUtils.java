@@ -257,4 +257,19 @@ public class SeleniumUtils
         }
         return browser;        
     }
+
+    public static boolean isLinkToPresent(Selenium selenium, String href)
+    {
+        return selenium.isElementPresent("//a[@href='" + href + "']");
+    }
+
+    public static void assertLinkToPresent(Selenium selenium, String href)
+    {
+        Assert.assertTrue("Link to '" + href + "' not found", isLinkToPresent(selenium, href));
+    }
+
+    public static void assertLinkToNotPresent(Selenium selenium, String href)
+    {
+        Assert.assertFalse("Unexpected link to '" + href + "' found", isLinkToPresent(selenium, href));
+    }
 }

@@ -1,7 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
@@ -26,34 +27,33 @@ public class TracChangeViewer extends BasePathChangeViewer
         super(baseURL, projectPath);
     }
 
-    public String getChangelistURL(Revision revision)
+    public String getRevisionURL(Revision revision)
     {
         return StringUtils.join("/", true, true, getBaseURL(), "changeset", revision.getRevisionString());
     }
 
-    public String getFileViewURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileViewURL(ChangeContext context, FileChange fileChange)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browser", StringUtils.urlEncodePath(path) + "?rev=" + fileRevision);
+        return StringUtils.join("/", true, true, getBaseURL(), "browser", StringUtils.urlEncodePath(fileChange.getPath()) + "?rev=" + fileChange.getRevision());
     }
 
-    public String getFileDownloadURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDownloadURL(ChangeContext context, FileChange fileChange)
     {
-        return getFileViewURL(path, changelistRevision, fileRevision) + "&format=raw";
+        return getFileViewURL(context, fileChange) + "&format=raw";
     }
 
-    public String getFileDiffURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDiffURL(ChangeContext context, FileChange fileChange) throws ScmException
     {
-        ScmConfiguration scm = lookupScmConfiguration();
-        String previous = scm.getPreviousRevision(fileRevision);
+        Revision previous = context.getPreviousFileRevision(fileChange);
         if(previous == null)
         {
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), "changeset?new=" + getDiffPath(path, fileRevision) + "&old=" + getDiffPath(path, previous));
+        return StringUtils.join("/", true, true, getBaseURL(), "changeset?new=" + getDiffPath(fileChange.getPath(), fileChange.getRevision()) + "&old=" + getDiffPath(fileChange.getPath(), previous));
     }
 
-    private String getDiffPath(String path, String revision)
+    private String getDiffPath(String path, Revision revision)
     {
         String result = StringUtils.join("/", path + "@" + revision);
         if(result.startsWith("/"))

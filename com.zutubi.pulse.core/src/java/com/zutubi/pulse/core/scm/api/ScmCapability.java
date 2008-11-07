@@ -4,7 +4,6 @@ package com.zutubi.pulse.core.scm.api;
  * SCM capabilities are used to indicate which of the optional operations an SCM
  * implementation supports.  The presence or absence of these capabilities will enable / disable
  * various features within pulse.
- * 
  */
 public enum ScmCapability
 {

@@ -9,18 +9,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-/**
- * <class comment/>
- */
 public class CvsAcceptanceTest extends ZutubiTestCase
 {
-    private static final SimpleDateFormat LOCAL_DATE;
     private static final SimpleDateFormat SERVER_DATE;
 
     static
     {
-        LOCAL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        LOCAL_DATE.setTimeZone(TimeZone.getTimeZone("EST"));
         SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
@@ -39,7 +33,7 @@ public class CvsAcceptanceTest extends ZutubiTestCase
         cvs = new CvsCore();
         cvs.setRoot(CVSRoot.parse(cvsRoot));
 
-        analyser = new LogInformationAnalyser("test", CVSRoot.parse(cvsRoot));
+        analyser = new LogInformationAnalyser(CVSRoot.parse(cvsRoot));
     }
 
     protected void tearDown() throws Exception

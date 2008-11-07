@@ -11,7 +11,6 @@ import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
@@ -23,8 +22,6 @@ import java.util.*;
  */
 public class LogInformationAnalyser
 {
-    private static final Logger LOG = Logger.getLogger(LogInformationAnalyser.class);
-
     //-------------------------------------------------------------------------
     // change set analysis:
     // - cvs changes are not atomic. therefore,
@@ -39,12 +36,10 @@ public class LogInformationAnalyser
 
     // group by (author,branch,comment)
 
-    private String uid;
     private CVSRoot root;
 
-    public LogInformationAnalyser(String uid, CVSRoot root)
+    public LogInformationAnalyser(CVSRoot root)
     {
-        this.uid = uid;
         this.root = root;
     }
 
@@ -182,6 +177,7 @@ public class LogInformationAnalyser
                 }
             }
 
+            assert(lastChange != null);
             CvsRevision rev = new CvsRevision(lastChange.getAuthor(), lastChange.getTag(), lastChange.getMessage(), lastChange.getDate());
             Changelist changelist = new Changelist(
                     CvsClient.convertRevision(rev),
@@ -192,7 +188,7 @@ public class LogInformationAnalyser
                     {
                         public FileChange map(Revision revision)
                         {
-                            return new FileChange(revision.getFilename(), revision.getRevision(), revision.getAction());
+                            return new FileChange(revision.getFilename(), new com.zutubi.pulse.core.scm.api.Revision(revision.getRevision()), revision.getAction());
                         }
                     })
             );
@@ -232,9 +228,6 @@ public class LogInformationAnalyser
                     previousChange.getMessage().equals(otherChange.getMessage());
         }
 
-        /**
-         *
-         */
         public List<LocalChangeSet> refine()
         {
             Map<String, String> filenames = new HashMap<String, String>();

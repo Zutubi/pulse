@@ -1,83 +1,80 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.tove.config.MockConfigurationProvider;
-import com.zutubi.tove.config.api.Configuration;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
-/**
- */
+import java.util.Collections;
+
 public class TracChangeViewerTest extends PulseTestCase
 {
     private static final String BASE = "http://trac.edgewall.org";
     private static final String PATH = "";
 
+    private static final Revision FILE_REVISION            = new Revision("3673");
+    private static final Revision PREVIOUS_FILE_REVISION   = new Revision("3672");
+    private static final Revision CHANGE_REVISION          = new Revision("12345");
+    private static final Revision PREVIOUS_CHANGE_REVISION = new Revision("12344");
+
+    private ScmClient mockScmClient;
     private TracChangeViewer viewer;
 
     protected void setUp() throws Exception
     {
-        final ProjectConfiguration project = new ProjectConfiguration();
-        project.setScm(new ScmConfiguration()
-        {
-            public String getType()
-            {
-                return "mock";
-            }
+        super.setUp();
 
-            public String getPreviousRevision(String revision)
-            {
-                long number = Long.valueOf(revision);
-                if (number > 0)
-                {
-                    return String.valueOf(number - 1);
-                }
-                return null;
-            }
-        });
+        mockScmClient = mock(ScmClient.class);
+        stub(mockScmClient.getPreviousRevision((ScmContext) anyObject(), same(CHANGE_REVISION), eq(false))).toReturn(PREVIOUS_CHANGE_REVISION);
+        stub(mockScmClient.getPreviousRevision((ScmContext) anyObject(), same(FILE_REVISION), eq(true))).toReturn(PREVIOUS_FILE_REVISION);
+
         viewer = new TracChangeViewer(BASE, PATH);
-        viewer.setConfigurationProvider(new MockConfigurationProvider()
-        {
-            public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
-            {
-                return (T) project;
-            }
-        });
     }
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getChangelistURL(new Revision("3673")));
+        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getRevisionURL(FILE_REVISION));
     }
 
     public void testGetFileViewURL()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673", viewer.getFileViewURL("/trunk/INSTALL", new Revision(12345), "3673"));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673", viewer.getFileViewURL(getContext(), getFileChange("/trunk/INSTALL")));
     }
 
     public void testGetFileDownloadURL()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL", new Revision(12345), "3673"));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673&format=raw", viewer.getFileDownloadURL(getContext(), getFileChange("/trunk/INSTALL")));
     }
 
-    public void testGetFileDiffURL()
+    public void testGetFileDiffURL() throws ScmException
     {
-        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%403673&old=trunk%2FINSTALL%403672", viewer.getFileDiffURL("/trunk/INSTALL", new Revision(12345), "3673"));
+        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%403673&old=trunk%2FINSTALL%403672", viewer.getFileDiffURL(getContext(), getFileChange("/trunk/INSTALL")));
     }
 
     public void testGetFileViewURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673", viewer.getFileViewURL("/trunk/INSTALL+this please", new Revision(12345), "3673"));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673", viewer.getFileViewURL(getContext(), getFileChange("/trunk/INSTALL+this please")));
     }
 
     public void testGetFileDownloadURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL+this please", new Revision(12345), "3673"));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673&format=raw", viewer.getFileDownloadURL(getContext(), getFileChange("/trunk/INSTALL+this please")));
     }
 
-    public void testGetFileDiffURLSpecial()
+    public void testGetFileDiffURLSpecial() throws ScmException
     {
-        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%2Bthis+please%403673&old=trunk%2FINSTALL%2Bthis+please%403672", viewer.getFileDiffURL("/trunk/INSTALL+this please", new Revision(12345), "3673"));
+        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%2Bthis+please%403673&old=trunk%2FINSTALL%2Bthis+please%403672", viewer.getFileDiffURL(getContext(), getFileChange("/trunk/INSTALL+this please")));
+    }
+
+    public FileChange getFileChange(String path)
+    {
+        return new FileChange(path, FILE_REVISION, FileChange.Action.EDIT);
+    }
+
+    public ChangeContext getContext()
+    {
+        Changelist changelist = new Changelist(CHANGE_REVISION, 0, null, null, Collections.<FileChange>emptyList());
+        return new ChangeContextImpl(changelist, null, mockScmClient, null);
     }
 }

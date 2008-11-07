@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.AbstractConfiguration;
@@ -24,9 +26,9 @@ public abstract class ChangeViewerConfiguration extends AbstractConfiguration
          */
         DOWNLOAD_FILE,
         /**
-         * The viewer can display a page with information about a changelist.
+         * The viewer can display a page with information about a revision.
          */
-        VIEW_CHANGELIST,
+        VIEW_REVISION,
         /**
          * The viewer can display a file, possily at a given revision.
          */
@@ -49,71 +51,67 @@ public abstract class ChangeViewerConfiguration extends AbstractConfiguration
     public abstract boolean hasCapability(Capability capability);
 
     /**
-     * Returns the URL for a view of the given changelist.
+     * Returns the URL for a view of the given revision.  Note that no context
+     * is provided in this case as we are not necessarily operating under the
+     * context of one change.
      * <p/>
-     * Required for capability {@link Capability#VIEW_CHANGELIST}
+     * Required for capability {@link Capability#VIEW_REVISION}
      *
      * @param revision revision of the changelist
      * @return URL for the changelist view
      */
     @Transient
-    public abstract String getChangelistURL(Revision revision);
+    public abstract String getRevisionURL(Revision revision);
 
     /**
      * Returns the URL for viewing a file at a given changelist and/or file
-     * revision.  Note that typically only one of the changelist or file
-     * revisions will be used, but different viewers require different
-     * information.
+     * revision.
      * <p/>
      * Required for capability {@link Capability#VIEW_FILE}
      *
-     * @param path               path of the file to generate a URL for, in the
-     *                           format returned by the SCM plugin implementation
-     *                           for file changes
-     * @param changelistRevision revision of the changelist at which to view the
-     *                           file
-     * @param fileRevision       revision of the file to view
+     * @param context    context of the change in which the file participated,
+     *                   including the changelist of which it was part
+     * @param fileChange information about the file to retrieve the URL for,
+     *                   most notably the path and file revision
      * @return URL for viewing the file at the given revision
+     * @throws com.zutubi.pulse.core.scm.api.ScmException if there is an error
+     *         retrieving further information from the SCM implementation
      */
     @Transient
-    public abstract String getFileViewURL(String path, Revision changelistRevision, String fileRevision);
+    public abstract String getFileViewURL(ChangeContext context, FileChange fileChange) throws ScmException;
 
     /**
      * Returns the URL for downloading a raw file at a given changelist and/or
-     * file revision.  Note that typically only one of the changelist or file
-     * revisions will be used, but different viewers require different
-     * information.
+     * file revision.
      * <p/>
      * Required for capability {@link Capability#DOWNLOAD_FILE}
      *
-     * @param path               path of the file to generate a URL for, in the
-     *                           format returned by the SCM plugin implementation
-     *                           for file changes
-     * @param changelistRevision revision of the changelist at which to download
-     *                           the file
-     * @param fileRevision       revision of the file to download
+     * @param context    context of the change in which the file participated,
+     *                   including the changelist of which it was part
+     * @param fileChange information about the file to retrieve the URL for,
+     *                   most notably the path and file revision
      * @return URL for downloading the file at the given revision
+     * @throws com.zutubi.pulse.core.scm.api.ScmException if there is an error
+     *         retrieving further information from the SCM implementation
      */
     @Transient
-    public abstract String getFileDownloadURL(String path, Revision changelistRevision, String fileRevision);
+    public abstract String getFileDownloadURL(ChangeContext context, FileChange fileChange) throws ScmException;
 
     /**
      * Returns the URL for viewing the differences applied to a file in a given
-     * changelist and/or file revision.  Note that typically only one of the
-     * changelist or file revisions will be used, but different viewers require
-     * different information.
+     * changelist and/or file revision.
      * <p/>
      * Required for capability {@link Capability#VIEW_FILE_DIFF}
      *
-     * @param path               path of the file to generate a URL for, in the
-     *                           format returned by the SCM plugin implementation
-     *                           for file changes
-     * @param changelistRevision revision of the changelist in which the file
-     *                           change occurred
-     * @param fileRevision       revision of the file after the change
+     * @param context    context of the change in which the file participated,
+     *                   including the changelist of which it was part
+     * @param fileChange information about the file to retrieve the URL for,
+     *                   most notably the path and file revision
      * @return URL for viewing the file changes that occurred at the given
      *         revision
+     * @throws com.zutubi.pulse.core.scm.api.ScmException if there is an error
+     *         retrieving further information from the SCM implementation
      */
     @Transient
-    public abstract String getFileDiffURL(String path, Revision changelistRevision, String fileRevision);
+    public abstract String getFileDiffURL(ChangeContext context, FileChange fileChange) throws ScmException;
 }

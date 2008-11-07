@@ -210,8 +210,9 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             ScmClient client = null;
             try
             {
-                client = scmManager.createClient(projectConfig.getScm());
-                r = client.parseRevision(revision);
+                ScmConfiguration scm = projectConfig.getScm();
+                client = scmManager.createClient(scm);
+                r = client.parseRevision(scmManager.createContext(project.getId(), scm), revision);
             }
             catch (ScmException e)
             {

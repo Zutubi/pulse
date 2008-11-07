@@ -59,7 +59,8 @@
             #contentHeading("change.comment" 1)
             #contentHeading("actions" 1)
         </tr>
-        #set($url = $action.getChangeUrl($project, $change.revision))
+        $action.updateChangeUrl($change)
+        #set($url = $action.getChangeUrl())
         <tr>
             #dynamicRightLinkCell($change.revision $url)
             #dynamicCell($change.author)

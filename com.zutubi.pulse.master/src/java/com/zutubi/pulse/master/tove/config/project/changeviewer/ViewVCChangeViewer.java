@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -28,7 +30,7 @@ public class ViewVCChangeViewer extends BasePathChangeViewer
     public boolean hasCapability(Capability capability)
     {
         ScmConfiguration scm = lookupScmConfiguration();
-        if(capability.equals(Capability.VIEW_CHANGELIST) && scm.getType().equals(CVS_TYPE))
+        if (capability.equals(Capability.VIEW_REVISION) && scm.getType().equals(CVS_TYPE))
         {
             return false;
         }
@@ -36,30 +38,34 @@ public class ViewVCChangeViewer extends BasePathChangeViewer
         return super.hasCapability(capability);
     }
 
-    public String getChangelistURL(Revision revision)
+    public String getRevisionURL(Revision revision)
     {
         return StringUtils.join("/", true, true, getBaseURL(), getProjectPath() + "?rev=" + revision.getRevisionString() + "&view=rev");
     }
 
-    public String getFileViewURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileViewURL(ChangeContext context, FileChange fileChange)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), StringUtils.urlEncodePath(path) + "?rev=" + fileRevision + "&view=markup");
+        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), pathPart(fileChange) + "?rev=" + fileChange.getRevision() + "&view=markup");
     }
 
-    public String getFileDownloadURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDownloadURL(ChangeContext context, FileChange fileChange)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "*checkout*", getProjectPath(), StringUtils.urlEncodePath(path) + "?rev=" + fileRevision);
+        return StringUtils.join("/", true, true, getBaseURL(), "*checkout*", getProjectPath(), pathPart(fileChange) + "?rev=" + fileChange.getRevision());
     }
 
-    public String getFileDiffURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDiffURL(ChangeContext context, FileChange fileChange) throws ScmException
     {
-        ScmConfiguration config = lookupScmConfiguration();
-        String previous = config.getPreviousRevision(fileRevision);
+        Revision previous = context.getPreviousFileRevision(fileChange);
         if(previous == null)
         {
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), StringUtils.urlEncodePath(path) + "?r1=" + previous + "&r2=" + fileRevision);
+        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), pathPart(fileChange) + "?r1=" + previous + "&r2=" + fileChange.getRevision());
+    }
+
+    private String pathPart(FileChange fileChange)
+    {
+        return StringUtils.urlEncodePath(fileChange.getPath());
     }
 }

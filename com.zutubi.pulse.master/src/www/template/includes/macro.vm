@@ -1996,13 +1996,7 @@
         #elseif($buildResult.revision)
             $action.updateChangeUrl($project, $buildResult.revision)
             #set($changeUrl = $action.getChangeUrl())
-            #if($changeUrl)
-            <a href="$changeUrl">
-            #end
-                #html($buildResult.revision)
-            #if($changeUrl)
-            </a>
-            #end
+            #if($changeUrl)<a href="$changeUrl">#end#html($buildResult.revision)#if($changeUrl)</a>#end
         #else
             none
         #end

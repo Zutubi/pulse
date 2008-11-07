@@ -1,7 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
@@ -23,30 +24,34 @@ public class P4WebChangeViewer extends BasePathChangeViewer
         super(baseURL, projectPath);
     }
 
-    public String getChangelistURL(Revision revision)
+    public String getRevisionURL(Revision revision)
     {
         return StringUtils.join("/", true, true, getBaseURL(), "@md=d@", revision.getRevisionString() + "?ac=10");
     }
 
-    public String getFileViewURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileViewURL(ChangeContext context, FileChange fileChange)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "@md=d@" + StringUtils.urlEncodePath(path) + "?ac=64&rev1=" + fileRevision);
+        return StringUtils.join("/", true, true, getBaseURL(), "@md=d@" + pathPart(fileChange) + "?ac=64&rev1=" + fileChange.getRevision());
     }
 
-    public String getFileDownloadURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDownloadURL(ChangeContext context, FileChange fileChange)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "@md=d&rev1=" + fileRevision + "@" + StringUtils.urlEncodePath(path));
+        return StringUtils.join("/", true, true, getBaseURL(), "@md=d&rev1=" + fileChange.getRevision() + "@" + pathPart(fileChange));
     }
 
-    public String getFileDiffURL(String path, Revision changelistRevision, String fileRevision)
+    public String getFileDiffURL(ChangeContext context, FileChange fileChange) throws ScmException
     {
-        ScmConfiguration config = lookupScmConfiguration();
-        String previous = config.getPreviousRevision(fileRevision);
+        Revision previous = context.getPreviousFileRevision(fileChange);
         if(previous == null)
         {
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), "@md=d@" + StringUtils.urlEncodePath(path) + "?ac=19&rev1=" + previous + "&rev2=" + fileRevision);
+        return StringUtils.join("/", true, true, getBaseURL(), "@md=d@" + pathPart(fileChange) + "?ac=19&rev1=" + previous + "&rev2=" + fileChange.getRevision());
+    }
+
+    private String pathPart(FileChange fileChange)
+    {
+        return StringUtils.urlEncodePath(fileChange.getPath());
     }
 }

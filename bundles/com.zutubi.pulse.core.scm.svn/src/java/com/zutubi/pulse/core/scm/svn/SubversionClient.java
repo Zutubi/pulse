@@ -428,7 +428,7 @@ public class SubversionClient implements ScmClient
                 SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
                 if (filter.accept(entryPath.getPath()))
                 {
-                    if (handler.handleChange(new FileChange(entryPath.getPath(), revision.toString(), decodeAction(entryPath.getType()))))
+                    if (handler.handleChange(new FileChange(entryPath.getPath(), revision, decodeAction(entryPath.getType()))))
                     {
                         return true;
                     }
@@ -726,7 +726,7 @@ public class SubversionClient implements ScmClient
         return EOLStyle.BINARY;
     }
 
-    public Revision parseRevision(String revision) throws ScmException
+    public Revision parseRevision(ScmContext context, String revision) throws ScmException
     {
         try
         {
@@ -745,6 +745,18 @@ public class SubversionClient implements ScmClient
         catch (SVNException e)
         {
             throw convertException(e);
+        }
+    }
+
+    public Revision getPreviousRevision(ScmContext context, Revision revision, boolean isFile) throws ScmException
+    {
+        try
+        {
+            return revision.getPreviousNumericalRevision();
+        }
+        catch (NumberFormatException e)
+        {
+            throw new ScmException("Invalid revision '" + revision.getRevisionString() + "': " + e.getMessage());
         }
     }
 

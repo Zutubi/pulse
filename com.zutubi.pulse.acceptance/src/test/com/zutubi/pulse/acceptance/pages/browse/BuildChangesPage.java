@@ -129,7 +129,7 @@ public class BuildChangesPage extends SeleniumPage
                     throw new RuntimeException("File string '" + fileString + "' does not match expected format");
                 }
 
-                fileChanges.add(new FileChange(matcher.group(1), matcher.group(2), FileChange.Action.fromString(matcher.group(3))));
+                fileChanges.add(new FileChange(matcher.group(1), new Revision(matcher.group(2)), FileChange.Action.fromString(matcher.group(3))));
             }
 
 

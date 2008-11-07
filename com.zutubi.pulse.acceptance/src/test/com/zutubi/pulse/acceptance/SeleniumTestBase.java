@@ -7,7 +7,9 @@ import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ExceptionWrappingRunnable;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
@@ -148,12 +150,12 @@ public class SeleniumTestBase extends ZutubiTestCase
         assertTrue(text.contains(message));        
     }
 
-    protected void addProject(String name, boolean useAPI)
+    protected String addProject(String name, boolean useAPI)
     {
-        addProject(name, false, ProjectManager.GLOBAL_PROJECT_NAME, useAPI);
+        return addProject(name, false, ProjectManager.GLOBAL_PROJECT_NAME, useAPI);
     }
 
-    protected void addProject(String name, boolean template, String parentName, boolean useAPI)
+    protected String addProject(String name, boolean template, String parentName, boolean useAPI)
     {
         if (useAPI)
         {
@@ -186,6 +188,8 @@ public class SeleniumTestBase extends ZutubiTestCase
                 }
             }
         }
+
+        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, name);
     }
 
     protected AddProjectWizard.AntState runProjectWizard(String name, boolean template, String parentName)
