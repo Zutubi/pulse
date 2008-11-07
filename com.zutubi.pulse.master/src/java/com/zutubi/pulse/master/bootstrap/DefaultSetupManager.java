@@ -475,7 +475,7 @@ public class DefaultSetupManager implements SetupManager
         configurationTemplateManager.init();
 
         LogConfigurationManager logConfigurationManager = SpringComponentContext.getBean("logConfigurationManager");
-        logConfigurationManager.init();
+        logConfigurationManager.applyConfig();
     }
 
     public void requestUpgradeComplete(final boolean changes)
