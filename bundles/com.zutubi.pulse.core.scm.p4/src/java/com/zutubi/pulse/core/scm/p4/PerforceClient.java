@@ -854,7 +854,7 @@ public class PerforceClient extends CachingScmClient
     {
         try
         {
-            return revision.getPreviousNumericalRevision();
+            return revision.calculatePreviousNumericalRevision();
         }
         catch (NumberFormatException e)
         {

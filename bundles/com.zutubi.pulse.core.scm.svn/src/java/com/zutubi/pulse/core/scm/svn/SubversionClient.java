@@ -752,7 +752,7 @@ public class SubversionClient implements ScmClient
     {
         try
         {
-            return revision.getPreviousNumericalRevision();
+            return revision.calculatePreviousNumericalRevision();
         }
         catch (NumberFormatException e)
         {

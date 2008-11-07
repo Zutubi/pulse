@@ -64,9 +64,9 @@ public class Revision
      * @throws NumberFormatException if our revision string cannot be parsed as
      *         a lon 
      */
-    public Revision getPreviousNumericalRevision()
+    public Revision calculatePreviousNumericalRevision()
     {
-        long number = Long.valueOf(revisionString);
+        long number = Long.parseLong(revisionString);
         if(number > 0)
         {
             return new Revision(String.valueOf(number - 1));

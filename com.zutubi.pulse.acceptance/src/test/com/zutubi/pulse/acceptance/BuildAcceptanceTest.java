@@ -140,7 +140,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         SeleniumUtils.assertLinkToPresent(selenium, changelistLink);
         SeleniumUtils.assertLinkToPresent(selenium, prefixPart + filePart + "?r=" + revisionString);
         SeleniumUtils.assertLinkToPresent(selenium, prefixPart + "~raw,r=" + revisionString + "/" + filePart);
-        SeleniumUtils.assertLinkToPresent(selenium, prefixPart + filePart + "?r1=" + new Revision(revisionString).getPreviousNumericalRevision() + "&r2=" + revisionString);
+        SeleniumUtils.assertLinkToPresent(selenium, prefixPart + filePart + "?r1=" + new Revision(revisionString).calculatePreviousNumericalRevision() + "&r2=" + revisionString);
     }
 
     private String editAndCommitBuildFile() throws IOException, SVNException
