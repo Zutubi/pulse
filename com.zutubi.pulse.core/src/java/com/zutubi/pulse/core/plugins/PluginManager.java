@@ -23,14 +23,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * The PluginManager is responsible for handling everything needed to support plugins.
+ * <p/>
+ * The Plugin Manager delegates much of the work to an embedded Equinox instance which
+ * is responsible for handling the lifecycle, classloading and interactions between plugins.
+ * <p/>
+ * The Plugin Manager handles the management tasks around equinox, including managing the
+ * deployed plugin files, tracking the plugin states (ENABLED, DISABLED etc), starting and
+ * stopping the equinox installation, deploying new plugins at runtime, managing the upgrade
+ * of plugins and more.
  */
 public class PluginManager
 {
     public static final boolean VERBOSE_EXTENSIONS = Boolean.getBoolean("pulse.verbose.extensions");
-
-    public static final String CONFIG_EXTENSION_POINT = "com.zutubi.pulse.core.config";
 
     private static final Logger LOG = Logger.getLogger(PluginManager.class);
 
@@ -40,9 +45,14 @@ public class PluginManager
 
     private PluginPaths paths;
 
+    /**
+     * The list of non-internal plugins.
+     */
     private List<LocalPlugin> plugins = new LinkedList<LocalPlugin>();
 
-    // special plugins that are loaded ahead of all others.  Upgrade handling does not apply to these plugins.
+    // Special plugins that are loaded ahead of all others.  Upgrade handling does not apply to these plugins.
+    // These plugins are also NOT registered in the registry.  They can not be disabled, uninstalled, upgraded
+    // etc etc.
     private List<LocalPlugin> internalPlugins = new LinkedList<LocalPlugin>();
 
     private IExtensionRegistry extensionRegistry;
@@ -55,9 +65,20 @@ public class PluginManager
     private static final String UPGRADE_SOURCE_KEY = PluginRegistryEntry.UPGRADE_SOURCE_KEY;
 
     //--- pending action strings
-
+    // There are some things that the plugin manager can not do whilst the equinox system
+    // is running.  These actions are defined as pending actions, and will be carried out
+    // on the next restart.
+    /**
+     * The plugin will be uninstalled on the next restart.
+     */
     private static final String UNINSTALL_PENDING_ACTION = "uninstall";
+    /**
+     * The plugin will be disabled on the next restart.
+     */
     private static final String DISABLE_PENDING_ACTION = "disable";
+    /**
+     * The plugin will be upgraded to a new version on the next restart.
+     */
     private static final String UPGRADE_PENDING_ACTION = "upgrade";
 
     private static final PluginFileFilter PLUGIN_FILTER = new PluginFileFilter();
@@ -66,9 +87,27 @@ public class PluginManager
 
     private boolean versionChangeDetected = false;
 
+    /**
+     * The plugin states.
+     */
     public enum State
     {
-        ENABLED, DISABLED, UNINSTALLED
+        /**
+         * The plugin is deployed and running within the embedded equinox instance.
+         */
+        ENABLED,
+        /**
+         * The plugin is currently disabled.  It has not been registered with the equinox
+         * system, but is located within the plugin storage directory, and as such can be
+         * deployed.
+         */
+        DISABLED,
+        /**
+         * This plugin has been uninstalled.  It does not exist in the plugin storage
+         * directory, and will not be automatically upgraded if it was one of the pre-packaged
+         * plugins.
+         */
+        UNINSTALLED
     }
 
     public PluginManager()
@@ -95,7 +134,8 @@ public class PluginManager
 
         startupInternalPlugins();
 
-        // extension registry is not available until the internal plugins containing the eclipse registry have been loaded.
+        // extension registry is not available until the internal plugins containing the eclipse registry have
+        // been loaded, that is, the internal plugins have been started up.
         extensionRegistry = RegistryFactory.getRegistry();
         extensionTracker = new ExtensionTracker(extensionRegistry);
 
@@ -107,6 +147,7 @@ public class PluginManager
         // miss interpreted.
         scanPrepackagedPlugins();
         scanUserPlugins();
+
         scanForManualUninstalls();
 
         // Step 4: plugin startup
@@ -117,13 +158,12 @@ public class PluginManager
 
         List<LocalPlugin> installedPlugins = new LinkedList<LocalPlugin>();
 
-        //TODO: create handles for all plugins - enabled and disabled.
         for (String id : registry.getRegistrations())
         {
             PluginRegistryEntry entry = registry.getEntry(id);
 
-            // initialise the installed plugins.
-            if (entry.containsKey(PLUGIN_SOURCE_KEY))
+            // initialise the installed plugins. Uninstalled plugins do not have source.
+            if (entry.hasSource())
             {
                 try
                 {
@@ -245,7 +285,6 @@ public class PluginManager
                     }
                 }
             }
-
         }
     }
 
@@ -254,7 +293,7 @@ public class PluginManager
         // A) load and install each of the plugins located in the internal storage location.
         for (File file : paths.getInternalPluginStorageDir().listFiles(PLUGIN_FILTER))
         {
-            LocalPlugin internalPlugin = createPluginHandle(file.toURI(), Plugin.Type.INTERNAL);
+            LocalPlugin internalPlugin = createPluginHandle(file, Plugin.Type.INTERNAL);
             internalPlugin.setBundle(equinox.install(internalPlugin.getSource()));
             internalPlugin.setBundleDescription(equinox.getBundleDescription(internalPlugin.getId(), internalPlugin.getVersion().toString()));
             internalPlugins.add(internalPlugin);
@@ -286,32 +325,19 @@ public class PluginManager
     {
         for (String id : registry.getRegistrations())
         {
-            try
-            {
-                PluginRegistryEntry entry = registry.getEntry(id);
+            PluginRegistryEntry entry = registry.getEntry(id);
 
-                // check for manually uninstalled plugins.
-                if (entry.containsKey(PLUGIN_SOURCE_KEY))
-                {
-                    String sourceUriString = entry.getSource();
-                    if (!TextUtils.stringSet(sourceUriString))
-                    {
-                        LOG.warning("Registry entry for plugin '" + id + "' is corrupt. It contains a null source string.");
-                        continue;
-                    }
-                    File source = new File(new URI(sourceUriString));
-                    if (!source.exists())
-                    {
-                        // looks like this plugin is no longer available.
-                        entry.setState(State.UNINSTALLED);
-                        entry.remove(PLUGIN_SOURCE_KEY);
-                        saveRegistry();
-                    }
-                }
-            }
-            catch (URISyntaxException e)
+            // check for manually uninstalled plugins.
+            if (entry.hasSource())
             {
-                LOG.warning("Registry entry for plugin '" + id + "' is corrupt. Error: " + e.getMessage());
+                File source = getPluginSourceFile(entry.getSource());
+                if (!source.exists())
+                {
+                    // looks like this plugin is no longer available.
+                    entry.setState(State.UNINSTALLED);
+                    entry.remove(PLUGIN_SOURCE_KEY);
+                    saveRegistry();
+                }
             }
         }
     }
@@ -340,27 +366,24 @@ public class PluginManager
                         }
                         else if (pendingAction.equals(UNINSTALL_PENDING_ACTION))
                         {
-                            if (entry.containsKey(PLUGIN_SOURCE_KEY))
+                            if (entry.hasSource())
                             {
-                                String source = entry.getSource();
-                                if (!TextUtils.stringSet(source))
-                                {
-                                    LOG.warning("Registry entry for plugin '" + id + "' is corrupt. Uninstall source not specified.");
-                                }
-                                File plugin = new File(new URI(source));
-                                FileSystemUtils.delete(plugin);
+                                File plugin = getPluginSourceFile(entry.getSource());
+                                delete(plugin);
                                 entry.remove(PLUGIN_SOURCE_KEY);
                             }
                             entry.setState(State.UNINSTALLED);
                         }
                         else if (pendingAction.equals(UPGRADE_PENDING_ACTION))
                         {
-                            URI newSource = new URI(entry.get(UPGRADE_SOURCE_KEY));
+                            URI newSource = getUpgradeSourceFile(entry.get(UPGRADE_SOURCE_KEY)).toURI();
                             upgradePluginSource(id, newSource);
 
                             // cleanup the temporary file.
                             File tmpPluginFile = new File(newSource);
-                            FileSystemUtils.delete(tmpPluginFile);
+                            delete(tmpPluginFile);
+
+                            entry.remove(UPGRADE_SOURCE_KEY);
                         }
                         entry.remove(PLUGIN_PENDING_KEY);
                         saveRegistry(); // this may be overly aggressive flushing.
@@ -378,27 +401,39 @@ public class PluginManager
         }
     }
 
+    private void delete(File plugin) throws IOException
+    {
+        if (plugin.isDirectory())
+        {
+            FileSystemUtils.rmdir(plugin);
+        }
+        else if (plugin.isFile())
+        {
+            FileSystemUtils.delete(plugin);
+        }
+    }
+
     private void upgradePluginSource(String id, URI newSource) throws URISyntaxException, IOException, PluginException
     {
         // replace the old plugin, install and register the new source
         PluginRegistryEntry entry = registry.getEntry(id);
 
         // delete the old
-        File pluginFile = new File(new URI(entry.getSource()));
+        File pluginFile = getPluginSourceFile(entry.getSource());
         if (pluginFile.isDirectory())
         {
             FileSystemUtils.rmdir(pluginFile);
         }
-        else if (pluginFile.isFile())
+        else
         {
             FileSystemUtils.delete(pluginFile);
         }
 
         // combination of uninstall the current plugin and installing the new.
-        URI installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
+        File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
 
         // register the plugin with the registry
-        entry.put(PLUGIN_SOURCE_KEY, installedSource.toString());
+        entry.put(PLUGIN_SOURCE_KEY, installedSource.getName());
         saveRegistry();
     }
 
@@ -419,13 +454,13 @@ public class PluginManager
         // discover pre-packaged plugins.
         for (File file : paths.getPrepackagedPluginStorageDir().listFiles(PLUGIN_FILTER))
         {
-            LocalPlugin plugin = createPluginHandle(file.toURI(), Plugin.Type.USER);
+            LocalPlugin plugin = createPluginHandle(file, Plugin.Type.USER);
             try
             {
                 if (!registry.isRegistered(plugin))
                 {
                     // download and register - may want to make the default 'discovery' behaviour configurable?
-                    URI installedSource = downloadPlugin(file.toURI(), paths.getPluginStorageDir());
+                    File installedSource = downloadPlugin(file.toURI(), paths.getPluginStorageDir());
 
                     registerPlugin(createPluginHandle(installedSource, Plugin.Type.USER));
                 }
@@ -441,13 +476,12 @@ public class PluginManager
                     }
 
                     // version check. if new version available, mark it for pending upgrade.
-                    String pluginSourceString = entry.getSource();
-                    if (!TextUtils.stringSet(pluginSourceString))
+                    if (!entry.hasSource())
                     {
-                        LOG.warning("Can not complete pre-packaged plugin version for " + plugin.getId() + ".  Installed source not available.");
                         continue;
                     }
-                    LocalPlugin registeredPlugin = createPluginHandle(new URI(pluginSourceString), entry.getType());
+
+                    LocalPlugin registeredPlugin = createPluginHandle(entry.getSource(), entry.getType());
 
                     //TODO: provide the user with the opportunity to not upgrade to the new version. They may have an old version for a specific reason.
 
@@ -475,47 +509,39 @@ public class PluginManager
     {
         for (File file : dir.listFiles(PLUGIN_FILTER))
         {
-            LocalPlugin plugin = createPluginHandle(file.toURI(), type);
-            try
-            {
+            LocalPlugin plugin = createPluginHandle(file, type);
 
-                if (!registry.isRegistered(plugin))
+            if (!registry.isRegistered(plugin))
+            {
+                // plugin is already where we want it, just a matter of installing it.
+                registerPlugin(createPluginHandle(file, type));
+            }
+            else
+            {
+                PluginRegistryEntry entry = registry.getEntry(plugin.getId());
+
+                if (State.UNINSTALLED.equals(entry.getState()))
                 {
                     // plugin is already where we want it, just a matter of installing it.
-                    registerPlugin(createPluginHandle(file.toURI(), type));
+                    registerPlugin(createPluginHandle(file, type));
                 }
                 else
                 {
-                    PluginRegistryEntry registryEntry = registry.getEntry(plugin.getId());
-
-                    if (State.UNINSTALLED.equals(registryEntry.getState()))
+                    // is the current file the same as the registered file?
+                    if (getPluginSourceFile(entry.getSource()).getName().compareTo(file.getName()) == 0)
                     {
-                        // plugin is already where we want it, just a matter of installing it.
-                        registerPlugin(createPluginHandle(file.toURI(), type));
+                        continue;
                     }
-                    else
-                    {
-                        // is the current file the same as the registered file?
-                        URI registryURI = new URI(registryEntry.getSource());
-                        if (registryURI.compareTo(file.toURI()) == 0)
-                        {
-                            continue;
-                        }
 
-                        // we always want to be using the latest version of the internal plugins, so update
-                        // the registry with whatever we find. The system startup will detect the version change
-                        // if one exists.
-                        // NOTE: We are effectively re-registering each of the internal plugins each time round
-                        registryEntry.put(PLUGIN_SOURCE_KEY, file.toURI().toString());
-                        saveRegistry();
+                    // we always want to be using the latest version of the internal plugins, so update
+                    // the registry with whatever we find. The system startup will detect the version change
+                    // if one exists.
+                    // NOTE: We are effectively re-registering each of the internal plugins each time round
+                    entry.put(PLUGIN_SOURCE_KEY, file.getName());
+                    saveRegistry();
 
-                        // Alternative - only update if a) no version specified, b) there is a known version increase.
-                    }
+                    // Alternative - only update if a) no version specified, b) there is a known version increase.
                 }
-            }
-            catch (URISyntaxException e)
-            {
-                LOG.warning("Registry entry for plugin '" + plugin.getId() + "' is corrupt. Error: " + e.getMessage());
             }
         }
     }
@@ -535,9 +561,7 @@ public class PluginManager
         //TODO: check that the plugin we download does not already exist.  We do not want to install the same plugin twice.
 
         // copy it into the internal plugin storage directory
-        URI installedSource = downloadPlugin(uri, filename, paths.getPluginStorageDir());
-
-        File file = new File(installedSource);
+        File file = downloadPlugin(uri, filename, paths.getPluginStorageDir());
 
         LocalPlugin installedPlugin;
         try
@@ -547,7 +571,7 @@ public class PluginManager
                 throw new PluginException("'" + uri + "' does not define a valid plugin.");
             }
 
-            installedPlugin = createPluginHandle(installedSource, Plugin.Type.USER);
+            installedPlugin = createPluginHandle(file, Plugin.Type.USER);
             // register the plugin with the registry
             registerPlugin(installedPlugin);
         }
@@ -555,7 +579,7 @@ public class PluginManager
         {
             try
             {
-                FileSystemUtils.delete(file);
+                delete(file);
             }
             catch (IOException e1)
             {
@@ -608,25 +632,10 @@ public class PluginManager
         try
         {
             PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-            if (entry.containsKey(PLUGIN_SOURCE_KEY))
+            if (entry.hasSource())
             {
-                String source = entry.getSource();
-                if (!TextUtils.stringSet(source))
-                {
-                    LOG.warning("Unable to remove source for plugin " + plugin.getId() + " during uninstall.  Source not known.");
-                }
-                else
-                {
-                    File pluginFile = new File(new URI(source));
-                    if (pluginFile.isDirectory())
-                    {
-                        FileSystemUtils.rmdir(pluginFile);
-                    }
-                    else if (pluginFile.isFile())
-                    {
-                        FileSystemUtils.delete(pluginFile);
-                    }
-                }
+                File pluginFile = getPluginSourceFile(entry.getSource());
+                delete(pluginFile);
 
                 entry.remove(PLUGIN_SOURCE_KEY);
             }
@@ -635,13 +644,9 @@ public class PluginManager
 
             plugin.setState(Plugin.State.UNINSTALLED);
         }
-        catch (URISyntaxException e)
-        {
-            throw new PluginException(e);
-        }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LOG.warning(e);
         }
     }
 
@@ -730,26 +735,19 @@ public class PluginManager
         {
             // replace the old plugin, install and register the new source
             File pluginFile = new File(currentPlugin.getSource());
-            if (pluginFile.isDirectory())
-            {
-                FileSystemUtils.rmdir(pluginFile);
-            }
-            else if (pluginFile.isFile())
-            {
-                FileSystemUtils.delete(pluginFile);
-            }
+            delete(pluginFile);
 
             plugins.remove(currentPlugin);
 
             // combination of uninstall the current plugin and installing the new.
 
-            URI installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
+            File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());
 
             LocalPlugin installedPlugin = createPluginHandle(installedSource, Plugin.Type.USER);
 
             // register the plugin with the registry
             PluginRegistryEntry registryEntry = registry.register(installedPlugin);
-            registryEntry.put(PLUGIN_SOURCE_KEY, installedSource.toString());
+            registryEntry.put(PLUGIN_SOURCE_KEY, installedSource.getName());
             saveRegistry();
 
             plugins.add(installedPlugin);
@@ -769,15 +767,8 @@ public class PluginManager
         {
             PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
-            File pluginFile = new File(new URI(entry.get(UPGRADE_SOURCE_KEY)));
-            if (pluginFile.isDirectory())
-            {
-                FileSystemUtils.rmdir(pluginFile);
-            }
-            else if (pluginFile.isFile())
-            {
-                FileSystemUtils.delete(pluginFile);
-            }
+            File pluginFile = getUpgradeSourceFile(entry.get(UPGRADE_SOURCE_KEY));
+            delete(pluginFile);
 
             entry.remove(PLUGIN_PENDING_KEY);
             entry.remove(UPGRADE_SOURCE_KEY);
@@ -788,20 +779,16 @@ public class PluginManager
         {
             throw new PluginException(e);
         }
-        catch (URISyntaxException e)
-        {
-            throw new PluginException(e); // internal error...
-        }
     }
 
     void requestUpgrade(LocalPlugin plugin, URI newSource) throws PluginException
     {
-        URI installedSource = downloadPlugin(newSource, paths.getPluginWorkDir());
+        File installedSource = downloadPlugin(newSource, paths.getPluginWorkDir());
 
         // the plugin is currently enabled, so we need to request a pending action.
         PluginRegistryEntry registryEntry = registry.getEntry(plugin.getId());
         registryEntry.put(PLUGIN_PENDING_KEY, UPGRADE_PENDING_ACTION);
-        registryEntry.put(UPGRADE_SOURCE_KEY, installedSource.toString());
+        registryEntry.put(UPGRADE_SOURCE_KEY, installedSource.getName());
         saveRegistry();
         plugin.setState(Plugin.State.UPDATING);
     }
@@ -827,37 +814,73 @@ public class PluginManager
 
     private LocalPlugin createPluginHandle(String source, Plugin.Type type) throws PluginException
     {
-        if (!TextUtils.stringSet(source))
+        return createPluginHandle(getPluginSourceFile(source), type);
+    }
+
+    private File getPluginSourceFile(String source) throws PluginException
+    {
+        if (isUriFormat(source))
         {
-            throw new IllegalArgumentException("Can not create a plugin handle without a source string defined.");
+            return parseUriFormat(source);
         }
-        try
+        else
         {
-            return createPluginHandle(new URI(source), type);
-        }
-        catch (URISyntaxException e)
-        {
-            throw new IllegalArgumentException(e);
+            return new File(paths.getPluginStorageDir(), source);
         }
     }
 
-    private LocalPlugin createPluginHandle(URI source, Plugin.Type type) throws PluginException
+    private File getUpgradeSourceFile(String source) throws PluginException
     {
-        //TODO: use the plugin file filter here to validate.
+        if (isUriFormat(source))
+        {
+            return parseUriFormat(source);
+        }
+        else
+        {
+            return new File(paths.getPluginWorkDir(), source);
+        }
+    }
 
-        File file = new File(source);
+    /**
+     * Provide backward compatibility support for absolute paths references were used for
+     * source entries in the registry.
+     *
+     * @param source raw registry entry
+     * @return the file representing the source string
+     * @throws PluginException on error.
+     */
+    private File parseUriFormat(String source) throws PluginException
+    {
+        try
+        {
+            return new File(new URI(source));
+        }
+        catch (URISyntaxException e)
+        {
+            throw new PluginException(e);
+        }
+    }
+
+    private boolean isUriFormat(String source)
+    {
+        return source.startsWith("file:/");
+    }
+
+    private LocalPlugin createPluginHandle(File file, Plugin.Type type) throws PluginException
+    {
+        if (!PLUGIN_FILTER.accept(file))
+        {
+            throw new PluginException("Unsupported plugin file format: " + file.getAbsolutePath() + ".");
+        }
+
         LocalPlugin plugin;
         if (file.isDirectory())
         {
             plugin = new DirectoryPlugin(file);
         }
-        else if (file.isFile() && file.getName().endsWith(".jar"))
-        {
-            plugin = new JarFilePlugin(file);
-        }
         else
         {
-            throw new PluginException("Unsupported plugin file format: " + file.getAbsolutePath() + ". Expected a .jar file or a directory.");
+            plugin = new JarFilePlugin(file);
         }
 
         plugin.manager = this;
@@ -883,12 +906,12 @@ public class PluginManager
         equinox.checkInstallAndResolve(plugin.manifest, plugin.source);
     }
 
-    private PluginRegistryEntry registerPlugin(Plugin plugin) throws PluginException
+    private PluginRegistryEntry registerPlugin(LocalPlugin plugin) throws PluginException
     {
         try
         {
             PluginRegistryEntry registryEntry = registry.register(plugin);
-            registryEntry.put(PLUGIN_SOURCE_KEY, plugin.getSource().toString());
+            registryEntry.put(PLUGIN_SOURCE_KEY, new File(plugin.getSource()).getName());
             registryEntry.setState(State.ENABLED);
             registryEntry.setType(plugin.getType());
             saveRegistry();
@@ -959,7 +982,7 @@ public class PluginManager
         return new PluginVersion(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier());
     }
 
-    private URI downloadPlugin(URI source, File dest) throws PluginException
+    private File downloadPlugin(URI source, File dest) throws PluginException
     {
         return downloadPlugin(source, null, dest);
     }
@@ -967,12 +990,13 @@ public class PluginManager
     /**
      * Copy the source contents into the destination directory.
      *
-     * @param source
-     * @param dest
-     * @return the URI for the copied content.
+     * @param source   the source to be downloaded.
+     * @param filename the filename to use for the downloaded file.
+     * @param dest     the directory into which the source will be downloaded.
+     * @return the file reference to the downloaded plugin source.
      * @throws PluginException if a problem occurs with the copy.
      */
-    private URI downloadPlugin(URI source, String filename, File dest) throws PluginException
+    private File downloadPlugin(URI source, String filename, File dest) throws PluginException
     {
         if (filename == null)
         {
@@ -1021,7 +1045,7 @@ public class PluginManager
             throw new PluginException("Unable to rename plugin temp file '" + tmpFile.getAbsolutePath() + "' to '" + downloadedFile.getAbsolutePath() + "'");
         }
 
-        return downloadedFile.toURI();
+        return downloadedFile;
     }
 
     private String deriveName(URI url)

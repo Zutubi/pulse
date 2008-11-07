@@ -19,6 +19,8 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
 {
     private static final Logger LOG = Logger.getLogger(AbstractExtensionManager.class);
 
+    public static final String CONFIG_EXTENSION_POINT = "com.zutubi.pulse.core.config";
+
     protected PluginManager pluginManager;
 
     public void init()
@@ -149,7 +151,7 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         IExtension[] bundleExtensions = registry.getExtensions(extension.getNamespaceIdentifier());
         for (IExtension candidate : bundleExtensions)
         {
-            if (candidate.getExtensionPointUniqueIdentifier().equals(PluginManager.CONFIG_EXTENSION_POINT))
+            if (candidate.getExtensionPointUniqueIdentifier().equals(CONFIG_EXTENSION_POINT))
             {
                 for (IConfigurationElement configElement : candidate.getConfigurationElements())
                 {

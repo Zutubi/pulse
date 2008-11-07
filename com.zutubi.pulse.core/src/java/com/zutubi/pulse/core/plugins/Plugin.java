@@ -41,6 +41,10 @@ public interface Plugin
          */
         UNINSTALLED,
 
+        /**
+         * Indicates that there was a plugin version change since the last time the plugin
+         * system was initialised and the plugin may require an upgrading.
+         */
         VERSION_CHANGE,
         
         /**
@@ -92,6 +96,10 @@ public interface Plugin
      */
     PluginVersion getVersion();
 
+    /**
+     * @return the plugin vendor, as defined within the plugins manifest. Matches
+     *          the OSGi Bundle-Vendor
+     */
     String getVendor();
 
     /**
@@ -100,6 +108,9 @@ public interface Plugin
      */
     String getDescription();
 
+    /**
+     * @return the URI defining from where the plugin was loaded.
+     */
     URI getSource();
 
     /**
@@ -107,6 +118,11 @@ public interface Plugin
      */
     State getState();
 
+    /**
+     * @see com.zutubi.pulse.core.plugins.Plugin.Type#INTERNAL
+     * @see com.zutubi.pulse.core.plugins.Plugin.Type#USER
+     * @return the type of this plugin.
+     */
     Type getType();
 
     /**
@@ -117,6 +133,17 @@ public interface Plugin
      */
     String getErrorMessage();
 
+    /**
+     * Enable the plugin.  This will start the plugin and make it available to other
+     * plugins that may depend on it.
+     * <p/>
+     * This is available to disabled and disabling plugins.
+     *
+     * @see State#DISABLED
+     * @see State#DISABLING
+     *
+     * @throws PluginException if there is a problem enabling the plugin.
+     */
     void enable() throws PluginException;
 
     void disable() throws PluginException;
@@ -129,10 +156,22 @@ public interface Plugin
 
     void resolve() throws PluginException;
 
+    /**
+     * @return the list of plugins that this plugin depends upon.
+     */
     List<PluginDependency> getRequiredPlugins();
 
+    /**
+     * @return the list of plugins that depend upon this plugin.
+     */
     List<Plugin> getDependentPlugins();
 
+    /**
+     * Load the specified class packaged within this plugin.
+     *
+     * @param name  the name of the class
+     * @return  the class instance
+     * @throws ClassNotFoundException is thrown if the named class could not be located.
+     */
     Class<?> loadClass(String name) throws ClassNotFoundException;
-
 }

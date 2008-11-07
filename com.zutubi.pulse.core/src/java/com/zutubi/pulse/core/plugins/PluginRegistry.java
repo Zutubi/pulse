@@ -18,12 +18,14 @@ public class PluginRegistry
     private static final Logger LOG = Logger.getLogger(PluginRegistry.class);
 
     private static final String ELEMENT_REGISTRY = "registry";
-    private static final String ELEMENT_BASE = "base";
     private static final String ELEMENT_PLUGINS = "plugins";
     private static final String ELEMENT_PLUGIN = "plugin";
     private static final String ATTRIBUTE_ID = "id";
 
-    private static final String REGISTRY_FILE_NAME = "plugin-registry.xml";
+    /**
+     * The name of the registry file.
+     */
+    static final String REGISTRY_FILE_NAME = "plugin-registry.xml";
 
     /**
      * The file in which all of the registry details are persisted.
@@ -31,8 +33,6 @@ public class PluginRegistry
     private File registry;
 
     private Map<String, PluginRegistryEntry> entries = new HashMap<String, PluginRegistryEntry>();
-
-    private Map<String, String> baseEntry = new HashMap<String, String>();
 
     /**
      * @param dir the dir containing the persistent registry information.
@@ -129,20 +129,6 @@ public class PluginRegistry
             plugins.appendChild(element);
         }
 
-        // write the base details.
-        if (baseEntry.size() > 0)
-        {
-            Element base = new Element(ELEMENT_BASE);
-            root.appendChild(base);
-
-            for (String key : baseEntry.keySet())
-            {
-                Element e = new Element(key);
-                e.appendChild(baseEntry.get(key));
-                base.appendChild(e);
-            }
-        }
-
         BufferedOutputStream bos = null;
         try
         {
@@ -201,19 +187,6 @@ public class PluginRegistry
         {
             // under what conditions would this happen? ... do we need this check?
             return;
-        }
-
-        // read the base details.
-        Elements baseElements = doc.getRootElement().getChildElements(ELEMENT_BASE);
-        if (baseElements.size() > 0)
-        {
-            Element baseElement = baseElements.get(0);
-            Elements children = baseElement.getChildElements();
-            for (int i = 0; i < children.size(); i++)
-            {
-                Element child = children.get(i);
-                baseEntry.put(child.getLocalName(), child.getValue());
-            }
         }
 
         // read the plugins details.

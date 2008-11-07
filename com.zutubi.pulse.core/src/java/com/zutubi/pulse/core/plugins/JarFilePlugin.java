@@ -12,8 +12,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- *
- *
+ * An implementation of the local plugin that represents a bundle deployed
+ * from a jar file.
  */
 public class JarFilePlugin extends LocalPlugin
 {

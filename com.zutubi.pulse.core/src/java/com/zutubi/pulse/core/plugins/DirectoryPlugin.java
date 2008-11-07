@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
- *
+ * An implementation of the local plugin that represents a bundle deployed
+ * as an expanded directory
  */
 public class DirectoryPlugin extends LocalPlugin
 {
@@ -49,5 +49,4 @@ public class DirectoryPlugin extends LocalPlugin
     {
         return FileSystemUtils.rmdir(source);
     }
-
 }

@@ -10,8 +10,8 @@ import java.net.URI;
 import java.util.List;
 
 /**
- *
- *
+ * The local plugin is a wrapper around a locally deployed OSGi bundle.  The
+ * plugin details are read from the OSGi Manifest headers.
  */
 public abstract class LocalPlugin implements Plugin
 {

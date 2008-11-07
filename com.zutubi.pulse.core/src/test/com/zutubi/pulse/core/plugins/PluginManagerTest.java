@@ -1,15 +1,14 @@
 package com.zutubi.pulse.core.plugins;
 
+import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.zip.ZipInputStream;
 
-/**
- *
- *
- */
 public class PluginManagerTest extends BasePluginSystemTestCase
 {
     private static final String PRODUCER_ID = "com.zutubi.bundles.producer";
@@ -312,7 +311,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         // manually upgrade the plugin in teh plugin store directory.
         assertTrue(new File(paths.getPluginStorageDir(), producer1.getName()).delete());
-        FileSystemUtils.copy(paths.getPluginStorageDir(), producer11);
+        manuallyDeploy(producer11);
 
         startupPluginCore();
 
@@ -475,7 +474,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         shutdownPluginCore();
 
-        FileSystemUtils.copy(paths.getPluginStorageDir(), producer1);
+        manuallyDeploy(producer1);
 
         startupPluginCore();
     }
@@ -531,6 +530,32 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         {
             assertEquals("Cannot uninstall plugin: this is an internal plugin.", e.getMessage());
         }
+    }
+
+    public void testUninstalledJarFileDeleted() throws Exception
+    {
+        manuallyDeploy(producer1);
+        startupPluginCore();
+
+        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        plugin.uninstall();
+
+        restartPluginCore();
+
+        assertFalse(new File(paths.getPluginStorageDir(), producer1.getName()).exists());
+    }
+
+    public void testUninstallExplodedDirectoryDeleted() throws Exception
+    {
+        manuallyDeploy(producer1, true);
+        startupPluginCore();
+
+        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        plugin.uninstall();
+
+        restartPluginCore();
+
+        assertFalse(new File(paths.getPluginStorageDir(), producer1.getName()).exists());
     }
 
     public void testDependentPlugins() throws PluginException
@@ -630,19 +655,92 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         PluginRegistry registry = manager.getPluginRegistry();
         assertEquals(0, registry.getRegistrations().size());
-        assertFalse(registry.isRegistered("com.zutubi.bundles.producer"));
+        assertFalse(registry.isRegistered(PRODUCER_ID));
     }
 
     public void testNonInternalPluginsAreRegistered() throws PluginException, IOException
     {
-        FileSystemUtils.copy(paths.getPluginStorageDir(), producer1);
+        manuallyDeploy(producer1);
         startupPluginCore();
 
         PluginRegistry registry = manager.getPluginRegistry();
         assertEquals(1, registry.getRegistrations().size());
-        assertTrue(registry.isRegistered("com.zutubi.bundles.producer"));
+        assertTrue(registry.isRegistered(PRODUCER_ID));
     }
 
+    public void testUninstalledPluginsRetainRegistryEntries() throws Exception
+    {
+        manuallyDeploy(producer1);
+        startupPluginCore();
+
+        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        plugin.uninstall();
+
+        restartPluginCore();
+
+        PluginRegistry registry = manager.getPluginRegistry();
+        assertNull(manager.getPlugin(PRODUCER_ID));
+        assertNotNull(registry.getEntry(PRODUCER_ID));
+    }
+
+    public void testRegistrySourceEntriesAreRelative() throws PluginException, IOException
+    {
+        manuallyDeploy(producer1);
+        startupPluginCore();
+
+        PluginRegistry registry = manager.getPluginRegistry();
+        assertEquals(producer1.getName(), registry.getEntry(PRODUCER_ID).getSource());
+    }
+
+    public void testRegistryUpgradeSourceEntriesAreRelative() throws Exception
+    {
+        manuallyDeploy(producer1);
+        startupPluginCore();
+
+        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        plugin.upgrade(producer11.toURI());
+
+        PluginRegistry registry = manager.getPluginRegistry();
+        assertEquals(producer11.getName(), registry.getEntry(PRODUCER_ID).getUpgradeSource());
+    }
+
+    public void testAbsoluteSourceEntrySupportedForBackwardCompatibility() throws Exception
+    {
+        // setup the registry.
+        PluginRegistry registry = new PluginRegistry(paths.getPluginRegistryDir());
+        PluginRegistryEntry entry = registry.register(PRODUCER_ID);
+        entry.setSource(new File(paths.getPluginStorageDir(), producer1.getName()).toURI().toString());
+        entry.setState(PluginManager.State.DISABLED);
+        entry.setType(Plugin.Type.USER);
+        entry.setVersion(new PluginVersion("1.0.0"));
+        registry.flush();
+
+        manuallyDeploy(producer1);
+        startupPluginCore();
+
+        // check that things are as expected.
+        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        assertEquals(Plugin.State.DISABLED, plugin.getState());
+    }
+
+    private void manuallyDeploy(File plugin) throws IOException
+    {
+        manuallyDeploy(plugin, false);
+    }
+
+    private void manuallyDeploy(File plugin, boolean expanded) throws IOException
+    {
+        if (expanded)
+        {
+            File base = new File(paths.getPluginStorageDir(), plugin.getName());
+            assertTrue(base.mkdirs());
+            ZipUtils.extractZip(new ZipInputStream(new FileInputStream(plugin)), base);
+        }
+        else
+        {
+            FileSystemUtils.copy(paths.getPluginStorageDir(), plugin);
+        }
+    }
 
     public void testConcurrentUpgrades()
     {
@@ -678,7 +776,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
     public void testDependencyCheckMessagesOnStartup() throws PluginException, IOException
     {
-        FileSystemUtils.copy(paths.getPluginStorageDir(), consumer1);
+        manuallyDeploy(consumer1);
 
         startupPluginCore();
 
@@ -719,7 +817,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
     public void testPluginThatFailsOnStartup_ManualInstall() throws IOException, PluginException
     {
-        FileSystemUtils.copy(paths.getPluginStorageDir(), failonstartup);
+        manuallyDeploy(failonstartup);
 
         startupPluginCore();
 
@@ -730,7 +828,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
     public void testPluginThatFailsOnStartupWillRetryStartupOnNextSystemStartup() throws Exception
     {
-        FileSystemUtils.copy(paths.getPluginStorageDir(), failonstartup);
+        manuallyDeploy(failonstartup);
 
         startupPluginCore();
 

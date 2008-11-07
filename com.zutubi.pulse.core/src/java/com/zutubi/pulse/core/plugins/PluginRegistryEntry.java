@@ -6,10 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- *
- *
- */
 public class PluginRegistryEntry
 {
     public static final String PLUGIN_STATE_KEY = "plugin.state";
@@ -51,9 +47,19 @@ public class PluginRegistryEntry
         return get(PLUGIN_PENDING_KEY);
     }
 
+    public boolean hasSource()
+    {
+        return TextUtils.stringSet(getSource()); 
+    }
+
     public String getSource()
     {
         return get(PLUGIN_SOURCE_KEY);
+    }
+
+    public void setSource(String str)
+    {
+        put(PLUGIN_SOURCE_KEY, str);
     }
 
     public PluginManager.State getState()

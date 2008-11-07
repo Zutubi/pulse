@@ -11,10 +11,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/**
- *
- *
- */
 public abstract class BasePluginSystemTestCase extends PulseTestCase
 {
     private File tmpDir;

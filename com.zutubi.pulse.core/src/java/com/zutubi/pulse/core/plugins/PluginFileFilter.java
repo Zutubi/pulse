@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.util.jar.JarFile;
 
 /**
- *
- *
+ * A FileFilter implementation that does some basic varification that
+ * the provided file is a valid plugin.
+ * <p/>
+ * The checks include that the file is either a directory or a jar file,
+ * and that both contain a META-INF/MANIFEST.MF file.
  */
 public class PluginFileFilter implements FileFilter
 {
