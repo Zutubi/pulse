@@ -394,8 +394,7 @@ function qs()
         var pos = parms[i].indexOf('=');
         if (pos > 0) {
             var key = parms[i].substring(0,pos);
-            var val = parms[i].substring(pos+1);
-            qsParm[key] = val;
+            qsParm[key] = parms[i].substring(pos+1);
         }
     }
     return qsParm;
@@ -438,7 +437,7 @@ function setSelectionRange(id, start, end)
  * Functions used for configuration UI
  *=========================================================================*/
 
-var getParentPath = function(path)
+function getParentPath(path)
 {
     var index = path.lastIndexOf('/');
     if(index >= 0)
@@ -447,9 +446,9 @@ var getParentPath = function(path)
     }
 
     return null;
-}
+};
 
-var onSelectFailure = function(element, response)
+function onSelectFailure(element, response)
 {
     if(response.status == 0)
     {
@@ -476,7 +475,7 @@ var onSelectFailure = function(element, response)
     }
 }
 
-var onConfigSelect = function(sm, node)
+function onConfigSelect(sm, node)
 {
     if(treesInitialised && node)
     {
@@ -493,7 +492,7 @@ var onConfigSelect = function(sm, node)
     }
 }
 
-var getAjaxCallback = function(maskedElement)
+function getAjaxCallback(maskedElement)
 {
     return {
         success: function(response)
@@ -528,10 +527,10 @@ var getAjaxCallback = function(maskedElement)
                 window.actionInProgress = false;
             }
         }
-    }
+    };
 }
 
-var runAjaxRequest = function(url)
+function runAjaxRequest(url)
 {
     var pane = Ext.get('nested-layout');
     pane.mask('Please wait...');
@@ -539,23 +538,23 @@ var runAjaxRequest = function(url)
     Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
 }
 
-var selectPath = function(path)
+function selectPath(path)
 {
     configTree.getSelectionModel().clearSelections();
     configTree.selectConfigPath(path);
 }
 
-var editPath = function(path)
+function editPath(path)
 {
     detailPanel.load({url: window.baseUrl + '/aconfig/' + path, scripts:true});
 }
 
-var addToPath = function(path, template)
+function addToPath(path, template)
 {
     runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?wizard' + (template ? '=template' : ''));
 }
 
-var actionPath = function(path, fromParent)
+function actionPath(path, fromParent)
 {
     var url = window.baseUrl + '/aconfig/' + path + '=input';
     if(fromParent)
@@ -565,12 +564,12 @@ var actionPath = function(path, fromParent)
     runAjaxRequest(url);
 }
 
-var deletePath = function(path)
+function deletePath(path)
 {
     runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?delete=confirm');
 }
 
-var showHelp = function(path, type)
+function showHelp(path, type)
 {
     var helpPanel = Ext.getCmp('nested-east');
     // Only show help when there is a panel for it (there is none during
@@ -581,7 +580,7 @@ var showHelp = function(path, type)
     }
 }
 
-var showFieldHelp = function(field)
+function showFieldHelp(field)
 {
     var helpPanel = Ext.getCmp('nested-east');
     // Only show help when there is a panel for it (there is none during
