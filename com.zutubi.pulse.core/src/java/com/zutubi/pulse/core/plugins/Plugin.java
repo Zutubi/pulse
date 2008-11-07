@@ -119,8 +119,7 @@ public interface Plugin
     State getState();
 
     /**
-     * @see com.zutubi.pulse.core.plugins.Plugin.Type#INTERNAL
-     * @see com.zutubi.pulse.core.plugins.Plugin.Type#USER
+     * @see com.zutubi.pulse.core.plugins.Plugin.Type
      * @return the type of this plugin.
      */
     Type getType();

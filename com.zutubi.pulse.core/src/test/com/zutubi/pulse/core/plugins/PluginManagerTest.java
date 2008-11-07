@@ -535,27 +535,25 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     public void testUninstalledJarFileDeleted() throws Exception
     {
         manuallyDeploy(producer1);
-        startupPluginCore();
-
-        Plugin plugin = manager.getPlugin(PRODUCER_ID);
-        plugin.uninstall();
-
-        restartPluginCore();
-
-        assertFalse(new File(paths.getPluginStorageDir(), producer1.getName()).exists());
+        assertPluginDeletedOnUninstall(PRODUCER_ID, producer1.getName());
     }
 
     public void testUninstallExplodedDirectoryDeleted() throws Exception
     {
         manuallyDeploy(producer1, true);
+        assertPluginDeletedOnUninstall(PRODUCER_ID, producer1.getName());
+    }
+
+    private void assertPluginDeletedOnUninstall(String pluginId, String pluginName) throws Exception
+    {
         startupPluginCore();
 
-        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        Plugin plugin = manager.getPlugin(pluginId);
         plugin.uninstall();
 
         restartPluginCore();
 
-        assertFalse(new File(paths.getPluginStorageDir(), producer1.getName()).exists());
+        assertFalse(new File(paths.getPluginStorageDir(), pluginName).exists());
     }
 
     public void testDependentPlugins() throws PluginException

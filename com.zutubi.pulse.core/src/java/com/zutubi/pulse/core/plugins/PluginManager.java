@@ -401,15 +401,15 @@ public class PluginManager
         }
     }
 
-    private void delete(File plugin) throws IOException
+    private void delete(File pluginSource) throws IOException
     {
-        if (plugin.isDirectory())
+        if (pluginSource.isDirectory())
         {
-            FileSystemUtils.rmdir(plugin);
+            FileSystemUtils.rmdir(pluginSource);
         }
-        else if (plugin.isFile())
+        else if (pluginSource.isFile())
         {
-            FileSystemUtils.delete(plugin);
+            FileSystemUtils.delete(pluginSource);
         }
     }
 
@@ -420,14 +420,7 @@ public class PluginManager
 
         // delete the old
         File pluginFile = getPluginSourceFile(entry.getSource());
-        if (pluginFile.isDirectory())
-        {
-            FileSystemUtils.rmdir(pluginFile);
-        }
-        else
-        {
-            FileSystemUtils.delete(pluginFile);
-        }
+        delete(pluginFile);
 
         // combination of uninstall the current plugin and installing the new.
         File installedSource = downloadPlugin(newSource, paths.getPluginStorageDir());

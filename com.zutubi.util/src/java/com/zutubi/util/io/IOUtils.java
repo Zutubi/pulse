@@ -265,15 +265,4 @@ public class IOUtils
     {
         joinStreams(inputStream, new FileOutputStream(file), true);
     }
-
-    /**
-     * Write the contents of the string to the specified file, replacing any existing content.
-     * @param file  the file to write to
-     * @param str   the content to write to the file
-     * @throws IOException is thrown on error
-     */
-    public static void writeToFile(File file, String str) throws IOException
-    {
-        joinStreams(new ByteArrayInputStream(str.getBytes()), new FileOutputStream(file), true);
-    }
 }
