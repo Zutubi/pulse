@@ -270,40 +270,6 @@
   <component converted="true" name="ProjectFileVersion" />
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/com.zutubi.config.annotations/com.zutubi.config.annotations.iml" filepath="$PROJECT_DIR$/com.zutubi.config.annotations/com.zutubi.config.annotations.iml" />
-      <module fileurl="file://$PROJECT_DIR$/com.zutubi.i18n/com.zutubi.i18n.iml" filepath="$PROJECT_DIR$/com.zutubi.i18n/com.zutubi.i18n.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/core-bundle/com.zutubi.pulse.core.iml" filepath="$PROJECT_DIR$/bundles/core-bundle/com.zutubi.pulse.core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/command-ant/com.zutubi.pulse.core.commands.ant.iml" filepath="$PROJECT_DIR$/bundles/command-ant/com.zutubi.pulse.core.commands.ant.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/command-bjam/com.zutubi.pulse.core.commands.bjam.iml" filepath="$PROJECT_DIR$/bundles/command-bjam/com.zutubi.pulse.core.commands.bjam.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/command-core/com.zutubi.pulse.core.commands.core.iml" filepath="$PROJECT_DIR$/bundles/command-core/com.zutubi.pulse.core.commands.core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/command-make/com.zutubi.pulse.core.commands.make.iml" filepath="$PROJECT_DIR$/bundles/command-make/com.zutubi.pulse.core.commands.make.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/command-maven/com.zutubi.pulse.core.commands.maven.iml" filepath="$PROJECT_DIR$/bundles/command-maven/com.zutubi.pulse.core.commands.maven.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/command-maven2/com.zutubi.pulse.core.commands.maven2.iml" filepath="$PROJECT_DIR$/bundles/command-maven2/com.zutubi.pulse.core.commands.maven2.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/command-xcode/com.zutubi.pulse.core.commands.xcode.iml" filepath="$PROJECT_DIR$/bundles/command-xcode/com.zutubi.pulse.core.commands.xcode.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/postprocessor-boostregression/com.zutubi.pulse.core.postprocessors.boostregression.iml" filepath="$PROJECT_DIR$/bundles/postprocessor-boostregression/com.zutubi.pulse.core.postprocessors.boostregression.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/postprocessor-cppunit/com.zutubi.pulse.core.postprocessors.cppunit.iml" filepath="$PROJECT_DIR$/bundles/postprocessor-cppunit/com.zutubi.pulse.core.postprocessors.cppunit.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/postprocessor-cunit/com.zutubi.pulse.core.postprocessors.cunit.iml" filepath="$PROJECT_DIR$/bundles/postprocessor-cunit/com.zutubi.pulse.core.postprocessors.cunit.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/postprocessor-gcc/com.zutubi.pulse.core.postprocessors.gcc.iml" filepath="$PROJECT_DIR$/bundles/postprocessor-gcc/com.zutubi.pulse.core.postprocessors.gcc.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/postprocessor-ocunit/com.zutubi.pulse.core.postprocessors.ocunit.iml" filepath="$PROJECT_DIR$/bundles/postprocessor-ocunit/com.zutubi.pulse.core.postprocessors.ocunit.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/postprocessor-test/com.zutubi.pulse.core.postprocessors.test.iml" filepath="$PROJECT_DIR$/bundles/postprocessor-test/com.zutubi.pulse.core.postprocessors.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/postprocessor-unittestpp/com.zutubi.pulse.core.postprocessors.unittestpp.iml" filepath="$PROJECT_DIR$/bundles/postprocessor-unittestpp/com.zutubi.pulse.core.postprocessors.unittestpp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/com.zutubi.pulse.core.scm.cvs/com.zutubi.pulse.core.scm.cvs.iml" filepath="$PROJECT_DIR$/bundles/com.zutubi.pulse.core.scm.cvs/com.zutubi.pulse.core.scm.cvs.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/com.zutubi.pulse.core.scm.git/com.zutubi.pulse.core.scm.git.iml" filepath="$PROJECT_DIR$/bundles/com.zutubi.pulse.core.scm.git/com.zutubi.pulse.core.scm.git.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/com.zutubi.pulse.core.scm.p4/com.zutubi.pulse.core.scm.p4.iml" filepath="$PROJECT_DIR$/bundles/com.zutubi.pulse.core.scm.p4/com.zutubi.pulse.core.scm.p4.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/com.zutubi.pulse.core.scm.svn/com.zutubi.pulse.core.scm.svn.iml" filepath="$PROJECT_DIR$/bundles/com.zutubi.pulse.core.scm.svn/com.zutubi.pulse.core.scm.svn.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/com.zutubi.pulse.master.external.jira/com.zutubi.pulse.master.external.jira.iml" filepath="$PROJECT_DIR$/bundles/com.zutubi.pulse.master.external.jira/com.zutubi.pulse.master.external.jira.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/com.zutubi.pulse.master.hook.email/com.zutubi.pulse.master.hook.email.iml" filepath="$PROJECT_DIR$/bundles/com.zutubi.pulse.master.hook.email/com.zutubi.pulse.master.hook.email.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/com.zutubi.pulse.master.hook.tag/com.zutubi.pulse.master.hook.tag.iml" filepath="$PROJECT_DIR$/bundles/com.zutubi.pulse.master.hook.tag/com.zutubi.pulse.master.hook.tag.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundles/server-core-bundle/com.zutubi.pulse.servercore.iml" filepath="$PROJECT_DIR$/bundles/server-core-bundle/com.zutubi.pulse.servercore.iml" />
-      <module fileurl="file://$PROJECT_DIR$/com.zutubi.util/com.zutubi.util.iml" filepath="$PROJECT_DIR$/com.zutubi.util/com.zutubi.util.iml" />
-      <module fileurl="file://$PROJECT_DIR$/com.zutubi.validation/com.zutubi.validation.iml" filepath="$PROJECT_DIR$/com.zutubi.validation/com.zutubi.validation.iml" />
-      <module fileurl="file://$PROJECT_DIR$/com.zutubi.validation.annotations/com.zutubi.validation.annotations.iml" filepath="$PROJECT_DIR$/com.zutubi.validation.annotations/com.zutubi.validation.annotations.iml" />
-      <module fileurl="file://$PROJECT_DIR$/acceptance/pulse-acceptance.iml" filepath="$PROJECT_DIR$/acceptance/pulse-acceptance.iml" />
-      <module fileurl="file://$PROJECT_DIR$/core/pulse-core.iml" filepath="$PROJECT_DIR$/core/pulse-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/local/pulse-local.iml" filepath="$PROJECT_DIR$/local/pulse-local.iml" />
-      <module fileurl="file://$PROJECT_DIR$/master/pulse-master.iml" filepath="$PROJECT_DIR$/master/pulse-master.iml" />
-      <module fileurl="file://$PROJECT_DIR$/server-core/pulse-server-core.iml" filepath="$PROJECT_DIR$/server-core/pulse-server-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/slave/pulse-slave.iml" filepath="$PROJECT_DIR$/slave/pulse-slave.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" project-jdk-type="JavaSDK">
