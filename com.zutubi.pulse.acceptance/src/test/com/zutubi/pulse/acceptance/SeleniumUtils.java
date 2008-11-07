@@ -6,7 +6,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.logging.Logger;
 import junit.framework.Assert;
 
 /**
@@ -14,8 +13,6 @@ import junit.framework.Assert;
  */
 public class SeleniumUtils
 {
-    private static final Logger LOG = Logger.getLogger(SeleniumUtils.class);
-
     public static final int DEFAULT_TIMEOUT = 30000;
 
     public static void waitForVariable(Selenium selenium, String variable, long timeout)
@@ -130,7 +127,7 @@ public class SeleniumUtils
             }
             catch (Exception e)
             {
-                LOG.warning(e);
+                e.printStackTrace(System.err);
             }
         }
     }

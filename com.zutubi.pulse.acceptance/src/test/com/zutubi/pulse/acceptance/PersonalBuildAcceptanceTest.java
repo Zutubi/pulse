@@ -127,7 +127,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         long buildNumber = ui.getBuildNumber();
         MyBuildsPage myBuildsPage = new MyBuildsPage(selenium, urls);
         myBuildsPage.goTo();
-        assertElementPresent(MyBuildsPage.getBuildNumberId(buildNumber));
+        SeleniumUtils.waitForElementId(selenium, MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
         SeleniumUtils.refreshUntilText(selenium, MyBuildsPage.getBuildStatusId(buildNumber), "failure");
         return buildNumber;
