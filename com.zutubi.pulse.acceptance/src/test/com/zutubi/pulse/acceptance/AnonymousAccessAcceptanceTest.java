@@ -13,8 +13,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
 
-/**
- */
 public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 {
     private static final String ANONYMOUS_GROUP_PATH = "groups/anonymous users";

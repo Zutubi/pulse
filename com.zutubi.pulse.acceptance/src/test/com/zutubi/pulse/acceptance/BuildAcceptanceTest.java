@@ -376,11 +376,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
 
         // edit the build options, setting prompt to true.
-        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
-        configPage.goTo();
-
-        BuildOptionsForm form = configPage.clickBuildOptions();
-        form.applyFormElements("false", "true", "false", "0");
+        enableBuildPrompting(random);
 
         // trigger a build
         ProjectHomePage home = new ProjectHomePage(selenium, urls, random);
@@ -399,7 +395,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         waitForBuildOnProjectHomePage(random, AgentManager.MASTER_AGENT_NAME);
     }
 
-
     /**
      * Check that the prompted property values that in a manual build are added to the build,
      * but do not change the project configuration.
@@ -415,11 +410,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
 
         // edit the build options, setting prompt to true.
-        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
-        configPage.goTo();
-
-        BuildOptionsForm form = configPage.clickBuildOptions();
-        form.applyFormElements("false", "true", "false", "0");
+        enableBuildPrompting(random);
 
         // trigger a build
         ProjectHomePage home = new ProjectHomePage(selenium, urls, random);
@@ -447,9 +438,21 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         propertiesPage.assertCellContent(0, 1, "pvalue");
     }
 
+    private void enableBuildPrompting(String projectName) throws Exception
+    {
+        Hashtable<String, Object> config = xmlRpcHelper.getConfig(getOptionsPath(projectName));
+        config.put("prompt", Boolean.TRUE);
+        xmlRpcHelper.saveConfig(getOptionsPath(projectName), config, false);
+    }
+
     private String getPropertiesPath(String projectName)
     {
         return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "properties");
+    }
+
+    private String getOptionsPath(String projectName)
+    {
+        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "options");
     }
 
     private void assertEnvironment(String projectName, int buildId, String... envs)

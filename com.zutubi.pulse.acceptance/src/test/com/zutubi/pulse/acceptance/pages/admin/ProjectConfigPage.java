@@ -43,7 +43,7 @@ public class ProjectConfigPage extends CompositePage
         return new ProjectHierarchyPage(selenium, urls, project, template);
     }
 
-    public BuildOptionsForm clickBuildOptions()
+    public BuildOptionsForm clickBuildOptionsAndWait()
     {
         clickComposite("options", "build options");
 
