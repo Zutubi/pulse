@@ -3,7 +3,9 @@ package com.zutubi.pulse.master.tove.config.project.changeviewer;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
+import com.zutubi.pulse.core.engine.api.HashReferenceMap;
 import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -153,7 +155,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     {
         if(TextUtils.stringSet(url))
         {
-            PulseScope scope = new PulseScope();
+            ReferenceMap scope = new HashReferenceMap();
             scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
 
             Map<String, Object> properties = ChangeViewerUtils.getRevisionProperties(revision);

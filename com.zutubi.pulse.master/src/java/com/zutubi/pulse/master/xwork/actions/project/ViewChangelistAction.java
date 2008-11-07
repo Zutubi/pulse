@@ -138,11 +138,6 @@ public class ViewChangelistAction extends ActionSupport
         return fileModels;
     }
 
-    public void setChangelist(PersistentChangelist changelist)
-    {
-        this.changelist = changelist;
-    }
-
     public String execute()
     {
         changelist = changelistDao.findById(id);
