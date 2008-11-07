@@ -118,24 +118,15 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
     public void testAllUsersGroupNameIsReadOnly()
     {
-        loginAsAdmin();
-
-        GroupsPage groupsPage = new GroupsPage(selenium, urls);
-        groupsPage.goTo();
-
-        // a) ensure only view link is available for all users group.
-        groupsPage.assertActionsNotPresent(ALL_USERS_GROUP_NAME, "clone", "delete");
-
-        // b) go to form, ensure name is not editable.
-        // click view or groups/name
-        BuiltinGroupForm form = groupsPage.clickViewBuiltinGroupAndWait("all.users");
-        form.assertFormPresent();
-        assertFalse(form.isEditable("name"));
-
-        logout();
+        assertBuiltinGroupNameIsReadOnly(ALL_USERS_GROUP_NAME, "all.users");
     }
 
     public void testAnonymousUserGroupNameIsReadOnly()
+    {
+        assertBuiltinGroupNameIsReadOnly(ANONYMOUS_USERS_GROUP_NAME, "anonymous.users");
+    }
+
+    private void assertBuiltinGroupNameIsReadOnly(String groupName, String groupId)
     {
         loginAsAdmin();
 
@@ -143,11 +134,11 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         groupsPage.goTo();
 
         // a) ensure only view link is available for all users group.
-        groupsPage.assertActionsNotPresent(ANONYMOUS_USERS_GROUP_NAME, "clone", "delete");
+        groupsPage.assertActionsNotPresent(groupName, "clone", "delete");
 
         // b) go to form, ensure name is not editable.
         // click view or groups/name
-        BuiltinGroupForm form = groupsPage.clickViewBuiltinGroupAndWait("anonymous.users");
+        BuiltinGroupForm form = groupsPage.clickViewBuiltinGroupAndWait(groupId);
         form.assertFormPresent();
         assertFalse(form.isEditable("name"));
 

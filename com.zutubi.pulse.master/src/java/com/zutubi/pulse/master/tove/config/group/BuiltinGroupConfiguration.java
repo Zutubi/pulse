@@ -29,11 +29,6 @@ public class BuiltinGroupConfiguration extends AbstractGroupConfiguration
         return super.getName();
     }
 
-    public void setName(String name)
-    {
-        super.setName(name);
-    }
-
     public String getRole()
     {
         return role;

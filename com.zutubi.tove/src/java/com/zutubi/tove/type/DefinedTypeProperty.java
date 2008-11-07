@@ -8,25 +8,18 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 /**
- * An implementation of the TypeProperty that for a compile type defined type property.
+ * An implementation of the TypeProperty that represents a compile time defined property.
  * <p/>
- * A property is defined as a field, named 'x', with accessors getX and setX.
+ * A property is named 'x', with accessors getX and setX.
  * <p/>
- * A public field is considered read and writeable.  A private field is considered readable
- * if it has a public getter, and writeable if it has a public setter.
+ * A property is considered writeable if it has a public setter and is not marked with
+ * the readOnly annotation.  A property is considered readable if it has a public getter.
  */
 public class DefinedTypeProperty extends TypeProperty
 {
-    private Field field;
-
     private Method getter;
 
     private Method setter;
-
-    protected void setField(Field field)
-    {
-        this.field = field;
-    }
 
     protected void setGetter(Method getter)
     {
@@ -44,19 +37,6 @@ public class DefinedTypeProperty extends TypeProperty
         if (getter != null)
         {
             result = getter.invoke(instance);
-        }
-        else if (field != null)
-        {
-            boolean accessible = field.isAccessible();
-            try
-            {
-                field.setAccessible(true);
-                result = field.get(instance);
-            }
-            finally
-            {
-                field.setAccessible(accessible);
-            }
         }
 
         if (getType() instanceof PrimitiveType)
@@ -88,20 +68,6 @@ public class DefinedTypeProperty extends TypeProperty
             {
                 setter.invoke(instance, value);
             }
-            else if (field != null)
-            {
-                // should we bother resetting the accessible field flag?
-                boolean accessible = field.isAccessible();
-                try
-                {
-                    field.setAccessible(true);
-                    field.set(instance, value);
-                }
-                finally
-                {
-                    field.setAccessible(accessible);
-                }
-            }
             else
             {
                 // should we ever end up in this sort of situation?.
@@ -115,7 +81,7 @@ public class DefinedTypeProperty extends TypeProperty
 
     public boolean isReadable()
     {
-        return getter != null && Modifier.isPublic(getter.getModifiers()) || field != null && Modifier.isPublic(field.getModifiers());
+        return getter != null && Modifier.isPublic(getter.getModifiers());
     }
 
     public boolean isWriteable()
@@ -127,6 +93,6 @@ public class DefinedTypeProperty extends TypeProperty
         }
 
         // public setter or public field.
-        return setter != null && Modifier.isPublic(setter.getModifiers()) || field != null && Modifier.isPublic(field.getModifiers());
+        return setter != null && Modifier.isPublic(setter.getModifiers());
     }
 }

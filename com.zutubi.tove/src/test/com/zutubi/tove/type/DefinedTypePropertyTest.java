@@ -29,17 +29,6 @@ public class DefinedTypePropertyTest extends TestCase
         assertEquals("A", instance.getA());
     }
 
-    public void testSetValueViaField() throws NoSuchFieldException, TypeException
-    {
-        DefinedTypeProperty property = new DefinedTypeProperty();
-        property.setType(new PrimitiveType(String.class));
-        property.setField(Sample.class.getDeclaredField("a"));
-
-        Sample instance = new Sample();
-        property.setValue(instance, "A");
-        assertEquals("A", instance.getA());
-    }
-
     public void testSetPrimitiveNull() throws NoSuchMethodException, TypeException
     {
         DefinedTypeProperty property = new DefinedTypeProperty();
@@ -75,17 +64,6 @@ public class DefinedTypePropertyTest extends TestCase
         assertEquals(instance.getA(), property.getValue(instance));
     }
 
-    public void testGetValueViaField() throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException
-    {
-        DefinedTypeProperty property = new DefinedTypeProperty();
-        property.setType(new PrimitiveType(String.class));
-        property.setField(Sample.class.getDeclaredField("a"));
-
-        Sample instance = new Sample();
-        instance.setA("A");
-        assertEquals(instance.getA(), property.getValue(instance));
-    }
-
     public void testGetPrimitiveNull() throws TypeException, NoSuchMethodException, IllegalAccessException, InvocationTargetException
     {
         DefinedTypeProperty property = new DefinedTypeProperty();
@@ -110,8 +88,6 @@ public class DefinedTypePropertyTest extends TestCase
     public void testIsReadable() throws NoSuchFieldException, NoSuchMethodException
     {
         DefinedTypeProperty property = new DefinedTypeProperty();
-        assertFalse(property.isReadable());
-        property.setField(Sample.class.getDeclaredField("a"));
         assertFalse(property.isReadable());
         property.setGetter(Sample.class.getDeclaredMethod("getA"));
         assertTrue(property.isReadable());
