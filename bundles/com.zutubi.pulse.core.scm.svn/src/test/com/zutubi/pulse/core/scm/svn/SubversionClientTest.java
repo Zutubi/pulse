@@ -129,7 +129,14 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testGetLatestRevision() throws ScmException
     {
+        ScmClientUtils.close(client);
+        client = new SubversionClient("svn://localhost/", "jsankey", "password");
         assertEquals("8", client.getLatestRevision(null).getRevisionString());
+    }
+
+    public void testGetLatestRevisionRestrictedToFiles() throws ScmException
+    {
+        assertEquals("4", client.getLatestRevision(null).getRevisionString());
     }
 
     public void testList() throws ScmException
@@ -241,6 +248,12 @@ public class SubversionClientTest extends PulseTestCase
         assertEquals(1, changelist.getChanges().size());
         assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getPath());
         assertEquals(FileChange.Action.DELETE, changelist.getChanges().get(0).getAction());
+    }
+
+    public void testChangesReverseRange() throws ScmException
+    {
+        List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(2));
+        assertTrue(changes.isEmpty());
     }
 
     public void testRevisionsSince() throws ScmException

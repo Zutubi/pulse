@@ -36,7 +36,7 @@ public class PerforceClient extends CachingScmClient
     private File clientRoot;
     private String port;
     private Pattern syncPattern;
-    private List<String> excludedPaths;
+    private List<String> excludedPaths = Collections.emptyList();
 
     public void setExcludedPaths(List<String> filteredPaths)
     {
@@ -200,7 +200,7 @@ public class PerforceClient extends CachingScmClient
 
         try
         {
-            return core.getLatestRevisionForFiles(clientName);
+            return core.getLatestRevisionForFiles(clientName, "//" + clientName + "/...");
         }
         finally
         {

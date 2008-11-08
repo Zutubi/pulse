@@ -563,7 +563,8 @@ public class SubversionClient implements ScmClient
     {
         try
         {
-            return new Revision(repository.getLatestRevision());
+            SVNDirEntry entry = repository.info(".", SVNRevision.HEAD.getNumber());
+            return new Revision(entry.getRevision());
         }
         catch (SVNException e)
         {

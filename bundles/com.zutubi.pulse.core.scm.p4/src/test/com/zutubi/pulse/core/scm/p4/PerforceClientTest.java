@@ -16,10 +16,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- */
 public class PerforceClientTest extends PulseTestCase
 {
+    private static final String DEPOT_CLIENT = "depot-client";
     private static final String TEST_CLIENT = "test-client";
 
     private PerforceCore core;
@@ -72,13 +71,19 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetLatestRevision() throws ScmException
     {
         getServer(TEST_CLIENT);
-        assertEquals("8", client.getLatestRevision(null).getRevisionString());
+        assertEquals("7", client.getLatestRevision(null).getRevisionString());
+    }
+
+    public void testGetLatestRevisionRestrictedToView() throws ScmException
+    {
+        getServer(DEPOT_CLIENT);
+        assertEquals("4", client.getLatestRevision(null).getRevisionString());
     }
 
     public void testCheckoutHead() throws Exception
     {
-        getServer("depot-client");
-        List<String> statuses = checkoutChanges(null, workDir, null, 8);
+        getServer(DEPOT_CLIENT);
+        List<String> statuses = checkoutChanges(null, workDir, null, 4);
 
         assertEquals(10, statuses.size());
         for (int i = 0; i < 10; i++)
@@ -109,7 +114,7 @@ public class PerforceClientTest extends PulseTestCase
 
     public void testCheckoutRevision() throws Exception
     {
-        getServer("depot-client");
+        getServer(DEPOT_CLIENT);
 
         Revision revision = client.checkout(createExecutionContext(workDir, null), createRevision(1), null);
         assertEquals("1", revision.getRevisionString());
@@ -118,14 +123,14 @@ public class PerforceClientTest extends PulseTestCase
 
     public void testCheckoutFile() throws ScmException, IOException
     {
-        getServer("depot-client");
+        getServer(DEPOT_CLIENT);
         String content = IOUtils.inputStreamToString(client.retrieve(null, FileSystemUtils.composeFilename("depot", "file2"), null));
         assertEquals("content of file2: edited at the same time as file2 in depot2.\n", content);
     }
 
     public void testCheckoutFileRevision() throws ScmException, IOException
     {
-        getServer("depot-client");
+        getServer(DEPOT_CLIENT);
         String content = IOUtils.inputStreamToString(client.retrieve(null, FileSystemUtils.composeFilename("depot", "file2"), createRevision(2)));
         assertEquals("content of file2\n", content);
     }
@@ -155,9 +160,16 @@ public class PerforceClientTest extends PulseTestCase
         assertEquals(FileChange.Action.DELETE, file10.getAction());
     }
 
+    public void testGetChangesReverseRange() throws Exception
+    {
+        getServer(TEST_CLIENT);
+        List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(2));
+        assertTrue(changes.isEmpty());
+    }
+
     public void testGetChangesRestrictedToView() throws Exception
     {
-        getServer("depot-client");
+        getServer(DEPOT_CLIENT);
         List<Changelist> changes = client.getChanges(null, createRevision(1), createRevision(7));
         assertEquals(1, changes.size());
         assertEquals("4", (changes.get(0).getRevision()).getRevisionString());
@@ -323,7 +335,7 @@ public class PerforceClientTest extends PulseTestCase
 
     public void testCheckoutThenUpdate() throws ScmException, IOException
     {
-        getServer("depot-client");
+        getServer(DEPOT_CLIENT);
 
         Revision got = client.checkout(createExecutionContext(workDir, "my-id"), createRevision(1), null);
         assertEquals("1", got.getRevisionString());
@@ -337,7 +349,7 @@ public class PerforceClientTest extends PulseTestCase
 
     public void testUpdateSameRevision() throws ScmException, IOException
     {
-        getServer("depot-client");
+        getServer(DEPOT_CLIENT);
 
         client.checkout(createExecutionContext(workDir, "my-id"), null, null);
 
@@ -394,10 +406,9 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetRevisionPostLatest() throws ScmException
     {
         getServer(TEST_CLIENT);
-        Revision latest = client.getLatestRevision(null);
         try
         {
-            client.parseRevision(null, Long.toString(Long.valueOf(latest.toString()) + 1));
+            client.parseRevision(null, "10000");
             fail();
         }
         catch (ScmException e)
@@ -439,8 +450,6 @@ public class PerforceClientTest extends PulseTestCase
         // CIB-1010
         getServer(TEST_CLIENT);
 
-        Revision latest = client.getLatestRevision(null);
-
         PerforceCore core = getClient();
         core.setEnv(PerforceConstants.ENV_CLIENT, TEST_CLIENT);
         core.runP4("Change: new\n" +
@@ -450,7 +459,7 @@ public class PerforceClientTest extends PulseTestCase
                      "Description:\n" +
                      "    Dead changelist",
                      "p4", "change", "-i");
-        core.runP4(null, "p4", "change", "-d", Long.toString(Long.valueOf(latest.getRevisionString()) + 1));
+        core.runP4(null, "p4", "change", "-d", "9");
 
         core.createClient(TEST_CLIENT, "edit-client", workDir);
         core.setEnv(PerforceConstants.ENV_CLIENT, "edit-client");
@@ -461,7 +470,7 @@ public class PerforceClientTest extends PulseTestCase
         core.runP4(null, "p4", "client", "-d", "edit-client");
 
         client.setExcludedPaths(Arrays.asList("//depot/file2"));
-        assertTrue(client.getRevisions(null, latest, null).size() > 0);
+        assertTrue(client.getRevisions(null, new Revision(7), null).size() > 0);
     }
 
     private PerforceCore getClient()
@@ -504,7 +513,7 @@ public class PerforceClientTest extends PulseTestCase
         ExecutionContext context = createExecutionContext(dir, id);
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         Revision rev = client.checkout(context, revision, handler);
-        assertEquals(expectedRevision, (long)Long.valueOf(rev.getRevisionString()));
+        assertEquals(expectedRevision, Long.parseLong(rev.getRevisionString()));
         return handler.getStatusMessages();
     }
 
