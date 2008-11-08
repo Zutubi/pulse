@@ -1,15 +1,12 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmCapability;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -207,12 +204,15 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         Revision r = null;
         if(TextUtils.stringSet(revision))
         {
-            ScmClient client = null;
             try
             {
-                ScmConfiguration scm = projectConfig.getScm();
-                client = scmManager.createClient(scm);
-                r = client.parseRevision(scmManager.createContext(project.getId(), scm), revision);
+                r = ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Revision>()
+                {
+                    public Revision process(ScmClient client, ScmContext context) throws ScmException
+                    {
+                        return client.parseRevision(context, revision);
+                    }
+                });
             }
             catch (ScmException e)
             {
@@ -221,11 +221,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
                 renderForm();
                 return INPUT;
             }
-            finally
-            {
-                ScmClientUtils.close(client);
-            }
-            
+
             // CIB-1162: Make sure we can get a pulse file at this revision
             try
             {

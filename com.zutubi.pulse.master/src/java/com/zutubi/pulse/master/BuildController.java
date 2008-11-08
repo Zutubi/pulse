@@ -6,8 +6,8 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
@@ -16,7 +16,6 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
@@ -25,6 +24,7 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
@@ -34,6 +34,7 @@ import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.*;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -179,13 +180,17 @@ public class BuildController implements EventListener
             RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stageConfig.getHandle());
-            RecipeController rc = new RecipeController(buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector, configurationManager, resourceManager, recipeDispatchService);
+            RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector);
             rc.setRecipeQueue(recipeQueue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
             rc.setEventManager(eventManager);
             rc.setBuildHookManager(buildHookManager);
-
+            rc.setConfigurationManager(configurationManager);
+            rc.setResourceManager(resourceManager);
+            rc.setRecipeDispatchService(recipeDispatchService);
+            rc.setScmManager(scmManager);
+            
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             pendingRecipes++;
@@ -319,7 +324,7 @@ public class BuildController implements EventListener
                 boolean checkoutOnly = request.isPersonal() || checkoutScheme == CheckoutScheme.CLEAN_CHECKOUT;
                 if (checkoutOnly)
                 {
-                    initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), false);
+                    initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision());
                     if (request.isPersonal())
                     {
                         initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
@@ -415,22 +420,20 @@ public class BuildController implements EventListener
 
     private Revision getLatestRevision()
     {
-        ScmConfiguration scm = projectConfig.getScm();
-        ScmClient client = null;
         try
         {
-            client = scmManager.createClient(scm);
-            ScmContext scmContext = scmManager.createContext(project.getId(), scm);
-            boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
-            return supportsRevisions ? client.getLatestRevision(scmContext) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
+            return ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Revision>()
+            {
+                public Revision process(ScmClient client, ScmContext context) throws ScmException
+                {
+                    boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
+                    return supportsRevisions ? client.getLatestRevision(context) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
+                }
+            });
         }
         catch (ScmException e)
         {
             throw new BuildException("Unable to retrieve latest revision: " + e.getMessage(), e);
-        }
-        finally
-        {
-            ScmClientUtils.close(client);
         }
     }
 
@@ -449,28 +452,25 @@ public class BuildController implements EventListener
         return pulseFile;
     }
 
-    private Bootstrapper createPersonalBuildBootstrapper(Bootstrapper initialBootstrapper)
+    private Bootstrapper createPersonalBuildBootstrapper(final Bootstrapper initialBootstrapper)
     {
         // TODO: preferrable to move this out (maybe to the request)
-        PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
-        ScmClient client = null;
         try
         {
-            ScmContext context = scmManager.createContext(projectConfig.getProjectId(), projectConfig.getScm());
-            client = scmManager.createClient(projectConfig.getScm());
-            EOLStyle localEOL = client.getEOLPolicy(context);
-            initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
+            return ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Bootstrapper>()
+            {
+                public Bootstrapper process(ScmClient client, ScmContext context) throws ScmException
+                {
+                    PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
+                    EOLStyle localEOL = client.getEOLPolicy(context);
+                    return new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
+                }
+            });
         }
         catch (ScmException e)
         {
             throw new BuildException("Unable to determine SCM end-of-line policy: " + e.getMessage(), e);
         }
-        finally
-        {
-            ScmClientUtils.close(client);
-        }
-
-        return initialBootstrapper;
     }
 
     private String getTriggerName(long recipeId)
@@ -734,7 +734,7 @@ public class BuildController implements EventListener
                 }
                 finally
                 {
-                    ScmClientUtils.close(client);
+                    IOUtils.close(client);
                 }
             }
         }

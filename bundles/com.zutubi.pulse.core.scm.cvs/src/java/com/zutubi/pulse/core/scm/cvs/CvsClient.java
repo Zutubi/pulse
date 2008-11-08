@@ -1,9 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.scm.DataCacheAware;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
@@ -122,6 +120,28 @@ public class CvsClient implements ScmClient, DataCacheAware
         return builder.toString();
     }
 
+    public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException
+    {
+        List<ResourceProperty> result = new LinkedList<ResourceProperty>();
+        result.add(new ResourceProperty("cvs.root", root));
+
+        if (branch != null)
+        {
+            result.add(new ResourceProperty("cvs.branch", branch));
+        }
+        result.add(new ResourceProperty("cvs.module", module));
+        if (modules.length > 1)
+        {
+            result.add(new ResourceProperty("cvs.module.count", String.valueOf(modules.length)));
+            for (int i = 0; i < modules.length; i++)
+            {
+                result.add(new ResourceProperty("cvs.module." + (i + 1), modules[i]));
+            }
+        }
+
+        return result;
+    }
+
     /**
      * Get the configured cvs root property.
      *
@@ -194,29 +214,6 @@ public class CvsClient implements ScmClient, DataCacheAware
         for (String module: modules)
         {
             core.tag(module, convertRevision(revision), name, moveExisting);
-        }
-    }
-
-    private void writePropertiesToContext(ExecutionContext context) throws ScmException
-    {
-        //TODO: Would prefer to be using the context.addString, but I dont know what 'scope' that ends up in
-        //TODO: nor what will happen to that scope - how long it will survivie since it is the leaf.
-        //TODO: Going to the scope manually for backward compatibility until the above concern is resolved.
-        
-        Scope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
-        scope.add(new ResourceProperty("cvs.root", root));
-        if (branch != null)
-        {
-            scope.add(new ResourceProperty("cvs.branch", branch));
-        }
-        scope.add(new ResourceProperty("cvs.module", module));
-        if (modules.length > 1)
-        {
-            scope.add(new ResourceProperty("cvs.module.count", String.valueOf(modules.length)));
-            for (int i = 0; i < modules.length; i++)
-            {
-                scope.add(new ResourceProperty("cvs.module." + (i + 1), modules[i]));
-            }
         }
     }
 
@@ -302,8 +299,6 @@ public class CvsClient implements ScmClient, DataCacheAware
             revision = getLatestRevision(null);
         }
 
-        writePropertiesToContext(context);
-        
         for (String module: modules)
         {
             core.checkout(context.getWorkingDir(), module, convertRevision(revision), handler);
@@ -315,7 +310,6 @@ public class CvsClient implements ScmClient, DataCacheAware
     public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         assertRevisionArgValid(rev);
-        writePropertiesToContext(context);
 
         // we can not run an update from the base directory, even though this is where the checkout occured.
         // Checkout will checkout into the current directory, but not generate a ./CVS directory.  For that, we need to

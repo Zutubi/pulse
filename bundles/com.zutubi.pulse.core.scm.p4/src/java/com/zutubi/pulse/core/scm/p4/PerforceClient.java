@@ -512,6 +512,32 @@ public class PerforceClient extends CachingScmClient
         return templateClient + "@" + port;
     }
 
+    public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException
+    {
+        List<ResourceProperty> result = new LinkedList<ResourceProperty>();
+        for (Map.Entry<String, String> entry : core.getEnv().entrySet())
+        {
+            result.add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
+        }
+
+        String id = getId(context);
+        result.add(new ResourceProperty("P4CLIENT", getClientName(id), true, false, false));
+        return result;
+    }
+
+    private String getId(ExecutionContext context)
+    {
+        if (context.getBoolean(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_INCREMENTAL_BUILD, false))
+        {
+            return context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT) + "-" +
+                context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public void testConnection() throws ScmException
     {
         String client = resolveClient(null);
@@ -523,8 +549,7 @@ public class PerforceClient extends CachingScmClient
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
-        addPropertiesToContext(context);
-        return sync(context.getString("scm.bootstrap.id"), context.getWorkingDir(), revision, handler, true);
+        return sync(getId(context), context.getWorkingDir(), revision, handler, true);
     }
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
@@ -669,8 +694,7 @@ public class PerforceClient extends CachingScmClient
 
     public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
-        addPropertiesToContext(context);
-        sync(context.getString("scm.bootstrap.id"), context.getWorkingDir(), rev, handler, false);
+        sync(getId(context), context.getWorkingDir(), rev, handler, false);
         return rev;
     }
 
@@ -694,19 +718,6 @@ public class PerforceClient extends CachingScmClient
         {
             deleteClient(clientName);
         }
-    }
-
-    private void addPropertiesToContext(ExecutionContext context) throws ScmException
-    {
-        Scope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
-
-        for (Map.Entry<String, String> entry : core.getEnv().entrySet())
-        {
-            ResourceProperty resourceProperty = new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false);
-            scope.add(resourceProperty);
-        }
-        ResourceProperty resourceProperty = new ResourceProperty("P4CLIENT", getClientName(context.getString("scm.bootstrap.id")), true, false, false);
-        scope.add(resourceProperty);
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException

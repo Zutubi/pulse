@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.admin.BuildOptionsForm;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.SpecifyBuildPropertiesForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -14,6 +13,7 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
@@ -51,6 +51,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     private static final String CHANGE_FILENAME = "build.xml";
 
     private static final String LOCATOR_ENV_ARTIFACT = "link=env.txt";
+    private static final String LOCATOR_OUTPUT_ARTIFACT = "link=output.txt";
 
     protected void setUp() throws Exception
     {
@@ -345,6 +346,19 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextNotPresent(suppressedValue);
     }
 
+    public void testScmPropertiesAvailableInPulseFile() throws Exception
+    {
+        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.customTypeConfig");
+        type.put("pulseFileString", "<?xml version=\"1.0\"?>\n" +
+                "<project default-recipe=\"default\"><recipe name=\"default\"><print name=\"mess\" message=\"${svn.url}\"/></recipe></project>");
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(), type);
+        xmlRpcHelper.runBuild(random, 30000);
+
+        loginAsAdmin();
+        goToArtifact(random, 1, "mess", LOCATOR_OUTPUT_ARTIFACT);
+        assertTextPresent(Constants.TRIVIAL_PROJECT_REPOSITORY);
+    }
+
     public void testBuildLogAvailable() throws Exception
     {
         addProject(random, true);
@@ -466,10 +480,15 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private void goToEnv(String projectName, int buildId)
     {
+        goToArtifact(projectName, buildId, "build", LOCATOR_ENV_ARTIFACT);
+    }
+
+    private void goToArtifact(String projectName, int buildId, String command, String artifact)
+    {
         BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, projectName, buildId);
         detailedViewPage.goTo();
-        detailedViewPage.clickCommand("default", "build");
-        selenium.click(LOCATOR_ENV_ARTIFACT);
+        detailedViewPage.clickCommand("default", command);
+        selenium.click(artifact);
         selenium.waitForPageToLoad("10000");
     }
 

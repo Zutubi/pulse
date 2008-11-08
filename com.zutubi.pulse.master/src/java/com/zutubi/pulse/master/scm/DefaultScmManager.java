@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.scm;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.Pollable;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
@@ -19,6 +18,7 @@ import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.*;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -271,7 +271,7 @@ public class DefaultScmManager implements ScmManager
         }
         finally
         {
-            ScmClientUtils.close(client);
+            IOUtils.close(client);
         }
     }
 

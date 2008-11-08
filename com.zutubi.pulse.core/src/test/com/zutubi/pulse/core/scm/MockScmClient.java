@@ -9,12 +9,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-/**
- *
- *
- */
 public class MockScmClient implements ScmClient, DataCacheAware
 {
+    public static String TEST_PROPERTY = "scm.prop";
+    public static String TEST_VALUE    = "scm.val";
+    
     private boolean throwError = false;
     protected Map<Object, Object> cache;
     protected String cacheId = "mock";
@@ -62,9 +61,9 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void testConnection() throws ScmException
+    public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException
     {
-        throw new RuntimeException("Method not implemented.");
+        return Arrays.asList(new ResourceProperty(TEST_PROPERTY, TEST_VALUE));
     }
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
@@ -83,11 +82,6 @@ public class MockScmClient implements ScmClient, DataCacheAware
     }
 
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public boolean hasChangedSince(Revision since) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -117,11 +111,6 @@ public class MockScmClient implements ScmClient, DataCacheAware
     public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         throw new RuntimeException("Method not implemented");
-    }
-
-    public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
-    {
-        throw new RuntimeException("Method not yet implemented.");
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException

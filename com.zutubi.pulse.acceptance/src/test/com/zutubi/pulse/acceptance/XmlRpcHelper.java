@@ -262,14 +262,11 @@ public class XmlRpcHelper
 
     public String insertSimpleProject(String name, String parent, boolean template) throws Exception
     {
-        Hashtable<String, Object> scm = createEmptyConfig("zutubi.subversionConfig");
-        scm.put("url", Constants.TRIVIAL_PROJECT_REPOSITORY);
-        scm.put("checkoutScheme", "CLEAN_CHECKOUT");
-        scm.put("monitor", false);
+        return insertProject(name, parent, template, getSubversionConfig(), getAntConfig());
+    }
 
-        Hashtable<String, Object> type = createEmptyConfig("zutubi.antTypeConfig");
-        type.put("file", "build.xml");
-
+    public String insertProject(String name, String parent, boolean template, Hashtable<String, Object> scm, Hashtable<String, Object> type) throws Exception
+    {
         Hashtable<String, Object> stage = createEmptyConfig(BuildStageConfiguration.class);
         stage.put("name", "default");
         Hashtable<String, Object> stages = new Hashtable<String, Object>();
@@ -288,6 +285,22 @@ public class XmlRpcHelper
         }
 
         return path;
+    }
+
+    public Hashtable<String, Object> getSubversionConfig()
+    {
+        Hashtable<String, Object> scm = createEmptyConfig("zutubi.subversionConfig");
+        scm.put("url", Constants.TRIVIAL_PROJECT_REPOSITORY);
+        scm.put("checkoutScheme", "CLEAN_CHECKOUT");
+        scm.put("monitor", false);
+        return scm;
+    }
+
+    public Hashtable<String, Object> getAntConfig()
+    {
+        Hashtable<String, Object> type = createEmptyConfig("zutubi.antTypeConfig");
+        type.put("file", "build.xml");
+        return type;
     }
 
     public void waitForProjectToInitialise(String name) throws Exception

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.util.FileSystemUtils;
@@ -127,6 +128,14 @@ public class GitClient implements ScmClient
     public String getLocation() throws ScmException
     {
         return getUid();
+    }
+
+    public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException
+    {
+        return Arrays.asList(
+                new ResourceProperty("git.repository", repository),
+                new ResourceProperty("git.branch", branch)
+        );
     }
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException

@@ -1,12 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
-import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmCapability;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmContext;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
 import com.zutubi.util.TimeStamps;
@@ -46,30 +42,28 @@ public class GetLatestRevisionAction extends ProjectActionSupport
         }
         else
         {
-            ScmConfiguration scm = project.getConfig().getScm();
-            ScmClient client = null;
             try
             {
-                ScmContext context = scmManager.createContext(project.getConfig().getProjectId(), project.getConfig().getScm());
-                client = scmManager.createClient(scm);
-                if(client.getCapabilities().contains(ScmCapability.REVISIONS))
+                latestRevision = ScmClientUtils.withScmClient(project.getConfig(), scmManager, new ScmClientUtils.ScmContextualAction<String>()
                 {
-                    latestRevision = client.getLatestRevision(context).getRevisionString();
-                }
-                else
-                {
-                    latestRevision = new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), getLocale())).getRevisionString();
-                }
+                    public String process(ScmClient client, ScmContext context) throws ScmException
+                    {
+                        if(client.getCapabilities().contains(ScmCapability.REVISIONS))
+                        {
+                            return client.getLatestRevision(context).getRevisionString();
+                        }
+                        else
+                        {
+                            return new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), getLocale())).getRevisionString();
+                        }
+                    }
+                });
 
                 successful = true;
             }
             catch (Exception e)
             {
                 error = e.toString();
-            }
-            finally
-            {
-                ScmClientUtils.close(client);
             }
         }
         

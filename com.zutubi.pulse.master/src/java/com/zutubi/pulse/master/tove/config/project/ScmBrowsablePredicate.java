@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;

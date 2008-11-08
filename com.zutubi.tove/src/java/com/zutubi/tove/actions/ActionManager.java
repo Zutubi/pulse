@@ -1,10 +1,10 @@
 package com.zutubi.tove.actions;
 
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
@@ -104,7 +104,7 @@ public class ActionManager
 
     public String getCustomiseName(final String actionName, final Configuration configurationInstance)
     {
-        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, String>()
+        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, String, Exception>()
         {
             public String process(ConfigurationActions actions) throws Exception
             {
@@ -115,7 +115,7 @@ public class ActionManager
 
     public Configuration prepare(final String actionName, final Configuration configurationInstance)
     {
-        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, Configuration>()
+        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, Configuration, Exception>()
         {
             public Configuration process(ConfigurationActions actions) throws Exception
             {
@@ -126,7 +126,7 @@ public class ActionManager
 
     public List<String> execute(final String actionName, final Configuration configurationInstance, final Configuration argumentInstance)
     {
-        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, List<String>>()
+        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, List<String>, Exception>()
         {
             public List<String> process(ConfigurationActions actions) throws Exception
             {
@@ -135,7 +135,7 @@ public class ActionManager
         });
     }
 
-    private <T> T processAction(String actionName, Configuration configurationInstance, UnaryFunctionE<ConfigurationActions, T> f)
+    private <T> T processAction(String actionName, Configuration configurationInstance, UnaryFunctionE<ConfigurationActions, T, Exception> f)
     {
         CompositeType type = getType(configurationInstance);
         ConfigurationActions actions = getConfigurationActions(type);

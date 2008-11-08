@@ -1,14 +1,12 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.util.io.ForkOutputStream;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -83,14 +81,9 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
             }
             finally
             {
-                ScmClientUtils.close(client);
+                IOUtils.close(client);
             }
         }
-    }
-
-    protected String getId(ExecutionContext buildContext)
-    {
-        return project + "-" + buildContext.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT);
     }
 
     public void status(String message)

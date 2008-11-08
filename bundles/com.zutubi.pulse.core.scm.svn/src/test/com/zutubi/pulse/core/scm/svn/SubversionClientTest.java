@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
@@ -114,7 +113,7 @@ public class SubversionClientTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        ScmClientUtils.close(client);
+        IOUtils.close(client);
         context = null;
         client = null;
         serverProcess.destroy();
@@ -129,7 +128,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testGetLatestRevision() throws ScmException
     {
-        ScmClientUtils.close(client);
+        IOUtils.close(client);
         client = new SubversionClient("svn://localhost/", "jsankey", "password");
         assertEquals("8", client.getLatestRevision(null).getRevisionString());
     }
@@ -181,7 +180,7 @@ public class SubversionClientTest extends PulseTestCase
         }
         finally
         {
-            ScmClientUtils.close(confirmServer);
+            IOUtils.close(confirmServer);
         }
     }
 
@@ -216,7 +215,7 @@ public class SubversionClientTest extends PulseTestCase
         }
         finally
         {
-            ScmClientUtils.close(confirmServer);
+            IOUtils.close(confirmServer);
         }
     }
 
@@ -308,7 +307,7 @@ public class SubversionClientTest extends PulseTestCase
         }
         finally
         {
-            ScmClientUtils.close(server);
+            IOUtils.close(server);
         }
     }
 

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -11,6 +10,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
@@ -90,7 +90,7 @@ public class ScmFileObject extends AbstractPulseFileObject
             }
             finally
             {
-                ScmClientUtils.close(client);
+                IOUtils.close(client);
             }
         }
         return scmChildren;
@@ -135,7 +135,7 @@ public class ScmFileObject extends AbstractPulseFileObject
             }
             finally
             {
-                ScmClientUtils.close(client);
+                IOUtils.close(client);
             }
         }
     }

@@ -111,7 +111,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         // else we can update.
         if (localDir.list().length == 0)
         {
-            return new CheckoutBootstrapper(projectName, scmConfig, revision, true);
+            return new CheckoutBootstrapper(projectName, scmConfig, revision);
         }
         else
         {

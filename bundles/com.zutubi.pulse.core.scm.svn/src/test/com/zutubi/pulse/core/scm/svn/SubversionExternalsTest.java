@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
@@ -14,8 +13,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -136,7 +135,7 @@ public class SubversionExternalsTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        ScmClientUtils.close(server);
+        IOUtils.close(server);
         server = null;
         svnProcess.destroy();
         svnProcess.waitFor();
@@ -295,7 +294,7 @@ public class SubversionExternalsTest extends PulseTestCase
         }
         finally
         {
-            ScmClientUtils.close(server);
+            IOUtils.close(server);
         }
     }
 

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
@@ -29,7 +29,7 @@ public class ChangelistIsolator
     public synchronized List<Revision> getRevisionsToRequest(ProjectConfiguration projectConfig, Project project, boolean force) throws ScmException
     {
         List<Revision> result;
-        Revision latestBuiltRevision;
+        final Revision latestBuiltRevision;
 
         if (latestRequestedRevisions.containsKey(projectConfig.getHandle()))
         {
@@ -46,28 +46,24 @@ public class ChangelistIsolator
             }
         }
 
-        ScmClient client = null;
-        try
+        result = ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<List<Revision>>()
         {
-            ScmContext context = scmManager.createContext(projectConfig.getProjectId(), projectConfig.getScm());
-            client = scmManager.createClient(projectConfig.getScm());
-            if (latestBuiltRevision == null)
+            public List<Revision> process(ScmClient client, ScmContext context) throws ScmException
             {
-                // The spec has never been built or even requested.  Just build
-                // the latest (we need to start somewhere!).
-                result = Arrays.asList(client.getLatestRevision(context));
+                if (latestBuiltRevision == null)
+                {
+                    // The spec has never been built or even requested.  Just build
+                    // the latest (we need to start somewhere!).
+                    return Arrays.asList(client.getLatestRevision(context));
+                }
+                else
+                {
+                    // We now have the last requested revision, return every revision
+                    // since then.
+                    return client.getRevisions(context, latestBuiltRevision, null);
+                }
             }
-            else
-            {
-                // We now have the last requested revision, return every revision
-                // since then.
-                result = client.getRevisions(context, latestBuiltRevision, null);
-            }
-        }
-        finally
-        {
-            ScmClientUtils.close(client);
-        }
+        });
 
         if (result.size() > 0)
         {

@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -28,14 +28,12 @@ public class UpdateBootstrapper extends ScmBootstrapper
         try
         {
             scm = createScmClient(executionContext);
-            // Temporarily pass the id string through so that the p4 implementation can work with it.
-            executionContext.addString("scm.bootstrap.id", getId(executionContext));
             scm.update(executionContext, revision.getRevision(), this);
             return scm;
         }
         catch (ScmException e)
         {
-            ScmClientUtils.close(scm);
+            IOUtils.close(scm);
             LOG.severe(e);
             throw new BuildException("Error checking out from SCM: " + e.getMessage(), e);
         }

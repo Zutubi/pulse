@@ -3,13 +3,8 @@ package com.zutubi.pulse.master.api;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmLocation;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmCapability;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -17,9 +12,11 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
@@ -219,7 +216,7 @@ public class RemoteApi
      */
     public String getTemplateParent(String token, String path) throws AuthenticationException
     {
-        tokenManager.logoutUser();
+        tokenManager.loginUser(token);
         try
         {
             TemplateNode node = getTemplateNode(path);
@@ -1130,7 +1127,7 @@ public class RemoteApi
         return getLatestBuildsForProject(token, projectName, completedOnly, 1);
     }
 
-    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, String projectName, String buildSpecification, int maxResults) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, String projectName, int maxResults) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
 
@@ -1146,9 +1143,9 @@ public class RemoteApi
         return result;
     }
 
-    public Vector<Hashtable<String, Object>> getLatestBuildWithWarnings(String token, String projectName, String buildSpecification) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getLatestBuildWithWarnings(String token, String projectName) throws AuthenticationException
     {
-        return getLatestBuildsWithWarnings(token, projectName, buildSpecification, 1);
+        return getLatestBuildsWithWarnings(token, projectName, 1);
     }
 
     public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id) throws AuthenticationException
@@ -1548,7 +1545,7 @@ public class RemoteApi
         return triggerBuild(token, projectName, null);
     }
 
-    public boolean triggerBuild(String token, String projectName, String revision) throws AuthenticationException
+    public boolean triggerBuild(String token, String projectName, final String revision) throws AuthenticationException
     {
         tokenManager.loginUser(token);
         try
@@ -1558,27 +1555,26 @@ public class RemoteApi
             Revision r = null;
             if(TextUtils.stringSet(revision))
             {
-                ScmClient client = null;
                 try
                 {
-                    ScmConfiguration scm = project.getConfig().getScm();
-                    client = scmManager.createClient(scm);
-                    if(client.getCapabilities().contains(ScmCapability.REVISIONS))
+                    r = ScmClientUtils.withScmClient(project.getConfig(), scmManager, new ScmClientUtils.ScmContextualAction<Revision>()
                     {
-                        r = client.parseRevision(scmManager.createContext(project.getId(), scm), revision);
-                    }
-                    else
-                    {
-                        throw new IllegalArgumentException("Attempt to specify a revision to build when SCM does not support revisions");
-                    }
+                        public Revision process(ScmClient client, ScmContext context) throws ScmException
+                        {
+                            if(client.getCapabilities().contains(ScmCapability.REVISIONS))
+                            {
+                                return client.parseRevision(context, revision);
+                            }
+                            else
+                            {
+                                throw new IllegalArgumentException("Attempt to specify a revision to build when SCM does not support revisions");
+                            }
+                        }
+                    });
                 }
                 catch (ScmException e)
                 {
                     throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
-                }
-                finally
-                {
-                    ScmClientUtils.close(client);
                 }
             }
 
@@ -1633,21 +1629,22 @@ public class RemoteApi
             throw new AccessDeniedException("User does not have authority to submit personal build requests.");
         }
 
-        ScmClient client = null;
         try
         {
-            Project project = internalGetProject(projectName, false);
-
-            Hashtable<String, String> scmDetails = new Hashtable<String, String>();
-            ScmConfiguration scm = project.getConfig().getScm();
-            scmDetails.put(ScmLocation.TYPE, scm.getType());
-            client = scmManager.createClient(scm);
-            scmDetails.put(ScmLocation.LOCATION, client.getLocation());
-            return scmDetails;
+            final ProjectConfiguration projectConfig = internalGetProject(projectName, false).getConfig();
+            return ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Hashtable<String, String>>()
+            {
+                public Hashtable<String, String> process(ScmClient client, ScmContext context) throws ScmException
+                {
+                    Hashtable<String, String> scmDetails = new Hashtable<String, String>();
+                    scmDetails.put(ScmLocation.TYPE, projectConfig.getScm().getType());
+                    scmDetails.put(ScmLocation.LOCATION, client.getLocation());
+                    return scmDetails;
+                }
+            });
         }
         finally
         {
-            ScmClientUtils.close(client);
             tokenManager.logoutUser();
         }
     }

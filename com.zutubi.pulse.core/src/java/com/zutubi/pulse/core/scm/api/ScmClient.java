@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
 import java.io.Closeable;
 import java.io.File;
@@ -73,6 +74,26 @@ public interface ScmClient extends Closeable
      * @throws ScmException on error
      */
     String getLocation() throws ScmException;
+
+    /**
+     * Returns a list of properties that should be added to the context of a
+     * build.  Properties can be accessed both by the Pulse file and by commands
+     * in the build.  By marking properties as add to environment it is also
+     * possible to set environment variables for the build (useful when SCM
+     * tools that might be called during the build are configured via the
+     * environment).
+     * <p/>
+     * Implementations are encouraged to return as much information as
+     * possible without invoking a network round trip to the SCM server.  For
+     * example, configuration fields such as the location of the server may be
+     * useful to the build.
+     *
+     * @param context defines the execution context in which the operation is
+     *                being run
+     * @return a list of SCM-related properties to be introduced into a build
+     * @throws ScmException on error
+     */
+    List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException;
 
     /**
      * Checks out a new working copy to the specified context.  The target directory for this checkout

@@ -1,12 +1,10 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.io.InputStream;
 import java.net.URLConnection;
@@ -45,25 +43,23 @@ public class DownloadSCMFileAction extends ProjectActionBase
 
     public String execute()
     {
-        ScmClient client = null;
         try
         {
-            ProjectConfiguration projectConfig = getRequiredProject().getConfig();
-            ScmConfiguration scmConfig = projectConfig.getScm();
-            client = scmManager.createClient(scmConfig);
-            ScmContext context = scmManager.createContext(projectConfig.getProjectId(), scmConfig);
-            inputStream = client.retrieve(context, path, null);
-            contentType = URLConnection.guessContentTypeFromName(path);
-            return SUCCESS;
+            return ScmClientUtils.withScmClient(getRequiredProject().getConfig(), scmManager, new ScmClientUtils.ScmContextualAction<String>()
+            {
+                public String process(ScmClient client, ScmContext context) throws ScmException
+                {
+                    inputStream = client.retrieve(context, path, null);
+                    contentType = URLConnection.guessContentTypeFromName(path);
+                    return SUCCESS;
+                }
+            });
+
         }
         catch (ScmException e)
         {
             addActionError(e.getMessage());
             return ERROR;
-        }
-        finally
-        {
-            ScmClientUtils.close(client);
         }
     }
 

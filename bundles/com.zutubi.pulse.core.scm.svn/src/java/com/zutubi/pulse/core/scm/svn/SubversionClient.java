@@ -1,9 +1,7 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -284,6 +282,11 @@ public class SubversionClient implements ScmClient
         return repository.getLocation().toString();
     }
 
+    public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException
+    {
+        return Arrays.asList(new ResourceProperty("svn.url", url));
+    }
+
     public void testConnection() throws ScmException
     {
         try
@@ -303,8 +306,6 @@ public class SubversionClient implements ScmClient
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
-        addPropertiesToContext(context);
-
         SVNRevision svnRevision;
         SVNUpdateClient updateClient = new SVNUpdateClient(repository.getAuthenticationManager(), null);
 
@@ -616,7 +617,6 @@ public class SubversionClient implements ScmClient
 
     public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
-        addPropertiesToContext(context);
         // CIB-610: cleanup before update in case WC is locked.
         SVNWCClient wcClient = new SVNWCClient(authenticationManager, null);
         try
@@ -697,12 +697,6 @@ public class SubversionClient implements ScmClient
         {
             throw convertException(e);
         }
-    }
-
-    private void addPropertiesToContext(ExecutionContext context) throws ScmException
-    {
-        Scope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
-        scope.add(new ResourceProperty("svn.url", url));
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException

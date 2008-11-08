@@ -2,18 +2,20 @@ package com.zutubi.pulse.master;
 
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.pulse.core.Bootstrapper;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.scm.MockScmClient;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.bootstrap.Data;
@@ -22,6 +24,7 @@ import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.AnyCapableAgentRequirements;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -33,7 +36,7 @@ import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.util.FileSystemUtils;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.util.*;
@@ -76,7 +79,8 @@ public class RecipeControllerTest extends PulseTestCase
 
         RecipeRequest recipeRequest = new RecipeRequest(makeContext("project", rootResult.getId(), rootResult.getRecipeName()));
         Project project = new Project();
-        project.setConfig(new ProjectConfiguration());
+        ProjectConfiguration projectConfig = new ProjectConfiguration();
+        project.setConfig(projectConfig);
         BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), project, 1, false);
         assignmentRequest = new RecipeAssignmentRequest(project, new AnyCapableAgentRequirements(), null, new BuildRevision(new Revision("0"), "dummy", false), recipeRequest, null);
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
@@ -91,10 +95,17 @@ public class RecipeControllerTest extends PulseTestCase
                 return new Data(getDataDirectory());
             }
         };
-        recipeController = new RecipeController(build, rootNode, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector, configurationManager, new DefaultResourceManager(), mock(RecipeDispatchService.class));
+
+        ScmManager scmManager = mock(ScmManager.class);
+        stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(new MockScmClient());
+        recipeController = new RecipeController(projectConfig, build, rootNode, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
         recipeController.setEventManager(new DefaultEventManager());
+        recipeController.setConfigurationManager(configurationManager);
+        recipeController.setResourceManager(new DefaultResourceManager());
+        recipeController.setRecipeDispatchService(mock(RecipeDispatchService.class));
+        recipeController.setScmManager(scmManager);
     }
 
     protected void tearDown() throws Exception
@@ -111,7 +122,7 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", null, new BuildRevision(), false);
+        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", null, new BuildRevision());
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
         RecipeAssignmentRequest dispatched = recipeQueue.getRequest(rootResult.getId());
@@ -505,11 +516,6 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Not implemented");
         }
 
-        public void setStatus(Status status)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
         public void upgradeStatus(UpgradeState state, int progress, String message)
         {
             throw new RuntimeException("Method not yet implemented.");
@@ -518,11 +524,6 @@ public class RecipeControllerTest extends PulseTestCase
         public AgentConfiguration getConfig()
         {
             return new AgentConfiguration();
-        }
-
-        public AgentState getState()
-        {
-            throw new RuntimeException("Method not yet implemented.");
         }
 
         public String getName()

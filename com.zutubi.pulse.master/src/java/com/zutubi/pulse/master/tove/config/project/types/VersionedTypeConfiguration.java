@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.personal.PatchArchive;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
@@ -54,7 +53,7 @@ public class VersionedTypeConfiguration extends TypeConfiguration
         }
         finally
         {
-            ScmClientUtils.close(scmClient);
+            IOUtils.close(scmClient);
             IOUtils.close(is);
         }
     }

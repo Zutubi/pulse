@@ -3,14 +3,17 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import static com.zutubi.pulse.core.RecipeUtils.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -21,12 +24,16 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
+import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.CopyBootstrapper;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  *
@@ -35,6 +42,7 @@ public class RecipeController
 {
     private static final Logger LOG = Logger.getLogger(RecipeController.class);
 
+    private ProjectConfiguration projectConfiguration;
     private BuildResult buildResult;
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
@@ -54,9 +62,11 @@ public class RecipeController
     private ResourceManager resourceManager;
     private BuildHookManager buildHookManager;
     private RecipeDispatchService recipeDispatchService;
+    private ScmManager scmManager;
 
-    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, PulseExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager, ResourceManager resourceManager, RecipeDispatchService recipeDispatchService)
+    public RecipeController(ProjectConfiguration projectConfiguration, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, PulseExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
     {
+        this.projectConfiguration = projectConfiguration;
         this.buildResult = buildResult;
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
@@ -65,9 +75,6 @@ public class RecipeController
         this.previousSuccessful = previousSuccessful;
         this.logger = logger;
         this.collector = collector;
-        this.configurationManager = configurationManager;
-        this.resourceManager = resourceManager;
-        this.recipeDispatchService = recipeDispatchService;
     }
 
     public void prepare(BuildResult buildResult)
@@ -171,13 +178,38 @@ public class RecipeController
         BuildRevision buildRevision = assignmentRequest.getRevision();
         recipeRequest.setPulseFileSource(buildRevision.getPulseFile());
 
-        ExecutionContext agentContext = recipeRequest.getContext();
+        final ExecutionContext agentContext = recipeRequest.getContext();
         addRevisionProperties(agentContext, buildRevision);
         agentContext.addString(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, agent.getConfig().getName());
         agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(buildResult.getProject().isForceCleanForAgent(agent.getId())));
 
+        addScmProperties(agentContext);
+
         // Now it may be dispatched.
         recipeDispatchService.dispatch(event);
+    }
+
+    private void addScmProperties(final ExecutionContext agentContext)
+    {
+        try
+        {
+            List<ResourceProperty> scmProperties = ScmClientUtils.withScmClient(projectConfiguration.getScm(), scmManager, new ScmClientUtils.ScmAction<List<ResourceProperty>>()
+            {
+                public List<ResourceProperty> process(ScmClient scmClient) throws ScmException
+                {
+                    return scmClient.getProperties(agentContext);
+                }
+            });
+
+            for (ResourceProperty property: scmProperties)
+            {
+                agentContext.add(property);
+            }
+        }
+        catch (ScmException e)
+        {
+            LOG.warning("Unable to add SCM properties: " + e.getMessage(), e);
+        }
     }
 
     private void handleRecipeDispatched(RecipeDispatchedEvent event)
@@ -414,7 +446,6 @@ public class RecipeController
         return recipeResult;
     }
 
-
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
@@ -438,5 +469,25 @@ public class RecipeController
     public void setBuildHookManager(BuildHookManager buildHookManager)
     {
         this.buildHookManager = buildHookManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void setResourceManager(ResourceManager resourceManager)
+    {
+        this.resourceManager = resourceManager;
+    }
+
+    public void setRecipeDispatchService(RecipeDispatchService recipeDispatchService)
+    {
+        this.recipeDispatchService = recipeDispatchService;
+    }
+
+    public void setScmManager(ScmManager scmManager)
+    {
+        this.scmManager = scmManager;
     }
 }
