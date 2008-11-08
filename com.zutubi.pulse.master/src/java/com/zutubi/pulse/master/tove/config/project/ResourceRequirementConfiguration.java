@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 
 @Table(columns = {"resource", "displayVersion"})
 @Form(fieldOrder = {"resource", "defaultVersion", "version"})
@@ -11,7 +11,7 @@ import com.zutubi.pulse.core.config.ResourceRequirement;
 public class ResourceRequirementConfiguration extends AbstractConfiguration
 {
     @Required
-    @FieldAction(template = "ResourceRequirement.browser")
+    @FieldAction(template = "ResourceRequirementConfiguration.browser")
     private String resource;
 
     @Required // if version is enabled, it is also required.
