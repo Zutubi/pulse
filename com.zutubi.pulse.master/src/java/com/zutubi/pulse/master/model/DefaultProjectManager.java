@@ -740,6 +740,24 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
+    public void updateLastPollTime(long projectId, long timestamp)
+    {
+        lockProjectState(projectId);
+        try
+        {
+            Project project = getState(projectId);
+            if (project != null)
+            {
+                project.setLastPollTime(timestamp);
+                save(project);
+            }
+        }
+        finally
+        {
+            unlockProjectState(projectId);
+        }
+    }
+
     public void setConfiguration(Project state)
     {
         long projectId = state.getId();
@@ -752,16 +770,25 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         BuildResult buildResult = event.getBuildResult();
         if (!buildResult.isPersonal())
         {
-            Project project = getProject(buildResult.getProject().getId(), true);
-            if (project != null)
+            long projectId = buildResult.getProject().getId();
+            lockProjectState(projectId);
+            try
             {
-                project.setBuildCount(project.getBuildCount() + 1);
-                if (buildResult.succeeded())
+                Project project = getProject(projectId, true);
+                if (project != null)
                 {
-                    project.setSuccessCount(project.getSuccessCount() + 1);
-                }
+                    project.setBuildCount(project.getBuildCount() + 1);
+                    if (buildResult.succeeded())
+                    {
+                        project.setSuccessCount(project.getSuccessCount() + 1);
+                    }
 
-                projectDao.save(project);
+                    projectDao.save(project);
+                }
+            }
+            finally
+            {
+                unlockProjectState(projectId);
             }
         }
     }

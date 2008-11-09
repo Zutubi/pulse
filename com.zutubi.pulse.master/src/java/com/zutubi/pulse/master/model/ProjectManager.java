@@ -156,4 +156,12 @@ public interface ProjectManager extends EntityManager<Project>
 
     @SecureParameter(action = AccessManager.ACTION_WRITE)
     void markForCleanBuild(Project project);
+
+    /**
+     * Sets the last poll time for the project to the given timestamp.
+     *
+     * @param projectId id of the project to update
+     * @param timestamp the new last poll time in milliseconds since the epoch
+     */
+    void updateLastPollTime(long projectId, long timestamp);
 }

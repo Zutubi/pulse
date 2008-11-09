@@ -181,9 +181,7 @@ public class DefaultScmManager implements ScmManager
             }
 
             eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Polling SCM for changes..."));
-            // set the poll time.
-            project.setLastPollTime(now);
-            projectManager.save(project);
+            projectManager.updateLastPollTime(projectId, now);
 
             // when was the last time that we checked? if never, get the latest revision.
             ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), projectConfig.getScm());
