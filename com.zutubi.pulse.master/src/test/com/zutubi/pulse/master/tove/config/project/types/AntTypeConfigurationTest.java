@@ -1,10 +1,7 @@
-package com.zutubi.pulse.master.model;
+package com.zutubi.pulse.master.tove.config.project.types;
 
+import com.zutubi.pulse.master.model.TemplateTypeConfigurationTestBase;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.pulse.master.tove.config.project.types.AntTypeConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.DirectoryArtifactConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.FileArtifactConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.TemplateTypeConfiguration;
 
 /**
  */
