@@ -1,27 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.pulse.master.tove.config.project.types.MavenTypeConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.TemplateTypeConfiguration;
-import com.zutubi.pulse.master.model.TemplateTypeConfigurationTestBase;
-
-/**
- */
 public class MavenTypeConfigurationTest extends TemplateTypeConfigurationTestBase
 {
-    private MavenTypeConfiguration type;
-
-    protected void setUp() throws Exception
-    {
-        type = new MavenTypeConfiguration();
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        FileSystemUtils.rmdir(tmpDir);
-    }
+    private MavenTypeConfiguration type = new MavenTypeConfiguration();
 
     public TemplateTypeConfiguration getType()
     {

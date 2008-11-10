@@ -1,28 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.pulse.master.tove.config.project.types.MakeTypeConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.TemplateTypeConfiguration;
-import com.zutubi.pulse.master.model.TemplateTypeConfigurationTestBase;
-
-/**
- */
 public class MakeTypeConfigurationTest extends TemplateTypeConfigurationTestBase
 {
-    private MakeTypeConfiguration type;
-
-    protected void setUp() throws Exception
-    {
-        type = new MakeTypeConfiguration();
-        generateMode = true;
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        FileSystemUtils.rmdir(tmpDir);
-    }
+    private MakeTypeConfiguration type = new MakeTypeConfiguration();
 
     public TemplateTypeConfiguration getType()
     {

@@ -1,12 +1,8 @@
-package com.zutubi.pulse.master.model;
+package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.PostProcessorManager;
-import com.zutubi.pulse.master.tove.config.project.types.DefaultPostProcessorFragment;
-import com.zutubi.pulse.master.tove.config.project.types.FileArtifactConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.PostProcessorFragment;
-import com.zutubi.pulse.master.tove.config.project.types.TemplateTypeConfiguration;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.velocity.app.VelocityEngine;
 
@@ -15,8 +11,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
-/**
- */
 public abstract class TemplateTypeConfigurationTestBase extends PulseTestCase
 {
     protected File tmpDir;
@@ -49,7 +43,6 @@ public abstract class TemplateTypeConfigurationTestBase extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        engine = null;
         FileSystemUtils.rmdir(tmpDir);
         super.tearDown();
     }
@@ -57,7 +50,7 @@ public abstract class TemplateTypeConfigurationTestBase extends PulseTestCase
     protected void createAndVerify(String expectedName) throws Exception
     {
         String got = getType().getPulseFile(null, null, null);
-        File file = new File(getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.master", "src", "test", "com", "zutubi", "pulse", "master", "model", getClass().getSimpleName() + "." + expectedName + ".xml"));
+        File file = new File(getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.master", "src", "test", "com", "zutubi", "pulse", "master", "tove", "config", "project", "types", getClass().getSimpleName() + "." + expectedName + ".xml"));
 
         if(generateMode)
         {

@@ -1,25 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.pulse.master.model.TemplateTypeConfigurationTestBase;
-import com.zutubi.util.FileSystemUtils;
-
-/**
- */
 public class AntTypeConfigurationTest extends TemplateTypeConfigurationTestBase
 {
-    private AntTypeConfiguration type;
-
-    protected void setUp() throws Exception
-    {
-        type = new AntTypeConfiguration();
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        FileSystemUtils.rmdir(tmpDir);
-    }
+    private AntTypeConfiguration type = new AntTypeConfiguration();
 
     public TemplateTypeConfiguration getType()
     {
