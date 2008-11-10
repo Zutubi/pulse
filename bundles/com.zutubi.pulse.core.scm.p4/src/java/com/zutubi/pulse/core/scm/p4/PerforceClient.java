@@ -527,7 +527,7 @@ public class PerforceClient extends CachingScmClient
 
     private String getId(ExecutionContext context)
     {
-        if (context.getBoolean(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_INCREMENTAL_BUILD, false))
+        if (context.getBoolean(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, false))
         {
             return context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT) + "-" +
                 context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT);

@@ -24,7 +24,8 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
-import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
@@ -193,7 +194,7 @@ public class RecipeController
     {
         try
         {
-            List<ResourceProperty> scmProperties = ScmClientUtils.withScmClient(projectConfiguration.getScm(), scmManager, new ScmClientUtils.ScmAction<List<ResourceProperty>>()
+            List<ResourceProperty> scmProperties = withScmClient(projectConfiguration.getScm(), scmManager, new ScmAction<List<ResourceProperty>>()
             {
                 public List<ResourceProperty> process(ScmClient scmClient) throws ScmException
                 {

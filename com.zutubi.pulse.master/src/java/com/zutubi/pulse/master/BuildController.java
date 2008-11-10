@@ -17,14 +17,13 @@ import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
-import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
@@ -318,21 +317,18 @@ public class BuildController implements EventListener
         {
             public Bootstrapper create()
             {
-                // check project configuration to determine which bootstrap configuration should be used.
                 Bootstrapper initialBootstrapper;
-                CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
-                boolean checkoutOnly = request.isPersonal() || checkoutScheme == CheckoutScheme.CLEAN_CHECKOUT;
-                if (checkoutOnly)
+                if (buildContext.getBoolean(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, false))
+                {
+                    initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision());
+                }
+                else
                 {
                     initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision());
                     if (request.isPersonal())
                     {
                         initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
                     }
-                }
-                else
-                {
-                    initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision());
                 }
                 return initialBootstrapper;
             }
@@ -422,7 +418,7 @@ public class BuildController implements EventListener
     {
         try
         {
-            return ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Revision>()
+            return withScmClient(projectConfig, scmManager, new ScmContextualAction<Revision>()
             {
                 public Revision process(ScmClient client, ScmContext context) throws ScmException
                 {
@@ -457,7 +453,7 @@ public class BuildController implements EventListener
         // TODO: preferrable to move this out (maybe to the request)
         try
         {
-            return ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Bootstrapper>()
+            return withScmClient(projectConfig, scmManager, new ScmContextualAction<Bootstrapper>()
             {
                 public Bootstrapper process(ScmClient client, ScmContext context) throws ScmException
                 {
@@ -711,7 +707,7 @@ public class BuildController implements EventListener
                 ScmClient client = null;
                 try
                 {
-                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(scm, scmManager);
+                    Set<ScmCapability> capabilities = getCapabilities(scm, scmManager);
                     if(capabilities.contains(ScmCapability.CHANGESETS))
                     {
                         ScmContext context = scmManager.createContext(projectConfig.getProjectId(), scm);

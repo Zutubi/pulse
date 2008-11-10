@@ -12,7 +12,8 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -1557,7 +1558,7 @@ public class RemoteApi
             {
                 try
                 {
-                    r = ScmClientUtils.withScmClient(project.getConfig(), scmManager, new ScmClientUtils.ScmContextualAction<Revision>()
+                    r = withScmClient(project.getConfig(), scmManager, new ScmContextualAction<Revision>()
                     {
                         public Revision process(ScmClient client, ScmContext context) throws ScmException
                         {
@@ -1632,7 +1633,7 @@ public class RemoteApi
         try
         {
             final ProjectConfiguration projectConfig = internalGetProject(projectName, false).getConfig();
-            return ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Hashtable<String, String>>()
+            return withScmClient(projectConfig, scmManager, new ScmContextualAction<Hashtable<String, String>>()
             {
                 public Hashtable<String, String> process(ScmClient client, ScmContext context) throws ScmException
                 {

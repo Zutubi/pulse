@@ -7,6 +7,8 @@ import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -206,7 +208,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         {
             try
             {
-                r = ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Revision>()
+                r = withScmClient(projectConfig, scmManager, new ScmContextualAction<Revision>()
                 {
                     public Revision process(ScmClient client, ScmContext context) throws ScmException
                     {

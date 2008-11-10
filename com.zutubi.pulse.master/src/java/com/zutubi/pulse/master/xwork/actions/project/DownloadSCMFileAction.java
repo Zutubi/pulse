@@ -3,7 +3,8 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 
 import java.io.InputStream;
@@ -45,7 +46,7 @@ public class DownloadSCMFileAction extends ProjectActionBase
     {
         try
         {
-            return ScmClientUtils.withScmClient(getRequiredProject().getConfig(), scmManager, new ScmClientUtils.ScmContextualAction<String>()
+            return withScmClient(getRequiredProject().getConfig(), scmManager, new ScmContextualAction<String>()
             {
                 public String process(ScmClient client, ScmContext context) throws ScmException
                 {

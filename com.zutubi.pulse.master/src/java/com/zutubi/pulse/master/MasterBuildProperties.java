@@ -62,11 +62,14 @@ public class MasterBuildProperties extends BuildProperties
             context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TRIGGER, ((TriggerBuildReason)buildReason).getTriggerName());
         }
 
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSONAL_BUILD, Boolean.toString(buildResult.isPersonal()));
+
         context.addString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL, masterUrl);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_COUNT, Integer.toString(project.getBuildCount()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_SUCCESS_COUNT, Integer.toString(project.getSuccessCount()));
 
         CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(!buildResult.isPersonal() && checkoutScheme != CheckoutScheme.CLEAN_CHECKOUT));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!buildResult.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE));
 
         context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, "true");

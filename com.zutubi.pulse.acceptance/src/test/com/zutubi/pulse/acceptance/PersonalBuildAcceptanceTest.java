@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
@@ -76,6 +77,13 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME);
         long buildNumber = runPersonalBuild();
         verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
+
+        PersonalEnvironmentArtifactPage envPage = new PersonalEnvironmentArtifactPage(selenium, urls, PROJECT_NAME, buildNumber, "default", "build");
+        envPage.goTo();
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, "false"));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, "true"));
+        // Make sure this view is not decorated (CIB-1711).
+        assertTextNotPresent("logout");
     }
 
     public void testPersonalBuildOnAgent() throws Exception
@@ -127,7 +135,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         long buildNumber = ui.getBuildNumber();
         MyBuildsPage myBuildsPage = new MyBuildsPage(selenium, urls);
         myBuildsPage.goTo();
-        SeleniumUtils.waitForElementId(selenium, MyBuildsPage.getBuildNumberId(buildNumber));
+        SeleniumUtils.refreshUntilElement(selenium, MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
         SeleniumUtils.refreshUntilText(selenium, MyBuildsPage.getBuildStatusId(buildNumber), "failure");
         return buildNumber;

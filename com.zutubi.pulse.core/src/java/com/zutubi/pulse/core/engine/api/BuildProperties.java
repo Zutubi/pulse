@@ -30,8 +30,18 @@ public class BuildProperties
     public static final String PROPERTY_CLEAN_BUILD             = "clean.build";
     public static final String PROPERTY_COMPRESS_ARTIFACTS      = "compress.artifacts";
     public static final String PROPERTY_COMPRESS_WORKING_DIR    = "compress.working.dir";
+    /**
+     * Set to "true" if the SCM bootstrap for the build is incremental, "false"
+     * otherwise.  Different to incremental.build: incremental bootstraps are
+     * also used for the "clean checkout" scheme, for example.
+     */
+    public static final String PROPERTY_INCREMENTAL_BOOTSTRAP   = "incremental.bootstrap";
     public static final String PROPERTY_INCREMENTAL_BUILD       = "incremental.build";
     public static final String PROPERTY_MASTER_URL              = "master.url";
+    /**
+     * Set to "true" for a personal build, "false" otherwise.
+     */
+    public static final String PROPERTY_PERSONAL_BUILD          = "personal.build";
     public static final String PROPERTY_PROJECT                 = "project";
     public static final String PROPERTY_SUCCESS_COUNT           = "success.count";
     public static final String PROPERTY_TEST_SUMMARY            = "test.summary";

@@ -2,7 +2,8 @@ package com.zutubi.pulse.master.xwork.actions.ajax;
 
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
 import com.zutubi.util.TimeStamps;
@@ -44,7 +45,7 @@ public class GetLatestRevisionAction extends ProjectActionSupport
         {
             try
             {
-                latestRevision = ScmClientUtils.withScmClient(project.getConfig(), scmManager, new ScmClientUtils.ScmContextualAction<String>()
+                latestRevision = withScmClient(project.getConfig(), scmManager, new ScmContextualAction<String>()
                 {
                     public String process(ScmClient client, ScmContext context) throws ScmException
                     {
