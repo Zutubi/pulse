@@ -62,4 +62,15 @@ public class Maven2TypeConfigurationTest extends TemplateTypeConfigurationTestBa
         createAndVerify("captureArtifacts");
     }
 
+    public void testSuppressWarning() throws Exception
+    {
+        type.setSuppressWarning("WARNING");
+        createAndVerify("suppressWarning");
+    }
+
+    public void testSuppressError() throws Exception
+    {
+        type.setSuppressError("ERROR");
+        createAndVerify("suppressError");
+    }
 }

@@ -9,7 +9,7 @@
             <maven2
                 args="arg1 arg2"
             >
-                            </maven2>
+                        </maven2>
 
             
         </command>

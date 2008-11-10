@@ -9,7 +9,7 @@
             <maven2
                 goals="goal1 goal2"
             >
-                            </maven2>
+                        </maven2>
 
             
         </command>

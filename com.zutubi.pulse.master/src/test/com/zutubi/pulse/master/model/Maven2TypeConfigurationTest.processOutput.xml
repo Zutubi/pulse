@@ -9,7 +9,7 @@
             <resource name="maven2" required="false"/>
             <maven2
             >
-                    <process processor="${junit}"/>
+                <process processor="${junit}"/>
             </maven2>
 
             

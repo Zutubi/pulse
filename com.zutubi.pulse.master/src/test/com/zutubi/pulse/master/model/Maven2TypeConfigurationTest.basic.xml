@@ -8,7 +8,7 @@
             <resource name="maven2" required="false"/>
             <maven2
             >
-                            </maven2>
+                        </maven2>
 
             
         </command>

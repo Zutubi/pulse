@@ -9,7 +9,7 @@
             <maven2
                 working-dir="${base.dir}/work"
             >
-                            </maven2>
+                        </maven2>
 
             
         </command>
