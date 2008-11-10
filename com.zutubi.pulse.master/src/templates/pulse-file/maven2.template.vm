@@ -18,7 +18,13 @@
                 args="$arguments"
 #end
             >
-                #parse("pulse-file/output.processors.vm")
+#if($suppressWarning)
+                <suppress-warning expression="$suppressWarning"/>
+#end
+#if($suppressError)
+                <suppress-error expression="$suppressError"/>
+#end
+            #parse("pulse-file/output.processors.vm")
             </maven2>
 
             #parse("pulse-file/artifacts.vm")

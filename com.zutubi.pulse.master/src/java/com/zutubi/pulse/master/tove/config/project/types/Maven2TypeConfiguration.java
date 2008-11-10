@@ -4,6 +4,8 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.master.tove.config.project.BrowseScmDirAction;
 import com.zutubi.util.TextUtils;
+import com.zutubi.validation.annotations.Regex;
+import com.zutubi.validation.annotations.ValidRegex;
 import org.apache.velocity.VelocityContext;
 
 /**
@@ -18,7 +20,8 @@ public class Maven2TypeConfiguration extends TemplateTypeConfiguration
     @BrowseScmDirAction
     private String workingDir;
     private String arguments;
-
+    private String suppressError;
+    private String suppressWarning;
     public String getGoals()
     {
         return goals;
@@ -48,7 +51,29 @@ public class Maven2TypeConfiguration extends TemplateTypeConfiguration
     {
         this.arguments = arguments;
     }
-    
+
+    @ValidRegex
+    public String getSuppressError()
+    {
+        return suppressError;
+    }
+
+    public void setSuppressError(String suppressError)
+    {
+        this.suppressError = suppressError;
+    }
+
+    @ValidRegex
+    public String getSuppressWarning()
+    {
+        return suppressWarning;
+    }
+
+    public void setSuppressWarning(String suppressWarning)
+    {
+        this.suppressWarning = suppressWarning;
+    }
+
     protected String getTemplateName()
     {
         return "maven2.template.vm";
@@ -64,10 +89,17 @@ public class Maven2TypeConfiguration extends TemplateTypeConfiguration
         {
             context.put("workingDir", workingDir.trim());
         }
-
         if (TextUtils.stringSet(arguments))
         {
             context.put("arguments", arguments);
+        }
+        if (TextUtils.stringSet(suppressWarning))
+        {
+            context.put("suppressWarning", suppressWarning);
+        }
+        if (TextUtils.stringSet(suppressError))
+        {
+            context.put("suppressError", suppressError);
         }
     }
 }

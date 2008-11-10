@@ -10,10 +10,18 @@ import com.zutubi.util.SystemUtils;
 import java.io.File;
 
 /**
+ * The Maven2 command is used to run a maven 2 build.
  */
 public class Maven2Command extends ExecutableCommand
 {
+    /**
+     * The goals to be passed to the maven2 command line.  The format is a space
+     * separated list of goals.
+     */
     private String goals;
+    /**
+     * The default maven 2 post processor used for all maven2 command output processing.
+     */
     private Maven2PostProcessor pp = new Maven2PostProcessor("maven2.pp");
 
     public Maven2Command()
