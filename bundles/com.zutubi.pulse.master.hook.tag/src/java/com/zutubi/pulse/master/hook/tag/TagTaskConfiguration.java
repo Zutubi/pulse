@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.annotations.Form;
@@ -66,13 +67,14 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
             return;
         }
 
-        ScmConfiguration scm = buildResult.getProject().getConfig().getScm();
+        Project project = buildResult.getProject();
+        ScmConfiguration scm = project.getConfig().getScm();
         ScmClient client = null;
         try
         {
             String tagName = VariableHelper.replaceVariables(tag, context.getScope(), VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
             client = scmManager.createClient(scm);
-            if(client.getCapabilities().contains(ScmCapability.TAG))
+            if(client.getCapabilities(project.isInitialised()).contains(ScmCapability.TAG))
             {
                 client.tag(context, revision, tagName, moveExisting);
             }

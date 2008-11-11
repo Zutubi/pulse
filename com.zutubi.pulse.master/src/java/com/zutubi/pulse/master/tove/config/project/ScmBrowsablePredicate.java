@@ -8,6 +8,8 @@ import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
+import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
@@ -25,6 +27,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
 
     private FileSystemManager fileSystemManager;
     private ScmManager scmManager;
+    private ProjectManager projectManager;
 
     public boolean satisfied(FieldDescriptor field, FieldAction annotation)
     {
@@ -43,10 +46,13 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
             ProjectConfigProvider projectConfigProvider = pfo.getAncestor(ProjectConfigProvider.class);
             if (projectConfigProvider != null && projectConfigProvider.getProjectConfig() != null)
             {
-                ScmConfiguration config = projectConfigProvider.getProjectConfig().getScm();
+                ProjectConfiguration projectConfig = projectConfigProvider.getProjectConfig();
+                Project project = projectManager.getProject(projectConfig.getProjectId(), true);
+
+                ScmConfiguration config = projectConfig.getScm();
                 if(config != null && config.isValid())
                 {
-                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(config, scmManager);
+                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(config, scmManager, project != null && project.isInitialised());
                     return capabilities.contains(ScmCapability.BROWSE);
                 }
             }
@@ -67,5 +73,10 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
     public void setScmManager(ScmManager scmManager)
     {
         this.scmManager = scmManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

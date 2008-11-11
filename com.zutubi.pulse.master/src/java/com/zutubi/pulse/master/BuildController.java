@@ -189,7 +189,7 @@ public class BuildController implements EventListener
             rc.setResourceManager(resourceManager);
             rc.setRecipeDispatchService(recipeDispatchService);
             rc.setScmManager(scmManager);
-            
+
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             pendingRecipes++;
@@ -373,7 +373,7 @@ public class BuildController implements EventListener
     public boolean updateRevisionIfNotFixed(Revision revision, String pulseFile)
     {
         boolean updated = false;
-        
+
         BuildRevision buildRevision = request.getRevision();
         buildRevision.lock();
         try
@@ -422,7 +422,7 @@ public class BuildController implements EventListener
             {
                 public Revision process(ScmClient client, ScmContext context) throws ScmException
                 {
-                    boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
+                    boolean supportsRevisions = client.getCapabilities(project.isInitialised()).contains(ScmCapability.REVISIONS);
                     return supportsRevisions ? client.getLatestRevision(context) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
                 }
             });
@@ -707,7 +707,7 @@ public class BuildController implements EventListener
                 ScmClient client = null;
                 try
                 {
-                    Set<ScmCapability> capabilities = getCapabilities(scm, scmManager);
+                    Set<ScmCapability> capabilities = getCapabilities(scm, scmManager, project.isInitialised());
                     if(capabilities.contains(ScmCapability.CHANGESETS))
                     {
                         ScmContext context = scmManager.createContext(projectConfig.getProjectId(), scm);

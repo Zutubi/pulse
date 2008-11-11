@@ -1551,7 +1551,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Project project = internalGetProject(projectName, false);
+            final Project project = internalGetProject(projectName, false);
 
             Revision r = null;
             if(TextUtils.stringSet(revision))
@@ -1562,7 +1562,7 @@ public class RemoteApi
                     {
                         public Revision process(ScmClient client, ScmContext context) throws ScmException
                         {
-                            if(client.getCapabilities().contains(ScmCapability.REVISIONS))
+                            if(client.getCapabilities(project.isInitialised()).contains(ScmCapability.REVISIONS))
                             {
                                 return client.parseRevision(context, revision);
                             }

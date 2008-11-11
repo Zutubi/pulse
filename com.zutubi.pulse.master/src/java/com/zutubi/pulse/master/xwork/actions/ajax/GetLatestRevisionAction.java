@@ -36,7 +36,7 @@ public class GetLatestRevisionAction extends ProjectActionSupport
 
     public String execute()
     {
-        Project project = getProject();
+        final Project project = getProject();
         if(project == null)
         {
             error = "Unknown project";
@@ -49,7 +49,7 @@ public class GetLatestRevisionAction extends ProjectActionSupport
                 {
                     public String process(ScmClient client, ScmContext context) throws ScmException
                     {
-                        if(client.getCapabilities().contains(ScmCapability.REVISIONS))
+                        if(client.getCapabilities(project.isInitialised()).contains(ScmCapability.REVISIONS))
                         {
                             return client.getLatestRevision(context).getRevisionString();
                         }

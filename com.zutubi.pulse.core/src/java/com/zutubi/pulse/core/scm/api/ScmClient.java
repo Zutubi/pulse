@@ -47,9 +47,12 @@ public interface ScmClient extends Closeable
      * that it helps fulfill.  Before calling a method, ensure that it is
      * supported by checking the associated capability.
      *
+     * @param contextAvailable  is true if the scm context will be available for a
+     * subsequent call to the scm client based on the returned capabilities.
+     *
      * @return a set of operations this implementation is capable of
      */
-    Set<ScmCapability> getCapabilities();
+    Set<ScmCapability> getCapabilities(boolean contextAvailable);
 
     /**
      * Returns a string that uniquely identifies the server itself.  This may

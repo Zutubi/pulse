@@ -41,7 +41,7 @@ public class MockScmClient implements ScmClient, DataCacheAware
     {
     }
 
-    public Set<ScmCapability> getCapabilities()
+    public Set<ScmCapability> getCapabilities(boolean contextAvailable)
     {
         return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
     }

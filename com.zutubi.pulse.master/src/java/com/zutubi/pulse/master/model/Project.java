@@ -641,4 +641,12 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
         return forceCleanAgents.size() != sizeBefore;
     }
+
+    /**
+     * @return true if the state of the project is initialised, false otherwise.
+     */
+    public boolean isInitialised()
+    {
+        return getState().isInitialised();
+    }
 }

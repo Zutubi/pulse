@@ -97,7 +97,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     {
     }
 
-    public Set<ScmCapability> getCapabilities()
+    public Set<ScmCapability> getCapabilities(boolean contextAvailable)
     {
         // should disable browsing on repos that do not support the remote ls operation.
         return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));

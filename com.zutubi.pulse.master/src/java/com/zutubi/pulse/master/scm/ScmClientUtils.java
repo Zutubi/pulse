@@ -67,13 +67,13 @@ public class ScmClientUtils
         }
     }
 
-    public static Set<ScmCapability> getCapabilities(ScmConfiguration config, ScmClientFactory<ScmConfiguration> clientFactory) throws ScmException
+    public static Set<ScmCapability> getCapabilities(ScmConfiguration config, ScmClientFactory<ScmConfiguration> clientFactory, final boolean contextAvailable) throws ScmException
     {
         return withScmClient(config, clientFactory, new ScmAction<Set<ScmCapability>>()
         {
             public Set<ScmCapability> process(ScmClient scmClient) throws ScmException
             {
-                return scmClient.getCapabilities();
+                return scmClient.getCapabilities(contextAvailable);
             }
         });
     }

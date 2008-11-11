@@ -43,6 +43,7 @@ public class GitClient implements ScmClient
         CAPABILITIES.add(ScmCapability.CHANGESETS);
         CAPABILITIES.add(ScmCapability.POLL);
         CAPABILITIES.add(ScmCapability.REVISIONS);
+        CAPABILITIES.add(ScmCapability.BROWSE);
     }
 
     private static final Map<String, FileChange.Action> LOG_ACTION_MAPPINGS = new HashMap<String, FileChange.Action>();
@@ -115,9 +116,16 @@ public class GitClient implements ScmClient
         // remains for the duration of the scm configuration.
     }
 
-    public Set<ScmCapability> getCapabilities()
+    public Set<ScmCapability> getCapabilities(boolean contextAvailable)
     {
-        return CAPABILITIES;
+        if (contextAvailable)
+        {
+            return CAPABILITIES;
+        }
+        // browse requires that the scm context be available.
+        HashSet<ScmCapability> capabilities = new HashSet<ScmCapability>(CAPABILITIES);
+        capabilities.remove(ScmCapability.BROWSE);
+        return capabilities;
     }
 
     public String getUid() throws ScmException
@@ -211,7 +219,6 @@ public class GitClient implements ScmClient
         {
             git.diff(handler, new Revision(fromRevision), new Revision(toRevision));
         }
-
 
         // cleanup any existing tmp local branches.
         List<GitBranchEntry> branches = git.branch();
@@ -313,11 +320,11 @@ public class GitClient implements ScmClient
             boolean localBranchExists = false;
             for (GitBranchEntry branch : git.branch())
             {
-               if (LOCAL_BRANCH_NAME.equals(branch.getName()))
-               {
-                   localBranchExists = true;
-                   break;
-               }
+                if (LOCAL_BRANCH_NAME.equals(branch.getName()))
+                {
+                    localBranchExists = true;
+                    break;
+                }
             }
 
             ScmFeedbackHandler handler = new ScmFeedbackAdapter();
@@ -424,13 +431,37 @@ public class GitClient implements ScmClient
 
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
-        // The fact that browse requires a local checkout is a problem.  Browse is available during the project
-        // creation wizard, at point at which no persistent working directory is available (problem a).  The
-        // second problem is that even if the directory was available, running a checkout at that point in time
-        // could potentially take a while.  The UI will appear to hang as a result - not good.  So, until these
-        // performance / timing issues are resolved, the browse capability has been disabled.
+        synchronized (context)
+        {
+            File workingDir = context.getPersistentWorkingDir();
 
-        return new LinkedList<ScmFile>();
+            preparePersistentDirectory(workingDir);
+
+            if (revision != null)
+            {
+                // reset to the requested revision.  We expect the requested revision to be in the log.
+                NativeGit git = new NativeGit();
+                git.setWorkingDirectory(workingDir);
+                git.checkout(null, revision.getRevisionString(), TMP_BRANCH_PREFIX + revision.getRevisionString());
+            }
+
+            ScmFile parent = new ScmFile(path);
+            File base = new File(workingDir, path);
+            if (base.isFile())
+            {
+                return Arrays.asList(new ScmFile(path));
+            }
+            List<ScmFile> listing = new LinkedList<ScmFile>();
+            if (base.isDirectory())
+            {
+                for (File file : base.listFiles())
+                {
+                    ScmFile f = new ScmFile(parent, file.getName(), file.isDirectory());
+                    listing.add(f);
+                }
+            }
+            return listing;
+        }
     }
 
     public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
