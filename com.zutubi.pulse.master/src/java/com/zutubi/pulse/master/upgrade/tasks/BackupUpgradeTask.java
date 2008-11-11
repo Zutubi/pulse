@@ -1,18 +1,17 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.upgrade.ConfigurationAware;
+import com.zutubi.pulse.master.restore.BackupManager;
 import com.zutubi.pulse.master.upgrade.UpgradeException;
 import com.zutubi.util.logging.Logger;
 
 /**
  * <class comment/>
  */
-public class BackupUpgradeTask extends AbstractUpgradeTask implements ConfigurationAware
+public class BackupUpgradeTask extends AbstractUpgradeTask 
 {
     private static final Logger LOG = Logger.getLogger(BackupUpgradeTask.class);
     
-    private MasterConfigurationManager configurationManager;
+    private BackupManager backupManager;
 
     public String getName()
     {
@@ -21,7 +20,7 @@ public class BackupUpgradeTask extends AbstractUpgradeTask implements Configurat
 
     public String getDescription()
     {
-        return "Create a cut down PULSE_DATA snapshot prior to upgrading.";
+        return "Run a backup prior to upgrading.";
     }
 
     public int getBuildNumber()
@@ -34,7 +33,7 @@ public class BackupUpgradeTask extends AbstractUpgradeTask implements Configurat
     {
         try
         {
-            configurationManager.getData().backup(configurationManager.getSystemPaths());
+            backupManager.triggerBackup();
         }
         catch (Exception e)
         {
@@ -48,8 +47,8 @@ public class BackupUpgradeTask extends AbstractUpgradeTask implements Configurat
         return true;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setBackupManager(BackupManager backupManager)
     {
-        this.configurationManager = configurationManager;
+        this.backupManager = backupManager;
     }
 }

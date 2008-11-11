@@ -26,6 +26,9 @@ public class BackupManager
 {
     private static final Logger LOG = Logger.getLogger(BackupManager.class);
 
+    /**
+     * The name of the scheduled cron trigger used to run regular backups 
+     */
     public static final String TRIGGER_NAME = "automated.backup";
 
     public static final String TRIGGER_GROUP = "admin";
@@ -38,16 +41,27 @@ public class BackupManager
     private Scheduler scheduler;
 
     private EventManager eventManager;
+    
+    /**
+     * The directory into which generated backups are copied for storage.
+     */
     private File backupDir;
 
+    /**
+     * The list of arhiveable components that are currently used for generating backups.
+     */
     private List<ArchiveableComponent> backupableComponents = new LinkedList<ArchiveableComponent>();
 
+    /**
+     * The directory used for temporary file storage
+     */
     private File tmp;
+    private static final String DELETE_FILE_SUFFIX = ".delete";
 
     public void init()
     {
         // all initialisation occurs on the system started event as we need
-        // to be sure the scheduler is available
+        // to be sure all of the components are available.
         eventManager.register(new SystemStartedListener()
         {
             public void systemStarted()
@@ -62,44 +76,26 @@ public class BackupManager
     {
         // initialise the automated backups with the scheduler
         BackupConfiguration instance = configurationProvider.get(BackupConfiguration.class);
-        if (instance.isEnabled())
+        try
         {
-            // check if the trigger exists. if not, create and schedule.
-            Trigger trigger = scheduler.getTrigger(TRIGGER_NAME, TRIGGER_GROUP);
-            if (trigger == null)
+            if (instance.isEnabled())
             {
-                // initialise the trigger.
-                trigger = new CronTrigger(instance.getCronSchedule(), TRIGGER_NAME, TRIGGER_GROUP);
-                trigger.setTaskClass(AutomatedBackupTask.class);
-
-                try
+                // check if the trigger exists. if not, create and schedule.
+                Trigger trigger = scheduler.getTrigger(TRIGGER_NAME, TRIGGER_GROUP);
+                if (trigger == null)
                 {
-                    scheduler.schedule(trigger);
+                    scheduleTrigger(instance);
                 }
-                catch (SchedulingException e)
+                else
                 {
-                    LOG.severe(e);
+                    // if any changes have been made to the record, then sync the trigger with that data.
+                    updateTriggerIfNecessary(trigger, instance);
                 }
             }
-            else
-            {
-                // if any changes have been made to the record, then sync the trigger with that data.
-                CronTrigger cronTrigger = (CronTrigger) trigger;
-                String existingCronString = cronTrigger.getCron();
-                if (!existingCronString.equals(instance.getCronSchedule()))
-                {
-                    cronTrigger.setCron(instance.getCronSchedule());
-
-                    try
-                    {
-                        scheduler.update(trigger);
-                    }
-                    catch (SchedulingException e)
-                    {
-                        LOG.warning(e);
-                    }
-                }
-            }
+        }
+        catch (SchedulingException e)
+        {
+            LOG.warning(e);
         }
 
         // register the configuration listener.
@@ -116,24 +112,11 @@ public class BackupManager
                     {
                         if (trigger == null)
                         {
-                            // initialise the trigger.
-                            trigger = new CronTrigger(instance.getCronSchedule(), TRIGGER_NAME, TRIGGER_GROUP);
-                            trigger.setTaskClass(AutomatedBackupTask.class);
-
-                            try
-                            {
-                                scheduler.schedule(trigger);
-                            }
-                            catch (SchedulingException e)
-                            {
-                                LOG.severe(e);
-                            }
+                            scheduleTrigger(instance);
                         }
                         else
                         {
-                            trigger.setCron(instance.getCronSchedule());
-
-                            scheduler.update(trigger);
+                            updateTriggerIfNecessary(trigger, instance);
                         }
                     }
                     else
@@ -154,13 +137,34 @@ public class BackupManager
         listener.register(configurationProvider, false);
     }
 
+    private void updateTriggerIfNecessary(Trigger trigger, BackupConfiguration instance) throws SchedulingException
+    {
+        CronTrigger cronTrigger = (CronTrigger) trigger;
+        String existingCronString = cronTrigger.getCron();
+        
+        if (!existingCronString.equals(instance.getCronSchedule()))
+        {
+            cronTrigger.setCron(instance.getCronSchedule());
+
+            scheduler.update(trigger);
+        }
+    }
+
+    private void scheduleTrigger(BackupConfiguration instance) throws SchedulingException
+    {
+        Trigger trigger = new CronTrigger(instance.getCronSchedule(), TRIGGER_NAME, TRIGGER_GROUP);
+        trigger.setTaskClass(AutomatedBackupTask.class);
+
+        scheduler.schedule(trigger);
+    }
+
     public void triggerBackup()
     {
         // prior to creating backups, we need to ensure that we cleanup the existing backups.  Cleanups
         // are to ensure we have enough disk space, so it is better to cleanup before creating a new backup
         // and risk deleting early (if the backup fails) that to fail a backup before we run out of space.
         cleanupBackups();
-        
+
         try
         {
             ArchiveFactory factory = new ArchiveFactory();
@@ -181,6 +185,9 @@ public class BackupManager
             }
 
             factory.exportArchive(archive, backupDir);
+
+            // cleanup the archive now that it has been exported to the persistent backup directory.
+            FileSystemUtils.rmdir(archive.getBase());
         }
         catch (ArchiveException e)
         {
@@ -198,11 +205,7 @@ public class BackupManager
         {
             public boolean accept(File dir, String name)
             {
-                if (name.endsWith(".delete"))
-                {
-                    return false;
-                }
-                return generator.matches(name);
+                return !name.endsWith(DELETE_FILE_SUFFIX) && generator.matches(name);
             }
         });
 
@@ -217,8 +220,13 @@ public class BackupManager
             {
                 if (cleanupTarget.exists())
                 {
-                    File renamedCleanupTarget = new File(cleanupTarget.getParentFile(), cleanupTarget.getName() + ".delete");
-                    cleanupTarget.renameTo(renamedCleanupTarget);
+                    File renamedCleanupTarget = new File(cleanupTarget.getParentFile(), cleanupTarget.getName() + DELETE_FILE_SUFFIX);
+                    if (!cleanupTarget.renameTo(renamedCleanupTarget))
+                    {
+                        LOG.warning("Failed to rename " + cleanupTarget.getAbsolutePath() + " to " +
+                                renamedCleanupTarget.getAbsolutePath() + ". This is causing a " +
+                                "problem with cleaning up backups.");
+                    }
                 }
             }
         }
@@ -228,7 +236,7 @@ public class BackupManager
         {
             public boolean accept(File dir, String name)
             {
-                return name.endsWith(".delete");
+                return name.endsWith(DELETE_FILE_SUFFIX);
             }
         });
 

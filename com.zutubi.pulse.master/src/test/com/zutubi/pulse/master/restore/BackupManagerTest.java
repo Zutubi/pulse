@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.restore;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
 import com.zutubi.pulse.master.scheduling.CronTrigger;
@@ -11,9 +10,9 @@ import com.zutubi.pulse.master.scheduling.DefaultScheduler;
 import com.zutubi.pulse.master.scheduling.MockSchedulerStrategy;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.tove.config.project.triggers.CronExpressionValidator;
-import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.MockConfigurationProvider;
 import com.zutubi.tove.config.events.PostSaveEvent;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.validation.MockValidationContext;
 import com.zutubi.validation.ValidationException;
 
@@ -41,6 +40,7 @@ public class BackupManagerTest extends PulseTestCase
         tmp = FileSystemUtils.createTempDir();
         backupDir = new File(tmp, "backup");
         backupTmpDir = new File(tmp, "tmp");
+        assertTrue(backupTmpDir.mkdirs());
 
         scheduler = new DefaultScheduler();
         scheduler.setTriggerDao(new MockTriggerDao());
@@ -189,6 +189,17 @@ public class BackupManagerTest extends PulseTestCase
         assertNull(trigger);
     }
 
+    public void testEnsureThatBackupProcessCleansUpTmpDirectory()
+    {
+        BackupManager manager = createAndStartBackupManager();
+
+        assertEquals(0, backupTmpDir.listFiles().length);
+
+        manager.triggerBackup();
+
+        assertEquals(0, backupTmpDir.listFiles().length);
+    }
+
     private void saveConfigurationChange(BackupConfiguration config)
     {
         PostSaveEvent evt = new PostSaveEvent(null, config);
@@ -204,11 +215,8 @@ public class BackupManagerTest extends PulseTestCase
         manager.setBackupDir(backupDir);
         manager.setTmpDirectory(backupTmpDir);
         manager.add(new NoopArchiveableComponent());
-        manager.init();
+        manager.initialiseManager();
 
-        // send the system started event.
-        eventManager.publish(new SystemStartedEvent(this));
-        
         return manager;
     }
 
