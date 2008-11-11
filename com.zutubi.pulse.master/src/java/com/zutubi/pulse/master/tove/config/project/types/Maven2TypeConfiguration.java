@@ -1,26 +1,26 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
+import com.zutubi.pulse.master.tove.config.project.BrowseScmDirAction;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.pulse.master.tove.config.project.BrowseScmDirAction;
 import com.zutubi.util.TextUtils;
-import com.zutubi.validation.annotations.Regex;
 import com.zutubi.validation.annotations.ValidRegex;
 import org.apache.velocity.VelocityContext;
 
 /**
- *
- *
+ * The UI configuration for the maven 2 project template.
  */
 @SymbolicName("zutubi.maven2TypeConfig")
-@Form(fieldOrder = {"workingDir", "goals", "arguments", "postProcessors"})
+@Form(fieldOrder = {"workingDir", "goals", "arguments", "postProcessors", "suppressWarning", "suppressError"})
 public class Maven2TypeConfiguration extends TemplateTypeConfiguration
 {
     private String goals;
     @BrowseScmDirAction
     private String workingDir;
     private String arguments;
+    @ValidRegex
     private String suppressError;
+    @ValidRegex
     private String suppressWarning;
     public String getGoals()
     {
@@ -52,7 +52,6 @@ public class Maven2TypeConfiguration extends TemplateTypeConfiguration
         this.arguments = arguments;
     }
 
-    @ValidRegex
     public String getSuppressError()
     {
         return suppressError;
@@ -63,7 +62,6 @@ public class Maven2TypeConfiguration extends TemplateTypeConfiguration
         this.suppressError = suppressError;
     }
 
-    @ValidRegex
     public String getSuppressWarning()
     {
         return suppressWarning;
