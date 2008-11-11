@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
+import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import static org.mockito.Mockito.*;
@@ -82,8 +83,12 @@ public class DataDirectoryArchiveTest extends PulseTestCase
         stub(paths.getUserConfigRoot()).toReturn(new File(data, "config"));
         stub(paths.getData()).toReturn(data);
 
+        DatabaseConsole console = mock(DatabaseConsole.class);
+        stub(console.isEmbedded()).toReturn(false);
+
         DataDirectoryArchive archive = new DataDirectoryArchive();
         archive.setUserPaths(paths);
+        archive.setDatabaseConsole(console);
 
         File archiveBase = new File(tmp, "archive");
         archive.backup(archiveBase);
