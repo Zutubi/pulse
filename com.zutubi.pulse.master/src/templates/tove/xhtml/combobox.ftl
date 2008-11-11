@@ -48,7 +48,7 @@
     }
 </#if>
     var combo = new Ext.form.ComboBox(fc);
-    form.add(combo);
+    ${form.name}.add(combo);
     combo.on('select', updateButtons);
 }());
 

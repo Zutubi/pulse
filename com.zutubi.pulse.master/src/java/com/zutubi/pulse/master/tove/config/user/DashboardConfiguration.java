@@ -1,8 +1,7 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.annotations.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,15 +10,10 @@ import java.util.List;
  * User preferences controlling what they see on their dashboard.
  */
 @SymbolicName("zutubi.dashboardConfig")
-@Form(labelWidth = 300, fieldOrder = {"buildCount", "showAllProjects", "shownProjects", "showAllGroups", "shownGroups", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
+@Form(labelWidth = 300, fieldOrder = {"showAllProjects", "shownProjects", "groupsShown", "showAllGroups", "shownGroups", "hierarchyShown", "hiddenHierarchyLevels", "buildsPerProject", "columns", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
 @Classification(single = "dashboard")
-public class DashboardConfiguration extends AbstractConfiguration
+public class DashboardConfiguration extends ProjectsSummaryConfiguration
 {
-    /**
-     * Number of builds to show for each project.
-     */
-    private int buildCount = 3;
-
     @ControllingCheckbox(invert = true, dependentFields = {"shownProjects"})
     private boolean showAllProjects = true;
     /**
@@ -27,6 +21,8 @@ public class DashboardConfiguration extends AbstractConfiguration
      */
     @Reference
     private List<ProjectConfiguration> shownProjects = new LinkedList<ProjectConfiguration>();
+    @ControllingCheckbox(dependentFields = {"showAllGroups"})
+    private boolean groupsShown = true;
     @ControllingCheckbox(invert = true, dependentFields = {"shownGroups"})
     private boolean showAllGroups = true;
     /**
@@ -54,16 +50,6 @@ public class DashboardConfiguration extends AbstractConfiguration
         setPermanent(true);
     }
 
-    public int getBuildCount()
-    {
-        return buildCount;
-    }
-
-    public void setBuildCount(int buildCount)
-    {
-        this.buildCount = buildCount;
-    }
-
     public boolean isShowAllProjects()
     {
         return showAllProjects;
@@ -82,6 +68,16 @@ public class DashboardConfiguration extends AbstractConfiguration
     public void setShownProjects(List<ProjectConfiguration> shownProjects)
     {
         this.shownProjects = shownProjects;
+    }
+
+    public boolean isGroupsShown()
+    {
+        return groupsShown;
+    }
+
+    public void setGroupsShown(boolean groupsShown)
+    {
+        this.groupsShown = groupsShown;
     }
 
     public boolean isShowAllGroups()

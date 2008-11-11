@@ -38,10 +38,10 @@
     fc.size = ${parameters.size};
 </#if>
 
-    form.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
+    ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
 
     var select = new ZUTUBI.Select(fc);
-    form.add(select);
+    ${form.name}.add(select);
     select.on('change', updateButtons);
 }());
 

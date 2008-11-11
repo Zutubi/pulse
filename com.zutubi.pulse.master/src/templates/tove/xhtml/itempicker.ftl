@@ -3,7 +3,7 @@
 (function()
 {
 <#if parameters.list?exists>
-    var optionData = [];
+    var od = [];
 
     <#list parameters.list as item>
         <#if parameters.listKey?exists>
@@ -17,22 +17,22 @@
             <#assign itemValue = item/>
         </#if>
 
-    optionData.push(['${itemKey?js_string}', '${itemValue?js_string}']);
+    od.push(['${itemKey?js_string}', '${itemValue?js_string}']);
     </#list>
 
     var optionStore = new Ext.data.SimpleStore({
         fields: ['value', 'text'],
-        data: optionData
+        data: od
     });
 
     fc.optionStore = optionStore;
 </#if>
 
-    var value = [];
+    var v = [];
 
 <#if parameters.value?exists>
     <#list parameters.value as item>
-        value.push('${item?js_string}');
+        v.push('${item?js_string}');
     </#list>
 </#if>
 
@@ -42,15 +42,15 @@
     });
 
     fc.store = store;
-    fc.value = value;
+    fc.value = v;
 <#if parameters.width?exists>
     fc.width = ${parameters.width};
 </#if>
 
-    form.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
+    ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
 
     var picker = new ZUTUBI.ItemPicker(fc);
-    form.add(picker);
+    ${form.name}.add(picker);
     picker.on('change', updateButtons);
 }());
 

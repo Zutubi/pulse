@@ -38,12 +38,12 @@ public class ProjectGroup
         return projects;
     }
 
-    void add(Project project)
+    public void add(Project project)
     {
         projects.add(project);
     }
 
-    void addAll(Collection<Project> projects)
+    public void addAll(Collection<Project> projects)
     {
         for(Project p: projects)
         {
@@ -51,8 +51,38 @@ public class ProjectGroup
         }
     }
 
-    boolean remove(Project project)
+    public boolean remove(Project project)
     {
         return projects.remove(project);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        ProjectGroup that = (ProjectGroup) o;
+
+        if (!name.equals(that.name))
+        {
+            return false;
+        }
+
+        return projects.equals(that.projects);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = name.hashCode();
+        result = 31 * result + projects.hashCode();
+        return result;
     }
 }

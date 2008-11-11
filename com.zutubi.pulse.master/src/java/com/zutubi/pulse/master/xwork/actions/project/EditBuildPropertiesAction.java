@@ -38,6 +38,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 {
     private static final Logger LOG = Logger.getLogger(EditBuildPropertiesAction.class);
 
+    private static final String SUBMIT_TRIGGER = "trigger";
+
     private static final String PROPERTY_PREFIX = "property.";
 
     private String formSource;
@@ -112,7 +114,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         properties = new ArrayList<ResourcePropertyConfiguration>(project.getConfig().getProperties().values());
         Collections.sort(properties, new NamedConfigurationComparator());
 
-        Form form = new Form("form", "edit.build.properties", (ajax ? "aaction/" : "") + "editBuildProperties.action");
+        Form form = new Form("form", "edit.build.properties", (ajax ? "aaction/" : "") + "editBuildProperties.action", SUBMIT_TRIGGER);
         form.setAjax(ajax);
 
         Field field = new Field(FieldType.HIDDEN, "projectName");
@@ -134,7 +136,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             form.add(field);
         }
 
-        addSubmit(form, "trigger");
+        addSubmit(form, SUBMIT_TRIGGER);
         addSubmit(form, "cancel");
 
         Map<String, Object> context = new HashMap<String, Object>();

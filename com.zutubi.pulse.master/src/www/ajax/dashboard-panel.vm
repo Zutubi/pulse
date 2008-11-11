@@ -1,68 +1,36 @@
-#macro(buildsTable $project $showHideLink $firstTable)
-    #set($recentBuilds = $action.getLatestBuilds($project))
-#if($showHideLink)
-        <tr id='#id("project_$project.name")'>
-#else
-        <tr id='#id("group_${group.name}_project_${project.name}")'>
-#end
-            <th class="heading" colspan="$columns.totalSpan">
-#if($firstTable)            
-                <span class="action">
-                    <a class="unadorned" href="#" id="columns-popup-link-my.projects" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
-    #if($showHideLink)
-                    <a id='#id("hide_project_$project.name")' href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
-    #end
-                </span>
-#end
-                <a href="$urls.projectHome($project)" id="home_$!webwork.htmlEncode($project.name)">
-                    <img alt="home" src="$base/images/house.gif">
-                    $!webwork.htmlEncode($project.name)
-                </a>
-            </th>
-        </tr>
-        #buildTableHeading($columns false)
-#if($recentBuilds.size() > 0)
-    #foreach($buildResult in $recentBuilds)
-        #buildTableRow($buildResult $columns true)
-    #end
-#else
-        <tr>
-            <td class="content" colspan="$columns.totalSpan">#wwtext("name=never.built")
-        </tr>
-#end
-#end
-
 #macro(changesTable $titleKey $changelists $showWho $source)
-    <table class="content">
-        #headingRow($titleKey 6)
+    <table class="two-content">
+        <tr><th class="two-heading" colspan="6">#wwtext("name=$titleKey")</th></tr>
         <tr>
-            #contentHeading("change.revision" 1)
+            #contentClassHeading("change.revision" 1 "leftmost")
     #if($showWho)
             #contentHeading("change.who" 1)
     #end
             #contentHeading("change.when" 1)
             #contentHeading("change.comment" 1)
             #contentHeading("build.results" 1)
-            #contentHeading("actions" 1)
+            #contentClassHeading("actions" 1 "rightmost")
         </tr>
     #if($changelists.size() > 0)
         #foreach($changelist in $changelists)
             #set($index = $velocityCount - 1)
             $action.updateChangeUrl($changelist)
         <tr>
-            #dynamicRightLinkCell($changelist.revision $action.getChangeUrl())
+            <td class="content leftmost">
+                #if($action.getChangeUrl())<a href="$action.getChangeUrl()">#end$!webwork.htmlEncode($changelist.revision)#if($action.getChangeUrl())</a>#end
+            </td>
     #if($showWho)
             #dynamicCell($changelist.author)
     #end
             #dateCell($changelist)
             #commitCommentCell($changelist $source)
             #aggregateResultCell($changelist $showWho)
-            #linkCell("view.$changelist.id" "view" "$base/dashboard/changes/$changelist.id/")
+            #linkClassCell("view.$changelist.id" "view" "$base/dashboard/changes/$changelist.id/" "rightmost")
         </tr>
         #end
     #else
         <tr>
-            <td class="content" colspan="6">#wwtext("name=no.changes")</td>
+            <td class="content leftmost rightmost understated" colspan="6">#wwtext("name=no.changes")</td>
         </tr>
     #end
     </table>
@@ -80,28 +48,13 @@
 #end
 </h2>
 
-#set($firstTable = true)
-#foreach($group in $shownGroups)
-    <table class="content" id='#id("group_$group.name")'>
-        <tr>
-            <th class="group" colspan="$columns.totalSpan">
-                <span class="action">
-                    <a id='#id("hide_group_$group.name")' href="$base/user/hideDashboardGroup.action?groupName=#uce($group.name)" class="unadorned">X</a>
-                </span>
-                $!webwork.htmlEncode($group.name)
-            </th>
-        </tr>
-    #foreach($project in $group.projects)
-        #buildsTable($project false $firstTable)
-        #set($firstTable = false)
-    #end
-    </table>
+#if($models.size() > 0)
+    #showProjectsModels($models $columns true)
+#else
+    <p>
+        No projects to display.
+    </p>
 #end
-    <table class="content">
-#foreach($project in $shownProjects)
-        #buildsTable($project true true)
-#end
-    </table>
 
 #if($dashboardConfig.showMyChanges)
     <h2 class="section">#wwtext("name=my.changes")</h2>
@@ -113,4 +66,4 @@
     #changesTable("my.project.changes" $projectChangelists true "project")
 #end
 
-#buildTableColumns($columns "my.projects")
+<br/>

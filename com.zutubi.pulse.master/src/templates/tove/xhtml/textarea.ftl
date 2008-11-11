@@ -18,7 +18,7 @@
 </#if>
 
     fc.autoCreate = autoCreate;
-    form.add(new Ext.form.TextField(fc));
+    ${form.name}.add(new Ext.form.TextField(fc));
 })();
 
 <#include "/tove/xhtml/controlfooter.ftl" />

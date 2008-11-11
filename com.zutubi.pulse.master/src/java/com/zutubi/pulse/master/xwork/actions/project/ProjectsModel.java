@@ -33,7 +33,7 @@ public class ProjectsModel
 
     public String getId()
     {
-        return StringUtils.toValidHtmlName("group." + groupName);
+        return labelled ? StringUtils.toValidHtmlName("group." + groupName) : "ungroup";
     }
     
     public TemplateProjectModel getRoot()

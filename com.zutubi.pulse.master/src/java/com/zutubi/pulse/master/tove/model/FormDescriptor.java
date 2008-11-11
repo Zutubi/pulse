@@ -96,10 +96,7 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
     public void setActions(String... actions)
     {
         this.actions.clear();
-        for(String action: actions)
-        {
-            this.actions.add(action);
-        }
+        this.actions.addAll(Arrays.asList(actions));
     }
 
     public void setActions(List<String> actions)
@@ -110,10 +107,11 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
 
     public Form instantiate(String path, Record record)
     {
-        Form form = new Form(name, id, ToveUtils.getConfigURL(path, action, null, namespace));
+        Form form = new Form(name, id, ToveUtils.getConfigURL(path, action, null, namespace), getDefaultSubmit());
         form.setReadOnly(readOnly);
         form.setDisplayMode(displayMode);
         form.setAjax(ajax);
+        form.setDefaultSubmit(getDefaultSubmit());
         form.addParameter("path", path);
         form.addAll(getParameters());
         
@@ -132,13 +130,11 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
             form.add(field);
         }
 
-        String defaultAction = getDefaultAction();
-
         // add the submit fields.
-        for (String action : actions)
+        for (String submitAction : actions)
         {
-            SubmitFieldDescriptor submitDescriptor = new SubmitFieldDescriptor(action.equals(defaultAction));
-            submitDescriptor.setName(action);
+            SubmitFieldDescriptor submitDescriptor = new SubmitFieldDescriptor(submitAction.equals(form.getDefaultSubmit()));
+            submitDescriptor.setName(submitAction);
             Field submit = submitDescriptor.instantiate(path, record);
             form.add(submit);
         }
@@ -146,7 +142,7 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
         return form;
     }
 
-    private String getDefaultAction()
+    private String getDefaultSubmit()
     {
         String defaultAction = actions.size() > 0 ? actions.get(0) : "save";
         if (actions.contains("next"))

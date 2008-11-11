@@ -10,6 +10,6 @@ fc.autoCreate = {tag: 'input', type: 'file', autocomplete: 'off'};
 fc.inputType = 'file';
 fc.width = 'auto';
 
-form.add(new Ext.form.TextField(fc));
+${form.name}.add(new Ext.form.TextField(fc));
 
 <#include "/tove/xhtml/controlfooter.ftl" />

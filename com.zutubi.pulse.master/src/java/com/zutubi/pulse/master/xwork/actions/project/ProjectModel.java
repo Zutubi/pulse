@@ -35,8 +35,8 @@ public abstract class ProjectModel
 
     public String getId()
     {
-        String groupPrefix = group.isLabelled() ? "grouped." : "ungrouped.";
-        return StringUtils.toValidHtmlName(groupPrefix + group.getGroupName() + "." + name);
+        String groupPrefix = group.isLabelled() ? "grouped." + group.getGroupName() : "ungrouped";
+        return StringUtils.toValidHtmlName(groupPrefix + "." + name);
     }
 
     public int getDepth()

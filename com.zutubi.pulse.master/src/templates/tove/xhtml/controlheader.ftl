@@ -10,3 +10,4 @@
 <#if parameters.noOverride?exists>
     fc.readOnly = true;
 </#if>
+    fc.submitOnEnter = ${parameters.submitOnEnter?default(true)?string};

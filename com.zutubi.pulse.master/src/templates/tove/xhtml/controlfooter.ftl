@@ -1,4 +1,4 @@
-form.items.last().on('render', function(field)
+${form.name}.items.last().on('render', function(field)
 {
 <#if parameters.actions?exists>
     <#list parameters.actions as action>
@@ -8,12 +8,12 @@ form.items.last().on('render', function(field)
     </#list>
 </#if>
 
-    addFieldAnnotations(form, field, ${parameters.required?default(false)?string}, ${parameters.noOverride?exists?string}, '${parameters.inheritedFrom!?js_string}', '${parameters.overriddenOwner!?js_string}');
+    addFieldAnnotations(${form.name}, field, ${parameters.required?default(false)?string}, ${parameters.noOverride?exists?string}, '${parameters.inheritedFrom!?js_string}', '${parameters.overriddenOwner!?js_string}');
 
 <#assign helpkey>${parameters.name}.help</#assign>
 <#assign helpmsg>${helpkey?i18n}</#assign>
 <#if helpmsg?exists && helpkey != helpmsg>
-    addFieldHelp(form, field, '${helpmsg?js_string}');
+    addFieldHelp(${form.name}, field, '${helpmsg?js_string}');
 </#if>
 });
 

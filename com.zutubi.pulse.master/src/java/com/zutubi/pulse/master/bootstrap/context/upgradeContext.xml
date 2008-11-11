@@ -39,6 +39,7 @@
                 <ref local="projectLifecycle"/>
                 <ref local="triggerRepackaging"/>
                 <ref local="triggerState"/>
+                <ref local="dashboardBuildPreferences"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -105,5 +106,9 @@
 
     <bean id="triggerState" class="com.zutubi.pulse.master.upgrade.tasks.TriggerStateUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200013005"/>
+    </bean>
+
+    <bean id="dashboardBuildPreferences" class="com.zutubi.pulse.master.upgrade.tasks.DashboardBuildPreferencesUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200014001"/>
     </bean>
 </beans>

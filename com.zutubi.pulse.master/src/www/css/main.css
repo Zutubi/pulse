@@ -488,16 +488,28 @@ th.right {
 Browse view
 */
 
-.project-group {
+.project-group, .two-content {
     width: 98%;
     border-collapse: collapse;
+}
+
+.two-content .content, .two-content .content-right, .two-content td {
+    border: dotted 1px #bbb;
+}
+
+.two-content .leftmost {
+    border-left: none;
+}
+
+.two-content .rightmost {
+    border-right: none;
 }
 
 .project-group td {
     padding: 4px;
 }
 
-td.group-header {
+td.group-header, th.two-heading {
     border-top: solid 1px #bbb;
     border-bottom: solid 1px #bbb;
     padding: 6px 4px;

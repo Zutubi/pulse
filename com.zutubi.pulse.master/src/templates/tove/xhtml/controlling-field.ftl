@@ -1,7 +1,7 @@
     function setEnabledState(controllingField)
     {
 <#if !form.readOnly>
-        if(!form.rendered)
+        if(!${form.name}.rendered)
         {
             return;
         }
@@ -12,28 +12,28 @@
         if(enabled)
         {
         <#list parameters.dependentFields as dependent>
-            form.enableField('zfid.${dependent}');
+            ${form.name}.enableField('zfid.${dependent}');
         </#list>
         }
         else
         {
         <#list parameters.dependentFields as dependent>
-            form.disableField('zfid.${dependent}');
+            ${form.name}.disableField('zfid.${dependent}');
         </#list>
         }
     <#else>
-        form.items.each(function(field)
+        ${form.name}.items.each(function(field)
         {
             var type = field.getEl().dom.type;
             if(field.getId() != controllingField.getId() && type && type != "hidden" && type != "submit")
             {
                 if(enabled)
                 {
-                    form.enableField(field.getId());
+                    ${form.name}.enableField(field.getId());
                 }
                 else
                 {
-                    form.disableField(field.getId());
+                    ${form.name}.disableField(field.getId());
                 }
             }
         });

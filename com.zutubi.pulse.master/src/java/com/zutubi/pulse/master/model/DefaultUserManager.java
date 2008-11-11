@@ -240,12 +240,6 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         else
         {
             projects.addAll(projectManager.mapConfigsToProjects(dashboardConfig.getShownProjects()));
-            List<String> groupNames = user.getPreferences().getDashboard().getShownGroups();
-            for(String groupName: groupNames)
-            {
-                ProjectGroup group = projectManager.getProjectGroup(groupName);
-                projects.addAll(group.getProjects());
-            }
         }
 
         return projects;

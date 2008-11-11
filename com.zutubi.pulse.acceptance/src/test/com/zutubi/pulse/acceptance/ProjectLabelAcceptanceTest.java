@@ -50,14 +50,14 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         BrowsePage browsePage = new BrowsePage(selenium, urls);
         browsePage.goTo();
-        browsePage.assertGroupPresent(g1, p1, p2);
-        browsePage.assertGroupPresent(g2, p1);
-        browsePage.assertGroupPresent(null, p3);
-        browsePage.assertProjectNotPresent(g1, p3);
-        browsePage.assertProjectNotPresent(g2, p2);
-        browsePage.assertProjectNotPresent(g2, p3);
-        browsePage.assertProjectNotPresent(null, p1);
-        browsePage.assertProjectNotPresent(null, p2);
+        assertGroupPresent(browsePage, g1, p1, p2);
+        assertGroupPresent(browsePage, g2, p1);
+        assertGroupPresent(browsePage, null, p3);
+        assertFalse(browsePage.isProjectPresent(g1, p3));
+        assertFalse(browsePage.isProjectPresent(g2, p2));
+        assertFalse(browsePage.isProjectPresent(g2, p3));
+        assertFalse(browsePage.isProjectPresent(null, p1));
+        assertFalse(browsePage.isProjectPresent(null, p2));
     }
 
     public void testAddProjectToGroup() throws Exception
@@ -75,13 +75,13 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         BrowsePage browsePage = new BrowsePage(selenium, urls);
         browsePage.goTo();
-        browsePage.assertGroupPresent(group, p1);
-        browsePage.assertProjectNotPresent(group, p2);
+        assertGroupPresent(browsePage, group, p1);
+        assertFalse(browsePage.isProjectPresent(group, p2));
 
         insertLabel(p2, label1);
 
         browsePage.goTo();
-        browsePage.assertGroupPresent(group, p1, p2);
+        assertGroupPresent(browsePage, group, p1, p2);
     }
 
     public void testRemoveProjectFromGroup() throws Exception
@@ -100,13 +100,13 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         BrowsePage browsePage = new BrowsePage(selenium, urls);
         browsePage.goTo();
-        browsePage.assertGroupPresent(group, p1, p2);
+        assertGroupPresent(browsePage, group, p1, p2);
 
         xmlRpcHelper.call("deleteConfig", path);
 
         browsePage.goTo();
-        browsePage.assertGroupPresent(group, p1);
-        browsePage.assertProjectNotPresent(group, p2);
+        assertGroupPresent(browsePage, group, p1);
+        assertFalse(browsePage.isProjectPresent(group, p2));
     }
 
     public void testEmptyOutGroup() throws Exception
@@ -122,12 +122,12 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         BrowsePage browsePage = new BrowsePage(selenium, urls);
         browsePage.goTo();
-        browsePage.assertGroupPresent(group, p1);
+        assertGroupPresent(browsePage, group, p1);
 
         xmlRpcHelper.call("deleteConfig", path);
 
         browsePage.goTo();
-        browsePage.assertGroupNotPresent(group);
+        assertFalse(browsePage.isGroupPresent(group));
     }
 
     private Hashtable<String, Object> createLabel(String name)
@@ -142,4 +142,12 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         return xmlRpcHelper.insertConfig(PathUtils.getPath("projects", project, "labels"), label);
     }
 
+    private void assertGroupPresent(BrowsePage browsePage, String group, String... projects)
+    {
+        assertTrue("Group '" + group + "' not found", browsePage.isGroupPresent(group));
+        for (String project: projects)
+        {
+            assertTrue("Project '" + project + "' not found in group '" + group + "'", browsePage.isProjectPresent(group, project));
+        }
+    }
 }

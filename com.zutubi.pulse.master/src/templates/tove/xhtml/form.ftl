@@ -23,72 +23,36 @@ width of its contents.  Floating it works, but hurts other things.
 <script type="text/javascript">
     Ext.form.Field.prototype.msgTarget = 'under';
 
-    var ${form.name} = function()
-    {
-        var form = new ZUTUBI.FormPanel({
-            method: 'POST',
+    var ${form.name} = new ZUTUBI.FormPanel({
+        method: 'POST',
 <#if form.fileUpload>
-            fileUpload: true,
+        fileUpload: true,
 </#if>
-            formName: '${form.name?js_string}',
-            waitMsgTarget: 'nested-layout',
-            border: false,
-            labelWidth: '-',
-            items: [{
-                xtype: 'hidden',
-                id: '${form.name?js_string}.submitField',
-                name: 'submitField',
-                value: 'h'
-            }]
-        });
+        ajax: ${form.ajax?string},
+        readOnly: ${form.readOnly?string},
+        defaultSubmitValue: '${form.defaultSubmit?js_string}',
+        formName: '${form.name?js_string}',
+        waitMsgTarget: 'nested-layout',
+        border: false,
+        labelWidth: '-',
+        items: [{
+            xtype: 'hidden',
+            id: '${form.name?js_string}.submitField',
+            name: 'submitField',
+            value: 'h'
+        }]
+    });
 
-        function submitForm(value)
-        {
-            var f = form.getForm();
-
-            Ext.get('${form.name?js_string}.submitField').dom.value = value;
-            if(value == 'cancel')
-            {
-                Ext.DomHelper.append(f.el.parent(), {tag: 'input', type: 'hidden', name: 'cancel', value: 'true'});
-            }
-
-            f.clearInvalid();
-    <#if form.ajax>
-            window.formSubmitting = true;
-            f.submit({
-                clientValidation: false,
-                waitMsg: 'Submitting...'
-            });
-    <#else>
-            if(value == 'cancel' || f.isValid())
-            {
-                f.el.dom.submit();
-            }
-    </#if>
-        }
-
-        var defaultSubmit = function() {};
-        var buttonConfig;
-
+    var bc;
     <#if !form.readOnly>
         <#list form.submitFields as submitField>
-            <#if submitField.parameters.default?exists>
-                defaultSubmit = function()
-                {
-                    submitForm('${submitField.value?js_string}');
-                };
-            </#if>
-
-            buttonConfig = { text: '${submitField.value?js_string}' };
+    bc = { text: '${submitField.value?js_string}' };
             <#if form.displayMode?default(false)>
-                buttonConfig.disabled = true;
+    bc.disabled = true;
             </#if>
-            form.addButton(buttonConfig, function() { submitForm('${submitField.value?js_string}'); });
+    ${form.name}.addButton(bc, function() { ${form.name}.submitForm('${submitField.value?js_string}'); });
         </#list>
     </#if>
     
-        <#include "/tove/xhtml/form-fields.ftl"/>
-
-        return form;
-    }();
+    <#include "/tove/xhtml/form-fields.ftl"/>
 </script>

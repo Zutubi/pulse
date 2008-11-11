@@ -27,6 +27,9 @@ public class InstallPluginAction extends PluginActionSupport
 {
     private static final Logger LOG = Logger.getLogger(InstallPluginAction.class);
 
+    private static final String SUBMIT_CONTINUE = "continue";
+    private static final String SUBMIT_UPLOAD = "upload";
+
     private String pluginPath;
     private String uploadFormSource;
     private String localFormSource;
@@ -81,7 +84,7 @@ public class InstallPluginAction extends PluginActionSupport
 
     private void renderForms() throws TemplateException, IOException
     {
-        Form uploadForm = new Form("uploadForm", "uploadForm", "admin/plugins?install=upload");
+        Form uploadForm = new Form("uploadForm", "uploadForm", "admin/plugins?install=upload", SUBMIT_UPLOAD);
         uploadForm.setAjax(false);
         uploadForm.setFileUpload(true);
 
@@ -90,8 +93,8 @@ public class InstallPluginAction extends PluginActionSupport
         pluginField.addParameter("size", "80");
         uploadForm.add(pluginField);
 
-        Field uploadButton = new Field(FieldType.SUBMIT, "upload");
-        uploadButton.setValue("upload");
+        Field uploadButton = new Field(FieldType.SUBMIT, SUBMIT_UPLOAD);
+        uploadButton.setValue(SUBMIT_UPLOAD);
         uploadForm.add(uploadButton);
 
         Field cancelButton = new Field(FieldType.SUBMIT, "cancel");
@@ -102,7 +105,7 @@ public class InstallPluginAction extends PluginActionSupport
         ToveUtils.renderForm(uploadForm, getClass(), writer, configuration);
         uploadFormSource = writer.toString();
 
-        Form localForm = new Form("localForm", "localForm", "admin/plugins?install=local");
+        Form localForm = new Form("localForm", "localForm", "admin/plugins?install=local", SUBMIT_CONTINUE);
         localForm.setAjax(false);
 
         Field pluginPathField = new Field(FieldType.TEXT, "pluginPath");
@@ -115,8 +118,8 @@ public class InstallPluginAction extends PluginActionSupport
         pluginPathField.addParameter(SCRIPTS, Arrays.asList("InstallPluginAction.browse"));
         localForm.add(pluginPathField);
 
-        Field continueButton = new Field(FieldType.SUBMIT, "continue");
-        continueButton.setValue("continue");
+        Field continueButton = new Field(FieldType.SUBMIT, SUBMIT_CONTINUE);
+        continueButton.setValue(SUBMIT_CONTINUE);
         localForm.add(continueButton);
         localForm.add(cancelButton);
 

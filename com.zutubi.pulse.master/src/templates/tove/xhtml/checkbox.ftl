@@ -8,10 +8,10 @@
     fc.width = 14;
     fc.autoCreate = { tag: 'input', type: 'checkbox', value: 'true', id: fc.id };
 
-    form.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: 'false'}));
+    ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: 'false'}));
 
     var checkbox = new Ext.form.Checkbox(fc);
-    form.add(checkbox);
+    ${form.name}.add(checkbox);
     checkbox.on('check', updateButtons);
 }());
 

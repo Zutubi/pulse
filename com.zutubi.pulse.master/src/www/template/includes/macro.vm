@@ -367,7 +367,14 @@
 ## Outputs a heading cell for a content table
 ##
 #macro(contentHeading $key $span)
-    <th class="content" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
+    #contentClassHeading($key $span "")
+#end
+
+##
+## Outputs a heading cell for a content table with a given additional class
+##
+#macro(contentClassHeading $key $span $additionalClass)
+    <th class="content $additionalClass" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
 #end
 
 ##
@@ -580,7 +587,14 @@
 ## Outputs a link cell for a content table
 ##
 #macro(linkCell $id $key $url)
-    <td class="content">
+    #linkClassCell($id $key $url "")
+#end
+
+##
+## Outputs a link cell for a content table with the given additional class.
+##
+#macro(linkClassCell $id $key $url $additionalClass)
+    <td class="content $additionalClass">
         <a id="$id" href="$url">#wwtext("name=$key")</a>
     </td>
 #end

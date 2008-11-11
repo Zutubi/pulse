@@ -7,6 +7,6 @@
     fc.width = ${parameters.size};
 </#if>
 fc.inputType = 'password';
-form.add(new Ext.form.TextField(fc));
+${form.name}.add(new Ext.form.TextField(fc));
 
 <#include "/tove/xhtml/controlfooter.ftl" />

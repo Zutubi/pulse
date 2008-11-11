@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.model;
 
 import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.pulse.master.tove.model.AbstractParameterised;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -20,6 +19,7 @@ public class Form extends AbstractParameterised
     private static final String PARAMETER_READ_ONLY = "readOnly";
     private static final String PARAMETER_AJAX = "ajax";
     private static final String PARAMETER_FILE_UPLOAD = "fileUpload";
+    private static final String PARAMETER_DEFAULT_SUBMIT = "defaultSubmit";
 
     /**
      * Ordered list of fields that make up this form.
@@ -30,11 +30,12 @@ public class Form extends AbstractParameterised
      */
     private List<Field> submitFields = new LinkedList<Field>();
 
-    public Form(String name, String id, String action)
+    public Form(String name, String id, String action, String defaultSubmit)
     {
         setName(name);
         setId(id);
         setAction(action);
+        setDefaultSubmit(defaultSubmit);
     }
 
     public String getName()
@@ -65,6 +66,16 @@ public class Form extends AbstractParameterised
     public void setAction(String action)
     {
         addParameter(PARAMETER_ACTION, action);
+    }
+
+    public String getDefaultSubmit()
+    {
+        return (String) getParameter(PARAMETER_DEFAULT_SUBMIT);
+    }
+
+    public void setDefaultSubmit(String defaultSubmit)
+    {
+        addParameter(PARAMETER_DEFAULT_SUBMIT, defaultSubmit);
     }
 
     public boolean isDisplayMode()

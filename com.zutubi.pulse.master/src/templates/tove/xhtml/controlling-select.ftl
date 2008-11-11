@@ -18,10 +18,10 @@
 
     <#include "/tove/xhtml/controlling-field.ftl" />
 
-    var select = form.findById('${parameters.id}');
+    var select = ${form.name}.findById('${parameters.id}');
     select.on('select', setEnabledState);
     select.on('disable', setEnabledState);
     select.on('enable', setEnabledState);
 
-    form.on('afterlayout', function() { setEnabledState(select); }, form, {single: true});
+    ${form.name}.on('afterlayout', function() { setEnabledState(select); }, ${form.name}, {single: true});
 }());

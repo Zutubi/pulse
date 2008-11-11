@@ -113,7 +113,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         BrowsePage browsePage = new BrowsePage(selenium, urls);
         browsePage.goTo();
-        browsePage.assertProjectNotPresent(null, random);
+        assertFalse(browsePage.isProjectPresent(null, random));
     }
 
     public void testDeleteProjectWithReference() throws Exception

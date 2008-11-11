@@ -57,7 +57,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         DashboardPage dashboard = new DashboardPage(selenium, urls);
         dashboard.goTo();
         assertTrue(dashboard.isGroupPresent(group));
-        assertTrue(dashboard.isGroupedProjectPresent(group, project));
+        assertTrue(dashboard.isProjectPresent(group, project));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
     }
 
@@ -76,9 +76,9 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         DashboardPage dashboard = new DashboardPage(selenium, urls);
         dashboard.goTo();
         assertTrue(dashboard.isGroupPresent(group1));
-        assertTrue(dashboard.isGroupedProjectPresent(group1, project));
+        assertTrue(dashboard.isProjectPresent(group1, project));
         assertFalse(dashboard.isGroupPresent(group2));
-        assertFalse(dashboard.isGroupedProjectPresent(group2, project));
+        assertFalse(dashboard.isProjectPresent(group2, project));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
     }
 
@@ -138,7 +138,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         assertTrue(dashboard.isUngroupedProjectPresent(project1));
         assertTrue(dashboard.isUngroupedProjectPresent(project2));
 
-        dashboard.hideProjectAndWait(project1);
+        dashboard.hideProjectAndWait(null, project1);
 
         assertFalse(dashboard.isUngroupedProjectPresent(project1));
         assertTrue(dashboard.isUngroupedProjectPresent(project2));

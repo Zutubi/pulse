@@ -31,6 +31,8 @@ import java.util.Set;
  */
 public class CloneAction extends ToveActionSupport
 {
+    private static final String SUBMIT_CLONE = "clone";
+
     public static final String CHECK_FIELD_PREFIX = "cloneCheck_";
     public static final String KEY_FIELD_PREFIX   = "cloneKey_";
 
@@ -228,7 +230,7 @@ public class CloneAction extends ToveActionSupport
     {
         Map parameters = ActionContext.getContext().getParameters();
 
-        Form form = new Form("form", "clone", ToveUtils.getConfigURL(path, smart ? "smartclone" : "clone", null, "aconfig"));
+        Form form = new Form("form", "clone", ToveUtils.getConfigURL(path, smart ? "smartclone" : "clone", null, "aconfig"), SUBMIT_CLONE);
         Field field = new Field(FieldType.TEXT, "cloneKey");
         field.setLabel("clone name");
         field.setValue(getValue("cloneKey", getKey(record), parameters));
@@ -245,7 +247,7 @@ public class CloneAction extends ToveActionSupport
             addDescendentFields(form);
         }
 
-        addSubmit(form, "clone", true);
+        addSubmit(form, SUBMIT_CLONE, true);
         addSubmit(form, "cancel", false);
 
         StringWriter writer = new StringWriter();

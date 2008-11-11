@@ -15,17 +15,9 @@ import java.util.List;
 @SymbolicName("zutubi.browseViewConfig")
 @Classification(single = "browse")
 @Form(fieldOrder = {"groupsShown", "hierarchyShown", "hiddenHierarchyLevels", "buildsPerProject", "columns"})
-public class BrowseViewConfiguration extends AbstractConfiguration
+public class BrowseViewConfiguration extends ProjectsSummaryConfiguration
 {
     private boolean groupsShown = true;
-    @ControllingCheckbox(dependentFields = "hiddenHierarchyLevels")
-    private boolean hierarchyShown = true;
-    @Numeric(min = 0)
-    private int hiddenHierarchyLevels = 1;
-    @Numeric(min = 1)
-    private int buildsPerProject = 1;
-    @ItemPicker(optionProvider = "BrowseViewColumnsOptionProvider")
-    private List<String> columns = defaultColumns();
 
     public BrowseViewConfiguration()
     {
@@ -40,50 +32,5 @@ public class BrowseViewConfiguration extends AbstractConfiguration
     public void setGroupsShown(boolean groupsShown)
     {
         this.groupsShown = groupsShown;
-    }
-
-    public boolean isHierarchyShown()
-    {
-        return hierarchyShown;
-    }
-
-    public void setHierarchyShown(boolean hierarchyShown)
-    {
-        this.hierarchyShown = hierarchyShown;
-    }
-
-    public int getHiddenHierarchyLevels()
-    {
-        return hiddenHierarchyLevels;
-    }
-
-    public void setHiddenHierarchyLevels(int hiddenHierarchyLevels)
-    {
-        this.hiddenHierarchyLevels = hiddenHierarchyLevels;
-    }
-
-    public int getBuildsPerProject()
-    {
-        return buildsPerProject;
-    }
-
-    public void setBuildsPerProject(int buildsPerProject)
-    {
-        this.buildsPerProject = buildsPerProject;
-    }
-
-    public List<String> getColumns()
-    {
-        return columns;
-    }
-
-    public void setColumns(List<String> columns)
-    {
-        this.columns = columns;
-    }
-
-    public static List<String> defaultColumns()
-    {
-        return new LinkedList(Arrays.asList(BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS));
     }
 }

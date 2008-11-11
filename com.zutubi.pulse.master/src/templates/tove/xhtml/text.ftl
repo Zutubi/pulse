@@ -6,6 +6,6 @@
 <#if parameters.size?exists>
     fc.width = ${parameters.size};
 </#if>
-form.add(new Ext.form.TextField(fc));
+${form.name}.add(new Ext.form.TextField(fc));
 
 <#include "/tove/xhtml/controlfooter.ftl" />

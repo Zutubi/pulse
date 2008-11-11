@@ -643,7 +643,7 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
 ZUTUBI.Form = function(config)
 {
     ZUTUBI.Form.superclass.constructor.call(this, null, config);
-}
+};
 
 Ext.extend(ZUTUBI.Form, Ext.form.BasicForm, {
     clearInvalid: function()
@@ -686,7 +686,7 @@ ZUTUBI.FormLayout = function(config)
 
     config.labelAlign = 'right';
     ZUTUBI.FormLayout.superclass.constructor.call(this, config);
-}
+};
 
 Ext.extend(ZUTUBI.FormLayout, Ext.layout.FormLayout, {
     renderItem: function(c, position, target)
@@ -849,6 +849,80 @@ Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
                 }
             }
         }
+    },
+
+    submitForm: function (value)
+    {
+        var f = this.getForm();
+        Ext.get(this.formName + '.submitField').dom.value = value;
+        if(value == 'cancel')
+        {
+            Ext.DomHelper.append(f.el.parent(), {tag: 'input', type: 'hidden', name: 'cancel', value: 'true'});
+        }
+
+        f.clearInvalid();
+        if (this.ajax)
+        {
+            window.formSubmitting = true;
+            f.submit({
+                clientValidation: false,
+                waitMsg: 'Submitting...'
+            });
+        }
+        else
+        {
+            if(value == 'cancel' || f.isValid())
+            {
+                f.el.dom.submit();
+            }
+        }
+    },
+
+    defaultSubmit: function()
+    {
+        if (!this.readOnly)
+        {
+            this.submitForm(this.defaultSubmitValue);
+        }
+    },
+
+    handleFieldKeypress: function (evt)
+    {
+        if (evt.getKey() != evt.RETURN || this.readOnly)
+        {
+            return true;
+        }
+        else
+        {
+            this.defaultSubmit();
+            evt.preventDefault();
+            return false;
+        }
+    },
+
+    attachFieldKeyHandlers: function()
+    {
+        var panel = this;
+        var form = this.getForm();
+        form.items.each(function(field) {
+            var el = field.getEl();
+            if(el)
+            {
+                if (field.getXType() == 'checkbox')
+                {
+                    el = field.innerWrap;
+                }
+
+                el.set({tabindex: window.nextTabindex++ });
+
+                if (field.submitOnEnter)
+                {
+                    el.on('keypress', function(event){ return panel.handleFieldKeypress(event); });
+                }
+                el.on('keyup', panel.updateButtons.createDelegate(panel));
+                el.on('click', panel.updateButtons.createDelegate(panel));
+            }
+        });
     }
 });
 
@@ -862,6 +936,19 @@ Ext.extend(ZUTUBI.CheckFormPanel, ZUTUBI.FormPanel, {
     createForm: function() {
         delete this.initialConfig.listeners;
         return new ZUTUBI.CheckForm(this.mainFormPanel.getForm(), this.initialConfig);
+    },
+
+    defaultSubmit: function()
+    {
+        var f = this.getForm();
+        if (f.isValid())
+        {
+            f.clearInvalid();
+            window.formSubmitting = true;
+            f.submit({
+                clientValidation: false
+            });
+        }
     }
 });
 
@@ -931,7 +1018,7 @@ ZUTUBI.ImageButton = function(renderTo, config)
 
     this.defaultAutoCreate = { tag: 'img', src: this.image, cls: 'x-image-button' };
     this.render(renderTo);
-}
+};
 
 Ext.extend(ZUTUBI.ImageButton, Ext.BoxComponent, {
     onRender: function(ct, position)

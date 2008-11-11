@@ -1,4 +1,4 @@
-form.items.last().on('browse', function(field)
+${form.name}.items.last().on('browse', function(field)
 {
     function findProjectPath(path)
     {
