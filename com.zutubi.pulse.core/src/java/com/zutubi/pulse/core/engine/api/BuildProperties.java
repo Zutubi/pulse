@@ -33,7 +33,7 @@ public class BuildProperties
     /**
      * Set to "true" if the SCM bootstrap for the build is incremental, "false"
      * otherwise.  Different to incremental.build: incremental bootstraps are
-     * also used for the "clean checkout" scheme, for example.
+     * also used for the "clean update" scheme, for example.
      */
     public static final String PROPERTY_INCREMENTAL_BOOTSTRAP   = "incremental.bootstrap";
     public static final String PROPERTY_INCREMENTAL_BUILD       = "incremental.build";
