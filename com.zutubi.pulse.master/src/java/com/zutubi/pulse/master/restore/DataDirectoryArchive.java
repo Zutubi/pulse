@@ -1,9 +1,8 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.HSQLDBUtils;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.FileSystemUtils;
 
 import javax.sql.DataSource;
@@ -21,6 +20,8 @@ import java.io.IOException;
 public class DataDirectoryArchive extends AbstractArchiveableComponent
 {
     private MasterUserPaths paths;
+    private DatabaseConsole databaseConsole;
+    private DataSource dataSource;
 
     public String getName()
     {
@@ -45,11 +46,10 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
             // PULSE_DATA/database directory if it is being used.  When we start using the DatabaseArchive
             // for managing database backups, this can be removed.
             // Are we running an embedded database? If so, we need to back it up.
-            DatabaseConsole databaseConsole = (DatabaseConsole) SpringComponentContext.getBean("databaseConsole");
             if (databaseConsole.isEmbedded())
             {
                 // trigger a checkpoint call on the database to compact the data.
-                HSQLDBUtils.compactDatabase((DataSource) SpringComponentContext.getBean("dataSource"));
+                HSQLDBUtils.compactDatabase(dataSource);
                 File dest = new File(archive, "database");
                 dest.mkdir();
                 conditionalCopy(dest, new File(paths.getDatabaseRoot(), "db.backup"));
@@ -179,5 +179,15 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
     public void setUserPaths(MasterUserPaths paths)
     {
         this.paths = paths;
+    }
+
+    public void setDatabaseConsole(DatabaseConsole databaseConsole)
+    {
+        this.databaseConsole = databaseConsole;
+    }
+
+    public void setDataSource(DataSource dataSource)
+    {
+        this.dataSource = dataSource;
     }
 }
