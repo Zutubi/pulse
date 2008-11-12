@@ -2,6 +2,8 @@ package com.zutubi.pulse.master.tove.wizard.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.tove.wizard.Wizard;
+import com.zutubi.pulse.master.tove.wizard.WizardState;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CollectionType;
@@ -9,8 +11,6 @@ import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.pulse.master.tove.wizard.Wizard;
-import com.zutubi.pulse.master.tove.wizard.WizardState;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.DelegatingValidationContext;
@@ -266,7 +266,7 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
 
     public static String getSessionKey(String path)
     {
-        return PathUtils.normalizePath(path);
+        return PathUtils.normalisePath(path);
     }
 
     public static Wizard getWizardInstance(String path)

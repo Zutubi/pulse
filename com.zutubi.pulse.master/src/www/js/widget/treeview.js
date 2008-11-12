@@ -8,10 +8,20 @@ ZUTUBI.widget.TreeView = function(id)
 
 YAHOO.extend(ZUTUBI.widget.TreeView, YAHOO.widget.TreeView, {
 
+    base:null,
+
     /**
      * Reference to the currently selected node.
      */
     selected: null,
+
+    /**
+     * Specify the base context path, needed for any links that are generated.
+     */
+    setBase: function(base)
+    {
+        this.base = base;
+    },
 
     /**
      * Add an on select callback to the treeview.
@@ -582,21 +592,11 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
 
     fsRoot:null,
 
-    base:null,
-
     error:"error",
 
     setFSRoot: function(root)
     {
         this.fsRoot = root;
-    },
-
-    /**
-     * Specify the base context path, needed for any links that are generated.
-     */
-    setBase: function(base)
-    {
-        this.base = base;
     },
 
     setErrorId: function(id)
@@ -715,4 +715,4 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
     {
         openDebugAlert(e2);
     }
-})
+});

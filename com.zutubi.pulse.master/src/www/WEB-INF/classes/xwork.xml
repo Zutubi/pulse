@@ -227,11 +227,6 @@
             </result>
         </action>
 
-        <action name="browseProjectScm" class="com.zutubi.pulse.master.xwork.actions.project.BrowseProjectScmAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">/browse-project-scm-dir.vm</result>
-        </action>
-
         <action name="downloadSCMFile" class="com.zutubi.pulse.master.xwork.actions.project.DownloadSCMFileAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">

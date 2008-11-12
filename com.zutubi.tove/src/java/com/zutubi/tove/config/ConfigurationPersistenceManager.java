@@ -1,10 +1,10 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.tove.config.api.Configuration;
 
 import java.util.*;
 
@@ -165,7 +165,7 @@ public class ConfigurationPersistenceManager
         {
             // Find the closest by starting at our path and working up the
             // ancestry until one hits.
-            path = PathUtils.normalizePath(path);
+            path = PathUtils.normalisePath(path);
             while (path != null)
             {
                 for (String candidatePattern : patterns)

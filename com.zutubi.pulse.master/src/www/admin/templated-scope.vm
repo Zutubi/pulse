@@ -274,6 +274,5 @@
 </head>
 <body>
     #adminTabs("${tab}")
-    </div>
 </body>
 </html>

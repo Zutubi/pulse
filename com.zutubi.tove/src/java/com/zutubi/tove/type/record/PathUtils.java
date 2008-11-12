@@ -74,7 +74,7 @@ public class PathUtils
         return path;
     }
 
-    public static String normalizePath(String path)
+    public static String normalisePath(String path)
     {
         if (path.startsWith(SEPARATOR))
         {

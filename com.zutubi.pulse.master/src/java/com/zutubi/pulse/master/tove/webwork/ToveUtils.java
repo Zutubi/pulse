@@ -55,7 +55,7 @@ public class ToveUtils
             result = StringUtils.join("/", true, true, result, path);
         }
 
-        result = PathUtils.normalizePath(result);
+        result = PathUtils.normalisePath(result);
         if (action != null && !action.equals("display") || submitField != null)
         {
             result = result + "?" + action;

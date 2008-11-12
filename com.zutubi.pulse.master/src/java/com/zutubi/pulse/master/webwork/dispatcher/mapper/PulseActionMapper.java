@@ -47,7 +47,7 @@ public class PulseActionMapper implements ActionMapper
         String path = request.getPathInfo();
         if(path != null)
         {
-            path = PathUtils.normalizePath(path);
+            path = PathUtils.normalisePath(path);
         }
 
         ActionMapping mapping = null;
@@ -159,6 +159,7 @@ public class PulseActionMapper implements ActionMapper
 
     private ActionMapping getDashboardMapping(String path, HttpServletRequest request)
     {
+        path = normalise(path);
         if(path.startsWith("preferences"))
         {
             // /dashboard/preferences/<path> is a config view rooted at
@@ -230,8 +231,12 @@ public class PulseActionMapper implements ActionMapper
 
     private ActionMapping getResolverMapping(String path, String namespace, ActionResolver resolver)
     {
-        path = path == null ? "" : PathUtils.normalizePath(path);
-        return resolve(namespace, path, resolver);
+        return resolve(namespace, normalise(path), resolver);
+    }
+
+    private String normalise(String path)
+    {
+        return path == null ? "" : PathUtils.normalisePath(path);
     }
 
     private ActionMapping resolve(String namespace, String path, ActionResolver actionResolver)
@@ -260,6 +265,7 @@ public class PulseActionMapper implements ActionMapper
 
     private ActionMapping getAdminMapping(String path, HttpServletRequest request)
     {
+        path = normalise(path);
         if(path.startsWith("actions"))
         {
             // /admin/actions?action=method takes your to:

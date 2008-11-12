@@ -1,13 +1,16 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
-import com.zutubi.tove.actions.ActionManager;
-import com.zutubi.tove.config.*;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.pulse.master.tove.model.ActionLink;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
+import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.config.ConfigurationPersistenceManager;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
@@ -78,7 +81,7 @@ public class ConfigurationUIModel
             throw new IllegalArgumentException("Path must be provided.");
         }
 
-        this.path = PathUtils.normalizePath(path);
+        this.path = PathUtils.normalisePath(path);
     }
 
     public void analyse()

@@ -44,6 +44,15 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         super.tearDown();
     }
 
+    public void testNoTrailingSlash() throws Exception
+    {
+        // See CIB-1715.
+        goTo("dashboard");
+        selenium.waitForPageToLoad("3000");
+        DashboardPage page = new DashboardPage(selenium, urls);
+        page.assertPresent();
+    }
+
     public void testShowGroups() throws Exception
     {
         setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, true));

@@ -21,7 +21,7 @@ public class WiringObjectFactory implements ObjectFactory
 
     public void initProperties(Object fieldSource)
     {
-        Class<? extends Object> sourceClass = fieldSource.getClass();
+        Class<?> sourceClass = fieldSource.getClass();
 
         for(Field field: ReflectionUtils.getDeclaredFields(sourceClass, Object.class))
         {

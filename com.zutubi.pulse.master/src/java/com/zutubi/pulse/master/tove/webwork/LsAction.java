@@ -57,11 +57,11 @@ public class LsAction extends ActionSupport
         String fullPath = "pulse:///";
         if(TextUtils.stringSet(basePath))
         {
-            fullPath += "/" + PathUtils.normalizePath(basePath);
+            fullPath += "/" + PathUtils.normalisePath(basePath);
         }
         if(TextUtils.stringSet(path))
         {
-            fullPath += "/" + PathUtils.normalizePath(path);
+            fullPath += "/" + PathUtils.normalisePath(path);
         }
 
         final FileObject fileObject = fileSystemManager.resolveFile(fullPath);

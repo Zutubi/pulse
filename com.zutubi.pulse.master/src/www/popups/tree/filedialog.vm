@@ -120,6 +120,7 @@
                 // construct the directory browser.
                 var tree = new ZUTUBI.widget.TreeView('browseTree');
                 tree.setSeparator('$separator');
+                tree.setBase('$base');
 
                 // register event handlers and callbacks.
                 tree.setDynamicLoad(function(node, onCompleteCallback)
