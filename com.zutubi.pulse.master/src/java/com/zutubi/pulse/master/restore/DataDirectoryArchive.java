@@ -112,16 +112,9 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
             {
                 // does the file already exist? and if so, is it a database file?. If so, do not overwrite it.
                 File target = new File(dest, file.getName());
-                if (!target.exists())
+                if (!target.exists() || !file.getName().startsWith("database"))
                 {
                     FileSystemUtils.copy(dest, file);
-                }
-                else
-                {
-                    if (!file.getName().startsWith("database"))
-                    {
-                        FileSystemUtils.copy(dest, file);
-                    }
                 }
             }
             else if (file.isDirectory())

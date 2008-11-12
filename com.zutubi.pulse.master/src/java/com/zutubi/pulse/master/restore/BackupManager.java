@@ -33,6 +33,8 @@ public class BackupManager
 
     public static final String TRIGGER_GROUP = "admin";
 
+    private static final String DELETE_FILE_SUFFIX = ".delete";
+
     // default backup details in case no configuration is stored.
     static final BackupConfiguration DEFAULT = new BackupConfiguration();
 
@@ -48,7 +50,7 @@ public class BackupManager
     private File backupDir;
 
     /**
-     * The list of arhiveable components that are currently used for generating backups.
+     * The list of archiveable components that are currently used for generating backups.
      */
     private List<ArchiveableComponent> backupableComponents = new LinkedList<ArchiveableComponent>();
 
@@ -56,7 +58,6 @@ public class BackupManager
      * The directory used for temporary file storage
      */
     private File tmp;
-    private static final String DELETE_FILE_SUFFIX = ".delete";
 
     public void init()
     {
