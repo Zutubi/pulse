@@ -50,12 +50,20 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
 
     protected void doAttach() throws Exception
     {
-        displayName = getProjectConfig().getName();
+        ProjectConfiguration config = getProjectConfig();
+        if (config != null)
+        {
+            displayName = config.getName();
+        }
+        else
+        {
+            displayName = String.valueOf(projectId);
+        }
     }
 
     protected FileType doGetType() throws Exception
     {
-        return FileType.FOLDER;
+        return (getProject() != null) ? FileType.FOLDER : FileType.IMAGINARY;
     }
 
     protected String[] doListChildren() throws Exception
