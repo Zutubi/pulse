@@ -15,14 +15,10 @@ import com.zutubi.util.TextUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import org.apache.commons.cli.ParseException;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-@Test
 public class StartupShutdownAcceptanceTest extends PulseTestCase
 {
     private File tmpDir;
@@ -33,7 +29,6 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
     private Pulse pulse;
     private DefaultSelenium selenium;
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         // create a temporary user home.
@@ -54,7 +49,6 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         pulse.setUserHome(userHome.getCanonicalPath());
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         try

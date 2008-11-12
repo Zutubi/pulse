@@ -5,6 +5,9 @@ import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.AntTypeConfiguration;
 
+import java.util.List;
+import java.util.LinkedList;
+
 /**
  * Encapsulates forms for the steps of the add project wizard.
  */
@@ -33,7 +36,15 @@ public class AddProjectWizard
         }
     }
 
-    public static class SubversionState extends SeleniumForm
+    public abstract static class ScmState extends SeleniumForm
+    {
+        public ScmState(Selenium selenium)
+        {
+            super(selenium);
+        }
+    }
+
+    public static class SubversionState extends ScmState
     {
         public SubversionState(Selenium selenium)
         {
@@ -56,7 +67,57 @@ public class AddProjectWizard
         }
     }
 
-    public static class AntState extends SeleniumForm
+    public static class GitState extends ScmState
+    {
+        public GitState(Selenium selenium)
+        {
+            super(selenium);
+        }
+
+        public String getFormName()
+        {
+            return "com.zutubi.pulse.core.scm.git.config.GitConfiguration";
+        }
+
+        public String[] getFieldNames()
+        {
+            return new String[]{ "repository", "branch", "checkoutScheme"};
+        }
+
+        public int[] getFieldTypes()
+        {
+            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD};
+        }
+    }
+
+    public abstract static class TypeState extends SeleniumForm
+    {
+        protected TypeState(Selenium selenium)
+        {
+            super(selenium);
+        }
+
+        public void cancel()
+        {
+            List<String> emptyValues = new LinkedList<String>();
+            for (int type : getFieldTypes())
+            {
+                switch (type)
+                {
+                    case TEXTFIELD:
+                        emptyValues.add("");
+                        break;
+                    case CHECKBOX:
+                        emptyValues.add("false");
+                        break;
+                }
+            }
+
+            cancelFormElements(emptyValues.toArray(new String[emptyValues.size()]));
+        }
+    }
+
+    public static class AntState extends TypeState
     {
         public AntState(Selenium selenium)
         {
@@ -76,6 +137,21 @@ public class AddProjectWizard
         public int[] getFieldTypes()
         {
             return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD };
+        }
+
+        public boolean isBrowseWorkAvailable()
+        {
+            return isBrowseFieldAvailable("work");
+        }
+
+        public boolean isBrowseFileAvailable()
+        {
+            return isBrowseFieldAvailable("file");
+        }
+
+        private boolean isBrowseFieldAvailable(String fieldName)
+        {
+            return selenium.isElementPresent("zfid."+fieldName+".browse");
         }
     }
 }

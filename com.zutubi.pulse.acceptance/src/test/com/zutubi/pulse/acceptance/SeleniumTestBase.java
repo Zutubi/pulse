@@ -170,7 +170,7 @@ public class SeleniumTestBase extends ZutubiTestCase
         }
         else
         {
-            runProjectWizard(name, template, parentName);
+            runAddProjectWizard(new DefaultProjectWizardDriver(parentName, name, template));
 
             ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, name, template);
             hierarchyPage.waitFor();
@@ -190,42 +190,6 @@ public class SeleniumTestBase extends ZutubiTestCase
         }
 
         return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, name);
-    }
-
-    protected AddProjectWizard.AntState runProjectWizard(String name, boolean template, String parentName)
-    {
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, parentName, true);
-        globalPage.goTo();
-        if (template)
-        {
-            globalPage.clickAddTemplate();
-        }
-        else
-        {
-            globalPage.clickAdd();
-        }
-
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
-        projectState.waitFor();
-        projectState.nextFormElements(name, "test description", "http://test.com/");
-
-        SelectTypeState scmTypeState = new SelectTypeState(selenium);
-        scmTypeState.waitFor();
-        scmTypeState.nextFormElements("zutubi.subversionConfig");
-
-        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
-        subversionState.waitFor();
-        subversionState.nextFormElements(Constants.TRIVIAL_PROJECT_REPOSITORY, null, null, null, null, "CLEAN_CHECKOUT");
-
-        SelectTypeState projectTypeState = new SelectTypeState(selenium);
-        projectTypeState.waitFor();
-        scmTypeState.nextFormElements("zutubi.antTypeConfig");
-
-        AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
-        antState.waitFor();
-        antState.finishFormElements(null, "build.xml", null, null);
-
-        return antState;
     }
 
     protected boolean ensureProject(final String name) throws Exception
@@ -288,5 +252,163 @@ public class SeleniumTestBase extends ZutubiTestCase
             }
         });
         return labels.get(labels.size() - 1);
+    }
+
+    /**
+     * Helper method that runs through the WebUI based project creation wizard, using the
+     * driver instance to guide the process.
+     *
+     * @param driver the driver instance
+     */
+    public AddProjectWizard.TypeState runAddProjectWizard(ProjectWizardDriver driver)
+    {
+        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, driver.getParentName(), true);
+        globalPage.goTo();
+        if (driver.isTemplate())
+        {
+            globalPage.clickAddTemplate();
+        }
+        else
+        {
+            globalPage.clickAdd();
+        }
+
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        projectState.waitFor();
+
+        driver.projectState(projectState);
+
+        SelectTypeState scmTypeState = new SelectTypeState(selenium);
+        scmTypeState.waitFor();
+        scmTypeState.nextFormElements(driver.selectScm());
+
+        AddProjectWizard.ScmState scmState = createScmForm(driver.selectScm());
+        scmState.waitFor();
+
+        driver.scmState(scmState);
+
+        SelectTypeState projectTypeState = new SelectTypeState(selenium);
+        projectTypeState.waitFor();
+        scmTypeState.nextFormElements(driver.selectType());
+
+        AddProjectWizard.AntState typeState = new AddProjectWizard.AntState(selenium);
+        typeState.waitFor();
+
+        driver.typeState(typeState);
+
+        return typeState;
+    }
+
+    private AddProjectWizard.ScmState createScmForm(String s)
+    {
+        if (s.equals("zutubi.subversionConfig"))
+        {
+            return new AddProjectWizard.SubversionState(selenium);
+        }
+        else if (s.equals("zutubi.gitConfig"))
+        {
+            return new AddProjectWizard.GitState(selenium);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unknown scm config: " + s);
+        }
+    }
+
+    /**
+     * A callback interface that allows a test case to drive the UI based project
+     * creation process.
+     */
+    public interface ProjectWizardDriver
+    {
+        /**
+         * Callback that allows interaction with the configure project
+         *  wizard form.
+         *
+         * @param form the form instance.
+         */
+        void projectState(AddProjectWizard.ProjectState form);
+
+        /**
+         * @return the symbolic name of the scm to be selected.
+         */
+        String selectScm();
+
+        /**
+         * Callback that allows interaction with the scm wizard form.
+         *
+         * @param form the form instance.
+         */
+        void scmState(AddProjectWizard.ScmState form);
+
+        /**
+         * @return the symbolic name of the project type to be selected.
+         */
+        String selectType();
+
+        /**
+         * Callback that allows interaction with the project type
+         * wizard form.
+         *
+         * @param form the form instance.
+         */
+        void typeState(AddProjectWizard.TypeState form);
+
+        String getParentName();
+
+        boolean isTemplate();
+    }
+
+    /**
+     * The default implementation of the project wizard driver that creates a
+     * concrete project using subversion and ant.
+     */
+    public class DefaultProjectWizardDriver implements ProjectWizardDriver
+    {
+        private String name;
+        private String parentName;
+        private boolean template;
+
+        public DefaultProjectWizardDriver(String parentName, String projectName, boolean template)
+        {
+            this.name = projectName;
+            this.parentName = parentName;
+            this.template = template;
+        }
+
+        public String getParentName()
+        {
+            return parentName;
+        }
+
+        public boolean isTemplate()
+        {
+            return template;
+        }
+
+        public void projectState(AddProjectWizard.ProjectState form)
+        {
+            form.nextFormElements(name, "test description", "http://test.com/");
+        }
+
+        public String selectScm()
+        {
+            return "zutubi.subversionConfig";
+        }
+
+        public void scmState(AddProjectWizard.ScmState form)
+        {
+            form.nextFormElements(Constants.TRIVIAL_PROJECT_REPOSITORY, null, null, null, null, "CLEAN_CHECKOUT");
+        }
+
+        public String selectType()
+        {
+            return "zutubi.antTypeConfig";
+        }
+
+        public void typeState(AddProjectWizard.TypeState form)
+        {
+            form.finishFormElements(null, "build.xml", null, null);
+        }
     }
 }

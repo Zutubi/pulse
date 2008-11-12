@@ -6,22 +6,17 @@ import com.zutubi.pulse.master.tove.config.project.ResourceVersionConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.TextUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.Hashtable;
 
 /**
  * Test for agent resources and project resource requirements.
  */
-@Test(dependsOnGroups = "init.*", groups = "xmlrpc")
 public class ResourceXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private String random;
     private String resourcesPath;
 
-    @BeforeMethod
     public void setUp() throws Exception
     {
         super.setUp();
@@ -31,7 +26,6 @@ public class ResourceXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         resourcesPath = PathUtils.getPath(agentPath, "resources");
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

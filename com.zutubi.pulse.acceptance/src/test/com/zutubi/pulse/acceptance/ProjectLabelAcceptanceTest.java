@@ -3,26 +3,20 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.Hashtable;
 
 /**
  * Acceptance tests that verify categorisation of projects using labels.
  */
-@Test(dependsOnGroups = {"init.*"})
 public class ProjectLabelAcceptanceTest extends SeleniumTestBase
 {
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

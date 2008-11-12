@@ -19,7 +19,6 @@ import java.util.List;
 public class GitClientTest extends PulseTestCase
 {
     private File tmp;
-    private String repository;
     private GitClient client;
     private File workingDir;
     private PulseExecutionContext context;
@@ -39,7 +38,7 @@ public class GitClientTest extends PulseTestCase
 
         File repositoryBase = new File(tmp, "repo");
 
-        repository = "file://" + repositoryBase.getCanonicalPath();
+        String repository = "file://" + repositoryBase.getCanonicalPath();
 
         client = new GitClient(repository, "master");
 
@@ -56,13 +55,6 @@ public class GitClientTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         removeDirectory(tmp);
-        tmp = null;
-        client = null;
-        repository = null;
-        handler = null;
-        workingDir = null;
-        context = null;
-        scmContext = null;
 
         super.tearDown();
     }
@@ -162,7 +154,6 @@ public class GitClientTest extends PulseTestCase
 
     public void testUpdate() throws ScmException
     {
-        client.setBranch("master");
         client.checkout(context, null, handler);
         assertEquals(7, handler.getStatusMessages().size());
         assertTrue(handler.getStatusMessages().contains("Branch local set up to track remote branch refs/remotes/origin/master."));
@@ -186,7 +177,6 @@ public class GitClientTest extends PulseTestCase
 
     public void testUpdateToRevision() throws ScmException, IOException, ParseException
     {
-        client.setBranch("master");
         client.checkout(context, null, handler);
         assertEquals("", IOUtils.fileToString(new File(workingDir, "a.txt")));
 
@@ -198,7 +188,6 @@ public class GitClientTest extends PulseTestCase
 
     public void testChanges() throws ScmException
     {
-        client.setBranch("master");
         client.init(scmContext, new ScmFeedbackAdapter());
         List<Changelist> changes = client.getChanges(scmContext, new Revision("HEAD~2"), null);
         assertEquals(2, changes.size());
@@ -206,7 +195,6 @@ public class GitClientTest extends PulseTestCase
 
     public void testHeadChanges() throws ScmException
     {
-        client.setBranch("master");
         client.init(scmContext, new ScmFeedbackAdapter());
 
         List<Changelist> changes = client.getChanges(scmContext, new Revision("HEAD~1"), new Revision("HEAD"));
@@ -221,6 +209,27 @@ public class GitClientTest extends PulseTestCase
         assertEquals("a.txt", change.getPath());
     }
 
+    public void testBrowse() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+
+        List<ScmFile> files = client.browse(scmContext, "", null);
+        assertEquals(3, files.size());
+        assertEquals("a.txt", files.get(0).getName());
+        assertEquals("b.txt", files.get(1).getName());
+        assertEquals("c.txt", files.get(2).getName());
+    }
+
+    public void testBrowseNotAvailableWhenContextNotAvailable()
+    {
+        assertFalse(client.getCapabilities(false).contains(ScmCapability.BROWSE));
+    }
+
+    public void testBrowseAvailableWhenContextAvailable()
+    {
+        assertTrue(client.getCapabilities(true).contains(ScmCapability.BROWSE));
+    }
+
     private void assertFiles(File base, String... filenames)
     {
         for (String filename : filenames)
@@ -231,7 +240,7 @@ public class GitClientTest extends PulseTestCase
 
     private void assertGitDir(File workingDir)
     {
-        assertTrue(new File(workingDir, ".git").isDirectory());
+        assertTrue(new File(workingDir, GitClient.GIT_REPOSITORY_DIRECTORY).isDirectory());
     }
 
 }

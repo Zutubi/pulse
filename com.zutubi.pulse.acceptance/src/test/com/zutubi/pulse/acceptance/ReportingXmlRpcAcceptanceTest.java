@@ -5,9 +5,6 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,17 +15,14 @@ import java.util.Vector;
  * Tests for the remote API, primarily the reporting functionality.
  * Configration functions are tested in {@link ConfigXmlRpcAcceptanceTest}.
  */
-@Test(dependsOnGroups = "init.*", groups = "xmlrpc")
 public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         logout();
@@ -113,7 +107,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         String userPath = xmlRpcHelper.insertTrivialUser(login);
         String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
-        
+
         xmlRpcHelper.logout();
         xmlRpcHelper.login(login, "");
         String dashboardPath = PathUtils.getPath(userPath, "preferences", "dashboard");
@@ -193,7 +187,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             build = xmlRpcHelper.getBuild(projectName, 1);
         }
-        while(build == null || !Boolean.TRUE.equals(build.get("completed")));
+        while (build == null || !Boolean.TRUE.equals(build.get("completed")));
 
         assertEquals(1, build.get("id"));
         assertEquals(projectName, build.get("project"));
@@ -207,7 +201,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
             xmlRpcHelper.getBuild("this is a made up project", 1);
             fail();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             assertTrue(e.getMessage().contains("Unknown project 'this is a made up project'"));
         }
@@ -225,7 +219,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String projectName = randomName();
         insertSimpleProject(projectName);
         xmlRpcHelper.runBuild(projectName, 60000);
-        
+
         assertTrue(xmlRpcHelper.deleteBuild(projectName, 1));
         assertNull(xmlRpcHelper.getBuild(projectName, 1));
     }
@@ -237,7 +231,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
             xmlRpcHelper.deleteBuild("this is a made up project", 1);
             fail();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             assertTrue(e.getMessage().contains("Unknown project 'this is a made up project'"));
         }
@@ -265,6 +259,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private interface GetAllHelper
     {
         Vector<String> get() throws Exception;
+
         void add(String name) throws Exception;
     }
 }

@@ -82,14 +82,12 @@ public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
 
     public void testBrowse() throws ScmException
     {
-        // currently not supported since the implementation does not work in all necessary cases.
-        // super.testBrowse();
+        super.testBrowse();
     }
 
     public void testAttemptingToBrowseFile() throws ScmException
     {
-        // currently not supported since the implementation does not work in all necessary cases.
-        // super.testAttemptingToBrowseFile();
+        super.testAttemptingToBrowseFile();
     }
 
     public void testGetLatestRevision() throws ScmException

@@ -3,9 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.setup.*;
 import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -18,14 +15,12 @@ import java.io.IOException;
  * having multiple test methods, there is one testSetupProcess method that is breaks up the setup
  * process and handles all of the validation testing as it goes.
  */
-@Test(groups = "init.setup")
 public class SetupAcceptanceTest extends SeleniumTestBase
 {
     public String licenseKey;
     public String expiredLicenseKey;
     public String invalidLicenseKey;
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -35,7 +30,6 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         super.tearDown();

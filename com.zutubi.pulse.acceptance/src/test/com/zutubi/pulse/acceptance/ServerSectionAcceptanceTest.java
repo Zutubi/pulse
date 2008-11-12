@@ -3,23 +3,17 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerInfoPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerMessagesPage;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * Acceptance tests for the server section of the reporting UI.
  */
-@Test(dependsOnGroups = {"init.*"})
 public class ServerSectionAcceptanceTest extends SeleniumTestBase
 {
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         super.tearDown();
@@ -50,7 +44,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         try
         {
-            for(int i = 0; i < 100; i++)
+            for (int i = 0; i < 100; i++)
             {
                 xmlRpcHelper.logError("Test error message " + i);
             }

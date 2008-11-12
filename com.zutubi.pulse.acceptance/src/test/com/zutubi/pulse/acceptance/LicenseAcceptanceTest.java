@@ -134,7 +134,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         assertExceeded();
 
         // Adding a project should fail
-        AddProjectWizard.AntState state = runProjectWizard(random + "-2", false, ProjectManager.GLOBAL_PROJECT_NAME);
+        AddProjectWizard.TypeState state = runAddProjectWizard(new DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random+"-2", false));
         state.waitFor();
         assertTextPresent("Unable to add project: license limit exceeded");
     }

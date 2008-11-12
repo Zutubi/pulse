@@ -219,7 +219,8 @@ public interface ScmClient extends Closeable
      * <p/>
      * Required for {@link ScmCapability#BROWSE}.
      *
-     * @param context  defines the scm context in which the operation is being run
+     * @param context  defines the scm context in which the operation is being run.
+     *                  This context may be null.
      * @param path     the path to list (relative to the root of the connection,
      *                 i.e. an empty string is valid and means "list the root").
      * @param revision revision at which to browse, or null for the latest

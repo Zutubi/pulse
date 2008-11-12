@@ -10,6 +10,7 @@ import com.zutubi.util.TextUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileFilter;
 import java.util.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -35,6 +36,8 @@ public class GitClient implements ScmClient
      * operation and are subsequently deleted.
      */
     private static final String TMP_BRANCH_PREFIX = "tmp.";
+
+    private static final FileFilter GIT_DIRECTORY_FILTER = new GitDirectoryFilter();
 
     private static final Set<ScmCapability> CAPABILITIES = new HashSet<ScmCapability>();
 
@@ -70,6 +73,8 @@ public class GitClient implements ScmClient
      * The source repositories branch name.
      */
     private String branch;
+
+    public static final String GIT_REPOSITORY_DIRECTORY = ".git";
 
     public GitClient(String repository, String branch)
     {
@@ -343,7 +348,7 @@ public class GitClient implements ScmClient
 
     private boolean isGitRepository(File dir)
     {
-        return new File(dir, ".git").isDirectory();
+        return new File(dir, GIT_REPOSITORY_DIRECTORY).isDirectory();
     }
 
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
@@ -431,19 +436,12 @@ public class GitClient implements ScmClient
 
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
-        synchronized (context)
+        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        try
         {
             File workingDir = context.getPersistentWorkingDir();
 
             preparePersistentDirectory(workingDir);
-
-            if (revision != null)
-            {
-                // reset to the requested revision.  We expect the requested revision to be in the log.
-                NativeGit git = new NativeGit();
-                git.setWorkingDirectory(workingDir);
-                git.checkout(null, revision.getRevisionString(), TMP_BRANCH_PREFIX + revision.getRevisionString());
-            }
 
             ScmFile parent = new ScmFile(path);
             File base = new File(workingDir, path);
@@ -454,13 +452,17 @@ public class GitClient implements ScmClient
             List<ScmFile> listing = new LinkedList<ScmFile>();
             if (base.isDirectory())
             {
-                for (File file : base.listFiles())
+                for (File file : base.listFiles(GIT_DIRECTORY_FILTER))
                 {
                     ScmFile f = new ScmFile(parent, file.getName(), file.isDirectory());
                     listing.add(f);
                 }
             }
             return listing;
+        }
+        finally
+        {
+            context.unlock();
         }
     }
 
@@ -494,5 +496,13 @@ public class GitClient implements ScmClient
     public void setBranch(String branch)
     {
         this.branch = branch;
+    }
+
+    private static class GitDirectoryFilter implements FileFilter
+    {
+        public boolean accept(File file)
+        {
+            return !(file.isDirectory() && file.getName().equals(GIT_REPOSITORY_DIRECTORY));
+        }
     }
 }
