@@ -10,6 +10,7 @@ import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.SystemUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
@@ -85,6 +86,9 @@ public class AgentFileSystemTest extends PulseTestCase
 
         FileObject fo = fileSystemManager.resolveFile("agent://1234");
 
-        assertEquals(listRoots.length,  fo.getChildren().length);
+        if (SystemUtils.IS_WINDOWS)
+        {
+            assertEquals(listRoots.length,  fo.getChildren().length);
+        }
     }
 }
