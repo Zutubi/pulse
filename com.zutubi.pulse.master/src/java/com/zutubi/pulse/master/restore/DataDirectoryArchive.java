@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.HSQLDBUtils;
+import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.FileSystemUtils;
 
@@ -19,6 +20,8 @@ import java.io.IOException;
  */
 public class DataDirectoryArchive extends AbstractArchiveableComponent
 {
+    private static final String DATABASE_FILE_PREFIX = SimpleMasterConfigurationManager.DATABASE_CONFIG_FILE_PREFIX;
+
     private MasterUserPaths paths;
     private DatabaseConsole databaseConsole;
     private DataSource dataSource;
@@ -112,7 +115,7 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
             {
                 // does the file already exist? and if so, is it a database file?. If so, do not overwrite it.
                 File target = new File(dest, file.getName());
-                if (!target.exists() || !file.getName().startsWith("database"))
+                if (!target.exists() || !file.getName().startsWith(DATABASE_FILE_PREFIX))
                 {
                     FileSystemUtils.copy(dest, file);
                 }
@@ -161,7 +164,7 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
                 {
                     cleanup(file);
                 }
-                if (!file.getName().startsWith("database"))
+                if (!file.getName().startsWith(DATABASE_FILE_PREFIX))
                 {
                     FileSystemUtils.delete(file);
                 }

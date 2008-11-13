@@ -24,6 +24,8 @@ import java.util.Properties;
  */
 public class SimpleMasterConfigurationManager extends AbstractConfigurationManager implements MasterConfigurationManager
 {
+    public static final String DATABASE_CONFIG_FILE_PREFIX = "database";
+
     private SystemConfiguration sysConfig;
     private DatabaseConfig dbConfig;
     private DriverRegistry driverRegistry;
@@ -84,7 +86,7 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
         MasterUserPaths userPaths = getUserPaths();
         if (userPaths != null)
         {
-            return new File(userPaths.getUserConfigRoot(), "database.properties");
+            return new File(userPaths.getUserConfigRoot(), DATABASE_CONFIG_FILE_PREFIX +".properties");
         }
         return null;
     }
@@ -103,7 +105,7 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
                     p.putAll(IOUtils.read(configFile));
                 }
 
-                configFile = new File(getUserPaths().getUserConfigRoot(), "database.user.properties");
+                configFile = new File(getUserPaths().getUserConfigRoot(), DATABASE_CONFIG_FILE_PREFIX +".user.properties");
                 if (configFile.exists())
                 {
                     p.putAll(IOUtils.read(configFile));
