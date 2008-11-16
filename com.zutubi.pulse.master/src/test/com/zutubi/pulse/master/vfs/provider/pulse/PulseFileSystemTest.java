@@ -9,16 +9,19 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
+import com.zutubi.pulse.master.xwork.actions.vfs.FileDepthFilterSelector;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.WiringObjectFactory;
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.mockito.Matchers;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 public class PulseFileSystemTest extends PulseTestCase
 {
@@ -90,31 +93,41 @@ public class PulseFileSystemTest extends PulseTestCase
 
         registerProject(project);
 
-        ScmRootFileObject obj = (ScmRootFileObject) fileSystemManager.resolveFile("pulse:///projects/"+id+"/scm");
-        assertTrue(obj.exists());
+        ScmRootFileObject scm = (ScmRootFileObject) fileSystemManager.resolveFile("pulse:///projects/"+id+"/scm");
+        assertTrue(scm.exists());
 
-        // not sure why we have this dude in the middle, will probably remove him.
-        assertEquals(1, obj.getChildren().length);
+        stub(client.browse(null, "", null)).toReturn(Arrays.asList(new ScmFile("1.txt"), new ScmFile("b.dir", true)));
+        stub(client.browse(null, "b.dir", null)).toReturn(asFiles("a.txt", "b.txt", "c.txt", "d.txt"));
 
-        ScmFileObject scmFileObject = (ScmFileObject) obj.getChildren()[0];
-        assertEquals("scm", scmFileObject.getName().getBaseName());
+        List<FileObject> selected = new LinkedList<FileObject>();
+        scm.findFiles(new FileDepthFilterSelector(new AcceptFileFilter(), 1), true, selected);
+        assertEquals(2, selected.size());
 
-        stub(client.browse(null, "", null)).toReturn(Arrays.asList(new ScmFile("a"), new ScmFile("b", true)));
-        stub(client.browse(null, "b", null)).toReturn(new LinkedList<ScmFile>());
-
-        FileObject[] listing = scmFileObject.getChildren();
-        assertEquals(2, listing.length);
-        assertEquals("a", listing[0].getName().getBaseName());
-        FileObject b = listing[1];
-        assertEquals("b", b.getName().getBaseName());
+        FileObject b = selected.get(1);
+        assertEquals("b.dir", b.getName().getBaseName());
         assertEquals(FileType.FOLDER, b.getType());
+        selected.clear();
+        b.findFiles(new FileDepthFilterSelector(new AcceptFileFilter(), 1), true, selected);
+        assertEquals(4, selected.size());
+        assertEquals("a.txt", selected.get(0).getName().getBaseName());
 
+        assertEquals(b, selected.get(0).getParent());
+
+/*
         verify(client, times(1)).browse(null, "", null);
+        verify(client, times(1)).browse(null, "b.dir", null);
+*/
+    }
 
-        listing = b.getChildren();
-        assertEquals(0, listing.length);
-
-        verify(client, times(1)).browse(null, "b", null);
+    private List<ScmFile> asFiles(String... filenames)
+    {
+        return CollectionUtils.map(Arrays.asList(filenames), new Mapping<String, ScmFile>()
+        {
+            public ScmFile map(String s)
+            {
+                return new ScmFile(s);
+            }
+        });
     }
 
     private Project createProject(long id)
@@ -132,5 +145,13 @@ public class PulseFileSystemTest extends PulseTestCase
     {
         stub(projectManager.getProject(eq(project.getId()), Matchers.anyBoolean())).toReturn(project);
         stub(projectManager.getProjectConfig(eq(project.getId()), Matchers.anyBoolean())).toReturn(project.getConfig());
+    }
+
+    private static class AcceptFileFilter implements FileFilter
+    {
+        public boolean accept(final FileSelectInfo fileInfo)
+        {
+            return true;
+        }
     }
 }

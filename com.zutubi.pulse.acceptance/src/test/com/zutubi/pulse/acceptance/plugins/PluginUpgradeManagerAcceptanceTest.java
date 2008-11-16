@@ -5,25 +5,17 @@ import com.zutubi.pulse.core.plugins.PluginManagerTest;
 import com.zutubi.pulse.core.plugins.PluginPaths;
 import com.zutubi.pulse.core.plugins.PluginRegistryEntry;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.plugins.PluginUpgradeManager;
 import com.zutubi.pulse.master.upgrade.DefaultUpgradeManager;
 import com.zutubi.pulse.master.upgrade.UpgradeTask;
 import com.zutubi.pulse.master.upgrade.UpgradeableComponent;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.List;
 
-/**
- *
- *
- */
-@Test
 public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 {
     private PluginUpgradeManager pluginUpgradeManager;
@@ -37,7 +29,6 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
     private PluginSystem pluginSystem;
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -64,7 +55,6 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         objectFactory = new DefaultObjectFactory();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         pluginSystem.shutdown();

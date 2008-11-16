@@ -19,10 +19,10 @@ ${form.name}.items.last().on('browse', function(field)
      projectPath = 'wizards/${field.parameters.parentPath}';
 </#if>
 
-    var prefix = 'scm';
+    var prefix = '';
 <#if field.parameters.baseDirField?exists>
     var dirField = Ext.getCmp('zfid.${field.parameters.baseDirField}')
-    prefix += '/' + dirField.getValue();
+    prefix += dirField.getValue();
 </#if>
 
     openSCMSelectDialog('${base}', true, '${form.name}', field.name, projectPath, prefix, '/');

@@ -20,23 +20,24 @@ import java.util.Collection;
  */
 public class PulseFileSystem extends AbstractFileSystem
 {
-    private RootFileObject rootFile;
+    private Class<? extends FileObject> rootFileType;
+    
     private ObjectFactory objectFactory;
     private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
+    private FileObject rootFile;
 
-    public PulseFileSystem(final FileName rootName, final FileObject parentLayer, final FileSystemOptions fileSystemOptions)
+    public PulseFileSystem(final FileName rootName, final FileObject parentLayer, final FileSystemOptions fileSystemOptions, Class<? extends FileObject> rootFileType)
     {
         super(rootName, parentLayer, fileSystemOptions);
+        this.rootFileType = rootFileType;
     }
 
     /**
      * Factory method used by the vfs system to delegate the creation of pulse file objects.
      *
-     * @param fileName  the name representing the new file object.
-     *
+     * @param fileName the name representing the new file object.
      * @return the new file object instance.
-     *
      * @throws Exception
      */
     protected FileObject createFile(final FileName fileName) throws Exception
@@ -44,29 +45,20 @@ public class PulseFileSystem extends AbstractFileSystem
         // If the file name represents to the root path, then we return the root file object.
         // This is a virtual node that defines the root level data folders.
         String path = fileName.getPath();
-        if (path.equals(FileName.ROOT_PATH))
-        {
-            if(rootFile == null)
-            {
-                rootFile = objectFactory.buildBean(RootFileObject.class,
-                                                   new Class[]{FileName.class, AbstractFileSystem.class},
-                                                   new Object[]{fileName, this}
-                );
-                rootFile.init();
-            }
 
-            return rootFile;
+        if (FileName.ROOT_PATH.equals(path))
+        {
+            return getRootFile(fileName);
         }
 
         // Delegate the creation of a file object to its parent.
         FileName parentFileName = fileName.getParent();
-        AbstractPulseFileObject pfo = (AbstractPulseFileObject) this.resolveFile(parentFileName);
-        if (pfo != null)
+        AbstractPulseFileObject parent = (AbstractPulseFileObject) this.resolveFile(parentFileName);
+        if (parent != null)
         {
-            AbstractPulseFileObject newFile = pfo.createFile(fileName);
+            AbstractPulseFileObject newFile = parent.createFile(fileName);
             if (newFile != null)
             {
-                newFile.init();
                 return newFile;
             }
             else
@@ -80,6 +72,21 @@ public class PulseFileSystem extends AbstractFileSystem
         throw new FileSystemException(String.format("failed to resolve the requested file: '%s'", fileName.getPath()));
     }
 
+    private FileObject getRootFile(FileName fileName) throws Exception
+    {
+        synchronized(this)
+        {
+            if (rootFile == null)
+            {
+                rootFile = objectFactory.buildBean(rootFileType,
+                        new Class[]{FileName.class, AbstractFileSystem.class},
+                        new Object[]{fileName, this}
+                );
+            }
+            return rootFile;
+        }
+    }
+
     protected void addCapabilities(Collection caps)
     {
         caps.addAll(PulseFileProvider.CAPABILITIES);
@@ -88,9 +95,8 @@ public class PulseFileSystem extends AbstractFileSystem
     /**
      * Provide a utility method for retrieving a build recipies base file system path.
      *
-     * @param buildId       the build id
-     * @param recipeId      the recipe id
-     *
+     * @param buildId  the build id
+     * @param recipeId the recipe id
      * @return the base.dir for the specified builds recipe.
      */
     protected File getBaseDir(Long buildId, Long recipeId)

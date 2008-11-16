@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
@@ -48,7 +47,9 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     /**
      * Every implementation of the pulse file object is responsible for the creation of its own children
      * via this factory method.
-     * 
+     * <p>
+     * Note: this may be called when the file is not attached.
+     *
      * @param fileName  is the name of the child file.
      *
      * @return the child file object instance.
@@ -111,16 +112,6 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     }
 
     /**
-     * Override this method if you need a post creation callback in which the wiried depenedencies are
-     * available.
-     *  
-     */
-    public void init()
-    {
-        
-    }
-
-    /**
      * This method searches through the file object hierarchy looking for, and returning when found, a file object
      * that matches the specified type.
      *
@@ -132,9 +123,7 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      */
     public <T> T getAncestor(Class<T> type) throws FileSystemException
     {
-        for(AbstractPulseFileObject ancestor = this;
-            ancestor != null;
-            ancestor = (AbstractPulseFileObject) ancestor.getParent())
+        for(AbstractPulseFileObject ancestor = this; ancestor != null; ancestor = (AbstractPulseFileObject) ancestor.getParent())
         {
             if (type.isInstance(ancestor))
             {

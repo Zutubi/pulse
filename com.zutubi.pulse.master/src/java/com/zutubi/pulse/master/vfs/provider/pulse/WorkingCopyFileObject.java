@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
+import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -14,10 +14,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class comment/>
  */
 public class WorkingCopyFileObject extends AbstractPulseFileObject implements AddressableFileObject
 {
+    private static final Logger LOG = Logger.getLogger(WorkingCopyFileObject.class);
+
     private final File base;
 
     public WorkingCopyFileObject(final FileName name, final File base, final AbstractFileSystem fs)
@@ -50,7 +51,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
         if (base.isFile())
         {
             List<FileAction> actions = new LinkedList<FileAction>();
-            actions.add(new FileAction("download", getUrlPath()));
+            actions.add(new FileAction(FileAction.TYPE_DOWNLOAD, getUrlPath()));
             return actions;
         }
         return super.getActions();
@@ -84,7 +85,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
         }
         catch (FileSystemException e)
         {
-            e.printStackTrace();
+            LOG.warning(e);
             return "";
         }
     }
@@ -122,7 +123,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            LOG.warning(e);
             return false;
         }
     }

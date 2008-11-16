@@ -13,6 +13,7 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
+import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;

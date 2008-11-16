@@ -9,11 +9,14 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * <class comment/>
+ * The PulseFileProvider is the FileProvider implementation that integrations the
+ * PulseFileSystem into the VFS.
  */
 public class PulseFileProvider extends AbstractOriginatingFileProvider
 {
     private ObjectFactory objectFactory;
+
+    private Class<? extends FileObject> rootFileType = RootFileObject.class;
 
     final static Collection CAPABILITIES = Collections.unmodifiableCollection(Arrays.asList(
         Capability.GET_TYPE,
@@ -32,8 +35,8 @@ public class PulseFileProvider extends AbstractOriginatingFileProvider
         try
         {
             return objectFactory.buildBean(PulseFileSystem.class,
-                    new Class[]{FileName.class, FileObject.class, FileSystemOptions.class}, 
-                    new Object[]{rootName, null, fileSystemOptions}
+                    new Class[]{FileName.class, FileObject.class, FileSystemOptions.class, Class.class}, 
+                    new Object[]{rootName, null, fileSystemOptions, rootFileType}
             );
         }
         catch (Exception e)
@@ -45,6 +48,19 @@ public class PulseFileProvider extends AbstractOriginatingFileProvider
     public Collection getCapabilities()
     {
         return CAPABILITIES;
+    }
+
+    /**
+     * Set the root file type to be used by the generated PulseFileSystem.  This root file type
+     * defines the file structure that will be available through the PulseFileSystem.
+     *
+     * @param rootFileType the root file type.
+     *
+     * @see com.zutubi.pulse.master.vfs.provider.pulse.RootFileObject
+     */
+    public void setRootFileType(Class<? extends FileObject> rootFileType)
+    {
+        this.rootFileType = rootFileType;
     }
 
     /**

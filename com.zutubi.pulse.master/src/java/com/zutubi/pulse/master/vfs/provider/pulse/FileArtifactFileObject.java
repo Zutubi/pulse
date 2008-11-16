@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
@@ -18,9 +17,6 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * <class comment/>
- */
 public class FileArtifactFileObject extends AbstractPulseFileObject implements AddressableFileObject, FileArtifactProvider
 {
     private static final Logger LOG = Logger.getLogger(FileArtifactFileObject.class);
@@ -122,7 +118,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
         List<FileAction> actions = new LinkedList<FileAction>();
         if (base.isFile())
         {
-            actions.add(new FileAction("download", getUrlPath()));
+            actions.add(new FileAction(FileAction.TYPE_DOWNLOAD, getUrlPath()));
         }
         if (canDecorate())
         {
@@ -131,7 +127,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
                 BuildResult build = getAncestor(BuildResultProvider.class).getBuildResult();
                 CommandResult command = getAncestor(CommandResultProvider.class).getCommandResult();
                 String url = new Urls("").commandArtifacts(build, command) + getFileArtifact().getPathUrl() + "/";
-                actions.add(new FileAction("decorate", url));
+                actions.add(new FileAction(FileAction.TYPE_DECORATE, url));
             }
             catch (Exception e)
             {

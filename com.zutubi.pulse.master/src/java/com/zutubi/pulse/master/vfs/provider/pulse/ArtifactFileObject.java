@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -14,7 +13,6 @@ import java.util.List;
 
 /**
  * The LocalArtifact File Object represents a StoredArtifact instance.
- * 
  */
 public class ArtifactFileObject extends AbstractPulseFileObject implements ArtifactProvider, AddressableFileObject
 {
@@ -136,15 +134,15 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         List<FileAction> actions = new ArrayList<FileAction>(3);
         if(isLinkArtifact)
         {
-            actions.add(new FileAction("link", getUrlPath()));
+            actions.add(new FileAction(FileAction.TYPE_LINK, getUrlPath()));
         }
         else if (getArtifactBase().isDirectory())
         {
             if (isHtmlArtifact)
             {
-                actions.add(new FileAction("download", getUrlPath()));
+                actions.add(new FileAction(FileAction.TYPE_DOWNLOAD, getUrlPath()));
             }
-            actions.add(new FileAction("archive", "/zip.action?path=" + getName().getURI()));
+            actions.add(new FileAction(FileAction.TYPE_ARCHIVE, "/zip.action?path=" + getName().getURI()));
         }
         return actions;
     }
