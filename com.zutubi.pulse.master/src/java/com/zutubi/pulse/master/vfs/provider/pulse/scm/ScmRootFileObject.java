@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
-import com.zutubi.pulse.master.vfs.provider.pulse.ScmProvider;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -20,7 +19,7 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
  * for the list of files and folders to be displayed.  From each of these, it
  * generates a new ScmFileObject which can then be navigated in turn.
  */
-public class ScmRootFileObject extends AbstractScmFileObject implements ScmProvider
+public class ScmRootFileObject extends AbstractScmFileObject
 {
     /**
      * The displayName of the root scm file object is the scm location.
@@ -36,7 +35,7 @@ public class ScmRootFileObject extends AbstractScmFileObject implements ScmProvi
     {
         try
         {
-            ScmConfiguration scm = getAncestor(ScmProvider.class).getScm();
+            ScmConfiguration scm = getAncestor(ProjectConfigProvider.class).getProjectConfig().getScm();
             displayName = ScmClientUtils.withScmClient(scm, scmManager, new ScmClientUtils.ScmAction<String>()
             {
                 public String process(ScmClient scmClient) throws ScmException
