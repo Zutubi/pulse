@@ -21,14 +21,8 @@ public class LocalFileSystemTest extends PulseTestCase
         fileSystemManager.init();
     }
 
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testResolveRootPathOnWindows() throws FileSystemException
     {
-        // should list the roots of the local file system.
         if (!SystemUtils.IS_WINDOWS)
         {
             return;
@@ -41,7 +35,6 @@ public class LocalFileSystemTest extends PulseTestCase
 
     public void testRootPathListingOnWindows() throws FileSystemException
     {
-        // should list the roots of the local file system.
         if (!SystemUtils.IS_WINDOWS)
         {
             return;
@@ -56,7 +49,6 @@ public class LocalFileSystemTest extends PulseTestCase
 
     public void testResolveCDriveOnWindows() throws FileSystemException
     {
-        // should list the roots of the local file system.
         if (!SystemUtils.IS_WINDOWS)
         {
             return;
@@ -68,7 +60,6 @@ public class LocalFileSystemTest extends PulseTestCase
 
     public void testCDriveListingOnWindows() throws FileSystemException
     {
-        // should list the roots of the local file system.
         if (!SystemUtils.IS_WINDOWS)
         {
             return;

@@ -48,11 +48,6 @@ public class AgentFileSystemTest extends PulseTestCase
         fileSystemManager.init();
     }
 
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testSimpleListingOfAgentFileSystem() throws FileSystemException
     {
         Agent agent = mock(Agent.class);

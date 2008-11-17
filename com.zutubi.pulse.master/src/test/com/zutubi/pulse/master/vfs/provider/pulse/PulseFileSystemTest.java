@@ -60,15 +60,13 @@ public class PulseFileSystemTest extends PulseTestCase
         assertEquals(0, obj.getChildren().length);
     }
 
-    public void testListingProectsWithChildren() throws FileSystemException
+    public void testListingProjectsWithChildren() throws FileSystemException
     {
-        Project project = new Project();
-        project.setId(1);
-        stub(projectManager.getProjects(false)).toReturn(Arrays.asList(project));
+        Project project = createProject(1);
+        registerProject(project);
 
         FileObject obj = fileSystemManager.resolveFile("pulse:///projects");
         assertTrue(obj.exists());
-        // NOTE: the projects object currently does not support listing for performance reasons.
         assertEquals(0, obj.getChildren().length);
     }
 

@@ -61,10 +61,6 @@ public class PulseFileSystem extends AbstractFileSystem
             {
                 return newFile;
             }
-            else
-            {
-                return null;
-            }
         }
 
         // We were unable to resolve the parent file. This means we have no way of knowing what we should be creating.
