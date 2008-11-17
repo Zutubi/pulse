@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.project.types;
 import com.zutubi.pulse.master.tove.config.project.BrowseScmDirAction;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.util.TextUtils;
 import com.zutubi.validation.annotations.ValidRegex;
 import org.apache.velocity.VelocityContext;
@@ -18,10 +19,13 @@ public class Maven2TypeConfiguration extends TemplateTypeConfiguration
     @BrowseScmDirAction
     private String workingDir;
     private String arguments;
+    @Wizard.Ignore
     @ValidRegex
     private String suppressError;
+    @Wizard.Ignore
     @ValidRegex
     private String suppressWarning;
+    
     public String getGoals()
     {
         return goals;

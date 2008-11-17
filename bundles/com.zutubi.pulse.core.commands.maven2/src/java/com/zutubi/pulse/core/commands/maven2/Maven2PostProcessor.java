@@ -75,28 +75,18 @@ public class Maven2PostProcessor extends PostProcessorGroup
         add(failurePP);
     }
 
-    public ExpressionElement createSuppressWarning(String expression)
+    public ExpressionElement createSuppressWarning()
     {
         ExpressionElement element = new ExpressionElement();
         warningPattern.addExclusion(element);
         return element;
     }
 
-    public ExpressionElement createSuppressError(String expression)
+    public ExpressionElement createSuppressError()
     {
         ExpressionElement element = new ExpressionElement();
         errorPattern.addExclusion(element);
         return element;
-    }
-
-    public void addSuppressWarning(ExpressionElement element)
-    {
-        warningPattern.addExclusion(element);
-    }
-
-    public void addSuppressError(ExpressionElement element)
-    {
-        errorPattern.addExclusion(element);
     }
 
     public void setFailOnError(boolean fail)

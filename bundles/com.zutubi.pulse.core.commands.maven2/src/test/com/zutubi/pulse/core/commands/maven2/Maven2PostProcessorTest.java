@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.maven2;
 
-import com.zutubi.pulse.core.ExpressionElement;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
 import com.zutubi.util.SystemUtils;
@@ -46,7 +45,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testSuppressAllWarnings() throws Exception
     {
-        pp.addSuppressWarning(new ExpressionElement(Pattern.compile(".*")));
+        pp.createSuppressWarning().setPattern(Pattern.compile(".*"));
         CommandResult result = createAndProcessArtifact("warnings", pp);
         assertTrue(result.succeeded());
         assertEquals(0, artifact.getFeatures().size());
@@ -54,12 +53,15 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testSuppressWarning() throws Exception
     {
-        pp.addSuppressWarning(new ExpressionElement(Pattern.compile(".*jar from forked lifecycle.*")));
+        // Turn off context because it makes it difficult to see the right
+        // warning is suppressed.
+        pp.setLeadingContext(0);
+        pp.setTrailingContext(0);
+        
+        pp.createSuppressWarning().setPattern(Pattern.compile("jar from forked lifecycle"));
         CommandResult result = createAndProcessArtifact("warnings", pp);
         assertTrue(result.succeeded());
-        assertWarnings("[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.\n" +
-                       "[WARNING] Another warning\n" +
-                       "[INFO] ----------------------------------------------------------------------------");
+        assertWarnings("[WARNING] Another warning");
     }
 
     public void testNoPOM() throws Exception
@@ -167,7 +169,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testSuppressError() throws Exception
     {
-        pp.addSuppressError(new ExpressionElement(Pattern.compile(".*too few arguments.*")));
+        pp.createSuppressError().setPattern(Pattern.compile("too few arguments"));
         CommandResult result = createAndProcessArtifact("successfulerror", pp);
         assertEquals(0, artifact.getFeatures().size());
         assertTrue(result.succeeded());
