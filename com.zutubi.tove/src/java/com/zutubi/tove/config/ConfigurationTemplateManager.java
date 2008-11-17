@@ -1,10 +1,10 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.tove.annotations.Wire;
 import com.zutubi.events.EventManager;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.*;
 import com.zutubi.tove.config.events.*;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.transaction.*;
 import com.zutubi.tove.type.*;
@@ -1193,10 +1193,9 @@ public class ConfigurationTemplateManager
 
                 CompositeType type = typeRegistry.getType(record.getSymbolicName());
 
-                // check readonly fields have not been altered.
                 ensureReadOnlyFieldsUnaltered(type, existingRecord, record);
 
-                MutableRecord newRecord = updateRecord(existingRecord, record, type);
+                MutableRecord newRecord = updateRecord(existingRecord, record);
                 boolean updated = true;
                 if (newPath.equals(path))
                 {
@@ -1250,22 +1249,7 @@ public class ConfigurationTemplateManager
                 String propertyName = property.getName();
                 Object existingValue = existingRecord.get(propertyName);
                 Object newValue = record.get(propertyName);
-                boolean different = false;
-                if (existingValue != null)
-                {
-                    if (!existingValue.equals(newValue))
-                    {
-                        different = true;
-                    }
-                }
-                else
-                {
-                    if (newValue != null)
-                    {
-                        different = true;
-                    }
-                }
-                if (different)
+                if (!RecordUtils.valuesEqual(existingValue, newValue))
                 {
                     throw new IllegalArgumentException("Attempt to change readOnly property " +
                             "'"+propertyName+"' from '"+existingValue+"' to '"+newValue+"' is not allowed.");
@@ -1360,7 +1344,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    private MutableRecord updateRecord(Record existingRecord, MutableRecord updates, CompositeType type)
+    private MutableRecord updateRecord(Record existingRecord, MutableRecord updates)
     {
         MutableRecord newRecord;
         if (existingRecord instanceof TemplateRecord)
@@ -1371,7 +1355,7 @@ public class ConfigurationTemplateManager
 
             // Scrub values from the incoming record where they are identical
             // to the existing record's parent.
-            scrubInheritedValues(templateRecord, newRecord, type);
+            scrubInheritedValues(templateRecord, newRecord);
         }
         else
         {
@@ -1408,7 +1392,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    public void scrubInheritedValues(TemplateRecord templateRecord, MutableRecord record, CompositeType type)
+    public void scrubInheritedValues(TemplateRecord templateRecord, MutableRecord record)
     {
         TemplateRecord existingParent = templateRecord.getParent();
         if (existingParent != null)
@@ -1657,12 +1641,12 @@ public class ConfigurationTemplateManager
                 }
 
                 String[] pathElements = PathUtils.getPathElements(path);
-                if(pathElements.length == 1)
+                if (pathElements.length == 1)
                 {
                     return false;
                 }
 
-                if(isTemplatedPath(path) && pathElements.length > 2)
+                if (isTemplatedPath(path) && pathElements.length > 2)
                 {
                     // We are deleting something inside a template: make sure
                     // it is not an inherited composite.
@@ -1864,6 +1848,17 @@ public class ConfigurationTemplateManager
         return result;
     }
 
+    /**
+     * Deletes all records that match the given path pattern and can be
+     * deleted.  Each matching path is passed to {@link #canDelete(String)}
+     * to determine if it is possible to delete.  If so, the record at the
+     * path is deleted, if not, the record is left untouched.
+     *
+     * @param pathPattern pattern to match paths to be deleted, may include
+     *                    wildcards (e.g. {@link PathUtils#WILDCARD_ANY_ELEMENT}).
+     * @return the number of records actually deleted, may be less than the
+     *         number of matching paths
+     */
     public int deleteAll(final String pathPattern)
     {
         return executeInsideTransaction(new Action<Integer>()
@@ -1871,11 +1866,16 @@ public class ConfigurationTemplateManager
             public Integer execute() throws Exception
             {
                 List<String> paths = recordManager.getAllPaths(pathPattern);
+                int deleted = 0;
                 for (String path : paths)
                 {
-                    delete(path);
+                    if (canDelete(path))
+                    {
+                        delete(path);
+                        deleted++;
+                    }
                 }
-                return paths.size();
+                return deleted;
             }
         });
     }
