@@ -32,6 +32,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(LicenseAcceptanceTest.class);
         suite.addTestSuite(DashboardAcceptanceTest.class);
         suite.addTestSuite(ServerSectionAcceptanceTest.class);
+        suite.addTestSuite(BrowseScmAcceptanceTest.class);
 
         //---( build tests )---
         suite.addTestSuite(BuildAcceptanceTest.class);

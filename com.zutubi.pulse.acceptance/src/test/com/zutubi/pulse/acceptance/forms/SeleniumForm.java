@@ -77,7 +77,7 @@ public abstract class SeleniumForm
         return selenium.isElementPresent(getFormName());
     }
 
-    private String getFieldId(String name)
+    protected String getFieldId(String name)
     {
         return "zfid." + name;
     }
