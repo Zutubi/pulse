@@ -2,25 +2,26 @@ package com.zutubi.pulse.master.tove.wizard.webwork;
 
 import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.i18n.Messages;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.ExtensionOptionProvider;
+import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.pulse.master.tove.model.FormDescriptor;
-import com.zutubi.tove.config.ConfigurationPersistenceManager;
-import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.pulse.master.tove.model.FormDescriptorFactory;
-import com.zutubi.pulse.master.tove.model.*;
-import com.zutubi.tove.type.*;
-import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.MutableRecordImpl;
-import com.zutubi.tove.type.record.Record;
-import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.pulse.master.tove.model.SelectFieldDescriptor;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 import com.zutubi.pulse.master.tove.wizard.Wizard;
 import com.zutubi.pulse.master.tove.wizard.WizardState;
 import com.zutubi.pulse.master.tove.wizard.WizardTransition;
 import static com.zutubi.pulse.master.tove.wizard.WizardTransition.*;
+import com.zutubi.tove.config.ConfigurationPersistenceManager;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.type.*;
+import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.MutableRecordImpl;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.TemplateRecord;
 
 import java.util.*;
 
@@ -456,7 +457,7 @@ public abstract class AbstractTypeWizard implements Wizard
             super.updateRecord(parameters);
             if(templateRecord != null)
             {
-                configurationTemplateManager.scrubInheritedValues(templateRecord, dataRecord, type);
+                configurationTemplateManager.scrubInheritedValues(templateRecord, dataRecord);
             }
         }
     }
