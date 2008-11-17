@@ -2,9 +2,9 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -13,8 +13,8 @@ import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import static org.mockito.Mockito.*;
-import org.mockito.stubbing.Answer;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.*;
 
@@ -347,6 +347,27 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         helper.createProjectsModels(config, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)));
         verify(buildManager).getLatestBuildResultsForProject(p1, 2);
         verifyNoMoreInteractions(buildManager);
+    }
+
+    public void testLabellingOfUngroupedSomeGroups()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        List<ProjectsModel> projectsModels = helper.createProjectsModels(config);
+        // Upgrouped projects come last.
+        ProjectsModel ungroup = projectsModels.get(projectsModels.size() - 1);
+        assertFalse(ungroup.isLabelled());
+        assertEquals("ungrouped projects", ungroup.getGroupName());
+    }
+
+    public void testLabellingOfUngroupedNoGroups()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        List<ProjectsModel> projectsModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>());
+
+        // When there are no other groups, don't use the "ungrouped" term
+        ProjectsModel ungroup = projectsModels.get(projectsModels.size() - 1);
+        assertFalse(ungroup.isLabelled());
+        assertEquals("projects", ungroup.getGroupName());
     }
 
     private void assertProjectsModelLists(List<ProjectsModel> expectedModels, List<ProjectsModel> gotModels)

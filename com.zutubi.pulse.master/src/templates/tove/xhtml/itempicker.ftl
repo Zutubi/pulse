@@ -3,6 +3,7 @@
 (function()
 {
 <#if parameters.list?exists>
+    <#-- od is short for optionData, shrunk to reduce javascript bloat -->
     var od = [];
 
     <#list parameters.list as item>

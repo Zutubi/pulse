@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.model.NamedEntityComparator;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
@@ -57,11 +59,12 @@ public class ProjectsModelsHelper
 
         if (projects.size() > 0)
         {
-            Collections.sort(projects, new ProjectComparator(stringComparator));
+            Collections.sort(projects, new NamedEntityComparator());
 
             // CIB-1550: Only label as ungrouped if there are some other
             // groups.
-            result.add(createModel(result.size() > 0 ? "ungrouped projects" : "projects", false, projects, hierarchy, configuration));
+            Messages messages = Messages.getInstance(ProjectsModelsHelper.class);
+            result.add(createModel(result.size() > 0 ? messages.format("projects.ungrouped") : messages.format("projects.all"), false, projects, hierarchy, configuration));
         }
 
         return result;

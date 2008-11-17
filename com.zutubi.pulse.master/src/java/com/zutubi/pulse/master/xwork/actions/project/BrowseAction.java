@@ -1,13 +1,15 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.core.model.NamedEntityComparator;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
-import com.zutubi.util.Sort;
 import com.zutubi.util.bean.ObjectFactory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Action for the main browse view which displays the status of all projects.
@@ -59,7 +61,7 @@ public class BrowseAction extends ProjectActionSupport
             }
         }
 
-        Collections.sort(invalidProjects, new ProjectComparator(new Sort.StringComparator()));
+        Collections.sort(invalidProjects, new NamedEntityComparator());
 
         ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
         models = helper.createProjectsModels(browseConfig);
