@@ -565,6 +565,11 @@ public class SubversionClient implements ScmClient
         try
         {
             SVNDirEntry entry = repository.info(".", SVNRevision.HEAD.getNumber());
+            if (entry == null)
+            {
+                throw new ScmException("Unable to retrieve latest revision: no repository found at '" + url + "'");
+            }
+            
             return new Revision(entry.getRevision());
         }
         catch (SVNException e)

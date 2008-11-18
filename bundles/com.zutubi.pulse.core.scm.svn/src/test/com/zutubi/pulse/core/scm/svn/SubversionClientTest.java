@@ -18,6 +18,8 @@ import java.util.List;
 public class SubversionClientTest extends PulseTestCase
 {
     private static final String MODULE_PATH = "bundles/com.zutubi.pulse.core.scm.svn";
+    private static final String USER = "jsankey";
+    private static final String PASSWORD = "password";
 
     private SubversionClient client;
     private File tmpDir;
@@ -108,34 +110,42 @@ public class SubversionClientTest extends PulseTestCase
 
         waitForServer(3690);
 
-        client = new SubversionClient("svn://localhost/test/trunk", "jsankey", "password");
+        client = new SubversionClient("svn://localhost/test/trunk", USER, PASSWORD);
     }
 
     protected void tearDown() throws Exception
     {
         IOUtils.close(client);
-        context = null;
-        client = null;
         serverProcess.destroy();
         serverProcess.waitFor();
-        serverProcess = null;
         removeDirectory(tmpDir);
-        tmpDir = null;
-        expectedDir = null;
-        gotDir = null;
         super.tearDown();
     }
 
     public void testGetLatestRevision() throws ScmException
     {
         IOUtils.close(client);
-        client = new SubversionClient("svn://localhost/", "jsankey", "password");
+        client = new SubversionClient("svn://localhost/", USER, PASSWORD);
         assertEquals("8", client.getLatestRevision(null).getRevisionString());
     }
 
     public void testGetLatestRevisionRestrictedToFiles() throws ScmException
     {
         assertEquals("4", client.getLatestRevision(null).getRevisionString());
+    }
+
+    public void testGetLatestRevisionBadRepository()
+    {
+        try
+        {
+            client = new SubversionClient("svn://localhost/no/such/repo", USER, PASSWORD);
+            client.getLatestRevision(null);
+            fail();
+        }
+        catch (ScmException e)
+        {
+            assertTrue(e.getMessage().contains("no repository found"));
+        }
     }
 
     public void testList() throws ScmException
@@ -167,7 +177,7 @@ public class SubversionClientTest extends PulseTestCase
 
         try
         {
-            confirmServer = new SubversionClient(TAG_PATH, "jsankey", "password");
+            confirmServer = new SubversionClient(TAG_PATH, USER, PASSWORD);
             List<ScmFile> files = getSortedListing(confirmServer);
 
             assertEquals(3, files.size());
@@ -202,7 +212,7 @@ public class SubversionClientTest extends PulseTestCase
         SubversionClient confirmServer = null;
         try
         {
-            confirmServer = new SubversionClient(TAG_PATH, "jsankey", "password");
+            confirmServer = new SubversionClient(TAG_PATH, USER, PASSWORD);
             List<ScmFile> files = getSortedListing(confirmServer);
 
             assertEquals(3, files.size());
