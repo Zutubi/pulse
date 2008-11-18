@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * The PulseFileProvider is the FileProvider implementation that integrations the
+ * The PulseFileProvider is the FileProvider implementation that integrates the
  * PulseFileSystem into the VFS.
  */
 public class PulseFileProvider extends AbstractOriginatingFileProvider

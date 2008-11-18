@@ -192,7 +192,7 @@ public abstract class SeleniumForm
         }
     }
 
-    public void setFormElement(String name, String value)
+    public void setFieldValue(String name, String value)
     {
         int type = getFieldType(name);
         setFormElement(name, value, type);

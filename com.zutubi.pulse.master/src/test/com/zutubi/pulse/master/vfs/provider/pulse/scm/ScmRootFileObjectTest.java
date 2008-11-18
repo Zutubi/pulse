@@ -3,10 +3,10 @@ package com.zutubi.pulse.master.vfs.provider.pulse.scm;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.vfs.provider.pulse.*;
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
@@ -20,15 +20,13 @@ import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
-import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 
 /**
  * Tests for the ScmRootFileObject AND the ScmFileObject classes.  It does not make
- * sence to test the ScmFileObject separately as it does not make sense to have a
+ * sense to test the ScmFileObject separately as it does not make sense to have a
  * ScmFileObject without also having an ScmRootFileObject.
  */
 public class ScmRootFileObjectTest extends PulseTestCase
@@ -61,11 +59,6 @@ public class ScmRootFileObjectTest extends PulseTestCase
         pulseFileProvider.setRootFileType(TestRootFileObject.class);
         fsm.addProvider("pulse", pulseFileProvider);
         fsm.init();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
     }
 
     public void testRootDisplayName() throws ScmException, FileSystemException
@@ -125,21 +118,43 @@ public class ScmRootFileObjectTest extends PulseTestCase
         assertEquals("a.txt", ((ScmFileObject)c).getDisplayName());
     }
 
-    public void testDoListChildren()
+    public void testDoListChildren() throws Exception
     {
+        registerDirectoryListing("", "a", "b", "c.txt", "d.txt");
 
+        ScmRootFileObject fo = resolveRoot();
+        String[] listing = fo.doListChildren();
+        assertEquals(4, listing.length);
+        assertEquals("a.dir", listing[0]);
+        assertEquals("b.dir", listing[1]);
+        assertEquals("c.txt.file", listing[2]);
+        assertEquals("d.txt.file", listing[3]);
     }
 
-    public void testNumberOfCallsToScmWhenNavigating()
+    public void testNumberOfCallsToScmWhenNavigating() throws ScmException, FileSystemException
     {
+        registerDirectoryListing("", "a", "b");
+        registerDirectoryListing("a", "a/1.txt", "a/2.txt");
+        registerDirectoryListing("b", "b/c", "b/3.txt", "b/4.txt");
+        registerDirectoryListing("b/c", "b/c/5.txt", "b/c/6.txt");
 
+        ScmRootFileObject srfo = resolveRoot();
+        FileObject[] rootChildren = srfo.getChildren();
+
+        verify(scmClient, times(1)).browse((ScmContext)anyObject(), anyString(), (Revision)anyObject());
+
+        rootChildren[0].getChildren();
+        verify(scmClient, times(2)).browse((ScmContext)anyObject(), anyString(), (Revision)anyObject());
+
+        rootChildren[1].getChildren();
+        verify(scmClient, times(3)).browse((ScmContext)anyObject(), anyString(), (Revision)anyObject());
     }
 
     public void testSampleNagivation() throws FileSystemException, ScmException
     {
-        stub(scmClient.browse((ScmContext)anyObject(), eq(""), (Revision)anyObject())).toReturn(list("a"));
-        stub(scmClient.browse((ScmContext)anyObject(), eq("a"), (Revision)anyObject())).toReturn(list("a/b"));
-        stub(scmClient.browse((ScmContext)anyObject(), eq("a/b"), (Revision)anyObject())).toReturn(list("a/b/c.txt"));
+        registerDirectoryListing("", "a");
+        registerDirectoryListing("a", "a/b");
+        registerDirectoryListing("a/b", "a/b/c.txt");
 
         ScmRootFileObject srfo = resolveRoot();
 
@@ -147,19 +162,16 @@ public class ScmRootFileObjectTest extends PulseTestCase
         assertEquals(1, cfos.length);
         FileObject cfo = cfos[0];
         assertEquals("a", cfo.getName().getBaseName());
-        assertTrue(cfo instanceof ScmFileObject);
         assertEquals(FileTypeConstants.FOLDER,((ScmFileObject)cfo).getFileType());
 
         cfos = cfo.getChildren();
         cfo = cfos[0];
         assertEquals("b", cfo.getName().getBaseName());
-        assertTrue(cfo instanceof ScmFileObject);
         assertEquals(FileTypeConstants.FOLDER,((ScmFileObject)cfo).getFileType());
 
         cfos = cfo.getChildren();
         cfo = cfos[0];
         assertEquals("c.txt", cfo.getName().getBaseName());
-        assertTrue(cfo instanceof ScmFileObject);
         assertEquals(FileTypeConstants.FILE,((ScmFileObject)cfo).getFileType());
     }
 
@@ -185,7 +197,7 @@ public class ScmRootFileObjectTest extends PulseTestCase
 
         FileObject fo = srfo.getChildren()[0];
         assertTrue(fo.exists()); // ensures attached.
-        
+
         return fo;
     }
 
@@ -200,11 +212,20 @@ public class ScmRootFileObjectTest extends PulseTestCase
         });
     }
 
+    private void registerDirectoryListing(String dir, String... listing) throws ScmException
+    {
+        stub(scmClient.browse((ScmContext)anyObject(), eq(dir), (Revision)anyObject())).toReturn(list(listing));
+    }
+
     private ScmRootFileObject resolveRoot() throws FileSystemException
     {
         return (ScmRootFileObject) fsm.resolveFile("pulse:///scm");
     }
 
+    /**
+     * Root pulse file system file object that has the ScmRootFileObject as its only child to
+     * simplify testing
+     */
     public static class TestRootFileObject extends AbstractPulseFileObject implements ProjectConfigProvider, ProjectProvider
     {
         public TestRootFileObject(final FileName name, final AbstractFileSystem fs)

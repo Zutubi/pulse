@@ -7,27 +7,27 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 public class FileAction
 {
     /**
-     * The action url represents the ability to download the file.
+     * This action url represents the ability to download the file.
      */
     public static final String TYPE_DOWNLOAD = "download";
     /**
-     * The action url represents the ability to download an archived version
+     * This action url represents the ability to download an archived version
      * of this file.
      */
     public static final String TYPE_ARCHIVE = "archive";
     /**
-     * The action url represents a link to viewing an online representation of
+     * This action url represents a link to viewing an online representation of
      * the file.
      */
     public static final String TYPE_LINK = "link";
     /**
-     * The action url represents the ability to view a decorated version
+     * This action url represents the ability to view a decorated version
      * of the file.
      */
     public static final String TYPE_DECORATE = "decorate";
 
     /**
-     * The action type determines how it is rendered.
+     * This action type determines how it is rendered.
      */
     private String type;
 

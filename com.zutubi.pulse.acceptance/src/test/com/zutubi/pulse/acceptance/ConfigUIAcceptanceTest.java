@@ -9,9 +9,6 @@ import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.Hashtable;
 
@@ -127,7 +124,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
         SubversionForm form = new SubversionForm(selenium);
         form.waitFor();
-        form.setFormElement("url", "svn://localhost:3088/");
+        form.setFieldValue("url", "svn://localhost:3088/");
         CheckForm checkForm = new CheckForm(form);
         checkForm.checkAndAssertResult(true, "ok");
     }
@@ -139,7 +136,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
         SubversionForm form = new SubversionForm(selenium);
         form.waitFor();
-        form.setFormElement("url", "svn://localhost:9999/foo");
+        form.setFieldValue("url", "svn://localhost:9999/foo");
         CheckForm checkForm = new CheckForm(form);
         checkForm.checkAndAssertResult(false, "connection refused");
     }
@@ -151,7 +148,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
         SubversionForm form = new SubversionForm(selenium);
         form.waitFor();
-        form.setFormElement("url", "");
+        form.setFieldValue("url", "");
         CheckForm checkForm = new CheckForm(form);
         checkForm.checkAndAssertResult(false, "unable to check configuration due to validation errors");
         assertTextPresent("url requires a value");
@@ -185,7 +182,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
         subversionState.waitFor();
 
-        subversionState.setFormElement("url", "svn://localhost:3088/");
+        subversionState.setFieldValue("url", "svn://localhost:3088/");
         CheckForm checkForm = new CheckForm(subversionState);
         checkForm.checkAndAssertResult(true, "ok");
 

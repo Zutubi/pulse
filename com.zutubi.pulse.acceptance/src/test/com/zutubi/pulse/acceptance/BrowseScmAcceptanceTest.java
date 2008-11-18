@@ -9,6 +9,7 @@ import com.zutubi.pulse.acceptance.windows.BrowseScmWindow;
 import com.zutubi.pulse.master.model.ProjectManager;
 
 import java.util.Hashtable;
+import java.io.File;
 
 /**
  * A high level acceptance test that checks the ability to browse and select
@@ -74,27 +75,29 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseLinkAvailableForSubversionAntProjectConfiguration() throws Exception
     {
-        AntTypeForm antForm = insertTestProjectAndNavigateToTypeConfig();
-        antForm.assertBrowseBuildFileLinkPresent();
-        antForm.assertBrowseWorkingDirectoryLinkPresent();
+        AntTypeForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
+        assertTrue(antForm.isBrowseBuildFileLinkPresent());
+        assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
     }
 
-    public void testBrowseLinkNoAvailableForGitAntProjectConfiguration()
+    public void testBrowseLinkAvailableForGitAntProjectConfiguration() throws Exception
     {
-        // TODO: need to set up a temporary git repository to allow testing.  Need to be able to initialise the project.
+        AntTypeForm antForm = insertTestGitProjectAndNavigateToTypeConfig();
+        assertTrue(antForm.isBrowseBuildFileLinkPresent());
+        assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
     }
 
     public void testBrowseSelectionOfScmFile() throws Exception
     {
-        AntTypeForm antForm = insertTestProjectAndNavigateToTypeConfig();
+        AntTypeForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
-        antForm.assertBrowseBuildFileLinkPresent();
+        assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
         BrowseScmWindow browse = antForm.clickBrowseBuildFile();
         browse.waitForNode("lib");
         browse.doubleClickNode("lib");
-        browse.waitForNode("junit-3.8.1.jar");
-        browse.selectNode("junit-3.8.1.jar");
+        browse.waitForNode("lib", "junit-3.8.1.jar");
+        browse.selectNode("lib", "junit-3.8.1.jar");
         browse.clickOkay();
 
         assertEquals("lib/junit-3.8.1.jar", antForm.getBuildFileFieldValue());
@@ -102,13 +105,13 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseSelectionOfScmDirectory() throws Exception
     {
-        AntTypeForm antForm = insertTestProjectAndNavigateToTypeConfig();
-        antForm.assertBrowseWorkingDirectoryLinkPresent();
+        AntTypeForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
+        assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
 
         BrowseScmWindow browse = antForm.clickBrowseWorkingDirectory();
         browse.waitForNode("lib");
         browse.doubleClickNode("lib");
-        browse.assertNodeNotPresent("junit-3.8.1.jar");
+        assertFalse(browse.isNodePresent("lib", "junit-3.8.1.jar"));
         browse.selectNode("lib");
         browse.clickOkay();
 
@@ -117,28 +120,69 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseAndCancelSelectionOfScmFile() throws Exception
     {
-        AntTypeForm antForm = insertTestProjectAndNavigateToTypeConfig();
+        AntTypeForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
-        antForm.assertBrowseBuildFileLinkPresent();
+        assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
         BrowseScmWindow browse = antForm.clickBrowseBuildFile();
         browse.waitForNode("lib");
         browse.doubleClickNode("lib");
-        browse.waitForNode("junit-3.8.1.jar");
-        browse.selectNode("junit-3.8.1.jar");
+        browse.waitForNode("lib", "junit-3.8.1.jar");
+        browse.selectNode("lib", "junit-3.8.1.jar");
         browse.clickCancel();
 
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
     }
 
-    private AntTypeForm insertTestProjectAndNavigateToTypeConfig() throws Exception
+    public void testBrowseFileUsesWorkingDirectory() throws Exception
+    {
+        AntTypeForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
+        antForm.setFieldValue("work", "src");
+
+        BrowseScmWindow browse = antForm.clickBrowseBuildFile();
+        browse.waitForNode("java");
+        assertFalse(browse.isNodePresent("lib"));
+        assertFalse(browse.isNodePresent("build.xml"));
+        assertTrue(browse.isNodePresent("test"));
+        browse.clickCancel();
+
+        assertEquals("build.xml", antForm.getBuildFileFieldValue());
+    }
+
+
+    private AntTypeForm insertTestSvnProjectAndNavigateToTypeConfig() throws Exception
     {
         Hashtable<String, Object> svnConfig = xmlRpcHelper.getSubversionConfig();
         svnConfig.put("url", Constants.TEST_PROJECT_REPOSITORY);
         xmlRpcHelper.loginAsAdmin();
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, xmlRpcHelper.getAntConfig());
         xmlRpcHelper.logout();
+        return navigateToTypeConfig();
+    }
 
+    private AntTypeForm insertTestGitProjectAndNavigateToTypeConfig() throws Exception
+    {
+        // the git repository is located on the local file system in the work.dir/git-repo directory
+        File workingDir = new File("./working"); // from IDEA, the working directory is located in the same directory as where the projects are run.
+        if (System.getProperties().contains("work.dir"))
+        {
+            // from the acceptance test suite, the work.dir system property is specified
+            workingDir = new File(System.getProperty("work.dir"));
+        }
+        File repositoryBase = new File(workingDir, "git-repo");
+
+        Hashtable<String, Object> gitConfig = xmlRpcHelper.createEmptyConfig("zutubi.gitConfig");
+        gitConfig.put("repository", "file://" + repositoryBase.getCanonicalPath());
+        gitConfig.put("checkoutScheme", "CLEAN_CHECKOUT");
+        gitConfig.put("monitor", false);
+        xmlRpcHelper.loginAsAdmin();
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, gitConfig, xmlRpcHelper.getAntConfig());
+        xmlRpcHelper.logout();
+        return navigateToTypeConfig();
+    }
+
+    private AntTypeForm navigateToTypeConfig()
+    {
         // go to the type configuration pages.
         ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, random, false);
         globalPage.goTo();
@@ -150,6 +194,6 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
         AntTypeForm antForm = new AntTypeForm(selenium);
         antForm.waitFor();
-        return antForm;        
+        return antForm;
     }
 }

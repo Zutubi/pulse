@@ -31,32 +31,12 @@ public class AntTypeForm extends ConfigurationForm
         return getFieldValue("file");
     }
 
-    public void assertBrowseWorkingDirectoryLinkPresent()
-    {
-        TestCase.assertTrue(isBrowseWorkingDirectoryLinkPresent());
-    }
-
-    public void assertBrowseWorkingDirectoryLinkNotPresent()
-    {
-        TestCase.assertFalse(isBrowseWorkingDirectoryLinkPresent());
-    }
-
-    private boolean isBrowseWorkingDirectoryLinkPresent()
+    public boolean isBrowseWorkingDirectoryLinkPresent()
     {
         return selenium.isElementPresent(getBrowseLinkId("work"));
     }
 
-    public void assertBrowseBuildFileLinkPresent()
-    {
-        TestCase.assertTrue(isBrowseBuildFileLinkPresent());
-    }
-
-    public void assertBrowseBuildFileLinkNotPresent()
-    {
-        TestCase.assertFalse(isBrowseBuildFileLinkPresent());
-    }
-
-    private boolean isBrowseBuildFileLinkPresent()
+    public boolean isBrowseBuildFileLinkPresent()
     {
         return selenium.isElementPresent(getBrowseLinkId("file"));
     }

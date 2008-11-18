@@ -66,12 +66,7 @@ public class ScmRootFileObject extends AbstractScmFileObject
 
     public String getDisplayName()
     {
-        if (isAttached())
-        {
-            return displayName;
-        }
-        // is there a way to ensure that we are attached here?.
-        return "not attached";
+        return displayName;
     }
 
     protected String getScmPath()

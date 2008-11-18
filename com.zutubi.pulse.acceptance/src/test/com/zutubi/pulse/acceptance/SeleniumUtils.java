@@ -19,7 +19,7 @@ public class SeleniumUtils
     {
         waitForVariable(selenium, variable, timeout, false);
     }
-    
+
     public static void waitForVariable(Selenium selenium, String variable, long timeout, boolean inverse)
     {
         selenium.waitForCondition((inverse ? "!" : "") + "selenium.browserbot.getCurrentWindow()." + variable, Long.toString(timeout));
@@ -48,10 +48,10 @@ public class SeleniumUtils
     public static void waitForLocator(Selenium selenium, String locator, long timeout, boolean invert)
     {
         long startTime = System.currentTimeMillis();
-        while(System.currentTimeMillis() - startTime < timeout)
+        while (System.currentTimeMillis() - startTime < timeout)
         {
             boolean present = selenium.isElementPresent(locator);
-            if(present && !invert || !present && invert)
+            if (present && !invert || !present && invert)
             {
                 return;
             }
@@ -146,9 +146,9 @@ public class SeleniumUtils
     private static void awaitCondition(long timeout, Condition condition, String conditionText)
     {
         long startTime = System.currentTimeMillis();
-        while(!condition.satisfied())
+        while (!condition.satisfied())
         {
-            if(System.currentTimeMillis() - startTime > timeout)
+            if (System.currentTimeMillis() - startTime > timeout)
             {
                 throw new SeleniumException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText);
             }
@@ -252,7 +252,7 @@ public class SeleniumUtils
                 browser = "*firefox";
             }
         }
-        return browser;        
+        return browser;
     }
 
     public static boolean isLinkToPresent(Selenium selenium, String href)
