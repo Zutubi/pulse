@@ -1,3 +1,3 @@
 . "$(dirname $0)/common.inc"
 
-services="svn-repo selenium"
+services="git-repo svn-repo selenium"
