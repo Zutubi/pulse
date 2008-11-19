@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -205,7 +206,7 @@ public class PerforceCore
         String clientSpec = result.stdout.toString();
 
         clientSpec = clientSpec.replaceAll("(\nOptions:.*) locked(.*)", "$1$2");
-        clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + toDirectory.getAbsolutePath()));
+        clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + FileSystemUtils.getNormalisedAbsolutePath(toDirectory)));
         clientSpec = clientSpec.replaceAll("\nHost:.*", Matcher.quoteReplacement("\nHost: "));
         clientSpec = clientSpec.replaceAll("\nClient:.*" + Pattern.quote(templateClient), Matcher.quoteReplacement("\nClient: " + clientName));
         clientSpec = clientSpec.replaceAll("//" + Pattern.quote(templateClient) + "/", Matcher.quoteReplacement("//" + clientName + "/"));

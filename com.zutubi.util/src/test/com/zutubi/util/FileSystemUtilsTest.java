@@ -1,17 +1,15 @@
 package com.zutubi.util;
 
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
-import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- */
 public class FileSystemUtilsTest extends ZutubiTestCase
 {
     private File tmpDir;
@@ -701,6 +699,66 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertEquals(tmpDir, tmp.getParentFile());
         assertTrue(tmp.isDirectory());
         assertTrue(tmp.delete());
+    }
+
+    public void testLocaliseSeparatorsEmpty()
+    {
+        assertEquals("", FileSystemUtils.localiseSeparators(""));
+    }
+
+    public void testLocaliseSeparatorsSingleSeparator()
+    {
+        // In this case a trailing slash is significant!
+        assertEquals(File.separator, FileSystemUtils.localiseSeparators(File.separator));
+    }
+
+    public void testLocaliseSeparatorsTwoSeparators()
+    {
+        // In this case a trailing slash is significant!
+        assertEquals(File.separator, FileSystemUtils.localiseSeparators(File.separator + File.separator));
+    }
+
+    public void testLocaliseSeparatorsOtherSeparator()
+    {
+        // In this case a trailing slash is significant!
+        assertEquals(File.separator, FileSystemUtils.localiseSeparators(getOtherSeparator()));
+    }
+
+    public void testLocaliseSeparatorsMixedSeparators()
+    {
+        assertEquals("one" + File.separator + "two" + File.separator + "three", FileSystemUtils.localiseSeparators("one" + File.separator + "two" + getOtherSeparator() + "three"));
+    }
+
+    public void testDuplicatedSeparators()
+    {
+        assertEquals("one" + File.separator + "two", FileSystemUtils.localiseSeparators("one" + File.separator + File.separator + "two"));
+    }
+
+    public void testLocaliseSeparatorsDuplicatedOtherSeparators()
+    {
+        assertEquals("one" + File.separator + "two", FileSystemUtils.localiseSeparators("one" + getOtherSeparator() + getOtherSeparator() + "two"));
+    }
+
+    public void testLocaliseSeparatorsDuplicatedMixedSeparators()
+    {
+        assertEquals("one" + File.separator + "two", FileSystemUtils.localiseSeparators("one" + File.separator + getOtherSeparator() + "two"));
+    }
+
+    public void testGetNormalisedAbsolutePath()
+    {
+        assertEquals(System.getProperty("user.dir") + File.separator + "one" + File.separator + "two", FileSystemUtils.getNormalisedAbsolutePath(new File("one", File.separator + getOtherSeparator() + "two" + File.separator)));
+    }
+
+    private String getOtherSeparator()
+    {
+        if (File.separatorChar == '/')
+        {
+            return "\\";
+        }
+        else
+        {
+            return "/";
+        }
     }
 
     private void simpleEOLTest(byte[] eol, String out) throws IOException
