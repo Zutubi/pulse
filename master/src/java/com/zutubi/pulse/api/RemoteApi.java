@@ -908,6 +908,14 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    public Vector<String> getAllAgentNames(String token) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+
+        List<Agent> agents = agentManager.getAllAgents();
+        return getNames(agents);
+    }
+
     public boolean createAgent(String token, String name, String host, int port) throws AuthenticationException, LicenseException
     {
         tokenManager.verifyAdmin(token);
