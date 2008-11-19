@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * Miscellaneous utilities for manipulating the file system.
@@ -580,6 +581,30 @@ public class FileSystemUtils
         return StringUtils.join(File.pathSeparator, parts);
     }
 
+    /**
+     * Returns the absolute path of the given file, canonicalised as best as it
+     * can be.  At the very least separators are normalised to their local
+     * form, with duplicate and trailing separators removed.
+     *
+     * @param file file to get the path for
+     * @return a best effort of a normalised absolute path to the file
+     */
+    public static String getNormalisedAbsolutePath(File file)
+    {
+        String path;
+        try
+        {
+            path = file.getCanonicalPath();
+        }
+        catch (IOException e)
+        {
+            // Continue on as best we can.
+            path = file.getAbsolutePath();
+        }
+
+        return localiseSeparators(path);
+    }
+
     public static String normaliseSeparators(String path)
     {
         if (File.separatorChar != '/')
@@ -602,21 +627,40 @@ public class FileSystemUtils
 
     /**
      * Converts any separator characters (/ or \) to the local separator
-     * character.
+     * character and removes unnecessary duplicate and trailing separators.
      *
      * @param path path to convert
-     * @return the path with all separators in local form
+     * @return the path with all separators in local form, with unnecesary
+     *         separators removed
      */
     public static String localiseSeparators(String path)
     {
+        // Convert all separators to the same format.
+        char otherSeparator;
+        String separatorRegex;
         if (File.separatorChar == '/')
         {
-            return path.replace('\\', '/');
+            otherSeparator = '\\';
+            separatorRegex = "/{2,}";
         }
         else
         {
-            return path.replace('/', '\\');
+            otherSeparator = '/';
+            separatorRegex = "\\\\{2,}";
         }
+
+        path = path.replace(otherSeparator, File.separatorChar);
+
+        // Replace sequences of separators with a single separator.
+        path = path.replaceAll(separatorRegex, Matcher.quoteReplacement(File.separator));
+
+        // Strip any trailing separator.
+        if (path.length() > 1 && path.endsWith(File.separator))
+        {
+            path = path.substring(0, path.length() - 1);
+        }
+
+        return path;
     }
 
 

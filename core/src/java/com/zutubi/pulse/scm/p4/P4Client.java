@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMException;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.util.process.AsyncProcess;
@@ -205,7 +206,7 @@ public class P4Client
         String clientSpec = result.stdout.toString();
 
         clientSpec = clientSpec.replaceAll("(\nOptions:.*) locked(.*)", "$1$2");
-        clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + toDirectory.getAbsolutePath()));
+        clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + FileSystemUtils.getNormalisedAbsolutePath(toDirectory)));
         clientSpec = clientSpec.replaceAll("\nHost:.*", Matcher.quoteReplacement("\nHost: "));
         clientSpec = clientSpec.replaceAll("\nClient:.*" + templateClient, Matcher.quoteReplacement("\nClient: " + clientName));
         clientSpec = clientSpec.replaceAll("//" + templateClient + "/", Matcher.quoteReplacement("//" + clientName + "/"));

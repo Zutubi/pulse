@@ -664,6 +664,66 @@ public class FileSystemUtilsTest extends PulseTestCase
         }
     }
 
+    public void testLocaliseSeparatorsEmpty()
+    {
+        assertEquals("", FileSystemUtils.localiseSeparators(""));
+    }
+
+    public void testLocaliseSeparatorsSingleSeparator()
+    {
+        // In this case a trailing slash is significant!
+        assertEquals(File.separator, FileSystemUtils.localiseSeparators(File.separator));
+    }
+
+    public void testLocaliseSeparatorsTwoSeparators()
+    {
+        // In this case a trailing slash is significant!
+        assertEquals(File.separator, FileSystemUtils.localiseSeparators(File.separator + File.separator));
+    }
+
+    public void testLocaliseSeparatorsOtherSeparator()
+    {
+        // In this case a trailing slash is significant!
+        assertEquals(File.separator, FileSystemUtils.localiseSeparators(getOtherSeparator()));
+    }
+
+    public void testLocaliseSeparatorsMixedSeparators()
+    {
+        assertEquals("one" + File.separator + "two" + File.separator + "three", FileSystemUtils.localiseSeparators("one" + File.separator + "two" + getOtherSeparator() + "three"));
+    }
+
+    public void testDuplicatedSeparators()
+    {
+        assertEquals("one" + File.separator + "two", FileSystemUtils.localiseSeparators("one" + File.separator + File.separator + "two"));
+    }
+
+    public void testLocaliseSeparatorsDuplicatedOtherSeparators()
+    {
+        assertEquals("one" + File.separator + "two", FileSystemUtils.localiseSeparators("one" + getOtherSeparator() + getOtherSeparator() + "two"));
+    }
+
+    public void testLocaliseSeparatorsDuplicatedMixedSeparators()
+    {
+        assertEquals("one" + File.separator + "two", FileSystemUtils.localiseSeparators("one" + File.separator + getOtherSeparator() + "two"));
+    }
+
+    public void testGetNormalisedAbsolutePath()
+    {
+        assertEquals(System.getProperty("user.dir") + File.separator + "one" + File.separator + "two", FileSystemUtils.getNormalisedAbsolutePath(new File("one", File.separator + getOtherSeparator() + "two" + File.separator)));
+    }
+    
+    private String getOtherSeparator()
+    {
+        if (File.separatorChar == '/')
+        {
+            return "\\";
+        }
+        else
+        {
+            return "/";
+        }
+    }
+
     private void simpleEOLTest(byte[] eol, String out) throws IOException
     {
         File test = null;
