@@ -255,6 +255,11 @@ public class XmlRpcHelper
         return call("getAllAgentNames");
     }
 
+    public Vector<Hashtable<String, Object>> getArtifactsInBuild(String project, int buildNumber) throws Exception
+    {
+        return call("getArtifactsInBuild", project, buildNumber);
+    }
+
     public String insertSimpleProject(String name, boolean template) throws Exception
     {
         return insertSimpleProject(name, ProjectManager.GLOBAL_PROJECT_NAME, template);

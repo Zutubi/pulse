@@ -18,6 +18,7 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
@@ -1405,12 +1406,7 @@ public class RemoteApi
         result.put("stage", stage);
         result.put("command", command);
         result.put("name", artifact.getName());
-        result.put("permalink", StringUtils.join("/", "display/projects",
-                                                 StringUtils.uriComponentEncode(project),
-                                                 "builds", Long.toString(build.getNumber()),
-                                                 StringUtils.uriComponentEncode(stage),
-                                                 StringUtils.uriComponentEncode(command),
-                                                 StringUtils.uriComponentEncode(artifact.getName())));
+        result.put("permalink", new Urls("").commandDownload(project, Long.toString(build.getNumber()), stage, command, artifact.getName()));
         return result;
     }
 

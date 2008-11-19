@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.webwork.dispatcher.mapper.browse;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.StaticMapActionResolver;
 
 /**
+ * Resolves actions for a build result.
  */
 public class BuildActionResolver extends StaticMapActionResolver
 {
@@ -18,6 +19,7 @@ public class BuildActionResolver extends StaticMapActionResolver
         addMapping("tests", new BuildTestsActionResolver());
         addMapping("file", new BuildPulseFileActionResolver());
         addMapping("artifacts", new BuildArtifactsActionResolver());
+        addMapping("downloads", new BuildDownloadsActionResolver());
         addMapping("wc", new BuildWorkingCopyActionResolver());
 
         addParameter("buildVID", id);

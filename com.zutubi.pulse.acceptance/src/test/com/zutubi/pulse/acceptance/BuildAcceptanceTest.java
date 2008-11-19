@@ -20,7 +20,9 @@ import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfigurat
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.TextUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
@@ -379,6 +381,32 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         selenium.waitForPageToLoad("10000");
 
         assertTextPresent("tail of build log");
+    }
+
+    public void testDownloadArtifactLink() throws Exception
+    {
+        // CIB-1724: download raw artifacts via 2.0 url scheme.
+        addProject(random, true);
+        int buildNumber = xmlRpcHelper.runBuild(random, 30000);
+        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(random, buildNumber);
+        Hashtable<String, Object> outputArtifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
+        {
+            public boolean satisfied(Hashtable<String, Object> artifact)
+            {
+                return "command output".equals(artifact.get("name"));
+            }
+        });
+
+        assertNotNull(outputArtifact);
+        String permalink = (String) outputArtifact.get("permalink");
+        // This is to check for the new 2.0-ised URL.
+        assertTrue(permalink.contains("/downloads/"));
+
+        loginAsAdmin();
+        goTo(permalink + "/output.txt");
+        selenium.waitForPageToLoad("30000");
+
+        assertTrue(selenium.getBodyText().contains("BUILD SUCCESSFUL"));
     }
 
     public void testManualTriggerBuildWithPrompt() throws Exception

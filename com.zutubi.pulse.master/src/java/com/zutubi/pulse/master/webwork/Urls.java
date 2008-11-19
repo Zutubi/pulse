@@ -1,11 +1,14 @@
 package com.zutubi.pulse.master.webwork;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.StringUtils.uriComponentEncode;
 
 /**
@@ -319,6 +322,37 @@ public class Urls
         return buildArtifacts(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
     }
 
+    public String buildDownloads(BuildResult build)
+    {
+        return build(build) + "downloads/";
+    }
+
+    public String buildDownloads(Object project, String number)
+    {
+        return build(project, number) + "downloads/";
+    }
+
+    public String stageDownloads(BuildResult build, RecipeResultNode node)
+    {
+        return buildDownloads(build) + getStageComponent(node);
+    }
+
+    public String commandDownloads(BuildResult build, CommandResult commandResult)
+    {
+        RecipeResultNode recipeResultNode = build.findResultNode(commandResult);
+        return buildDownloads(build) + getStageComponent(recipeResultNode) + uriComponentEncode(commandResult.getCommandName()) + "/";
+    }
+
+    public String commandDownloads(Object project, String number, String stage, String command)
+    {
+        return buildDownloads(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
+    }
+
+    public String commandDownload(Object project, String number, String stage, String command, String artifact)
+    {
+        return buildDownloads(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/" + uriComponentEncode(artifact) + "/";
+    }
+
     public String buildWorkingCopy(BuildResult build)
     {
         return build(build) + "wc/";
@@ -472,5 +506,38 @@ public class Urls
     public String adminPlugin(String id)
     {
         return adminPlugins() + id + "/";
+    }
+
+    public String file()
+    {
+        return base() + "file/";
+    }
+
+    public String fileArtifacts()
+    {
+        return file() + "artifacts/";
+    }
+
+    public String fileArtifact(String id)
+    {
+        return fileArtifacts() + id + "/";
+    }
+
+    public String fileArtifact(StoredArtifact artifact)
+    {
+        return fileArtifact(Long.toString(artifact.getId()));
+    }
+
+    public String fileFileArtifact(String id, String filePath)
+    {
+        return fileArtifact(id) + filePath;
+    }
+
+    public String fileFileArtifact(StoredArtifact artifact, StoredFileArtifact file)
+    {
+        String pathPart = file.getPathUrl();
+        // Strip the artifact name, it is implied by the id.
+        pathPart = PathUtils.getPath(1, PathUtils.getPathElements(pathPart));
+        return fileFileArtifact(Long.toString(artifact.getId()), pathPart);
     }
 }

@@ -5,27 +5,26 @@ import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
+import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Tests for build hooks, both configuration and ensuring they are executed
  * when expected.
  */
-@Test(dependsOnGroups = {"init.*"})
 public class BuildHookAcceptanceTest extends SeleniumTestBase
 {
     private static final String PROJECT_NAME = "hook-test-project";
@@ -37,7 +36,6 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     private File tempDir;
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -48,7 +46,6 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();
@@ -72,17 +69,24 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     public void testPostBuildHook() throws Exception
     {
-        chooseHookType("zutubi.postBuildHookConfig");
-
-        ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
-        hookForm.waitFor();
-        hookForm.nextFormElements(random, "true", null, "false");
-
-        selectFromAllTasks();
+        postBuildHelper();
         addTask("${project} ${status}");
 
         xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
         assertArgs(PROJECT_NAME, "success");
+    }
+
+    public void testBuildDirProperty() throws Exception
+    {
+        postBuildHelper();
+        addTask("${build.dir}");
+
+        xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        List<String> args = getArgs();
+
+        // The build directory contains the build log.
+        File log = new File(args.get(0), BuildResult.BUILD_LOG);
+        assertTrue(log.isFile());
     }
 
     public void testPostBuildHookCanAccessProjectProperty() throws Exception
@@ -105,17 +109,24 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     public void testPostStageHook() throws Exception
     {
-        chooseHookType("zutubi.postStageHookConfig");
-
-        ConfigurationForm hookForm = new ConfigurationForm(selenium, PostStageHookConfiguration.class);
-        hookForm.waitFor();
-        hookForm.nextFormElements(random, "true", null, "true", null, "false");
-
-        selectFromStageTasks();
+        postStageHelper();
         addTask("${project} ${stage} ${recipe} ${status}");
 
         xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
+    }
+
+    public void testStageDirProperty() throws Exception
+    {
+        postStageHelper();
+        addTask("${stage.dir}");
+
+        xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        List<String> args = getArgs();
+
+        // The stage directory contains the recipe log.
+        File log = new File(args.get(0), RecipeResult.RECIPE_LOG);
+        assertTrue(log.isFile());
     }
 
     public void testManualHook() throws Exception
@@ -153,13 +164,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     {
         int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
 
-        chooseHookType("zutubi.postStageHookConfig");
-
-        ConfigurationForm hookForm = new ConfigurationForm(selenium, PostStageHookConfiguration.class);
-        hookForm.waitFor();
-        hookForm.nextFormElements(random, "true", null, "true", null, "false");
-
-        selectFromStageTasks();
+        postStageHelper();
         CompositePage hookPage = addTask("${project} ${stage} ${recipe} ${status}");
         triggerHook(hookPage, buildNumber);
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
@@ -201,13 +206,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     public void testDisable() throws Exception
     {
-        chooseHookType("zutubi.postBuildHookConfig");
-
-        ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
-        hookForm.waitFor();
-        hookForm.nextFormElements(random, "true", null, "false");
-
-        selectFromAllTasks();
+        postBuildHelper();
         CompositePage hookPage = addTask("${project} ${status}");
         hookPage.clickActionAndWait("disable");
         assertEquals("disabled", hookPage.getStateField("state"));
@@ -237,6 +236,28 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         waitForTask();
         assertArgs(Long.toString(buildNumber), PROJECT_NAME, "success");
+    }
+
+    private void postBuildHelper()
+    {
+        chooseHookType("zutubi.postBuildHookConfig");
+
+        ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
+        hookForm.waitFor();
+        hookForm.nextFormElements(random, "true", null, "false");
+
+        selectFromAllTasks();
+    }
+
+    private void postStageHelper()
+    {
+        chooseHookType("zutubi.postStageHookConfig");
+
+        ConfigurationForm hookForm = new ConfigurationForm(selenium, PostStageHookConfiguration.class);
+        hookForm.waitFor();
+        hookForm.nextFormElements(random, "true", null, "true", null, "false");
+
+        selectFromStageTasks();
     }
 
     private void triggerHook(CompositePage hookPage, int buildNumber) throws InterruptedException
@@ -324,10 +345,16 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         return hookPage;
     }
 
-    private void assertArgs(String... expected) throws IOException
+    private List<String> getArgs() throws IOException
     {
         File argFile = new File(tempDir, "args.txt");
         String args = IOUtils.fileToString(argFile);
-        assertEquals(Arrays.asList(expected), Arrays.asList(args.split("\\r?\\n")));
+        return Arrays.asList(args.split("\\r?\\n"));
+    }
+
+    private void assertArgs(String... expected) throws IOException
+    {
+        List<String> gotArgs = getArgs();
+        assertEquals(Arrays.asList(expected), gotArgs);
     }
 }

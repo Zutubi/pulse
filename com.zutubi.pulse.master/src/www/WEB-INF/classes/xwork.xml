@@ -206,6 +206,11 @@
             <result name="success" type="velocity">/view-artifact.vm</result>
         </action>
 
+        <action name="downloadArtifact" class="com.zutubi.pulse.master.xwork.actions.project.DownloadArtifactAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
+            <result name="success" type="redirect">${url}</result>
+        </action>
+
         <action name="browseProjectDir" class="com.zutubi.pulse.master.xwork.actions.project.BrowseProjectDirAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/browse-project-dir.vm</result>

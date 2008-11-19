@@ -45,14 +45,14 @@ public class MasterBuildProperties extends BuildProperties
         addCompletedBuildProperties(context, result, configurationManager);
     }
 
-    public static void addBuildProperties(ExecutionContext context, BuildResult buildResult, Project project, File buildDir, String masterUrl)
+    public static void addBuildProperties(ExecutionContext context, BuildResult buildResult, Project project, File buildOutputDir, String masterUrl)
     {
         ProjectConfiguration projectConfig = project.getConfig();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildResult.getNumber()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, projectConfig.getName());
-        if (buildDir != null)
+        if (buildOutputDir != null)
         {
-            context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_DIRECTORY, buildDir.getAbsolutePath());
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_DIRECTORY, buildOutputDir.getAbsolutePath());
         }
 
         BuildReason buildReason = buildResult.getReason();
@@ -114,8 +114,6 @@ public class MasterBuildProperties extends BuildProperties
 
     public static void addStageProperties(ExecutionContext context, BuildResult result, RecipeResultNode node, MasterConfigurationManager configurationManager, boolean includeName)
     {
-        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-
         String name = node.getStageName();
         String prefix = "stage.";
 
@@ -145,7 +143,7 @@ public class MasterBuildProperties extends BuildProperties
         {
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, recipeResult.getState().getString());
-            context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, paths.getRecipeDir(result, recipeResult.getId()).getAbsolutePath());
+            context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, recipeResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()).getAbsolutePath());
 
             for(CommandResult command: recipeResult.getCommandResults())
             {

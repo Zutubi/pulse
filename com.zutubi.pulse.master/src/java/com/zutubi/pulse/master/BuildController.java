@@ -130,7 +130,7 @@ public class BuildController implements EventListener
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         buildDir = paths.getBuildDir(buildResult);
 
-        buildLogger = new DefaultBuildLogger(new File(buildDir, "build.log"));
+        buildLogger = new DefaultBuildLogger(new File(buildDir, BuildResult.BUILD_LOG));
 
         buildContext = new PulseExecutionContext();
         MasterBuildProperties.addProjectProperties(buildContext, projectConfig);

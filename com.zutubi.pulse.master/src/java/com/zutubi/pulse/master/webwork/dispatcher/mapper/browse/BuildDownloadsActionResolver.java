@@ -4,17 +4,17 @@ import com.zutubi.pulse.master.webwork.dispatcher.mapper.ActionResolver;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.ActionResolverSupport;
 
 /**
- * Resolves to the artifacts view for a build.
+ * Support for raw artifact downloads.
  */
-public class BuildArtifactsActionResolver extends ActionResolverSupport
+public class BuildDownloadsActionResolver extends ActionResolverSupport
 {
-    public BuildArtifactsActionResolver()
+    public BuildDownloadsActionResolver()
     {
         super("viewBuildArtifacts");
     }
 
     public ActionResolver getChild(String name)
     {
-        return new StageArtifactsActionResolver(name, false);
+        return new StageArtifactsActionResolver(name, true);
     }
 }
