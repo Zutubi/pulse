@@ -13,10 +13,6 @@ import java.io.IOException;
 
 import junit.extensions.TestSetup;
 
-/**
- *
- *
- */
 public class AcceptanceTestSuiteSetupTeardown extends TestSetup
 {
     private Pulse pulse;
@@ -27,7 +23,6 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
         super(test);
     }
 
-    @BeforeSuite
     public void setUp() throws Exception
     {
         JythonPackageFactory factory = new JythonPackageFactory();
@@ -36,7 +31,7 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
 
         File pulsePackage = PulseTestCase.getPulsePackage();
 
-        File dir = new File(System.getProperty("work.dir"));
+        File dir = AcceptanceTestUtils.getWorkingDirectory();
 
         PulsePackage pkg = factory.createPackage(pulsePackage);
         pulse = pkg.extractTo(new File(dir, "master").getCanonicalPath());
@@ -54,7 +49,6 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
         agent.start();
     }
 
-    @AfterSuite
     public void tearDown() throws IOException
     {
         shutdown(pulse);

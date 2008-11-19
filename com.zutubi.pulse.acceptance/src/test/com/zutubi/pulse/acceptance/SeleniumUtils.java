@@ -143,7 +143,12 @@ public class SeleniumUtils
         }, "locator '" + locator + "' to become visible");
     }
 
-    private static void awaitCondition(long timeout, Condition condition, String conditionText)
+    public static void awaitCondition(Condition condition, String conditionText)
+    {
+        awaitCondition(DEFAULT_TIMEOUT, condition, conditionText);
+    }
+
+    public static void awaitCondition(long timeout, Condition condition, String conditionText)
     {
         long startTime = System.currentTimeMillis();
         while (!condition.satisfied())

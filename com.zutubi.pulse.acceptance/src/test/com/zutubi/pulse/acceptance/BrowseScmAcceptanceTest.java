@@ -26,9 +26,26 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     protected void tearDown() throws Exception
     {
+        // if something goes wrong whilst focused on the browse window, then
+        // logout fails with an error.  Avoid this by resetting the focused window.
+        resetToPulseWindow();
+
         logout();
         
         super.tearDown();
+    }
+
+    private void resetToPulseWindow()
+    {
+        String[] titles = selenium.getAllWindowTitles();
+        for (String title : titles)
+        {
+            if (title.startsWith(":: pulse ::"))
+            {
+                selenium.selectWindow(title);
+                return;
+            }
+        }
     }
 
     //---( Test the rendering of the 'browse' link on the project wizard type form )---
@@ -87,6 +104,8 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
     }
 
+    //---( test the browse window . )---
+
     public void testBrowseSelectionOfScmFile() throws Exception
     {
         AntTypeForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
@@ -96,8 +115,8 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         BrowseScmWindow browse = antForm.clickBrowseBuildFile();
         browse.waitForNode("lib");
         browse.doubleClickNode("lib");
-        browse.waitForNode("lib", "junit-3.8.1.jar");
-        browse.selectNode("lib", "junit-3.8.1.jar");
+        browse.waitForNode("junit-3.8.1.jar");
+        browse.selectNode("junit-3.8.1.jar");
         browse.clickOkay();
 
         assertEquals("lib/junit-3.8.1.jar", antForm.getBuildFileFieldValue());
@@ -111,7 +130,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         BrowseScmWindow browse = antForm.clickBrowseWorkingDirectory();
         browse.waitForNode("lib");
         browse.doubleClickNode("lib");
-        assertFalse(browse.isNodePresent("lib", "junit-3.8.1.jar"));
+        assertFalse(browse.isNodePresent("junit-3.8.1.jar"));
         browse.selectNode("lib");
         browse.clickOkay();
 
@@ -127,8 +146,8 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         BrowseScmWindow browse = antForm.clickBrowseBuildFile();
         browse.waitForNode("lib");
         browse.doubleClickNode("lib");
-        browse.waitForNode("lib", "junit-3.8.1.jar");
-        browse.selectNode("lib", "junit-3.8.1.jar");
+        browse.waitForNode("junit-3.8.1.jar");
+        browse.selectNode("junit-3.8.1.jar");
         browse.clickCancel();
 
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
@@ -144,11 +163,13 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertFalse(browse.isNodePresent("lib"));
         assertFalse(browse.isNodePresent("build.xml"));
         assertTrue(browse.isNodePresent("test"));
-        browse.clickCancel();
+        browse.expandPath("java", "com", "zutubi", "testant");
+        browse.waitForNode("Unit.java");
+        browse.selectNode("Unit.java");
+        browse.clickOkay();
 
-        assertEquals("build.xml", antForm.getBuildFileFieldValue());
+        assertEquals("java/com/zutubi/testant/Unit.java", antForm.getBuildFileFieldValue());
     }
-
 
     private AntTypeForm insertTestSvnProjectAndNavigateToTypeConfig() throws Exception
     {
@@ -163,12 +184,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     private AntTypeForm insertTestGitProjectAndNavigateToTypeConfig() throws Exception
     {
         // the git repository is located on the local file system in the work.dir/git-repo directory
-        File workingDir = new File("./working"); // from IDEA, the working directory is located in the same directory as where the projects are run.
-        if (System.getProperties().contains("work.dir"))
-        {
-            // from the acceptance test suite, the work.dir system property is specified
-            workingDir = new File(System.getProperty("work.dir"));
-        }
+        File workingDir = AcceptanceTestUtils.getWorkingDirectory();
         File repositoryBase = new File(workingDir, "git-repo");
 
         Hashtable<String, Object> gitConfig = xmlRpcHelper.createEmptyConfig("zutubi.gitConfig");

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance.windows;
 
 import com.thoughtworks.selenium.Selenium;
-import com.thoughtworks.selenium.SeleniumException;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.util.Condition;
 
 import java.util.Arrays;
 
@@ -27,26 +27,13 @@ public class BrowseScmWindow
 
     public void waitForWindow()
     {
-        int timeout = SeleniumUtils.DEFAULT_TIMEOUT;
-
-        long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < timeout)
+        SeleniumUtils.awaitCondition(new Condition()
         {
-            if (isWindowPresent())
+            public boolean satisfied()
             {
-                return;
+                return isWindowPresent();
             }
-
-            try
-            {
-                Thread.sleep(300);
-            }
-            catch (InterruptedException e)
-            {
-                // Ignore
-            }
-        }
-        throw new SeleniumException("Timeout out after " + timeout + "ms");
+        }, "Window not available");
     }
 
     public void selectWindow()
@@ -73,45 +60,37 @@ public class BrowseScmWindow
         originalWindow = null;
     }
 
-    /**
-     * Click the text of the node in the browse tree that is identified by the specified
-     * path.
-     *
-     * @param path  the path to the selected node.
-     */
-    public void selectNode(String... path)
+    public void selectNode(String path)
     {
-        selenium.click("//div[@id='browseTree']" + toXpathSelector(path));
+        selenium.click(toSelector(path));
     }
 
-    public void waitForNode(String... path)
+    public void waitForNode(String path)
     {
-        SeleniumUtils.waitForLocator(selenium, "//div[@id='browseTree']" + toXpathSelector(path));
+        SeleniumUtils.waitForLocator(selenium, toSelector(path));
     }
 
-    public boolean isNodePresent(String... path)
+    public boolean isNodePresent(String path)
     {
-        return selenium.isElementPresent("//div[@id='browseTree']" + toXpathSelector(path));
+        return selenium.isElementPresent(toSelector(path));
     }
 
-    /**
-     * Double click the text of the node in the browse tree identified by the specified path.
-     *
-     * @param path  the path to the selected tree node
-     */
-    public void doubleClickNode(String... path)
+    public void doubleClickNode(String path)
     {
-        selenium.doubleClick("//div[@id='browseTree']" + toXpathSelector(path));
+        selenium.doubleClick(toSelector(path));
     }
 
-    private String toXpathSelector(String... path)
+    public void expandPath(String... path)
     {
-        String selector = "";
         for (String p : path)
         {
-            selector = selector + "//a[text()='"+p+"']";
+            waitForNode(p);
+            doubleClickNode(p);
         }
-        return selector;
     }
 
+    private String toSelector(String linkText)
+    {
+        return "link="+linkText+"";
+    }
 }
