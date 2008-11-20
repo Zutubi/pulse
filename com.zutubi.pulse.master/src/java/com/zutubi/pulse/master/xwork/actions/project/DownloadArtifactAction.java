@@ -18,7 +18,7 @@ public class DownloadArtifactAction extends FileArtifactActionBase
 
     public String execute()
     {
-        url = new Urls("").fileFileArtifact(getRequiredArtifact(), getRequiredFileArtifact());
+        url = Urls.getBaselessInstance().fileFileArtifact(getRequiredArtifact(), getRequiredFileArtifact());
         return SUCCESS;
     }
 }

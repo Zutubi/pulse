@@ -40,6 +40,6 @@ public class ProjectConfigsFileObject extends AbstractPulseFileObject implements
 
     public String getUrlPath()
     {
-        return new Urls("").projects();
+        return Urls.getBaselessInstance().projects();
     }
 }

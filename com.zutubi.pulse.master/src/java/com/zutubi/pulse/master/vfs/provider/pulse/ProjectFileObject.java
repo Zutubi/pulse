@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
+import com.zutubi.pulse.master.webwork.Urls;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -100,6 +100,6 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
 
     public String getUrlPath()
     {
-        return new Urls("").project(getProject());
+        return Urls.getBaselessInstance().project(getProject());
     }
 }

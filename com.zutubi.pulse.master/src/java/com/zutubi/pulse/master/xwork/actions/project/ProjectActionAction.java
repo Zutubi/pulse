@@ -26,7 +26,7 @@ public class ProjectActionAction extends ProjectActionBase
 
     public String getRedirect()
     {
-        Urls urls = new Urls("");
+        Urls urls = Urls.getBaselessInstance();
         if(TextUtils.stringSet(tab))
         {
             return urls.project(getProject()) + tab + "/";

@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.xwork.actions.server;
 import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
 /**
  */
@@ -27,7 +27,7 @@ public class CancelBuildAction extends ActionSupport
 
     public String getRedirect()
     {
-        Urls urls = new Urls("");
+        Urls urls = Urls.getBaselessInstance();
         if(fromBuild)
         {
             BuildResult build = buildManager.getBuildResult(buildId);

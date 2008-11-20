@@ -126,7 +126,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
             {
                 BuildResult build = getAncestor(BuildResultProvider.class).getBuildResult();
                 CommandResult command = getAncestor(CommandResultProvider.class).getCommandResult();
-                String url = new Urls("").commandArtifacts(build, command) + getFileArtifact().getPathUrl() + "/";
+                String url = Urls.getBaselessInstance().commandArtifacts(build, command) + getFileArtifact().getPathUrl() + "/";
                 actions.add(new FileAction(FileAction.TYPE_DECORATE, url));
             }
             catch (Exception e)

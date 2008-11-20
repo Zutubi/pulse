@@ -64,6 +64,6 @@ public class WorkingCopyContextFileObject extends AbstractPulseFileObject implem
 
     public String getUrlPath() throws FileSystemException
     {
-        return new Urls("").buildWorkingCopy(getBuildResult());
+        return Urls.getBaselessInstance().buildWorkingCopy(getBuildResult());
     }
 }

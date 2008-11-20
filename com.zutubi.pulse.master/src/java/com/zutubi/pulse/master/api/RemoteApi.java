@@ -1406,7 +1406,7 @@ public class RemoteApi
         result.put("stage", stage);
         result.put("command", command);
         result.put("name", artifact.getName());
-        result.put("permalink", new Urls("").commandDownload(project, Long.toString(build.getNumber()), stage, command, artifact.getName()));
+        result.put("permalink", Urls.getBaselessInstance().commandDownload(project, Long.toString(build.getNumber()), stage, command, artifact.getName()));
         return result;
     }
 

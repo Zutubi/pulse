@@ -74,6 +74,6 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
 
     public String getUrlPath()
     {
-        return new Urls("").projects();
+        return Urls.getBaselessInstance().projects();
     }
 }

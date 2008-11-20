@@ -26,7 +26,7 @@ public class AgentActionAction extends AgentActionBase
 
     public String getRedirect()
     {
-        Urls urls = new Urls("");
+        Urls urls = Urls.getBaselessInstance();
         if(TextUtils.stringSet(tab))
         {
             return urls.agent(getAgent()) + tab + "/";

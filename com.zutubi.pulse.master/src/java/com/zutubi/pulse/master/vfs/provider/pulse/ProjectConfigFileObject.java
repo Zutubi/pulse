@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
-import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileName;
@@ -68,7 +68,7 @@ public class ProjectConfigFileObject extends AbstractPulseFileObject implements 
 
     public String getUrlPath()
     {
-        return new Urls("").project(StringUtils.uriComponentEncode(getProjectConfig().getName()));
+        return Urls.getBaselessInstance().project(StringUtils.uriComponentEncode(getProjectConfig().getName()));
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)

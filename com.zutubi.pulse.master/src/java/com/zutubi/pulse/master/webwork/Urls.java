@@ -17,7 +17,18 @@ import static com.zutubi.util.StringUtils.uriComponentEncode;
  */
 public class Urls
 {
+    private static final Urls BASELESS_INSTANCE = new Urls("");
+
     private String baseUrl;
+
+    /**
+     * @return a singleton Urls instance for relative URLs, i.e. those that
+     *         have an empty base url
+     */
+    public static Urls getBaselessInstance()
+    {
+        return BASELESS_INSTANCE;
+    }
 
     public Urls(String baseUrl)
     {
