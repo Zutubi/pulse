@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -229,7 +229,8 @@ public class RecipeResult extends Result
 
     public File getRecipeDir(File dataRoot)
     {
-        return getAbsoluteOutputDir(dataRoot).getParentFile();
+        File outputDir = getAbsoluteOutputDir(dataRoot);
+        return outputDir == null ? null : outputDir.getParentFile();
     }
 
     public TestSuiteResult getFailedTestResults()

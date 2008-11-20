@@ -143,10 +143,10 @@ public class MasterBuildProperties extends BuildProperties
         {
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, recipeResult.getState().getString());
-            File outputDir = recipeResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
-            if (outputDir != null)
+            File recipeDir = recipeResult.getRecipeDir(configurationManager.getDataDirectory());
+            if (recipeDir != null)
             {
-                context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, outputDir.getAbsolutePath());
+                context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, recipeDir.getAbsolutePath());
             }
 
             for(CommandResult command: recipeResult.getCommandResults())
