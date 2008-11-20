@@ -33,7 +33,7 @@ public class BrowseScmWindow
             {
                 return isWindowPresent();
             }
-        }, "Window not available");
+        }, "Timeout waiting for " + windowName + " window.");
     }
 
     public void selectWindow()
