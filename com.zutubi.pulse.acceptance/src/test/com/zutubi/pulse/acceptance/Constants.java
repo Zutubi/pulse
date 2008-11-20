@@ -15,7 +15,7 @@ public class Constants
      */
     public static final String TEST_ANT_REPOSITORY = "svn://localhost:3088/accept/trunk/testant";
     /**
-     * Subversino URL for a small sample maven project that contains the pom.xml, along with a
+     * Subversion URL for a small sample maven project that contains the pom.xml, along with a
      * source and test file.
      */
     public static final String TEST_MAVEN_REPOSITORY = "svn://localhost:3088/accept/trunk/testmaven";

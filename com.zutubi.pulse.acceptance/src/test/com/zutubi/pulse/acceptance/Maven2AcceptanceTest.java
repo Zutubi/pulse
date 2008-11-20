@@ -1,16 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.admin.DirectoryArtifactForm;
-import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
-import com.zutubi.pulse.acceptance.pages.admin.ListPage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildArtifactsPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.project.types.DirectoryArtifactConfiguration;
 
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * The acceptance tests for the Pulse builtin maven integration.
@@ -24,41 +19,23 @@ public class Maven2AcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
     }
 
-    protected void tearDown() throws Exception
-    {
-        logout();
-
-        super.tearDown();
-    }
-
     public void testSurefireTestsArtifactConfiguration() throws Exception
     {
         createMavenProject(random);
 
         // We expect a artifact called surefire-reports to be configured.
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
-        hierarchyPage.goTo();
-        ProjectConfigPage configPage = hierarchyPage.clickConfigure();
-        configPage.waitFor();
-        CompositePage type = configPage.clickComposite("type", "maven 2 command and artifacts");
-        type.waitFor();
-        type.expandTreeNode(random + "/type");
-        ListPage artifacts = type.clickCollection("artifacts", "artifacts");
-        artifacts.waitFor();
-        artifacts.assertItemPresent("surefire-reports", null, "view", "clone", "delete");
-        artifacts.clickView("surefire-reports");
-
-        DirectoryArtifactForm artifact = new DirectoryArtifactForm(selenium, DirectoryArtifactConfiguration.class);
-        artifact.waitFor();
-        
-        assertTrue(artifact.isFormPresent());
-        assertEquals("surefire-reports", artifact.getNameFieldValue());
-        assertEquals("target/surefire-reports", artifact.getBaseDirectoryFieldValue());
-        assertEquals("*.xml", artifact.getIncludesFieldValue());
-        
-        String[] selectedPostProcessors = artifact.getSelectedPostProcessorValues();
-        assertEquals(1, selectedPostProcessors.length);
-        assertEquals("junit", selectedPostProcessors[0]);
+        xmlRpcHelper.loginAsAdmin();
+        Hashtable<String, Object> projectConfig = xmlRpcHelper.getConfig("projects/" + random);
+        Hashtable<String, Object> projectType = (Hashtable<String, Object>) projectConfig.get("type");
+        Hashtable<String, Object> typeArtifacts = (Hashtable<String, Object>) projectType.get("artifacts");
+        Hashtable<String, Object> artifactConfig = (Hashtable<String, Object>) typeArtifacts.get("test reports");
+        assertEquals("test reports", artifactConfig.get("name"));
+        assertEquals("target/surefire-reports", artifactConfig.get("base"));
+        assertEquals("TEST-*.xml", artifactConfig.get("includes"));
+        Vector<String> postprocessors = (Vector<String>) artifactConfig.get("postprocessors");
+        assertEquals(1, postprocessors.size());
+        assertEquals("junit", postprocessors.get(0));
+        xmlRpcHelper.logout();
     }
 
     public void testMaven2BuildPicksUpTests() throws Exception
@@ -72,10 +49,10 @@ public class Maven2AcceptanceTest extends SeleniumTestBase
         summaryPage.goTo();
         assertTrue(selenium.isElementPresent("link=*all 1 passed*"));
 
-        // We expect the artifacts page to contain an artifact called surefire-reports.
+        // We expect the artifacts page to contain an artifact called test reports.
         BuildArtifactsPage artifactsPage = new BuildArtifactsPage(selenium, urls, random, buildNumber);
         artifactsPage.goTo();
-        SeleniumUtils.waitForLocator(selenium, artifactsPage.getArtifactLocator("surefire-reports"));
+        SeleniumUtils.waitForLocator(selenium, artifactsPage.getArtifactLocator("test reports"));
     }
 
     private void createMavenProject(String projectName) throws Exception

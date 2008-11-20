@@ -14,16 +14,6 @@ public class DirectoryArtifactForm extends ConfigurationForm
         super(selenium, configurationClass);
     }
 
-    public String[] getFieldNames()
-    {
-        return new String[]{"name", "base", "type", "includes", "excludes", "postprocessors"};
-    }
-
-    public int[] getFieldTypes()
-    {
-        return new int[]{TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, MULTI_SELECT};
-    }
-
     public String getNameFieldValue()
     {
         return getFieldValue("name");

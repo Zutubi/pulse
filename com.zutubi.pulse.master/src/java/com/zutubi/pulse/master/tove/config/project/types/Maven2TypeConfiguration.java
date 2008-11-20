@@ -31,8 +31,8 @@ public class Maven2TypeConfiguration extends TemplateTypeConfiguration
         // setup the default surefire-reports test artifact
         DirectoryArtifactConfiguration artifact = new DirectoryArtifactConfiguration();
         artifact.setBase("target/surefire-reports");
-        artifact.setIncludes("*.xml");
-        artifact.setName("surefire-reports");
+        artifact.setIncludes("TEST-*.xml");
+        artifact.setName("test reports");
         artifact.addPostprocessor("junit");
         addArtifact(artifact);
     }
