@@ -69,19 +69,14 @@ public class Maven2AcceptanceTest extends SeleniumTestBase
 
     private int runBuild(String projectName) throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.triggerBuild(projectName);
-
-        Hashtable<String, Object> build;
-        do
+        try
         {
-            build = xmlRpcHelper.getBuild(projectName, 1);
+            xmlRpcHelper.loginAsAdmin();
+            return xmlRpcHelper.runBuild(projectName, 30000);
         }
-        while (build == null || !Boolean.TRUE.equals(build.get("completed")));
-
-        xmlRpcHelper.logout();
-
-        return (Integer)build.get("id");
+        finally
+        {
+            xmlRpcHelper.logout();
+        }
     }
-
 }
