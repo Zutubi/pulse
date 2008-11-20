@@ -9,6 +9,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base for form classes: supports methods for reading and writing fields and
@@ -120,10 +121,28 @@ public abstract class SeleniumForm
         return selenium.getEval(js).split(",");
     }
 
-    public void submitFormElements(String id, String... args)
+    public void submitFormElements(String submitValue, Map<String, String> fieldValues)
     {
-        setFormElements(args);
-        submit(id);
+        if (fieldValues != null)
+        {
+            for (Map.Entry<String, String> entry: fieldValues.entrySet())
+            {
+                setFieldValue(entry.getKey(), entry.getValue());
+            }
+        }
+
+        submit(submitValue);
+    }
+
+    public void submitFormElements(String submitValue, String... fieldValues)
+    {
+        setFormElements(fieldValues);
+        submit(submitValue);
+    }
+
+    public void nextFormElements(Map<String, String> fieldValues)
+    {
+        submitFormElements("next", fieldValues);
     }
 
     public void nextFormElements(String... args)
@@ -131,9 +150,19 @@ public abstract class SeleniumForm
         submitFormElements("next", args);
     }
 
+    public void applyFormElements(Map<String, String> fieldValues)
+    {
+        submitFormElements("apply", fieldValues);
+    }
+
     public void applyFormElements(String... args)
     {
         submitFormElements("apply", args);
+    }
+
+    public void saveFormElements(Map<String, String> fieldValues)
+    {
+        submitFormElements("save", fieldValues);
     }
 
     public void saveFormElements(String... args)
@@ -141,9 +170,19 @@ public abstract class SeleniumForm
         submitFormElements("save", args);
     }
 
+    public void finishFormElements(Map<String, String> fieldValues)
+    {
+        submitFormElements("finish", fieldValues);
+    }
+
     public void finishFormElements(String... args)
     {
         submitFormElements("finish", args);
+    }
+
+    public void cancelFormElements(Map<String, String> fieldValues)
+    {
+        submitFormElements("cancel", fieldValues);
     }
 
     public void cancelFormElements(String... args)
@@ -169,6 +208,18 @@ public abstract class SeleniumForm
         }
     }
 
+    /**
+     * Returns an array of values of the same size as the form which is null-
+     * filled.  When used to set or submit the form, no values in the form will
+     * be changed.
+     *
+     * @return a value array that will leave the form unchanged
+     */
+    public String[] getUnchangedValues()
+    {
+        return new String[getFieldNames().length];
+    }
+
     public String getFieldValue(String name)
     {
         int type = getFieldType(name);
@@ -190,25 +241,19 @@ public abstract class SeleniumForm
 
     private void setFormElement(String name, String value, int type)
     {
-        String id = getFieldId(name);
-        switch (type)
+        if (value != null)
         {
-            case TEXTFIELD:
-                if (value != null)
-                {
+            String id = getFieldId(name);
+            switch (type)
+            {
+                case TEXTFIELD:
                     selenium.type(id, value);
-                }
-                break;
-            case COMBOBOX:
-                if (value != null)
-                {
+                    break;
+                case COMBOBOX:
                     setComponentValue(id, "'" + value + "'");
-                }
-                break;
-            case ITEM_PICKER:
-            case MULTI_SELECT:
-                if (value != null)
-                {
+                    break;
+                case ITEM_PICKER:
+                case MULTI_SELECT:
                     String[] values = convertMultiValue(value);
                     List<String> quotedValues = CollectionUtils.map(values, new Mapping<String, String>()
                     {
@@ -218,22 +263,16 @@ public abstract class SeleniumForm
                         }
                     });
                     setComponentValue(id, quotedValues.toString());
-                }
-                break;
-            case CHECKBOX:
-                if (value != null)
-                {
+                    break;
+                case CHECKBOX:
                     setComponentValue(id, value);
-                }
-                break;
-            case MULTI_CHECKBOX:
-                if (value != null)
-                {
+                    break;
+                case MULTI_CHECKBOX:
                     setMultiValues(name, value);
-                }
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
