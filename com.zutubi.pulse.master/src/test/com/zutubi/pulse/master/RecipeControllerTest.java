@@ -41,8 +41,6 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.util.*;
 
-/**
- */
 public class RecipeControllerTest extends PulseTestCase
 {
     private File recipeDir;
