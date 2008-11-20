@@ -155,7 +155,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
             BasicAuthenticationManager authenticationManager = new BasicAuthenticationManager(CHANGE_AUTHOR, CHANGE_AUTHOR);
             SVNUpdateClient updateClient = new SVNUpdateClient(authenticationManager, options);
-            updateClient.doCheckout(SVNURL.parseURIDecoded(Constants.TRIVIAL_PROJECT_REPOSITORY), wcDir, SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNDepth.INFINITY, false);
+            updateClient.doCheckout(SVNURL.parseURIDecoded(Constants.TRIVIAL_ANT_REPOSITORY), wcDir, SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNDepth.INFINITY, false);
 
             File buildFile = new File(wcDir, CHANGE_FILENAME);
             assertTrue(buildFile.exists());
@@ -358,7 +358,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         goToArtifact(random, 1, "mess", LOCATOR_OUTPUT_ARTIFACT);
-        assertTextPresent(Constants.TRIVIAL_PROJECT_REPOSITORY);
+        assertTextPresent(Constants.TRIVIAL_ANT_REPOSITORY);
     }
 
     public void testBuildLogAvailable() throws Exception
@@ -428,7 +428,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // we should be prompted for a revision and a pname value.
         SpecifyBuildPropertiesForm sbpf = new SpecifyBuildPropertiesForm(selenium);
         sbpf.waitFor();
-        sbpf.assertFormPresent();
+        assertTrue(sbpf.isFormPresent());
         
         // leave the revision blank
         sbpf.triggerFormElements("");

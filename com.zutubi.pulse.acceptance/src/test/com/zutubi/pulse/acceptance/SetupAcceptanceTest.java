@@ -84,14 +84,14 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         assertPulseTabsNotVisible();
 
         SetPulseDataForm form = new SetPulseDataForm(selenium);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         assertFormFieldNotEmpty("zfid.data");
 
         String defaultDataDir = "data";
 
         form.nextFormElements("");
         assertTextPresent("pulse data directory requires a value");
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
 
         form.nextFormElements(defaultDataDir);
     }
@@ -109,7 +109,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         assertPulseTabsNotVisible();
 
         SetupDatabaseTypeForm form = new SetupDatabaseTypeForm(selenium);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         form.nextFormElements("EMBEDDED", null, null, null, null, null, null);
     }
 
@@ -119,29 +119,29 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
         PulseLicenseForm licenseForm = new PulseLicenseForm(selenium);
 
-        licenseForm.assertFormPresent();
+        assertTrue(licenseForm.isFormPresent());
 
         // check that license is required.
         licenseForm.nextFormElements("");
-        licenseForm.assertFormPresent();
+        assertTrue(licenseForm.isFormPresent());
         licenseForm.assertFormElements("");
         assertTextPresent("license key requires a value");
 
         // check that license validation works.
         licenseForm.nextFormElements(invalidLicenseKey);
-        licenseForm.assertFormPresent();
+        assertTrue(licenseForm.isFormPresent());
         licenseForm.assertFormElements(invalidLicenseKey);
         assertTextPresent("invalid");
 
         // check that an expired license is not accepted.
         licenseForm.nextFormElements(expiredLicenseKey);
-        licenseForm.assertFormPresent();
+        assertTrue(licenseForm.isFormPresent());
         licenseForm.assertFormElements(expiredLicenseKey);
         assertTextPresent("expired");
 
         // enter a valid license.
         licenseForm.nextFormElements(licenseKey);
-        licenseForm.assertFormNotPresent();
+        assertFalse(licenseForm.isFormPresent());
     }
 
     private void checkCreateAdmin()
@@ -151,7 +151,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         CreateAdminForm createAdminForm = new CreateAdminForm(selenium);
 
         // create admin.
-        createAdminForm.assertFormPresent();
+        assertTrue(createAdminForm.isFormPresent());
         createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin", "admin");
     }
 
@@ -160,7 +160,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         assertPulseTabsNotVisible();
 
         ServerSettingsForm settingsForm = new ServerSettingsForm(selenium);
-        settingsForm.assertFormPresent();
+        assertTrue(settingsForm.isFormPresent());
         settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
     }
 

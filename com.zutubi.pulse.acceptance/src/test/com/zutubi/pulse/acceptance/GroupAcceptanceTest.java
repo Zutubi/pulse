@@ -28,7 +28,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         form.finishFormElements(random, null, null);
 
         waitForElement(getGroupPath(random));
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         form.assertFormElements(random, "", "");
     }
 
@@ -139,7 +139,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         // b) go to form, ensure name is not editable.
         // click view or groups/name
         BuiltinGroupForm form = groupsPage.clickViewBuiltinGroupAndWait(groupId);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         assertFalse(form.isEditable("name"));
 
         logout();

@@ -79,7 +79,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         assertFalse(loginPage.isSignupPresent());
         goTo(SIGNUP_INPUT_ACTION);
         SignupForm form = new SignupForm(selenium);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "", "");
         assertTextPresent("Anonymous signup is not enabled");
     }
@@ -89,9 +89,9 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
         goTo(SIGNUP_INPUT_ACTION);
         SignupForm form = new SignupForm(selenium);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "p1", "p2");
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         assertTextPresent("passwords do not match");
     }
 
@@ -100,9 +100,9 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
         goTo(SIGNUP_INPUT_ACTION);
         SignupForm form = new SignupForm(selenium);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         form.saveFormElements("admin", "name", "p", "p");
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         assertTextPresent("login 'admin' is already in use");
     }
 

@@ -25,7 +25,18 @@ public class Maven2TypeConfiguration extends TemplateTypeConfiguration
     @Wizard.Ignore
     @ValidRegex
     private String suppressWarning;
-    
+
+    public Maven2TypeConfiguration()
+    {
+        // setup the default surefire-reports test artifact
+        DirectoryArtifactConfiguration artifact = new DirectoryArtifactConfiguration();
+        artifact.setBase("target/surefire-reports");
+        artifact.setIncludes("*.xml");
+        artifact.setName("surefire-reports");
+        artifact.addPostprocessor("junit");
+        addArtifact(artifact);
+    }
+
     public String getGoals()
     {
         return goals;

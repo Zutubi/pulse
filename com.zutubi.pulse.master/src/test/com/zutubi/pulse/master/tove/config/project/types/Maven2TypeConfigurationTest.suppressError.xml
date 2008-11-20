@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <project defaultRecipe="default">
 
-    
+        <junit.pp name="junit"/>
+
     <recipe name="default">
         <command name="build">
             <!-- pull in the maven2 resource if configured. -->
@@ -11,7 +12,13 @@
                 <suppress-error expression="ERROR"/>
                         </maven2>
 
-            
+                <dir-artifact name="surefire-reports" fail-if-not-present="false"
+                base="target/surefire-reports"
+                                >
+            <include pattern="*.xml"/>
+                                <process processor="${junit}"/>
+    </dir-artifact>
+    
         </command>
     </recipe>
 </project>

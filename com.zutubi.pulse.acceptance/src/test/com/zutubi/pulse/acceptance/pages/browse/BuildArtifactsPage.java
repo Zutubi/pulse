@@ -29,4 +29,9 @@ public class BuildArtifactsPage extends SeleniumPage
     {
         return "link=*command*::*" + command + "*";
     }
+
+    public String getArtifactLocator(String artifactName)
+    {
+        return "link=" + artifactName;
+    }
 }

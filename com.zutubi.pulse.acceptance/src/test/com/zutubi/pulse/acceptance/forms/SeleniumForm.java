@@ -62,17 +62,7 @@ public abstract class SeleniumForm
         SeleniumUtils.waitForElementId(selenium, getFieldId(fields[fields.length - 1]));
     }
 
-    public void assertFormPresent()
-    {
-        TestCase.assertTrue(isFormPresent());
-    }
-
-    public void assertFormNotPresent()
-    {
-        TestCase.assertFalse(isFormPresent());
-    }
-
-    private boolean isFormPresent()
+    public boolean isFormPresent()
     {
         return selenium.isElementPresent(getFormName());
     }
@@ -293,7 +283,7 @@ public abstract class SeleniumForm
 
     public void assertFormElements(String... values)
     {
-        assertFormPresent();
+        TestCase.assertTrue(isFormPresent());
 
         int[] types = getActualFieldTypes();
         Assert.assertEquals(values.length, types.length);

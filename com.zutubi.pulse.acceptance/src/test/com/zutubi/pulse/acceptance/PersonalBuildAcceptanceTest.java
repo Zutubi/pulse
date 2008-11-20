@@ -54,7 +54,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
         SVNUpdateClient client = new SVNUpdateClient(SVNWCUtil.createDefaultAuthenticationManager(), null);
-        client.doCheckout(SVNURL.parseURIDecoded(Constants.TRIVIAL_PROJECT_REPOSITORY), workingCopyDir, SVNRevision.HEAD, SVNRevision.HEAD, SVNDepth.INFINITY, false);
+        client.doCheckout(SVNURL.parseURIDecoded(Constants.TRIVIAL_ANT_REPOSITORY), workingCopyDir, SVNRevision.HEAD, SVNRevision.HEAD, SVNDepth.INFINITY, false);
 
         xmlRpcHelper.loginAsAdmin();
     }

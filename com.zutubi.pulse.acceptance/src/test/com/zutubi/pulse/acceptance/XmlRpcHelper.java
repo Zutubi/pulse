@@ -295,7 +295,7 @@ public class XmlRpcHelper
     public Hashtable<String, Object> getSubversionConfig()
     {
         Hashtable<String, Object> scm = createEmptyConfig("zutubi.subversionConfig");
-        scm.put("url", Constants.TRIVIAL_PROJECT_REPOSITORY);
+        scm.put("url", Constants.TRIVIAL_ANT_REPOSITORY);
         scm.put("checkoutScheme", "CLEAN_CHECKOUT");
         scm.put("monitor", false);
         return scm;
@@ -305,6 +305,13 @@ public class XmlRpcHelper
     {
         Hashtable<String, Object> type = createEmptyConfig("zutubi.antTypeConfig");
         type.put("file", "build.xml");
+        return type;
+    }
+
+    public Hashtable<String, Object> getMaven2Config()
+    {
+        Hashtable<String, Object> type = createEmptyConfig("zutubi.maven2TypeConfig");
+        type.put("goals", "install");
         return type;
     }
 

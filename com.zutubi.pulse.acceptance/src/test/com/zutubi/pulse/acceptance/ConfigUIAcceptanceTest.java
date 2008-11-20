@@ -249,7 +249,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use, please select another name");
     }
 
@@ -268,7 +268,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use, please select another name");
     }
 
@@ -289,7 +289,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use in descendent \"" + childName + "\", please select another name");
     }
 
@@ -313,7 +313,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use in descendents [" + child1Name + ", " + child2Name + "], please select another name");
     }
 
@@ -337,7 +337,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        form.assertFormPresent();
+        assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use in ancestor \"" + parentName + "\", please select another name");
     }
 
@@ -516,7 +516,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         scmPage.waitFor();
         SubversionForm subversionForm = new SubversionForm(selenium);
         subversionForm.waitFor();
-        subversionForm.assertFormElements(Constants.TRIVIAL_PROJECT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null);
+        subversionForm.assertFormElements(Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     private void addInheritingProject(String parentName, String childName)
@@ -551,7 +551,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
         subversionState.waitFor();
         subversionState.nextFormElements("", null, null, null, null, null);
-        subversionState.assertFormPresent();
+        assertTrue(subversionState.isFormPresent());
         assertTextPresent("url requires a value");
     }
 
@@ -608,7 +608,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         subversionState.waitFor();
         assertTrue(subversionState.isMarkedRequired("url"));
         subversionState.nextFormElements("", null, null, null, null, "CLEAN_CHECKOUT");
-        subversionState.assertFormPresent();
+        assertTrue(subversionState.isFormPresent());
         assertTextPresent("url requires a value");
         subversionState.cancelFormElements(null, null, null, null, null, "CLEAN_CHECKOUT");
     }
@@ -626,7 +626,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         projectState.waitFor();
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements("", "", "");
-        projectState.assertFormPresent();
+        assertTrue(projectState.isFormPresent());
         assertTextPresent("name is a required field");
         projectState.nextFormElements(random, "", "");
 

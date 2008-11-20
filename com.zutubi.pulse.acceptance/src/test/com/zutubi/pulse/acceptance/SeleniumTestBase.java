@@ -291,12 +291,28 @@ public class SeleniumTestBase extends ZutubiTestCase
         projectTypeState.waitFor();
         scmTypeState.nextFormElements(driver.selectType());
 
-        AddProjectWizard.AntState typeState = new AddProjectWizard.AntState(selenium);
+        AddProjectWizard.TypeState typeState = createTypeForm(driver.selectType());
         typeState.waitFor();
 
         driver.typeState(typeState);
 
         return typeState;
+    }
+
+    private AddProjectWizard.TypeState createTypeForm(String s)
+    {
+        if (s.equals("zutubi.antTypeConfig"))
+        {
+            return new AddProjectWizard.AntState(selenium);
+        }
+        else if (s.equals("zutubi.maven2TypeConfig"))
+        {
+            return new AddProjectWizard.Maven2State(selenium);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unknown type config: " + s);
+        }
     }
 
     private AddProjectWizard.ScmState createScmForm(String s)
@@ -398,7 +414,7 @@ public class SeleniumTestBase extends ZutubiTestCase
 
         public void scmState(AddProjectWizard.ScmState form)
         {
-            form.nextFormElements(Constants.TRIVIAL_PROJECT_REPOSITORY, null, null, null, null, "CLEAN_CHECKOUT");
+            form.nextFormElements(Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, "CLEAN_CHECKOUT");
         }
 
         public String selectType()

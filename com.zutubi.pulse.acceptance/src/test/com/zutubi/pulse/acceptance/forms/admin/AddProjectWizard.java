@@ -4,6 +4,7 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.AntTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.Maven2TypeConfiguration;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -115,6 +116,11 @@ public class AddProjectWizard
 
             cancelFormElements(emptyValues.toArray(new String[emptyValues.size()]));
         }
+
+        protected boolean isBrowseFieldAvailable(String fieldName)
+        {
+            return selenium.isElementPresent("zfid."+fieldName+".browse");
+        }
     }
 
     public static class AntState extends TypeState
@@ -148,10 +154,33 @@ public class AddProjectWizard
         {
             return isBrowseFieldAvailable("file");
         }
+    }
 
-        private boolean isBrowseFieldAvailable(String fieldName)
+    public static class Maven2State extends TypeState
+    {
+        public Maven2State(Selenium selenium)
         {
-            return selenium.isElementPresent("zfid."+fieldName+".browse");
+            super(selenium);
+        }
+
+        public String getFormName()
+        {
+            return Maven2TypeConfiguration.class.getName();
+        }
+
+        public String[] getFieldNames()
+        {
+            return new String[]{"workingDir", "goals", "arguments"};
+        }
+
+        public int[] getFieldTypes()
+        {
+            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD};
+        }
+
+        public boolean isBrowseWorkAvailable()
+        {
+            return isBrowseFieldAvailable("workingDir");
         }
     }
 }
