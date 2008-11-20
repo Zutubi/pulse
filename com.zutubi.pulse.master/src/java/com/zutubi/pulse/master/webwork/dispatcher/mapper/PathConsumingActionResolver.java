@@ -2,6 +2,9 @@ package com.zutubi.pulse.master.webwork.dispatcher.mapper;
 
 import com.zutubi.util.TextUtils;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * A resolver that allows an arbitrary path to be appended to the url.  The
  * path is captured as a single parameter.
@@ -23,6 +26,11 @@ public class PathConsumingActionResolver extends ActionResolverSupport
         this.paramName = paramName;
         this.currentPath = currentPath;
         addParameter(paramName, currentPath);
+    }
+
+    public List<String> listChildren()
+    {
+        return Arrays.asList("<path element>");
     }
 
     public ActionResolver getChild(String name)

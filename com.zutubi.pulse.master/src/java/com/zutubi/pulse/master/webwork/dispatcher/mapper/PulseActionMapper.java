@@ -9,6 +9,8 @@ import com.zutubi.pulse.master.webwork.dispatcher.mapper.browse.BrowseActionReso
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.dashboard.MyBuildsActionResolver;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.server.ServerActionResolver;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.TextUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,11 @@ public class PulseActionMapper implements ActionMapper
     public static final String SERVER_NAMESPACE    = "/server";
     public static final String AGENTS_NAMESPACE    = "/agents";
     public static final String ADMIN_NAMESPACE     = "/admin";
+
+    private static final String PATH_MY_BUILDS = "my";
+    private static final String PATH_MY_CHANGES = "changes";
+    private static final String PATH_PREFERENCES = "preferences";
+    private static final String PATH_MY_HOME = "home";
 
     private DefaultActionMapper delegate = new DefaultActionMapper();
     private ActionResolver browseActionResolver = new BrowseActionResolver();
@@ -160,17 +167,17 @@ public class PulseActionMapper implements ActionMapper
     private ActionMapping getDashboardMapping(String path, HttpServletRequest request)
     {
         path = normalise(path);
-        if(path.startsWith("preferences"))
+        if(path.startsWith(PATH_PREFERENCES))
         {
             // /dashboard/preferences/<path> is a config view rooted at
             // users/<user>/preferences
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("prefixPath", "users/${principle}");
             parameters.put("section", "dashboard");
-            parameters.put("tab", "preferences");
+            parameters.put("tab", PATH_PREFERENCES);
             return getConfigMapping(ADMIN_NAMESPACE, path, request.getQueryString(), parameters);
         }
-        else if(path.startsWith("changes"))
+        else if(path.startsWith(PATH_MY_CHANGES))
         {
             String[] elements = path.split("/");
             if(elements.length != 2)
@@ -182,7 +189,7 @@ public class PulseActionMapper implements ActionMapper
             parameters.put("id", elements[1]);
             return new ActionMapping("viewChangelist", "default", null, parameters);
         }
-        else if(path.startsWith("my"))
+        else if(path.startsWith(PATH_MY_BUILDS))
         {
             return getResolverMapping(path.substring(2), DASHBOARD_NAMESPACE, new MyBuildsActionResolver());
         }
@@ -190,7 +197,7 @@ public class PulseActionMapper implements ActionMapper
         {
             if (path.length() == 0)
             {
-                path = "home";
+                path = PATH_MY_HOME;
             }
             
             // All other dashboard paths are trivial action names.
@@ -309,5 +316,33 @@ public class PulseActionMapper implements ActionMapper
     public String getUriFromActionMapping(ActionMapping mapping)
     {
         return delegate.getUriFromActionMapping(mapping);
+    }
+
+    public static void main(String argv[])
+    {
+        // Displays valid URLs for all namespaces except /admin.
+        Map<String, ActionResolver> baseResolvers = CollectionUtils.asOrderedMap(
+                asPair(DASHBOARD_NAMESPACE + "/" + PATH_MY_HOME + "/", (ActionResolver) null),
+                asPair(DASHBOARD_NAMESPACE + "/" + PATH_MY_BUILDS, new MyBuildsActionResolver()),
+                asPair(DASHBOARD_NAMESPACE + "/" + PATH_PREFERENCES + "/", (ActionResolver) null),
+                asPair(BROWSE_NAMESPACE, new BrowseActionResolver()),
+                asPair(SERVER_NAMESPACE, new ServerActionResolver()),
+                asPair(AGENTS_NAMESPACE, new AgentsActionResolver())
+        );
+
+        for (Map.Entry<String, ActionResolver> entry: baseResolvers.entrySet())
+        {
+            if (entry.getValue() == null)
+            {
+                System.out.println(entry.getKey());
+            }
+            else
+            {
+                for (String url: UrlEnumerator.enumerate(entry.getValue()))
+                {
+                    System.out.println(entry.getKey() + "/" + url);
+                }
+            }
+        }
     }
 }

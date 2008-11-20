@@ -2,11 +2,13 @@ package com.zutubi.pulse.master.webwork.dispatcher.mapper;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
+ * Helper base class that implements the ActionResolver interface.
  */
-public class ActionResolverSupport implements ActionResolver
+public abstract class ActionResolverSupport implements ActionResolver
 {
     private String action;
     private Map<String, String> parameters = null;
@@ -40,6 +42,11 @@ public class ActionResolverSupport implements ActionResolver
             parameters = new HashMap<String, String>();
         }
         parameters.put(name, value);
+    }
+
+    public List<String> listChildren()
+    {
+        return Collections.EMPTY_LIST;
     }
 
     public ActionResolver getChild(String name)
