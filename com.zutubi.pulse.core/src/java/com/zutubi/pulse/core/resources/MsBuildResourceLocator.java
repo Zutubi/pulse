@@ -1,9 +1,8 @@
 package com.zutubi.pulse.core.resources;
 
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -119,7 +118,7 @@ public class MsBuildResourceLocator implements ResourceLocator
             try
             {
                 String[] v1 = o1.getName().split("\\.");
-                String[] v2 = o1.getName().split("\\.");
+                String[] v2 = o2.getName().split("\\.");
 
                 for (int i = 0; i < v1.length && i < v2.length; i++)
                 {
