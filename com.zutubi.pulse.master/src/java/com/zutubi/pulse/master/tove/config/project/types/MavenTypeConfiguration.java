@@ -7,8 +7,7 @@ import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 /**
- *
- *
+ * The UI configuration for the maven 1.x project template.
  */
 @SymbolicName("zutubi.mavenTypeConfig")
 @Form(fieldOrder = {"workingDir", "targets", "arguments", "postProcessors"})
@@ -17,8 +16,19 @@ public class MavenTypeConfiguration extends TemplateTypeConfiguration
     private String targets;
     @BrowseScmDirAction
     private String workingDir;
-    
+
     private String arguments;
+
+    public MavenTypeConfiguration()
+    {
+        // setup the default surefire-reports test artifact
+        DirectoryArtifactConfiguration artifact = new DirectoryArtifactConfiguration();
+        artifact.setName("test reports");
+        artifact.setBase("target/test-reports");
+        artifact.setIncludes("TEST-*.xml");
+        artifact.addPostprocessor("junit");
+        addArtifact(artifact);
+    }
 
     public String getTargets()
     {

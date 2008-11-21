@@ -8,21 +8,29 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 /**
- * The acceptance tests for the Pulse builtin maven integration.
+ * The acceptance tests for the Pulse builtin maven 1.x and 2.x integration.
  */
-public class Maven2AcceptanceTest extends SeleniumTestBase
+public class MavenAcceptanceTest extends SeleniumTestBase
 {
-    protected void setUp() throws Exception
+    @SuppressWarnings({ "unchecked" })
+    public void testMavenDefaultTestArtifactConfiguration() throws Exception
     {
-        super.setUp();
+        createMavenProject(random);
 
-        loginAsAdmin();
+        // We expect a artifact called surefire-reports to be configured.
+        Hashtable<String, Object> artifact = getArtifactConfiguration(random, "test reports");
+        assertEquals("test reports", artifact.get(Constants.DirectoryArtifact.NAME));
+        assertEquals("target/test-reports", artifact.get(Constants.DirectoryArtifact.BASE));
+        assertEquals("TEST-*.xml", artifact.get(Constants.DirectoryArtifact.INCLUDES));
+        Vector<String> postprocessors = (Vector<String>) artifact.get(Constants.DirectoryArtifact.POSTPROCESSORS);
+        assertEquals(1, postprocessors.size());
+        assertEquals("junit", postprocessors.get(0));
     }
 
     @SuppressWarnings({ "unchecked" })
-    public void testSurefireTestsArtifactConfiguration() throws Exception
+    public void testMaven2DefaultTestArtifactConfiguration() throws Exception
     {
-        createMavenProject(random);
+        createMaven2Project(random);
 
         // We expect a artifact called surefire-reports to be configured.
         Hashtable<String, Object> artifact = getArtifactConfiguration(random, "test reports");
@@ -36,14 +44,16 @@ public class Maven2AcceptanceTest extends SeleniumTestBase
 
     public void testMaven2BuildPicksUpTests() throws Exception
     {
-        createMavenProject(random);
+        createMaven2Project(random);
 
         int buildNumber = runBuild(random);
+
+        loginAsAdmin();
 
         // We expect the summary page to report that 1 test passed.
         BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, random, buildNumber);
         summaryPage.goTo();
-        assertTrue(selenium.isElementPresent("link=*all 1 passed*"));
+        assertEquals("all 1 passed", summaryPage.getSummaryTestsColumnText());
 
         // We expect the artifacts page to contain an artifact called test reports.
         BuildArtifactsPage artifactsPage = new BuildArtifactsPage(selenium, urls, random, buildNumber);
@@ -53,11 +63,27 @@ public class Maven2AcceptanceTest extends SeleniumTestBase
 
     private void createMavenProject(String projectName) throws Exception
     {
+        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.mavenTypeConfig");
+        type.put("targets", "install");
+
+        createMavenProject(projectName, type);
+    }
+
+    private void createMaven2Project(String projectName) throws Exception
+    {
+        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.maven2TypeConfig");
+        type.put("goals", "install");
+
+        createMavenProject(projectName, type);
+    }
+
+    private void createMavenProject(String projectName, Hashtable<String, Object> type) throws Exception
+    {
         xmlRpcHelper.loginAsAdmin();
 
         Hashtable<String, Object> scm = xmlRpcHelper.getSubversionConfig();
         scm.put("url", Constants.TEST_MAVEN_REPOSITORY);
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, scm, xmlRpcHelper.getMaven2Config());
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, scm, type);
 
         xmlRpcHelper.waitForProjectToInitialise(projectName);
         xmlRpcHelper.logout();

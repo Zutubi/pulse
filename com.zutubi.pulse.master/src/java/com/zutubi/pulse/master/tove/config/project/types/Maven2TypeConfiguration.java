@@ -9,7 +9,7 @@ import com.zutubi.validation.annotations.ValidRegex;
 import org.apache.velocity.VelocityContext;
 
 /**
- * The UI configuration for the maven 2 project template.
+ * The UI configuration for the maven 2.x project template.
  */
 @SymbolicName("zutubi.maven2TypeConfig")
 @Form(fieldOrder = {"workingDir", "goals", "arguments", "postProcessors", "suppressWarning", "suppressError"})

@@ -7,18 +7,8 @@
         <command name="build">
             <!-- pull in the maven resource if configured. -->
             <resource name="maven" required="false"/>
-            <maven
-#if($workingDir)
-                working-dir="${base.dir}/$workingDir"
-#end
-#if($targets)
-                targets="$targets"
-#end
-#if($arguments)
-                args="$arguments"
-#end
-            >
-                #parse("pulse-file/output.processors.vm")
+            <maven#if($workingDir) working-dir="${base.dir}/$workingDir"#end#if($targets) targets="$targets"#end#if($arguments) args="$arguments"#end>
+            #parse("pulse-file/output.processors.vm")
             </maven>
 
             #parse("pulse-file/artifacts.vm")

@@ -317,13 +317,6 @@ public class XmlRpcHelper
         return type;
     }
 
-    public Hashtable<String, Object> getMaven2Config()
-    {
-        Hashtable<String, Object> type = createEmptyConfig("zutubi.maven2TypeConfig");
-        type.put("goals", "install");
-        return type;
-    }
-
     public void waitForProjectToInitialise(String name) throws Exception
     {
         long startTime = System.currentTimeMillis();

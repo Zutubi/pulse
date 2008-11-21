@@ -29,4 +29,14 @@ public class BuildSummaryPage extends SeleniumPage
     {
         selenium.click("hook." + hookName);
     }
+
+    public boolean hasTests()
+    {
+        return !getSummaryTestsColumnText().contains("none");
+    }
+
+    public String getSummaryTestsColumnText()
+    {
+        return selenium.getText("id="+projectName+".build."+buildId+".test");
+    }
 }

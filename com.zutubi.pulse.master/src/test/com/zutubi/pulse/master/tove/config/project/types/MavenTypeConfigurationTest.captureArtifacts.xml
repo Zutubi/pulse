@@ -7,11 +7,16 @@
         <command name="build">
             <!-- pull in the maven resource if configured. -->
             <resource name="maven" required="false"/>
-            <maven
-            >
-                            </maven>
+            <maven>
+                        </maven>
 
-                <artifact name="artifact 1" file="filename" fail-if-not-present="false"
+                <dir-artifact name="test reports" fail-if-not-present="false"
+                base="target/test-reports"
+                                >
+            <include pattern="TEST-*.xml"/>
+                                <process processor="${junit}"/>
+    </dir-artifact>
+        <artifact name="artifact 1" file="filename" fail-if-not-present="false"
                 >
                 <process processor="${junit}"/>
     </artifact>
