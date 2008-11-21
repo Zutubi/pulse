@@ -12,10 +12,10 @@
                 <process processor="${junit}"/>
             </maven2>
 
-                <dir-artifact name="surefire-reports" fail-if-not-present="false"
+                <dir-artifact name="test reports" fail-if-not-present="false"
                 base="target/surefire-reports"
                                 >
-            <include pattern="*.xml"/>
+            <include pattern="TEST-*.xml"/>
                                 <process processor="${junit}"/>
     </dir-artifact>
     
