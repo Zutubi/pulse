@@ -80,8 +80,8 @@
         </div>
     </div>
 
-    <h3 class="heading">#wwtext("name=project.tail.box") <!--#if($logExists) &nbsp;<a href="$urls.projectLog($project)raw/true/"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=project.full.log")</a> #end --></h3>
-    <div class="box">
+    <h3 class="heading">#wwtext("name=project.tail.box") #if($logExists) &nbsp;<a href="$urls.projectLog($project)raw/true/"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=project.full.log")</a> #end</h3>
+    <div id="project-log-${project.name}" class="box">
         <div id="panel">
             #parse("ajax/tail-log-panel.vm")
         </div>

@@ -115,6 +115,4 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
             assertTrue(selenium.isElementPresent("page.next"));
         }
     }
-
-
 }

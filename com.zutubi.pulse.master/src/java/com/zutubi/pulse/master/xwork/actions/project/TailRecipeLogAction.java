@@ -13,6 +13,7 @@ import com.zutubi.util.io.Tail;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  */
@@ -26,7 +27,7 @@ public class TailRecipeLogAction extends StageActionBase
     protected String tail = "";
     protected MasterConfigurationManager configurationManager;
     protected boolean logExists;
-    private FileInputStream inputStream;
+    protected InputStream inputStream;
     private ConfigurationProvider configurationProvider;
 
     public void setRaw(boolean raw)
@@ -64,7 +65,7 @@ public class TailRecipeLogAction extends StageActionBase
         return logExists;
     }
 
-    public FileInputStream getInputStream()
+    public InputStream getInputStream()
     {
         return inputStream;
     }

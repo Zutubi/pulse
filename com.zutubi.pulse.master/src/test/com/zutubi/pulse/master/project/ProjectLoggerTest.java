@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.io.IOUtils;
+import static com.zutubi.util.io.IOUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,10 +31,9 @@ public class ProjectLoggerTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        IOUtils.close(logger);
+        close(logger);
         removeDirectory(tempDir);
-        logger = null;
-        tempDir = null;
+
         super.tearDown();
     }
 
@@ -45,7 +44,7 @@ public class ProjectLoggerTest extends PulseTestCase
         // Null out to prevent second close in tearDown.
         logger = null;
 
-        String written = IOUtils.fileToString(new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0)));
+        String written = fileToString(new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0)));
         assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(written));
     }
 
@@ -73,10 +72,10 @@ public class ProjectLoggerTest extends PulseTestCase
         logMessage(TEST_MESSAGE);
         assertTrue(rotatedFile.exists());
 
-        assertEquals(getFullContent(), wipeTimestamps(IOUtils.fileToString(rotatedFile)));
+        assertEquals(getFullContent(), wipeTimestamps(fileToString(rotatedFile)));
 
         File primaryFile = new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0));
-        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(IOUtils.fileToString(primaryFile)));
+        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(fileToString(primaryFile)));
     }
 
     public void testTailAfterRotate() throws IOException
@@ -104,10 +103,56 @@ public class ProjectLoggerTest extends PulseTestCase
         }
 
         File primaryFile = new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0));
-        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(IOUtils.fileToString(primaryFile)));
+        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(fileToString(primaryFile)));
 
         File rotatedFile = new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 1));
-        assertEquals(getFullContent(), wipeTimestamps(IOUtils.fileToString(rotatedFile)));
+        assertEquals(getFullContent(), wipeTimestamps(fileToString(rotatedFile)));
+    }
+
+    public void testRawWithNoLogMessages() throws IOException
+    {
+        assertEquals("", inputStreamToString(logger.raw()));
+    }
+
+    public void testRaw() throws IOException
+    {
+        logMessage(TEST_MESSAGE);
+
+        String raw = inputStreamToString(logger.raw());
+        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(raw));
+    }
+
+    public void testRawAfterFirstRotation() throws IOException
+    {
+        for (int i = 0; i < LINE_LIMIT + 1; i++)
+        {
+            logMessage(TEST_MESSAGE);
+        }
+
+        String raw = inputStreamToString(logger.raw());
+        assertEquals(getFullContent() + TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(raw));
+    }
+
+    public void testRawAfterSecondRotation() throws IOException
+    {
+        for (int i = 0; i < LINE_LIMIT * 2 + 1; i++)
+        {
+            logMessage(TEST_MESSAGE);
+        }
+
+        String raw = inputStreamToString(logger.raw());
+        assertEquals(getFullContent() + TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(raw));
+    }
+
+    public void testRawBeforeSecondRotation() throws IOException
+    {
+        for (int i = 0; i < LINE_LIMIT * 2; i++)
+        {
+            logMessage(TEST_MESSAGE);
+        }
+
+        String raw = inputStreamToString(logger.raw());
+        assertEquals(getFullContent() + getFullContent(), wipeTimestamps(raw));
     }
 
     private void logMessage(String message)

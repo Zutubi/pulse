@@ -5,8 +5,11 @@ import com.zutubi.pulse.master.project.events.ProjectInitialisationCommencedEven
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.io.MultipleFileInputStream;
 import com.zutubi.util.io.Tail;
 import com.zutubi.util.logging.Logger;
 
@@ -112,6 +115,33 @@ public class ProjectLogger implements Closeable
 
         Tail tail = new Tail(maxLines, lastFile, currentFile);
         return tail.getTail();
+    }
+
+    /**
+     * Return an inputstream that provides access to the raw data of the project log.
+     * <p/>
+     * Note: the input stream will need to be closed by the caller.
+     *
+     * @return input stream that provides access to the project log.
+     *
+     * @throws IOException if there is a problem reading the log files.
+     */
+    public synchronized InputStream raw() throws IOException
+    {
+        if (closed)
+        {
+            throw new IllegalStateException("The logger is closed.");
+        }
+
+        File[] files = CollectionUtils.filterToArray(new File[]{lastFile, currentFile}, new Predicate<File>()
+        {
+            public boolean satisfied(File file)
+            {
+                return file.isFile();
+            }
+        });
+
+        return new MultipleFileInputStream(files);
     }
 
     /**
