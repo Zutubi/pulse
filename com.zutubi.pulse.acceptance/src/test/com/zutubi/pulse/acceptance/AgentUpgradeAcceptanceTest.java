@@ -5,29 +5,24 @@ import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import static com.zutubi.util.FileSystemUtils.*;
 import com.zutubi.util.Constants;
+import static com.zutubi.util.FileSystemUtils.createTempDir;
+import static com.zutubi.util.FileSystemUtils.join;
+import com.zutubi.util.NullUnaryProcedure;
+import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
 
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
-
-/**
- *
- *
- */
-@Test
 public class AgentUpgradeAcceptanceTest extends PulseTestCase
 {
     private File tmp = null;
-
     private PackageFactory packageFactory = null;
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -36,7 +31,6 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         packageFactory = new JythonPackageFactory();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         packageFactory = null;
@@ -48,63 +42,52 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
     public void testNormalAgentUpgrade() throws Exception
     {
+        runAgentUpgrade(new NullUnaryProcedure<Pulse>());
+    }
+
+    public void testUserEditedFiles() throws Exception
+    {
+        runAgentUpgrade(new UnaryProcedure<Pulse>()
+        {
+            public void process(Pulse agent)
+            {
+                try
+                {
+                    File bin = new File(agent.getPulseHome(), "bin");
+
+                    // Users may edit wrapper.conf to tune settings
+                    editFile(new File(bin, "wrapper.conf"));
+                    // Another common file to edit is init.sh
+                    editFile(new File(bin, "init.sh"));
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+    private void editFile(File file) throws IOException
+    {
+        assertTrue(file.isFile());
+        String conf = IOUtils.fileToString(file);
+        FileSystemUtils.createFile(file, conf + "\n");
+    }
+
+    private void runAgentUpgrade(UnaryProcedure<Pulse> agentCallback) throws Exception
+    {
         Pulse agent = null;
         Pulse master = null;
 
         try
         {
-            // get package details.
-            File pulsePackage = getPulsePackage();
-
-            // get old agent package that we are upgrading from.
-            // a) start with a predefined package, later move to a range of older packages that we can test from.
-            File oldAgentPackage = new File(getPulseRoot(), join("com.zutubi.pulse.acceptance", "src", "test", "data", "pulse-agent-2.0.0.zip"));
-
-            // ensure that the two packages exist.
-
-            // unpack and start old agent.
-            // agent-port
-            // tmp/agent-data
-            PulsePackage agentPackage = packageFactory.createPackage(oldAgentPackage);
-            agent = agentPackage.extractTo(new File(tmp, "agent").getCanonicalPath());
-            agent.setUserHome(new File(tmp, "user-home").getCanonicalPath());
-            agent.setDataDir(new File(tmp, "agent-data").getCanonicalPath());
-            agent.setPort(7689);
-            agent.start();
-
-            // unpack and start master
-            // master-port
-            // tmp/master-data
-            PulsePackage masterPackage = packageFactory.createPackage(pulsePackage);
-            master = masterPackage.extractTo(new File(tmp, "master").getCanonicalPath());
-            master.setUserHome(new File(tmp, "user-home").getCanonicalPath());
-            master.setDataDir(new File(tmp, "master-data").getCanonicalPath());
-            master.setPort(7688);
-            master.start();
-
-            // work through the master setup.
-            // - piggy back of the existing acceptance test.
-            try
-            {
-                System.setProperty("pulse.port", "7688");
-                SetupAcceptanceTest setup = new SetupAcceptanceTest();
-                setup.setUp();
-                // we can not run the usual test since that attempts to specify the data directory.
-                setup.checkPostPulseData();
-                setup.tearDown();
-            }
-            catch (RuntimeException e)
-            {
-                fail(e.getMessage());
-            }
-            catch (Exception e)
-            {
-                fail(e.getMessage());
-            }
+            agent = prepareAgent(agent);
+            agentCallback.process(agent);
+            master = prepareMaster(master);
 
             // test
             // a) check that the agent build number is as expected.
-
             String agentUrl = agent.getServerUrl();
             agentUrl = agentUrl + "/xmlrpc";
 
@@ -126,7 +109,6 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
             masterXmlRpc.insertTemplatedConfig("agents/global agent template", agentConfig, false);
 
-            //RemoteApi.getAgentStatus(master.getAdminToken(), 'upgrade-agent')
             long endTime = System.currentTimeMillis() + 5 * Constants.MINUTE;
             Thread.sleep(5 * Constants.SECOND);
 
@@ -148,6 +130,67 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
             shutdown(agent);
             shutdown(master);
         }
+    }
+
+    private Pulse prepareMaster(Pulse master) throws IOException
+    {
+        // unpack and start master
+        // master-port
+        // tmp/master-data
+        File pulsePackage = getPulsePackage();
+        assertNotNull("No pulse package specified (use the system property pulse.package)", pulsePackage);
+        PulsePackage masterPackage = packageFactory.createPackage(pulsePackage);
+        master = masterPackage.extractTo(new File(tmp, "master").getCanonicalPath());
+        master.setUserHome(new File(tmp, "user-home").getCanonicalPath());
+        master.setDataDir(new File(tmp, "master-data").getCanonicalPath());
+        master.setPort(7688);
+        master.start();
+
+        setupMaster();
+        return master;
+    }
+
+    private void setupMaster()
+    {
+        // work through the master setup.
+        // - piggy back of the existing acceptance test.
+        try
+        {
+            System.setProperty("pulse.port", "7688");
+            SetupAcceptanceTest setup = new SetupAcceptanceTest();
+            setup.setUp();
+            // we can not run the usual test since that attempts to specify the data directory.
+            setup.checkPostPulseData();
+            setup.tearDown();
+        }
+        catch (RuntimeException e)
+        {
+            fail(e.getMessage());
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
+    }
+
+    private Pulse prepareAgent(Pulse agent) throws IOException
+    {
+        // get old agent package that we are upgrading from.
+        // a) start with a predefined package, later move to a range of older packages that we can test from.
+        File oldAgentPackage = new File(getPulseRoot(), join("com.zutubi.pulse.acceptance", "src", "test", "data", "pulse-agent-2.0.0.zip"));
+
+        // ensure that the two packages exist.
+
+        // unpack and start old agent.
+        // agent-port
+        // tmp/agent-data
+        PulsePackage agentPackage = packageFactory.createPackage(oldAgentPackage);
+        agent = agentPackage.extractTo(new File(tmp, "agent").getCanonicalPath());
+        agent.setUserHome(new File(tmp, "user-home").getCanonicalPath());
+        agent.setDataDir(new File(tmp, "agent-data").getCanonicalPath());
+        agent.setPort(7689);
+        agent.start();
+        return agent;
     }
 
     private void shutdown(Pulse instance)

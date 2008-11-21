@@ -2,7 +2,6 @@ package com.zutubi.pulse.slave.command;
 
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
@@ -10,6 +9,7 @@ import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.pulse.slave.MasterProxyFactory;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -30,24 +30,22 @@ public class UpdateCommand implements Runnable
     private String token;
     private long handle;
     private String url;
-    private long packageSize;
     private ConfigurationManager configurationManager;
     private MasterProxyFactory masterProxyFactory;
     private ShutdownManager shutdownManager;
 
-    public UpdateCommand(String build, String master, String token, long handle, String url, long packageSize)
+    public UpdateCommand(String build, String master, String token, long handle, String url)
     {
         this.build = build;
         this.master = master;
         this.token = token;
         this.handle = handle;
         this.url = url;
-        this.packageSize = packageSize;
     }
 
     public void run()
     {
-        MasterService masterService = null;
+        MasterService masterService;
         try
         {
             masterService = masterProxyFactory.createProxy(master);
@@ -79,7 +77,7 @@ public class UpdateCommand implements Runnable
                 versionDir.delete();
 
                 // Need to obtain the package
-                if(!downloadAndApplyUpdate(masterService, pulseHome, versionDir))
+                if(!downloadAndApplyUpdate(masterService, versionDir))
                 {
                     // The package contains new components that we cannot
                     // update.  Log and give up.
@@ -106,11 +104,6 @@ public class UpdateCommand implements Runnable
         sendMessage(masterService, state, null);
     }
 
-    private void sendMessage(MasterService masterService, UpgradeState state, int progress)
-    {
-        sendMessage(masterService, state, progress, null);
-    }
-
     private void sendMessage(MasterService masterService, UpgradeState state, String message)
     {
         sendMessage(masterService, state, -1, message);
@@ -128,7 +121,7 @@ public class UpdateCommand implements Runnable
         }
     }
 
-    private boolean downloadAndApplyUpdate(MasterService masterService, File pulseHome, File versionDir) throws IOException
+    private boolean downloadAndApplyUpdate(MasterService masterService, File versionDir) throws IOException
     {
         File tempDir = new File(configurationManager.getSystemPaths().getTmpRoot(), RandomUtils.randomString(3));
         tempDir.mkdirs();
@@ -168,12 +161,6 @@ public class UpdateCommand implements Runnable
             File packageVersionFile = PulseCtl.getActiveVersionFile(packageRoot);
             packageVersionFile.delete();
 
-            if(!checkUnversionedComponents(pulseHome, packageRoot, true))
-            {
-                sendMessage(masterService, UpgradeState.FAILED, "Unable to apply this update automatically.  A manual upgrade is required.");
-                return false;
-            }
-
             // This comes last: we only want to do this when we are happy to upgrade to this version!
             if(!packageVersionDir.renameTo(versionDir))
             {
@@ -186,57 +173,6 @@ public class UpdateCommand implements Runnable
         {
             FileSystemUtils.rmdir(tempDir);
         }
-    }
-
-    /**
-     * Tests if all the non-versioned files/directories in the package (i.e.
-     * files not under the versions dir) are present and identical in our
-     * current installation.
-     *
-     * @param installDir
-     * @param packageDir
-     */
-    private boolean checkUnversionedComponents(File installDir, File packageDir, boolean top) throws IOException
-    {
-        String[] children = packageDir.list();
-        for(String child: children)
-        {
-            if(top && child.equals("versions"))
-            {
-                // Ignore the versioned components
-                continue;
-            }
-
-            File packageFile = new File(packageDir, child);
-            File installFile = new File(installDir, child);
-
-            if(packageFile.isDirectory())
-            {
-                if(!installFile.isDirectory())
-                {
-                    return false;
-                }
-
-                if(!checkUnversionedComponents(installFile, packageFile, false))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if(!installFile.isFile())
-                {
-                    return false;
-                }
-
-                if(!FileSystemUtils.filesMatch(installFile, packageFile))
-                {
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 
     private void updateActiveVersion(File pulseHome) throws IOException

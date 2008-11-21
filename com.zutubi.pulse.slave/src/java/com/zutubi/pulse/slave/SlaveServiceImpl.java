@@ -53,7 +53,7 @@ public class SlaveServiceImpl implements SlaveService
         serviceTokenManager.validateToken(token);
 
         // Currently we always accept the request
-        UpdateCommand command = new UpdateCommand(build, master, token, handle, packageUrl, packageSize);
+        UpdateCommand command = new UpdateCommand(build, master, token, handle, packageUrl);
         SpringComponentContext.autowire(command);
         threadPool.execute(command);
         return true;
