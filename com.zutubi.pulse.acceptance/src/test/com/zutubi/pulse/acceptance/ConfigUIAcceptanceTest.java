@@ -142,7 +142,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         CheckForm checkForm = new CheckForm(form);
         checkForm.checkFormElementsAndWait();
         assertFalse(checkForm.isResultOk());
-        assertEquals("connection refused", checkForm.getResultMessage());
+        assertTrue(checkForm.getResultMessage().contains("connection refused"));
     }
 
     public void testCheckFormValidationFailure() throws Exception
