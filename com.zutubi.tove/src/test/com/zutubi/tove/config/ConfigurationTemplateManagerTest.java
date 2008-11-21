@@ -6,6 +6,8 @@ import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.annotations.ReadOnly;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.config.events.*;

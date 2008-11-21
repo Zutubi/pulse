@@ -4,7 +4,7 @@ import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Text;
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;

@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 
 /**
  * Represents an external SCM change viewing application, such as Fisheye or

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.xwork.actions.DefaultAction;
+import com.zutubi.tove.annotations.*;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Numeric;
 

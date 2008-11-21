@@ -4,7 +4,7 @@ import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;

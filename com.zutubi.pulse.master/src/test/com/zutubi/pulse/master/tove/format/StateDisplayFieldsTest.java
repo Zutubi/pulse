@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.format;
 
-import com.zutubi.tove.config.AbstractConfiguration;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
 /**
  * Base for all contact points, establishes the minimal contract they must

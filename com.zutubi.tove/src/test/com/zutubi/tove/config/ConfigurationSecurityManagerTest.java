@@ -1,6 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.security.*;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;

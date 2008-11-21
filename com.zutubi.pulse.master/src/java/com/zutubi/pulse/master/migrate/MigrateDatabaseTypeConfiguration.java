@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.migrate;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.tove.config.setup.DatabaseType;
+import com.zutubi.tove.annotations.*;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.Validateable;

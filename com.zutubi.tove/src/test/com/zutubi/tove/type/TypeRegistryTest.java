@@ -1,13 +1,13 @@
 package com.zutubi.tove.type;
 
 import com.zutubi.tove.annotations.ID;
-import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.ReadOnly;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.config.AbstractConfiguration;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
-import com.zutubi.validation.annotations.Required;
+import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.junit.ZutubiTestCase;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.List;
 import java.util.Map;

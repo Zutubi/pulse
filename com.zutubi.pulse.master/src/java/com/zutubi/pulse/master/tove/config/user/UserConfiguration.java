@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.tove.annotations.*;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.type.Extendable;
 import com.zutubi.validation.annotations.Required;
 

@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.config.api;
 
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
 /**

@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.validation.annotations.Required;
 
 /**

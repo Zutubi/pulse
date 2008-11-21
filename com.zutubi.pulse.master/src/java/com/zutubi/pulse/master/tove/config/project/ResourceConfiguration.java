@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

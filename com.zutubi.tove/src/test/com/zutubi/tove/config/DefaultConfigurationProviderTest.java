@@ -2,6 +2,7 @@ package com.zutubi.tove.config;
 
 import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;

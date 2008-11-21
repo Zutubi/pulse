@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.tove.config.admin;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 
 /**
  */

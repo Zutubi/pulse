@@ -1,6 +1,6 @@
 package com.zutubi.tove.config.cleanup;
 
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;

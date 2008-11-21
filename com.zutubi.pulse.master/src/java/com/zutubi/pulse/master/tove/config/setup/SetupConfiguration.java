@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 
 /**
  *

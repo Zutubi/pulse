@@ -1,7 +1,7 @@
 package com.zutubi.tove.type;
 
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;

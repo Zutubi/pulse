@@ -1,7 +1,8 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.util.Sort;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.util.Sort;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Collections;

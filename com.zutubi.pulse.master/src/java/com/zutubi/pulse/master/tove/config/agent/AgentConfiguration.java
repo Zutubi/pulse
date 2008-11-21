@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.tove.config.agent;
 import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;

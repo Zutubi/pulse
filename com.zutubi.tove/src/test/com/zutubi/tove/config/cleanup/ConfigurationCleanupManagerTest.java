@@ -2,8 +2,8 @@ package com.zutubi.tove.config.cleanup;
 
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TypeException;

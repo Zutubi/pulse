@@ -1,13 +1,11 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.events.Event;
 import com.zutubi.tove.annotations.NoInherit;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.events.Event;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.config.ConfigurationList;
-import com.zutubi.tove.config.ConfigurationMap;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;

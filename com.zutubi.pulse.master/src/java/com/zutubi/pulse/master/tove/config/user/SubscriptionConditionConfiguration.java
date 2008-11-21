@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 
 /**
  * A condition that needs to be satisfied before a project build subscription

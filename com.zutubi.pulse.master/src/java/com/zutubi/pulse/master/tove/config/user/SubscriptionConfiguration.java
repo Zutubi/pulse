@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.tove.config.user;
 
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.validation.annotations.Required;
 
 /**

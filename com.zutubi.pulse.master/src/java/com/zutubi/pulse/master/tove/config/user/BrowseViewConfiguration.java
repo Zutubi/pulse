@@ -1,13 +1,8 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractConfiguration;
-import com.zutubi.pulse.master.model.BuildColumns;
-import com.zutubi.validation.annotations.Numeric;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import com.zutubi.tove.annotations.Classification;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 
 /**
  * User preferences for the browse page.

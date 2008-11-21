@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.model;
 
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.junit.ZutubiTestCase;

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.commit;
 
+import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.master.committransformers.Substitution;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
 import java.util.List;
 

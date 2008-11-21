@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.TextArea;
 import com.zutubi.pulse.Version;
-import com.zutubi.tove.config.AbstractConfiguration;
 import com.zutubi.pulse.master.license.License;
 import com.zutubi.pulse.master.license.LicenseDecoder;
 import com.zutubi.pulse.master.license.LicenseException;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.TextArea;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;

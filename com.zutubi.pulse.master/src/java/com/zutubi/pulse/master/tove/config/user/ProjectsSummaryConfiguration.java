@@ -1,15 +1,15 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.tove.config.AbstractConfiguration;
-import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.ItemPicker;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Numeric;
-import com.zutubi.pulse.master.model.BuildColumns;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Base class for configuration of views of that show summaries of project status.

@@ -1,7 +1,4 @@
-package com.zutubi.tove.config;
-
-import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.config.api.Configuration;
+package com.zutubi.tove.config.api;
 
 import java.util.*;
 
@@ -77,7 +74,6 @@ public abstract class AbstractConfiguration implements Configuration
         putMeta(PERMANENT_KEY, Boolean.toString(permanent));
     }
 
-    @Transient
     public boolean isValid()
     {
         if(instanceErrors.size() > 0)
@@ -96,7 +92,6 @@ public abstract class AbstractConfiguration implements Configuration
         return true;
     }
 
-    @Transient
     public List<String> getInstanceErrors()
     {
         return instanceErrors;
@@ -112,7 +107,6 @@ public abstract class AbstractConfiguration implements Configuration
         instanceErrors.clear();
     }
 
-    @Transient
     public Map<String, List<String>> getFieldErrors()
     {
         return fieldErrors;
@@ -123,7 +117,6 @@ public abstract class AbstractConfiguration implements Configuration
         fieldErrors.clear();
     }
 
-    @Transient
     public List<String> getFieldErrors(String field)
     {
         List<String> errors = fieldErrors.get(field);

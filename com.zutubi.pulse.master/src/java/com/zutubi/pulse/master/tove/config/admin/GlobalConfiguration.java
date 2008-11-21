@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
+import com.zutubi.pulse.master.jabber.config.JabberConfiguration;
+import com.zutubi.pulse.master.license.config.LicenseConfiguration;
+import com.zutubi.pulse.master.restore.BackupConfiguration;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.AbstractConfiguration;
-import com.zutubi.pulse.master.jabber.config.JabberConfiguration;
-import com.zutubi.pulse.master.license.config.LicenseConfiguration;
-import com.zutubi.pulse.master.restore.BackupConfiguration;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.TextUtils;
 
 /**

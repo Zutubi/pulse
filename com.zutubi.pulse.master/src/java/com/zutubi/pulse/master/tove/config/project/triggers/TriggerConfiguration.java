@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
+import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
 /**
  * 

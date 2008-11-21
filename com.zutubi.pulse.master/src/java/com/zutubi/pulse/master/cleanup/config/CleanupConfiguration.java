@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.cleanup.config;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
+import com.zutubi.tove.annotations.*;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
