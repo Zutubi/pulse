@@ -4,7 +4,6 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
-import junit.framework.Assert;
 
 /**
  * Base for all pages, with basic functions for identifying page presence and
@@ -12,6 +11,8 @@ import junit.framework.Assert;
  */
 public abstract class SeleniumPage
 {
+    public static final String TITLE_PREFIX = ":: pulse :: ";
+
     protected Selenium selenium;
     /**
      * Used to determine urls for the page.
@@ -27,7 +28,6 @@ public abstract class SeleniumPage
      * test).
      */
     private String title;
-    private static final String TITLE_PREFIX = ":: pulse :: ";
 
     public SeleniumPage(Selenium selenium, Urls urls, String id)
     {
@@ -58,19 +58,14 @@ public abstract class SeleniumPage
         SeleniumUtils.waitForElementId(selenium, id);
     }
 
-    public void assertPresent()
+    public boolean isPresent()
     {
-        Assert.assertTrue(selenium.isElementPresent("id=" + StringUtils.toValidHtmlName(id)));
+        return selenium.isElementPresent("id=" + StringUtils.toValidHtmlName(id));
+    }
 
-        if (title != null)
-        {
-            String gotTitle = selenium.getTitle();
-            if(gotTitle.startsWith(TITLE_PREFIX))
-            {
-                gotTitle = gotTitle.substring(TITLE_PREFIX.length());
-            }
-            Assert.assertEquals(title, gotTitle);
-        }
+    public String getTitle()
+    {
+        return title;
     }
 
     public abstract String getUrl();

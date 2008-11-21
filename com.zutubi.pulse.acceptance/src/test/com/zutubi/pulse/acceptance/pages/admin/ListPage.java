@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * A page in the admin UI that displays a list of composites.  The list is
@@ -43,43 +44,29 @@ public class ListPage extends ConfigPage
         return urls.admin() + path + "/";
     }
 
-    public void assertItemPresent(String baseName, String annotation, String... actions)
+    public boolean isItemPresent(String baseName)
     {
-        SeleniumUtils.assertElementPresent(selenium, getItemId(baseName));
-
-        if(annotation == null)
-        {
-            annotation = "noan";
-        }
-        SeleniumUtils.assertElementPresent(selenium, annotation + ":" + baseName);
-
-        for(String action: actions)
-        {
-            SeleniumUtils.assertLinkPresent(selenium, getActionId(action, baseName));
-        }
+        return selenium.isElementPresent(StringUtils.toValidHtmlName(getItemId(baseName)));
     }
 
-    public void assertItemNotPresent(String baseName)
+    public boolean isAnnotationPresent(String baseName, String annotation)
     {
-        SeleniumUtils.assertElementNotPresent(selenium, getItemId(baseName));
+        return selenium.isElementPresent(StringUtils.toValidHtmlName(annotation + ":" + baseName));
     }
 
-    public void assertCellContent(int itemIndex, int columnIndex, String text)
+    public boolean isActionLinkPresent(String baseName, String action)
     {
-        SeleniumUtils.assertCellContents(selenium, IDs.COLLECTION_TABLE, itemIndex + 2, columnIndex, text);
+        return SeleniumUtils.isLinkPresent(selenium, getActionId(action, baseName));
     }
-    
+
+    public String getCellContent(int itemIndex, int columnIndex)
+    {
+        return SeleniumUtils.getCellContents(selenium, IDs.COLLECTION_TABLE, itemIndex + 2, columnIndex);
+    }
+
     private String getItemId(String baseName)
     {
         return "item:" + baseName;
-    }
-
-    public void assertActionsNotPresent(String baseName, String... actions)
-    {
-        for(String action: actions)
-        {
-            SeleniumUtils.assertLinkNotPresent(selenium, getActionId(action, baseName));
-        }
     }
 
     public String getActionId(String action, String baseName)

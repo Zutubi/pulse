@@ -55,7 +55,8 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         login(random, "testpw");
         selenium.waitForPageToLoad("30000");
         WelcomePage welcomePage = new WelcomePage(selenium, urls);
-        welcomePage.assertPresent();
+        assertTrue(welcomePage.isPresent());
+        assertTitle(welcomePage);
     }
 
     public void testCustomActionWithArgumentValidation() throws Exception
@@ -84,7 +85,8 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         login(random, "");
         selenium.waitForPageToLoad("30000");
         WelcomePage welcomePage = new WelcomePage(selenium, urls);
-        welcomePage.assertPresent();
+        assertTrue(welcomePage.isPresent());
+        assertTitle(welcomePage);
     }
 
     private ListPage customActionWithArgumentPrelude() throws Exception
@@ -126,8 +128,8 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         customForm.cancelFormElements(new String[]{null});
 
         projectPage.waitFor();
-        projectPage.assertTreeLinkNotPresent("pulse file");
-        projectPage.assertTreeLinkPresent("ant command and artifacts");
+        assertFalse(projectPage.isTreeLinkPresent("pulse file"));
+        assertTrue(projectPage.isTreeLinkPresent("ant command and artifacts"));
 
         projectPage.clickComposite("type", "ant command and artifacts");
         AntTypeForm antForm = new AntTypeForm(selenium);

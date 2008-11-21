@@ -31,18 +31,29 @@ public class HierarchyPage extends ConfigurationPanePage
         this.template = template;
     }
 
-    public void assertPresent()
+    public boolean isAddLinkPresent()
     {
-        super.assertPresent();
+        return isLinkPresent(LINK_ADD);
+    }
 
-        String[] links = selenium.getAllLinks();
-        if (template)
-        {
-            Assert.assertTrue(CollectionUtils.contains(links, LINK_ADD));
-            Assert.assertTrue(CollectionUtils.contains(links, LINK_ADD_TEMPLATE));
-        }
+    public boolean isAddTempalteLinkPresent()
+    {
+        return isLinkPresent(LINK_ADD_TEMPLATE);
+    }
 
-        Assert.assertTrue(CollectionUtils.contains(links, LINK_CONFIGURE));
+    public boolean isConfigureLinkPresent()
+    {
+        return isLinkPresent(LINK_CONFIGURE);
+    }
+
+    public boolean isTemplate()
+    {
+        return template;
+    }
+    
+    protected boolean isLinkPresent(String link)
+    {
+        return CollectionUtils.contains(selenium.getAllLinks(), link);
     }
 
     public String getUrl()

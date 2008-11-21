@@ -2,10 +2,9 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
-import junit.framework.Assert;
 
 /**
- * The Subversion SCM form.
+ * The check form.
  */
 public class CheckForm extends SeleniumForm
 {
@@ -32,12 +31,15 @@ public class CheckForm extends SeleniumForm
         submitFormElements("check", args);
     }
 
-    public void assertResult(boolean ok, String message)
+    public boolean isResultOk()
     {
         String checkOK = SeleniumUtils.evalVariable(selenium, "checkOK");
-        Assert.assertEquals(Boolean.toString(ok), checkOK);
-        String got = selenium.getText("check.result");
-        Assert.assertTrue("Check result '" + got + "' does not contain expected message '" + message + "'", got.contains(message));
+        return Boolean.valueOf(checkOK);
+    }
+
+    public String getResultMessage()
+    {
+        return selenium.getText("check.result");
     }
 
     public void waitForCheck()
@@ -45,10 +47,9 @@ public class CheckForm extends SeleniumForm
         SeleniumUtils.waitForVariable(selenium, "checkComplete", 30000);
     }
 
-    public void checkAndAssertResult(boolean ok, String message, String... args)
+    public void checkFormElementsAndWait(String... args)
     {
         checkFormElements(args);
         waitForCheck();
-        assertResult(ok, message);
     }
 }

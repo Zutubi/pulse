@@ -240,6 +240,15 @@ public class XmlRpcHelper
         return call("getProjectGroup", name);
     }
 
+    @SuppressWarnings({"unchecked"})
+    public Hashtable<String, Object> getProjectArtifact(String projectName, String artifactName) throws Exception
+    {
+        Hashtable<String, Object> projectConfig = getConfig(ConfigurationRegistry.PROJECTS_SCOPE + "/" + projectName);
+        Hashtable<String, Object> projectType = (Hashtable<String, Object>) projectConfig.get(Constants.Project.TYPE);
+        Hashtable<String, Object> typeArtifacts = (Hashtable<String, Object>) projectType.get(Constants.Project.Type.ARTIFACTS);
+        return (Hashtable<String, Object>) typeArtifacts.get(artifactName);
+    }
+
     public int getAgentCount() throws Exception
     {
         return (Integer) call("getAgentCount");

@@ -59,10 +59,10 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         page.goTo();
 
         assertEquals("100 messages found", page.getMessagesCountText());
-        page.assertPagingLinks(10);
+        assertPagingLinks(page, 10);
         page = page.clickPage(5);
         page.waitFor();
-        page.assertPagingLinks(10);
+        assertPagingLinks(page, 10);
         assertTextPresent("Test error message 59");
     }
 
@@ -77,4 +77,44 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         assertTextPresent("version information");
         assertTextPresent("pulse paths");
     }
+
+    private void assertPagingLinks(ServerMessagesPage page, int pageCount)
+    {
+        for(int i = 1; i <= pageCount; i++)
+        {
+            String pageId = page.getPageId(i);
+            if(i == page.getPageNumber())
+            {
+                assertFalse(selenium.isElementPresent(pageId));
+            }
+            else
+            {
+                assertTrue(selenium.isElementPresent(pageId));
+            }
+        }
+
+        if(page.getPageNumber() == 1)
+        {
+            assertFalse(selenium.isElementPresent("page.latest"));
+            assertFalse(selenium.isElementPresent("page.previous"));
+        }
+        else
+        {
+            assertTrue(selenium.isElementPresent("page.latest"));
+            assertTrue(selenium.isElementPresent("page.previous"));
+        }
+
+        if(page.getPageNumber() == pageCount)
+        {
+            assertFalse(selenium.isElementPresent("page.oldest"));
+            assertFalse(selenium.isElementPresent("page.next"));
+        }
+        else
+        {
+            assertTrue(selenium.isElementPresent("page.oldest"));
+            assertTrue(selenium.isElementPresent("page.next"));
+        }
+    }
+
+
 }

@@ -124,19 +124,19 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         // check that license is required.
         licenseForm.nextFormElements("");
         assertTrue(licenseForm.isFormPresent());
-        licenseForm.assertFormElements("");
+        assertFormElements(licenseForm, "");
         assertTextPresent("license key requires a value");
 
         // check that license validation works.
         licenseForm.nextFormElements(invalidLicenseKey);
         assertTrue(licenseForm.isFormPresent());
-        licenseForm.assertFormElements(invalidLicenseKey);
+        assertFormElements(licenseForm, invalidLicenseKey);
         assertTextPresent("invalid");
 
         // check that an expired license is not accepted.
         licenseForm.nextFormElements(expiredLicenseKey);
         assertTrue(licenseForm.isFormPresent());
-        licenseForm.assertFormElements(expiredLicenseKey);
+        assertFormElements(licenseForm, expiredLicenseKey);
         assertTextPresent("expired");
 
         // enter a valid license.

@@ -46,7 +46,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
         // We should be denied access and redirected to the login page.
         LoginPage loginPage = new LoginPage(selenium, urls);
-        loginPage.assertPresent();
+        assertTrue(loginPage.isPresent());
+        assertTitle(loginPage);
     }
 
     public void testAnonymousSignup() throws Exception
@@ -63,7 +64,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         form.saveFormElements("login_" + random, "name_" + random, "password", "password");
 
         WelcomePage welcomePage = new WelcomePage(selenium, urls);
-        welcomePage.assertPresent();
+        assertTrue(welcomePage.isPresent());
+        assertTitle(welcomePage);
         assertTextPresent("name_" + random);
         assertElementPresent(ID_DASHBOARD_TAB);
         assertElementPresent(ID_PREFERENCES);
@@ -112,7 +114,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         goTo(urls.projects());
 
         BrowsePage browsePage = new BrowsePage(selenium, urls);
-        browsePage.assertPresent();
+        assertTrue(browsePage.isPresent());
+        assertTitle(browsePage);
         assertElementPresent(ID_LOGIN);
 
         // No dashboard tab, user info or logout link for anonymous users

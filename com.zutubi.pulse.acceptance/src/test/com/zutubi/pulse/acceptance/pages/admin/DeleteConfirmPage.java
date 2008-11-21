@@ -1,10 +1,8 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import junit.framework.Assert;
 
 /**
  * The delete record confirmation page, which shows the necessary actions for
@@ -28,6 +26,11 @@ public class DeleteConfirmPage extends ConfigurationPanePage
     {
         // We don't support direct navigation.
         return null;
+    }
+
+    public boolean isHide()
+    {
+        return hide;
     }
 
     public void clickDelete()
@@ -60,24 +63,5 @@ public class DeleteConfirmPage extends ConfigurationPanePage
     {
         selenium.click(CANCEL_LINK);
         return new ListPage(selenium, urls, PathUtils.getParentPath(path));        
-    }
-
-    public void assertTasks(String... pathActionPairs)
-    {
-        if(pathActionPairs.length % 2 != 0)
-        {
-            Assert.fail("Tasks must be made up of (path, action) pairs");
-        }
-
-        int i;
-        for(i = 0; i < pathActionPairs.length / 2; i++)
-        {
-            SeleniumUtils.assertCellContents(selenium, getId(), i + 1, 0, pathActionPairs[i * 2]);
-            SeleniumUtils.assertCellContents(selenium, getId(), i + 1, 1, pathActionPairs[i * 2 + 1]);
-        }
-
-        String actionsCell = SeleniumUtils.getCellContents(selenium, getId(), i + 1, 0);
-        actionsCell = actionsCell.replaceAll(" +", " ");
-        Assert.assertEquals((hide ? "hide" : "delete") + " cancel", actionsCell);
     }
 }

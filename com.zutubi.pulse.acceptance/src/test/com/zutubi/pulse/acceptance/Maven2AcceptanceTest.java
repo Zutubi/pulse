@@ -19,23 +19,19 @@ public class Maven2AcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
     }
 
+    @SuppressWarnings({ "unchecked" })
     public void testSurefireTestsArtifactConfiguration() throws Exception
     {
         createMavenProject(random);
 
         // We expect a artifact called surefire-reports to be configured.
-        xmlRpcHelper.loginAsAdmin();
-        Hashtable<String, Object> projectConfig = xmlRpcHelper.getConfig("projects/" + random);
-        Hashtable<String, Object> projectType = (Hashtable<String, Object>) projectConfig.get("type");
-        Hashtable<String, Object> typeArtifacts = (Hashtable<String, Object>) projectType.get("artifacts");
-        Hashtable<String, Object> artifactConfig = (Hashtable<String, Object>) typeArtifacts.get("test reports");
-        assertEquals("test reports", artifactConfig.get("name"));
-        assertEquals("target/surefire-reports", artifactConfig.get("base"));
-        assertEquals("TEST-*.xml", artifactConfig.get("includes"));
-        Vector<String> postprocessors = (Vector<String>) artifactConfig.get("postprocessors");
+        Hashtable<String, Object> artifact = getArtifactConfiguration(random, "test reports");
+        assertEquals("test reports", artifact.get(Constants.DirectoryArtifact.NAME));
+        assertEquals("target/surefire-reports", artifact.get(Constants.DirectoryArtifact.BASE));
+        assertEquals("TEST-*.xml", artifact.get(Constants.DirectoryArtifact.INCLUDES));
+        Vector<String> postprocessors = (Vector<String>) artifact.get(Constants.DirectoryArtifact.POSTPROCESSORS);
         assertEquals(1, postprocessors.size());
         assertEquals("junit", postprocessors.get(0));
-        xmlRpcHelper.logout();
     }
 
     public void testMaven2BuildPicksUpTests() throws Exception
@@ -73,6 +69,19 @@ public class Maven2AcceptanceTest extends SeleniumTestBase
         {
             xmlRpcHelper.loginAsAdmin();
             return xmlRpcHelper.runBuild(projectName, 30000);
+        }
+        finally
+        {
+            xmlRpcHelper.logout();
+        }
+    }
+
+    private Hashtable<String, Object> getArtifactConfiguration(String projectName, String artifactName) throws Exception
+    {
+        try
+        {
+            xmlRpcHelper.loginAsAdmin();
+            return xmlRpcHelper.getProjectArtifact(projectName, artifactName);
         }
         finally
         {

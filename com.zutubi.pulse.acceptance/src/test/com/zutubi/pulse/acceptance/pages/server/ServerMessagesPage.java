@@ -37,47 +37,14 @@ public class ServerMessagesPage extends SeleniumPage
         }
     }
 
-    public void assertPagingLinks(int pageCount)
-    {
-        for(int i = 1; i <= pageCount; i++)
-        {
-            String pageId = getPageId(i);
-            if(i == page)
-            {
-                SeleniumUtils.assertElementNotPresent(selenium, pageId);
-            }
-            else
-            {
-                SeleniumUtils.assertElementPresent(selenium, pageId);
-            }
-        }
-
-        if(page == 1)
-        {
-            SeleniumUtils.assertElementNotPresent(selenium, "page.latest");
-            SeleniumUtils.assertElementNotPresent(selenium, "page.previous");
-        }
-        else
-        {
-            SeleniumUtils.assertElementPresent(selenium, "page.latest");
-            SeleniumUtils.assertElementPresent(selenium, "page.previous");
-        }
-
-        if(page == pageCount)
-        {
-            SeleniumUtils.assertElementNotPresent(selenium, "page.oldest");
-            SeleniumUtils.assertElementNotPresent(selenium, "page.next");
-        }
-        else
-        {
-            SeleniumUtils.assertElementPresent(selenium, "page.oldest");
-            SeleniumUtils.assertElementPresent(selenium, "page.next");
-        }
-    }
-
-    private String getPageId(int i)
+    public String getPageId(int i)
     {
         return "page." + i;
+    }
+
+    public int getPageNumber()
+    {
+        return page;
     }
 
     public ServerMessagesPage clickPage(int page)

@@ -52,16 +52,6 @@ public abstract class ConfigPage extends ConfigurationPanePage
         return selenium.isElementPresent(getTreeLinkLocator(displayName));
     }
 
-    public void assertTreeLinkPresent(String displayName)
-    {
-        Assert.assertTrue(isTreeLinkPresent(displayName));
-    }
-
-    public void assertTreeLinkNotPresent(String displayName)
-    {
-        Assert.assertFalse(isTreeLinkPresent(displayName));
-    }
-
     protected String getHierarchyLocator()
     {
         return "//span[text()='hierarchy']";

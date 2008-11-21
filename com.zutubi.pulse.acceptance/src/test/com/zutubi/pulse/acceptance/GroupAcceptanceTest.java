@@ -29,7 +29,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
         waitForElement(getGroupPath(random));
         assertTrue(form.isFormPresent());
-        form.assertFormElements(random, "", "");
+        assertFormElements(form, random, "", "");
     }
 
     public void testAddUserToGroup() throws Exception
@@ -134,7 +134,8 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         groupsPage.goTo();
 
         // a) ensure only view link is available for all users group.
-        groupsPage.assertActionsNotPresent(groupName, "clone", "delete");
+        assertFalse(groupsPage.isActionLinkPresent(groupName, "clone"));
+        assertFalse(groupsPage.isActionLinkPresent(groupName, "delete"));
 
         // b) go to form, ensure name is not editable.
         // click view or groups/name

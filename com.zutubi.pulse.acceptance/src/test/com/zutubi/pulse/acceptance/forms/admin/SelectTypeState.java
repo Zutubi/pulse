@@ -12,6 +12,8 @@ import java.util.Arrays;
  */
 public class SelectTypeState extends SeleniumForm
 {
+    private static final String FIELD_NAME_SELECT = "wizard.select";
+
     public SelectTypeState(Selenium selenium)
     {
         super(selenium);
@@ -24,7 +26,7 @@ public class SelectTypeState extends SeleniumForm
 
     public String[] getFieldNames()
     {
-        return new String[]{ "wizard.select" };
+        return new String[]{FIELD_NAME_SELECT};
     }
 
     public int[] getFieldTypes()
@@ -34,12 +36,12 @@ public class SelectTypeState extends SeleniumForm
 
     public String[] getOptions()
     {
-        return getComboBoxOptions(getFieldNames()[0]);
+        return getComboBoxOptions(FIELD_NAME_SELECT);
     }
 
     public List<String> getSortedOptionList()
     {
-        String[] options = getComboBoxOptions(getFieldNames()[0]);
+        String[] options = getComboBoxOptions(FIELD_NAME_SELECT);
         Arrays.sort(options, new Sort.StringComparator());
         return Arrays.asList(options);
     }

@@ -50,7 +50,8 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         goTo("dashboard");
         selenium.waitForPageToLoad("3000");
         DashboardPage page = new DashboardPage(selenium, urls);
-        page.assertPresent();
+        assertTrue(page.isPresent());
+        assertTitle(page);
     }
 
     public void testShowGroups() throws Exception

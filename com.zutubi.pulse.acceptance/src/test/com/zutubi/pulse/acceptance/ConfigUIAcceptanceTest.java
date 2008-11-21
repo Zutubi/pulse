@@ -67,12 +67,12 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         labelsPage.waitFor();
         String baseName = getNewestListItem(labelsPath);
-        labelsPage.assertItemPresent(baseName, null, "view", "delete");
+        assertItemPresent(labelsPage, baseName, null, "view", "delete");
         DeleteConfirmPage deleteConfirmPage = labelsPage.clickDelete(baseName);
         deleteConfirmPage.waitFor();
         labelsPage = deleteConfirmPage.confirmDeleteListItem();
 
-        labelsPage.assertItemNotPresent(baseName);
+        assertFalse(labelsPage.isItemPresent(baseName));
     }
 
     public void testCancelAddListItem() throws Exception
@@ -89,7 +89,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         labelForm.cancelFormElements("my-label");
 
         labelsPage.waitFor();
-        labelsPage.assertItemNotPresent("my-label");
+        assertFalse(labelsPage.isItemPresent("my-label"));
     }
 
     public void testCancelViewListItem() throws Exception
@@ -107,7 +107,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         labelForm.cancelFormElements("");
 
         labelsPage.waitFor();
-        labelsPage.assertItemPresent(labelBaseName, null);
+        assertItemPresent(labelsPage, labelBaseName, null);
     }
 
     private String insertLabel(String projectPath) throws Exception
@@ -126,7 +126,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.setFieldValue("url", "svn://localhost:3088/");
         CheckForm checkForm = new CheckForm(form);
-        checkForm.checkAndAssertResult(true, "ok");
+        checkForm.checkFormElementsAndWait();
+        assertTrue(checkForm.isResultOk());
+        assertEquals("configuration ok", checkForm.getResultMessage());
     }
 
     public void testCheckFormFailure() throws Exception
@@ -138,7 +140,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.setFieldValue("url", "svn://localhost:9999/foo");
         CheckForm checkForm = new CheckForm(form);
-        checkForm.checkAndAssertResult(false, "connection refused");
+        checkForm.checkFormElementsAndWait();
+        assertFalse(checkForm.isResultOk());
+        assertEquals("connection refused", checkForm.getResultMessage());
     }
 
     public void testCheckFormValidationFailure() throws Exception
@@ -150,7 +154,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.setFieldValue("url", "");
         CheckForm checkForm = new CheckForm(form);
-        checkForm.checkAndAssertResult(false, "unable to check configuration due to validation errors");
+        checkForm.checkFormElementsAndWait();
+        assertFalse(checkForm.isResultOk());
+        assertEquals("unable to check configuration due to validation errors", checkForm.getResultMessage());
         assertTextPresent("url requires a value");
     }
 
@@ -161,7 +167,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         EmailSettingsForm form = new EmailSettingsForm(selenium);
         form.waitFor();
         EmailSettingsCheckForm checkForm = new EmailSettingsCheckForm(form);
-        checkForm.checkAndAssertResult(false, "unable to check configuration due to validation errors", "");
+        checkForm.checkFormElementsAndWait("");
+        assertFalse(checkForm.isResultOk());
+        assertEquals("unable to check configuration due to validation errors", checkForm.getResultMessage());
         assertTextPresent("recipient address requires a value");
     }
 
@@ -184,11 +192,12 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         subversionState.setFieldValue("url", "svn://localhost:3088/");
         CheckForm checkForm = new CheckForm(subversionState);
-        checkForm.checkAndAssertResult(true, "ok");
+        checkForm.checkFormElementsAndWait();
+        assertTrue(checkForm.isResultOk());
+        assertEquals("configuration ok", checkForm.getResultMessage());
 
         subversionState.cancelFormElements(null, null, null, null, null, null);
     }
-
 
     public void testClearItemPicker() throws Exception
     {
@@ -199,20 +208,20 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         configPage.goTo();
         ListPage listPage = configPage.clickCollection("permissions", "permissions");
         listPage.waitFor();
-        listPage.assertCellContent(0, 1, "[view]");
+        assertEquals("[view]", listPage.getCellContent(0, 1));
 
         selenium.click("link=view");
         ProjectAclForm form = new ProjectAclForm(selenium);
         form.waitFor();
-        form.assertFormElements("all users", "view");
+        assertFormElements(form, "all users", "view");
         form.saveFormElements(null, "");
         listPage.waitFor();
 
-        listPage.assertCellContent(0, 1, "[]");
+        assertEquals("[]", listPage.getCellContent(0, 1));
         selenium.click("link=view");
         form = new ProjectAclForm(selenium);
         form.waitFor();
-        form.assertFormElements("all users", "");
+        assertFormElements(form, "all users", "");
     }
 
     public void testClearMultiSelect() throws Exception
@@ -225,14 +234,14 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         configPage.clickComposite("type", "ant command and artifacts");
         AntTypeForm form = new AntTypeForm(selenium);
         form.waitFor();
-        form.assertFormElements("", "build.xml", "", "", "");
+        assertFormElements(form, "", "build.xml", "", "", "");
         form.applyFormElements(null, null, null, null, "ant");
         form.waitFor();
-        form.assertFormElements("", "build.xml", "", "", "ant");
+        assertFormElements(form, "", "build.xml", "", "", "ant");
 
         form.applyFormElements(null, null, null, null, "");
         form.waitFor();
-        form.assertFormElements("", "build.xml", "", "", "");
+        assertFormElements(form, "", "build.xml", "", "", "");
     }
 
     public void testNameValidationDuplicate() throws Exception
@@ -246,7 +255,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         propertiesPage.goTo();
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
         assertTrue(form.isFormPresent());
@@ -265,7 +274,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         propertiesPage.goTo();
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
         assertTrue(form.isFormPresent());
@@ -283,10 +292,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(parentPath));
         propertiesPage.goTo();
-        propertiesPage.assertItemNotPresent("p1");
+        assertFalse(propertiesPage.isItemPresent("p1"));
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
         assertTrue(form.isFormPresent());
@@ -307,10 +316,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(parentPath));
         propertiesPage.goTo();
-        propertiesPage.assertItemNotPresent("p1");
+        assertFalse(propertiesPage.isItemPresent("p1"));
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
         assertTrue(form.isFormPresent());
@@ -331,10 +340,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ListPage propertiesPage = new ListPage(selenium, urls, childPropertiesPath);
         propertiesPage.goTo();
-        propertiesPage.assertItemPresent("p1", ListPage.ANNOTATION_HIDDEN);
+        assertItemPresent(propertiesPage, "p1", ListPage.ANNOTATION_HIDDEN);
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
         assertTrue(form.isFormPresent());
@@ -363,7 +372,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // in the parent.
         compositePage.goTo();
         assertFalse(compositePage.isConfigureLinkPresent());
-        compositePage.assertConfiguredDescendents(childName);
+        assertTrue(compositePage.isConfiguredDescendentPresent(childName));
     }
 
     public void testOrderLinks() throws Exception
@@ -373,11 +382,11 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
         listPage.goTo();
-        listPage.assertItemPresent("p1", null, ACTION_DOWN);
-        listPage.assertActionsNotPresent("p1", ACTION_UP);
-        listPage.assertItemPresent("p2", null, ACTION_DOWN, ACTION_UP);
-        listPage.assertItemPresent("p3", null, ACTION_UP);
-        listPage.assertActionsNotPresent("p3", ACTION_DOWN);
+        assertItemPresent(listPage, "p1", null, ACTION_DOWN);
+        assertFalse(listPage.isActionLinkPresent("p1", ACTION_UP));
+        assertItemPresent(listPage, "p2", null, ACTION_DOWN, ACTION_UP);
+        assertItemPresent(listPage, "p3", null, ACTION_UP);
+        assertFalse(listPage.isActionLinkPresent("p3", ACTION_DOWN));
     }
 
     public void testMoveUp() throws Exception
@@ -387,12 +396,12 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
         listPage.goTo();
-        listPage.assertCellContent(1, 0, "p2");
-        listPage.assertCellContent(2, 0, "p3");
+        assertEquals("p2", listPage.getCellContent(1, 0));
+        assertEquals("p3", listPage.getCellContent(2, 0));
         listPage.clickUp("p3");
         listPage.waitFor();
-        listPage.assertCellContent(1, 0, "p3");
-        listPage.assertCellContent(2, 0, "p2");
+        assertEquals("p3", listPage.getCellContent(1, 0));
+        assertEquals("p2", listPage.getCellContent(2, 0));
     }
 
     public void testMoveDown() throws Exception
@@ -402,12 +411,12 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
         listPage.goTo();
-        listPage.assertCellContent(1, 0, "p2");
-        listPage.assertCellContent(2, 0, "p3");
+        assertEquals("p2", listPage.getCellContent(1, 0));
+        assertEquals("p3", listPage.getCellContent(2, 0));
         listPage.clickDown("p2");
         listPage.waitFor();
-        listPage.assertCellContent(2, 0, "p2");
-        listPage.assertCellContent(1, 0, "p3");
+        assertEquals("p2", listPage.getCellContent(2, 0));
+        assertEquals("p3", listPage.getCellContent(1, 0));
     }
 
     private String orderPrelude() throws Exception
@@ -433,10 +442,12 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ListPage listPage = new ListPage(selenium, urls, triggersPath);
         listPage.goTo();
         assertFalse(listPage.isOrderColumnPresent(2));
-        listPage.assertItemPresent("t1", null);
-        listPage.assertItemPresent("t2", null);
-        listPage.assertActionsNotPresent("t1", ACTION_UP, ACTION_DOWN);
-        listPage.assertActionsNotPresent("t2", ACTION_UP, ACTION_DOWN);
+        assertItemPresent(listPage, "t1", null);
+        assertItemPresent(listPage, "t2", null);
+        assertFalse(listPage.isActionLinkPresent("t1", ACTION_UP));
+        assertFalse(listPage.isActionLinkPresent("t1", ACTION_DOWN));
+        assertFalse(listPage.isActionLinkPresent("t2", ACTION_UP));
+        assertFalse(listPage.isActionLinkPresent("t2", ACTION_DOWN));
     }
 
     public void testOrderLinksNotPresentWithNoWritePermission() throws Exception
@@ -448,12 +459,15 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
         listPage.goTo();
         assertFalse(listPage.isOrderColumnPresent(2));
-        listPage.assertItemPresent("p1", null);
-        listPage.assertItemPresent("p2", null);
-        listPage.assertItemPresent("p3", null);
-        listPage.assertActionsNotPresent("p1", ACTION_UP, ACTION_DOWN);
-        listPage.assertActionsNotPresent("p2", ACTION_UP, ACTION_DOWN);
-        listPage.assertActionsNotPresent("p3", ACTION_UP, ACTION_DOWN);
+        assertItemPresent(listPage, "p1", null);
+        assertItemPresent(listPage, "p2", null);
+        assertItemPresent(listPage, "p3", null);
+        assertFalse(listPage.isActionLinkPresent("p1", ACTION_UP));
+        assertFalse(listPage.isActionLinkPresent("p1", ACTION_DOWN));
+        assertFalse(listPage.isActionLinkPresent("p2", ACTION_UP));
+        assertFalse(listPage.isActionLinkPresent("p2", ACTION_DOWN));
+        assertFalse(listPage.isActionLinkPresent("p3", ACTION_UP));
+        assertFalse(listPage.isActionLinkPresent("p3", ACTION_DOWN));
     }
 
     public void testInheritedOrder() throws Exception
@@ -516,7 +530,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         scmPage.waitFor();
         SubversionForm subversionForm = new SubversionForm(selenium);
         subversionForm.waitFor();
-        subversionForm.assertFormElements(Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null);
+        assertFormElements(subversionForm, Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     private void addInheritingProject(String parentName, String childName)
@@ -562,11 +576,11 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, random, "stages"));
         listPage.goTo();
-        listPage.assertItemPresent("default", null, "view", "delete");
+        assertItemPresent(listPage, "default", null, "view", "delete");
 
         listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, random, "triggers"));
         listPage.goTo();
-        listPage.assertItemPresent("scm trigger", null, "view", "delete", "pause");
+        assertItemPresent(listPage, "scm trigger", null, "view", "delete", "pause");
     }
 
     public void testDefaultProjectConfigNotCreatedWhenAlreadyInherited()
@@ -580,11 +594,11 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));
         listPage.goTo();
-        listPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, "view", "delete");
+        assertItemPresent(listPage, "default", ListPage.ANNOTATION_INHERITED, "view", "delete");
 
         listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, childName, "triggers"));
         listPage.goTo();
-        listPage.assertItemPresent("scm trigger", ListPage.ANNOTATION_INHERITED, "view", "delete", "pause");
+        assertItemPresent(listPage, "scm trigger", ListPage.ANNOTATION_INHERITED, "view", "delete", "pause");
     }
 
     public void testValidationInWizard()
@@ -748,7 +762,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.applyFormElements(null, null, url, null, null, null, null, null, null);
 
         form.waitFor();
-        form.assertFormElements(null, null, url, null, null, null, null, null, null);
+        assertFormElements(form, null, null, url, null, null, null, null, null, null);
     }
 
     public void testCancelNoParentPath() throws Exception
@@ -761,7 +775,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.resetFormElements(null, null, "http://somehelpurl.com/" + random, null, null, null, null, null, null);
 
         form.waitFor();
-        form.assertFormElements(null, null, originalUrl, null, null, null, null, null, null);
+        assertFormElements(form, null, null, originalUrl, null, null, null, null, null, null);
     }
 
     private void insertProperty(String projectPath) throws Exception

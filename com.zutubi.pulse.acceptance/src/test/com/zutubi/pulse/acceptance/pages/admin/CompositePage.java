@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.StringUtils;
 
 /**
  * A page in the admin UI that displays a single composite.  This page
@@ -36,12 +37,9 @@ public class CompositePage extends ConfigPage
         return SeleniumUtils.isLinkPresent(selenium, CONFIGURE_LINK);
     }
 
-    public void assertConfiguredDescendents(String... descendents)
+    public boolean isConfiguredDescendentPresent(String descendent)
     {
-        for (String descendent: descendents)
-        {
-            SeleniumUtils.assertElementPresent(selenium, "cd-" + descendent);
-        }
+        return selenium.isElementPresent(StringUtils.toValidHtmlName("cd-" + descendent));
     }
 
     public String getActionId(String action)

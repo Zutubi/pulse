@@ -9,9 +9,9 @@ import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration
  */
 public class ResourcePropertyForm extends ConfigurationForm
 {
-    public ResourcePropertyForm(Selenium selenium, boolean inherited)
+    public ResourcePropertyForm(Selenium selenium)
     {
-        super(selenium, ResourcePropertyConfiguration.class, true, inherited);
+        super(selenium, ResourcePropertyConfiguration.class, true, false);
     }
 
     public int[] getFieldTypes()

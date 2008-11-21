@@ -744,9 +744,10 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertEquals("one" + File.separator + "two", FileSystemUtils.localiseSeparators("one" + File.separator + getOtherSeparator() + "two"));
     }
 
-    public void testGetNormalisedAbsolutePath()
+    public void testGetNormalisedAbsolutePath() throws IOException
     {
-        assertEquals(System.getProperty("user.dir") + File.separator + "one" + File.separator + "two", FileSystemUtils.getNormalisedAbsolutePath(new File("one", File.separator + getOtherSeparator() + "two" + File.separator)));
+        String expected = new File("one" + File.separator + "two").getCanonicalPath();
+        assertEquals(expected, FileSystemUtils.getNormalisedAbsolutePath(new File("one", File.separator + getOtherSeparator() + "two" + File.separator)));
     }
 
     private String getOtherSeparator()

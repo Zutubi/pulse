@@ -109,7 +109,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ListPage labelsPage = new ListPage(selenium, urls, PathUtils.getParentPath(path));
         labelsPage.goTo();
         String baseName = PathUtils.getBaseName(path);
-        labelsPage.assertItemPresent(baseName, null);
+        assertTrue(labelsPage.isItemPresent(baseName));
         assertEquals(expectedAvailable, selenium.isElementPresent(labelsPage.getActionId(ListPage.ACTION_CLONE, baseName)));
     }
 
@@ -120,12 +120,12 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         cloneForm.waitFor();
         cloneForm.cloneFormElements(CLONE_PROPERTY_NAME);
 
-        ResourcePropertyForm propertyForm = new ResourcePropertyForm(selenium, false);
+        ResourcePropertyForm propertyForm = new ResourcePropertyForm(selenium);
         propertyForm.waitFor();
-        propertyForm.assertFormElements(CLONE_PROPERTY_NAME, TEST_PROPERTY_VALUE, "false", "false", "false");
+        assertFormElements(propertyForm, CLONE_PROPERTY_NAME, TEST_PROPERTY_VALUE, "false", "false", "false");
 
         labelList.goTo();
-        labelList.assertItemPresent(CLONE_PROPERTY_NAME, null);
+        assertTrue(labelList.isItemPresent(CLONE_PROPERTY_NAME));
     }
 
     public void testCloneMapItemValidation() throws Exception
@@ -151,8 +151,8 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         cloneForm.cancelFormElements(CLONE_PROPERTY_NAME);
         labelList.waitFor();
-        labelList.assertItemPresent(TEST_PROPERTY_NAME, null);
-        labelList.assertItemNotPresent(CLONE_PROPERTY_NAME);
+        assertTrue(labelList.isItemPresent(TEST_PROPERTY_NAME));
+        assertFalse(labelList.isItemPresent(CLONE_PROPERTY_NAME));
     }
 
     private ListPage prepareMapItem() throws Exception
@@ -163,7 +163,8 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ListPage labelList = new ListPage(selenium, urls, getParentPath(propertyPath));
         labelList.goTo();
-        labelList.assertItemPresent(TEST_PROPERTY_NAME, null, AccessManager.ACTION_CLONE);
+        assertTrue(labelList.isItemPresent(TEST_PROPERTY_NAME));
+        assertTrue(labelList.isActionLinkPresent(TEST_PROPERTY_NAME, AccessManager.ACTION_CLONE));
         return labelList;
     }
 

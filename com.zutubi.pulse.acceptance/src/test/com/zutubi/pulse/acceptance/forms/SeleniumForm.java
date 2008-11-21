@@ -17,12 +17,12 @@ import java.util.Map;
  */
 public abstract class SeleniumForm
 {
-    protected static final int TEXTFIELD      = 3;
-    protected static final int CHECKBOX       = 4;
-    protected static final int COMBOBOX       = 6;
-    protected static final int MULTI_CHECKBOX = 7;
-    protected static final int MULTI_SELECT   = 8;
-    protected static final int ITEM_PICKER    = 9;
+    public static final int TEXTFIELD      = 3;
+    public static final int CHECKBOX       = 4;
+    public static final int COMBOBOX       = 6;
+    public static final int MULTI_CHECKBOX = 7;
+    public static final int MULTI_SELECT   = 8;
+    public static final int ITEM_PICKER    = 9;
 
     protected Selenium selenium;
     protected boolean inherited = false;
@@ -320,44 +320,6 @@ public abstract class SeleniumForm
         }
     }
 
-    public void assertFormElements(String... values)
-    {
-        TestCase.assertTrue(isFormPresent());
-
-        int[] types = getActualFieldTypes();
-        Assert.assertEquals(values.length, types.length);
-
-        for (int i = 0; i < types.length; i++)
-        {
-            if (values[i] != null)
-            {
-                String fieldName = getActualFieldNames()[i];
-                switch (types[i])
-                {
-                    case TEXTFIELD:
-                        TestCase.assertEquals(StringUtils.stripLineBreaks(values[i]), StringUtils.stripLineBreaks(getFieldValue(fieldName)));
-                        break;
-                    case CHECKBOX:
-                        TestCase.assertEquals(Boolean.valueOf(values[i]) ? "on" : "off", getFieldValue(fieldName));
-                        break;
-                    case COMBOBOX:
-                        TestCase.assertEquals(values[i], getFieldValue(fieldName));
-                        break;
-                    case ITEM_PICKER:
-                    case MULTI_CHECKBOX:
-                    case MULTI_SELECT:
-                        if (values[i] != null)
-                        {
-                            String[] expected = convertMultiValue(values[i]);
-                            assertMultiValues(fieldName, expected);
-                        }
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-
     public String[] getFormValues()
     {
         String[] fieldNames = getActualFieldNames();
@@ -372,17 +334,6 @@ public abstract class SeleniumForm
         return formValues;
     }
 
-    public void assertMultiValues(String name, String... values)
-    {
-        String fieldValue = getFieldValue(name);
-        String[] gotValues = fieldValue.length() == 0 ? new String[0] : fieldValue.split(",");
-        Assert.assertEquals(values.length, gotValues.length);
-        for (int i = 0; i < values.length; i++)
-        {
-            Assert.assertEquals(values[i], gotValues[i]);
-        }
-    }
-
     public void setMultiValues(String name, String values)
     {
         String[] set = convertMultiValue(values);
@@ -394,7 +345,7 @@ public abstract class SeleniumForm
         }
     }
 
-    private String[] convertMultiValue(String values)
+    public String[] convertMultiValue(String values)
     {
         String[] set;
         if (values.length() > 0)
@@ -408,7 +359,7 @@ public abstract class SeleniumForm
         return set;
     }
 
-    private String[] getActualFieldNames()
+    public String[] getActualFieldNames()
     {
         String[] fieldNames = getFieldNames();
         if(inherited)
@@ -420,7 +371,7 @@ public abstract class SeleniumForm
         return fieldNames;
     }
 
-    private int[] getActualFieldTypes()
+    public int[] getActualFieldTypes()
     {
         int[] fieldTypes = getFieldTypes();
         if(inherited)

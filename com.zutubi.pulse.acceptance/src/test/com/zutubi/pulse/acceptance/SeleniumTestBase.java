@@ -4,8 +4,11 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
+import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -19,6 +22,9 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
+
+import junit.framework.TestCase;
+import junit.framework.Assert;
 
 /**
  * Helper base class for web UI acceptance tests that use Selenium.
@@ -174,7 +180,6 @@ public class SeleniumTestBase extends ZutubiTestCase
 
             ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, name, template);
             hierarchyPage.waitFor();
-            hierarchyPage.assertPresent();
 
             if (!template)
             {
@@ -425,6 +430,80 @@ public class SeleniumTestBase extends ZutubiTestCase
         public void typeState(AddProjectWizard.TypeState form)
         {
             form.finishFormElements(null, "build.xml", null, null);
+        }
+    }
+
+    public void assertFormElements(SeleniumForm form, String... values)
+    {
+        TestCase.assertTrue(form.isFormPresent());
+
+        int[] types = form.getActualFieldTypes();
+        Assert.assertEquals(values.length, types.length);
+
+        for (int i = 0; i < types.length; i++)
+        {
+            if (values[i] != null)
+            {
+                String fieldName = form.getActualFieldNames()[i];
+                switch (types[i])
+                {
+                    case SeleniumForm.TEXTFIELD:
+                        TestCase.assertEquals(StringUtils.stripLineBreaks(values[i]), StringUtils.stripLineBreaks(form.getFieldValue(fieldName)));
+                        break;
+                    case SeleniumForm.CHECKBOX:
+                        TestCase.assertEquals(Boolean.valueOf(values[i]) ? "on" : "off", form.getFieldValue(fieldName));
+                        break;
+                    case SeleniumForm.COMBOBOX:
+                        TestCase.assertEquals(values[i], form.getFieldValue(fieldName));
+                        break;
+                    case SeleniumForm.ITEM_PICKER:
+                    case SeleniumForm.MULTI_CHECKBOX:
+                    case SeleniumForm.MULTI_SELECT:
+                        if (values[i] != null)
+                        {
+                            String[] expected = form.convertMultiValue(values[i]);
+
+                            String fieldValue = form.getFieldValue(fieldName);
+                            String[] gotValues = fieldValue.length() == 0 ? new String[0] : fieldValue.split(",");
+                            Assert.assertEquals(expected.length, gotValues.length);
+                            for (int j = 0; j < expected.length; j++)
+                            {
+                                Assert.assertEquals(expected[j], gotValues[j]);
+                            }
+                        }
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    public void assertTitle(SeleniumPage page)
+    {
+        if (page.getTitle() != null)
+        {
+            String gotTitle = selenium.getTitle();
+            if(gotTitle.startsWith(SeleniumPage.TITLE_PREFIX))
+            {
+                gotTitle = gotTitle.substring(SeleniumPage.TITLE_PREFIX.length());
+            }
+            Assert.assertEquals(page.getTitle(), gotTitle);
+        }
+    }
+
+    protected void assertItemPresent(ListPage page, String baseName, String annotation, String... actions)
+    {
+        assertTrue(page.isItemPresent(baseName));
+
+        if(annotation == null)
+        {
+            annotation = "noan";
+        }
+        assertTrue(page.isAnnotationPresent(baseName, annotation));
+
+        for(String action: actions)
+        {
+            assertTrue(page.isActionLinkPresent(baseName, action));
         }
     }
 }

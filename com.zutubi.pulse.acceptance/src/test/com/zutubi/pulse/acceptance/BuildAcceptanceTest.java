@@ -476,8 +476,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         propertiesPage.goTo();
         propertiesPage.waitFor();
 
-        propertiesPage.assertCellContent(0, 0, "pname");
-        propertiesPage.assertCellContent(0, 1, "pvalue");
+        assertEquals("pname", propertiesPage.getCellContent(0, 0));
+        assertEquals("pvalue", propertiesPage.getCellContent(0, 1));
     }
 
     private void enableBuildPrompting(String projectName) throws Exception
