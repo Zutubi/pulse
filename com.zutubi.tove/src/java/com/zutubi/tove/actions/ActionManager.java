@@ -4,6 +4,7 @@ import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CompositeType;
@@ -27,6 +28,9 @@ import java.util.Map;
 public class ActionManager
 {
     private static final Logger LOG = Logger.getLogger(ActionManager.class);
+
+    public static final String I18N_KEY_SUFFIX_LABEL   = ".label";
+    public static final String I18N_KEY_SUFFIX_FEEDACK = ".feedback";
 
     private Map<CompositeType, ConfigurationActions> actionsByType = new HashMap<CompositeType, ConfigurationActions>();
     private ObjectFactory objectFactory;
@@ -124,13 +128,23 @@ public class ActionManager
         });
     }
 
-    public List<String> execute(final String actionName, final Configuration configurationInstance, final Configuration argumentInstance)
+    public ActionResult execute(final String actionName, final Configuration configurationInstance, final Configuration argumentInstance)
     {
-        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, List<String>, Exception>()
+        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, ActionResult, Exception>()
         {
-            public List<String> process(ConfigurationActions actions) throws Exception
+            public ActionResult process(ConfigurationActions actions) throws Exception
             {
-                return actions.execute(actionName, configurationInstance, argumentInstance);
+                ActionResult result;
+                try
+                {
+                    result = actions.execute(actionName, configurationInstance, argumentInstance);
+                }
+                catch (Exception e)
+                {
+                    result = new ActionResult(ActionResult.Status.FAILURE, e.getMessage());
+                }
+
+                return result;
             }
         });
     }
@@ -157,10 +171,8 @@ public class ActionManager
         }
         else
         {
-            LOG.warning("Request for unrecognised action '" + actionName + "' on path '" + configurationInstance.getConfigurationPath() + "'");
+            throw new IllegalArgumentException("Request for unrecognised action '" + actionName + "' on path '" + configurationInstance.getConfigurationPath() + "'");
         }
-
-        return null;
     }
 
     private CompositeType getType(Object configurationInstance)

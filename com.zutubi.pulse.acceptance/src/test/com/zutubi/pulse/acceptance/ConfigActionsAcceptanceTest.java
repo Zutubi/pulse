@@ -9,13 +9,10 @@ import com.zutubi.pulse.acceptance.pages.admin.AgentConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.Hashtable;
 
@@ -23,21 +20,28 @@ import java.util.Hashtable;
  * Acceptance tests for actions that may be executed on configuration
  * instances.
  */
-@Test(dependsOnGroups = {"init.*"})
 public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 {
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();
         super.tearDown();
+    }
+
+    public void testActionFeedbackSimple() throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(random, false);
+        loginAsAdmin();
+        ProjectConfigPage projectConfigPage = new ProjectConfigPage(selenium, urls, random, false);
+        projectConfigPage.goTo();
+        projectConfigPage.clickAction("clean");
+        waitForStatus("the next build on each agent will be clean");
     }
 
     public void testCustomActionWithArgument() throws Exception

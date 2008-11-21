@@ -1,17 +1,16 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.actions.ConfigurationAction;
 import com.zutubi.tove.actions.ConfigurationActions;
+import com.zutubi.tove.config.api.ActionResult;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
-
-import java.util.List;
 
 /**
  */
@@ -170,7 +169,7 @@ public class GenericAction extends ToveActionSupport
         }
 
         // All clear to execute action.
-        List<String> invalidatedPaths = actionManager.execute(actionName, config, argument);
+        ActionResult actionResult = actionManager.execute(actionName, config, argument);
 
         if (TextUtils.stringSet(newPath))
         {
@@ -181,15 +180,30 @@ public class GenericAction extends ToveActionSupport
             response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
         }
 
-        if(invalidatedPaths != null)
+        if (TextUtils.stringSet(actionResult.getMessage()))
         {
-            for(String invalidatedPath: invalidatedPaths)
-            {
-                response.addRenamedPath(new ConfigurationResponse.Rename(invalidatedPath, invalidatedPath, ToveUtils.getDisplayName(invalidatedPath, configurationTemplateManager)));
-            }
+            response.setStatus(new ConfigurationResponse.Status(mapStatus(actionResult.getStatus()), actionResult.getMessage()));
+        }
+
+        for(String invalidatedPath: actionResult.getInvalidatedPaths())
+        {
+            response.addRenamedPath(new ConfigurationResponse.Rename(invalidatedPath, invalidatedPath, ToveUtils.getDisplayName(invalidatedPath, configurationTemplateManager)));
         }
         
         return SUCCESS;
+    }
+
+    private ConfigurationResponse.Status.Type mapStatus(ActionResult.Status status)
+    {
+        switch(status)
+        {
+            case SUCCESS:
+                return ConfigurationResponse.Status.Type.SUCCESS;
+            case FAILURE:
+                return ConfigurationResponse.Status.Type.FAILURE;
+            default:
+                throw new RuntimeException("Unrecognised action status '" + status + "'");
+        }
     }
 
     public void setActionManager(ActionManager actionManager)

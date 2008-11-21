@@ -9,24 +9,10 @@
         var treesInitialised = false;
         var detailPanel = new ZUTUBI.DetailPanel();
 
-        var handleConfigurationResponse = function(result)
+        function handleSuccessfulConfigurationResponse(result)
         {
-            if(result.success)
-            {
-                if(result.newPanel)
-                {
-                    detailPanel.update(result.newPanel);
-                }
-                configTree.handleResponse(result);
-                configTree.redirectToNewPath(result);
-            }
-            else
-            {
-                if(result.actionErrors && result.actionErrors.length > 0)
-                {
-                    showStatus(result.actionErrors[0], 'failure');
-                }
-            }
+            configTree.handleResponse(result);
+            configTree.redirectToNewPath(result);
         }
 
         var Layout = function()

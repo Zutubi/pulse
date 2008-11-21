@@ -1,6 +1,8 @@
 package com.zutubi.tove.actions;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.Permission;
+import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
@@ -22,8 +24,10 @@ public class ConfigurationActions
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationActions.class);
 
+    private static final String I18N_KEY_DEFAULT_FEEDBACK = "default.feedback";
+
     private Class configurationClass;
-    private Class actionHandlerClass;
+    private Class<?> actionHandlerClass;
     private Method enabledMethod;
     private Method actionListingMethod;
     private Map<String, ConfigurationAction> availableActions = new HashMap<String, ConfigurationAction>();
@@ -85,7 +89,7 @@ public class ConfigurationActions
                 {
                     continue;
                 }
-                if (method.getReturnType() != Void.TYPE && !ReflectionUtils.returnsParameterisedType(method, List.class, String.class))
+                if (method.getReturnType() != Void.TYPE && method.getReturnType() != ActionResult.class)
                 {
                     continue;
                 }
@@ -309,15 +313,16 @@ public class ConfigurationActions
         return result;
     }
 
-    List<String> execute(String name, Configuration configurationInstance, Configuration argument) throws Exception
+    ActionResult execute(String name, Configuration configurationInstance, Configuration argument) throws Exception
     {
         ConfigurationAction action = verifyAction(name, configurationInstance);
 
         Object handlerInstance = objectFactory.buildBean(actionHandlerClass);
         Class argumentClass = action.getArgumentClass();
+        ActionResult result;
         if (argumentClass == null)
         {
-            return (List<String>) action.getMethod().invoke(handlerInstance, configurationInstance);
+            result = (ActionResult) action.getMethod().invoke(handlerInstance, configurationInstance);
         }
         else
         {
@@ -326,8 +331,40 @@ public class ConfigurationActions
                 throw new IllegalArgumentException("Invoking action '" + name + "' of type '" + configurationClass.getName() + "': argument instance is of wrong type: expecting '" + argumentClass.getName() + "', got '" + argument.getClass().getName() + "'");
             }
 
-            return (List<String>) action.getMethod().invoke(handlerInstance, configurationInstance, argument);
+            result = (ActionResult) action.getMethod().invoke(handlerInstance, configurationInstance, argument);
         }
+
+        if (result == null)
+        {
+            result = getDefaultResult(name);
+        }
+
+        return result;
+    }
+
+    private ActionResult getDefaultResult(String name)
+    {
+        String feedback;
+        Messages messages = Messages.getInstance(configurationClass);
+        String key = name + ActionManager.I18N_KEY_SUFFIX_FEEDACK;
+
+        if (messages.isKeyDefined(key))
+        {
+            feedback = messages.format(key);
+        }
+        else
+        {
+            String actionLabel = messages.format(name + ActionManager.I18N_KEY_SUFFIX_LABEL);
+            if (actionLabel == null)
+            {
+                actionLabel = name;
+            }
+            
+            messages = Messages.getInstance(ConfigurationActions.class);
+            feedback = messages.format(I18N_KEY_DEFAULT_FEEDBACK, new String[]{actionLabel});
+        }
+
+        return new ActionResult(ActionResult.Status.SUCCESS, feedback);
     }
 
     private ConfigurationAction verifyAction(String name, Configuration configurationInstance)

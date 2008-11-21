@@ -437,6 +437,34 @@ function setSelectionRange(id, start, end)
  * Functions used for configuration UI
  *=========================================================================*/
 
+function handleConfigurationResponse(result)
+{
+    if (result.success)
+    {
+        if (result.newPanel)
+        {
+            detailPanel.update(result.newPanel);
+        }
+
+        if (handleSuccessfulConfigurationResponse)
+        {
+            handleSuccessfulConfigurationResponse(result);
+        }
+
+        if (result.status)
+        {
+            showStatus(result.status.message, result.status.type);
+        }
+    }
+    else
+    {
+        if(result.actionErrors && result.actionErrors.length > 0)
+        {
+            showStatus(result.actionErrors[0], 'failure');
+        }
+    }
+}
+
 function getParentPath(path)
 {
     var index = path.lastIndexOf('/');

@@ -36,6 +36,10 @@ public class ConfigurationResponse
      * The new template path to redirect to.
      */
     private String newTemplatePath;
+    /**
+     * A status message to display in the UI status bar.
+     */
+    private Status status;
 
     /**
      * Creates a response with a new path and optional template path to
@@ -64,6 +68,16 @@ public class ConfigurationResponse
     public String getNewTemplatePath()
     {
         return newTemplatePath;
+    }
+
+    public Status getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(Status status)
+    {
+        this.status = status;
     }
 
     /**
@@ -145,6 +159,57 @@ public class ConfigurationResponse
         }
 
         return removedPaths.toArray(new String[removedPaths.size()]);
+    }
+
+    /**
+     * A message to show in the UI status bar.
+     */
+    public static class Status
+    {
+        /**
+         * Types which match the JavaScript function in the UI.
+         */
+        public enum Type
+        {
+            /**
+             * Maps to the green tick icon.
+             */
+            SUCCESS,
+            /**
+             * Maps to the red exclamation icon.
+             */
+            FAILURE,
+            /**
+             * Maps to the in progress spinning icon.
+             */
+            WORKING
+        }
+
+        private Type type;
+        private String message;
+
+        /**
+         * A new status message for display in the UI status bar.
+         *
+         * @param type    the type of message, maps to an icon in the UI
+         * @param message the message itself, may contain HTML (it will not be
+         *                escaped)
+         */
+        public Status(Type type, String message)
+        {
+            this.type = type;
+            this.message = message;
+        }
+
+        public String getType()
+        {
+            return type.toString().toLowerCase();
+        }
+
+        public String getMessage()
+        {
+            return message;
+        }
     }
 
     public static class Addition

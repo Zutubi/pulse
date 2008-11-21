@@ -18,41 +18,26 @@
 	    // Shared tree functions
         // ------------------------------------------------------------------
 
-        var handleConfigurationResponse = function(result)
+        function handleSuccessfulConfigurationResponse(result)
         {
-            if (result.success)
+            if (configTree)
             {
-                if (result.newPanel)
-                {
-                    detailPanel.update(result.newPanel);
-                }
-
-                if (configTree)
-                {
-                    configTree.handleResponse(result);
-                }
-
-                if (templateTree)
-                {
-                    templateTree.handleResponse(result);
-                }
-
-                if (visibleTree.dead)
-                {
-                    // Config tree dies when the root is deleted.
-                    tabPanel.activate('template-tree');
-                    visibleTree = templateTree;
-                }
-
-                visibleTree.redirectToNewPath(result);
+                configTree.handleResponse(result);
             }
-            else
+
+            if (templateTree)
             {
-                if(result.actionErrors && result.actionErrors.length > 0)
-                {
-                    showStatus(result.actionErrors[0], 'failure');
-                }
+                templateTree.handleResponse(result);
             }
+
+            if (visibleTree.dead)
+            {
+                // Config tree dies when the root is deleted.
+                tabPanel.activate('template-tree');
+                visibleTree = templateTree;
+            }
+
+            visibleTree.redirectToNewPath(result);
         }
 
         // ------------------------------------------------------------------

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -9,6 +10,7 @@ import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfigurat
 import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
@@ -170,11 +172,11 @@ public class ProjectConfigurationActions
     }
 
     @Permission(AccessManager.ACTION_WRITE)
-    public List<String> doConvertToCustom(final ProjectConfiguration projectConfig, final CustomTypeConfiguration custom)
+    public ActionResult doConvertToCustom(final ProjectConfiguration projectConfig, final CustomTypeConfiguration custom)
     {
-        return configurationProvider.executeInsideTransaction(new NullaryFunction<List<String>>()
+        return configurationProvider.executeInsideTransaction(new NullaryFunction<ActionResult>()
         {
-            public List<String> process()
+            public ActionResult process()
             {
                 if(!canConvertType(projectConfig))
                 {
@@ -184,17 +186,17 @@ public class ProjectConfigurationActions
                 String typePath = projectConfig.getType().getConfigurationPath();
                 configurationProvider.delete(typePath);
                 configurationProvider.insert(typePath, custom);
-                return Arrays.asList(typePath);
+                return new ActionResult(ActionResult.Status.SUCCESS, Messages.format(projectConfig, "convertToCustom.feedback"), Arrays.asList(typePath));
             }
         });
     }
 
     @Permission(AccessManager.ACTION_WRITE)
-    public List<String> doConvertToVersioned(final ProjectConfiguration projectConfig, final VersionedTypeConfiguration versioned)
+    public ActionResult doConvertToVersioned(final ProjectConfiguration projectConfig, final VersionedTypeConfiguration versioned)
     {
-        return configurationProvider.executeInsideTransaction(new NullaryFunction<List<String>>()
+        return configurationProvider.executeInsideTransaction(new NullaryFunction<ActionResult>()
         {
-            public List<String> process()
+            public ActionResult process()
             {
                 if(!canConvertType(projectConfig))
                 {
@@ -204,7 +206,7 @@ public class ProjectConfigurationActions
                 String typePath = projectConfig.getType().getConfigurationPath();
                 configurationProvider.delete(typePath);
                 configurationProvider.insert(typePath, versioned);
-                return Arrays.asList(typePath);
+                return new ActionResult(ActionResult.Status.SUCCESS, Messages.format(projectConfig, "convertToVersioned.feedback"), Arrays.asList(typePath));
             }
         });
     }

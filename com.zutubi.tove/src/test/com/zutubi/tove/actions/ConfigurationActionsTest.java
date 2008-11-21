@@ -1,6 +1,7 @@
 package com.zutubi.tove.actions;
 
 import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
@@ -12,27 +13,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- */
 public class ConfigurationActionsTest extends ZutubiTestCase
 {
-    private ActionManager a = null;
+    private static final String RESULT_MESSAGE = "did it";
 
     private static Object obj = null;
-    private DefaultObjectFactory objectFactory;
-
-    protected void setUp() throws Exception
-    {
-        a = new ActionManager();
-        objectFactory = new DefaultObjectFactory();
-        a.setObjectFactory(objectFactory);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        a = null;
-        obj = null;
-    }
+    private DefaultObjectFactory objectFactory = new DefaultObjectFactory();
 
     public void testDefaultActions() throws Exception
     {
@@ -58,14 +44,42 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         assertActions(ca.getActions(new T()), "action");
     }
 
-    public void testResultAction() throws Exception
+    public void testResultExplicit() throws Exception
     {
-        ConfigurationActions ca = new ConfigurationActions(T.class, ResultAction.class, objectFactory);
-        assertTrue(ca.hasAction("result"));
-        List<String> result = ca.execute("result", new T(), null);
-        assertEquals(0, result.size());
+        resultHelper("result", RESULT_MESSAGE);
     }
-    
+
+    public void testResultDefaultNoLabel() throws Exception
+    {
+        resultHelper("defaultNoLabel", "action 'defaultNoLabel' triggered");
+    }
+
+    public void testResultDefaultLabel() throws Exception
+    {
+        resultHelper("defaultLabel", "action 'labelled' triggered");
+    }
+
+    public void testResultDefaultFeedback() throws Exception
+    {
+        resultHelper("defaultFeedback", "fedbacked");
+    }
+
+    public void testResultDefaultLabelAndFeedback() throws Exception
+    {
+        resultHelper("defaultLabelAndFeedback", "fedbacked");
+    }
+
+    private void resultHelper(String actionName, String expectedMessage) throws Exception
+    {
+        ConfigurationActions ca = new ConfigurationActions(T.class, ResultActions.class, objectFactory);
+        assertTrue(ca.hasAction(actionName));
+
+        ActionResult result = ca.execute(actionName, new T(), null);
+        assertEquals(ActionResult.Status.SUCCESS, result.getStatus());
+        assertEquals(expectedMessage, result.getMessage());
+        assertEquals(0, result.getInvalidatedPaths().size());
+    }
+
     public void testEnabledMethod() throws Exception
     {
         assertEnabledMethod(true, EnabledMethod.class);
@@ -495,11 +509,27 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         }
     }
 
-    public static class ResultAction
+    public static class ResultActions
     {
-        public List<String> doResult(T t)
+        public ActionResult doResult(T t)
         {
-            return Arrays.asList();
+            return new ActionResult(ActionResult.Status.SUCCESS, RESULT_MESSAGE);
+        }
+
+        public void doDefaultNoLabel(T t)
+        {
+        }
+
+        public void doDefaultLabel(T t)
+        {
+        }
+
+        public void doDefaultFeedback(T t)
+        {
+        }
+
+        public void doDefaultLabelAndFeedback(T t)
+        {
         }
     }
 }
