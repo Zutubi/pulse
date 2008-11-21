@@ -8,7 +8,8 @@
             <!-- pull in the maven resource if configured. -->
             <resource name="maven" required="false"/>
             <maven>
-            <process processor="${junit}"/>            </maven>
+                <process processor="${junit}"/>
+            </maven>
 
                 <dir-artifact name="test reports" fail-if-not-present="false"
                 base="target/test-reports"

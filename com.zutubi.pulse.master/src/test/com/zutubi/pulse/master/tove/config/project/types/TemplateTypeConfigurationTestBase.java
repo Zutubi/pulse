@@ -64,7 +64,7 @@ public abstract class TemplateTypeConfigurationTestBase extends PulseTestCase
             {
                 expectedStream = new FileInputStream(file);
                 String expected = IOUtils.inputStreamToString(expectedStream);
-                assertEquals(expected, got);
+                assertEquals(normaliseLines(expected), normaliseLines(got));
                 expectedStream.close();
             }
             finally
@@ -94,6 +94,11 @@ public abstract class TemplateTypeConfigurationTestBase extends PulseTestCase
 //        {
 //            IOUtils.close(input);
 //        }
+    }
+
+    private String normaliseLines(String s)
+    {
+        return s.replaceAll("\\r\\n", "\n");
     }
 
     public abstract TemplateTypeConfiguration getType();
