@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
@@ -771,7 +772,7 @@ public class SubversionClient implements ScmClient
         private static final String LABEL_LOCKED     = "L";
         private static final String LABEL_UNLOCKED   = "B";
 
-        private static final String FORMAT_STATUS = "%s%s%s  %s";
+        private static final String FORMAT_LABELS = "%s%s%s  ";
 
         private ScmFeedbackHandler handler;
 
@@ -824,7 +825,11 @@ public class SubversionClient implements ScmClient
                         lockLabel = convertStatusType(event.getLockStatus());
                     }
 
-                    handler.status(String.format(FORMAT_STATUS, pathChangeLabel, propertiesChangeLabel, lockLabel, event.getFile().getPath()));
+                    String labels = String.format(FORMAT_LABELS, pathChangeLabel, propertiesChangeLabel, lockLabel);
+                    if (TextUtils.stringSet(labels.trim()))
+                    {
+                        handler.status(labels + event.getFile().getPath());
+                    }
                 }
             }
         }

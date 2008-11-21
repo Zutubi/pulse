@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
@@ -305,6 +306,19 @@ public class SubversionClientTest extends PulseTestCase
         client.update(context, createRevision(4), null);
         client.update(context, createRevision(8), null);
         assertRevision(gotDir, 8);
+    }
+
+    public void testUpdateDoesNotPrintUnlabelledLines() throws Exception
+    {
+        client.checkout(context, createRevision(1), null);
+        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
+        client.update(context, null, handler);
+        for (String message: handler.getStatusMessages())
+        {
+            // Status is "<labels>  <path>", so if we trim whitespace it
+            // should still contain the spaces in between.
+            assertTrue("No labels in status message '" + message + "'", message.trim().contains("  "));
+        }
     }
 
     public void testCheckNonExistantPathHTTP() throws Exception
