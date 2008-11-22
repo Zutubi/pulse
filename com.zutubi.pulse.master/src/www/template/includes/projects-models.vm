@@ -117,8 +117,8 @@
             </td>
             #end
         #else
-            <td colspan="3" class="fit-width">
-            #set($building = $child.getCount($action.stateInProgress))
+            <td id="${child.id}.building" colspan="3" class="fit-width">
+            #set($building = $child.getInProgressCount())
             #if($building == 0)
                 #wwtext("name=builds.inprogress.none")
             #elseif($building == 1)

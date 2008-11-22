@@ -189,6 +189,17 @@ public class FileSystemUtils
     }
 
     /**
+     * Gets the location to use for storing temporary files, controlled by a
+     * standard system property.
+     *
+     * @return the system temporary directory
+     */
+    public static File getSystemTempDir()
+    {
+        return new File(System.getProperty("java.io.tmpdir"));
+    }
+
+    /**
      * Create a temporary directory using pre-defined prefix and suffix values.  Use this when you really don't
      * care what the directory is called.
      *

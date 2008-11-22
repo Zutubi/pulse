@@ -6,19 +6,28 @@ package com.zutubi.pulse.acceptance;
 public class Constants
 {
     /**
+     * Subversion base URL for several test projects (see below).
+     */
+    private static final String SUBVERSION_ACCEPT_REPO = "svn://localhost:3088/accept/trunk/";
+    /**
      * Subversion URL for a trivial ant project (just a build.xml file).
      */
-    public static final String TRIVIAL_ANT_REPOSITORY = "svn://localhost:3088/accept/trunk/triviant";
+    public static final String TRIVIAL_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "triviant";
     /**
      * Subversion URL for a small sample ant project that contains a build file as well as src and
      * test directories.
      */
-    public static final String TEST_ANT_REPOSITORY = "svn://localhost:3088/accept/trunk/testant";
+    public static final String TEST_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "testant";
     /**
      * Subversion URL for a small sample maven project that contains the pom.xml, along with a
      * source and test file.
      */
-    public static final String TEST_MAVEN_REPOSITORY = "svn://localhost:3088/accept/trunk/testmaven";
+    public static final String TEST_MAVEN_REPOSITORY = SUBVERSION_ACCEPT_REPO + "testmaven";
+    /**
+     * Subversion URL for an ant project which will wait up to 5 minutes for a file to
+     * appear.
+     */
+    public static final String WAIT_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "waitant";
 
     /**
      * The constants for the property names in the ProjectConfiguration class.
@@ -26,6 +35,14 @@ public class Constants
     public static class Project
     {
         public static final String TYPE = "type";
+
+        /**
+         * Property names in the ant type class.
+         */
+        public static class AntType
+        {
+            public static final String ARGUMENTS = "args";
+        }
 
         /**
          * The constants for the property names in the project template type class.

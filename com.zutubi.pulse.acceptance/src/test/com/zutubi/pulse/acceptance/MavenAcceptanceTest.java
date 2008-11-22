@@ -15,7 +15,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
     @SuppressWarnings({ "unchecked" })
     public void testMavenDefaultTestArtifactConfiguration() throws Exception
     {
-        createMavenProject(random);
+        createMavenProject();
 
         // We expect a artifact called surefire-reports to be configured.
         Hashtable<String, Object> artifact = getArtifactConfiguration(random, "test reports");
@@ -30,7 +30,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
     @SuppressWarnings({ "unchecked" })
     public void testMaven2DefaultTestArtifactConfiguration() throws Exception
     {
-        createMaven2Project(random);
+        createMaven2Project();
 
         // We expect a artifact called surefire-reports to be configured.
         Hashtable<String, Object> artifact = getArtifactConfiguration(random, "test reports");
@@ -44,7 +44,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     public void testMaven2BuildPicksUpTests() throws Exception
     {
-        createMaven2Project(random);
+        createMaven2Project();
 
         int buildNumber = runBuild(random);
 
@@ -61,31 +61,26 @@ public class MavenAcceptanceTest extends SeleniumTestBase
         SeleniumUtils.waitForLocator(selenium, artifactsPage.getArtifactLocator("test reports"));
     }
 
-    private void createMavenProject(String projectName) throws Exception
+    private void createMavenProject() throws Exception
     {
         Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.mavenTypeConfig");
         type.put("targets", "install");
 
-        createMavenProject(projectName, type);
+        createMavenProject(type);
     }
 
-    private void createMaven2Project(String projectName) throws Exception
+    private void createMaven2Project() throws Exception
     {
         Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.maven2TypeConfig");
         type.put("goals", "install");
 
-        createMavenProject(projectName, type);
+        createMavenProject(type);
     }
 
-    private void createMavenProject(String projectName, Hashtable<String, Object> type) throws Exception
+    private void createMavenProject(Hashtable<String, Object> type) throws Exception
     {
         xmlRpcHelper.loginAsAdmin();
-
-        Hashtable<String, Object> scm = xmlRpcHelper.getSubversionConfig();
-        scm.put("url", Constants.TEST_MAVEN_REPOSITORY);
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, scm, type);
-
-        xmlRpcHelper.waitForProjectToInitialise(projectName);
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TEST_MAVEN_REPOSITORY), type);
         xmlRpcHelper.logout();
     }
 

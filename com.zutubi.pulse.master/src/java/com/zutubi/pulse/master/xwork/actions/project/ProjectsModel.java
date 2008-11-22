@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Represents a group of projects for display on the dashboard or browse view.
  */
 public class ProjectsModel
 {
@@ -75,7 +76,7 @@ public class ProjectsModel
                 }
             }
         });
+
         return result;
     }
-
 }

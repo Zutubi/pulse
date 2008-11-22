@@ -353,7 +353,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.customTypeConfig");
         type.put("pulseFileString", "<?xml version=\"1.0\"?>\n" +
                 "<project default-recipe=\"default\"><recipe name=\"default\"><print name=\"mess\" message=\"${svn.url}\"/></recipe></project>");
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(), type);
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), type);
         xmlRpcHelper.runBuild(random, 30000);
 
         loginAsAdmin();

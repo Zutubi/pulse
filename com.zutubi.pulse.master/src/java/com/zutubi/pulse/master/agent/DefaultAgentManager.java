@@ -105,7 +105,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         listener.register(configurationProvider, true);
     }
 
-    public void handleConfigurationSystemStarted(ConfigurationSystemStartedEvent event)
+    public void handleConfigurationSystemStarted()
     {
         refreshAgents();
 
@@ -116,6 +116,8 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
         // ensure that we create the default master agent.
         ensureDefaultAgentsDefined();
+
+        pingAgents();
     }
 
     private void ensureDefaultAgentsDefined()
@@ -401,7 +403,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
         else
         {
-            handleConfigurationSystemStarted((ConfigurationSystemStartedEvent) evt);
+            handleConfigurationSystemStarted();
         }
     }
 

@@ -85,4 +85,11 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
 
         return prefix + "." + name;
     }
+
+    public String getBuildingSummary(String group, String templateName)
+    {
+        String id = getProjectRowId(group, templateName) + ".building";
+        SeleniumUtils.waitForElementId(selenium, id);
+        return selenium.getText(id);
+    }
 }

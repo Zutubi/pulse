@@ -9,9 +9,11 @@ import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.Condition;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.URL;
@@ -276,7 +278,7 @@ public class XmlRpcHelper
 
     public String insertSimpleProject(String name, String parent, boolean template) throws Exception
     {
-        return insertProject(name, parent, template, getSubversionConfig(), getAntConfig());
+        return insertProject(name, parent, template, getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), getAntConfig());
     }
 
     public String insertProject(String name, String parent, boolean template, Hashtable<String, Object> scm, Hashtable<String, Object> type) throws Exception
@@ -288,8 +290,14 @@ public class XmlRpcHelper
 
         Hashtable<String, Object> project = createEmptyConfig("zutubi.projectConfig");
         project.put("name", name);
-        project.put("scm", scm);
-        project.put("type", type);
+        if (scm != null)
+        {
+            project.put("scm", scm);
+        }
+        if (type != null)
+        {
+            project.put("type", type);
+        }
         project.put("stages", stages);
 
         String path = call("insertTemplatedConfig", "projects/" + parent, project, template);
@@ -301,10 +309,10 @@ public class XmlRpcHelper
         return path;
     }
 
-    public Hashtable<String, Object> getSubversionConfig()
+    public Hashtable<String, Object> getSubversionConfig(String url)
     {
         Hashtable<String, Object> scm = createEmptyConfig("zutubi.subversionConfig");
-        scm.put("url", Constants.TRIVIAL_ANT_REPOSITORY);
+        scm.put("url", url);
         scm.put("checkoutScheme", "CLEAN_CHECKOUT");
         scm.put("monitor", false);
         return scm;
@@ -461,6 +469,20 @@ public class XmlRpcHelper
         call("triggerBuild", projectName);
     }
 
+    /**
+     * Requests the given build be terminated.
+     *
+     * @param projectName name of the project that is building
+     * @param number      the build number to terminate
+     * @return true if the build was found and in progress when the request was
+     *         made
+     * @throws Exception on error
+     */
+    public boolean cancelBuild(String projectName, int number) throws Exception
+    {
+        return (Boolean) call("cancelBuild", projectName, number);
+    }
+
     public Hashtable<String, Object> getBuild(String projectName, int number) throws Exception
     {
         Vector<Hashtable<String, Object>> build = call("getBuild", projectName, number);
@@ -492,21 +514,76 @@ public class XmlRpcHelper
     {
         int number = getNextBuildNumber(projectName);
         triggerBuild(projectName);
+        waitForBuildToComplete(projectName, number, timeout);
+        return number;
+    }
 
-        long startTime = System.currentTimeMillis();
-        while(true)
+    /**
+     * Waits for a project build to be in progress.  Should not be used if
+     * there is a risk the build has already completed.
+     *
+     * @param projectName the project that is building
+     * @param number      the build number
+     * @param timeout     timeout in milliseconds
+     * @throws Exception on error
+     */
+    public void waitForBuildInProgress(final String projectName, final int number, long timeout) throws Exception
+    {
+        waitForCondition(new Condition()
         {
-            if(System.currentTimeMillis() - startTime > timeout)
+            public boolean satisfied()
             {
-                throw new TimeoutException("Timed out waiting for build " + number + " of project '" + projectName + "' to complete");
+                try
+                {
+                    Hashtable<String, Object> build = getBuild(projectName, number);
+                    return build != null && build.get("status").equals(ResultState.IN_PROGRESS.getPrettyString());
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, timeout, "build " + number + " of project " + projectName + " to become in progress");
+    }
+
+    /**
+     * Waits for a project build to finish.
+     *
+     * @param projectName the project that is building
+     * @param number      the build number
+     * @param timeout     timeout in milliseconds
+     * @throws Exception on error
+     */
+    public void waitForBuildToComplete(final String projectName, final int number, long timeout) throws Exception
+    {
+        waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    Hashtable<String, Object> build = getBuild(projectName, number);
+                    return build != null && Boolean.TRUE.equals(build.get("completed"));
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, timeout, "build " + number + " of project " + projectName + " to complete");
+    }
+
+    private void waitForCondition(Condition condition, long timeout, String description) throws Exception
+    {
+        long endTime = System.currentTimeMillis() + timeout;
+        while(!condition.satisfied())
+        {
+            if(System.currentTimeMillis() > endTime)
+            {
+                throw new TimeoutException("Timed out waiting for " + description);
             }
 
-            Thread.sleep(500);
-            Hashtable<String, Object> build = getBuild(projectName, number);
-            if(build != null && Boolean.TRUE.equals(build.get("completed")))
-            {
-                return number;
-            }
+            Thread.sleep(200);
         }
     }
 

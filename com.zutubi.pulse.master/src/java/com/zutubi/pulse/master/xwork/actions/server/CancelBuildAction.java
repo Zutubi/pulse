@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
 import com.zutubi.pulse.master.FatController;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -48,6 +49,13 @@ public class CancelBuildAction extends ActionSupport
     
     public String execute() throws Exception
     {
+        BuildResult build = buildManager.getBuildResult(buildId);
+        if (build == null)
+        {
+            throw new IllegalArgumentException("Unknown build '" + buildId + "'");
+        }
+
+        accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, build.getProject());
         fatController.terminateBuild(buildId, false);
         Thread.sleep(500);
         return SUCCESS;

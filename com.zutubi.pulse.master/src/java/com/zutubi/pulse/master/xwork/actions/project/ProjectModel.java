@@ -5,6 +5,8 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryProcedure;
 
 /**
+ * Details for a single project or project template for display on the
+ * dashboard or browse view.
  */
 public abstract class ProjectModel
 {
@@ -51,10 +53,15 @@ public abstract class ProjectModel
         }
     }
 
+    public int getInProgressCount()
+    {
+        return getCount(ResultState.IN_PROGRESS);
+    }
+
     public abstract boolean isConcrete();
 
     public abstract boolean isLeaf();
-    
+
     public abstract ProjectHealth getHealth();
 
     public abstract ResultState getLatestState();

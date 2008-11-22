@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -18,6 +19,7 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
@@ -59,6 +61,7 @@ public class RemoteApi
     private ProjectManager projectManager;
     private UserManager userManager;
     private ScmManager scmManager;
+    private FatController fatController;
 
     public RemoteApi()
     {
@@ -1585,6 +1588,42 @@ public class RemoteApi
     }
 
     /**
+     * Request that the given build is cancelled.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project that is building
+     * @param id          the id of the build to cancel
+     * @return true if cancellation was requested, false if the build was not
+     *         found or was not in progress
+     * @throws AuthenticationException if the given token is invalid, or the
+     *         user does not have permission to cancel builds for the project
+     * @throws IllegalArgumentException if the given project name is invalid
+     */
+    public boolean cancelBuild(String token, String projectName, int id) throws AuthenticationException
+    {
+        User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            Project project = internalGetProject(projectName, true);
+            BuildResult build = buildManager.getByProjectAndNumber(project, id);
+            if (build == null || !build.inProgress())
+            {
+                return false;
+            }
+            else
+            {
+                accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, project);
+                fatController.terminateBuild(build.getId(), false);
+                return true;
+            }
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
      * Retrieves the state of the given project.  Possible states include:
      * <ul>
      *   <li>initialising</li>
@@ -1910,5 +1949,10 @@ public class RemoteApi
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setFatController(FatController fatController)
+    {
+        this.fatController = fatController;
     }
 }
