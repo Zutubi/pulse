@@ -169,7 +169,15 @@ public class GenericAction extends ToveActionSupport
         }
 
         // All clear to execute action.
-        ActionResult actionResult = actionManager.execute(actionName, config, argument);
+        ActionResult actionResult = null;
+        try
+        {
+            actionResult = actionManager.execute(actionName, config, argument);
+        }
+        catch (Exception e)
+        {
+            actionResult = new ActionResult(ActionResult.Status.FAILURE, e.getMessage());
+        }
 
         if (TextUtils.stringSet(newPath))
         {

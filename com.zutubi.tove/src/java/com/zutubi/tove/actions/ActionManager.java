@@ -134,17 +134,7 @@ public class ActionManager
         {
             public ActionResult process(ConfigurationActions actions) throws Exception
             {
-                ActionResult result;
-                try
-                {
-                    result = actions.execute(actionName, configurationInstance, argumentInstance);
-                }
-                catch (Exception e)
-                {
-                    result = new ActionResult(ActionResult.Status.FAILURE, e.getMessage());
-                }
-
-                return result;
+                return actions.execute(actionName, configurationInstance, argumentInstance);
             }
         });
     }

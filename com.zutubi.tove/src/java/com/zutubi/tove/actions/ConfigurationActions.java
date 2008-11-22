@@ -361,7 +361,7 @@ public class ConfigurationActions
             }
             
             messages = Messages.getInstance(ConfigurationActions.class);
-            feedback = messages.format(I18N_KEY_DEFAULT_FEEDBACK, new String[]{actionLabel});
+            feedback = messages.format(I18N_KEY_DEFAULT_FEEDBACK, new Object[]{actionLabel});
         }
 
         return new ActionResult(ActionResult.Status.SUCCESS, feedback);
