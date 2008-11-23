@@ -7,7 +7,9 @@ import com.zutubi.pulse.acceptance.SeleniumUtils;
  */
 public class InstallPluginForm
 {
-    private static final String PATH_FIELD_ID = "zfid.pluginPath";
+    private static final String ID_PATH_FIELD = "zfid.pluginPath";
+    private static final String ID_CONTINUE   = "zfid.continue";
+    private static final String ID_CANCEL     = "zfid.cancel";
 
     private Selenium selenium;
 
@@ -18,18 +20,23 @@ public class InstallPluginForm
 
     public boolean isFormPresent()
     {
-        return selenium.isElementPresent(PATH_FIELD_ID);
+        return selenium.isElementPresent(ID_PATH_FIELD);
     }
 
     public void waitFor()
     {
-        SeleniumUtils.waitForElementId(selenium, PATH_FIELD_ID);
+        SeleniumUtils.waitForElementId(selenium, ID_PATH_FIELD);
     }
 
+    public void cancel()
+    {
+        selenium.click(ID_CANCEL);
+    }
+    
     public void continueFormElements(String path)
     {
-        selenium.type(PATH_FIELD_ID, path);
-        selenium.click("zfid.continue");
+        selenium.type(ID_PATH_FIELD, path);
+        selenium.click(ID_CONTINUE);
         selenium.waitForPageToLoad("30000");
     }
 }

@@ -4,21 +4,16 @@ import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.admin.PluginPage;
 import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
 import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
-
 /**
  * Tests for the plugin management UI.
  */
-@Test(dependsOnGroups = {"init.*"})
 public class PluginUIAcceptanceTest extends SeleniumTestBase
 {
     private static final String STATE_ENABLED      = "enabled";
@@ -34,13 +29,6 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     private File tmpDir = null;
 
-    @BeforeMethod
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         if(tmpDir != null)
@@ -74,6 +62,17 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
         assertTrue(pluginsPage.isPluginPresent(id));
         assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
+    }
+
+    public void testCancelInstallPlugin() throws Exception
+    {
+        loginAsAdmin();
+        PluginsPage pluginsPage = new PluginsPage(selenium, urls);
+        pluginsPage.goTo();
+        InstallPluginForm form = pluginsPage.clickInstall();
+        form.waitFor();
+        form.cancel();
+        pluginsPage.waitFor();
     }
 
     public void testDisablePlugin() throws Exception

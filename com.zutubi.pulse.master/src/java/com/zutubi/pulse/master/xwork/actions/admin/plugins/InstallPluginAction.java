@@ -2,12 +2,12 @@ package com.zutubi.pulse.master.xwork.actions.admin.plugins;
 
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
-import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
-import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
-import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
+import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
+import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -33,8 +33,15 @@ public class InstallPluginAction extends PluginActionSupport
     private String pluginPath;
     private String uploadFormSource;
     private String localFormSource;
+    private String submitField;
 
     private Configuration configuration;
+
+    @Override
+    public boolean isCancelled()
+    {
+        return "cancel".equals(submitField);
+    }
 
     public String getPluginPath()
     {
@@ -44,6 +51,11 @@ public class InstallPluginAction extends PluginActionSupport
     public void setPluginPath(String pluginPath)
     {
         this.pluginPath = pluginPath;
+    }
+
+    public void setSubmitField(String submitField)
+    {
+        this.submitField = submitField;
     }
 
     public String getUploadFormSource() throws IOException, TemplateException
