@@ -1,7 +1,5 @@
 package com.zutubi.util;
 
-import com.zutubi.util.FileSystemUtils;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -47,7 +45,8 @@ public class FileSystem
      */
     public File[] listRoots()
     {
-        return convertNullToEmpty(File.listRoots());
+        File[] files = convertNullToEmpty(File.listRoots());
+        return files;
     }
 
     /**
