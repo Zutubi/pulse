@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.model.NamedEntityComparator;
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
@@ -37,10 +36,6 @@ public class BrowseAction extends ProjectActionSupport
         return browseConfig.getColumns();
     }
 
-    public ResultState getStateInProgress()
-    {
-        return ResultState.IN_PROGRESS;
-    }
 
     public String execute() throws Exception
     {

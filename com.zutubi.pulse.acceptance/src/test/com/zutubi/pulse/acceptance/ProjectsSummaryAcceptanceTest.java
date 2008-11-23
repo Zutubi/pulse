@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
+import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.FileSystemUtils;
@@ -50,26 +50,29 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
         String childProject = random + "-child";
 
         File waitFile = new File(FileSystemUtils.getSystemTempDir(), childProject);
+
+        Hashtable<String, Object> svn = xmlRpcHelper.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
+        xmlRpcHelper.insertProject(templateProject, ProjectManager.GLOBAL_PROJECT_NAME, true, svn, null);
+
+        Hashtable<String,Object> antType = xmlRpcHelper.getAntConfig();
+        antType.put(Constants.Project.AntType.ARGUMENTS, getFileArgument(waitFile));
+        xmlRpcHelper.insertProject(childProject, templateProject, false, null, antType);
+
         try
         {
-            Hashtable<String, Object> svn = xmlRpcHelper.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
-            xmlRpcHelper.insertProject(templateProject, ProjectManager.GLOBAL_PROJECT_NAME, true, svn, null);
-
-            Hashtable<String,Object> antType = xmlRpcHelper.getAntConfig();
-            antType.put(Constants.Project.AntType.ARGUMENTS, getFileArgument(waitFile));
-            xmlRpcHelper.insertProject(childProject, templateProject, false, null, antType);
-
             loginAsAdmin();
             summaryPage.goTo();
             assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
 
             triggerAndWaitForBuildToCommence(childProject);
             selenium.refresh();
+            selenium.waitForPageToLoad("30000");
             assertEquals(STATUS_ONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
 
             FileSystemUtils.createFile(waitFile, "test");
             xmlRpcHelper.waitForBuildToComplete(childProject, 1, TIMEOUT);
             selenium.refresh();
+            selenium.waitForPageToLoad("30000");
             assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
         }
         finally
