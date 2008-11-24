@@ -18,12 +18,27 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  */
 public class UpdateCommand implements Runnable
 {
     private static final Logger LOG = Logger.getLogger(UpdateCommand.class);
+
+    /**
+     * The pulse entry point script, may be edited by the user.
+     */
+    private static final String PULSE_SCRIPT = "pulse";
+    /**
+     * Files with these extensions may normally be edited by the user.
+     */
+    private static final List<String> IGNORED_EXTENSIONS = Arrays.asList("bat", "conf", "sh", "txt");
+    /**
+     * The package directory containing versioned components.
+     */
+    private static final String VERSIONS_DIRECTORY = "versions";
 
     private String build;
     private String master;
@@ -77,7 +92,7 @@ public class UpdateCommand implements Runnable
                 versionDir.delete();
 
                 // Need to obtain the package
-                if(!downloadAndApplyUpdate(masterService, versionDir))
+                if(!downloadAndApplyUpdate(masterService, pulseHome, versionDir))
                 {
                     // The package contains new components that we cannot
                     // update.  Log and give up.
@@ -121,7 +136,7 @@ public class UpdateCommand implements Runnable
         }
     }
 
-    private boolean downloadAndApplyUpdate(MasterService masterService, File versionDir) throws IOException
+    private boolean downloadAndApplyUpdate(MasterService masterService, File pulseHome, File versionDir) throws IOException
     {
         File tempDir = new File(configurationManager.getSystemPaths().getTmpRoot(), RandomUtils.randomString(3));
         tempDir.mkdirs();
@@ -161,6 +176,8 @@ public class UpdateCommand implements Runnable
             File packageVersionFile = PulseCtl.getActiveVersionFile(packageRoot);
             packageVersionFile.delete();
 
+            checkUnversionedComponents(pulseHome, packageRoot, true);
+            
             // This comes last: we only want to do this when we are happy to upgrade to this version!
             if(!packageVersionDir.renameTo(versionDir))
             {
@@ -172,6 +189,68 @@ public class UpdateCommand implements Runnable
         finally
         {
             FileSystemUtils.rmdir(tempDir);
+        }
+    }
+
+    /**
+ 	 * Tests if all the non-versioned files/directories in the package (i.e.
+ 	 * files not under the versions dir) are present and identical in our
+ 	 * current installation, and warns the user if they are not.  Note that
+     * this implementation ignores files that the user may reasonably choose
+     * to edit.
+ 	 *
+ 	 * @param installDir the directory within the current installation
+ 	 * @param packageDir the corresponding directory in the incoming package
+     * @param top        true iff this is the top level directory
+     * @throws java.io.IOException is there is an error comparing files
+ 	 */
+    private void checkUnversionedComponents(File installDir, File packageDir, boolean top) throws IOException
+    {
+        String[] children = packageDir.list();
+        for (String child : children)
+        {
+            if (isFileIgnored(child, top))
+            {
+                // Ignore the versioned components
+                continue;
+            }
+
+            File packageFile = new File(packageDir, child);
+            File installFile = new File(installDir, child);
+
+            if (packageFile.isDirectory())
+            {
+                if (!installFile.isDirectory())
+                {
+                    LOG.warning("Existing installation has no directory '" + installFile.getAbsolutePath() + "', incoming package does.");
+                }
+
+                checkUnversionedComponents(installFile, packageFile, false);
+            }
+            else
+            {
+                if (!installFile.isFile())
+                {
+                    LOG.warning("Existing installation has no file '" + installFile.getAbsolutePath() + "', incoming package does.");
+                }
+
+                if (!FileSystemUtils.filesMatch(installFile, packageFile))
+                {
+                    LOG.warning("Existing installation file '" + installFile.getAbsolutePath() + "', does not match that from incoming package.");
+                }
+            }
+        }
+    }
+
+    private boolean isFileIgnored(String file, boolean top)
+    {
+        if (top)
+        {
+            return file.equals(VERSIONS_DIRECTORY);
+        }
+        else
+        {
+            return IGNORED_EXTENSIONS.contains(FileSystemUtils.getFilenameExtension(file)) || PULSE_SCRIPT.equals(file);
         }
     }
 

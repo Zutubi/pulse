@@ -766,6 +766,29 @@ public class FileSystemUtils
     }
 
     /**
+     * Returns the windows-style file extension for the given filename.  This
+     * is considered to by everything after the last period, except when this
+     * period is also the first character in the filename (which is the case
+     * for Unix-style dotfiles), in which case the extension is considered
+     * to be empty.
+     *
+     * @param filename the filename to retrieve the extension from
+     * @return the filenames's extension
+     */
+    public static String getFilenameExtension(String filename)
+    {
+        int index = filename.lastIndexOf('.');
+        if (index > 0)
+        {
+            return filename.substring(index + 1);
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    /**
      * Tests if the two files given are identical.
      *
      * @param f1 the first file

@@ -106,6 +106,36 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             }
         }
     }
+    
+    public void testGetFilenameExtensionEmpty()
+    {
+        assertEquals("", FileSystemUtils.getFilenameExtension(""));
+    }
+
+    public void testGetFilenameExtensionJustDot()
+    {
+        assertEquals("", FileSystemUtils.getFilenameExtension("."));
+    }
+
+    public void testGetFilenameExtensionEmptyExtension()
+    {
+        assertEquals("", FileSystemUtils.getFilenameExtension("foo."));
+    }
+
+    public void testGetFilenameExtensionEmptyFilename()
+    {
+        assertEquals("", FileSystemUtils.getFilenameExtension(".txt"));
+    }
+
+    public void testGetFilenameExtensionNormal()
+    {
+        assertEquals("txt", FileSystemUtils.getFilenameExtension("foo.txt"));
+    }
+
+    public void testGetFilenameMultiplePeriods()
+    {
+        assertEquals("txt", FileSystemUtils.getFilenameExtension("foo.bar.txt"));
+    }
 
     public void testFilesMatchBothEmpty() throws IOException
     {
