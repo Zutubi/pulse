@@ -281,7 +281,7 @@ public class FileSystemUtils
      * @param file file to test
      * @return true if the file is a symlink with a relative path
      */
-    public static boolean isSymlink(File file)
+    public static boolean isRelativeSymlink(File file)
     {
         // WARNING: only detects relative symnlinks
         if (!SystemUtils.IS_WINDOWS)
@@ -1018,11 +1018,18 @@ public class FileSystemUtils
 
         if (src.length == 1)
         {
-            // cp handles file->file and file->dir as expected.  Help is
-            // required for dir->dir, we need to eliminate an existing dest.
             if (src[0].isDirectory())
             {
+                // cp handles file->file and file->dir as expected.  Help is
+                // required for dir->dir, we need to eliminate an existing dest.
                 delete(dest);
+            }
+            else
+            {
+                // Avoid link preservation for a single file copy -- it only
+                // makes sense when picking up both the link and what it links
+                // to.
+                flags = "-p";
             }
         }
         else

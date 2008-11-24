@@ -245,7 +245,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 f = File.createTempFile(FileSystemUtils.class.getName(), ".txt");
 
                 long startTime = System.currentTimeMillis();
-                for (int i = 0; i < 10000; i++)
+                for (int i = 0; i < 100; i++)
                 {
                    FileSystemUtils.getPermissions(f);
                 }
@@ -621,13 +621,55 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         }
     }
 
+    public void testCopySymlinkFileToFile() throws IOException
+    {
+        if (FileSystemUtils.LN_AVAILABLE)
+        {
+            final String CONTENT = "content";
+
+            File linkTarget = new File(tmpDir, "target");
+            File link = new File(tmpDir, "link");
+            File dest = new File(tmpDir, "dest");
+            FileSystemUtils.createFile(linkTarget, CONTENT);
+            assertTrue(FileSystemUtils.createSymlink(link, linkTarget));
+
+            FileSystemUtils.copy(dest, link);
+
+            assertTrue(dest.isFile());
+            assertFalse(FileSystemUtils.isRelativeSymlink(dest));
+            assertEquals(CONTENT, IOUtils.fileToString(dest));
+        }
+    }
+
+    public void testCopySymlinkFileToDirectory() throws IOException
+    {
+        if (FileSystemUtils.LN_AVAILABLE)
+        {
+            final String CONTENT = "content";
+
+            File linkTarget = new File(tmpDir, "target");
+            File link = new File(tmpDir, "link");
+            File destDir = new File(tmpDir, "dest");
+            File dest = new File(destDir, link.getName());
+            FileSystemUtils.createFile(linkTarget, CONTENT);
+            assertTrue(FileSystemUtils.createSymlink(link, linkTarget));
+            assertTrue(destDir.mkdir());
+            
+            FileSystemUtils.copy(destDir, link);
+
+            assertTrue(dest.isFile());
+            assertFalse(FileSystemUtils.isRelativeSymlink(dest));
+            assertEquals(CONTENT, IOUtils.fileToString(dest));
+        }
+    }
+
     public void testIsSymlinkRegularFile() throws IOException
     {
         if(FileSystemUtils.LN_AVAILABLE)
         {
             File file = new File(tmpDir, "file");
             FileSystemUtils.createFile(file, "data");
-            Assert.assertFalse(FileSystemUtils.isSymlink(file));
+            Assert.assertFalse(FileSystemUtils.isRelativeSymlink(file));
         }
     }
 
@@ -635,7 +677,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         if(FileSystemUtils.LN_AVAILABLE)
         {
-            Assert.assertFalse(FileSystemUtils.isSymlink(tmpDir));
+            Assert.assertFalse(FileSystemUtils.isRelativeSymlink(tmpDir));
         }
     }
 
@@ -648,7 +690,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             FileSystemUtils.createFile(file, "data");
             FileSystemUtils.createSymlink(link, file);
 
-            Assert.assertTrue(FileSystemUtils.isSymlink(link));
+            Assert.assertTrue(FileSystemUtils.isRelativeSymlink(link));
         }
     }
 
@@ -660,7 +702,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File link = new File(tmpDir, "link");
             dir.mkdir();
             FileSystemUtils.createSymlink(link, dir);
-            Assert.assertTrue(FileSystemUtils.isSymlink(link));
+            Assert.assertTrue(FileSystemUtils.isRelativeSymlink(link));
         }
     }
 
@@ -675,8 +717,8 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             FileSystemUtils.createSymlink(link, dir);
             FileSystemUtils.createFile(file, "data");
 
-            Assert.assertTrue(FileSystemUtils.isSymlink(link));
-            Assert.assertFalse(FileSystemUtils.isSymlink(file));
+            Assert.assertTrue(FileSystemUtils.isRelativeSymlink(link));
+            Assert.assertFalse(FileSystemUtils.isRelativeSymlink(file));
         }
     }
 
@@ -693,8 +735,8 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             FileSystemUtils.createFile(file, "data");
             FileSystemUtils.createSymlink(fileLink, file);
 
-            Assert.assertTrue(FileSystemUtils.isSymlink(dirLink));
-            Assert.assertTrue(FileSystemUtils.isSymlink(fileLink));
+            Assert.assertTrue(FileSystemUtils.isRelativeSymlink(dirLink));
+            Assert.assertTrue(FileSystemUtils.isRelativeSymlink(fileLink));
         }
     }
 

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.util;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.SystemUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.SystemUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
 import java.util.Map;
@@ -545,7 +545,7 @@ public class ZipUtilsTest extends PulseTestCase
             ZipUtils.setUseExternalArchiving(true);
             simpleTest();
 
-            assertTrue(FileSystemUtils.isSymlink(new File(unzipDir, "l")));
+            assertTrue(FileSystemUtils.isRelativeSymlink(new File(unzipDir, "l")));
         }
     }
 
