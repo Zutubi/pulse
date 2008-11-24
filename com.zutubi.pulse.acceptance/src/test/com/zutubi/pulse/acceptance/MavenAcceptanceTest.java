@@ -12,34 +12,22 @@ import java.util.Vector;
  */
 public class MavenAcceptanceTest extends SeleniumTestBase
 {
-    @SuppressWarnings({ "unchecked" })
     public void testMavenDefaultTestArtifactConfiguration() throws Exception
     {
         createMavenProject();
 
         // We expect a artifact called surefire-reports to be configured.
         Hashtable<String, Object> artifact = getArtifactConfiguration(random, "test reports");
-        assertEquals("test reports", artifact.get(Constants.DirectoryArtifact.NAME));
-        assertEquals("target/test-reports", artifact.get(Constants.DirectoryArtifact.BASE));
-        assertEquals("TEST-*.xml", artifact.get(Constants.DirectoryArtifact.INCLUDES));
-        Vector<String> postprocessors = (Vector<String>) artifact.get(Constants.DirectoryArtifact.POSTPROCESSORS);
-        assertEquals(1, postprocessors.size());
-        assertEquals("junit", postprocessors.get(0));
+        assertArtifactConfiguration(artifact, "test reports", "target/test-reports", "TEXT-*.xml", "junit");
     }
 
-    @SuppressWarnings({ "unchecked" })
     public void testMaven2DefaultTestArtifactConfiguration() throws Exception
     {
         createMaven2Project();
 
         // We expect a artifact called surefire-reports to be configured.
         Hashtable<String, Object> artifact = getArtifactConfiguration(random, "test reports");
-        assertEquals("test reports", artifact.get(Constants.DirectoryArtifact.NAME));
-        assertEquals("target/surefire-reports", artifact.get(Constants.DirectoryArtifact.BASE));
-        assertEquals("TEST-*.xml", artifact.get(Constants.DirectoryArtifact.INCLUDES));
-        Vector<String> postprocessors = (Vector<String>) artifact.get(Constants.DirectoryArtifact.POSTPROCESSORS);
-        assertEquals(1, postprocessors.size());
-        assertEquals("junit", postprocessors.get(0));
+        assertArtifactConfiguration(artifact, "test reports", "target/surefire-reports", "TEXT-*.xml", "junit");
     }
 
     public void testMaven2BuildPicksUpTests() throws Exception
@@ -59,6 +47,20 @@ public class MavenAcceptanceTest extends SeleniumTestBase
         BuildArtifactsPage artifactsPage = new BuildArtifactsPage(selenium, urls, random, buildNumber);
         artifactsPage.goTo();
         SeleniumUtils.waitForLocator(selenium, artifactsPage.getArtifactLocator("test reports"));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    private void assertArtifactConfiguration(Hashtable<String, Object> artifact, String expectedName, String expectedBase, String expectedIncludes, String... expectedPostProcessors)
+    {
+        Vector<String> postprocessors = (Vector<String>) artifact.get(Constants.DirectoryArtifact.POSTPROCESSORS);
+        assertEquals(expectedPostProcessors.length, postprocessors.size());
+        for (int i = 0; i < expectedPostProcessors.length; i++)
+        {
+            assertEquals(expectedPostProcessors[i], postprocessors.get(i));
+        }
+        assertEquals(expectedName, artifact.get(Constants.DirectoryArtifact.NAME));
+        assertEquals(expectedBase, artifact.get(Constants.DirectoryArtifact.BASE));
+        assertEquals(expectedIncludes, artifact.get(Constants.DirectoryArtifact.INCLUDES));
     }
 
     private void createMavenProject() throws Exception
