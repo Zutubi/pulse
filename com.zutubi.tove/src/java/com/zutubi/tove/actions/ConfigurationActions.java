@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Describes a bunch of available actions for a configuration type.
  */
-public class ConfigurationActions
+public class    ConfigurationActions
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationActions.class);
 
@@ -339,10 +339,20 @@ public class ConfigurationActions
             result = getDefaultResult(name);
         }
 
+        if (result.getMessage() == null)
+        {
+            result = new ActionResult(result.getStatus(), getDefaultFeedback(name), result.getInvalidatedPaths());
+        }
+
         return result;
     }
 
     private ActionResult getDefaultResult(String name)
+    {
+        return new ActionResult(ActionResult.Status.SUCCESS, getDefaultFeedback(name));
+    }
+
+    private String getDefaultFeedback(String name)
     {
         String feedback;
         Messages messages = Messages.getInstance(configurationClass);
@@ -350,7 +360,7 @@ public class ConfigurationActions
 
         if (messages.isKeyDefined(key))
         {
-            feedback = messages.format(key);
+            feedback = messages.format(key, new Object[]{name});
         }
         else
         {
@@ -359,12 +369,11 @@ public class ConfigurationActions
             {
                 actionLabel = name;
             }
-            
+
             messages = Messages.getInstance(ConfigurationActions.class);
             feedback = messages.format(I18N_KEY_DEFAULT_FEEDBACK, new Object[]{actionLabel});
         }
-
-        return new ActionResult(ActionResult.Status.SUCCESS, feedback);
+        return feedback;
     }
 
     private ConfigurationAction verifyAction(String name, Configuration configurationInstance)

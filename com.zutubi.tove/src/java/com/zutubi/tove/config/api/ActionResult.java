@@ -48,7 +48,8 @@ public class ActionResult
      * Creates a new result with the given status and message.
      *
      * @param status  the result of the action execution
-     * @param message feedback for the user
+     * @param message feedback for the user, may be null to indicate that the
+     *                default message should be used
      */
     public ActionResult(Status status, String message)
     {
@@ -60,7 +61,8 @@ public class ActionResult
      * that invalidated some configuration paths.
      *
      * @param status           the result of the action execution
-     * @param message          feedback for the user
+     * @param message          feedback for the user, may be null to indicate
+     *                         that the default message should be used
      * @param invalidatedPaths configuration paths that have been invalidated
      *                         by executing the action
      */

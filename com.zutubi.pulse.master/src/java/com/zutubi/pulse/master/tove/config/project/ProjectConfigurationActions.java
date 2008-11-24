@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -186,7 +185,7 @@ public class ProjectConfigurationActions
                 String typePath = projectConfig.getType().getConfigurationPath();
                 configurationProvider.delete(typePath);
                 configurationProvider.insert(typePath, custom);
-                return new ActionResult(ActionResult.Status.SUCCESS, Messages.format(projectConfig, "convertToCustom.feedback"), Arrays.asList(typePath));
+                return new ActionResult(ActionResult.Status.SUCCESS, null, Arrays.asList(typePath));
             }
         });
     }
@@ -206,7 +205,7 @@ public class ProjectConfigurationActions
                 String typePath = projectConfig.getType().getConfigurationPath();
                 configurationProvider.delete(typePath);
                 configurationProvider.insert(typePath, versioned);
-                return new ActionResult(ActionResult.Status.SUCCESS, Messages.format(projectConfig, "convertToVersioned.feedback"), Arrays.asList(typePath));
+                return new ActionResult(ActionResult.Status.SUCCESS, null, Arrays.asList(typePath));
             }
         });
     }

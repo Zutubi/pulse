@@ -49,6 +49,11 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         resultHelper("result", RESULT_MESSAGE);
     }
 
+    public void testResultExplicitNoMessage() throws Exception
+    {
+        resultHelper("resultNoMessage", "default fallback");
+    }
+
     public void testResultDefaultNoLabel() throws Exception
     {
         resultHelper("defaultNoLabel", "action 'defaultNoLabel' triggered");
@@ -67,6 +72,11 @@ public class ConfigurationActionsTest extends ZutubiTestCase
     public void testResultDefaultLabelAndFeedback() throws Exception
     {
         resultHelper("defaultLabelAndFeedback", "fedbacked");
+    }
+
+    public void testResultDefaultFeedbackReferencesName() throws Exception
+    {
+        resultHelper("defaultFeedbackReferencesName", "name is defaultFeedbackReferencesName");
     }
 
     private void resultHelper(String actionName, String expectedMessage) throws Exception
@@ -516,6 +526,11 @@ public class ConfigurationActionsTest extends ZutubiTestCase
             return new ActionResult(ActionResult.Status.SUCCESS, RESULT_MESSAGE);
         }
 
+        public ActionResult doResultNoMessage(T t)
+        {
+            return new ActionResult(ActionResult.Status.SUCCESS, null);
+        }
+
         public void doDefaultNoLabel(T t)
         {
         }
@@ -529,6 +544,10 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         }
 
         public void doDefaultLabelAndFeedback(T t)
+        {
+        }
+
+        public void doDefaultFeedbackReferencesName(T t)
         {
         }
     }

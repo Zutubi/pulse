@@ -93,14 +93,15 @@ public class KeepMostRecentXCleanupStrategyTest extends PulseTestCase
     {
         for (int i = 0; i < x; i++)
         {
-            createTmpFile("backup-" + i);
+            createTmpFile("backup-" + i).setLastModified(System.currentTimeMillis() - (x - i) * 1000);
         }
     }
 
-    private void createTmpFile(String fileName) throws IOException
+    private File createTmpFile(String fileName) throws IOException
     {
         File f = new File(tmp, fileName);
         f.createNewFile();
+        return f;
     }
 
 }
