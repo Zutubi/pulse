@@ -1,13 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectLogPage;
 
 public class ProjectLogAcceptanceTest extends SeleniumTestBase
 {
     public void testProjectLogAvailable() throws Exception
     {
-        createProject(random);
+        addProject(random, true);
 
         loginAsAdmin();
 
@@ -19,7 +18,7 @@ public class ProjectLogAcceptanceTest extends SeleniumTestBase
 
     public void testProjectLogContent() throws Exception
     {
-        createProject(random);
+        addProject(random, true);
 
         loginAsAdmin();
 
@@ -28,23 +27,16 @@ public class ProjectLogAcceptanceTest extends SeleniumTestBase
 
         assertTrue(page.isDownloadLinkAvailable());
 
-/*
-        page.clickDownloadLink();
-        String log = wipeTimestamps(selenium.getBodyText());
-        assertTrue(log.contains("Project initialisation succeeded"));
-*/
+        if (isBrowserFirefox())
+        {
+            page.clickDownloadLink();
+            String log = wipeTimestamps(selenium.getBodyText());
+            assertTrue(log.contains("Project initialisation succeeded"));
+        }
     }
 
     private String wipeTimestamps(String tail)
     {
         return tail.replaceAll("(?m)^.*: ", "");
-    }
-
-    private void createProject(String projectName) throws Exception
-    {
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
-        xmlRpcHelper.waitForProjectToInitialise(projectName);
-        xmlRpcHelper.logout();
     }
 }

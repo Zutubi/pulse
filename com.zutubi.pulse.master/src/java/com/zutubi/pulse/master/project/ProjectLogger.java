@@ -126,7 +126,7 @@ public class ProjectLogger implements Closeable
      *
      * @throws IOException if there is a problem reading the log files.
      */
-    public synchronized InputStream raw() throws IOException
+    public synchronized InputStream getRawInputStream() throws IOException
     {
         if (closed)
         {

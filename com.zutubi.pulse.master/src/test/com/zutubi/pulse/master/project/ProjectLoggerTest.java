@@ -111,48 +111,38 @@ public class ProjectLoggerTest extends PulseTestCase
 
     public void testRawWithNoLogMessages() throws IOException
     {
-        assertEquals("", inputStreamToString(logger.raw()));
+        assertEquals("", inputStreamToString(logger.getRawInputStream()));
     }
 
     public void testRaw() throws IOException
     {
-        logMessage(TEST_MESSAGE);
-
-        String raw = inputStreamToString(logger.raw());
-        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(raw));
+        rawHelper(1, getSingleLine());
     }
 
     public void testRawAfterFirstRotation() throws IOException
     {
-        for (int i = 0; i < LINE_LIMIT + 1; i++)
-        {
-            logMessage(TEST_MESSAGE);
-        }
-
-        String raw = inputStreamToString(logger.raw());
-        assertEquals(getFullContent() + TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(raw));
+        rawHelper(LINE_LIMIT + 1, getFullContent() + getSingleLine());
     }
 
     public void testRawAfterSecondRotation() throws IOException
     {
-        for (int i = 0; i < LINE_LIMIT * 2 + 1; i++)
-        {
-            logMessage(TEST_MESSAGE);
-        }
-
-        String raw = inputStreamToString(logger.raw());
-        assertEquals(getFullContent() + TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(raw));
+        rawHelper(LINE_LIMIT * 2 + 1, getFullContent() + getSingleLine());
     }
 
     public void testRawBeforeSecondRotation() throws IOException
     {
-        for (int i = 0; i < LINE_LIMIT * 2; i++)
+        rawHelper(LINE_LIMIT * 2, getFullContent() + getFullContent());
+    }
+
+    private void rawHelper(int numLines, String expected) throws IOException
+    {
+        for (int i = 0; i < numLines; i++)
         {
             logMessage(TEST_MESSAGE);
         }
 
-        String raw = inputStreamToString(logger.raw());
-        assertEquals(getFullContent() + getFullContent(), wipeTimestamps(raw));
+        String raw = inputStreamToString(logger.getRawInputStream());
+        assertEquals(expected, wipeTimestamps(raw));
     }
 
     private void logMessage(String message)
@@ -163,6 +153,11 @@ public class ProjectLoggerTest extends PulseTestCase
     private String wipeTimestamps(String tail)
     {
         return tail.replaceAll("(?m)^.*: ", "");
+    }
+
+    private String getSingleLine()
+    {
+        return TEST_MESSAGE + LINE_SEPARATOR;
     }
 
     private String getFullContent()

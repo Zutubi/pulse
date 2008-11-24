@@ -336,6 +336,11 @@ public class SeleniumTestBase extends ZutubiTestCase
         }
     }
 
+    protected boolean isBrowserFirefox()
+    {
+        return SeleniumUtils.getSeleniumBrowserProperty().contains("firefox");
+    }
+
     /**
      * A callback interface that allows a test case to drive the UI based project
      * creation process.
