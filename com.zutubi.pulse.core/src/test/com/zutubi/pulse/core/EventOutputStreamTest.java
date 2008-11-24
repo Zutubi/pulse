@@ -4,6 +4,8 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import static com.zutubi.pulse.core.CommandEventOutputStream.DISABLE_AUTO_FLUSH;
+import static com.zutubi.pulse.core.CommandEventOutputStream.MINIMUM_SIZE;
 import com.zutubi.pulse.core.events.OutputEvent;
 import com.zutubi.pulse.core.test.PulseTestCase;
 
@@ -17,7 +19,7 @@ public class EventOutputStreamTest extends PulseTestCase implements EventListene
 {
     private static final int CYCLE_LIMIT = 33;
 
-    private EventOutputStream stream;
+    private CommandEventOutputStream stream;
     private EventManager eventManager;
     private List<OutputEvent> receivedEvents;
 
@@ -25,7 +27,7 @@ public class EventOutputStreamTest extends PulseTestCase implements EventListene
     {
         eventManager = new DefaultEventManager();
         eventManager.register(this);
-        stream = new CommandEventOutputStream(eventManager, 0, false);
+        stream = new CommandEventOutputStream(eventManager, 0, DISABLE_AUTO_FLUSH);
         receivedEvents = new LinkedList<OutputEvent>();
     }
 
@@ -46,54 +48,54 @@ public class EventOutputStreamTest extends PulseTestCase implements EventListene
     public void testWriteOneUnder() throws IOException
     {
         // Write just under the limit and ensure it is not sent until flushed
-        stream.write(getBuffer(EventOutputStream.MINIMUM_SIZE - 1));
+        stream.write(getBuffer(MINIMUM_SIZE - 1));
         assertEquals(0, receivedEvents.size());
         stream.flush();
-        assertEvent(EventOutputStream.MINIMUM_SIZE - 1);
+        assertEvent(MINIMUM_SIZE - 1);
     }
 
     public void testWriteExact() throws IOException
     {
-        stream.write(getBuffer(EventOutputStream.MINIMUM_SIZE));
-        assertEvent(EventOutputStream.MINIMUM_SIZE);
+        stream.write(getBuffer(MINIMUM_SIZE));
+        assertEvent(MINIMUM_SIZE);
         stream.flush();
         assertEquals(0, receivedEvents.size());
     }
 
     public void testWriteOver() throws IOException
     {
-        stream.write(getBuffer(EventOutputStream.MINIMUM_SIZE + 33));
-        assertEvent(EventOutputStream.MINIMUM_SIZE + 33);
+        stream.write(getBuffer(MINIMUM_SIZE + 33));
+        assertEvent(MINIMUM_SIZE + 33);
         stream.flush();
         assertEquals(0, receivedEvents.size());
     }
 
     public void testCreepToLimit() throws IOException
     {
-        stream.write(getBuffer(EventOutputStream.MINIMUM_SIZE - 1));
+        stream.write(getBuffer(MINIMUM_SIZE - 1));
         assertEquals(0, receivedEvents.size());
-        stream.write((EventOutputStream.MINIMUM_SIZE - 1) % CYCLE_LIMIT);
-        assertEvent(EventOutputStream.MINIMUM_SIZE);
+        stream.write((MINIMUM_SIZE - 1) % CYCLE_LIMIT);
+        assertEvent(MINIMUM_SIZE);
         stream.flush();
         assertEquals(0, receivedEvents.size());
     }
 
     public void testWriteToLimit() throws IOException
     {
-        stream.write(getBuffer(EventOutputStream.MINIMUM_SIZE - CYCLE_LIMIT));
+        stream.write(getBuffer(MINIMUM_SIZE - CYCLE_LIMIT));
         assertEquals(0, receivedEvents.size());
-        stream.write(getBuffer(CYCLE_LIMIT, EventOutputStream.MINIMUM_SIZE - CYCLE_LIMIT));
-        assertEvent(EventOutputStream.MINIMUM_SIZE);
+        stream.write(getBuffer(CYCLE_LIMIT, MINIMUM_SIZE - CYCLE_LIMIT));
+        assertEvent(MINIMUM_SIZE);
         stream.flush();
         assertEquals(0, receivedEvents.size());
     }
 
     public void testWriteToOver() throws IOException
     {
-        stream.write(getBuffer(EventOutputStream.MINIMUM_SIZE - 100));
+        stream.write(getBuffer(MINIMUM_SIZE - 100));
         assertEquals(0, receivedEvents.size());
-        stream.write(getBuffer(200, EventOutputStream.MINIMUM_SIZE - 100));
-        assertEvent(EventOutputStream.MINIMUM_SIZE + 100);
+        stream.write(getBuffer(200, MINIMUM_SIZE - 100));
+        assertEvent(MINIMUM_SIZE + 100);
         stream.flush();
         assertEquals(0, receivedEvents.size());
     }
@@ -120,20 +122,61 @@ public class EventOutputStreamTest extends PulseTestCase implements EventListene
 
     public void testAutoFlush() throws InterruptedException, IOException
     {
-        stream = new CommandEventOutputStream(eventManager, 1, true);
+        stream = new CommandEventOutputStream(eventManager, 1, 10);
         stream.write(getBuffer(1));
-        Thread.sleep(6000);
+
+        Thread.sleep(100);
+
         assertReceived(1);
     }
 
     public void testAutoFlushAfterFullWrite() throws InterruptedException, IOException
     {
-        stream = new CommandEventOutputStream(eventManager, 1, true);
-        stream.write(getBuffer(EventOutputStream.MINIMUM_SIZE));
+        stream = new CommandEventOutputStream(eventManager, 1, 10);
+        stream.write(getBuffer(MINIMUM_SIZE));
         stream.write(getBuffer(1));
-        Thread.sleep(6000);
-        assertEvent(EventOutputStream.MINIMUM_SIZE);
+
+        Thread.sleep(100);
+
+        assertEvent(MINIMUM_SIZE);
         assertEvent(1);
+    }
+
+    public void testAutoAfterLargeWrite() throws InterruptedException, IOException
+    {
+        final int LARGE_WRITE = MINIMUM_SIZE * 5 + 10;
+        final int UNDER_MIN_WRITE = MINIMUM_SIZE - 1;
+
+        stream = new CommandEventOutputStream(eventManager, 1, 10);
+        stream.write(getBuffer(LARGE_WRITE));
+        stream.write(getBuffer(UNDER_MIN_WRITE));
+
+        Thread.sleep(100);
+
+        assertEvent(LARGE_WRITE);
+        assertEvent(UNDER_MIN_WRITE);
+    }
+
+    public void testAutoAfterManyLargeWrites() throws InterruptedException, IOException
+    {
+        final int LARGE_WRITE_COUNT = 100;
+        final int LARGE_WRITE = MINIMUM_SIZE * 5 + 10;
+        final int UNDER_MIN_WRITE = MINIMUM_SIZE - 1;
+
+        stream = new CommandEventOutputStream(eventManager, 1, 10);
+        for (int i = 0; i < LARGE_WRITE_COUNT; i++)
+        {
+            stream.write(getBuffer(LARGE_WRITE));
+        }
+        stream.write(getBuffer(UNDER_MIN_WRITE));
+
+        Thread.sleep(100);
+
+        for (int i = 0; i < LARGE_WRITE_COUNT; i++)
+        {
+            assertEvent(LARGE_WRITE);
+        }
+        assertEvent(UNDER_MIN_WRITE);
     }
 
     private byte[] getBuffer(int size)

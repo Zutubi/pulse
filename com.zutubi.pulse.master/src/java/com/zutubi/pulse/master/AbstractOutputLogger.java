@@ -21,6 +21,7 @@ public class AbstractOutputLogger extends AbstractFileLogger implements OutputLo
         if (length > 0)
         {
             writer.write(new String(output, offset, length));
+            writer.flush();
         }
     }
 }

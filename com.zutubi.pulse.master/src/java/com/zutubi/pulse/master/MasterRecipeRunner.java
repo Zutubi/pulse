@@ -49,7 +49,7 @@ public class MasterRecipeRunner implements Runnable
         PulseExecutionContext context = request.getContext();
         ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false));
 
-        EventOutputStream outputStream = null;
+        CommandEventOutputStream outputStream = null;
         context.push();
         try
         {
@@ -59,7 +59,7 @@ public class MasterRecipeRunner implements Runnable
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
-            outputStream = new CommandEventOutputStream(eventManager, request.getId(), true);
+            outputStream = new CommandEventOutputStream(eventManager, request.getId());
             context.setOutputStream(outputStream);
             context.setWorkingDir(recipePaths.getBaseDir());
 

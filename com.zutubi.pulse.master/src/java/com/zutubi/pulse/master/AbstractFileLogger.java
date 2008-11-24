@@ -40,6 +40,7 @@ public abstract class AbstractFileLogger
     public void closeWriter()
     {
         IOUtils.close(writer);
+        writer = null;
     }
 
     protected void logMarker(String message)

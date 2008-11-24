@@ -80,7 +80,7 @@ public class SlaveRecipeProcessor
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
             context.push();
-            EventOutputStream outputStream = null;
+            CommandEventOutputStream outputStream = null;
             try
             {
                 recipeCleanup.cleanup(eventManager, processorPaths.getRecipesRoot(), request.getId());
@@ -89,7 +89,7 @@ public class SlaveRecipeProcessor
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repo);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
-                outputStream = new CommandEventOutputStream(eventManager, request.getId(), true);
+                outputStream = new CommandEventOutputStream(eventManager, request.getId());
                 context.setOutputStream(outputStream);
                 context.setWorkingDir(processorPaths.getBaseDir());
 
