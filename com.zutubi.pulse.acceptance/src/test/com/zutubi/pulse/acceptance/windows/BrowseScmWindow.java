@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.windows;
 
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.util.Condition;
 
@@ -27,13 +28,13 @@ public class BrowseScmWindow
 
     public void waitForWindow()
     {
-        SeleniumUtils.awaitCondition(new Condition()
+        AcceptanceTestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
                 return isWindowPresent();
             }
-        }, "Timeout waiting for " + windowName + " window.");
+        }, SeleniumUtils.DEFAULT_TIMEOUT, "Timeout waiting for " + windowName + " window.");
     }
 
     public void selectWindow()

@@ -19,7 +19,6 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
@@ -1601,7 +1600,7 @@ public class RemoteApi
      */
     public boolean cancelBuild(String token, String projectName, int id) throws AuthenticationException
     {
-        User user = tokenManager.loginAndReturnUser(token);
+        tokenManager.loginUser(token);
         try
         {
             Project project = internalGetProject(projectName, true);
@@ -1612,8 +1611,7 @@ public class RemoteApi
             }
             else
             {
-                accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, project);
-                fatController.terminateBuild(build.getId(), false);
+                fatController.terminateBuild(build, false);
                 return true;
             }
         }

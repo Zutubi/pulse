@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
@@ -9,7 +10,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.TimeoutException;
 
 /**
  */
@@ -529,7 +528,7 @@ public class XmlRpcHelper
      */
     public void waitForBuildInProgress(final String projectName, final int number, long timeout) throws Exception
     {
-        waitForCondition(new Condition()
+        AcceptanceTestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
@@ -556,7 +555,7 @@ public class XmlRpcHelper
      */
     public void waitForBuildToComplete(final String projectName, final int number, long timeout) throws Exception
     {
-        waitForCondition(new Condition()
+        AcceptanceTestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
@@ -571,20 +570,6 @@ public class XmlRpcHelper
                 }
             }
         }, timeout, "build " + number + " of project " + projectName + " to complete");
-    }
-
-    private void waitForCondition(Condition condition, long timeout, String description) throws Exception
-    {
-        long endTime = System.currentTimeMillis() + timeout;
-        while(!condition.satisfied())
-        {
-            if(System.currentTimeMillis() > endTime)
-            {
-                throw new TimeoutException("Timed out waiting for " + description);
-            }
-
-            Thread.sleep(200);
-        }
     }
 
     public static void main(String[] argv) throws Exception

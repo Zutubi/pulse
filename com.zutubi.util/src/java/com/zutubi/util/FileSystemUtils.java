@@ -2,11 +2,9 @@ package com.zutubi.util;
 
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import sun.security.action.GetPropertyAction;
 
 import java.io.*;
 import java.net.URLConnection;
-import java.security.AccessController;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -225,9 +223,7 @@ public class FileSystemUtils
 
         if (base == null)
         {
-            // need to determine the default tmp directory
-            GetPropertyAction a = new GetPropertyAction("java.io.tmpdir");
-            base = new File(((String) AccessController.doPrivileged(a)));
+            base = getSystemTempDir();
         }
 
         if (!TextUtils.stringSet(prefix))

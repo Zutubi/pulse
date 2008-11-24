@@ -45,8 +45,7 @@ public class FileSystem
      */
     public File[] listRoots()
     {
-        File[] files = convertNullToEmpty(File.listRoots());
-        return files;
+        return convertNullToEmpty(File.listRoots());
     }
 
     /**

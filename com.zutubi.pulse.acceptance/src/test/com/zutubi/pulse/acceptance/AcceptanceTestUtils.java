@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.util.Condition;
+
 import java.io.File;
 
 public class AcceptanceTestUtils
@@ -13,5 +15,26 @@ public class AcceptanceTestUtils
             workingDir = new File(System.getProperty("work.dir"));
         }
         return workingDir;
+    }
+
+    public static void waitForCondition(Condition condition, long timeout, String description)
+    {
+        long endTime = System.currentTimeMillis() + timeout;
+        while(!condition.satisfied())
+        {
+            if(System.currentTimeMillis() > endTime)
+            {
+                throw new RuntimeException("Timed out waiting for " + description);
+            }
+
+            try
+            {
+                Thread.sleep(200);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException("Interrupted waiting for " + description);
+            }
+        }
     }
 }

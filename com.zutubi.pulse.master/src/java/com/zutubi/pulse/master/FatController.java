@@ -22,6 +22,7 @@ import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import org.quartz.JobDetail;
@@ -57,6 +58,7 @@ public class FatController implements EventListener, Stoppable
     private AgentManager agentManager;
     private UserManager userManager;
     private ThreadFactory threadFactory;
+    private AccessManager accessManager;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
@@ -256,9 +258,10 @@ public class FatController implements EventListener, Stoppable
         }
     }
 
-    public void terminateBuild(long id, boolean timeout)
+    public void terminateBuild(BuildResult buildResult, boolean timeout)
     {
-        eventManager.publish(new BuildTerminationRequestEvent(this, id, timeout));
+        accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, buildResult);
+        eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), timeout));
     }
 
     private void handleBuildCompleted(BuildCompletedEvent event)
@@ -386,5 +389,10 @@ public class FatController implements EventListener, Stoppable
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

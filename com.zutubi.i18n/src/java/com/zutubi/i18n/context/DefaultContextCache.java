@@ -1,10 +1,6 @@
 package com.zutubi.i18n.context;
 
-import sun.misc.SoftCache;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -13,18 +9,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class DefaultContextCache implements ContextCache
 {
-    private SoftCache contextCache;
+    private Map<Long, List<ResourceBundle>> contextCache;
 
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private static final int INITIAL_CACHE_SIZE = 25;
-    private static final float CACHE_LOAD_FACTOR = (float) 1.0;
 
     /**
      * Construct cache with default settings
      */
     public DefaultContextCache()
     {
-        contextCache = new SoftCache(INITIAL_CACHE_SIZE, CACHE_LOAD_FACTOR);
+        contextCache = new HashMap<Long, List<ResourceBundle>>();
     }
 
     /**

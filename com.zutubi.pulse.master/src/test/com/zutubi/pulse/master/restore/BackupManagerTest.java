@@ -126,7 +126,9 @@ public class BackupManagerTest extends PulseTestCase
 
         File firstBackup = backupDir.listFiles()[0];
         assertTrue(firstBackup.isFile());
-        
+        // We need to ensure this first file is the oldest.
+        Thread.sleep(1000);
+
         for (int i = 0; i < 10; i++)
         {
             manager.triggerBackup();

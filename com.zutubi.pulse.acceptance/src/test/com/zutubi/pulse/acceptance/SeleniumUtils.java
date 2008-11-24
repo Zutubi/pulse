@@ -134,39 +134,13 @@ public class SeleniumUtils
 
     public static void waitForVisible(final Selenium selenium, final String locator)
     {
-        awaitCondition(DEFAULT_TIMEOUT, new Condition()
+        AcceptanceTestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
                 return selenium.isVisible(locator);
             }
-        }, "locator '" + locator + "' to become visible");
-    }
-
-    public static void awaitCondition(Condition condition, String conditionText)
-    {
-        awaitCondition(DEFAULT_TIMEOUT, condition, conditionText);
-    }
-
-    public static void awaitCondition(long timeout, Condition condition, String conditionText)
-    {
-        long startTime = System.currentTimeMillis();
-        while (!condition.satisfied())
-        {
-            if (System.currentTimeMillis() - startTime > timeout)
-            {
-                throw new SeleniumException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText);
-            }
-
-            try
-            {
-                Thread.sleep(1000);
-            }
-            catch (InterruptedException e)
-            {
-                throw new SeleniumException(e);
-            }
-        }
+        }, DEFAULT_TIMEOUT, "locator '" + locator + "' to become visible");
     }
 
     public static void waitAndClickId(Selenium selenium, String id)
