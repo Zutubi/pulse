@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  */
-public class EventOutputStreamTest extends PulseTestCase implements EventListener
+public class CommandEventOutputStreamTest extends PulseTestCase implements EventListener
 {
     private static final int CYCLE_LIMIT = 33;
 
