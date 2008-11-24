@@ -310,15 +310,30 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testUpdateDoesNotPrintUnlabelledLines() throws Exception
     {
+        RecordingScmFeedbackHandler handler = runRecordedUpdate();
+        for (String message: handler.getStatusMessages())
+        {
+            System.out.println("message = " + message);
+        }
+    }
+
+    public void testUpdateShowsExpectedStatusLabels() throws Exception
+    {
+        RecordingScmFeedbackHandler handler = runRecordedUpdate();
+
+        List<String> messages = handler.getStatusMessages();
+        assertEquals(1, messages.size());
+        String[] pieces = messages.get(0).split(" +");
+        assertEquals(2, pieces.length);
+        assertEquals("U", pieces[0]);
+    }
+
+    private RecordingScmFeedbackHandler runRecordedUpdate() throws ScmException
+    {
         client.checkout(context, createRevision(1), null);
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         client.update(context, null, handler);
-        for (String message: handler.getStatusMessages())
-        {
-            // Status is "<labels>  <path>", so if we trim whitespace it
-            // should still contain the spaces in between.
-            assertTrue("No labels in status message '" + message + "'", message.trim().contains("  "));
-        }
+        return handler;
     }
 
     public void testCheckNonExistantPathHTTP() throws Exception
@@ -338,8 +353,13 @@ public class SubversionClientTest extends PulseTestCase
     private void assertRevision(File dir, int revision) throws IOException
     {
         File dataFile = getTestDataFile(MODULE_PATH, Integer.toString(revision), "zip");
+        File expectedTestDir = new File(expectedDir, "test");
+        if (expectedTestDir.isDirectory())
+        {
+            removeDirectory(expectedTestDir);
+        }
         ZipUtils.extractZip(dataFile, expectedDir);
-        assertDirectoriesEqual(new File(new File(expectedDir, "test"), "trunk"), dir);
+        assertDirectoriesEqual(new File(expectedTestDir, "trunk"), dir);
     }
 
     private List<ScmFile> getSortedListing(SubversionClient confirmServer)
