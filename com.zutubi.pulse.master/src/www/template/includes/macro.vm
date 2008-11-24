@@ -837,9 +837,9 @@
 ##
 #macro(testResultsCell $build $recipe $result)
     #if($result.succeeded() && $result.warningFeatureCount > 0)
-        <td #if(!$recipe)id="#id(${build.project.name}.build.${build.number}.test)"#end class="warning">
+        <td #if(!$recipe)id='#id("${build.project.name}.build.${build.number}.test")'#end class="warning">
     #else
-        <td #if(!$recipe)id="#id(${build.project.name}.build.${build.number}.test)"#end class="$result.state.string">
+        <td #if(!$recipe)id='#id("${build.project.name}.build.${build.number}.test")'#end class="$result.state.string">
     #end
     
     #set($summary = $result.testSummary)
