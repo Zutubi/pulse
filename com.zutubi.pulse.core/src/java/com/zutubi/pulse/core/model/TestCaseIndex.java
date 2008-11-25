@@ -25,7 +25,7 @@ public class TestCaseIndex extends Entity
         this.name = name;
     }
 
-    public void recordExecution(TestCaseResult.Status status, long buildId, long buildNumber)
+    public void recordExecution(PersistentTestCaseResult.Status status, long buildId, long buildNumber)
     {
         totalCount++;
         switch (status)

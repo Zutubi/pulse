@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.boostregression;
 
-import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestCaseResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
 import java.io.File;
@@ -25,41 +25,41 @@ public class BoostRegressionPostProcessorTest extends XMLTestReportPostProcessor
 
     public void testBasic() throws Exception
     {
-        singleLogHelper("compilefail", "iterator", "interoperable_fail", TestCaseResult.Status.PASS, null);
+        singleLogHelper("compilefail", "iterator", "interoperable_fail", PersistentTestCaseResult.Status.PASS, null);
     }
 
     public void testRun() throws Exception
     {
-        singleLogHelper("run", "statechart", "InvalidResultCopyTestRelaxed", TestCaseResult.Status.PASS, null);
+        singleLogHelper("run", "statechart", "InvalidResultCopyTestRelaxed", PersistentTestCaseResult.Status.PASS, null);
     }
 
     public void testBroken() throws Exception
     {
-        singleLogHelper("broken", "statechart", "InvalidResultCopyTestRelaxed", TestCaseResult.Status.FAILURE, "============================[ compile output below ]============================\n" +
+        singleLogHelper("broken", "statechart", "InvalidResultCopyTestRelaxed", PersistentTestCaseResult.Status.FAILURE, "============================[ compile output below ]============================\n" +
                 "    compiler error here\n" +
                 "============================[ compile output above ]============================\n");
     }
 
     public void testNested() throws Exception
     {
-        TestSuiteResult tests = runProcessor("nested");
+        PersistentTestSuiteResult tests = runProcessor("nested");
         assertEquals(1, tests.getSuites().size());
-        TestSuiteResult suite = tests.getSuites().get(0);
+        PersistentTestSuiteResult suite = tests.getSuites().get(0);
         assertEquals("algorithm", suite.getName());
         assertEquals(1, suite.getTotal());
         suite = suite.getSuite("minmax");
         assertNotNull(suite);
-        checkCase(suite.getCase("minmax"), "minmax", TestCaseResult.Status.PASS, TestCaseResult.UNKNOWN_DURATION, null);
+        checkCase(suite.getCase("minmax"), "minmax", PersistentTestCaseResult.Status.PASS, PersistentTestCaseResult.UNKNOWN_DURATION, null);
     }
 
-    private void singleLogHelper(String testName, String suiteName, String caseName, TestCaseResult.Status status, String message) throws Exception
+    private void singleLogHelper(String testName, String suiteName, String caseName, PersistentTestCaseResult.Status status, String message) throws Exception
     {
-        TestSuiteResult tests = runProcessor(testName);
+        PersistentTestSuiteResult tests = runProcessor(testName);
         assertEquals(1, tests.getSuites().size());
-        TestSuiteResult suite = tests.getSuites().get(0);
+        PersistentTestSuiteResult suite = tests.getSuites().get(0);
         assertEquals(suiteName, suite.getName());
         assertEquals(1, suite.getTotal());
-        checkCase(suite.getCase(caseName), caseName, status, TestCaseResult.UNKNOWN_DURATION, message);
+        checkCase(suite.getCase(caseName), caseName, status, PersistentTestCaseResult.UNKNOWN_DURATION, message);
     }
 
 }

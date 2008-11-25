@@ -6,11 +6,11 @@ import java.util.Comparator;
 
 /**
  */
-public class TestResultComparator implements Comparator<TestResult>
+public class TestResultComparator implements Comparator<PersistentTestResult>
 {
     private Comparator<String> packageComparator = new Sort.PackageComparator();
 
-    public int compare(TestResult r1, TestResult r2)
+    public int compare(PersistentTestResult r1, PersistentTestResult r2)
     {
         if(r1.isSuite())
         {

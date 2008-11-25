@@ -21,7 +21,7 @@ public class RecipeResult extends Result
 
     private String recipeName;
     private List<CommandResult> results = new LinkedList<CommandResult>();
-    private TestSuiteResult failedTestResults;
+    private PersistentTestSuiteResult failedTestResults;
     private TestResultSummary testSummary = new TestResultSummary();
 
     public RecipeResult()
@@ -233,12 +233,12 @@ public class RecipeResult extends Result
         return outputDir == null ? null : outputDir.getParentFile();
     }
 
-    public TestSuiteResult getFailedTestResults()
+    public PersistentTestSuiteResult getFailedTestResults()
     {
         return failedTestResults;
     }
 
-    public void setFailedTestResults(TestSuiteResult failedTestResults)
+    public void setFailedTestResults(PersistentTestSuiteResult failedTestResults)
     {
         this.failedTestResults = failedTestResults;
     }

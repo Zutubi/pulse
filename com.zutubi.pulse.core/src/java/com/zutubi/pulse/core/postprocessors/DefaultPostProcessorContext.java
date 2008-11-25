@@ -42,9 +42,9 @@ public class DefaultPostProcessorContext implements PostProcessorContext
         return executionContext;
     }
 
-    public TestSuiteResult getTestSuite()
+    public PersistentTestSuiteResult getTestSuite()
     {
-        return executionContext.getValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, TestSuiteResult.class);
+        return executionContext.getValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, PersistentTestSuiteResult.class);
     }
     
     public ResultState getResultState()

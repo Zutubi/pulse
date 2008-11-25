@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors;
 
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
@@ -26,10 +26,10 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
         return new StoredFileArtifact(getClass().getSimpleName() + "." + name + ".xml");
     }
 
-    protected TestSuiteResult runProcessor(String... names) throws Exception
+    protected PersistentTestSuiteResult runProcessor(String... names) throws Exception
     {
         File outputDir = getOutputDir();
-        TestSuiteResult testResults = new TestSuiteResult();
+        PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
         ExecutionContext context = new PulseExecutionContext();
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
@@ -48,7 +48,7 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
         return testResults;
     }
 
-    protected void checkCase(TestCaseResult caseResult, String name, TestCaseResult.Status status, long duration, String message)
+    protected void checkCase(PersistentTestCaseResult caseResult, String name, PersistentTestCaseResult.Status status, long duration, String message)
     {
         assertEquals(name, caseResult.getName());
         assertEquals(status, caseResult.getStatus());
@@ -56,12 +56,12 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
         assertEquals(message, caseResult.getMessage());
     }
 
-    protected void checkCase(TestCaseResult caseResult, String name, TestCaseResult.Status status, String message)
+    protected void checkCase(PersistentTestCaseResult caseResult, String name, PersistentTestCaseResult.Status status, String message)
     {
-        checkCase(caseResult, name, status, TestResult.UNKNOWN_DURATION, message);
+        checkCase(caseResult, name, status, PersistentTestResult.UNKNOWN_DURATION, message);
     }
 
-    protected void checkSuite(TestSuiteResult suite, String name, int total, int failures, int errors)
+    protected void checkSuite(PersistentTestSuiteResult suite, String name, int total, int failures, int errors)
     {
         assertEquals(name, suite.getName());
         assertEquals(total, suite.getTotal());
@@ -69,40 +69,40 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
         assertEquals(errors, suite.getErrors());
     }
 
-    protected void checkPassCase(TestSuiteResult suite, String name)
+    protected void checkPassCase(PersistentTestSuiteResult suite, String name)
     {
-        TestCaseResult caseResult = suite.getCase(name);
+        PersistentTestCaseResult caseResult = suite.getCase(name);
         assertNotNull(caseResult);
         checkPassCase(caseResult, name);
     }
 
-    protected void checkPassCase(TestCaseResult caseResult, String name)
+    protected void checkPassCase(PersistentTestCaseResult caseResult, String name)
     {
-        checkCase(caseResult, name, TestCaseResult.Status.PASS, null);
+        checkCase(caseResult, name, PersistentTestCaseResult.Status.PASS, null);
     }
 
-    protected void checkFailureCase(TestSuiteResult suite, String name, String message)
+    protected void checkFailureCase(PersistentTestSuiteResult suite, String name, String message)
     {
-        TestCaseResult caseResult = suite.getCase(name);
+        PersistentTestCaseResult caseResult = suite.getCase(name);
         assertNotNull(caseResult);
         checkFailureCase(caseResult, name, message);
     }
 
-    protected void checkFailureCase(TestCaseResult caseResult, String name, String message)
+    protected void checkFailureCase(PersistentTestCaseResult caseResult, String name, String message)
     {
-        checkCase(caseResult, name, TestCaseResult.Status.FAILURE, message);
+        checkCase(caseResult, name, PersistentTestCaseResult.Status.FAILURE, message);
     }
 
-    protected void checkErrorCase(TestSuiteResult suite, String name, String message)
+    protected void checkErrorCase(PersistentTestSuiteResult suite, String name, String message)
     {
-        TestCaseResult caseResult = suite.getCase(name);
+        PersistentTestCaseResult caseResult = suite.getCase(name);
         assertNotNull(caseResult);
         checkErrorCase(caseResult, name, message);
     }
 
-    protected void checkErrorCase(TestCaseResult caseResult, String name, String message)
+    protected void checkErrorCase(PersistentTestCaseResult caseResult, String name, String message)
     {
-        checkCase(caseResult, name, TestCaseResult.Status.ERROR, message);
+        checkCase(caseResult, name, PersistentTestCaseResult.Status.ERROR, message);
     }
 }
 

@@ -250,7 +250,7 @@ public class BuildStatusPrinter implements EventListener
             TestSuitePersister persister = new TestSuitePersister();
             try
             {
-                TestSuiteResult failedTests = persister.read(null, new File(outputDir, RecipeResult.TEST_DIR), true, true, failureLimit);
+                PersistentTestSuiteResult failedTests = persister.read(null, new File(outputDir, RecipeResult.TEST_DIR), true, true, failureLimit);
                 showTestSuite(failedTests, "");
             }
             catch (Exception e)
@@ -261,19 +261,19 @@ public class BuildStatusPrinter implements EventListener
         }
     }
 
-    private void showTestSuite(TestSuiteResult suiteResult, String prefix)
+    private void showTestSuite(PersistentTestSuiteResult suiteResult, String prefix)
     {
         if(suiteResult.getName() != null)
         {
             prefix += suiteResult.getName() + ".";
         }
 
-        for(TestSuiteResult nested: suiteResult.getSuites())
+        for(PersistentTestSuiteResult nested: suiteResult.getSuites())
         {
             showTestSuite(nested, prefix);
         }
 
-        for(TestCaseResult caseResult: suiteResult.getCases())
+        for(PersistentTestCaseResult caseResult: suiteResult.getCases())
         {
             String message = String.format("%s%-7s: %s", prefix, caseResult.getStatus().toString().toLowerCase(), caseResult.getName());
             if(TextUtils.stringSet(caseResult.getMessage()))

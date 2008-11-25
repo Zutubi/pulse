@@ -28,88 +28,88 @@ public class TestSuitePersisterTest extends PulseTestCase
 
     public void testEmptySuite() throws Exception
     {
-        TestSuiteResult suite = new TestSuiteResult("name", 121);
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult("name", 121);
         roundTrip(suite);
     }
 
     public void testSingleCase() throws Exception
     {
-        TestSuiteResult suite = new TestSuiteResult("suite", 100);
-        suite.add(new TestCaseResult("case", 24, TestCaseResult.Status.PASS, "this is the message"));
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult("suite", 100);
+        suite.add(new PersistentTestCaseResult("case", 24, PersistentTestCaseResult.Status.PASS, "this is the message"));
         roundTrip(suite);
     }
 
     public void testMultipleCases() throws Exception
     {
-        TestSuiteResult suite = new TestSuiteResult("asuite");
-        suite.add(new TestCaseResult("case3", -1, TestCaseResult.Status.FAILURE, null));
-        suite.add(new TestCaseResult("case1", 24, TestCaseResult.Status.PASS, "this is the message"));
-        suite.add(new TestCaseResult("case2", 100, TestCaseResult.Status.ERROR, null));
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult("asuite");
+        suite.add(new PersistentTestCaseResult("case3", -1, PersistentTestCaseResult.Status.FAILURE, null));
+        suite.add(new PersistentTestCaseResult("case1", 24, PersistentTestCaseResult.Status.PASS, "this is the message"));
+        suite.add(new PersistentTestCaseResult("case2", 100, PersistentTestCaseResult.Status.ERROR, null));
         roundTrip(suite);
     }
 
     public void testNestedSuite() throws Exception
     {
-        TestSuiteResult suite = new TestSuiteResult("asuite");
-        TestSuiteResult nestedSuite = new TestSuiteResult("anestedsuite");
-        nestedSuite.add(new TestCaseResult("case1", 100, TestCaseResult.Status.ERROR, null));
-        suite.add(new TestCaseResult("case1", -1, TestCaseResult.Status.FAILURE, null));
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult("asuite");
+        PersistentTestSuiteResult nestedSuite = new PersistentTestSuiteResult("anestedsuite");
+        nestedSuite.add(new PersistentTestCaseResult("case1", 100, PersistentTestCaseResult.Status.ERROR, null));
+        suite.add(new PersistentTestCaseResult("case1", -1, PersistentTestCaseResult.Status.FAILURE, null));
         suite.add(nestedSuite);
         roundTrip(suite);
     }
 
     public void testComplexSuite() throws Exception
     {
-        TestSuiteResult suite = new TestSuiteResult("asuite");
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult("asuite");
 
-        TestSuiteResult nestedNestedSuite = new TestSuiteResult("anestednestedsuite");
-        nestedNestedSuite.add(new TestCaseResult("deep", 100000, TestCaseResult.Status.FAILURE, "sorry\nit failed"));
+        PersistentTestSuiteResult nestedNestedSuite = new PersistentTestSuiteResult("anestednestedsuite");
+        nestedNestedSuite.add(new PersistentTestCaseResult("deep", 100000, PersistentTestCaseResult.Status.FAILURE, "sorry\nit failed"));
 
-        TestSuiteResult nestedSuite = new TestSuiteResult("anestedsuite");
-        nestedSuite.add(new TestCaseResult("case1", 100, TestCaseResult.Status.ERROR, null));
-        nestedSuite.add(new TestCaseResult("anothercase", 1, TestCaseResult.Status.ERROR, "with a messsage"));
+        PersistentTestSuiteResult nestedSuite = new PersistentTestSuiteResult("anestedsuite");
+        nestedSuite.add(new PersistentTestCaseResult("case1", 100, PersistentTestCaseResult.Status.ERROR, null));
+        nestedSuite.add(new PersistentTestCaseResult("anothercase", 1, PersistentTestCaseResult.Status.ERROR, "with a messsage"));
         nestedSuite.add(nestedNestedSuite);
-        nestedSuite.add(new TestCaseResult("yetanothercase", 1, TestCaseResult.Status.PASS, "with another messsage"));
+        nestedSuite.add(new PersistentTestCaseResult("yetanothercase", 1, PersistentTestCaseResult.Status.PASS, "with another messsage"));
 
-        suite.add(new TestCaseResult("case1", -1, TestCaseResult.Status.FAILURE, null));
+        suite.add(new PersistentTestCaseResult("case1", -1, PersistentTestCaseResult.Status.FAILURE, null));
         suite.add(nestedSuite);
         roundTrip(suite);
     }
 
     public void testXMLSpecialCharacters() throws Exception
     {
-        TestSuiteResult suite = new TestSuiteResult("<>&'\"!<!-- -->");
-        suite.add(new TestCaseResult("<>&'\"!<!-- -->", 1, TestCaseResult.Status.PASS, "<>&'\"!<!-- -->"));
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult("<>&'\"!<!-- -->");
+        suite.add(new PersistentTestCaseResult("<>&'\"!<!-- -->", 1, PersistentTestCaseResult.Status.PASS, "<>&'\"!<!-- -->"));
 
-        TestSuiteResult outer = new TestSuiteResult("outer");
+        PersistentTestSuiteResult outer = new PersistentTestSuiteResult("outer");
         outer.add(suite);
         roundTrip(outer);
     }
 
     public void testControlCharacters() throws Exception
     {
-        TestSuiteResult suite = new TestSuiteResult("\u0018");
-        suite.add(new TestCaseResult("\u0018", 1, TestCaseResult.Status.PASS, "\u0018"));
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult("\u0018");
+        suite.add(new PersistentTestCaseResult("\u0018", 1, PersistentTestCaseResult.Status.PASS, "\u0018"));
 
-        TestSuiteResult outer = new TestSuiteResult("outer");
+        PersistentTestSuiteResult outer = new PersistentTestSuiteResult("outer");
         outer.add(suite);
         roundTrip(outer);
     }
 
     public void testEmptyMessage() throws Exception
     {
-        TestSuiteResult suite = new TestSuiteResult("suity");
-        suite.add(new TestCaseResult("castor", 1, TestCaseResult.Status.PASS, ""));
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult("suity");
+        suite.add(new PersistentTestCaseResult("castor", 1, PersistentTestCaseResult.Status.PASS, ""));
 
-        TestSuiteResult outer = new TestSuiteResult("outer");
+        PersistentTestSuiteResult outer = new PersistentTestSuiteResult("outer");
         outer.add(suite);
         roundTrip(outer);
     }
 
-    private void roundTrip(TestSuiteResult suite) throws IOException, ParsingException
+    private void roundTrip(PersistentTestSuiteResult suite) throws IOException, ParsingException
     {
         persister.write(suite, tempDir);
-        TestSuiteResult otherSuite = persister.read(suite.getName(), tempDir, true, false, -1);
+        PersistentTestSuiteResult otherSuite = persister.read(suite.getName(), tempDir, true, false, -1);
         assertTrue(suite.isEquivalent(otherSuite));
     }
 }

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors;
 
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.model.TestSuiteResult;
 
 import java.io.File;
 
@@ -61,19 +61,19 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
 
     protected void process(File artifactFile, PostProcessorContext ppContext)
     {
-        TestSuiteResult testResults = ppContext.getTestSuite();
+        PersistentTestSuiteResult testResults = ppContext.getTestSuite();
         int brokenBefore = testResults.getSummary().getBroken();
 
         if(artifactFile.isFile())
         {
-            TestSuiteResult parentSuite;
+            PersistentTestSuiteResult parentSuite;
             if(suite == null)
             {
                 parentSuite = testResults;
             }
             else
             {
-                parentSuite = new TestSuiteResult(suite);
+                parentSuite = new PersistentTestSuiteResult(suite);
             }
 
             process(artifactFile, parentSuite, ppContext);
@@ -105,5 +105,5 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
      * @param suite     root test suite to add discovered test results to
      * @param ppContext context in which the post processor is executing
      */
-    protected abstract void process(File file, TestSuiteResult suite, PostProcessorContext ppContext);
+    protected abstract void process(File file, PersistentTestSuiteResult suite, PostProcessorContext ppContext);
 }

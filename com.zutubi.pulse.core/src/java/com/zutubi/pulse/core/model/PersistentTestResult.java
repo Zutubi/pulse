@@ -5,7 +5,7 @@ import com.zutubi.util.TimeStamps;
 /**
  * Abstract base for test suites and cases.
  */
-public abstract class TestResult
+public abstract class PersistentTestResult
 {
     public static final long UNKNOWN_DURATION = -1;
 
@@ -19,16 +19,16 @@ public abstract class TestResult
      */
     private long duration;
 
-    protected TestResult()
+    protected PersistentTestResult()
     {
     }
 
-    protected TestResult(String name)
+    protected PersistentTestResult(String name)
     {
         this(name, UNKNOWN_DURATION);
     }
 
-    protected TestResult(String name, long duration)
+    protected PersistentTestResult(String name, long duration)
     {
         this.name = name;
         this.duration = duration;
@@ -91,7 +91,7 @@ public abstract class TestResult
         summary.addTotal(getTotal());
     }
 
-    public boolean isEquivalent(TestResult other)
+    public boolean isEquivalent(PersistentTestResult other)
     {
         if(!getName().equals(other.getName()))
         {

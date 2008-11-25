@@ -1,13 +1,13 @@
 package com.zutubi.pulse.core.commands.core;
 
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.PersistentTestCaseResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -67,7 +67,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testSmokeTest() throws FileLoadException
     {
-        TestSuiteResult tests = process();
+        PersistentTestSuiteResult tests = process();
         assertEquals(5, tests.getFailures());
         assertEquals(91, tests.getTotal());
         assertEquals(0, tests.getErrors());
@@ -75,7 +75,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testConflictsAppend() throws FileLoadException
     {
-        TestSuiteResult tests = process("append", false, -1);
+        PersistentTestSuiteResult tests = process("append", false, -1);
         assertEquals(5, tests.getTotal());
         assertTrue(tests.hasCase(" <TEST COMMAND0>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>"));
@@ -86,7 +86,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testConflictsOff() throws FileLoadException
     {
-        TestSuiteResult tests = process();
+        PersistentTestSuiteResult tests = process();
         assertEquals(3, tests.getTotal());
         assertTrue(tests.hasCase(" <TEST COMMAND0>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>"));
@@ -95,7 +95,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testConflictsPrepend() throws FileLoadException
     {
-        TestSuiteResult tests = process("prepend", false, -1);
+        PersistentTestSuiteResult tests = process("prepend", false, -1);
         assertEquals(5, tests.getTotal());
         assertTrue(tests.hasCase(" <TEST COMMAND0>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>"));
@@ -106,45 +106,45 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testAutoFail() throws FileLoadException
     {
-        TestSuiteResult tests = process("off", true, -1);
+        PersistentTestSuiteResult tests = process("off", true, -1);
         assertEquals(5, tests.getTotal());
         assertEquals(3, tests.getFailures());
         assertEquals(1, tests.getErrors());
-        assertEquals(TestCaseResult.Status.PASS, tests.getCase("test1").getStatus());
-        assertEquals(TestCaseResult.Status.ERROR, tests.getCase("test2").getStatus());
-        assertEquals(TestCaseResult.Status.FAILURE, tests.getCase("test3").getStatus());
-        assertEquals(TestCaseResult.Status.FAILURE, tests.getCase("test4").getStatus());
-        assertEquals(TestCaseResult.Status.FAILURE, tests.getCase("test5").getStatus());
+        assertEquals(PersistentTestCaseResult.Status.PASS, tests.getCase("test1").getStatus());
+        assertEquals(PersistentTestCaseResult.Status.ERROR, tests.getCase("test2").getStatus());
+        assertEquals(PersistentTestCaseResult.Status.FAILURE, tests.getCase("test3").getStatus());
+        assertEquals(PersistentTestCaseResult.Status.FAILURE, tests.getCase("test4").getStatus());
+        assertEquals(PersistentTestCaseResult.Status.FAILURE, tests.getCase("test5").getStatus());
     }
 
     public void testUnrecognised() throws FileLoadException
     {
-        TestSuiteResult tests = process();
+        PersistentTestSuiteResult tests = process();
         assertEquals(3, tests.getTotal());
         assertEquals(1, tests.getFailures());
         assertEquals(1, tests.getErrors());
-        assertEquals(TestCaseResult.Status.PASS, tests.getCase("test1").getStatus());
-        assertEquals(TestCaseResult.Status.ERROR, tests.getCase("test2").getStatus());
-        assertEquals(TestCaseResult.Status.FAILURE, tests.getCase("test4").getStatus());
+        assertEquals(PersistentTestCaseResult.Status.PASS, tests.getCase("test1").getStatus());
+        assertEquals(PersistentTestCaseResult.Status.ERROR, tests.getCase("test2").getStatus());
+        assertEquals(PersistentTestCaseResult.Status.FAILURE, tests.getCase("test4").getStatus());
         assertFalse(tests.hasCase("test3"));
         assertFalse(tests.hasCase("test5"));
     }
 
     public void testDetails() throws FileLoadException
     {
-        TestSuiteResult tests = process("off", false, 3);
+        PersistentTestSuiteResult tests = process("off", false, 3);
         assertEquals(4, tests.getTotal());
         assertEquals(2, tests.getFailures());
         assertEquals("fail 1 details", tests.getCase(" <FAIL1>").getMessage());
         assertEquals("fail 2 details", tests.getCase(" <FAIL2>").getMessage());
     }
 
-    private TestSuiteResult process() throws FileLoadException
+    private PersistentTestSuiteResult process() throws FileLoadException
     {
         return process("off", false, -1);
     }
 
-    private TestSuiteResult process(String resolution, boolean autoFail, int detailsGroup) throws FileLoadException
+    private PersistentTestSuiteResult process(String resolution, boolean autoFail, int detailsGroup) throws FileLoadException
     {
         RegexTestPostProcessor pp = new RegexTestPostProcessor();
         pp.setRegex("\\[(.*)\\] .*EDT:([^:]*)(?:\\: (.*))?");
@@ -156,7 +156,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         pp.setResolveConflicts(resolution);
         pp.setAutoFail(autoFail);
 
-        TestSuiteResult testResults = new TestSuiteResult();
+        PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
         ExecutionContext context = new PulseExecutionContext();
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tmpDir.getAbsolutePath());

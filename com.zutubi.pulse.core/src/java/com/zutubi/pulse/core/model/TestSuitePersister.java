@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.XMLUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 import org.apache.commons.codec.binary.Base64;
@@ -34,9 +34,9 @@ public class TestSuitePersister
     public static final String ATTRIBUTE_FIXED = "fixed";
 
 
-    public void write(TestSuiteResult suite, File directory) throws IOException
+    public void write(PersistentTestSuiteResult suite, File directory) throws IOException
     {
-        for (TestSuiteResult childSuite : suite.getSuites())
+        for (PersistentTestSuiteResult childSuite : suite.getSuites())
         {
             File suiteDir = new File(directory, encodeName(childSuite.getName()));
             FileSystemUtils.createDirectory(suiteDir);
@@ -47,18 +47,18 @@ public class TestSuitePersister
         writeCases(suite, new File(directory, SUITE_FILE_NAME));
     }
 
-    private void writeCases(TestSuiteResult suite, File file) throws IOException
+    private void writeCases(PersistentTestSuiteResult suite, File file) throws IOException
     {
         Document doc = suiteToDoc(suite);
         XMLUtils.writeDocument(file, doc);
     }
 
-    private Document suiteToDoc(TestSuiteResult suite)
+    private Document suiteToDoc(PersistentTestSuiteResult suite)
     {
         Element root = new Element(ELEMENT_SUITE);
         root.addAttribute(new Attribute(ATTRIBUTE_DURATION, Long.toString(suite.getDuration())));
 
-        for (TestSuiteResult child : suite.getSuites())
+        for (PersistentTestSuiteResult child : suite.getSuites())
         {
             Element suiteElement = new Element(ELEMENT_SUITE);
             suiteElement.addAttribute(safeAttribute(ATTRIBUTE_NAME, child.getName()));
@@ -70,7 +70,7 @@ public class TestSuitePersister
             root.appendChild(suiteElement);
         }
 
-        for (TestCaseResult child : suite.getCases())
+        for (PersistentTestCaseResult child : suite.getCases())
         {
             Element caseElement = new Element(ELEMENT_CASE);
             caseElement.addAttribute(safeAttribute(ATTRIBUTE_NAME, child.getName()));
@@ -130,7 +130,7 @@ public class TestSuitePersister
         }
     }
 
-    public TestSuiteResult read(String name, File directory, boolean deep, boolean failuresOnly, int limit) throws IOException, ParsingException
+    public PersistentTestSuiteResult read(String name, File directory, boolean deep, boolean failuresOnly, int limit) throws IOException, ParsingException
     {
         BuildingTestHandler handler = new BuildingTestHandler();
         read(handler, name, directory, deep, failuresOnly, new Counter(limit));
@@ -148,7 +148,7 @@ public class TestSuitePersister
         Document doc = readDoc(suiteFile);
         long duration = getDuration(doc.getRootElement());
 
-        handler.startSuite(new TestSuiteResult(name, duration));
+        handler.startSuite(new PersistentTestSuiteResult(name, duration));
         loadSuites(handler, doc, directory, deep, failuresOnly, counter);
         loadCases(handler, doc, failuresOnly, counter);
         if(handler.endSuite())
@@ -189,7 +189,7 @@ public class TestSuitePersister
             }
             else
             {
-                handler.startSuite(new TestSuiteResult(name, duration, total, errors, failures));
+                handler.startSuite(new PersistentTestSuiteResult(name, duration, total, errors, failures));
                 handler.endSuite();
             }
         }
@@ -247,14 +247,14 @@ public class TestSuitePersister
         for (int i = 0; i < elements.size(); i++)
         {
             Element element = elements.get(i);
-            TestCaseResult.Status status = getStatus(element);
-            if (failuresOnly && status == TestCaseResult.Status.PASS)
+            PersistentTestCaseResult.Status status = getStatus(element);
+            if (failuresOnly && status == PersistentTestCaseResult.Status.PASS)
             {
                 continue;
             }
 
-            TestCaseResult caseResult = new TestCaseResult(getSafeAttributeValue(element, ATTRIBUTE_NAME), getDuration(element), status, getSafeText(element, ELEMENT_MESSAGE));
-            if(caseResult.getStatus() == TestCaseResult.Status.PASS)
+            PersistentTestCaseResult caseResult = new PersistentTestCaseResult(getSafeAttributeValue(element, ATTRIBUTE_NAME), getDuration(element), status, getSafeText(element, ELEMENT_MESSAGE));
+            if(caseResult.getStatus() == PersistentTestCaseResult.Status.PASS)
             {
                 caseResult.setFixed(element.getAttributeValue(ATTRIBUTE_FIXED) != null);
             }
@@ -293,7 +293,7 @@ public class TestSuitePersister
 
     private long getDuration(Element element)
     {
-        long result = TestResult.UNKNOWN_DURATION;
+        long result = PersistentTestResult.UNKNOWN_DURATION;
         String attributeValue = element.getAttributeValue(ATTRIBUTE_DURATION);
 
         if (attributeValue != null)
@@ -311,15 +311,15 @@ public class TestSuitePersister
         return result;
     }
 
-    private TestCaseResult.Status getStatus(Element element)
+    private PersistentTestCaseResult.Status getStatus(Element element)
     {
-        TestCaseResult.Status status = TestCaseResult.Status.PASS;
+        PersistentTestCaseResult.Status status = PersistentTestCaseResult.Status.PASS;
         String statusName = element.getAttributeValue(ATTRIBUTE_STATUS);
         if (statusName != null)
         {
             try
             {
-                status = TestCaseResult.Status.valueOf(statusName);
+                status = PersistentTestCaseResult.Status.valueOf(statusName);
             }
             catch (IllegalArgumentException e)
             {

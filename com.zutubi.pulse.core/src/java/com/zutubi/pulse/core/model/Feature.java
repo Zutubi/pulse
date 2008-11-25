@@ -9,29 +9,14 @@ public class Feature extends Entity
 
     public enum Level
     {
-        INFO
-                {
-                    public String getPrettyString()
-                    {
-                        return "info";
-                    }
-                },
-        WARNING
-                {
-                    public String getPrettyString()
-                    {
-                        return "warning";
-                    }
-                },
-        ERROR
-                {
-                    public String getPrettyString()
-                    {
-                        return "error";
-                    }
-                };
+        INFO,
+        WARNING,
+        ERROR;
 
-        public abstract String getPrettyString();
+        public String getPrettyString()
+        {
+            return name().toLowerCase();
+        }
     }
 
     private Level level;

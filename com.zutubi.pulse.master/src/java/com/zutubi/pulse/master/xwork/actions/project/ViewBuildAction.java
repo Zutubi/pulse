@@ -1,8 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -11,6 +10,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 
@@ -146,12 +146,12 @@ public class ViewBuildAction extends CommandActionBase
         return SUCCESS;
     }
 
-    public String appendSuitePath(String path, TestSuiteResult suite)
+    public String appendSuitePath(String path, PersistentTestSuiteResult suite)
     {
         return path + "/" + urlEncode(suite.getName());
     }
 
-    public String pushSuite(TestSuiteResult suite)
+    public String pushSuite(PersistentTestSuiteResult suite)
     {
         if(pathStack.empty())
         {

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
-import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -22,7 +22,7 @@ public class ViewTestSuiteAction extends StageActionBase
     private static final Logger LOG = Logger.getLogger(ViewTestSuiteAction.class);
 
     private String path;
-    private TestSuiteResult suite;
+    private PersistentTestSuiteResult suite;
     private List<String> paths;
     private MasterConfigurationManager configurationManager;
 
@@ -36,7 +36,7 @@ public class ViewTestSuiteAction extends StageActionBase
         this.path = path;
     }
 
-    public TestSuiteResult getSuite()
+    public PersistentTestSuiteResult getSuite()
     {
         return suite;
     }

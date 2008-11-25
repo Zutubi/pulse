@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.postprocessors;
 
 import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.model.TestSuiteResult;
 
 /**
  */
@@ -21,7 +21,7 @@ public class LineBasedPostProcessorContext implements PostProcessorContext
         return delegate;
     }
 
-    public TestSuiteResult getTestSuite()
+    public PersistentTestSuiteResult getTestSuite()
     {
         return delegate.getTestSuite();
     }

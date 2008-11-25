@@ -8,15 +8,15 @@ import java.util.Stack;
  */
 public class BuildingTestHandler implements TestHandler
 {
-    private TestSuiteResult top;
-    private Stack<TestSuiteResult> suites = new Stack<TestSuiteResult>();
+    private PersistentTestSuiteResult top;
+    private Stack<PersistentTestSuiteResult> suites = new Stack<PersistentTestSuiteResult>();
 
-    public TestSuiteResult getTop()
+    public PersistentTestSuiteResult getTop()
     {
         return top;
     }
 
-    public void startSuite(TestSuiteResult suiteResult)
+    public void startSuite(PersistentTestSuiteResult suiteResult)
     {
         if(suites.size() > 0)
         {
@@ -36,7 +36,7 @@ public class BuildingTestHandler implements TestHandler
         return false;
     }
 
-    public void handleCase(TestCaseResult caseResult, Element element)
+    public void handleCase(PersistentTestCaseResult caseResult, Element element)
     {
         suites.peek().add(caseResult);
     }

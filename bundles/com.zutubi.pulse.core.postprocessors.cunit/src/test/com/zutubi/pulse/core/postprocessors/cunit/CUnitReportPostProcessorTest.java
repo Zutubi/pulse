@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.postprocessors.cunit;
 
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
 import java.io.File;
@@ -29,17 +29,17 @@ public class CUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
 
     public void testBasic() throws Exception
     {
-        TestSuiteResult tests = runProcessor("basic");
+        PersistentTestSuiteResult tests = runProcessor("basic");
         assertEquals(1, tests.getSuites().size());
         assertFirstSuite(tests.getSuites().get(0));
     }
 
     public void testMulti() throws Exception
     {
-        TestSuiteResult tests = runProcessor("multi");
+        PersistentTestSuiteResult tests = runProcessor("multi");
         assertEquals(3, tests.getSuites().size());
 
-        TestSuiteResult suite = tests.getSuites().get(0);
+        PersistentTestSuiteResult suite = tests.getSuites().get(0);
         checkSuite(suite, "Borked Suite", 1, 0, 1);
         checkErrorCase(suite.getCases().iterator().next(), "Suite Failure Notification", "Suite Initialization Failed");
 
@@ -55,7 +55,7 @@ public class CUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         checkFailureCase(suite, "Test Fatal", "c:\\users\\jsankey\\documents\\visual studio 2008\\projects\\cunitplay\\firsttest\\main.cpp: 58: 0");
     }
 
-    private void assertFirstSuite(TestSuiteResult suite)
+    private void assertFirstSuite(PersistentTestSuiteResult suite)
     {
         checkSuite(suite, "First Suite", 2, 1, 0);
         checkPassCase(suite, "Test Pass");

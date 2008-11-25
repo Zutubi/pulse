@@ -6,40 +6,40 @@ import java.util.*;
  * Represents the results of a test suite: a group of child test suites and
  * cases unified under one name.
  */
-public class TestSuiteResult extends TestResult
+public class PersistentTestSuiteResult extends PersistentTestResult
 {
     /**
      * Child suites, stored in name order.
      */
-    private List<TestSuiteResult> suites;
+    private List<PersistentTestSuiteResult> suites;
     /**
      * Child cases, stored in the order added.
      */
-    private LinkedHashMap<String, TestCaseResult> cases;
+    private LinkedHashMap<String, PersistentTestCaseResult> cases;
     private TestResultComparator comparator = new TestResultComparator();
 
     private int total;
     private int errors;
     private int failures;
 
-    public TestSuiteResult()
+    public PersistentTestSuiteResult()
     {
         this(null, UNKNOWN_DURATION);
     }
 
-    public TestSuiteResult(String name)
+    public PersistentTestSuiteResult(String name)
     {
         this(name, UNKNOWN_DURATION);
     }
 
-    public TestSuiteResult(String name, long duration)
+    public PersistentTestSuiteResult(String name, long duration)
     {
         this(name, duration, -1, -1, -1);
-        suites = new ArrayList<TestSuiteResult>();
-        cases = new LinkedHashMap<String, TestCaseResult>();
+        suites = new ArrayList<PersistentTestSuiteResult>();
+        cases = new LinkedHashMap<String, PersistentTestCaseResult>();
     }
 
-    public TestSuiteResult(String name, long duration, int total, int errors, int failures)
+    public PersistentTestSuiteResult(String name, long duration, int total, int errors, int failures)
     {
         super(name, duration);
         this.total = total;
@@ -47,7 +47,7 @@ public class TestSuiteResult extends TestResult
         this.failures = failures;
     }
 
-    public void add(TestSuiteResult suite)
+    public void add(PersistentTestSuiteResult suite)
     {
         int index = Collections.binarySearch(suites, suite, comparator);
         if (index < 0)
@@ -56,22 +56,22 @@ public class TestSuiteResult extends TestResult
         }
         else
         {
-            TestSuiteResult existing = suites.get(index);
-            for(TestSuiteResult childSuite: suite.getSuites())
+            PersistentTestSuiteResult existing = suites.get(index);
+            for(PersistentTestSuiteResult childSuite: suite.getSuites())
             {
                 existing.add(childSuite);
             }
 
-            for(TestCaseResult childCase: suite.getCases())
+            for(PersistentTestCaseResult childCase: suite.getCases())
             {
                 existing.add(childCase);
             }
         }
     }
 
-    public void add(TestCaseResult childCase)
+    public void add(PersistentTestCaseResult childCase)
     {
-        TestCaseResult existing = getCase(childCase.getName());
+        PersistentTestCaseResult existing = getCase(childCase.getName());
         if (existing == null)
         {
             cases.put(childCase.getName(), childCase);
@@ -87,7 +87,7 @@ public class TestSuiteResult extends TestResult
         }
     }
 
-    public TestCaseResult getCase(String name)
+    public PersistentTestCaseResult getCase(String name)
     {
         return cases.get(name);
     }
@@ -103,12 +103,12 @@ public class TestSuiteResult extends TestResult
         {
             int result = 0;
 
-            for (TestSuiteResult child : suites)
+            for (PersistentTestSuiteResult child : suites)
             {
                 result += child.getErrors();
             }
 
-            for (TestCaseResult child : cases.values())
+            for (PersistentTestCaseResult child : cases.values())
             {
                 result += child.getErrors();
             }
@@ -127,12 +127,12 @@ public class TestSuiteResult extends TestResult
         {
             int result = 0;
 
-            for (TestSuiteResult child : suites)
+            for (PersistentTestSuiteResult child : suites)
             {
                 result += child.getFailures();
             }
 
-            for (TestCaseResult child : cases.values())
+            for (PersistentTestCaseResult child : cases.values())
             {
                 result += child.getFailures();
             }
@@ -151,12 +151,12 @@ public class TestSuiteResult extends TestResult
         {
             int result = 0;
 
-            for (TestSuiteResult child : suites)
+            for (PersistentTestSuiteResult child : suites)
             {
                 result += child.getTotal();
             }
 
-            for (TestCaseResult child : cases.values())
+            for (PersistentTestCaseResult child : cases.values())
             {
                 result += child.getTotal();
             }
@@ -174,30 +174,30 @@ public class TestSuiteResult extends TestResult
         return true;
     }
 
-    public List<TestSuiteResult> getSuites()
+    public List<PersistentTestSuiteResult> getSuites()
     {
         return suites;
     }
 
-    public Collection<TestCaseResult> getCases()
+    public Collection<PersistentTestCaseResult> getCases()
     {
         return cases.values();
     }
 
-    public boolean isEquivalent(TestResult otherResult)
+    public boolean isEquivalent(PersistentTestResult otherResult)
     {
-        if(!(otherResult instanceof TestSuiteResult))
+        if(!(otherResult instanceof PersistentTestSuiteResult))
         {
             return false;
         }
 
-        TestSuiteResult other = (TestSuiteResult) otherResult;
+        PersistentTestSuiteResult other = (PersistentTestSuiteResult) otherResult;
         if(!super.isEquivalent(other))
         {
             return false;
         }
 
-        List<TestSuiteResult> otherSuites = other.getSuites();
+        List<PersistentTestSuiteResult> otherSuites = other.getSuites();
         if(suites.size() != otherSuites.size())
         {
             return false;
@@ -211,14 +211,14 @@ public class TestSuiteResult extends TestResult
             }
         }
 
-        Collection<TestCaseResult> otherCases = other.getCases();
+        Collection<PersistentTestCaseResult> otherCases = other.getCases();
         if(cases.size() != otherCases.size())
         {
             return false;
         }
 
-        Iterator<TestCaseResult> ourIt = cases.values().iterator();
-        Iterator<TestCaseResult> otherIt = otherCases.iterator();
+        Iterator<PersistentTestCaseResult> ourIt = cases.values().iterator();
+        Iterator<PersistentTestCaseResult> otherIt = otherCases.iterator();
         while(ourIt.hasNext())
         {
             if(!ourIt.next().isEquivalent(otherIt.next()))
@@ -230,9 +230,9 @@ public class TestSuiteResult extends TestResult
         return true;
     }
 
-    public TestSuiteResult getSuite(String name)
+    public PersistentTestSuiteResult getSuite(String name)
     {
-        for(TestSuiteResult suite: suites)
+        for(PersistentTestSuiteResult suite: suites)
         {
             if(suite.getName().equals(name))
             {

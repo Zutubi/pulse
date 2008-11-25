@@ -1,18 +1,18 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import static com.zutubi.pulse.core.RecipeUtils.*;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeStatusEvent;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
-import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -59,7 +59,7 @@ public class RecipeProcessor
         recipeResult.setId(request.getId());
         recipeResult.commence();
         
-        TestSuiteResult testResults = new TestSuiteResult();
+        PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
 
         runningRecipe = recipeResult.getId();
         eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeResult.getStartTime()));
@@ -176,7 +176,7 @@ public class RecipeProcessor
         }
     }
 
-    private void writeTestResults(RecipePaths paths, TestSuiteResult testResults)
+    private void writeTestResults(RecipePaths paths, PersistentTestSuiteResult testResults)
     {
         try
         {
@@ -191,7 +191,7 @@ public class RecipeProcessor
         }
     }
 
-    private void pushRecipeContext(PulseExecutionContext context, RecipeRequest request, TestSuiteResult testResults, long recipeStartTime)
+    private void pushRecipeContext(PulseExecutionContext context, RecipeRequest request, PersistentTestSuiteResult testResults, long recipeStartTime)
     {
         context.push();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());

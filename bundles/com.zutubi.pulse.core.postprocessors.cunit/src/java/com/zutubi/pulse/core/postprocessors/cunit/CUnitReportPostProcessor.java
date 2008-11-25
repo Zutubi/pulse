@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.cunit;
 
-import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestCaseResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
 import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.util.UnaryProcedure;
@@ -54,7 +54,7 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         return builder;
     }
 
-    protected void processDocument(Document doc, final TestSuiteResult tests)
+    protected void processDocument(Document doc, final PersistentTestSuiteResult tests)
     {
         Element root = doc.getRootElement();
         XMLUtils.forEachChild(root, ELEMENT_RESULT_LISTING, new UnaryProcedure<Element>()
@@ -86,12 +86,12 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         });
     }
 
-    private void handleSuite(TestSuiteResult tests, Element element)
+    private void handleSuite(PersistentTestSuiteResult tests, Element element)
     {
         try
         {
             String suiteName = XMLUtils.getRequiredChildText(element, ELEMENT_SUITE_NAME, true);
-            final TestSuiteResult suite = new TestSuiteResult(suiteName);
+            final PersistentTestSuiteResult suite = new PersistentTestSuiteResult(suiteName);
             XMLUtils.forEachChild(element, ELEMENT_RUN_TEST, new UnaryProcedure<Element>()
             {
                 public void process(Element element)
@@ -108,14 +108,14 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         }
     }
 
-    private void processCase(TestSuiteResult suite, Element element)
+    private void processCase(PersistentTestSuiteResult suite, Element element)
     {
         try
         {
             Element success = element.getFirstChildElement(ELEMENT_RUN_TEST_SUCCESS);
             if(success != null)
             {
-                suite.add(new TestCaseResult(XMLUtils.getRequiredChildText(success, ELEMENT_TEST_NAME, true)));
+                suite.add(new PersistentTestCaseResult(XMLUtils.getRequiredChildText(success, ELEMENT_TEST_NAME, true)));
             }
             else
             {
@@ -125,10 +125,10 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
                     String name = XMLUtils.getRequiredChildText(failure, ELEMENT_TEST_NAME, true);
                     String message = getFailureMessage(failure);
 
-                    TestCaseResult caseResult = suite.getCase(name);
+                    PersistentTestCaseResult caseResult = suite.getCase(name);
                     if(caseResult == null)
                     {
-                        suite.add(new TestCaseResult(name, TestCaseResult.UNKNOWN_DURATION, TestCaseResult.Status.FAILURE, message));
+                        suite.add(new PersistentTestCaseResult(name, PersistentTestCaseResult.UNKNOWN_DURATION, PersistentTestCaseResult.Status.FAILURE, message));
                     }
                     else
                     {
@@ -152,7 +152,7 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         return String.format("%s: %s: %s", file, line, condition);
     }
 
-    private void handleFailedSuite(TestSuiteResult tests, Element element)
+    private void handleFailedSuite(PersistentTestSuiteResult tests, Element element)
     {
         // The suite didn't run properly at all, but record a special case to
         // show what happened.
@@ -160,8 +160,8 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         {
             String name = XMLUtils.getRequiredChildText(element, ELEMENT_SUITE_NAME, true);
             String failureReason = XMLUtils.getRequiredChildText(element, ELEMENT_SUITE_FAILURE_REASON, true);
-            TestSuiteResult suite = new TestSuiteResult(name);
-            suite.add(new TestCaseResult("Suite Failure Notification", TestCaseResult.UNKNOWN_DURATION, TestCaseResult.Status.ERROR, failureReason));
+            PersistentTestSuiteResult suite = new PersistentTestSuiteResult(name);
+            suite.add(new PersistentTestCaseResult("Suite Failure Notification", PersistentTestCaseResult.UNKNOWN_DURATION, PersistentTestCaseResult.Status.ERROR, failureReason));
             tests.add(suite);
         }
         catch(XMLException e)

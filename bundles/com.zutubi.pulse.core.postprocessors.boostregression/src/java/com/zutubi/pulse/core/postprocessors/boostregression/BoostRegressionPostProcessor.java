@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.boostregression;
 
-import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestCaseResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
 import com.zutubi.pulse.core.util.XMLUtils;
 import nu.xom.Document;
@@ -45,7 +45,7 @@ public class BoostRegressionPostProcessor extends XMLTestReportPostProcessorSupp
         super("Boost.Regression");
     }
 
-    protected void processDocument(Document doc, TestSuiteResult tests)
+    protected void processDocument(Document doc, PersistentTestSuiteResult tests)
     {
         Element root = doc.getRootElement();
         if(root.getLocalName().equals(ELEMENT_TEST_LOG))
@@ -55,26 +55,26 @@ public class BoostRegressionPostProcessor extends XMLTestReportPostProcessorSupp
         }
     }
 
-    private void processTestLog(Element element, TestSuiteResult tests)
+    private void processTestLog(Element element, PersistentTestSuiteResult tests)
     {
         String suite = element.getAttributeValue(ATTRIBUTE_LIBRARY);
         String name = element.getAttributeValue(ATTRIBUTE_TEST_NAME);
 
         if(suite != null && name != null)
         {
-            TestSuiteResult suiteResult = getSuite(suite, tests);
-            TestCaseResult.Status status = getStatus(element);
+            PersistentTestSuiteResult suiteResult = getSuite(suite, tests);
+            PersistentTestCaseResult.Status status = getStatus(element);
             String details = null;
-            if(status != TestCaseResult.Status.PASS)
+            if(status != PersistentTestCaseResult.Status.PASS)
             {
                 details = getDetails(element);
             }
 
-            suiteResult.add(new TestCaseResult(name, TestCaseResult.UNKNOWN_DURATION, status, details));
+            suiteResult.add(new PersistentTestCaseResult(name, PersistentTestCaseResult.UNKNOWN_DURATION, status, details));
         }
     }
 
-    private TestCaseResult.Status getStatus(Element testLogElement)
+    private PersistentTestCaseResult.Status getStatus(Element testLogElement)
     {
         Elements children = testLogElement.getChildElements();
         for(int i = 0; i < children.size(); i++)
@@ -85,12 +85,12 @@ public class BoostRegressionPostProcessor extends XMLTestReportPostProcessorSupp
                 String result = child.getAttributeValue(ATTRIBUTE_RESULT);
                 if(RESULT_FAILURE.equals(result))
                 {
-                    return TestCaseResult.Status.FAILURE;
+                    return PersistentTestCaseResult.Status.FAILURE;
                 }
             }
         }
 
-        return TestCaseResult.Status.PASS;
+        return PersistentTestCaseResult.Status.PASS;
     }
 
     private String getDetails(Element testLogElement)
@@ -134,23 +134,23 @@ public class BoostRegressionPostProcessor extends XMLTestReportPostProcessorSupp
         return false;
     }
 
-    private TestSuiteResult getSuite(String suitePath, TestSuiteResult parentSuite)
+    private PersistentTestSuiteResult getSuite(String suitePath, PersistentTestSuiteResult parentSuite)
     {
         String[] pieces = suitePath.split("/");
         return getSuite(pieces, 0, parentSuite);
     }
 
-    private TestSuiteResult getSuite(String[] path, int index, TestSuiteResult parentSuite)
+    private PersistentTestSuiteResult getSuite(String[] path, int index, PersistentTestSuiteResult parentSuite)
     {
         if(index == path.length)
         {
             return parentSuite;
         }
 
-        TestSuiteResult suite = parentSuite.getSuite(path[index]);
+        PersistentTestSuiteResult suite = parentSuite.getSuite(path[index]);
         if(suite == null)
         {
-            suite = new TestSuiteResult(path[index]);
+            suite = new PersistentTestSuiteResult(path[index]);
             parentSuite.add(suite);
         }
 

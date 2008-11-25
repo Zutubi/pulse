@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.postprocessors;
 
 import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.model.TestSuiteResult;
 
 /**
  * Context in which a post-processor executes.  Provides a high-level
@@ -19,7 +19,7 @@ public interface PostProcessorContext
      *
      * @return the root test suite to which all test results should be added
      */
-    TestSuiteResult getTestSuite();
+    PersistentTestSuiteResult getTestSuite();
 
     /**
      * Retrieves the current state for the command which produced the

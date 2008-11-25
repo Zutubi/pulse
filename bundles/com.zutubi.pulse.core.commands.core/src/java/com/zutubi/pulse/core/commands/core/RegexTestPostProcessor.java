@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestCaseResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.TestReportPostProcessorSupport;
 import com.zutubi.util.TextUtils;
@@ -45,14 +45,14 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
     private boolean trim = true;
     private Resolution resolveConflicts = Resolution.OFF;
     
-    private Map<String, TestCaseResult.Status> statusMap = new HashMap<String, TestCaseResult.Status>();
+    private Map<String, PersistentTestCaseResult.Status> statusMap = new HashMap<String, PersistentTestCaseResult.Status>();
 
     public RegexTestPostProcessor()
     {
         // provide some defaults.
-        this.statusMap.put("PASS", TestCaseResult.Status.PASS);
-        this.statusMap.put("FAILURE", TestCaseResult.Status.FAILURE);
-        this.statusMap.put("ERROR", TestCaseResult.Status.ERROR);
+        this.statusMap.put("PASS", PersistentTestCaseResult.Status.PASS);
+        this.statusMap.put("FAILURE", PersistentTestCaseResult.Status.FAILURE);
+        this.statusMap.put("ERROR", PersistentTestCaseResult.Status.ERROR);
     }
 
     public RegexTestPostProcessor(String name)
@@ -60,7 +60,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
         setName(name);
     }
 
-    public void process(File file, TestSuiteResult suite, PostProcessorContext ppContext)
+    public void process(File file, PersistentTestSuiteResult suite, PostProcessorContext ppContext)
     {
         // clean up any whitespace from the regex which may have been added via the setText()
         if (trim)
@@ -94,7 +94,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
         }
     }
 
-    private void processFile(TestSuiteResult tests) throws IOException
+    private void processFile(PersistentTestSuiteResult tests) throws IOException
     {
         Pattern pattern = Pattern.compile(regex);
 
@@ -109,17 +109,17 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
                 {
                     String testName = m.group(nameGroup);
 
-                    TestCaseResult result = new TestCaseResult(testName);
+                    PersistentTestCaseResult result = new PersistentTestCaseResult(testName);
                     if (detailsGroup >= 0)
                     {
                         result.setMessage(m.group(detailsGroup));
                     }
 
-                    TestCaseResult.Status status = statusMap.get(statusString);
+                    PersistentTestCaseResult.Status status = statusMap.get(statusString);
                     if(status == null)
                     {
                         // Must be auto-fail case
-                        status = TestCaseResult.Status.FAILURE;
+                        status = PersistentTestCaseResult.Status.FAILURE;
                     }
 
                     result.setStatus(status);
@@ -206,9 +206,9 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
     public String getPassStatus()
     {
-        for(Map.Entry<String, TestCaseResult.Status> entry: statusMap.entrySet())
+        for(Map.Entry<String, PersistentTestCaseResult.Status> entry: statusMap.entrySet())
         {
-            if(entry.getValue().equals(TestCaseResult.Status.PASS))
+            if(entry.getValue().equals(PersistentTestCaseResult.Status.PASS))
             {
                 return entry.getKey();
             }
@@ -219,14 +219,14 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
     public void setPassStatus(String status)
     {
-        this.statusMap.put(status, TestCaseResult.Status.PASS);
+        this.statusMap.put(status, PersistentTestCaseResult.Status.PASS);
     }
 
     public String getFailureStatus()
     {
-        for(Map.Entry<String, TestCaseResult.Status> entry: statusMap.entrySet())
+        for(Map.Entry<String, PersistentTestCaseResult.Status> entry: statusMap.entrySet())
         {
-            if(entry.getValue().equals(TestCaseResult.Status.FAILURE))
+            if(entry.getValue().equals(PersistentTestCaseResult.Status.FAILURE))
             {
                 return entry.getKey();
             }
@@ -237,7 +237,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
     public void setFailureStatus(String status)
     {
-        this.statusMap.put(status, TestCaseResult.Status.FAILURE);
+        this.statusMap.put(status, PersistentTestCaseResult.Status.FAILURE);
     }
 
     public void setText(String txt)

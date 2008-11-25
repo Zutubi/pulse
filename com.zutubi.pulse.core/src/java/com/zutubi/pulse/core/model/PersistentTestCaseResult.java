@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.model;
 /**
  * Represents the result of a single test case.
  */
-public class TestCaseResult extends TestResult
+public class PersistentTestCaseResult extends PersistentTestResult
 {
     public enum Status
     {
@@ -38,21 +38,21 @@ public class TestCaseResult extends TestResult
     private boolean fixed = false;
 
     
-    public TestCaseResult()
+    public PersistentTestCaseResult()
     {
     }
 
-    public TestCaseResult(String name)
+    public PersistentTestCaseResult(String name)
     {
         this(name, UNKNOWN_DURATION);
     }
 
-    public TestCaseResult(String name, long duration)
+    public PersistentTestCaseResult(String name, long duration)
     {
         this(name, duration, Status.PASS, null);
     }
 
-    public TestCaseResult(String name, long duration, Status status, String message)
+    public PersistentTestCaseResult(String name, long duration, Status status, String message)
     {
         super(name, duration);
         this.status = status;
@@ -144,9 +144,9 @@ public class TestCaseResult extends TestResult
         this.fixed = fixed;
     }
 
-    public boolean isEquivalent(TestResult otherResult)
+    public boolean isEquivalent(PersistentTestResult otherResult)
     {
-        if(!(otherResult instanceof TestCaseResult))
+        if(!(otherResult instanceof PersistentTestCaseResult))
         {
             return false;
         }
@@ -156,7 +156,7 @@ public class TestCaseResult extends TestResult
             return false;
         }
 
-        TestCaseResult other = (TestCaseResult) otherResult;
+        PersistentTestCaseResult other = (PersistentTestCaseResult) otherResult;
         if(message == null)
         {
             if(other.message != null)

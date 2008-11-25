@@ -71,7 +71,7 @@ public class DefaultTestManager implements TestManager
 
     private class IndexingHandler implements TestHandler
     {
-        private Stack<TestSuiteResult> suites = new Stack<TestSuiteResult>();
+        private Stack<PersistentTestSuiteResult> suites = new Stack<PersistentTestSuiteResult>();
         private Stack<Boolean> changed = new Stack<Boolean>();
         private long projectId;
         private long buildId;
@@ -96,7 +96,7 @@ public class DefaultTestManager implements TestManager
             }
         }
 
-        public void startSuite(TestSuiteResult suiteResult)
+        public void startSuite(PersistentTestSuiteResult suiteResult)
         {
             suites.push(suiteResult);
             changed.push(false);
@@ -115,7 +115,7 @@ public class DefaultTestManager implements TestManager
             int i = 0;
             path = "";
 
-            for (TestSuiteResult suite : suites)
+            for (PersistentTestSuiteResult suite : suites)
             {
                 if (i > 1)
                 {
@@ -144,7 +144,7 @@ public class DefaultTestManager implements TestManager
             }
         }
 
-        public void handleCase(TestCaseResult caseResult, Element element)
+        public void handleCase(PersistentTestCaseResult caseResult, Element element)
         {
             String casePath = getCasePath(caseResult.getName());
             TestCaseIndex caseIndex = allCases.get(casePath);
@@ -162,7 +162,7 @@ public class DefaultTestManager implements TestManager
                 element.addAttribute(new Attribute(TestSuitePersister.ATTRIBUTE_BROKEN_NUMBER, Long.toString(caseIndex.getBrokenNumber())));
                 markChanged();
             }
-            else if (!caseIndex.isHealthy() && caseResult.getStatus() == TestCaseResult.Status.PASS)
+            else if (!caseIndex.isHealthy() && caseResult.getStatus() == PersistentTestCaseResult.Status.PASS)
             {
                 // Fixed in this build
                 element.addAttribute(new Attribute(TestSuitePersister.ATTRIBUTE_FIXED, "true"));

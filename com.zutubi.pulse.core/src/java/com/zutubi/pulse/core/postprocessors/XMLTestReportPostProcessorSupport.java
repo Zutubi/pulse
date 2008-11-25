@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors;
 
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -35,7 +35,7 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
         this.reportType = reportType;
     }
 
-    protected void process(File file, TestSuiteResult suite, PostProcessorContext ppContext)
+    protected void process(File file, PersistentTestSuiteResult suite, PostProcessorContext ppContext)
     {
         FileInputStream input = null;
 
@@ -85,5 +85,5 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
      * @param doc   XML document to post process
      * @param tests suite to add all discovered test results to
      */
-    protected abstract void processDocument(Document doc, TestSuiteResult tests);
+    protected abstract void processDocument(Document doc, PersistentTestSuiteResult tests);
 }

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestCaseResult;
+import com.zutubi.pulse.core.model.PersistentTestResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
 import nu.xom.*;
 
@@ -41,7 +41,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         super(reportType);
     }
 
-    protected void processDocument(Document doc, TestSuiteResult tests)
+    protected void processDocument(Document doc, PersistentTestSuiteResult tests)
     {
         Element root = doc.getRootElement();
         if(root.getLocalName().equals(suiteElement))
@@ -60,7 +60,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         }
     }
 
-    private void processSuite(Element element, TestSuiteResult tests)
+    private void processSuite(Element element, PersistentTestSuiteResult tests)
     {
         String name = "";
 
@@ -84,7 +84,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 
         long duration = getDuration(element);
 
-        TestSuiteResult suite = new TestSuiteResult(name, duration);
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult(name, duration);
         Elements nested = element.getChildElements(suiteElement);
         for(int i = 0; i < nested.size(); i++)
         {
@@ -100,7 +100,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         tests.add(suite);
     }
 
-    private void processCase(Element element, TestSuiteResult suite)
+    private void processCase(Element element, PersistentTestSuiteResult suite)
     {
         String name = element.getAttributeValue(nameAttribute);
         if(name == null)
@@ -116,13 +116,13 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         }
 
         long duration = getDuration(element);
-        TestCaseResult caseResult = new TestCaseResult(name, duration);
+        PersistentTestCaseResult caseResult = new PersistentTestCaseResult(name, duration);
         suite.add(caseResult);
 
         Element child = element.getFirstChildElement(errorElement);
         if(child != null)
         {
-            caseResult.setStatus(TestCaseResult.Status.ERROR);
+            caseResult.setStatus(PersistentTestCaseResult.Status.ERROR);
 
             getMessage(child, caseResult);
 
@@ -134,12 +134,12 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         child = element.getFirstChildElement(failureElement);
         if(child != null)
         {
-            caseResult.setStatus(TestCaseResult.Status.FAILURE);
+            caseResult.setStatus(PersistentTestCaseResult.Status.FAILURE);
             getMessage(child, caseResult);
         }
     }
 
-    private void getMessage(Element element, TestCaseResult caseResult)
+    private void getMessage(Element element, PersistentTestCaseResult caseResult)
     {
         if (element.getChildCount() > 0)
         {
@@ -161,7 +161,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 
     private long getDuration(Element element)
     {
-        long duration = TestResult.UNKNOWN_DURATION;
+        long duration = PersistentTestResult.UNKNOWN_DURATION;
         String attr = element.getAttributeValue(timeAttribute);
 
         if(attr != null)

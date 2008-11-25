@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.cppunit;
 
-import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestCaseResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
 import java.io.File;
@@ -26,11 +26,11 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
 
     public void testBasic() throws Exception
     {
-        TestSuiteResult tests = runProcessor("basic");
+        PersistentTestSuiteResult tests = runProcessor("basic");
 
         assertEquals(2, tests.getSuites().size());
 
-        TestSuiteResult suite = tests.getSuites().get(0);
+        PersistentTestSuiteResult suite = tests.getSuites().get(0);
         assertAnotherTest(suite, "AnotherTest");
 
         suite = tests.getSuites().get(1);
@@ -39,11 +39,11 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
 
     public void testTwoReports() throws Exception
     {
-        TestSuiteResult tests = runProcessor("basic", "second");
+        PersistentTestSuiteResult tests = runProcessor("basic", "second");
 
         assertEquals(3, tests.getSuites().size());
 
-        TestSuiteResult suite = tests.getSuites().get(0);
+        PersistentTestSuiteResult suite = tests.getSuites().get(0);
         assertAnotherTest(suite, "AnotherTest");
 
         suite = tests.getSuites().get(1);
@@ -55,15 +55,15 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
 
     public void testEmptyTags() throws Exception
     {
-        TestSuiteResult tests = runProcessor("emptytags");
+        PersistentTestSuiteResult tests = runProcessor("emptytags");
 
         assertEquals(1, tests.getSuites().size());
 
-        TestSuiteResult suite = tests.getSuites().get(0);
+        PersistentTestSuiteResult suite = tests.getSuites().get(0);
         assertEquals(1, suite.getCases().size());
 
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
-        TestCaseResult caseResult = children[0];
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult caseResult = children[0];
         assertEquals("all", caseResult.getName());
         assertEquals(1, caseResult.getErrors());
     }
@@ -71,34 +71,34 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
     public void testParentSuite() throws Exception
     {
         pp.setSuite("parent");
-        TestSuiteResult tests = runProcessor("basic");
+        PersistentTestSuiteResult tests = runProcessor("basic");
 
-        List<TestSuiteResult> topLevelSuites = tests.getSuites();
+        List<PersistentTestSuiteResult> topLevelSuites = tests.getSuites();
         assertEquals(1, topLevelSuites.size());
         assertEquals("parent", topLevelSuites.get(0).getName());
         
         tests = topLevelSuites.get(0);
         assertEquals(2, tests.getSuites().size());
-        TestSuiteResult suite = tests.getSuites().get(0);
+        PersistentTestSuiteResult suite = tests.getSuites().get(0);
         assertAnotherTest(suite, "AnotherTest");
 
         suite = tests.getSuites().get(1);
         assertTest(suite, "Test");
     }
 
-    private void assertHelloWorld(TestSuiteResult suite, String name)
+    private void assertHelloWorld(PersistentTestSuiteResult suite, String name)
     {
         checkSuite(suite, name, 1, 0, 0);
 
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         checkPassCase(children[0], "testHelloWorld");
     }
 
-    private void assertTest(TestSuiteResult suite, String name)
+    private void assertTest(PersistentTestSuiteResult suite, String name)
     {
         checkSuite(suite, name, 6, 2, 1);
 
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         checkFailureCase(children[0], "testFailure", "At file cppunit.cpp line 34\n" +
                                                          "assertion failed\n" +
                                                          "- Expression: 1 == 2");
@@ -111,11 +111,11 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
         checkPassCase(children[5], "testExpectedFailure");
     }
 
-    private void assertAnotherTest(TestSuiteResult suite, String name)
+    private void assertAnotherTest(PersistentTestSuiteResult suite, String name)
     {
         checkSuite(suite, name, 1, 0, 0);
 
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         checkPassCase(children[0], "testIt");
     }
 }

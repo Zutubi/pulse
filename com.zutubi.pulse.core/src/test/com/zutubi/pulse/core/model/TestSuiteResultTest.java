@@ -8,12 +8,12 @@ import java.util.List;
  */
 public class TestSuiteResultTest extends PulseTestCase
 {
-    private TestSuiteResult suite;
+    private PersistentTestSuiteResult suite;
 
 
     protected void setUp() throws Exception
     {
-        suite = new TestSuiteResult("test", 10);
+        suite = new PersistentTestSuiteResult("test", 10);
     }
 
     protected void tearDown() throws Exception
@@ -23,7 +23,7 @@ public class TestSuiteResultTest extends PulseTestCase
 
     public void testAddCase()
     {
-        TestCaseResult childCase = new TestCaseResult("acase", 100, TestCaseResult.Status.PASS, "test message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
         suite.add(childCase);
         assertEquals(1, suite.getTotal());
         assertTrue(suite.getCases().iterator().next() == childCase);
@@ -31,33 +31,33 @@ public class TestSuiteResultTest extends PulseTestCase
 
     public void testAddSuite()
     {
-        TestSuiteResult childSuite = new TestSuiteResult("child suite");
+        PersistentTestSuiteResult childSuite = new PersistentTestSuiteResult("child suite");
         suite.add(childSuite);
-        List<TestSuiteResult> children = suite.getSuites();
+        List<PersistentTestSuiteResult> children = suite.getSuites();
         assertEquals(1, children.size());
         assertTrue(children.get(0) == childSuite);
     }
 
     public void testAddCaseAlreadyExists()
     {
-        TestCaseResult childCase = new TestCaseResult("acase", 100, TestCaseResult.Status.PASS, "test message");
-        TestCaseResult childCase2 = new TestCaseResult("acase", 100, TestCaseResult.Status.PASS, "test message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
         suite.add(childCase);
         suite.add(childCase2);
         
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         assertEquals(1, children.length);
         assertTrue(children[0].isEquivalent(childCase));
     }
 
     public void testAddCaseLessSevereAlreadyExists()
     {
-        TestCaseResult childCase = new TestCaseResult("acase", 100, TestCaseResult.Status.PASS, "test message");
-        TestCaseResult childCase2 = new TestCaseResult("acase", 102, TestCaseResult.Status.FAILURE, "failure message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 102, PersistentTestCaseResult.Status.FAILURE, "failure message");
         suite.add(childCase);
         suite.add(childCase2);
 
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         assertEquals(1, children.length);
         assertFalse(children[0].isEquivalent(childCase));
         assertTrue(children[0].isEquivalent(childCase2));
@@ -65,12 +65,12 @@ public class TestSuiteResultTest extends PulseTestCase
 
     public void testAddCaseMoreSevereAlreadyExists()
     {
-        TestCaseResult childCase = new TestCaseResult("acase", 102, TestCaseResult.Status.FAILURE, "failure message");
-        TestCaseResult childCase2 = new TestCaseResult("acase", 100, TestCaseResult.Status.PASS, "test message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 102, PersistentTestCaseResult.Status.FAILURE, "failure message");
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
         suite.add(childCase);
         suite.add(childCase2);
 
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         assertEquals(1, children.length);
         assertTrue(children[0].isEquivalent(childCase));
         assertFalse(children[0].isEquivalent(childCase2));
@@ -78,18 +78,18 @@ public class TestSuiteResultTest extends PulseTestCase
 
     public void testAddSuiteAlreadyExists()
     {
-        TestSuiteResult childSuite = new TestSuiteResult("child suite");
-        TestSuiteResult childSuite2 = new TestSuiteResult("child suite");
-        TestCaseResult childCase = new TestCaseResult("acase", 1002, TestCaseResult.Status.PASS, null);
-        TestCaseResult childCase2 = new TestCaseResult("acase2", 102, TestCaseResult.Status.FAILURE, "failure message");
+        PersistentTestSuiteResult childSuite = new PersistentTestSuiteResult("child suite");
+        PersistentTestSuiteResult childSuite2 = new PersistentTestSuiteResult("child suite");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 1002, PersistentTestCaseResult.Status.PASS, null);
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase2", 102, PersistentTestCaseResult.Status.FAILURE, "failure message");
         childSuite.add(childCase);
         childSuite.add(childCase2);
         suite.add(childSuite);
         suite.add(childSuite2);
 
-        List<TestSuiteResult> children = suite.getSuites();
+        List<PersistentTestSuiteResult> children = suite.getSuites();
         assertEquals(1, children.size());
-        TestSuiteResult suiteResult = children.get(0);
+        PersistentTestSuiteResult suiteResult = children.get(0);
         assertEquals(2, suiteResult.getCases().size());
         assertTrue(suiteResult.getCase(childCase.getName()).isEquivalent(childCase));
         assertTrue(suiteResult.getCase(childCase2.getName()).isEquivalent(childCase2));
@@ -97,20 +97,20 @@ public class TestSuiteResultTest extends PulseTestCase
 
     public void testAddSuiteAlreadyExistsOverlappingCase()
     {
-        TestSuiteResult childSuite = new TestSuiteResult("child suite");
-        TestSuiteResult childSuite2 = new TestSuiteResult("child suite");
-        TestCaseResult childCase = new TestCaseResult("acase", 1002, TestCaseResult.Status.PASS, null);
-        TestCaseResult childCase2 = new TestCaseResult("acase", 102, TestCaseResult.Status.FAILURE, "failure message");
+        PersistentTestSuiteResult childSuite = new PersistentTestSuiteResult("child suite");
+        PersistentTestSuiteResult childSuite2 = new PersistentTestSuiteResult("child suite");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 1002, PersistentTestCaseResult.Status.PASS, null);
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 102, PersistentTestCaseResult.Status.FAILURE, "failure message");
         childSuite.add(childCase);
         childSuite.add(childCase2);
         suite.add(childSuite);
         suite.add(childSuite2);
 
-        List<TestSuiteResult> children = suite.getSuites();
+        List<PersistentTestSuiteResult> children = suite.getSuites();
         assertEquals(1, children.size());
-        TestSuiteResult suiteResult = children.get(0);
+        PersistentTestSuiteResult suiteResult = children.get(0);
         assertEquals(1, suiteResult.getCases().size());
-        TestCaseResult[] cases = suiteResult.getCases().toArray(new TestCaseResult[suiteResult.getCases().size()]);
+        PersistentTestCaseResult[] cases = suiteResult.getCases().toArray(new PersistentTestCaseResult[suiteResult.getCases().size()]);
         assertTrue(cases[0].isEquivalent(childCase2));
     }
 }

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.ocunit;
 
-import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.PersistentTestCaseResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.TestReportPostProcessorSupport;
 import com.zutubi.util.io.IOUtils;
@@ -39,7 +39,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
         setName(name);
     }
     
-    protected void process(File file, TestSuiteResult suite, PostProcessorContext ppContext)
+    protected void process(File file, PersistentTestSuiteResult suite, PostProcessorContext ppContext)
     {
         try
         {
@@ -68,7 +68,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
         }
     }
 
-    private void processFile(TestSuiteResult tests) throws IOException
+    private void processFile(PersistentTestSuiteResult tests) throws IOException
     {
         // look for a TestSuite.
         currentLine = nextLine();
@@ -84,7 +84,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
         }
     }
 
-    private TestSuiteResult processSuite() throws IOException
+    private PersistentTestSuiteResult processSuite() throws IOException
     {
         // varify that we have a start suite here.
         Matcher m = START_SUITE_PATTERN.matcher(currentLine);
@@ -94,7 +94,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
         }
 
         // start the suite.
-        TestSuiteResult suite = new TestSuiteResult(m.group(1));
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult(m.group(1));
 
         currentLine = nextLine();
 
@@ -113,17 +113,17 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
                 Matcher caseMatch = CASE_SUMMARY_PATTERN.matcher(currentLine);
                 caseMatch.matches();
 
-                TestCaseResult result = new TestCaseResult(caseMatch.group(2));
+                PersistentTestCaseResult result = new PersistentTestCaseResult(caseMatch.group(2));
                 result.setMessage(caseOutput);
 
                 String statusString = caseMatch.group(3);
                 if (statusString.compareTo("passed") == 0)
                 {
-                    result.setStatus(TestCaseResult.Status.PASS);
+                    result.setStatus(PersistentTestCaseResult.Status.PASS);
                 }
                 else if (statusString.compareTo("failed") == 0)
                 {
-                    result.setStatus(TestCaseResult.Status.FAILURE);
+                    result.setStatus(PersistentTestCaseResult.Status.FAILURE);
                 }
                 result.setDuration((long) (Double.parseDouble(caseMatch.group(4)) * 1000));
                 suite.add(result);

@@ -6,7 +6,7 @@ import nu.xom.Element;
  */
 public interface TestHandler
 {
-    void startSuite(TestSuiteResult suiteResult);
+    void startSuite(PersistentTestSuiteResult suiteResult);
     boolean endSuite();
-    void handleCase(TestCaseResult caseResult, Element element);
+    void handleCase(PersistentTestCaseResult caseResult, Element element);
 }

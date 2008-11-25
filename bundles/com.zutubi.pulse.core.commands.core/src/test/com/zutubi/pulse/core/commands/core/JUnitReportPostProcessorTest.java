@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.core;
 
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
@@ -26,35 +26,35 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
 
     public void testSimple() throws Exception
     {
-        TestSuiteResult tests = runProcessor("simple");
+        PersistentTestSuiteResult tests = runProcessor("simple");
 
         assertEquals(2, tests.getSuites().size());
         checkWarning(tests.getSuites().get(0), "com.zutubi.pulse.junit.EmptyTest", 91, "No tests found");
 
-        TestSuiteResult suite = tests.getSuites().get(1);
+        PersistentTestSuiteResult suite = tests.getSuites().get(1);
         assertEquals("com.zutubi.pulse.junit.SimpleTest", suite.getName());
         assertEquals(90, suite.getDuration());
 
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         assertEquals(3, children.length);
-        checkCase(children[0], "testSimple", TestCaseResult.Status.PASS, 0, null);
-        checkCase(children[1], "testAssertionFailure", TestCaseResult.Status.FAILURE, 10,
+        checkCase(children[0], "testSimple", PersistentTestCaseResult.Status.PASS, 0, null);
+        checkCase(children[1], "testAssertionFailure", PersistentTestCaseResult.Status.FAILURE, 10,
                 "junit.framework.AssertionFailedError: expected:<1> but was:<2>\n" +
                 "\tat com.zutubi.pulse.junit.SimpleTest.testAssertionFailure(Unknown Source)");
-        checkCase(children[2], "testThrowException", TestCaseResult.Status.ERROR, 10,
+        checkCase(children[2], "testThrowException", PersistentTestCaseResult.Status.ERROR, 10,
                 "java.lang.RuntimeException: random message\n" +
                 "\tat com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)");
     }
 
     public void testSingle() throws Exception
     {
-        TestSuiteResult tests = runProcessor("single");
+        PersistentTestSuiteResult tests = runProcessor("single");
         assertSingleSuite(tests);
     }
 
     public void testSuite() throws Exception
     {
-        TestSuiteResult tests = runProcessor("suite");
+        PersistentTestSuiteResult tests = runProcessor("suite");
         assertEquals(274, tests.getTotal());
         assertNotNull(tests.getSuite("com.zutubi.pulse.acceptance.AcceptanceTestSuite").getCase("com.zutubi.pulse.acceptance.LicenseAuthorisationAcceptanceTest.testAddProjectLinkOnlyAvailableWhenLicensed"));
     }
@@ -69,26 +69,26 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         pp.setNameAttribute("customname");
         pp.setPackageAttribute("custompackage");
         pp.setTimeAttribute("customtime");
-        TestSuiteResult tests = runProcessor("custom");
+        PersistentTestSuiteResult tests = runProcessor("custom");
         assertSingleSuite(tests);
     }
 
-    private void assertSingleSuite(TestSuiteResult tests)
+    private void assertSingleSuite(PersistentTestSuiteResult tests)
     {
         assertEquals(1, tests.getSuites().size());
 
-        TestSuiteResult suite = tests.getSuites().get(0);
+        PersistentTestSuiteResult suite = tests.getSuites().get(0);
         assertEquals("com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest", suite.getName());
         assertEquals(391, suite.getDuration());
 
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         assertEquals(3, children.length);
-        checkCase(children[0], "testSimple", TestCaseResult.Status.PASS, 291, null);
-        checkCase(children[1], "testFailure", TestCaseResult.Status.FAILURE, 10,
+        checkCase(children[0], "testSimple", PersistentTestCaseResult.Status.PASS, 291, null);
+        checkCase(children[1], "testFailure", PersistentTestCaseResult.Status.FAILURE, 10,
                 "junit.framework.AssertionFailedError\n" +
                         "\tat\n" +
                         "        com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest.testFailure(JUnitReportPostProcessorTest.java:63)");
-        checkCase(children[2], "testError", TestCaseResult.Status.ERROR, 0,
+        checkCase(children[2], "testError", PersistentTestCaseResult.Status.ERROR, 0,
                 "java.lang.RuntimeException: whoops!\n" +
                         "\tat\n" +
                         "        com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");
@@ -129,8 +129,8 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
 
     public void testNoMessage() throws Exception
     {
-        TestSuiteResult tests = runProcessor("nomessage");
-        TestSuiteResult suite = tests.getSuite("com.zutubi.pulse.junit.NoMessages");
+        PersistentTestSuiteResult tests = runProcessor("nomessage");
+        PersistentTestSuiteResult suite = tests.getSuite("com.zutubi.pulse.junit.NoMessages");
         checkSuite(suite, "com.zutubi.pulse.junit.NoMessages", 2, 2, 0);
         checkFailureCase(suite, "testFailureNoMessageAtAll", null);
         checkFailureCase(suite, "testFailureMessageInAttribute", "this message only");
@@ -138,26 +138,26 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
 
     public void testNested() throws Exception
     {
-        TestSuiteResult tests = runProcessor("nested");
-        TestSuiteResult suite = tests.getSuite("Outer");
+        PersistentTestSuiteResult tests = runProcessor("nested");
+        PersistentTestSuiteResult suite = tests.getSuite("Outer");
         assertNotNull(suite);
         checkSuite(suite, "Outer", 2, 0, 0);
-        TestSuiteResult nested = suite.getSuite("Nested");
+        PersistentTestSuiteResult nested = suite.getSuite("Nested");
         checkSuite(nested, "Nested", 2, 0, 0);
         checkPassCase(nested, "test1");
         checkPassCase(nested, "test2");
     }
 
-    private void checkWarning(TestResult testResult, String name, long duration, String contents)
+    private void checkWarning(PersistentTestResult testResult, String name, long duration, String contents)
     {
-        assertTrue(testResult instanceof TestSuiteResult);
-        TestSuiteResult suite = (TestSuiteResult) testResult;
+        assertTrue(testResult instanceof PersistentTestSuiteResult);
+        PersistentTestSuiteResult suite = (PersistentTestSuiteResult) testResult;
         assertEquals(name, suite.getName());
         assertEquals(duration, suite.getDuration());
 
-        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         assertEquals(1, children.length);
-        TestCaseResult caseResult = children[0];
+        PersistentTestCaseResult caseResult = children[0];
         assertEquals("warning", caseResult.getName());
         assertEquals(10, caseResult.getDuration());
         assertTrue(caseResult.getMessage().contains(contents));
@@ -167,7 +167,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
     {
         File outputDir = getOutputDir();
         StoredFileArtifact artifact = getArtifact("simple");
-        TestSuiteResult testResults = new TestSuiteResult();
+        PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
 
         ExecutionContext context = new PulseExecutionContext();
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
