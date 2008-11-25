@@ -1,4 +1,4 @@
-#helpTag("Projects+Section")
+#helpTag("Browse+Section")
 #authorisationTags($principle)
 <content tag="selectedTab">projects</content>
 <html>

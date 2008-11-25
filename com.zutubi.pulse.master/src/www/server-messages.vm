@@ -1,4 +1,4 @@
-#helpTag("Server+Messages+Tab")
+#helpTag("Server+Section")
 #authorisationTags($principle)
 <content tag="selectedTab">server</content>
 <html>

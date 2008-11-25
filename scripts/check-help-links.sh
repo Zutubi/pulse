@@ -8,7 +8,7 @@ failed=0
 notag=0
 failures=
 
-for filename in $(find master/src/www -name '*.vm')
+for filename in $(find com.zutubi.pulse.master/src/www -name '*.vm')
 do
     count=$((count + 1))
 
@@ -18,7 +18,7 @@ do
         tag=${tag#*\"}
         tag=${tag%\"*}
 
-        if wget "http://confluence.zutubi.com/display/pulse0102/$tag" -o /dev/null
+        if wget "http://confluence.zutubi.com/display/pulse0200/$tag" -o /dev/null
         then
             ok=$((ok + 1))
             status="$tag: ok"
@@ -32,7 +32,7 @@ do
         status="No help tag"
     fi
 
-    echo "${filename#master/src/www/}: $status"
+    echo "${filename#com.zutubi.pulse.master/src/www/}: $status"
 done
 
 echo

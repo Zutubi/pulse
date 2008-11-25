@@ -1,7 +1,7 @@
 #if($agentName)
-    #helpTag("Agent+Info+Tab")
+    #helpTag("Agents+Section")
 #else
-    #helpTag("Server+Info+Tab")
+    #helpTag("Server+Section")
     <content tag="selectedTab">server</content>
 #end
 #authorisationTags($principle)

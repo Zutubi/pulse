@@ -1,4 +1,4 @@
-#helpTag("Project")
+#helpTag("Project+Log+Tab")
 #authorisationTags($principle)
 #projectTags($project)
 <html>

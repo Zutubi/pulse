@@ -1,4 +1,4 @@
-#helpTag("Plugins+Tab")
+#helpTag("Plugins+(Setup+and+Administration)")
 #authorisationTags($principle)
 <content tag="selectedTab">administration</content>
 <html>

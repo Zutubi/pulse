@@ -1,4 +1,4 @@
-#helpTag("Agent+Messages+Tab")
+#helpTag("Agents+Section")
 #authorisationTags($principle)
 #agentTags()
 <html>
