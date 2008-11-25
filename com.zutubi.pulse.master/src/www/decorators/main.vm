@@ -208,7 +208,7 @@
         <table>
             <tr>
               <td class="logo">
-                  :: <a href="$base/default.action">pulse 2 [ beta ]</a> ::
+                  :: <a href="$base/default.action">pulse 2</a> ::
 #if($personalBuild)
                   <a href="$urls.dashboardMyBuilds()">my builds</a>
     #if($buildNumber && $buildNumber != "0")

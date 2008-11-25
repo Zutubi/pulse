@@ -14,12 +14,12 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 2.0 [beta]!  This is your opportunity to start working with Pulse 2.0
-        before its final release.  It is a great time to provide feedback: let us know what you
-        think of the new features!
+        Welcome to Pulse 2.0!  Pulse is an automated build server that is simple to set up and easy
+        to use while providing advanced features such as distributed and personal builds.
     </p>
     <p>
-        You can return to this page at any time by clicking on the pulse link in the top left corner.
+        You can return to this page at any time by clicking on the "pulse 2" link in the top left
+        corner.
     </p>
     <h1> :: getting started :: </h1>
     <p>
