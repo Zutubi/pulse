@@ -20,11 +20,12 @@ public class DelegateScmClientFactory implements ScmClientFactory<ScmConfigurati
 
     private ObjectFactory objectFactory;
 
-    private Map<Class, ScmClientFactory<ScmConfiguration>> factories = new HashMap<Class, ScmClientFactory<ScmConfiguration>>();
+    private Map<Class, ScmClientFactory> factories = new HashMap<Class, ScmClientFactory>();
 
     public ScmClient createClient(ScmConfiguration config) throws ScmException
     {
-        ScmClientFactory<ScmConfiguration> factory = getFactory(config);
+        ScmClientFactory factory = getFactory(config);
+        @SuppressWarnings({"unchecked"})
         ScmClient client = factory.createClient(config);
         if (client instanceof DataCacheAware)
         {
@@ -40,16 +41,16 @@ public class DelegateScmClientFactory implements ScmClientFactory<ScmConfigurati
         return client;
     }
 
-    private ScmClientFactory<ScmConfiguration> getFactory(Object config)
+    private ScmClientFactory getFactory(ScmConfiguration config)
     {
         return factories.get(config.getClass());
     }
 
-    public void register(Class configType, Class<? extends ScmClientFactory<ScmConfiguration>> factoryType) throws ScmException
+    public <T extends ScmConfiguration> void register(Class<T> configType, Class<? extends ScmClientFactory<T>> factoryType) throws ScmException
     {
         try
         {
-            ScmClientFactory<ScmConfiguration> factory = objectFactory.buildBean(factoryType);
+            ScmClientFactory<T> factory = objectFactory.buildBean(factoryType);
             factories.put(configType, factory);
         }
         catch (Exception e)
