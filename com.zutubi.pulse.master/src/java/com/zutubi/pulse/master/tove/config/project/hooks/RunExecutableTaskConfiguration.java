@@ -1,8 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
-import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.ByteHandler;
 import com.zutubi.pulse.core.util.process.ForwardingByteHandler;
@@ -93,8 +91,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         AsyncProcess asyncProcess = null;
         try
         {
-            Scope scope = context.getScope();
-            List<String> resolvedArguments = VariableHelper.splitAndReplaceVariables(arguments, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
+            List<String> resolvedArguments = context.splitAndResolveReferences(arguments);
             List<String> commandLine = new LinkedList<String>();
             commandLine.add(command);
             commandLine.addAll(resolvedArguments);

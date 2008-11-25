@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.engine.api.Reference;
-import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
@@ -358,9 +358,9 @@ public class PulseScope implements Scope
         {
             try
             {
-                value = VariableHelper.replaceVariables(value, this, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
+                value = ReferenceResolver.resolveReferences(value, this, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
             }
-            catch (FileLoadException e)
+            catch (ResolutionException e)
             {
                 // Just use unresolved value.
             }

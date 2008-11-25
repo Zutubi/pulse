@@ -17,7 +17,7 @@ public class BooleanSqueezer implements TypeSqueezer
         return obj.toString();
     }
 
-    public Object unsqueeze(String... str) throws SqueezeException
+    public Boolean unsqueeze(String... str) throws SqueezeException
     {
         String value = str[0];
         if (value != null)

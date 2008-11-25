@@ -7,15 +7,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Handles the lexical analysis of variable references.
+ * Methods for analysing and replacing references within strings.
  */
-public class VariableHelper
+public class ReferenceResolver
 {
     public enum ResolutionStrategy
     {
         /**
          * Resolve all references, throwing an error for non-existant
-         * variables.
+         * references.
          */
         RESOLVE_STRICT
         {
@@ -58,7 +58,7 @@ public class VariableHelper
     {
         SPACE,
         TEXT,
-        VARIABLE_REFERENCE
+        REFERENCE
     }
 
     /**
@@ -70,7 +70,7 @@ public class VariableHelper
         INITIAL,
         ESCAPED,
         DOLLAR,
-        VARIABLE
+        REFERENCE_NAME
     }
 
     /**
@@ -88,7 +88,7 @@ public class VariableHelper
         }
     }
 
-    private static List<Token> tokenise(String input, boolean split) throws FileLoadException
+    private static List<Token> tokenise(String input, boolean split) throws ResolutionException
     {
         List<Token> result = new LinkedList<Token>();
         LexerState state = LexerState.INITIAL;
@@ -185,18 +185,17 @@ public class VariableHelper
                     {
                         case '{':
                         {
-                            state = LexerState.VARIABLE;
+                            state = LexerState.REFERENCE_NAME;
                             break;
                         }
                         default:
                         {
-                            // TODO give some context
-                            throw new FileLoadException("Syntax error: expecting '{', got '" + inputChar + "'");
+                            throw new ResolutionException("Syntax error: expecting '{', got '" + inputChar + "'");
                         }
                     }
                     break;
                 }
-                case VARIABLE:
+                case REFERENCE_NAME:
                 {
                     switch (inputChar)
                     {
@@ -204,10 +203,10 @@ public class VariableHelper
                         {
                             if (current.length() == 0)
                             {
-                                throw new FileLoadException("Syntax error: empty variable reference");
+                                throw new ResolutionException("Syntax error: empty reference");
                             }
 
-                            result.add(new Token(TokenType.VARIABLE_REFERENCE, current.toString()));
+                            result.add(new Token(TokenType.REFERENCE, current.toString()));
                             state = LexerState.INITIAL;
                             current.delete(0, current.length());
                             break;
@@ -229,7 +228,7 @@ public class VariableHelper
             {
                 if(quoted)
                 {
-                    throw new FileLoadException("Syntax error: unexpected end of input looking for closing quotes (\")");
+                    throw new ResolutionException("Syntax error: unexpected end of input looking for closing quotes (\")");
                 }
                 
                 addCurrent(current, haveData, result);
@@ -237,15 +236,15 @@ public class VariableHelper
             }
             case ESCAPED:
             {
-                throw new FileLoadException("Syntax error: unexpected end of input in escape sequence (\\)");
+                throw new ResolutionException("Syntax error: unexpected end of input in escape sequence (\\)");
             }
             case DOLLAR:
             {
-                throw new FileLoadException("Syntax error: unexpected end of input looking for '{'");
+                throw new ResolutionException("Syntax error: unexpected end of input looking for '{'");
             }
-            case VARIABLE:
+            case REFERENCE_NAME:
             {
-                throw new FileLoadException("Syntax error: unexpected end of input looking for '}'");
+                throw new ResolutionException("Syntax error: unexpected end of input looking for '}'");
             }
         }
 
@@ -261,42 +260,42 @@ public class VariableHelper
         }
     }
 
-    public static boolean containsVariables(String input) throws FileLoadException
+    public static boolean containsReference(String input) throws ResolutionException
     {
         List<Token> tokens = tokenise(input, false);
         for (Token token : tokens)
         {
             switch (token.type)
             {
-                case VARIABLE_REFERENCE:
+                case REFERENCE:
                     return true;
             }
         }
         return false;
     }
 
-    public static Object replaceVariable(String input, ReferenceMap properties) throws FileLoadException
+    public static Object resolveReference(String input, ReferenceMap references) throws ResolutionException
     {
         List<Token> tokens = tokenise(input, false);
-        if (tokens.size() != 1 || tokens.get(0).type != TokenType.VARIABLE_REFERENCE)
+        if (tokens.size() != 1 || tokens.get(0).type != TokenType.REFERENCE)
         {
-            throw new FileLoadException("Expected single variable reference. Instead found '"+input+"'"); //TODO
+            throw new ResolutionException("Expected single reference. Instead found '" + input + "'");
         }
         Token token = tokens.get(0);
-        Reference ref = properties.getReference(token.value);
+        Reference ref = references.getReference(token.value);
         if (ref != null)
         {
             return ref.getValue();
         }
-        throw new FileLoadException("Unknown variable reference '" + token.value + "'");
+        throw new ResolutionException("Unknown reference '" + token.value + "'");
     }
 
-    public static String replaceVariables(String input, ReferenceMap properties) throws FileLoadException
+    public static String resolveReferences(String input, ReferenceMap references) throws ResolutionException
     {
-        return replaceVariables(input, properties, ResolutionStrategy.RESOLVE_STRICT);
+        return resolveReferences(input, references, ResolutionStrategy.RESOLVE_STRICT);
     }
 
-    public static String replaceVariables(String input, ReferenceMap properties, ResolutionStrategy resolutionStrategy) throws FileLoadException
+    public static String resolveReferences(String input, ReferenceMap references, ResolutionStrategy resolutionStrategy) throws ResolutionException
     {
         StringBuilder result = new StringBuilder();
 
@@ -311,9 +310,9 @@ public class VariableHelper
                     result.append(token.value);
                     break;
                 }
-                case VARIABLE_REFERENCE:
+                case REFERENCE:
                 {
-                    result.append(resolveReference(properties, token, resolutionStrategy));
+                    result.append(resolveReference(references, token, resolutionStrategy));
                     break;
                 }
             }
@@ -321,7 +320,7 @@ public class VariableHelper
         return result.toString();
     }
 
-    public static List<String> splitAndReplaceVariables(String input, ReferenceMap properties, ResolutionStrategy resolutionStrategy) throws FileLoadException
+    public static List<String> splitAndResolveReferences(String input, ReferenceMap references, ResolutionStrategy resolutionStrategy) throws ResolutionException
     {
         List<String> result = new LinkedList<String>();
         StringBuilder current = new StringBuilder();
@@ -349,9 +348,9 @@ public class VariableHelper
                     haveData = true;
                     break;
                 }
-                case VARIABLE_REFERENCE:
+                case REFERENCE:
                 {
-                    String value = resolveReference(properties, token, resolutionStrategy);
+                    String value = resolveReference(references, token, resolutionStrategy);
                     if(value.length() > 0)
                     {
                         current.append(value);
@@ -370,23 +369,18 @@ public class VariableHelper
         return result;
     }
 
-    private static String resolveReference(ReferenceMap properties, Token token, ResolutionStrategy resolutionStrategy) throws FileLoadException
+    private static String resolveReference(ReferenceMap references, Token token, ResolutionStrategy resolutionStrategy) throws ResolutionException
     {
         if(resolutionStrategy.resolve())
         {
-            Reference reference = properties.getReference(token.value);
+            Reference reference = references.getReference(token.value);
             if (reference != null && reference.getValue() != null)
             {
-                Object obj = reference.getValue();
-                if (!(obj instanceof String))
-                {
-                    throw new FileLoadException("Reference to non string variable '" + token.value + "'");
-                }
-                return (String) obj;
+                return reference.getValue().toString();
             }
             else if(resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
             {
-                throw new FileLoadException("Reference to unknown variable '" + token.value + "'");
+                throw new ResolutionException("Unknown reference '" + token.value + "'");
             }
         }
 

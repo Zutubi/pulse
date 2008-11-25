@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.engine.api;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * The execution context provides access to the information specific to the current
@@ -71,4 +72,8 @@ public interface ExecutionContext
     void addValue(String namespace, String name, Object value);
 
     void addValue(String name, Object value);
+
+    String resolveReferences(String input);
+
+    List<String> splitAndResolveReferences(String input);
 }

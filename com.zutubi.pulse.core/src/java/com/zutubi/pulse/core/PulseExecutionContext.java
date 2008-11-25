@@ -2,13 +2,15 @@ package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_USER;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * An environment in which commands are executed.  Consists of scopes,
@@ -200,6 +202,32 @@ public class PulseExecutionContext implements ExecutionContext
     public void addValue(String name, Object value)
     {
         scopeStack.getScope().add(new GenericReference<Object>(name, value));
+    }
+
+    public String resolveReferences(String input)
+    {
+        try
+        {
+            return ReferenceResolver.resolveReferences(input, getScope(), ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
+        }
+        catch (ResolutionException e)
+        {
+            // Never happens, but return unresolved anyway.
+            return input;
+        }
+    }
+
+    public List<String> splitAndResolveReferences(String input)
+    {
+        try
+        {
+            return ReferenceResolver.splitAndResolveReferences(input, getScope(), ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
+        }
+        catch (ResolutionException e)
+        {
+            // Never happens, just return split anyway.
+            return StringUtils.split(input);
+        }
     }
 
     public void push()

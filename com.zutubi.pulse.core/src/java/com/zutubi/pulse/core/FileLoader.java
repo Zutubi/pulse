@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.validation.CommandValidationException;
-import com.zutubi.pulse.core.validation.PulseValidationContext;
-import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.api.ScopeAware;
+import com.zutubi.pulse.core.validation.CommandValidationException;
+import com.zutubi.pulse.core.validation.PulseValidationContext;
+import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.ValidationContext;
@@ -286,25 +286,25 @@ public class FileLoader
 
         if (text != null && typeHelper.hasSetText())
         {
-            VariableHelper.ResolutionStrategy resolutionStrategy = getResolutionStrategy(predicate, type, e);
+            ReferenceResolver.ResolutionStrategy resolutionStrategy = getResolutionStrategy(predicate, type, e);
 
-            text = VariableHelper.replaceVariables(text, scope, resolutionStrategy);            
+            text = ReferenceResolver.resolveReferences(text, scope, resolutionStrategy);
             typeHelper.setText(type, text);
         }
     }
 
-    private VariableHelper.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Object type, Element e)
+    private ReferenceResolver.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Object type, Element e)
     {
-        VariableHelper.ResolutionStrategy resolutionStrategy = VariableHelper.ResolutionStrategy.RESOLVE_NONE;
+        ReferenceResolver.ResolutionStrategy resolutionStrategy = ReferenceResolver.ResolutionStrategy.RESOLVE_NONE;
         if (predicate.resolveReferences(type, e))
         {
             if(predicate.allowUnresolved(type, e))
             {
-                resolutionStrategy = VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT;
+                resolutionStrategy = ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
             }
             else
             {
-                resolutionStrategy = VariableHelper.ResolutionStrategy.RESOLVE_STRICT;
+                resolutionStrategy = ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT;
             }
         }
         return resolutionStrategy;
@@ -351,7 +351,7 @@ public class FileLoader
                 {
                     String macroName = attribute.getValue();
 
-                    Object o = VariableHelper.replaceVariable(macroName, scope);
+                    Object o = ReferenceResolver.resolveReference(macroName, scope);
                     if(!LocationAwareElement.class.isAssignableFrom(o.getClass()))
                     {
                         throw new FileLoadException("Reference '" + macroName + "' does not resolve to a macro");

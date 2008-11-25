@@ -1,39 +1,34 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.engine.api.HashReferenceMap;
+import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.api.Scope;
-import com.zutubi.pulse.core.engine.api.Property;
-
-/**
- * 
- *
- */
-public class VariableHelperTest extends ZutubiTestCase
+public class ReferenceResolverTest extends ZutubiTestCase
 {
-
-    private Scope scope = null;
+    private ReferenceMap scope = null;
 
     public void setUp() throws FileLoadException
     {
-        scope = new PulseScope();
-        scope.addUnique(new Property("foo", "foo"));
-        scope.addUnique(new Property("bar", "baz"));
-        scope.addUnique(new Property("a\\b", "slashed"));
-        scope.addUnique(new Property("empty", ""));
+        scope = new HashReferenceMap();
+        scope.add(new Property("foo", "foo"));
+        scope.add(new Property("bar", "baz"));
+        scope.add(new Property("a\\b", "slashed"));
+        scope.add(new Property("empty", ""));
     }
 
     private void errorTest(String input, String expectedError)
     {
-        String result = "";
+        String result;
 
         try
         {
-            result = VariableHelper.replaceVariables(input, scope);
+            result = ReferenceResolver.resolveReferences(input, scope);
             fail("Expected config exception, got '" + result + "'");
         }
         catch (PulseException e)
@@ -44,13 +39,13 @@ public class VariableHelperTest extends ZutubiTestCase
 
     private void successTest(String in, String out) throws Exception
     {
-        String result = VariableHelper.replaceVariables(in, scope);
+        String result = ReferenceResolver.resolveReferences(in, scope);
         assertEquals(out, result);
     }
 
     private void successSplitTest(String in, String... out) throws Exception
     {
-        List<String> result = VariableHelper.splitAndReplaceVariables(in, scope, VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
+        List<String> result = ReferenceResolver.splitAndResolveReferences(in, scope, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
         assertEquals(Arrays.asList(out), result);
     }
 
@@ -59,7 +54,7 @@ public class VariableHelperTest extends ZutubiTestCase
         List<String> result;
         try
         {
-            result = VariableHelper.splitAndReplaceVariables(input, scope, VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
+            result = ReferenceResolver.splitAndResolveReferences(input, scope, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
             fail("Expected config exception, got '" + result + "'");
         }
         catch (PulseException e)
@@ -88,14 +83,14 @@ public class VariableHelperTest extends ZutubiTestCase
         errorTest("hoorah \\", "Syntax error: unexpected end of input in escape sequence (\\)");
     }
 
-    public void testEmptyVariable()
+    public void testEmptyReference()
     {
-        errorTest("${}", "Syntax error: empty variable reference");
+        errorTest("${}", "Syntax error: empty reference");
     }
 
-    public void testUnknownVariable()
+    public void testUnknownReference()
     {
-        errorTest("${greebo}", "Reference to unknown variable 'greebo'");
+        errorTest("${greebo}", "Unknown reference 'greebo'");
     }
 
     public void testSimpleSubstitution() throws Exception
@@ -148,14 +143,14 @@ public class VariableHelperTest extends ZutubiTestCase
         successTest("\\\\\\x", "\\x");
     }
 
-    public void testSlashInVariable() throws Exception
+    public void testSlashInReference() throws Exception
     {
         successTest("${a\\b}", "slashed");
     }
 
-    public void testNestedVariable() throws Exception
+    public void testNestedReference() throws Exception
     {
-        scope.addUnique(new Property("a", "${foo}"));
+        scope.add(new Property("a", "${foo}"));
         successTest("${a}", "${foo}");
     }
 
@@ -234,31 +229,31 @@ public class VariableHelperTest extends ZutubiTestCase
         successSplitTest("\"inside \\\" quotes\"", "inside \" quotes");
     }
 
-    public void testSplitVariableReference() throws Exception
+    public void testSplitSingleReference() throws Exception
     {
         successSplitTest("${bar}", "baz");
     }
 
-    public void testSplitAroundVariableReferences() throws Exception
+    public void testSplitAroundMultipleReferences() throws Exception
     {
         successSplitTest("${foo} and ${bar}", "foo", "and", "baz");
     }
 
-    public void testSplitVariableReferenceInQuotes() throws Exception
+    public void testSplitReferenceInQuotes() throws Exception
     {
         successSplitTest("quotes \"around ${bar}\"", "quotes", "around baz");
     }
 
-    public void testSplitQuotesInVariableReference() throws Exception
+    public void testSplitQuotesInReference() throws Exception
     {
-        scope.addUnique(new Property("a\"b", "val"));
-        successSplitTest("odd ${a\"b} variable", "odd", "val", "variable");        
+        scope.add(new Property("a\"b", "val"));
+        successSplitTest("odd ${a\"b} ref", "odd", "val", "ref");
     }
 
-    public void testSplitSpaceInVariableReference() throws Exception
+    public void testSplitSpaceInReference() throws Exception
     {
-        scope.addUnique(new Property("space invader", "val"));
-        successSplitTest("odd ${space invader} variable", "odd", "val", "variable");
+        scope.add(new Property("space invader", "val"));
+        successSplitTest("odd ${space invader} ref", "odd", "val", "ref");
     }
 
     public void testSplitSpaceAtStart() throws Exception
@@ -296,19 +291,19 @@ public class VariableHelperTest extends ZutubiTestCase
         successSplitTest("empty\"\" adjacent", "empty", "adjacent");
     }
 
-    public void testSplitEmptyVariable() throws Exception
+    public void testSplitEmptyReference() throws Exception
     {
         successSplitTest("${empty}");
     }
 
-    public void testSplitQuotedEmptyVariable() throws Exception
+    public void testSplitQuotedEmptyReference() throws Exception
     {
         successSplitTest("\"${empty}\"", "");
     }
 
-    public void testSplitEmptyVariableAdjacent() throws Exception
+    public void testSplitEmptyReferenceAdjacent() throws Exception
     {
-        successSplitTest("adjacent${empty} variable", "adjacent", "variable");
+        successSplitTest("adjacent${empty} ref", "adjacent", "ref");
     }
 
     public void testSplitUnterminatedQuotes() throws Exception

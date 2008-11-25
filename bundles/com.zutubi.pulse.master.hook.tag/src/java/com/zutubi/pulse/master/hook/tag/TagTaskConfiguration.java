@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.hook.tag;
 
-import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
@@ -72,7 +71,7 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         ScmClient client = null;
         try
         {
-            String tagName = VariableHelper.replaceVariables(tag, context.getScope(), VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
+            String tagName = context.resolveReferences(tag);
             client = scmManager.createClient(scm);
             if(client.getCapabilities(project.isInitialised()).contains(ScmCapability.TAG))
             {

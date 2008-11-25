@@ -2,10 +2,6 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.api.PulseException;
 
-/**
- * 
- *
- */
 public class FileLoaderTest extends FileLoaderTestBase
 {
     public void setUp() throws Exception 
@@ -135,7 +131,7 @@ public class FileLoaderTest extends FileLoaderTestBase
 
     public void testMacroRefNotFound() throws Exception
     {
-        errorHelper("testMacroRefNotFound", "Unknown variable reference 'not-found'");
+        errorHelper("testMacroRefNotFound", "Unknown reference 'not-found'");
     }
 
     public void testMacroRefUnknownAttribute() throws Exception

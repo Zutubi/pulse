@@ -1,8 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
-import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.VariableHelper;
+import com.zutubi.pulse.core.ReferenceResolver;
+import com.zutubi.pulse.core.ResolutionException;
 import com.zutubi.pulse.core.engine.api.HashReferenceMap;
 import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.ReferenceMap;
@@ -155,35 +154,34 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     {
         if(TextUtils.stringSet(url))
         {
-            ReferenceMap scope = new HashReferenceMap();
-            scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
+            ReferenceMap references = new HashReferenceMap();
+            references.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
 
             Map<String, Object> properties = ChangeViewerUtils.getRevisionProperties(revision);
             if (properties.containsKey(ChangeViewerUtils.PROPERTY_AUTHOR))
             {
-                scope.add(new Property(PROPERTY_AUTHOR, (String) properties.get(ChangeViewerUtils.PROPERTY_AUTHOR)));
+                references.add(new Property(PROPERTY_AUTHOR, (String) properties.get(ChangeViewerUtils.PROPERTY_AUTHOR)));
             }
 
             if (properties.containsKey(ChangeViewerUtils.PROPERTY_BRANCH))
             {
-                scope.add(new Property(PROPERTY_BRANCH, (String) properties.get(ChangeViewerUtils.PROPERTY_BRANCH)));
+                references.add(new Property(PROPERTY_BRANCH, (String) properties.get(ChangeViewerUtils.PROPERTY_BRANCH)));
             }
 
             if (properties.containsKey(ChangeViewerUtils.PROPERTY_DATE))
             {
                 Date date = (Date) properties.get(ChangeViewerUtils.PROPERTY_DATE);
-                scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(date)));
-                scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(date)));
+                references.add(new Property(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(date)));
+                references.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(date)));
             }
 
             try
             {
-                return VariableHelper.replaceVariables(url, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
+                return ReferenceResolver.resolveReferences(url, references, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
             }
-            catch (FileLoadException e)
+            catch (ResolutionException e)
             {
-                // Never happens with allowUnresolved set to true
-                e.printStackTrace();
+                // Never happens with non-strict resolution
             }
         }
 
@@ -194,12 +192,12 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     {
         if (TextUtils.stringSet(url))
         {
-            PulseScope scope = new PulseScope();
-            scope.add(new Property(PROPERTY_PATH, StringUtils.urlEncodePath(fileChange.getPath())));
-            scope.add(new Property(PROPERTY_PATH_RAW, fileChange.getPath()));
-            scope.add(new Property(PROPERTY_PATH_FORM, StringUtils.formUrlEncode(fileChange.getPath())));
-            scope.add(new Property(PROPERTY_REVISION, fileChange.getRevision().getRevisionString()));
-            scope.add(new Property(PROPERTY_CHANGE_REVISION, context.getChangelist().getRevision().getRevisionString()));
+            ReferenceMap references = new HashReferenceMap();
+            references.add(new Property(PROPERTY_PATH, StringUtils.urlEncodePath(fileChange.getPath())));
+            references.add(new Property(PROPERTY_PATH_RAW, fileChange.getPath()));
+            references.add(new Property(PROPERTY_PATH_FORM, StringUtils.formUrlEncode(fileChange.getPath())));
+            references.add(new Property(PROPERTY_REVISION, fileChange.getRevision().getRevisionString()));
+            references.add(new Property(PROPERTY_CHANGE_REVISION, context.getChangelist().getRevision().getRevisionString()));
 
             // Quick check to see if there is a chance we need to calculate the
             // previous revision.  May have false positives, but that is OK, we
@@ -209,7 +207,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
                 Revision previousFileRevision = context.getPreviousFileRevision(fileChange);
                 if (previousFileRevision != null)
                 {
-                    scope.add(new Property(PROPERTY_PREVIOUS_REVISION, previousFileRevision.getRevisionString()));
+                    references.add(new Property(PROPERTY_PREVIOUS_REVISION, previousFileRevision.getRevisionString()));
                 }
             }
 
@@ -220,15 +218,15 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
                 Revision previousChangelistRevision = context.getPreviousChangelistRevision();
                 if (previousChangelistRevision != null)
                 {
-                    scope.add(new Property(PROPERTY_PREVIOUS_CHANGE_REVISION, previousChangelistRevision.getRevisionString()));
+                    references.add(new Property(PROPERTY_PREVIOUS_CHANGE_REVISION, previousChangelistRevision.getRevisionString()));
                 }
             }
 
             try
             {
-                return VariableHelper.replaceVariables(url, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
+                return ReferenceResolver.resolveReferences(url, references, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
             }
-            catch (FileLoadException e)
+            catch (ResolutionException e)
             {
                 // Never happens with non-strict resolution
             }
@@ -239,18 +237,18 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
     public static void validateChangesetURL(String url)
     {
-        PulseScope scope = new PulseScope();
-        scope.add(new Property(PROPERTY_REVISION, ""));
-        scope.add(new Property(PROPERTY_AUTHOR, ""));
-        scope.add(new Property(PROPERTY_BRANCH, ""));
-        scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, ""));
-        scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, ""));
+        ReferenceMap references = new HashReferenceMap();
+        references.add(new Property(PROPERTY_REVISION, ""));
+        references.add(new Property(PROPERTY_AUTHOR, ""));
+        references.add(new Property(PROPERTY_BRANCH, ""));
+        references.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, ""));
+        references.add(new Property(PROPERTY_TIMESTAMP_PULSE, ""));
 
         try
         {
-            VariableHelper.replaceVariables(url, scope);
+            ReferenceResolver.resolveReferences(url, references);
         }
-        catch (FileLoadException e)
+        catch (ResolutionException e)
         {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
@@ -258,16 +256,16 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
     public static void validateFileURL(String url)
     {
-        PulseScope scope = new PulseScope();
-        scope.add(new Property(PROPERTY_PATH, ""));
-        scope.add(new Property(PROPERTY_REVISION, ""));
-        scope.add(new Property(PROPERTY_PREVIOUS_REVISION, ""));
+        ReferenceMap references = new HashReferenceMap();
+        references.add(new Property(PROPERTY_PATH, ""));
+        references.add(new Property(PROPERTY_REVISION, ""));
+        references.add(new Property(PROPERTY_PREVIOUS_REVISION, ""));
 
         try
         {
-            VariableHelper.replaceVariables(url, scope);
+            ReferenceResolver.resolveReferences(url, references);
         }
-        catch (FileLoadException e)
+        catch (ResolutionException e)
         {
             throw new IllegalArgumentException(e.getMessage(), e);
         }

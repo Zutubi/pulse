@@ -1,8 +1,10 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.engine.api.Reference;
-import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.api.ReferenceMap;
+import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.tove.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.squeezers.BooleanSqueezer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -34,8 +36,6 @@ public class IntrospectionHelper
             PRIMITIVE_TYPE_MAP.put(primitives[i], wrappers[i]);
         }
     }
-
-    private final Class bean;
 
     private Method setText;
 
@@ -75,10 +75,8 @@ public class IntrospectionHelper
 
     private IntrospectionHelper(final Class bean, Map<String, Class> typeDefinitions)
     {
-        this.bean = bean;
-
         // initialise helper:
-        Method[] methods = this.bean.getMethods();
+        Method[] methods = bean.getMethods();
         for (final Method method : methods)
         {
 
@@ -197,8 +195,8 @@ public class IntrospectionHelper
      */
     private interface AttributeSetter
     {
-        void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
-                throws InvocationTargetException, IllegalAccessException, FileLoadException;
+        void set(Object parent, String value, ReferenceResolver.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
+                throws InvocationTargetException, IllegalAccessException, FileLoadException, ResolutionException;
     }
 
     /**
@@ -209,23 +207,13 @@ public class IntrospectionHelper
         public void add(Object parent, Object arg, Scope scope) throws InvocationTargetException, IllegalAccessException;
     }
 
-    /**
-     * Convert the specified method name into its associated property name.
-     * NOTE: This method does not follow the standard bean conventions.
-     *
-     * @param methodName
-     */
+     // NOTE: This method does not follow the standard bean conventions.
     private String getPropertyName(String methodName, String prefix)
     {
         // cut of the set, lowercase the first letter.
         return methodName.substring(prefix.length(), prefix.length() + 1).toLowerCase() + methodName.substring(prefix.length() + 1);
     }
 
-    /**
-     *
-     * @param method
-     * @param arg
-     */
     private AttributeSetter createAttributeSetter(final Method method, Class arg, final Map<String, Class> typeDefinitions)
     {
         // Simplify things by treating primities like there wrapper classes.
@@ -237,10 +225,10 @@ public class IntrospectionHelper
             // String argument requires no conversion.
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
-                        throws InvocationTargetException, IllegalAccessException, FileLoadException
+                public void set(Object parent, String value, ReferenceResolver.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
+                        throws InvocationTargetException, IllegalAccessException, FileLoadException, ResolutionException
                 {
-                    method.invoke(parent, VariableHelper.replaceVariables(value, referenceMap, resolutionStrategy));
+                    method.invoke(parent, ReferenceResolver.resolveReferences(value, referenceMap, resolutionStrategy));
                 }
             };
         }
@@ -249,7 +237,7 @@ public class IntrospectionHelper
             // Boolean argument uses custom conversion.
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
+                public void set(Object parent, String value, ReferenceResolver.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     method.invoke(parent, toBoolean(value));
@@ -263,7 +251,7 @@ public class IntrospectionHelper
             // char and Character get special treatment - take the first character
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
+                public void set(Object parent, String value, ReferenceResolver.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     if (value.length() == 0)
@@ -280,7 +268,7 @@ public class IntrospectionHelper
             // Class argument uses Class.forName() conversion.
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
+                public void set(Object parent, String value, ReferenceResolver.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     try
@@ -297,11 +285,11 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
-                        throws InvocationTargetException, IllegalAccessException, FileLoadException
+                public void set(Object parent, String value, ReferenceResolver.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
+                        throws InvocationTargetException, IllegalAccessException, FileLoadException, ResolutionException
                 {
                     // lookup the type object within the projects references.
-                    Object obj = VariableHelper.replaceVariable(value, referenceMap);
+                    Object obj = ReferenceResolver.resolveReference(value, referenceMap);
 
                     if (!reflectedArg.isAssignableFrom(obj.getClass()))
                     {
@@ -347,10 +335,10 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
-                        throws InvocationTargetException, IllegalAccessException, FileLoadException
+                public void set(Object parent, String value, ReferenceResolver.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
+                        throws InvocationTargetException, IllegalAccessException, FileLoadException, ResolutionException
                 {
-                    method.invoke(parent, VariableHelper.splitAndReplaceVariables(value, referenceMap, resolutionStrategy));
+                    method.invoke(parent, ReferenceResolver.splitAndResolveReferences(value, referenceMap, resolutionStrategy));
                 }
             };
         }
@@ -364,11 +352,11 @@ public class IntrospectionHelper
 
                 return new AttributeSetter()
                 {
-                    public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap) throws InvocationTargetException, IllegalAccessException, FileLoadException
+                    public void set(Object parent, String value, ReferenceResolver.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap) throws InvocationTargetException, IllegalAccessException, FileLoadException, ResolutionException
                     {
                         try
                         {
-                            Object attribute = c.newInstance(VariableHelper.replaceVariables(value, referenceMap, resolutionStrategy));
+                            Object attribute = c.newInstance(ReferenceResolver.resolveReferences(value, referenceMap, resolutionStrategy));
                             method.invoke(parent, attribute);
                         } catch (InstantiationException ie)
                         {
@@ -423,8 +411,8 @@ public class IntrospectionHelper
         return nestedCreators.get(name).create(parent);
     }
 
-    public void set(String name, Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
-            throws IllegalAccessException, InvocationTargetException, ParseException, FileLoadException
+    public void set(String name, Object parent, String value, ReferenceResolver.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
+            throws IllegalAccessException, InvocationTargetException, ParseException, FileLoadException, ResolutionException
     {
         AttributeSetter setter = attributeSetters.get(name);
         if (setter == null)
@@ -457,15 +445,20 @@ public class IntrospectionHelper
      * Custom data conversion for string to boolean. Expand on default
      * conversion and include on and yes.
      *
-     * @param str
+     * @param str string to convert
      * @return will return true if the specified string is 'on', 'true' or 'yes'
      *         and false otherwise.
      */
     public static boolean toBoolean(String str)
     {
-        return (str.equalsIgnoreCase("on") ||
-                       str.equalsIgnoreCase("true") ||
-                       str.equalsIgnoreCase("yes"));
+        try
+        {
+            return new BooleanSqueezer().unsqueeze(str);
+        }
+        catch (SqueezeException e)
+        {
+            return false;
+        }
     }
     
 }

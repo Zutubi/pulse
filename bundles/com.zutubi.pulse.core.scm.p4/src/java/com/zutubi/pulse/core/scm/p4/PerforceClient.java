@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.VariableHelper;
+import com.zutubi.pulse.core.ReferenceResolver;
 import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
@@ -64,7 +64,7 @@ public class PerforceClient extends CachingScmClient
                 Process p;
                 try
                 {
-                    List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, referenceMap, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
+                    List<String> command = ReferenceResolver.splitAndResolveReferences(commandLine, referenceMap, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
                     p = Runtime.getRuntime().exec(command.toArray(new String[command.size()]));
                 }
                 catch(Exception e)

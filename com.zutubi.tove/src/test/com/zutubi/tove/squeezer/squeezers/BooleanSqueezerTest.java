@@ -3,9 +3,6 @@ package com.zutubi.tove.squeezer.squeezers;
 import com.zutubi.tove.squeezer.SqueezeException;
 import com.zutubi.util.junit.ZutubiTestCase;
 
-/**
- * <class-comment/>
- */
 public class BooleanSqueezerTest extends ZutubiTestCase
 {
     private BooleanSqueezer squeezer;
@@ -15,13 +12,6 @@ public class BooleanSqueezerTest extends ZutubiTestCase
         super.setUp();
 
         squeezer = new BooleanSqueezer();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        squeezer = null;
-
-        super.tearDown();
     }
 
     public void testNullToString() throws SqueezeException
@@ -43,9 +33,9 @@ public class BooleanSqueezerTest extends ZutubiTestCase
 
     public void testStringToBoolean() throws SqueezeException
     {
-        assertEquals(false, squeezer.unsqueeze("false"));
-        assertEquals(false, squeezer.unsqueeze("0"));
-        assertEquals(true, squeezer.unsqueeze("true"));
+        assertEquals(Boolean.FALSE, squeezer.unsqueeze("false"));
+        assertEquals(Boolean.FALSE, squeezer.unsqueeze("0"));
+        assertEquals(Boolean.TRUE, squeezer.unsqueeze("true"));
     }
 
 }

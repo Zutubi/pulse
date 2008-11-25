@@ -1,8 +1,11 @@
 package com.zutubi.pulse.servercore;
 
-import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.ReferenceResolver;
+import com.zutubi.pulse.core.ResolutionException;
+import com.zutubi.pulse.core.engine.api.HashReferenceMap;
 import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -51,16 +54,16 @@ public class ServerRecipePaths implements RecipePaths
     public File getPersistentWorkDir()
     {
         String pattern = System.getProperty(PROPERTY_PERSISTENT_WORK_DIR, DEFAULT_PERSISTENT_WORK_DIR);
-        Scope scope = new PulseScope();
-        scope.add(new Property("data", dataDir.getAbsolutePath()));
-        scope.add(new Property("project", encode(project)));
+        ReferenceMap references = new HashReferenceMap();
+        references.add(new Property("data", dataDir.getAbsolutePath()));
+        references.add(new Property("project", encode(project)));
 
         try
         {
-            String path = VariableHelper.replaceVariables(pattern, scope, VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
+            String path = ReferenceResolver.resolveReferences(pattern, references, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
             return new File(path);
         }
-        catch (FileLoadException e)
+        catch (ResolutionException e)
         {
             LOG.warning("Invalid persistent work directory '" + pattern + "': " + e.getMessage(), e);
             return new File(dataDir, FileSystemUtils.composeFilename("work", encode(project)));
