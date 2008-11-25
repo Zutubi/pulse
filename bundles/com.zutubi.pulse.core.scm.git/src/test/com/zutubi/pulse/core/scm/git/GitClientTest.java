@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Sort;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class GitClientTest extends PulseTestCase
@@ -215,6 +218,7 @@ public class GitClientTest extends PulseTestCase
 
         List<ScmFile> files = client.browse(scmContext, "", null);
         assertEquals(3, files.size());
+        Collections.sort(files, new ScmFileComparator());
         assertEquals("a.txt", files.get(0).getName());
         assertEquals("b.txt", files.get(1).getName());
         assertEquals("c.txt", files.get(2).getName());
@@ -243,4 +247,13 @@ public class GitClientTest extends PulseTestCase
         assertTrue(new File(workingDir, GitClient.GIT_REPOSITORY_DIRECTORY).isDirectory());
     }
 
+    private static class ScmFileComparator implements Comparator<ScmFile>
+    {
+        private final Sort.StringComparator comp = new Sort.StringComparator();
+
+        public int compare(ScmFile o1, ScmFile o2)
+        {
+            return comp.compare(o1.getName(), o2.getName());
+        }
+    }
 }
