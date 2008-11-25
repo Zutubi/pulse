@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.migrate;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.tove.config.setup.DatabaseType;
 import com.zutubi.pulse.master.util.jdbc.DriverWrapper;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -22,7 +22,7 @@ import java.sql.SQLException;
  * JDBC connection.
  */
 @SymbolicName("zutubi.setupMigrateDatabaseTypeConfigurationCheckHandler")
-public class MigrateDatabaseTypeConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<MigrateDatabaseTypeConfiguration>
+public class MigrateDatabaseTypeConfigurationCheckHandler extends AbstractConfigurationCheckHandler<MigrateDatabaseTypeConfiguration>
 {
     private static final Logger LOG = Logger.getLogger(MigrateDatabaseTypeConfigurationCheckHandler.class);
     private static final String MYSQL_INSANITY = "** BEGIN NESTED EXCEPTION **";

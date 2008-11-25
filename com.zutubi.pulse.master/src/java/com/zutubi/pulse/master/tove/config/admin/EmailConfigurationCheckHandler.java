@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  */
 @SymbolicName("zutubi.emailConfigurationCheckHandler")
-public class EmailConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<EmailConfiguration>
+public class EmailConfigurationCheckHandler extends AbstractConfigurationCheckHandler<EmailConfiguration>
 {
     @Required
     private String emailAddress;

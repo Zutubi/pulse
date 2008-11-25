@@ -1,21 +1,20 @@
 package com.zutubi.pulse.core.scm.git.config;
 
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wire;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.git.GitClient;
-import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 
 /**
  * not yet implemented
  */
 @Wire
 @SymbolicName("zutubi.gitConfigurationCheckHandler")
-public class GitConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<GitConfiguration>
+public class GitConfigurationCheckHandler extends AbstractConfigurationCheckHandler<GitConfiguration>
 {
-    private ScmClientFactory<ScmConfiguration> scmClientFactory;
+    private ScmClientFactory<? super GitConfiguration> scmClientFactory;
 
     public void test(GitConfiguration configuration) throws ScmException
     {
@@ -37,7 +36,7 @@ public class GitConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
         }
     }
 
-    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientManager)
+    public void setScmClientFactory(ScmClientFactory<? super GitConfiguration> scmClientManager)
     {
         this.scmClientFactory = scmClientManager;
     }

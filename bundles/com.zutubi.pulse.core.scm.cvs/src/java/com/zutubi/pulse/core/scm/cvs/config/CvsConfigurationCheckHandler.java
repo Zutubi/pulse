@@ -1,12 +1,11 @@
 package com.zutubi.pulse.core.scm.cvs.config;
 
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wire;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 
 /**
  *
@@ -14,9 +13,9 @@ import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
  */
 @SymbolicName("zutubi.cvsConfigurationCheckHandler")
 @Wire
-public class CvsConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<CvsConfiguration>
+public class CvsConfigurationCheckHandler extends AbstractConfigurationCheckHandler<CvsConfiguration>
 {
-    private ScmClientFactory<ScmConfiguration> scmClientFactory;
+    private ScmClientFactory<? super CvsConfiguration> scmClientFactory;
 
     public void test(CvsConfiguration configuration) throws ScmException
     {
@@ -35,7 +34,7 @@ public class CvsConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
         }
     }
 
-    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientManager)
+    public void setScmClientFactory(ScmClientFactory<? super CvsConfiguration> scmClientManager)
     {
         this.scmClientFactory = scmClientManager;
     }

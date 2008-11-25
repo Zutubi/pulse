@@ -1,19 +1,19 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wire;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
-import com.zutubi.tove.config.ConfigurationCheckHandlerSupport;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 
 /**
  */
 @Wire
 @SymbolicName("zutubi.subversionConfigurationCheckHandler")
-public class SubversionConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<SubversionConfiguration>
+public class SubversionConfigurationCheckHandler extends AbstractConfigurationCheckHandler<SubversionConfiguration>
 {
-    private ScmClientFactory scmClientFactory;
+    private ScmClientFactory<? super SubversionConfiguration> scmClientFactory;
 
     public void test(SubversionConfiguration configuration) throws ScmException
     {
@@ -32,7 +32,7 @@ public class SubversionConfigurationCheckHandler extends ConfigurationCheckHandl
         }
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    public void setScmClientFactory(ScmClientFactory<? super SubversionConfiguration> scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
     }
