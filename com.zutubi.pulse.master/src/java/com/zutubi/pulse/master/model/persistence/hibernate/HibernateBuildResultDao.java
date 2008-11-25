@@ -587,11 +587,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         getHibernateTemplate().saveOrUpdate(node);
     }
 
-    public void save(PersistentName name)
-    {
-        getHibernateTemplate().saveOrUpdate(name);
-    }
-
     public void save(RecipeResult result)
     {
         getHibernateTemplate().saveOrUpdate(result);

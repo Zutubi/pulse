@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
@@ -10,7 +9,10 @@ import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -232,17 +234,6 @@ public class BuildQueryTest extends MasterPersistenceTestCase
                 return false;
             }
         });
-    }
-
-    private List<String> getNames(List<PersistentName> specs)
-    {
-        List<String> result = new ArrayList<String>(specs.size());
-        for(PersistentName n: specs)
-        {
-            result.add(n.getName());
-        }
-
-        return result;
     }
 
     private List<BuildResult> getFiltered(final int earliestStart, final int latestStart)
