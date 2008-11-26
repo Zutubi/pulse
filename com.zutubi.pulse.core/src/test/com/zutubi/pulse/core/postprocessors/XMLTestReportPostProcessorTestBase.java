@@ -47,7 +47,9 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
             // not much point running a test if the artifact being processed does not exist.
             assertTrue("File " + artifactFile.getAbsolutePath() + " does not exist.", artifactFile.exists());
 
-            pp.process(artifact, new CommandResult("test"), context);
+            CommandResult commandResult = new CommandResult("test");
+            PostProcessorContext ppContext = new DefaultPostProcessorContext(artifact, commandResult, context);
+            pp.process(artifactFile, ppContext);
         }
         
         return testResults;

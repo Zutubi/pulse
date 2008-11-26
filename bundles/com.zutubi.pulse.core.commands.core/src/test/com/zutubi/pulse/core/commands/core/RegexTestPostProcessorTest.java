@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
@@ -21,6 +22,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
     private File tmpDir = null;
     private StoredFileArtifact artifact = null;
     private CommandResult result = null;
+    private File tmpFile;
 
     public RegexTestPostProcessorTest()
     {
@@ -50,7 +52,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     private StoredFileArtifact prepareArtifact(String name) throws IOException
     {
-        File tmpFile = new File(tmpDir, name + ".txt");
+        tmpFile = new File(tmpDir, name + ".txt");
         IOUtils.joinStreams(
                 this.getClass().getResourceAsStream("RegexTestPostProcessorTest."+name+".txt"),
                 new FileOutputStream(tmpFile),
@@ -156,7 +158,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tmpDir.getAbsolutePath());
 
-        pp.process(artifact, result, context);
+        pp.process(tmpFile, new DefaultPostProcessorContext(artifact, result, context));
         return testResults;
     }
 }

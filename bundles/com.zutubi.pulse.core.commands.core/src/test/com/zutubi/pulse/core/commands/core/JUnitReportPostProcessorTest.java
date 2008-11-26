@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 
@@ -174,6 +175,6 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
 
-        pp.process(artifact, result, context);
+        pp.process(new File(outputDir, artifact.getPath()), new DefaultPostProcessorContext(artifact, result, context));
     }
 }

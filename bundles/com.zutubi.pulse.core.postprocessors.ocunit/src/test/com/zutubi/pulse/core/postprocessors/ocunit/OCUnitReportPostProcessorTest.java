@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -157,7 +158,7 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tmpDir.getAbsolutePath());
         
-        pp.process(artifact, result, context);
+        pp.process(new File(tmpDir, artifact.getPath()), new DefaultPostProcessorContext(artifact, result, context));
         return testResults;
     }
 }

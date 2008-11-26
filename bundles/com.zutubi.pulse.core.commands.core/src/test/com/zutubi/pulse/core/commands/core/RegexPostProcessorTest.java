@@ -1,12 +1,13 @@
 package com.zutubi.pulse.core.commands.core;
 
+import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.RegexPattern;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
-import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.RegexPattern;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
 
@@ -298,7 +299,7 @@ public class RegexPostProcessorTest extends PulseTestCase
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
-        pp.process(artifact, result, context);
+        pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
         List<Feature> features = artifact.getFeatures();
         assertEquals(2, features.size());
         assertEquals(Feature.Level.WARNING, features.get(0).getLevel());
@@ -394,7 +395,7 @@ public class RegexPostProcessorTest extends PulseTestCase
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
-        pp.process(artifact, result, context);
+        pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
         List<Feature> features = artifact.getFeatures();
 
         assertEquals(lines.length, features.size());

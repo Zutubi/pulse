@@ -17,16 +17,12 @@ public class DefaultPostProcessorContext implements PostProcessorContext
     private StoredFileArtifact artifact;
     private CommandResult commandResult;
     private ExecutionContext executionContext;
-    private boolean failOnError;
-    private boolean failOnWarning;
 
-    public DefaultPostProcessorContext(StoredFileArtifact artifact, CommandResult commandResult, ExecutionContext executionContext, boolean failOnError, boolean failOnWarning)
+    public DefaultPostProcessorContext(StoredFileArtifact artifact, CommandResult commandResult, ExecutionContext executionContext)
     {
         this.artifact = artifact;
         this.commandResult = commandResult;
         this.executionContext = executionContext;
-        this.failOnError = failOnError;
-        this.failOnWarning = failOnWarning;
     }
 
     public StoredFileArtifact getArtifact()
@@ -68,21 +64,6 @@ public class DefaultPostProcessorContext implements PostProcessorContext
 
     public void addFeature(Feature feature)
     {
-        switch(feature.getLevel())
-        {
-            case ERROR:
-                if (failOnError)
-                {
-                    commandResult.failure("Error features detected");
-                }
-                break;
-            case WARNING:
-                if (failOnWarning)
-                {
-                    commandResult.failure("Warning features detected");
-                }
-                break;
-        }
         artifact.addFeature(feature);
     }
 

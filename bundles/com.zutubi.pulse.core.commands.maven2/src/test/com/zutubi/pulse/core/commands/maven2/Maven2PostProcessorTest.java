@@ -7,9 +7,6 @@ import com.zutubi.util.SystemUtils;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-/**
- * Tests for RegexPostProcessor.
- */
 public class Maven2PostProcessorTest extends PostProcessorTestBase
 {
     private Maven2PostProcessor pp;
@@ -18,12 +15,6 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
     {
         pp = new Maven2PostProcessor();
         super.setUp();
-    }
-
-    public void tearDown()
-    {
-        pp = null;
-        super.tearDown();
     }
 
     public void testSuccess() throws Exception

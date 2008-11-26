@@ -22,7 +22,7 @@ import java.io.IOException;
  */
 public abstract class TextFilePostProcessorSupport extends PostProcessorSupport
 {
-    protected void process(File artifactFile, PostProcessorContext ppContext)
+    public void processFile(File artifactFile, PostProcessorContext ppContext)
     {
         BufferedReader reader = null;
         try

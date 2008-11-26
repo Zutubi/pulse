@@ -1,13 +1,14 @@
 package com.zutubi.pulse.core.commands.make;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
-import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.io.File;
@@ -80,7 +81,7 @@ public class MakePostProcessorTest extends PulseTestCase
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, file.getParentFile().getAbsolutePath());
 
-        pp.process(artifact, new CommandResult("w00t"), context);
+        pp.process(file, new DefaultPostProcessorContext(artifact, new CommandResult("w00t"), context));
         return artifact.getFeatures();
     }
 

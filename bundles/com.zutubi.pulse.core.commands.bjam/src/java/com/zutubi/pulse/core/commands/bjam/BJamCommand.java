@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.commands.bjam;
 
+import com.zutubi.pulse.core.ProcessArtifact;
 import com.zutubi.pulse.core.commands.core.ExecutableCommand;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredArtifact;
 
 /**
  */
@@ -31,14 +31,10 @@ public class BJamCommand extends ExecutableCommand
             cmdResult.getProperties().put("targets", targets);
         }
 
-        super.execute(context, cmdResult);
+        ProcessArtifact pa = createProcess();
+        pa.setProcessor(new BJamPostProcessor());
 
-        StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_ARTIFACT_NAME);
-        if(artifact != null)
-        {
-            BJamPostProcessor pp = new BJamPostProcessor();
-            pp.process(artifact.getFile(), cmdResult, context);
-        }
+        super.execute(context, cmdResult);
     }
 
     public String getJamfile()

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.commands.xcode;
 
+import com.zutubi.pulse.core.ProcessArtifact;
 import com.zutubi.pulse.core.commands.core.ExecutableCommand;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 
@@ -57,14 +57,10 @@ public class XCodeCommand extends ExecutableCommand
             cmdResult.getProperties().put("settings", StringUtils.unsplit(settings));
         }
 
+        ProcessArtifact pa = createProcess();
+        pa.setProcessor(new XCodePostProcessor("xcode.pp"));
+        
         super.execute(context, cmdResult);
-
-        StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_ARTIFACT_NAME);
-        if(artifact != null)
-        {
-            XCodePostProcessor pp = new XCodePostProcessor("xcode.pp");
-            pp.process(artifact.getFile(), cmdResult, context);
-        }
     }
 
     public String getTarget()

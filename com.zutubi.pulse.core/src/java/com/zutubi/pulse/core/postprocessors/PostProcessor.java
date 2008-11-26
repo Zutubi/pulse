@@ -1,9 +1,8 @@
 package com.zutubi.pulse.core.postprocessors;
 
 import com.zutubi.pulse.core.engine.api.Reference;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
+
+import java.io.File;
 
 
 /**
@@ -36,16 +35,11 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
 public interface PostProcessor extends Reference
 {
     /**
-     * Called once for each file artifact that the processor should process.
-     * The processor is free to inspect the artifact file and make changes to
-     * the artifact and/or command result (e.g. add features or tests).
+     * Called once for each artifact file to process.  Details discovered by
+     * processing should be added via the given context.
      *
-     * @param artifact the artifact to be processed
-     * @param result   the result of the command which produced the artifact
-     * @param context  context in which the command was executed
-     * @throws com.zutubi.pulse.core.BuildException if some fatal error (one
-     *         which should error the build) is encountered that prevents
-     *         post processing
+     * @param artifactFile the file to post process
+     * @param ppContext    context in which the post processing is executing
      */
-    void process(StoredFileArtifact artifact, CommandResult result, ExecutionContext context);
+    void process(File artifactFile, PostProcessorContext ppContext);
 }
