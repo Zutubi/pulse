@@ -3,8 +3,8 @@ package com.zutubi.pulse.core.test;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
-import junit.framework.AssertionFailedError;
 import com.zutubi.util.junit.ZutubiTestCase;
+import junit.framework.AssertionFailedError;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -423,7 +423,7 @@ public abstract class PulseTestCase extends ZutubiTestCase
         String pulsePackage = System.getProperty("pulse.package");
         if (!TextUtils.stringSet(pulsePackage))
         {
-            return null;
+            throw new IllegalStateException("No pulse package specified (use the system property pulse.package)");
         }
         File pkg = new File(pulsePackage);
         if (!pkg.isFile())

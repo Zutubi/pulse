@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.engine.api.Reference;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.util.process.ProcessControl;
 import com.zutubi.util.Constants;
 import com.zutubi.util.SystemUtils;

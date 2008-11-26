@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.util.Predicate;

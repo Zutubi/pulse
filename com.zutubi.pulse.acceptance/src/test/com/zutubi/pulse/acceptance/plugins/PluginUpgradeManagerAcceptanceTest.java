@@ -37,12 +37,6 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         tmpDir = FileSystemUtils.createTempDir(PluginManagerTest.class.getName(), "");
 
         File pkgFile = getPulsePackage();
-/*
-        if (pkgFile == null)
-        {
-            pkgFile = new File("test-packages/pulse-2.0.9.zip");
-        }
-*/
 
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         paths = pluginSystem.getPluginPaths();

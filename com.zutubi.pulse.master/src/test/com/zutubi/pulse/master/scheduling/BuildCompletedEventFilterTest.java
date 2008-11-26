@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.scheduling;
 
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;

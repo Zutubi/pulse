@@ -1,11 +1,15 @@
-package com.zutubi.pulse.core.model;
+package com.zutubi.pulse.core.engine.api;
 
-import com.zutubi.util.TextUtils;
-
-import java.util.*;
-
+/**
+ * The possible states for a build, stage or command result.  Indicates what
+ * step of the lifecycle the result has reached, and in the case of a completed
+ * result whether it succeeded.
+ */
 public enum ResultState
 {
+    /**
+     * The result has not yet commenced.
+     */
     INITIAL
             {
                 public boolean isBroken()
@@ -28,6 +32,9 @@ public enum ResultState
                     return "pending";
                 }
             },
+    /**
+     * The result has commenced and is in progress (not yet completed).
+     */
     IN_PROGRESS
             {
                 public boolean isBroken()
@@ -50,6 +57,10 @@ public enum ResultState
                     return "in progress";
                 }
             },
+    /**
+     * The result has been asked forcefully to complete, and will do so as soon
+     * as possible.
+     */
     TERMINATING
             {
                 public boolean isBroken()
@@ -72,6 +83,9 @@ public enum ResultState
                     return "terminating";
                 }
             },
+    /**
+     * The result completed successfully.
+     */
     SUCCESS
             {
                 public boolean isBroken()
@@ -94,6 +108,9 @@ public enum ResultState
                     return "success";
                 }
             },
+    /**
+     * The result has completed and has failed due to a build problem.
+     */
     FAILURE
             {
                 public boolean isBroken()
@@ -116,6 +133,9 @@ public enum ResultState
                     return "failure";
                 }
             },
+    /**
+     * The result has completed and has failed due to an external problem.
+     */
     ERROR
             {
                 public boolean isBroken()
@@ -139,13 +159,6 @@ public enum ResultState
                 }
             };
 
-    public abstract boolean isBroken();
-    public abstract boolean isCompleted();
-    public abstract String getPrettyString();
-    public abstract String getString();
-
-
-    public static final String SEPARATOR = ",";
     private static final ResultState[] BROKEN_STATES;
     private static final ResultState[] COMPLETED_STATES;
     private static final ResultState[] INCOMPLETE_STATES;
@@ -196,134 +209,45 @@ public enum ResultState
         }
     }
 
-    public static List<String> getNames(List<ResultState> states)
-    {
-        List<String> result = new ArrayList<String>(states.size());
-        for(ResultState state: states)
-        {
-            result.add(state.toString());
-        }
-        return result;
-    }
-
-    public static String getStatesString(ResultState... states)
-    {
-        return getStateNamesString(getNames(Arrays.asList(states)));
-    }
-
-    public static String getStatesString(List<ResultState> states)
-    {
-        return getStateNamesString(getNames(states));
-    }
-
-    public static String getStateNamesString(List<String> stateNames)
-    {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-
-        for(String s: stateNames)
-        {
-            if(first)
-            {
-                first = false;
-            }
-            else
-            {
-                result.append(SEPARATOR);
-            }
-
-            result.append(s);
-        }
-
-        return result.toString();
-    }
-
-    public static List<String> getNamesList(String value)
-    {
-        return getNames(getStatesList(value));
-    }
-
-    public static List<ResultState> getStatesList(String value)
-    {
-        return Arrays.asList(getStates(value));
-    }
-
-    public static List<ResultState> getStatesList(List<String> names)
-    {
-        List<ResultState> result = new LinkedList<ResultState>();
-        if (names != null)
-        {
-            for(String name: names)
-            {
-                result.add(ResultState.valueOf(name));
-            }
-        }
-        return result;
-    }
-
-    public static ResultState[] getStates(String value)
-    {
-        if(!TextUtils.stringSet(value))
-        {
-            return new ResultState[0];
-        }
-
-        String[] parts = value.split(SEPARATOR);
-        ResultState[] states = new ResultState[parts.length];
-
-        for(int i = 0; i < parts.length; i++)
-        {
-            states[i] = ResultState.valueOf(parts[i]);
-        }
-
-        return states;
-    }
-
+    /**
+     * @return the set of states that return true from {@link #isBroken()}
+     */
     public static ResultState[] getBrokenStates()
     {
         return BROKEN_STATES;
     }
     
+    /**
+     * @return the set of states that return true from {@link #isCompleted()}
+     */
     public static ResultState[] getCompletedStates()
     {
         return COMPLETED_STATES;
     }
 
-    public static Map<String, String> getCompletedStatesMap()
-    {
-        Map<String, String> states = new LinkedHashMap<String, String>();
-        for(ResultState state: getCompletedStates())
-        {
-            states.put(state.toString(), state.toString().toLowerCase());
-        }
-
-        return states;
-    }
-
-    public static String[] getCompletedStateNames()
-    {
-        ResultState[] states = getCompletedStates();
-        String[] result = new String[states.length];
-        for(int i = 0; i < states.length; i++)
-        {
-            result[i] = states[i].toString();
-        }
-
-        return result;
-    }
-
+    /**
+     * @return the set of states that return false from {@link #isCompleted()}
+     */
     public static ResultState[] getIncompleteStates()
     {
         return INCOMPLETE_STATES;
     }
 
+    /**
+     * Returns the more severe of two completed states.  Errors take precedence
+     * over failures, and failures over success.
+     *
+     * @param s1 the first completed state
+     * @param s2 the second completed state
+     * @return the more severe of the two completed states
+     */
     public static ResultState getWorseState(ResultState s1, ResultState s2)
     {
-        if(s1 == ERROR || s2 == ERROR)
+        if (s1 == ERROR || s2 == ERROR)
         {
             return ERROR;
         }
-        else if(s1 == FAILURE || s2 == FAILURE)
+        else if (s1 == FAILURE || s2 == FAILURE)
         {
             return FAILURE;
         }
@@ -333,6 +257,13 @@ public enum ResultState
         }
     }
 
+    /**
+     * Parses a pretty string representation back into a state.
+     *
+     * @param prettyString the pretty string, as returned by {@link #getPrettyString()}
+     * @return the state that has the given pretty string
+     * @throws IllegalArgumentException if no state has the given pretty string
+     */
     public static ResultState fromPrettyString(String prettyString)
     {
         for(ResultState state: values())
@@ -345,4 +276,23 @@ public enum ResultState
 
         throw new IllegalArgumentException("No such result state '" + prettyString + "'");
     }
+
+    /**
+     * @return true if this state indicates a result that is complete but
+     *         unsuccessful
+     */
+    public abstract boolean isBroken();
+
+    /**
+     * @return true if this state indicates a result that is complete
+     */
+    public abstract boolean isCompleted();
+    /**
+     * @return a human-readable string for this state
+     */
+    public abstract String getPrettyString();
+    /**
+     * @return an all lower-case machine-readable string for this state
+     */
+    public abstract String getString();
 }

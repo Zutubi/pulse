@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
-import com.zutubi.tove.annotations.ControllingCheckbox;
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Select;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.events.build.BuildEvent;
 import com.zutubi.pulse.master.events.build.PostBuildEvent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.tove.annotations.ControllingCheckbox;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.Select;
+import com.zutubi.tove.annotations.SymbolicName;
 
 import java.util.LinkedList;
 import java.util.List;

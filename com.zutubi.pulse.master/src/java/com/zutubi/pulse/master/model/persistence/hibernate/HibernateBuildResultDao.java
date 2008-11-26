@@ -1,6 +1,10 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
@@ -398,7 +402,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             {
                 Query queryObject = session.createQuery("select count (*) from BuildResult model where model.user = :user and model.stateName in (:stateNames)");
                 queryObject.setEntity("user", user);
-                queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
+                queryObject.setParameterList("stateNames", getStateNames(ResultState.getCompletedStates()));
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.uniqueResult();
             }
@@ -418,7 +422,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 {
                     Query queryObject = session.createQuery("from BuildResult model where model.user = :user and model.stateName in (:stateNames) order by model.number asc");
                     queryObject.setEntity("user", user);
-                    queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
+                    queryObject.setParameterList("stateNames", getStateNames(ResultState.getCompletedStates()));
                     if(max > 0)
                     {
                         queryObject.setMaxResults(max);

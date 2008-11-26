@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.charting;
 
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.Constants;
 
 /**

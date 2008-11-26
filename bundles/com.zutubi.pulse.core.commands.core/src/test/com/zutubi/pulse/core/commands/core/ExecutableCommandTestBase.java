@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.Command;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;

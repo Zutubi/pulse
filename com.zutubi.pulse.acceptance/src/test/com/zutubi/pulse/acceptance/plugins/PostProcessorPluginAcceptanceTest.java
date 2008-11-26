@@ -1,8 +1,10 @@
 package com.zutubi.pulse.acceptance.plugins;
 
-import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.PulseFile;
+import com.zutubi.pulse.core.PulseFileLoader;
+import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.test.PulseTestCase;
@@ -11,10 +13,6 @@ import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.File;
 
-/**
- *
- *
- */
 public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 {
     private PostProcessorExtensionManager extensionManager;
@@ -22,7 +20,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
     private PulseFileLoaderFactory loaderFactory;
     private File tmpDir;
     private PluginSystem pluginSystem;
-    private File samplePostProccorPlugin;
+    private File samplePostProcessorPlugin;
 
     protected void setUp() throws Exception
     {
@@ -32,14 +30,13 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         tmpDir = FileSystemUtils.createTempDir();
 
         File pkgFile = getPulsePackage();
-
         if (!pkgFile.exists())
         {
             fail("Pulse package file '" + pkgFile.getAbsolutePath() + "'does not exist.");
         }
 
         File dataDir = new File(getPulseRoot(), FileSystemUtils.join("com.zutubi.pulse.acceptance", "src", "test", "data"));
-        samplePostProccorPlugin = new File(dataDir, "com.zutubi.bundles.postprocessor.sample_1.0.0.jar");
+        samplePostProcessorPlugin = new File(dataDir, "com.zutubi.bundles.postprocessor.sample_1.0.0.jar");
 
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         pluginSystem.startup();
@@ -56,14 +53,8 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        // tear down the plugin system.
         pluginSystem.shutdown();
-        pluginSystem = null;
-        loaderFactory = null;
-        extensionManager = null;
-
         removeDirectory(tmpDir);
-        tmpDir = null;
 
         super.tearDown();
     }
@@ -71,7 +62,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
     public void testPostProcessorPlugins() throws PulseException, InterruptedException
     {
         // install test plugin.
-        Plugin plugin = pluginSystem.install(samplePostProccorPlugin);
+        Plugin plugin = pluginSystem.install(samplePostProcessorPlugin);
         assertEquals(Plugin.State.ENABLED, plugin.getState());
 
         // need to yield since the extension manager is notified of the new plugin asynchronously.

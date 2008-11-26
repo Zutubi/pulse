@@ -6,11 +6,11 @@ import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.Constants;
+import com.zutubi.util.FileSystemUtils;
 import static com.zutubi.util.FileSystemUtils.createTempDir;
 import static com.zutubi.util.FileSystemUtils.join;
 import com.zutubi.util.NullUnaryProcedure;
 import com.zutubi.util.UnaryProcedure;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -138,7 +138,6 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         // master-port
         // tmp/master-data
         File pulsePackage = getPulsePackage();
-        assertNotNull("No pulse package specified (use the system property pulse.package)", pulsePackage);
         PulsePackage masterPackage = packageFactory.createPackage(pulsePackage);
         master = masterPackage.extractTo(new File(tmp, "master").getCanonicalPath());
         master.setUserHome(new File(tmp, "user-home").getCanonicalPath());

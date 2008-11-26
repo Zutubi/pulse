@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryProcedure;
 

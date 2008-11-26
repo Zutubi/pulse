@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.io.IOUtils;
 

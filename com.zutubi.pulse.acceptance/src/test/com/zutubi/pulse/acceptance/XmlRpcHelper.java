@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;

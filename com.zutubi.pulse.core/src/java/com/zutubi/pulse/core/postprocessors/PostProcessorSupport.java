@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.postprocessors;
 
 import com.zutubi.pulse.core.SelfReference;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 

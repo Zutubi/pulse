@@ -1,13 +1,17 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.ProcessArtifact;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.RegexPattern;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_BUILD_NUMBER;
-import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.ProcessArtifact;
-import com.zutubi.pulse.core.RegexPattern;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;

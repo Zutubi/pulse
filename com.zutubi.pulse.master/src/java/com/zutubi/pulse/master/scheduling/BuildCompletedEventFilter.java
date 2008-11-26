@@ -1,12 +1,15 @@
 package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.events.Event;
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,18 +58,16 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
 
         try
         {
-            ResultState[] states = ResultState.getStates(stateString);
-            if(states != null)
+            List<ResultState> states = CollectionUtils.map(stateString.split(SEPARATOR), new Mapping<String, ResultState>()
             {
-                ResultState state = event.getBuildResult().getState();
-                for(ResultState s: states)
+                public ResultState map(String s)
                 {
-                    if(s == state)
-                    {
-                        return true;
-                    }
+                    return ResultState.valueOf(s);
                 }
-            }
+            });
+
+            ResultState state = event.getBuildResult().getState();
+            return states.contains(state);
         }
         catch (IllegalArgumentException e)
         {

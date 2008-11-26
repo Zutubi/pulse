@@ -1,14 +1,17 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
-import com.zutubi.tove.annotations.*;
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.scheduling.BuildCompletedEventFilter;
 import com.zutubi.pulse.master.scheduling.EventTrigger;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Required;
 
 import java.io.Serializable;
@@ -121,7 +124,15 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
 
         if(states != null && states.size() > 0)
         {
-            dataMap.put(BuildCompletedEventFilter.PARAM_STATES, ResultState.getStatesString(states));
+            List<String> stateNames = CollectionUtils.map(states, new Mapping<ResultState, String>()
+            {
+                public String map(ResultState resultState)
+                {
+                    return resultState.toString();
+                }
+            });
+
+            dataMap.put(BuildCompletedEventFilter.PARAM_STATES, StringUtils.join(BuildCompletedEventFilter.SEPARATOR, stateNames));
         }
         else
         {

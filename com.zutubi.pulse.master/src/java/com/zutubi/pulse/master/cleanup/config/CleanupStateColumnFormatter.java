@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.cleanup.config;
 
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.table.ColumnFormatter;
 
 import java.util.List;
