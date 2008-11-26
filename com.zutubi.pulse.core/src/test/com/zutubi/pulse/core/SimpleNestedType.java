@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.api.SelfReference;
+
 import java.util.LinkedList;
 import java.util.List;
 

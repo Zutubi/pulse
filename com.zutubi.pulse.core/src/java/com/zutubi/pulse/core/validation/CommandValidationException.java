@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.validation;
 
-import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.validation.ValidationContext;
 
 import java.util.List;

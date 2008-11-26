@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.SelfReference;
-import com.zutubi.pulse.core.postprocessors.PostProcessor;
-import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
+import com.zutubi.pulse.core.engine.api.SelfReference;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 
 import java.io.File;
 import java.util.LinkedList;

@@ -7,8 +7,10 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestCaseResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.TestResult;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorSupport;
 import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.io.File;

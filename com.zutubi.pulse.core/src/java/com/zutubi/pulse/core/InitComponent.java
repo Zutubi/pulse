@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.api.FileLoadException;
+
 /**
  * 
  *

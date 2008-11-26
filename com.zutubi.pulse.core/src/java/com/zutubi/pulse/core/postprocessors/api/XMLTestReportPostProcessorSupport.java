@@ -1,7 +1,5 @@
-package com.zutubi.pulse.core.postprocessors;
+package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.postprocessors.api.Feature;
-import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -35,7 +33,7 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
         this.reportType = reportType;
     }
 
-    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
+    protected final void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
     {
         FileInputStream input = null;
 

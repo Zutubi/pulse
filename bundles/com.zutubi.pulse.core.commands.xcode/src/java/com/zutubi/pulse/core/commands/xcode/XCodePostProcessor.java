@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.commands.xcode;
 
 import com.zutubi.pulse.core.commands.core.PostProcessorGroup;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
-import com.zutubi.pulse.core.postprocessors.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 
 /**
  * <class-comment/>

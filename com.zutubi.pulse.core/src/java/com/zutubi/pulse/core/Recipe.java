@@ -1,14 +1,11 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.engine.api.*;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.CommandCommencedEvent;
 import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.engine.api.Reference;
-import com.zutubi.pulse.core.engine.api.Scope;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;

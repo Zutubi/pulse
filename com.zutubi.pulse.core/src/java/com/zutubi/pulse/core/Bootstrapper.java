@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.api.BuildException;
+
 /**
  * Bootstrappers are used to initialise a working area ready for a build.
  */

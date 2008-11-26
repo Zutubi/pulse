@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
 import java.util.LinkedHashMap;

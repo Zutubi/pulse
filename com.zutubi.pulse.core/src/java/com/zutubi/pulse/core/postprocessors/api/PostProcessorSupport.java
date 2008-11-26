@@ -1,10 +1,8 @@
-package com.zutubi.pulse.core.postprocessors;
+package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.SelfReference;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
-import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
-import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+import com.zutubi.pulse.core.engine.api.SelfReference;
 
 import java.io.File;
 
@@ -17,8 +15,7 @@ import java.io.File;
  * </p>
  * <p>
  * This implementation handles standard fail on error and warning
- * capabilities, and hides the specifics of looking up the file to
- * process and adding features.
+ * capabilities.
  * </p>
  *
  * @see TestReportPostProcessorSupport
@@ -77,14 +74,19 @@ public abstract class PostProcessorSupport extends SelfReference implements Post
     {
         processFile(artifactFile, new PostProcessorContext()
         {
+            public ExecutionContext getExecutionContext()
+            {
+                return ppContext.getExecutionContext();
+            }
+
             public ResultState getResultState()
             {
                 return ppContext.getResultState();
             }
 
-            public void addTestSuite(TestSuiteResult suite, NameConflictResolution conflictResolution)
+            public void addTests(TestSuiteResult suite, NameConflictResolution conflictResolution)
             {
-                ppContext.addTestSuite(suite, conflictResolution);
+                ppContext.addTests(suite, conflictResolution);
             }
 
             public void addFeature(Feature feature)

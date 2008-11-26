@@ -2,8 +2,8 @@ package com.zutubi.pulse.master;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.events.PublishFlag;
-import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;

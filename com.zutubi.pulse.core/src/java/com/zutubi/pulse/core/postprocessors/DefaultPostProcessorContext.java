@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 
 /**
@@ -47,7 +48,7 @@ public class DefaultPostProcessorContext implements PostProcessorContext
         return commandResult.getState();
     }
 
-    public void addTestSuite(TestSuiteResult suite, NameConflictResolution conflictResolution)
+    public void addTests(TestSuiteResult suite, NameConflictResolution conflictResolution)
     {
         PersistentTestSuiteResult recipeSuite = executionContext.getValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, PersistentTestSuiteResult.class);
         PersistentTestSuiteResult persistentSuite = new PersistentTestSuiteResult(suite, conflictResolution);

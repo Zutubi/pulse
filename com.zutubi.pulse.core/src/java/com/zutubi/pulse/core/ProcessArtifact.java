@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.postprocessors.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 

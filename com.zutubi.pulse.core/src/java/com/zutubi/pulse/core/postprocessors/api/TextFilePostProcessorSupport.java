@@ -1,6 +1,6 @@
-package com.zutubi.pulse.core.postprocessors;
+package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.BufferedReader;
@@ -22,7 +22,7 @@ import java.io.IOException;
  */
 public abstract class TextFilePostProcessorSupport extends PostProcessorSupport
 {
-    public void processFile(File artifactFile, PostProcessorContext ppContext)
+    public final void processFile(File artifactFile, PostProcessorContext ppContext)
     {
         BufferedReader reader = null;
         try

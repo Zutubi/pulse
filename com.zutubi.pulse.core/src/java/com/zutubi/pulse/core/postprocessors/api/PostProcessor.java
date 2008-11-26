@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.postprocessors;
+package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.pulse.core.engine.api.Reference;
 

@@ -1,10 +1,6 @@
 package com.zutubi.pulse.core.postprocessors.cunit;
 
-import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
-import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
-import com.zutubi.pulse.core.postprocessors.api.TestResult;
-import com.zutubi.pulse.core.postprocessors.api.TestStatus;
-import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.api.*;
 import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;

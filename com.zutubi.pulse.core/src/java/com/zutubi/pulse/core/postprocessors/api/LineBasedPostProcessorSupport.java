@@ -1,6 +1,5 @@
-package com.zutubi.pulse.core.postprocessors;
+package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.CircularBuffer;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
@@ -25,7 +24,7 @@ public abstract class LineBasedPostProcessorSupport extends TextFilePostProcesso
     /** @see #setJoinOverlapping(boolean) */
     private boolean joinOverlapping = true;
 
-    protected void process(BufferedReader reader, PostProcessorContext ppContext) throws IOException
+    protected final void process(BufferedReader reader, PostProcessorContext ppContext) throws IOException
     {
         List<Feature> allFeatures = new LinkedList<Feature>();
         if (leadingContext == 0 && trailingContext == 0)

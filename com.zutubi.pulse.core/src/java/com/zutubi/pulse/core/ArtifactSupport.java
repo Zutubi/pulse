@@ -6,8 +6,8 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
-import com.zutubi.pulse.core.postprocessors.PostProcessor;
-import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.annotations.Required;
 

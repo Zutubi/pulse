@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;

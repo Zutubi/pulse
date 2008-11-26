@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 
 import java.util.LinkedList;

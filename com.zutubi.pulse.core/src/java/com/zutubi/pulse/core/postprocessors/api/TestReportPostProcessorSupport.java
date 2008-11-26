@@ -1,10 +1,7 @@
-package com.zutubi.pulse.core.postprocessors;
+package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
-import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
-import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import com.zutubi.util.TextUtils;
 
 import java.io.File;
@@ -46,7 +43,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
 
     /**
      * @see #setFailOnFailure(boolean)
-     * @return
+     * @return the current value of the failOnFailure flag
      */
     public boolean getFailOnFailure()
     {
@@ -96,7 +93,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
             }
 
             extractTestResults(artifactFile, ppContext, accumulateSuite);
-            ppContext.addTestSuite(suiteResult, resolveConflicts);
+            ppContext.addTests(suiteResult, resolveConflicts);
 
             ResultState state = ppContext.getResultState();
             if (failOnFailure && state != ResultState.ERROR && state != ResultState.FAILURE)
@@ -131,15 +128,18 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
     }
 
     /**
-     * FIXME NOW
      * Called once for each file to post process for test results.  Test
      * results found should be added to the given suite.  Nested suites are
      * supported.  Additional manipulation of the artifact being processed or
      * corresponding command result can be done via the context.
      *
      * @param file      file to post process to find test results
-     * @param suite     root test suite to add discovered test results to
      * @param ppContext context in which the post processor is executing
+     * @param tests     root test suite to add discovered test results to (note
+     *                  this suite itself is unnamed and not added to the
+     *                  recipe, rather it is just used to collect suites and
+     *                  cases which are then extracted and added directly to
+     *                  the recipe test results)
      */
-    protected abstract void extractTestResults(File filesuite, PostProcessorContext ppContext, TestSuiteResult tests);
+    protected abstract void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests);
 }

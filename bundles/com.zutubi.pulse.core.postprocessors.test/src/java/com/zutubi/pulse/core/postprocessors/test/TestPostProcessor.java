@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.postprocessors.test;
 
-import com.zutubi.pulse.core.SelfReference;
-import com.zutubi.pulse.core.postprocessors.PostProcessor;
-import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
+import com.zutubi.pulse.core.engine.api.SelfReference;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 
 import java.io.File;
 

@@ -1,9 +1,7 @@
-package com.zutubi.pulse.core.postprocessors;
+package com.zutubi.pulse.core.postprocessors.api;
 
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
-import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
-import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 
 /**
  * Context in which a post-processor executes.  Provides a high-level
@@ -14,6 +12,14 @@ import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 public interface PostProcessorContext
 {
     /**
+     * Returns the execution context for the build in which this processor is
+     * running.
+     *
+     * @return the current build's context
+     */
+    ExecutionContext getExecutionContext();
+
+    /**
      * Retrieves the current state for the command which produced the
      * artifact being processed.
      *
@@ -21,7 +27,17 @@ public interface PostProcessorContext
      */
     ResultState getResultState();
 
-    void addTestSuite(TestSuiteResult suite, NameConflictResolution conflictResolution);
+    /**
+     * Adds the suites and cases within the given suite directly to the test
+     * results for the running recipe.  Note that the passed suite itself is
+     * <strong>not</strong> added - the nested suites and cases are pulled
+     * out of it.
+     *
+     * @param suite              suite holding the suites and cases to add
+     * @param conflictResolution specifies how test case name conflicts should
+     *                           be resolved
+     */
+    void addTests(TestSuiteResult suite, NameConflictResolution conflictResolution);
 
     /**
      * Adds a new feature to the artifact being processed.  Any error,

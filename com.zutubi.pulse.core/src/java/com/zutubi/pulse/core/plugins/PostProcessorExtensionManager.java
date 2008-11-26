@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.zutubi.pulse.core.postprocessors.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;

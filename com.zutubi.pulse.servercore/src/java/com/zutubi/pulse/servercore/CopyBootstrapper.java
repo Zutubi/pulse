@@ -1,8 +1,8 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.BootstrapperSupport;
-import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
 

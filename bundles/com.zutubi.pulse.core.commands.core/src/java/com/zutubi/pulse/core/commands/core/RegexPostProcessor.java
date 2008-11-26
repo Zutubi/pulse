@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.RegexPattern;
-import com.zutubi.pulse.core.postprocessors.LineBasedPostProcessorSupport;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.postprocessors.api.LineBasedPostProcessorSupport;
 
 import java.util.LinkedList;
 import java.util.List;

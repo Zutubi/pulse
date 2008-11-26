@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.Reference;
 
 import java.util.Collections;

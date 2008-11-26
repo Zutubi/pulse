@@ -1,9 +1,13 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.Artifact;
+import com.zutubi.pulse.core.CommandSupport;
+import com.zutubi.pulse.core.PrecapturedArtifact;
+import com.zutubi.pulse.core.ProcessArtifact;
+import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.util.io.IOUtils;
 

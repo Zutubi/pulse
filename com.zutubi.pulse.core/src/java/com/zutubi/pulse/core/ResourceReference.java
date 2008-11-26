@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.api.ScopeAware;
 import com.zutubi.util.TextUtils;

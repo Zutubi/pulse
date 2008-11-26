@@ -1,11 +1,6 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
-import com.zutubi.pulse.core.postprocessors.TestReportPostProcessorSupport;
-import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
-import com.zutubi.pulse.core.postprocessors.api.TestResult;
-import com.zutubi.pulse.core.postprocessors.api.TestStatus;
-import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.api.*;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;

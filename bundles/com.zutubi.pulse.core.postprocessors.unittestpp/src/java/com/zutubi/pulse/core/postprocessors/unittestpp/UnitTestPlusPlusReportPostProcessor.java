@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.postprocessors.unittestpp;
 
-import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
 import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorSupport;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;

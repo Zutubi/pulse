@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.HashReferenceMap;
 import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.ReferenceMap;

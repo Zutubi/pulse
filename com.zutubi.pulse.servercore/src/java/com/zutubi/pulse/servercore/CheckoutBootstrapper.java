@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servercore;
 
-import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;

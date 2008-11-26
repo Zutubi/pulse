@@ -1,6 +1,6 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.servercore.services.MasterService;

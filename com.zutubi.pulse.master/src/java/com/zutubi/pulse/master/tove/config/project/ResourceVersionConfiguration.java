@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.ID;
