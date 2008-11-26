@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.PlainFeature;
+import com.zutubi.pulse.core.model.PersistentFeature;
+import com.zutubi.pulse.core.model.PersistentPlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.logging.Logger;
 
@@ -35,12 +36,12 @@ public class ViewDecoratedArtifactAction extends FileArtifactActionBase
     private void determineLineLevels()
     {
         lineLevels = new TreeMap<Long, Feature.Level>();
-        List<Feature> features = getFileArtifact().getFeatures();
-        for(Feature f: features)
+        List<PersistentFeature> features = getFileArtifact().getFeatures();
+        for(PersistentFeature f: features)
         {
-            if(f instanceof PlainFeature)
+            if(f instanceof PersistentPlainFeature)
             {
-                PlainFeature p = (PlainFeature) f;
+                PersistentPlainFeature p = (PersistentPlainFeature) f;
                 updateLevel(p.getLineNumber(), p.getLevel());
             }
         }

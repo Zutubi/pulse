@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.XMLUtils;
+import com.zutubi.util.FileSystemUtils;
 import nu.xom.ParsingException;
 
 import java.io.File;
@@ -35,7 +36,7 @@ public class FeaturePersisterTest extends PulseTestCase
 
     public void testSingleFeature() throws Exception
     {
-        CommandResult result = getResultWithFeatures(new PlainFeature(Feature.Level.ERROR, "summary here", 10));
+        CommandResult result = getResultWithFeatures(new PersistentPlainFeature(Feature.Level.ERROR, "summary here", 10));
         roundTrip(result);
     }
 
@@ -47,13 +48,13 @@ public class FeaturePersisterTest extends PulseTestCase
 
     public void testComplexSummary() throws Exception
     {
-        CommandResult result = getResultWithFeatures(new PlainFeature(Feature.Level.WARNING, "this is a summary that\nhas multiple lines & special\n<characters> in /> it <", 1, 10, 3));
+        CommandResult result = getResultWithFeatures(new PersistentPlainFeature(Feature.Level.WARNING, "this is a summary that\nhas multiple lines & special\n<characters> in /> it <", 1, 10, 3));
         roundTrip(result);
     }
 
     public void testControlCharacterINSummary() throws Exception
     {
-        CommandResult result = getResultWithFeatures(new PlainFeature(Feature.Level.ERROR, "summary\u0000here", 10));
+        CommandResult result = getResultWithFeatures(new PersistentPlainFeature(Feature.Level.ERROR, "summary\u0000here", 10));
         roundTrip(result);
     }
 
@@ -76,19 +77,19 @@ public class FeaturePersisterTest extends PulseTestCase
         roundTrip(result);
     }
 
-    private PlainFeature getFeature(String summary)
+    private PersistentPlainFeature getFeature(String summary)
     {
-        return new PlainFeature(Feature.Level.INFO, summary, 1, 10, 3);
+        return new PersistentPlainFeature(Feature.Level.INFO, summary, 1, 10, 3);
     }
 
-    private CommandResult getResultWithFeatures(PlainFeature... features)
+    private CommandResult getResultWithFeatures(PersistentPlainFeature... features)
     {
         CommandResult result = new CommandResult("dummy");
         StoredArtifact artifact = new StoredArtifact("artifact");
         StoredFileArtifact file = new StoredFileArtifact("path/to/file");
         result.addArtifact(artifact);
         artifact.add(file);
-        for(PlainFeature feature: features)
+        for(PersistentPlainFeature feature: features)
         {
             file.addFeature(feature);
         }
@@ -114,9 +115,9 @@ public class FeaturePersisterTest extends PulseTestCase
             for(StoredFileArtifact fa: a.getChildren())
             {
                 description.append("  ").append(fa.getPath()).append('\n');
-                for(Feature f: fa.getFeatures())
+                for(PersistentFeature f: fa.getFeatures())
                 {
-                    PlainFeature pf = (PlainFeature) f;
+                    PersistentPlainFeature pf = (PersistentPlainFeature) f;
                     description.append("    ").append(pf.getLevel()).append(':').append(pf.getFirstLine()).append(':').append(pf.getLastLine()).append(':').append(pf.getLineNumber()).append(':').append(XMLUtils.removeIllegalCharacters(pf.getSummary())).append('\n');
                 }
             }

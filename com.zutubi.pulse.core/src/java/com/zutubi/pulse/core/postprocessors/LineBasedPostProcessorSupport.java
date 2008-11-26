@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.postprocessors;
 
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.PlainFeature;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.CircularBuffer;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
@@ -9,6 +8,7 @@ import com.zutubi.validation.ValidationContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -27,11 +27,11 @@ public abstract class LineBasedPostProcessorSupport extends TextFilePostProcesso
 
     protected void process(BufferedReader reader, PostProcessorContext ppContext) throws IOException
     {
-        LineBasedPostProcessorContext lineContext = new LineBasedPostProcessorContext(ppContext);
+        List<Feature> allFeatures = new LinkedList<Feature>();
         if (leadingContext == 0 && trailingContext == 0)
         {
             // Optimise this common case
-            simpleProcess(lineContext, reader);
+            simpleProcess(reader, allFeatures);
         }
         else
         {
@@ -59,7 +59,7 @@ public abstract class LineBasedPostProcessorSupport extends TextFilePostProcesso
             {
                 lineNumber++;
                 line = trailingBuffer.getElement(0);
-                processLine(lineContext, line, lineNumber, leadingBuffer, trailingBuffer, 1);
+                processLine(line, lineNumber, leadingBuffer, trailingBuffer, 1, allFeatures);
                 leadingBuffer.append(line);
                 trailingBuffer.append(next);
             }
@@ -69,13 +69,18 @@ public abstract class LineBasedPostProcessorSupport extends TextFilePostProcesso
             {
                 lineNumber++;
                 line = trailingBuffer.getElement(i);
-                processLine(lineContext, line, lineNumber, leadingBuffer, trailingBuffer, i + 1);
+                processLine(line, lineNumber, leadingBuffer, trailingBuffer, i + 1, allFeatures);
                 leadingBuffer.append(line);
             }
         }
+
+        for (Feature f: allFeatures)
+        {
+            ppContext.addFeature(f);
+        }
     }
 
-    private void simpleProcess(LineBasedPostProcessorContext ppContext, BufferedReader reader) throws IOException
+    private void simpleProcess(BufferedReader reader, List<Feature> allFeatures) throws IOException
     {
         String line;
         long lineNumber = 0;
@@ -83,57 +88,56 @@ public abstract class LineBasedPostProcessorSupport extends TextFilePostProcesso
         while ((line = reader.readLine()) != null)
         {
             lineNumber++;
-            processLine(ppContext, line, lineNumber);
+            processLine(line, lineNumber, allFeatures);
         }
     }
 
-    private void processLine(LineBasedPostProcessorContext ppContext, String line, long lineNumber)
+    private void processLine(String line, long lineNumber, List<Feature> allFeatures)
     {
-        processLine(ppContext, line, lineNumber, null, null, 0);
+        processLine(line, lineNumber, null, null, 0, allFeatures);
     }
 
-    private void processLine(LineBasedPostProcessorContext ppContext, String line, long lineNumber, CircularBuffer<String> leadingContext, CircularBuffer<String> trailingContext, int trailingIndex)
+    private void processLine(String line, long lineNumber, CircularBuffer<String> leadingContext, CircularBuffer<String> trailingContext, int trailingIndex, List<Feature> allFeatures)
     {
         for (Feature f: findFeatures(line))
         {
-                if (leadingContext == null)
-                {
-                    addFeature(ppContext, new PlainFeature(f.getLevel(), f.getSummary(), lineNumber));
-                }
-                else
-                {
-                    // Add the context lines to the summary
-                    StringBuilder summaryBuilder = new StringBuilder();
-                    append(summaryBuilder, leadingContext, 0, true);
-                    summaryBuilder.append(f.getSummary());
-                    append(summaryBuilder, trailingContext, trailingIndex, false);
-                    addFeature(ppContext, new PlainFeature(f.getLevel(), summaryBuilder.toString(), lineNumber - leadingContext.getCount(), lineNumber + trailingContext.getCount() - trailingIndex, lineNumber));
+            if (leadingContext == null)
+            {
+                addFeature(new Feature(f.getLevel(), f.getSummary(), lineNumber), allFeatures);
+            }
+            else
+            {
+                // Add the context lines to the summary
+                StringBuilder summaryBuilder = new StringBuilder();
+                append(summaryBuilder, leadingContext, 0, true);
+                summaryBuilder.append(f.getSummary());
+                append(summaryBuilder, trailingContext, trailingIndex, false);
+                addFeature(new Feature(f.getLevel(), summaryBuilder.toString(), lineNumber, lineNumber - leadingContext.getCount(), lineNumber + trailingContext.getCount() - trailingIndex), allFeatures);
             }
         }
     }
 
-    private void addFeature(LineBasedPostProcessorContext ppContext, PlainFeature feature)
+    private void addFeature(Feature feature, List<Feature> allFeatures)
     {
-        if(canJoin(ppContext, feature))
+        if (canJoin(feature, allFeatures))
         {
             // Join with previous
-            PlainFeature previous = (PlainFeature) ppContext.getPreviousFeature();
+            Feature previous = allFeatures.remove(allFeatures.size() - 1);
             long overlappingLines = previous.getLastLine() - feature.getFirstLine() + 1;
             String remainingSummary = getRemainingSummary(feature.getSummary(), overlappingLines);
-            previous.appendToSummary(remainingSummary);
-            previous.setLastLine(feature.getLastLine());
+            allFeatures.add(new Feature(previous.getLevel(), previous.getSummary() + remainingSummary, previous.getLineNumber(), previous.getFirstLine(), feature.getLastLine()));
         }
         else
         {
-            ppContext.addFeature(feature);
+            allFeatures.add(feature);
         }
     }
 
-    private boolean canJoin(LineBasedPostProcessorContext ppContext, PlainFeature feature)
+    private boolean canJoin(Feature feature, List<Feature> allFeatures)
     {
-        if(joinOverlapping && ppContext.getPreviousFeature() != null)
+        if (joinOverlapping && allFeatures.size() > 0)
         {
-            PlainFeature previous = (PlainFeature) ppContext.getPreviousFeature();
+            Feature previous = allFeatures.get(allFeatures.size() - 1);
             return previous.getLevel() == feature.getLevel() && previous.getLastLine() >= feature.getFirstLine();
         }
 

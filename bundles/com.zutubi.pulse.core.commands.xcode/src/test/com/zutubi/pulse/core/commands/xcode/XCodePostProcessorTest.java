@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.xcode;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
 import com.zutubi.util.Constants;
@@ -33,7 +33,7 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
     {
         CommandResult result = createAndProcessArtifact(getName(), pp);
         assertTrue(result.failed());
-        List<Feature> features = artifact.getFeatures();
+        List<PersistentFeature> features = artifact.getFeatures();
         assertEquals(3, features.size());
         assertEquals("buffer line\n" +
                      "some warning: here\n" +
@@ -59,7 +59,7 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
 
         CommandResult result = createAndProcessArtifact("testSimple", pp);
         assertTrue(result.failed());
-        List<Feature> features = artifact.getFeatures();
+        List<PersistentFeature> features = artifact.getFeatures();
         assertEquals(3, features.size());
         assertEquals("some warning: here", features.get(0).getSummary());
         assertEquals("Uncaught exception: Blah", features.get(1).getSummary());

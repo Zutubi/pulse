@@ -8,6 +8,7 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_D
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
 
@@ -300,7 +301,7 @@ public class RegexPostProcessorTest extends PulseTestCase
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
         pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
-        List<Feature> features = artifact.getFeatures();
+        List<PersistentFeature> features = artifact.getFeatures();
         assertEquals(2, features.size());
         assertEquals(Feature.Level.WARNING, features.get(0).getLevel());
         assertEquals(Feature.Level.ERROR, features.get(1).getLevel());
@@ -349,9 +350,9 @@ public class RegexPostProcessorTest extends PulseTestCase
     private void checkFeatureLines(StoredFileArtifact artifact, int leading, int trailing)
     {
         int lineNumber = 1;
-        for (Feature f : artifact.getFeatures())
+        for (PersistentFeature f : artifact.getFeatures())
         {
-            PlainFeature pf = (PlainFeature) f;
+            PersistentPlainFeature pf = (PersistentPlainFeature) f;
             assertEquals(lineNumber, pf.getLineNumber());
             assertEquals(lineNumber > leading ? lineNumber - leading : 1, pf.getFirstLine());
             assertEquals(lineNumber + trailing <= LINES.length ? lineNumber + trailing : LINES.length, pf.getLastLine());
@@ -396,12 +397,12 @@ public class RegexPostProcessorTest extends PulseTestCase
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
         pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
-        List<Feature> features = artifact.getFeatures();
+        List<PersistentFeature> features = artifact.getFeatures();
 
         assertEquals(lines.length, features.size());
         for (int i = 0; i < lines.length; i++)
         {
-            Feature feature = features.get(i);
+            PersistentFeature feature = features.get(i);
             assertEquals(level, feature.getLevel());
             assertEquals(lines[i], feature.getSummary());
         }
@@ -425,7 +426,7 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     private String getFailureMessage(Result result)
     {
-        Feature feature = result.getFeatures().get(0);
+        PersistentFeature feature = result.getFeatures().get(0);
         assertEquals(Feature.Level.ERROR, feature.getLevel());
         return feature.getSummary();
     }

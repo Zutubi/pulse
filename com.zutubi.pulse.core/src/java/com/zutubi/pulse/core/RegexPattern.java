@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 
 import java.util.LinkedList;
 import java.util.List;

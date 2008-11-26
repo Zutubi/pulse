@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.Feature;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -128,9 +130,9 @@ public class StoredArtifact extends Entity
         return false;
     }
 
-    public List<Feature> getFeatures(Feature.Level level)
+    public List<PersistentFeature> getFeatures(Feature.Level level)
     {
-        List<Feature> result = new LinkedList<Feature>();
+        List<PersistentFeature> result = new LinkedList<PersistentFeature>();
         for (StoredFileArtifact child : children)
         {
             result.addAll(child.getFeatures(level));

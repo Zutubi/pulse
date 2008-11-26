@@ -5,10 +5,11 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNA
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.PlainFeature;
+import com.zutubi.pulse.core.model.PersistentFeature;
+import com.zutubi.pulse.core.model.PersistentPlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.io.File;
@@ -22,7 +23,7 @@ public class MakePostProcessorTest extends PulseTestCase
 {
     public void testCommandError() throws URISyntaxException
     {
-        List<Feature> features = getFeatures("commanderror");
+        List<PersistentFeature> features = getFeatures("commanderror");
         assertEquals(1, features.size());
         assertFeature(features.get(0), Feature.Level.ERROR,
                         "gcc foo.c\n" +
@@ -33,7 +34,7 @@ public class MakePostProcessorTest extends PulseTestCase
 
     public void testNoSuchCommand() throws URISyntaxException
     {
-        List<Feature> features = getFeatures("nosuchcommand");
+        List<PersistentFeature> features = getFeatures("nosuchcommand");
         assertEquals(1, features.size());
         assertFeature(features.get(0), Feature.Level.ERROR,
                         "nosuchcommand\n" +
@@ -43,7 +44,7 @@ public class MakePostProcessorTest extends PulseTestCase
 
     public void testRecursiveError() throws URISyntaxException
     {
-        List<Feature> features = getFeatures("recursiveerror");
+        List<PersistentFeature> features = getFeatures("recursiveerror");
         assertEquals(1, features.size());
         assertFeature(features.get(0), Feature.Level.ERROR,
                         "make[1]: Entering directory `/home/jason/mt/sm'\n" +
@@ -56,22 +57,22 @@ public class MakePostProcessorTest extends PulseTestCase
 
     public void testNoSuchMakefile() throws URISyntaxException
     {
-        List<Feature> features = getFeatures("nosuchmakefile");
+        List<PersistentFeature> features = getFeatures("nosuchmakefile");
         assertEquals(1, features.size());
         assertFeature(features.get(0), Feature.Level.ERROR,
                         "make: NoMakefile: No such file or directory\n" +
                         "make: *** No rule to make target `NoMakefile'.  Stop.");
     }
 
-    private void assertFeature(Feature feature, Feature.Level level, String summary)
+    private void assertFeature(PersistentFeature feature, Feature.Level level, String summary)
     {
-        assertTrue(feature instanceof PlainFeature);
-        PlainFeature pf = (PlainFeature) feature;
+        assertTrue(feature instanceof PersistentPlainFeature);
+        PersistentPlainFeature pf = (PersistentPlainFeature) feature;
         assertEquals(level, pf.getLevel());
         assertEquals(summary, pf.getSummary());
     }
 
-    private List<Feature> getFeatures(String name) throws URISyntaxException
+    private List<PersistentFeature> getFeatures(String name) throws URISyntaxException
     {
         MakePostProcessor pp = new MakePostProcessor();
         URL url = getInputURL(name, "txt");

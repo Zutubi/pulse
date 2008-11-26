@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.io.IOUtils;
 
@@ -23,7 +24,7 @@ public abstract class Result extends Entity
     protected ResultState state = ResultState.INITIAL;
     protected TimeStamps stamps = new TimeStamps();
     private File outputDir;
-    protected List<Feature> features = new LinkedList<Feature>();
+    protected List<PersistentFeature> features = new LinkedList<PersistentFeature>();
 
     /**
      * A count of the number of warning features associated with this result.
@@ -150,14 +151,14 @@ public abstract class Result extends Entity
 
     public void addFeature(Feature.Level level, String message)
     {
-        Feature feature = new Feature(level, message);
+        PersistentFeature feature = new PersistentFeature(level, message);
         addFeature(feature);
     }
 
-    public void addFeature(Feature feature)
+    public void addFeature(PersistentFeature feature)
     {
         // Eliminate duplicates
-        for (Feature f : features)
+        for (PersistentFeature f : features)
         {
             if (feature.equals(f))
             {
@@ -333,15 +334,15 @@ public abstract class Result extends Entity
         }
     }
 
-    public List<Feature> getFeatures()
+    public List<PersistentFeature> getFeatures()
     {
         return features;
     }
 
-    public List<Feature> getFeatures(Feature.Level level)
+    public List<PersistentFeature> getFeatures(Feature.Level level)
     {
-        List<Feature> result = new LinkedList<Feature>();
-        for (Feature f : features)
+        List<PersistentFeature> result = new LinkedList<PersistentFeature>();
+        for (PersistentFeature f : features)
         {
             if (f.getLevel() == level)
             {
@@ -352,7 +353,7 @@ public abstract class Result extends Entity
         return result;
     }
 
-    private void setFeatures(List<Feature> features)
+    private void setFeatures(List<PersistentFeature> features)
     {
         this.features = features;
     }
@@ -361,7 +362,7 @@ public abstract class Result extends Entity
     {
         List<String> errors = new LinkedList<String>();
 
-        for (Feature f : features)
+        for (PersistentFeature f : features)
         {
             if (f.getLevel() == Feature.Level.ERROR)
             {
@@ -374,7 +375,7 @@ public abstract class Result extends Entity
 
     public boolean hasDirectMessages(Feature.Level level)
     {
-        for (Feature f : features)
+        for (PersistentFeature f : features)
         {
             if (f.getLevel() == level)
             {
@@ -451,7 +452,7 @@ public abstract class Result extends Entity
         warningFeatureCount = 0;
         errorFeatureCount = 0;
 
-        for (Feature f : features)
+        for (PersistentFeature f : features)
         {
             if (f.getLevel() == Feature.Level.ERROR)
             {

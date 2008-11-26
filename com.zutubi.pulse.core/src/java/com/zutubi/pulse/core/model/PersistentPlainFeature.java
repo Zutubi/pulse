@@ -1,11 +1,13 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.Feature;
+
 /**
  * A PlainFeature is a feture discovered by analysing an artifact as plain
  * text, line by line.  In addition to the summary, these features contain
  * location information.
  */
-public class PlainFeature extends Feature
+public class PersistentPlainFeature extends PersistentFeature
 {
     /**
      * One-based line number of where this feature (possibly including
@@ -24,12 +26,12 @@ public class PlainFeature extends Feature
     private long lineNumber;
 
 
-    public PlainFeature()
+    public PersistentPlainFeature()
     {
 
     }
 
-    public PlainFeature(Level level, String summary, long lineNumber)
+    public PersistentPlainFeature(Feature.Level level, String summary, long lineNumber)
     {
         super(level, summary);
 
@@ -38,7 +40,7 @@ public class PlainFeature extends Feature
         this.lastLine = lineNumber;
     }
 
-    public PlainFeature(Level level, String summary, long firstLine, long lastLine, long lineNumber)
+    public PersistentPlainFeature(Feature.Level level, String summary, long firstLine, long lastLine, long lineNumber)
     {
         super(level, summary);
 
@@ -109,9 +111,9 @@ public class PlainFeature extends Feature
 
     public boolean equals(Object o)
     {
-        if (o instanceof PlainFeature)
+        if (o instanceof PersistentPlainFeature)
         {
-            PlainFeature other = (PlainFeature) o;
+            PersistentPlainFeature other = (PersistentPlainFeature) o;
             return super.equals(o) && other.firstLine == firstLine && other.lineNumber == lineNumber && other.lastLine == lastLine;
         }
 

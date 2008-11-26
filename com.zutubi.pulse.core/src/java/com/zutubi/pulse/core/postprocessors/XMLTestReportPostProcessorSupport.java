@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.postprocessors;
 
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.Builder;

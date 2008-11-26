@@ -3,7 +3,8 @@ package com.zutubi.pulse.core.commands.maven2;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestBase;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentFeature;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -100,7 +101,7 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
         Maven2Command command = new Maven2Command();
         command.setGoals("test");
         CommandResult result = failedRun(command);
-        List<Feature> features = result.getArtifact("command output").getFeatures(Feature.Level.ERROR);
+        List<PersistentFeature> features = result.getArtifact("command output").getFeatures(Feature.Level.ERROR);
         // unfortunately, different versions of the maven surefire plugin (responsible for running the unit tests)
         // result in different output, significantly to the point where a different number of features are captured.
         // For this reason we assert that we have some features captured, not that we have exactly 2 (plugin version 1.5.3)

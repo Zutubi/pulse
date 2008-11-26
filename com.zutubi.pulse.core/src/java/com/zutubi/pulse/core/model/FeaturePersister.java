@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
@@ -78,9 +79,9 @@ public class FeaturePersister
 
     private void addFeatures(Element parent, StoredFileArtifact fileArtifact)
     {
-        for(Feature f: fileArtifact.getFeatures())
+        for(PersistentFeature f: fileArtifact.getFeatures())
         {
-            PlainFeature pf = (PlainFeature) f;
+            PersistentPlainFeature pf = (PersistentPlainFeature) f;
             Element element = new Element(ELEMENT_FEATURE);
             element.addAttribute(new Attribute(ATTRIBUTE_LEVEL, pf.getLevel().toString()));
             element.addAttribute(new Attribute(ATTRIBUTE_FIRST_LINE, Long.toString(pf.getFirstLine())));
@@ -158,7 +159,7 @@ public class FeaturePersister
                 long line = Long.parseLong(getRequiredAttribute(element, ATTRIBUTE_LINE));
                 String summary = XMLUtils.getText(element);
 
-                fileArtifact.addFeature(new PlainFeature(level, summary, firstLine, lastLine, line));
+                fileArtifact.addFeature(new PersistentPlainFeature(level, summary, firstLine, lastLine, line));
             }
             catch (IllegalArgumentException e)
             {

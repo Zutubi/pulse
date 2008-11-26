@@ -1,36 +1,25 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.StringUtils;
 
-public class Feature extends Entity
+public class PersistentFeature extends Entity
 {
     private static final int MAX_SUMMARY_LENGTH = 4095;
     private static final String SUMMARY_TRIM_MESSAGE = "... [trimmed]";
 
-    public enum Level
-    {
-        INFO,
-        WARNING,
-        ERROR;
-
-        public String getPrettyString()
-        {
-            return name().toLowerCase();
-        }
-    }
-
-    private Level level;
+    private Feature.Level level;
     /**
      * A simple textual summary of the feature for display to users.
      */
     private String summary;
 
-    public Feature()
+    public PersistentFeature()
     {
 
     }
 
-    public Feature(Level level, String summary)
+    public PersistentFeature(Feature.Level level, String summary)
     {
         this.level = level;
         if (summary != null)
@@ -39,7 +28,7 @@ public class Feature extends Entity
         }
     }
 
-    public Level getLevel()
+    public Feature.Level getLevel()
     {
         return level;
     }
@@ -66,7 +55,7 @@ public class Feature extends Entity
 
     private void setLevelName(String name)
     {
-        level = Level.valueOf(name);
+        level = Feature.Level.valueOf(name);
     }
 
     public boolean isPlain()
@@ -76,9 +65,9 @@ public class Feature extends Entity
 
     public boolean equals(Object o)
     {
-        if (o instanceof Feature)
+        if (o instanceof PersistentFeature)
         {
-            Feature other = (Feature) o;
+            PersistentFeature other = (PersistentFeature) o;
             return other.level == level && StringUtils.equals(other.summary, summary);
         }
 

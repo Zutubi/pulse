@@ -4,6 +4,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -1427,7 +1428,7 @@ public class RemoteApi
                 {
                     final BuildResult build = internalGetBuild(project, id);
                     build.loadFeatures(configurationManager.getDataDirectory());
-                    for(Feature f: build.getFeatures())
+                    for(PersistentFeature f: build.getFeatures())
                     {
                         result.add(convertFeature(null, null, null, null, f));
                     }
@@ -1440,7 +1441,7 @@ public class RemoteApi
                             if(recipeResult != null)
                             {
                                 String stage = recipeResultNode.getStageName();
-                                for(Feature f: recipeResult.getFeatures())
+                                for(PersistentFeature f: recipeResult.getFeatures())
                                 {
                                     result.add(convertFeature(stage, null, null, null, f));
                                 }
@@ -1448,7 +1449,7 @@ public class RemoteApi
                                 for(CommandResult commandResult: recipeResult.getCommandResults())
                                 {
                                     String command = commandResult.getCommandName();
-                                    for(Feature f: commandResult.getFeatures())
+                                    for(PersistentFeature f: commandResult.getFeatures())
                                     {
                                         result.add(convertFeature(stage, command, null, null, f));
                                     }
@@ -1459,7 +1460,7 @@ public class RemoteApi
                                         for(StoredFileArtifact fileArtifact: artifact.getChildren())
                                         {
                                             String artifactPath = fileArtifact.getPath();
-                                            for(Feature f: fileArtifact.getFeatures())
+                                            for(PersistentFeature f: fileArtifact.getFeatures())
                                             {
                                                 result.add(convertFeature(stage, command, artifactName, artifactPath, f));
                                             }
@@ -1512,7 +1513,7 @@ public class RemoteApi
         return result;
     }
 
-    private Hashtable<String, String> convertFeature(String stageName, String commandName, String artifactName, String artifactPath, Feature feature)
+    private Hashtable<String, String> convertFeature(String stageName, String commandName, String artifactName, String artifactPath, PersistentFeature feature)
     {
         Hashtable<String, String> result = new Hashtable<String, String>();
         if(stageName != null)

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.renderer;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -233,15 +234,15 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         command.failure("artifacts let me down");
 
         StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
-        artifact.addFeature(new Feature(Feature.Level.INFO, "info message"));
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "error message"));
-        artifact.addFeature(new PlainFeature(Feature.Level.WARNING, "warning message", 19));
+        artifact.addFeature(new PersistentFeature(Feature.Level.INFO, "info message"));
+        artifact.addFeature(new PersistentFeature(Feature.Level.ERROR, "error message"));
+        artifact.addFeature(new PersistentPlainFeature(Feature.Level.WARNING, "warning message", 19));
         command.addArtifact(new StoredArtifact("first-artifact", artifact));
 
         artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
-        artifact.addFeature(new PlainFeature(Feature.Level.ERROR, "error 1", 1000000));
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 2"));
-        artifact.addFeature(new Feature(Feature.Level.ERROR, "error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages"));
+        artifact.addFeature(new PersistentPlainFeature(Feature.Level.ERROR, "error 1", 1000000));
+        artifact.addFeature(new PersistentFeature(Feature.Level.ERROR, "error 2"));
+        artifact.addFeature(new PersistentFeature(Feature.Level.ERROR, "error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
         secondResult.add(command);

@@ -4,18 +4,19 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_RECIPE_PATHS;
 import com.zutubi.pulse.core.Command;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.Recipe;
 import com.zutubi.pulse.core.SimpleRecipePaths;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_RECIPE_PATHS;
 import com.zutubi.pulse.core.events.CommandCommencedEvent;
 import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -215,7 +216,7 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
 
     protected void assertFeatures(StoredFileArtifact artifact, Feature.Level level, String... summaryRegexes)
     {
-        List<Feature> features = artifact.getFeatures(level);
+        List<PersistentFeature> features = artifact.getFeatures(level);
         assertEquals(summaryRegexes.length, features.size());
         for(int i = 0; i < summaryRegexes.length; i++)
         {

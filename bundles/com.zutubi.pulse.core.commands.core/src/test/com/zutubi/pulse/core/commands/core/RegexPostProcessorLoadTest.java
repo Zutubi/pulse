@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.FileLoaderTestBase;
-import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.RegexPattern;
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 
 /**
  *

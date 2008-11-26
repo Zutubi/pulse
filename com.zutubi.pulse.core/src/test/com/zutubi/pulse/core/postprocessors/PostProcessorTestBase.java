@@ -5,8 +5,9 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNA
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -81,7 +82,7 @@ public abstract class PostProcessorTestBase extends PulseTestCase
 
     protected void assertFeatures(Feature.Level level, String... summaries)
     {
-        List<Feature> features = artifact.getFeatures(level);
+        List<PersistentFeature> features = artifact.getFeatures(level);
         assertEquals(summaries.length, features.size());
         for(int i = 0; i < summaries.length; i++)
         {

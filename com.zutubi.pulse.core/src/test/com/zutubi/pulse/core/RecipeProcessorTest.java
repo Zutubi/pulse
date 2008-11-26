@@ -7,7 +7,8 @@ import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentFeature;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -316,7 +317,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private void assertCommandFailure(long id, String message)
     {
         CommandCompletedEvent e = assertCommandCompleted(id, ResultState.FAILURE);
-        Feature feature = e.getResult().getFeatures().get(0);
+        PersistentFeature feature = e.getResult().getFeatures().get(0);
         assertEquals(Feature.Level.ERROR, feature.getLevel());
         assertEquals(message, feature.getSummary());
     }
@@ -324,7 +325,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private void assertCommandError(long id, String message)
     {
         CommandCompletedEvent e = assertCommandCompleted(id, ResultState.ERROR);
-        Feature feature = e.getResult().getFeatures().get(0);
+        PersistentFeature feature = e.getResult().getFeatures().get(0);
         assertEquals(Feature.Level.ERROR, feature.getLevel());
         assertEquals(message, feature.getSummary());
     }
@@ -342,7 +343,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private void assertRecipeError(long id, String message)
     {
         RecipeCompletedEvent e = assertRecipeCompleted(id, ResultState.ERROR);
-        Feature feature = e.getResult().getFeatures().get(0);
+        PersistentFeature feature = e.getResult().getFeatures().get(0);
         assertEquals(Feature.Level.ERROR, feature.getLevel());
         assertEquals(message, feature.getSummary());
     }

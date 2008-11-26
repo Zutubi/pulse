@@ -5,6 +5,7 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.io.ForkOutputStream;
 
@@ -132,7 +133,7 @@ public class BuildStatusPrinter implements EventListener
     private void showMessages(Result result, Feature.Level level)
     {
         indenter.indent();
-        for (Feature feature : result.getFeatures(level))
+        for (PersistentFeature feature : result.getFeatures(level))
         {
             indenter.println(feature.getSummary());
         }
@@ -154,7 +155,7 @@ public class BuildStatusPrinter implements EventListener
 
                 for (Feature.Level level : Feature.Level.values())
                 {
-                    List<Feature> features = fileArtifact.getFeatures(level);
+                    List<PersistentFeature> features = fileArtifact.getFeatures(level);
                     if (features.size() > 0)
                     {
                         indenter.indent();
@@ -182,12 +183,12 @@ public class BuildStatusPrinter implements EventListener
         return result;
     }
 
-    private void showFeatures(Feature.Level level, List<Feature> features)
+    private void showFeatures(Feature.Level level, List<PersistentFeature> features)
     {
         indenter.println(level.toString().toLowerCase() + " features:");
         indenter.indent();
 
-        for (Feature f : features)
+        for (PersistentFeature f : features)
         {
             indenter.println("* " + f.getSummary());
         }

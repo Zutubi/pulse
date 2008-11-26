@@ -5,6 +5,7 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RES
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 
@@ -65,7 +66,7 @@ public class DefaultPostProcessorContext implements PostProcessorContext
 
     public void addFeature(Feature feature)
     {
-        artifact.addFeature(feature);
+        artifact.addFeature(convertFeature(feature));
     }
 
     public void failCommand(String message)
@@ -80,6 +81,18 @@ public class DefaultPostProcessorContext implements PostProcessorContext
 
     public void addFeatureToCommand(Feature feature)
     {
-        commandResult.addFeature(feature);
+        commandResult.addFeature(convertFeature(feature));
+    }
+
+    private PersistentFeature convertFeature(Feature feature)
+    {
+        if (feature.getLineNumber() == Feature.LINE_UNKNOWN)
+        {
+            return new PersistentFeature(feature.getLevel(), feature.getSummary());
+        }
+        else
+        {
+            return new PersistentPlainFeature(feature.getLevel(), feature.getSummary(), feature.getFirstLine(), feature.getLastLine(), feature.getLineNumber());
+        }
     }
 }

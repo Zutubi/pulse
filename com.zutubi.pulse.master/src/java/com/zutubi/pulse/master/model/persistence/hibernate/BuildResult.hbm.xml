@@ -21,7 +21,7 @@
 
         <bag name="features" cascade="all,delete-orphan" lazy="true">
             <key column="BUILD_RESULT_ID"/>
-            <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
+            <one-to-many class="com.zutubi.pulse.core.model.PersistentFeature"/>
         </bag>
 
         <property name="number" column="NUMBER" type="long" not-null="true"/>
@@ -114,7 +114,7 @@
 
         <bag name="features" cascade="all,delete-orphan" lazy="true">
             <key column="RECIPE_RESULT_ID"/>
-            <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
+            <one-to-many class="com.zutubi.pulse.core.model.PersistentFeature"/>
         </bag>
 
         <property name="warningFeatureCount" type="int">

@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.commands.ant;
 import com.zutubi.pulse.core.ExpressionElement;
 import com.zutubi.pulse.core.RegexPattern;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.SystemUtils;
 
 import java.util.regex.Pattern;

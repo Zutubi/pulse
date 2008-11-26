@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master;
 
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.bootstrap.tasks.BuildAborterStartupTask;
 import com.zutubi.pulse.master.model.*;

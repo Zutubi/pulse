@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 
@@ -15,7 +16,7 @@ public class StoredFileArtifact extends Entity
 
     private String path;
     private String type;
-    private List<Feature> features = new LinkedList<Feature>();
+    private List<PersistentFeature> features = new LinkedList<PersistentFeature>();
 
     public StoredFileArtifact()
     {
@@ -65,12 +66,12 @@ public class StoredFileArtifact extends Entity
         return result.toString();
     }
 
-    public void addFeature(Feature feature)
+    public void addFeature(PersistentFeature feature)
     {
         features.add(feature);
     }
 
-    public void addFeatures(List<Feature> features)
+    public void addFeatures(List<PersistentFeature> features)
     {
         this.features.addAll(features);
     }
@@ -84,7 +85,7 @@ public class StoredFileArtifact extends Entity
     {
         Set<Feature.Level> levels = new TreeSet<Feature.Level>();
 
-        for (Feature f : features)
+        for (PersistentFeature f : features)
         {
             levels.add(f.getLevel());
         }
@@ -97,10 +98,10 @@ public class StoredFileArtifact extends Entity
         return getFeatures(level).size() > 0;
     }
 
-    public List<Feature> getFeatures(Feature.Level level)
+    public List<PersistentFeature> getFeatures(Feature.Level level)
     {
-        List<Feature> result = new LinkedList<Feature>();
-        for (Feature f : features)
+        List<PersistentFeature> result = new LinkedList<PersistentFeature>();
+        for (PersistentFeature f : features)
         {
             if (f.getLevel() == level)
             {
@@ -121,12 +122,12 @@ public class StoredFileArtifact extends Entity
         this.type = type;
     }
 
-    public List<Feature> getFeatures()
+    public List<PersistentFeature> getFeatures()
     {
         return features;
     }
 
-    private void setFeatures(List<Feature> features)
+    private void setFeatures(List<PersistentFeature> features)
     {
         this.features = features;
     }
@@ -149,9 +150,9 @@ public class StoredFileArtifact extends Entity
             return true;
         }
 
-        for (Feature f : features)
+        for (PersistentFeature f : features)
         {
-            if (f instanceof PlainFeature)
+            if (f instanceof PersistentPlainFeature)
             {
                 return true;
             }

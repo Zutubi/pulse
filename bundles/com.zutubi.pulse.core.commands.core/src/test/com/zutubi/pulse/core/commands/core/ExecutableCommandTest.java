@@ -9,9 +9,10 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_BUILD_NU
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -98,9 +99,9 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         assertEquals(ResultState.FAILURE, cmdResult.getState());
 
         StoredArtifact artifact = cmdResult.getArtifact(ExecutableCommand.OUTPUT_ARTIFACT_NAME);
-        List<Feature> features = artifact.getFeatures(Feature.Level.ERROR);
+        List<PersistentFeature> features = artifact.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
-        Feature feature = features.get(0);
+        PersistentFeature feature = features.get(0);
         assertEquals(Feature.Level.ERROR, feature.getLevel());
         assertEquals("error: badness", feature.getSummary());
     }
@@ -287,7 +288,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         result = runCommand(command, 1234);
         assertTrue(result.errored());
 
-        List<Feature> features = result.getFeatures(Feature.Level.ERROR);
+        List<PersistentFeature> features = result.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
         String message = features.get(0).getSummary();
         boolean java15 = message.contains("No such executable 'thisfiledoesnotexist'");
@@ -312,7 +313,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         result = runCommand(command, 1234);
 
         assertTrue(result.errored());
-        List<Feature> features = result.getFeatures(Feature.Level.ERROR);
+        List<PersistentFeature> features = result.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
         String message = features.get(0).getSummary();
         boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");

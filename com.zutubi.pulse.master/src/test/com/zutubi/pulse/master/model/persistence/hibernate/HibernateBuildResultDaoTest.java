@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
@@ -195,7 +196,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         result.commence();
         result.success();
         StoredFileArtifact artifact = new StoredFileArtifact("to file");
-        PlainFeature feature = new PlainFeature(Feature.Level.ERROR, "getSummary here", 7);
+        PersistentPlainFeature feature = new PersistentPlainFeature(Feature.Level.ERROR, "getSummary here", 7);
 
         artifact.addFeature(feature);
         result.addArtifact(new StoredArtifact("test", artifact));
