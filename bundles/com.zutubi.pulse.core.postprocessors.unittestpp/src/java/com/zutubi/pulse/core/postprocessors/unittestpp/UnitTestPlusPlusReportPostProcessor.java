@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.postprocessors.unittestpp;
 
-import com.zutubi.pulse.core.model.PersistentTestCaseResult;
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -22,18 +23,18 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
     private static final String ATTRIBUTE_TIME = "time";
     private static final String ATTRIBUTE_SUITE = "suite";
 
-    private Map<String, PersistentTestSuiteResult> suites;
+    private Map<String, TestSuiteResult> suites;
 
     public UnitTestPlusPlusReportPostProcessor()
     {
         super("UnitTest++");
     }
 
-    protected void processDocument(Document doc, PersistentTestSuiteResult tests)
+    protected void processDocument(Document doc, TestSuiteResult tests)
     {
         Element root = doc.getRootElement();
 
-        suites = new TreeMap<String, PersistentTestSuiteResult>();
+        suites = new TreeMap<String, TestSuiteResult>();
 
         // We should get FailedTests and SuccessfulTests sections
         Elements testElements = root.getChildElements(ELEMENT_TEST);
@@ -53,18 +54,18 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
 
         if(suite != null && name != null)
         {
-            PersistentTestSuiteResult suiteResult = getSuite(suite);
+            TestSuiteResult suiteResult = getSuite(suite);
             Element failure = element.getFirstChildElement(ELEMENT_FAILURE);
-            PersistentTestCaseResult caseResult;
+            TestCaseResult caseResult;
             if(failure == null)
             {
-                caseResult = new PersistentTestCaseResult(name, duration);
+                caseResult = new TestCaseResult(name, duration, TestStatus.PASS);
             }
             else
             {
-                caseResult = new PersistentTestCaseResult(name, duration, PersistentTestCaseResult.Status.FAILURE, failure.getAttributeValue(ATTRIBUTE_MESSAGE));
+                caseResult = new TestCaseResult(name, duration, TestStatus.FAILURE, failure.getAttributeValue(ATTRIBUTE_MESSAGE));
             }
-            suiteResult.add(caseResult);
+            suiteResult.addCase(caseResult);
         }
     }
 
@@ -86,15 +87,15 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
         return -1;
     }
 
-    private void addSuites(PersistentTestSuiteResult tests)
+    private void addSuites(TestSuiteResult tests)
     {
-        for(PersistentTestSuiteResult suite: suites.values())
+        for(TestSuiteResult suite: suites.values())
         {
-            tests.add(suite);
+            tests.addSuite(suite);
         }
     }
 
-    private PersistentTestSuiteResult getSuite(String name)
+    private TestSuiteResult getSuite(String name)
     {
         if(suites.containsKey(name))
         {
@@ -102,7 +103,7 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
         }
         else
         {
-            PersistentTestSuiteResult suite = new PersistentTestSuiteResult(name);
+            TestSuiteResult suite = new TestSuiteResult(name);
             suites.put(name, suite);
             return suite;
         }

@@ -5,9 +5,9 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.PersistentTestCaseResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -16,9 +16,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/**
- * <class comment/>
- */
 public class RegexTestPostProcessorTest extends PulseTestCase
 {
     private File tmpDir = null;
@@ -47,9 +44,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        artifact = null;
         removeDirectory(tmpDir);
-
         super.tearDown();
     }
 
@@ -110,11 +105,11 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         assertEquals(5, tests.getTotal());
         assertEquals(3, tests.getFailures());
         assertEquals(1, tests.getErrors());
-        assertEquals(PersistentTestCaseResult.Status.PASS, tests.getCase("test1").getStatus());
-        assertEquals(PersistentTestCaseResult.Status.ERROR, tests.getCase("test2").getStatus());
-        assertEquals(PersistentTestCaseResult.Status.FAILURE, tests.getCase("test3").getStatus());
-        assertEquals(PersistentTestCaseResult.Status.FAILURE, tests.getCase("test4").getStatus());
-        assertEquals(PersistentTestCaseResult.Status.FAILURE, tests.getCase("test5").getStatus());
+        assertEquals(PASS, tests.getCase("test1").getStatus());
+        assertEquals(ERROR, tests.getCase("test2").getStatus());
+        assertEquals(FAILURE, tests.getCase("test3").getStatus());
+        assertEquals(FAILURE, tests.getCase("test4").getStatus());
+        assertEquals(FAILURE, tests.getCase("test5").getStatus());
     }
 
     public void testUnrecognised() throws FileLoadException
@@ -123,9 +118,9 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         assertEquals(3, tests.getTotal());
         assertEquals(1, tests.getFailures());
         assertEquals(1, tests.getErrors());
-        assertEquals(PersistentTestCaseResult.Status.PASS, tests.getCase("test1").getStatus());
-        assertEquals(PersistentTestCaseResult.Status.ERROR, tests.getCase("test2").getStatus());
-        assertEquals(PersistentTestCaseResult.Status.FAILURE, tests.getCase("test4").getStatus());
+        assertEquals(PASS, tests.getCase("test1").getStatus());
+        assertEquals(ERROR, tests.getCase("test2").getStatus());
+        assertEquals(FAILURE, tests.getCase("test4").getStatus());
         assertFalse(tests.hasCase("test3"));
         assertFalse(tests.hasCase("test5"));
     }

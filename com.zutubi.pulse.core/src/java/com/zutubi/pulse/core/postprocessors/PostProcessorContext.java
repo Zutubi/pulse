@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.postprocessors;
 
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 
 /**
  * Context in which a post-processor executes.  Provides a high-level
@@ -13,21 +14,14 @@ import com.zutubi.pulse.core.model.ResultState;
 public interface PostProcessorContext
 {
     /**
-     * Access to test results for the build, where new results may be added.
-     * Consider subclassing {@link TestReportPostProcessorSupport} instead of
-     * using this directly.
-     *
-     * @return the root test suite to which all test results should be added
-     */
-    PersistentTestSuiteResult getTestSuite();
-
-    /**
      * Retrieves the current state for the command which produced the
      * artifact being processed.
      *
      * @return the current state of the executed command
      */
     ResultState getResultState();
+
+    void addTestSuite(TestSuiteResult suite, NameConflictResolution conflictResolution);
 
     /**
      * Adds a new feature to the artifact being processed.  Any error,

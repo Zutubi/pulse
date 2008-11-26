@@ -5,6 +5,7 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 
 import java.io.File;
 import java.net.URL;
@@ -37,11 +38,11 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
 
         PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         assertEquals(3, children.length);
-        checkCase(children[0], "testSimple", PersistentTestCaseResult.Status.PASS, 0, null);
-        checkCase(children[1], "testAssertionFailure", PersistentTestCaseResult.Status.FAILURE, 10,
+        checkCase(children[0], "testSimple", PASS, 0, null);
+        checkCase(children[1], "testAssertionFailure", FAILURE, 10,
                 "junit.framework.AssertionFailedError: expected:<1> but was:<2>\n" +
                 "\tat com.zutubi.pulse.junit.SimpleTest.testAssertionFailure(Unknown Source)");
-        checkCase(children[2], "testThrowException", PersistentTestCaseResult.Status.ERROR, 10,
+        checkCase(children[2], "testThrowException", ERROR, 10,
                 "java.lang.RuntimeException: random message\n" +
                 "\tat com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)");
     }
@@ -83,12 +84,12 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
 
         PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
         assertEquals(3, children.length);
-        checkCase(children[0], "testSimple", PersistentTestCaseResult.Status.PASS, 291, null);
-        checkCase(children[1], "testFailure", PersistentTestCaseResult.Status.FAILURE, 10,
+        checkCase(children[0], "testSimple", PASS, 291, null);
+        checkCase(children[1], "testFailure", FAILURE, 10,
                 "junit.framework.AssertionFailedError\n" +
                         "\tat\n" +
                         "        com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest.testFailure(JUnitReportPostProcessorTest.java:63)");
-        checkCase(children[2], "testError", PersistentTestCaseResult.Status.ERROR, 0,
+        checkCase(children[2], "testError", ERROR, 0,
                 "java.lang.RuntimeException: whoops!\n" +
                         "\tat\n" +
                         "        com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");

@@ -1,7 +1,11 @@
 package com.zutubi.pulse.core.postprocessors;
 
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
+import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+import com.zutubi.util.TextUtils;
 
 import java.io.File;
 
@@ -24,6 +28,8 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
     private String suite;
     /** @see #setFailOnFailure(boolean) */
     private boolean failOnFailure = true;
+    /** @see #setResolveConflicts(String) */
+    private NameConflictResolution resolveConflicts = NameConflictResolution.OFF;
 
     /**
      * Sets the name of a nested suite to add all found test results to.
@@ -59,35 +65,43 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
         this.failOnFailure = failOnFailure;
     }
 
+    public NameConflictResolution getResolveConflicts()
+    {
+        return resolveConflicts;
+    }
+
+    public void setResolveConflicts(String resolveConflicts) throws FileLoadException
+    {
+        try
+        {
+            this.resolveConflicts = NameConflictResolution.valueOf(resolveConflicts.toUpperCase());
+        }
+        catch(IllegalArgumentException e)
+        {
+            throw new FileLoadException("Unrecognised conflict resolution '" + resolveConflicts + "'");
+        }
+    }
+
     protected void process(File artifactFile, PostProcessorContext ppContext)
     {
-        PersistentTestSuiteResult testResults = ppContext.getTestSuite();
-        int brokenBefore = testResults.getSummary().getBroken();
-
         if(artifactFile.isFile())
         {
-            PersistentTestSuiteResult parentSuite;
-            if(suite == null)
+
+            TestSuiteResult suiteResult = new TestSuiteResult(null);
+            TestSuiteResult accumulateSuite = suiteResult;
+            if (TextUtils.stringSet(suite))
             {
-                parentSuite = testResults;
-            }
-            else
-            {
-                parentSuite = new PersistentTestSuiteResult(suite);
+                accumulateSuite = new TestSuiteResult(suite);
+                suiteResult.addSuite(accumulateSuite);
             }
 
-            process(artifactFile, parentSuite, ppContext);
-
-            if(suite != null)
-            {
-                testResults.add(parentSuite);
-            }
+            extractTestResults(artifactFile, ppContext, accumulateSuite);
+            ppContext.addTestSuite(suiteResult, resolveConflicts);
 
             ResultState state = ppContext.getResultState();
-            if(failOnFailure && state != ResultState.ERROR && state != ResultState.FAILURE)
+            if (failOnFailure && state != ResultState.ERROR && state != ResultState.FAILURE)
             {
-                int brokenAfter = testResults.getSummary().getBroken();
-                if(brokenAfter > brokenBefore)
+                if (containsBrokenCase(suiteResult))
                 {
                     ppContext.failCommand("One or more test cases failed.");
                 }
@@ -95,7 +109,29 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
         }
     }
 
+    private boolean containsBrokenCase(TestSuiteResult suite)
+    {
+        for (TestCaseResult caseResult: suite.getCases())
+        {
+            if (caseResult.getStatus().isBroken())
+            {
+                return true;
+            }
+        }
+
+        for (TestSuiteResult nestedSuite: suite.getSuites())
+        {
+            if (containsBrokenCase(nestedSuite))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
+     * FIXME NOW
      * Called once for each file to post process for test results.  Test
      * results found should be added to the given suite.  Nested suites are
      * supported.  Additional manipulation of the artifact being processed or
@@ -105,5 +141,5 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
      * @param suite     root test suite to add discovered test results to
      * @param ppContext context in which the post processor is executing
      */
-    protected abstract void process(File file, PersistentTestSuiteResult suite, PostProcessorContext ppContext);
+    protected abstract void extractTestResults(File filesuite, PostProcessorContext ppContext, TestSuiteResult tests);
 }

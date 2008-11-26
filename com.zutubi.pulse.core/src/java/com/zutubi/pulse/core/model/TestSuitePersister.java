@@ -1,23 +1,21 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.TestResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 /**
  */
 public class TestSuitePersister
 {
-    private static final Logger LOG = Logger.getLogger(TestSuitePersister.class);
-
     public static final String SUITE_FILE_NAME = "suite.xml";
     public static final String ELEMENT_SUITE = "suite";
     public static final String ELEMENT_CASE = "case";
@@ -247,14 +245,14 @@ public class TestSuitePersister
         for (int i = 0; i < elements.size(); i++)
         {
             Element element = elements.get(i);
-            PersistentTestCaseResult.Status status = getStatus(element);
-            if (failuresOnly && status == PersistentTestCaseResult.Status.PASS)
+            TestStatus status = getStatus(element);
+            if (failuresOnly && status == TestStatus.PASS)
             {
                 continue;
             }
 
             PersistentTestCaseResult caseResult = new PersistentTestCaseResult(getSafeAttributeValue(element, ATTRIBUTE_NAME), getDuration(element), status, getSafeText(element, ELEMENT_MESSAGE));
-            if(caseResult.getStatus() == PersistentTestCaseResult.Status.PASS)
+            if(caseResult.getStatus() == TestStatus.PASS)
             {
                 caseResult.setFixed(element.getAttributeValue(ATTRIBUTE_FIXED) != null);
             }
@@ -293,7 +291,7 @@ public class TestSuitePersister
 
     private long getDuration(Element element)
     {
-        long result = PersistentTestResult.UNKNOWN_DURATION;
+        long result = TestResult.DURATION_UNKNOWN;
         String attributeValue = element.getAttributeValue(ATTRIBUTE_DURATION);
 
         if (attributeValue != null)
@@ -311,15 +309,15 @@ public class TestSuitePersister
         return result;
     }
 
-    private PersistentTestCaseResult.Status getStatus(Element element)
+    private TestStatus getStatus(Element element)
     {
-        PersistentTestCaseResult.Status status = PersistentTestCaseResult.Status.PASS;
+        TestStatus status = TestStatus.PASS;
         String statusName = element.getAttributeValue(ATTRIBUTE_STATUS);
         if (statusName != null)
         {
             try
             {
-                status = PersistentTestCaseResult.Status.valueOf(statusName);
+                status = TestStatus.valueOf(statusName);
             }
             catch (IllegalArgumentException e)
             {
@@ -362,18 +360,6 @@ public class TestSuitePersister
         try
         {
             return URLEncoder.encode(name, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return name;
-        }
-    }
-
-    private String decodeName(String name)
-    {
-        try
-        {
-            return URLDecoder.decode(name, "UTF-8");
         }
         catch (UnsupportedEncodingException e)
         {

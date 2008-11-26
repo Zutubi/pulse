@@ -1,5 +1,10 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestResult;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+
 import java.util.*;
 
 /**
@@ -24,12 +29,12 @@ public class PersistentTestSuiteResult extends PersistentTestResult
 
     public PersistentTestSuiteResult()
     {
-        this(null, UNKNOWN_DURATION);
+        this(null, TestResult.DURATION_UNKNOWN);
     }
 
     public PersistentTestSuiteResult(String name)
     {
-        this(name, UNKNOWN_DURATION);
+        this(name, TestResult.DURATION_UNKNOWN);
     }
 
     public PersistentTestSuiteResult(String name, long duration)
@@ -37,6 +42,49 @@ public class PersistentTestSuiteResult extends PersistentTestResult
         this(name, duration, -1, -1, -1);
         suites = new ArrayList<PersistentTestSuiteResult>();
         cases = new LinkedHashMap<String, PersistentTestCaseResult>();
+    }
+
+    public PersistentTestSuiteResult(TestSuiteResult suite, NameConflictResolution resolution)
+    {
+        this(suite.getName(), suite.getDuration());
+        for (TestSuiteResult nestedSuite : suite.getSuites())
+        {
+            add(new PersistentTestSuiteResult(nestedSuite, resolution));
+        }
+
+        for (TestCaseResult caseResult : suite.getCases())
+        {
+            add(convertCase(caseResult, resolution));
+        }
+    }
+
+    private PersistentTestCaseResult convertCase(TestCaseResult caseResult, NameConflictResolution resolution)
+    {
+        String name = caseResult.getName();
+        if (resolution != NameConflictResolution.OFF && hasCase(name))
+        {
+            int addition = 2;
+            while (hasCase(makeCaseName(name, addition, resolution)))
+            {
+                addition++;
+            }
+
+            name = makeCaseName(name, addition, resolution);
+        }
+
+        return new PersistentTestCaseResult(name, caseResult.getDuration(), caseResult.getStatus(), caseResult.getMessage());
+    }
+
+    private String makeCaseName(String name, int addition, NameConflictResolution resolution)
+    {
+        if (resolution == NameConflictResolution.APPEND)
+        {
+            return name + addition;
+        }
+        else
+        {
+            return Integer.toString(addition) + name;
+        }
     }
 
     public PersistentTestSuiteResult(String name, long duration, int total, int errors, int failures)

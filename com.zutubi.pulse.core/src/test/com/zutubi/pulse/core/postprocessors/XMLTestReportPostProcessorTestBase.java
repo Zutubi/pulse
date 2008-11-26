@@ -3,7 +3,12 @@ package com.zutubi.pulse.core.postprocessors;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.PersistentTestCaseResult;
+import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.api.TestResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.io.File;
@@ -48,7 +53,7 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
         return testResults;
     }
 
-    protected void checkCase(PersistentTestCaseResult caseResult, String name, PersistentTestCaseResult.Status status, long duration, String message)
+    protected void checkCase(PersistentTestCaseResult caseResult, String name, TestStatus status, long duration, String message)
     {
         assertEquals(name, caseResult.getName());
         assertEquals(status, caseResult.getStatus());
@@ -56,9 +61,9 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
         assertEquals(message, caseResult.getMessage());
     }
 
-    protected void checkCase(PersistentTestCaseResult caseResult, String name, PersistentTestCaseResult.Status status, String message)
+    protected void checkCase(PersistentTestCaseResult caseResult, String name, TestStatus status, String message)
     {
-        checkCase(caseResult, name, status, PersistentTestResult.UNKNOWN_DURATION, message);
+        checkCase(caseResult, name, status, TestResult.DURATION_UNKNOWN, message);
     }
 
     protected void checkSuite(PersistentTestSuiteResult suite, String name, int total, int failures, int errors)
@@ -78,7 +83,7 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
 
     protected void checkPassCase(PersistentTestCaseResult caseResult, String name)
     {
-        checkCase(caseResult, name, PersistentTestCaseResult.Status.PASS, null);
+        checkCase(caseResult, name, TestStatus.PASS, null);
     }
 
     protected void checkFailureCase(PersistentTestSuiteResult suite, String name, String message)
@@ -90,7 +95,7 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
 
     protected void checkFailureCase(PersistentTestCaseResult caseResult, String name, String message)
     {
-        checkCase(caseResult, name, PersistentTestCaseResult.Status.FAILURE, message);
+        checkCase(caseResult, name, TestStatus.FAILURE, message);
     }
 
     protected void checkErrorCase(PersistentTestSuiteResult suite, String name, String message)
@@ -102,7 +107,7 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
 
     protected void checkErrorCase(PersistentTestCaseResult caseResult, String name, String message)
     {
-        checkCase(caseResult, name, PersistentTestCaseResult.Status.ERROR, message);
+        checkCase(caseResult, name, TestStatus.ERROR, message);
     }
 }
 

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.TestResult;
 import com.zutubi.util.TimeStamps;
 
 /**
@@ -7,8 +8,6 @@ import com.zutubi.util.TimeStamps;
  */
 public abstract class PersistentTestResult
 {
-    public static final long UNKNOWN_DURATION = -1;
-
     /**
      * Name of the test.
      */
@@ -25,7 +24,7 @@ public abstract class PersistentTestResult
 
     protected PersistentTestResult(String name)
     {
-        this(name, UNKNOWN_DURATION);
+        this(name, TestResult.DURATION_UNKNOWN);
     }
 
     protected PersistentTestResult(String name, long duration)

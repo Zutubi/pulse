@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.model.PersistentTestCaseResult;
-import com.zutubi.pulse.core.model.PersistentTestResult;
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import nu.xom.*;
 
 /**
@@ -41,7 +42,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         super(reportType);
     }
 
-    protected void processDocument(Document doc, PersistentTestSuiteResult tests)
+    protected void processDocument(Document doc, TestSuiteResult tests)
     {
         Element root = doc.getRootElement();
         if(root.getLocalName().equals(suiteElement))
@@ -60,7 +61,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         }
     }
 
-    private void processSuite(Element element, PersistentTestSuiteResult tests)
+    private void processSuite(Element element, TestSuiteResult tests)
     {
         String name = "";
 
@@ -84,7 +85,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 
         long duration = getDuration(element);
 
-        PersistentTestSuiteResult suite = new PersistentTestSuiteResult(name, duration);
+        TestSuiteResult suite = new TestSuiteResult(name, duration);
         Elements nested = element.getChildElements(suiteElement);
         for(int i = 0; i < nested.size(); i++)
         {
@@ -97,10 +98,10 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
             processCase(cases.get(i), suite);
         }
 
-        tests.add(suite);
+        tests.addSuite(suite);
     }
 
-    private void processCase(Element element, PersistentTestSuiteResult suite)
+    private void processCase(Element element, TestSuiteResult suite)
     {
         String name = element.getAttributeValue(nameAttribute);
         if(name == null)
@@ -116,13 +117,13 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         }
 
         long duration = getDuration(element);
-        PersistentTestCaseResult caseResult = new PersistentTestCaseResult(name, duration);
-        suite.add(caseResult);
+        TestCaseResult caseResult = new TestCaseResult(name, duration, TestStatus.PASS);
+        suite.addCase(caseResult);
 
         Element child = element.getFirstChildElement(errorElement);
         if(child != null)
         {
-            caseResult.setStatus(PersistentTestCaseResult.Status.ERROR);
+            caseResult.setStatus(TestStatus.ERROR);
 
             getMessage(child, caseResult);
 
@@ -134,12 +135,12 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         child = element.getFirstChildElement(failureElement);
         if(child != null)
         {
-            caseResult.setStatus(PersistentTestCaseResult.Status.FAILURE);
+            caseResult.setStatus(TestStatus.FAILURE);
             getMessage(child, caseResult);
         }
     }
 
-    private void getMessage(Element element, PersistentTestCaseResult caseResult)
+    private void getMessage(Element element, TestCaseResult caseResult)
     {
         if (element.getChildCount() > 0)
         {
@@ -151,7 +152,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         }
         else
         {
-            String message = element.getAttributeValue(ATTRIBUTE_MESSAGE);
+            String message = element.getAttributeValue(messageAttribute);
             if(message != null)
             {
                 caseResult.setMessage(message);
@@ -161,7 +162,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 
     private long getDuration(Element element)
     {
-        long duration = PersistentTestResult.UNKNOWN_DURATION;
+        long duration = TestResult.DURATION_UNKNOWN;
         String attr = element.getAttributeValue(timeAttribute);
 
         if(attr != null)

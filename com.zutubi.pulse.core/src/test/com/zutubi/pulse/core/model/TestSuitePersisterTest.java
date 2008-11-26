@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.model;
 
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import nu.xom.ParsingException;
@@ -35,16 +36,16 @@ public class TestSuitePersisterTest extends PulseTestCase
     public void testSingleCase() throws Exception
     {
         PersistentTestSuiteResult suite = new PersistentTestSuiteResult("suite", 100);
-        suite.add(new PersistentTestCaseResult("case", 24, PersistentTestCaseResult.Status.PASS, "this is the message"));
+        suite.add(new PersistentTestCaseResult("case", 24, PASS, "this is the message"));
         roundTrip(suite);
     }
 
     public void testMultipleCases() throws Exception
     {
         PersistentTestSuiteResult suite = new PersistentTestSuiteResult("asuite");
-        suite.add(new PersistentTestCaseResult("case3", -1, PersistentTestCaseResult.Status.FAILURE, null));
-        suite.add(new PersistentTestCaseResult("case1", 24, PersistentTestCaseResult.Status.PASS, "this is the message"));
-        suite.add(new PersistentTestCaseResult("case2", 100, PersistentTestCaseResult.Status.ERROR, null));
+        suite.add(new PersistentTestCaseResult("case3", -1, FAILURE, null));
+        suite.add(new PersistentTestCaseResult("case1", 24, PASS, "this is the message"));
+        suite.add(new PersistentTestCaseResult("case2", 100, ERROR, null));
         roundTrip(suite);
     }
 
@@ -52,8 +53,8 @@ public class TestSuitePersisterTest extends PulseTestCase
     {
         PersistentTestSuiteResult suite = new PersistentTestSuiteResult("asuite");
         PersistentTestSuiteResult nestedSuite = new PersistentTestSuiteResult("anestedsuite");
-        nestedSuite.add(new PersistentTestCaseResult("case1", 100, PersistentTestCaseResult.Status.ERROR, null));
-        suite.add(new PersistentTestCaseResult("case1", -1, PersistentTestCaseResult.Status.FAILURE, null));
+        nestedSuite.add(new PersistentTestCaseResult("case1", 100, ERROR, null));
+        suite.add(new PersistentTestCaseResult("case1", -1, FAILURE, null));
         suite.add(nestedSuite);
         roundTrip(suite);
     }
@@ -63,15 +64,15 @@ public class TestSuitePersisterTest extends PulseTestCase
         PersistentTestSuiteResult suite = new PersistentTestSuiteResult("asuite");
 
         PersistentTestSuiteResult nestedNestedSuite = new PersistentTestSuiteResult("anestednestedsuite");
-        nestedNestedSuite.add(new PersistentTestCaseResult("deep", 100000, PersistentTestCaseResult.Status.FAILURE, "sorry\nit failed"));
+        nestedNestedSuite.add(new PersistentTestCaseResult("deep", 100000, FAILURE, "sorry\nit failed"));
 
         PersistentTestSuiteResult nestedSuite = new PersistentTestSuiteResult("anestedsuite");
-        nestedSuite.add(new PersistentTestCaseResult("case1", 100, PersistentTestCaseResult.Status.ERROR, null));
-        nestedSuite.add(new PersistentTestCaseResult("anothercase", 1, PersistentTestCaseResult.Status.ERROR, "with a messsage"));
+        nestedSuite.add(new PersistentTestCaseResult("case1", 100, ERROR, null));
+        nestedSuite.add(new PersistentTestCaseResult("anothercase", 1, ERROR, "with a messsage"));
         nestedSuite.add(nestedNestedSuite);
-        nestedSuite.add(new PersistentTestCaseResult("yetanothercase", 1, PersistentTestCaseResult.Status.PASS, "with another messsage"));
+        nestedSuite.add(new PersistentTestCaseResult("yetanothercase", 1, PASS, "with another messsage"));
 
-        suite.add(new PersistentTestCaseResult("case1", -1, PersistentTestCaseResult.Status.FAILURE, null));
+        suite.add(new PersistentTestCaseResult("case1", -1, FAILURE, null));
         suite.add(nestedSuite);
         roundTrip(suite);
     }
@@ -79,7 +80,7 @@ public class TestSuitePersisterTest extends PulseTestCase
     public void testXMLSpecialCharacters() throws Exception
     {
         PersistentTestSuiteResult suite = new PersistentTestSuiteResult("<>&'\"!<!-- -->");
-        suite.add(new PersistentTestCaseResult("<>&'\"!<!-- -->", 1, PersistentTestCaseResult.Status.PASS, "<>&'\"!<!-- -->"));
+        suite.add(new PersistentTestCaseResult("<>&'\"!<!-- -->", 1, PASS, "<>&'\"!<!-- -->"));
 
         PersistentTestSuiteResult outer = new PersistentTestSuiteResult("outer");
         outer.add(suite);
@@ -89,7 +90,7 @@ public class TestSuitePersisterTest extends PulseTestCase
     public void testControlCharacters() throws Exception
     {
         PersistentTestSuiteResult suite = new PersistentTestSuiteResult("\u0018");
-        suite.add(new PersistentTestCaseResult("\u0018", 1, PersistentTestCaseResult.Status.PASS, "\u0018"));
+        suite.add(new PersistentTestCaseResult("\u0018", 1, PASS, "\u0018"));
 
         PersistentTestSuiteResult outer = new PersistentTestSuiteResult("outer");
         outer.add(suite);
@@ -99,7 +100,7 @@ public class TestSuitePersisterTest extends PulseTestCase
     public void testEmptyMessage() throws Exception
     {
         PersistentTestSuiteResult suite = new PersistentTestSuiteResult("suity");
-        suite.add(new PersistentTestCaseResult("castor", 1, PersistentTestCaseResult.Status.PASS, ""));
+        suite.add(new PersistentTestCaseResult("castor", 1, PASS, ""));
 
         PersistentTestSuiteResult outer = new PersistentTestSuiteResult("outer");
         outer.add(suite);

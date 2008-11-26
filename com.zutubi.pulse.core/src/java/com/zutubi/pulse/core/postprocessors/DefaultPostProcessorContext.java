@@ -4,6 +4,8 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNA
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RESULTS;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 
 /**
  * Holds contextual information for the post processing of a single artifact
@@ -42,14 +44,26 @@ public class DefaultPostProcessorContext implements PostProcessorContext
         return executionContext;
     }
 
-    public PersistentTestSuiteResult getTestSuite()
-    {
-        return executionContext.getValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, PersistentTestSuiteResult.class);
-    }
-    
     public ResultState getResultState()
     {
         return commandResult.getState();
+    }
+
+    public void addTestSuite(TestSuiteResult suite, NameConflictResolution conflictResolution)
+    {
+        PersistentTestSuiteResult recipeSuite = executionContext.getValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, PersistentTestSuiteResult.class);
+        PersistentTestSuiteResult persistentSuite = new PersistentTestSuiteResult(suite, conflictResolution);
+
+        // Fold the suite directly into the recipe suite.
+        for (PersistentTestSuiteResult nestedSuite: persistentSuite.getSuites())
+        {
+            recipeSuite.add(nestedSuite);
+        }
+
+        for (PersistentTestCaseResult nestedCase: persistentSuite.getCases())
+        {
+            recipeSuite.add(nestedCase);
+        }
     }
 
     public void addFeature(Feature feature)

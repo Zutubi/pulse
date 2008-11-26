@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.renderer;
 
 import com.zutubi.pulse.core.model.*;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.model.*;
@@ -268,19 +270,19 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
         PersistentTestSuiteResult rootSuite = new PersistentTestSuiteResult("root test suite");
-        rootSuite.add(new PersistentTestCaseResult("2 failed", 0, PersistentTestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
-        rootSuite.add(new PersistentTestCaseResult("3 error", 0, PersistentTestCaseResult.Status.ERROR, "short error"));
+        rootSuite.add(new PersistentTestCaseResult("2 failed", 0, FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
+        rootSuite.add(new PersistentTestCaseResult("3 error", 0, ERROR, "short error"));
 
         PersistentTestSuiteResult nestedSuite = new PersistentTestSuiteResult("nested suite");
-        nestedSuite.add(new PersistentTestCaseResult("n1 failed", 0, PersistentTestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
-        nestedSuite.add(new PersistentTestCaseResult("n2 error", 0, PersistentTestCaseResult.Status.ERROR, "short error"));
+        nestedSuite.add(new PersistentTestCaseResult("n1 failed", 0, FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
+        nestedSuite.add(new PersistentTestCaseResult("n2 error", 0, ERROR, "short error"));
         rootSuite.add(nestedSuite);
 
         tests.add(rootSuite);
         command.addArtifact(new StoredArtifact("first-artifact", artifact));
 
         artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
-        tests.add(new PersistentTestCaseResult("test case at top level", 0, PersistentTestCaseResult.Status.FAILURE, "and i failed"));
+        tests.add(new PersistentTestCaseResult("test case at top level", 0, FAILURE, "and i failed"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
         secondResult.add(command);
@@ -338,19 +340,19 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
         PersistentTestSuiteResult rootSuite = new PersistentTestSuiteResult("root test suite");
-        rootSuite.add(new PersistentTestCaseResult("2 failed", 0, PersistentTestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
-        rootSuite.add(new PersistentTestCaseResult("3 error", 0, PersistentTestCaseResult.Status.ERROR, "short error"));
+        rootSuite.add(new PersistentTestCaseResult("2 failed", 0, FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
+        rootSuite.add(new PersistentTestCaseResult("3 error", 0, ERROR, "short error"));
 
         PersistentTestSuiteResult nestedSuite = new PersistentTestSuiteResult("nested suite");
-        nestedSuite.add(new PersistentTestCaseResult("n1 failed", 0, PersistentTestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
-        nestedSuite.add(new PersistentTestCaseResult("n2 error", 0, PersistentTestCaseResult.Status.ERROR, "short error"));
+        nestedSuite.add(new PersistentTestCaseResult("n1 failed", 0, FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
+        nestedSuite.add(new PersistentTestCaseResult("n2 error", 0, ERROR, "short error"));
         rootSuite.add(nestedSuite);
 
         tests.add(rootSuite);
         command.addArtifact(new StoredArtifact("first-artifact", artifact));
 
         artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
-        tests.add(new PersistentTestCaseResult("test case at top level", 0, PersistentTestCaseResult.Status.FAILURE, "and i failed"));
+        tests.add(new PersistentTestCaseResult("test case at top level", 0, FAILURE, "and i failed"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
         secondResult.add(command);

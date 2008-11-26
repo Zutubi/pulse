@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors;
 
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -35,7 +35,7 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
         this.reportType = reportType;
     }
 
-    protected void process(File file, PersistentTestSuiteResult suite, PostProcessorContext ppContext)
+    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
     {
         FileInputStream input = null;
 
@@ -45,7 +45,7 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
             Builder builder = createBuilder();
             Document doc;
             doc = builder.build(input);
-            processDocument(doc, suite);
+            processDocument(doc, tests);
         }
         catch (ParsingException pex)
         {
@@ -85,5 +85,5 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
      * @param doc   XML document to post process
      * @param tests suite to add all discovered test results to
      */
-    protected abstract void processDocument(Document doc, PersistentTestSuiteResult tests);
+    protected abstract void processDocument(Document doc, TestSuiteResult tests);
 }

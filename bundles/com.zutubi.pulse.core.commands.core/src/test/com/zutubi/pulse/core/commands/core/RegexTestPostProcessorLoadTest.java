@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.FileLoaderTestBase;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
 
 /**
  */
@@ -24,6 +25,6 @@ public class RegexTestPostProcessorLoadTest extends FileLoaderTestBase
         assertEquals(0, pp.getDetailsGroup());
         assertEquals("PASS", pp.getPassStatus());
         assertEquals("FAIL", pp.getFailureStatus());
-        assertEquals(RegexTestPostProcessor.Resolution.APPEND, pp.getResolveConflicts());
+        assertEquals(NameConflictResolution.APPEND, pp.getResolveConflicts());
     }
 }

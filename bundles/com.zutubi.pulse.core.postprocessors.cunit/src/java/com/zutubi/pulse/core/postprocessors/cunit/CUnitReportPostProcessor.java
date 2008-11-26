@@ -1,8 +1,10 @@
 package com.zutubi.pulse.core.postprocessors.cunit;
 
-import com.zutubi.pulse.core.model.PersistentTestCaseResult;
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
@@ -54,7 +56,7 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         return builder;
     }
 
-    protected void processDocument(Document doc, final PersistentTestSuiteResult tests)
+    protected void processDocument(Document doc, final TestSuiteResult tests)
     {
         Element root = doc.getRootElement();
         XMLUtils.forEachChild(root, ELEMENT_RESULT_LISTING, new UnaryProcedure<Element>()
@@ -86,12 +88,12 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         });
     }
 
-    private void handleSuite(PersistentTestSuiteResult tests, Element element)
+    private void handleSuite(TestSuiteResult tests, Element element)
     {
         try
         {
             String suiteName = XMLUtils.getRequiredChildText(element, ELEMENT_SUITE_NAME, true);
-            final PersistentTestSuiteResult suite = new PersistentTestSuiteResult(suiteName);
+            final TestSuiteResult suite = new TestSuiteResult(suiteName);
             XMLUtils.forEachChild(element, ELEMENT_RUN_TEST, new UnaryProcedure<Element>()
             {
                 public void process(Element element)
@@ -100,7 +102,7 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
                 }
             });
 
-            tests.add(suite);
+            tests.addSuite(suite);
         }
         catch (XMLException e)
         {
@@ -108,14 +110,14 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         }
     }
 
-    private void processCase(PersistentTestSuiteResult suite, Element element)
+    private void processCase(TestSuiteResult suite, Element element)
     {
         try
         {
             Element success = element.getFirstChildElement(ELEMENT_RUN_TEST_SUCCESS);
             if(success != null)
             {
-                suite.add(new PersistentTestCaseResult(XMLUtils.getRequiredChildText(success, ELEMENT_TEST_NAME, true)));
+                suite.addCase(new TestCaseResult(XMLUtils.getRequiredChildText(success, ELEMENT_TEST_NAME, true)));
             }
             else
             {
@@ -125,10 +127,10 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
                     String name = XMLUtils.getRequiredChildText(failure, ELEMENT_TEST_NAME, true);
                     String message = getFailureMessage(failure);
 
-                    PersistentTestCaseResult caseResult = suite.getCase(name);
+                    TestCaseResult caseResult = suite.findCase(name);
                     if(caseResult == null)
                     {
-                        suite.add(new PersistentTestCaseResult(name, PersistentTestCaseResult.UNKNOWN_DURATION, PersistentTestCaseResult.Status.FAILURE, message));
+                        suite.addCase(new TestCaseResult(name, TestResult.DURATION_UNKNOWN, TestStatus.FAILURE, message));
                     }
                     else
                     {
@@ -152,7 +154,7 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         return String.format("%s: %s: %s", file, line, condition);
     }
 
-    private void handleFailedSuite(PersistentTestSuiteResult tests, Element element)
+    private void handleFailedSuite(TestSuiteResult tests, Element element)
     {
         // The suite didn't run properly at all, but record a special case to
         // show what happened.
@@ -160,9 +162,9 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         {
             String name = XMLUtils.getRequiredChildText(element, ELEMENT_SUITE_NAME, true);
             String failureReason = XMLUtils.getRequiredChildText(element, ELEMENT_SUITE_FAILURE_REASON, true);
-            PersistentTestSuiteResult suite = new PersistentTestSuiteResult(name);
-            suite.add(new PersistentTestCaseResult("Suite Failure Notification", PersistentTestCaseResult.UNKNOWN_DURATION, PersistentTestCaseResult.Status.ERROR, failureReason));
-            tests.add(suite);
+            TestSuiteResult suite = new TestSuiteResult(name);
+            suite.addCase(new TestCaseResult("Suite Failure Notification", TestResult.DURATION_UNKNOWN, TestStatus.ERROR, failureReason));
+            tests.addSuite(suite);
         }
         catch(XMLException e)
         {

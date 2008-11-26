@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.model;
 
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.PASS;
 import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.util.List;
@@ -23,7 +25,7 @@ public class TestSuiteResultTest extends PulseTestCase
 
     public void testAddCase()
     {
-        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 100, PASS, "test message");
         suite.add(childCase);
         assertEquals(1, suite.getTotal());
         assertTrue(suite.getCases().iterator().next() == childCase);
@@ -40,8 +42,8 @@ public class TestSuiteResultTest extends PulseTestCase
 
     public void testAddCaseAlreadyExists()
     {
-        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
-        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 100, PASS, "test message");
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 100, PASS, "test message");
         suite.add(childCase);
         suite.add(childCase2);
         
@@ -52,8 +54,8 @@ public class TestSuiteResultTest extends PulseTestCase
 
     public void testAddCaseLessSevereAlreadyExists()
     {
-        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
-        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 102, PersistentTestCaseResult.Status.FAILURE, "failure message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 100, PASS, "test message");
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 102, FAILURE, "failure message");
         suite.add(childCase);
         suite.add(childCase2);
 
@@ -65,8 +67,8 @@ public class TestSuiteResultTest extends PulseTestCase
 
     public void testAddCaseMoreSevereAlreadyExists()
     {
-        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 102, PersistentTestCaseResult.Status.FAILURE, "failure message");
-        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 100, PersistentTestCaseResult.Status.PASS, "test message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 102, FAILURE, "failure message");
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 100, PASS, "test message");
         suite.add(childCase);
         suite.add(childCase2);
 
@@ -80,8 +82,8 @@ public class TestSuiteResultTest extends PulseTestCase
     {
         PersistentTestSuiteResult childSuite = new PersistentTestSuiteResult("child suite");
         PersistentTestSuiteResult childSuite2 = new PersistentTestSuiteResult("child suite");
-        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 1002, PersistentTestCaseResult.Status.PASS, null);
-        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase2", 102, PersistentTestCaseResult.Status.FAILURE, "failure message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 1002, PASS, null);
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase2", 102, FAILURE, "failure message");
         childSuite.add(childCase);
         childSuite.add(childCase2);
         suite.add(childSuite);
@@ -99,8 +101,8 @@ public class TestSuiteResultTest extends PulseTestCase
     {
         PersistentTestSuiteResult childSuite = new PersistentTestSuiteResult("child suite");
         PersistentTestSuiteResult childSuite2 = new PersistentTestSuiteResult("child suite");
-        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 1002, PersistentTestCaseResult.Status.PASS, null);
-        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 102, PersistentTestCaseResult.Status.FAILURE, "failure message");
+        PersistentTestCaseResult childCase = new PersistentTestCaseResult("acase", 1002, PASS, null);
+        PersistentTestCaseResult childCase2 = new PersistentTestCaseResult("acase", 102, FAILURE, "failure message");
         childSuite.add(childCase);
         childSuite.add(childCase2);
         suite.add(childSuite);

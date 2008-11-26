@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core.postprocessors.cppunit;
 
-import com.zutubi.pulse.core.model.PersistentTestCaseResult;
-import com.zutubi.pulse.core.model.PersistentTestResult;
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import com.zutubi.pulse.core.util.XMLUtils;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -28,22 +29,21 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
     private static final String ELEMENT_MESSAGE = "Message";
 
     private static final String FAILURE_TYPE_ERROR = "Error";
-    private static final String FAILURE_TYPE_ASSERTION = "Assertion";
 
-    private Map<String, PersistentTestSuiteResult> suites;
+    private Map<String, TestSuiteResult> suites;
 
     public CppUnitReportPostProcessor()
     {
         super("CppUnit");
     }
 
-    protected void processDocument(Document doc, PersistentTestSuiteResult tests)
+    protected void processDocument(Document doc, TestSuiteResult tests)
     {
         Element root = doc.getRootElement();
 
         // CIB-755: the post processor must be stateless, as it can be used
         // to process multiple reports.  Recreate this map each time.
-        suites = new TreeMap<String, PersistentTestSuiteResult>();
+        suites = new TreeMap<String, TestSuiteResult>();
 
         // We should get FailedTests and SuccessfulTests sections
         Elements testElements = root.getChildElements(ELEMENT_FAILED_TESTS);
@@ -70,12 +70,12 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
             Element testElement = elements.get(i);
             String[] name = getTestName(testElement);
 
-            PersistentTestCaseResult.Status status = getStatus(testElement);
+            TestStatus status = getStatus(testElement);
             String message = getMessage(testElement);
 
-            PersistentTestSuiteResult suite = getSuite(name[0]);
-            PersistentTestCaseResult result = new PersistentTestCaseResult(name[1], PersistentTestResult.UNKNOWN_DURATION, status, message);
-            suite.add(result);
+            TestSuiteResult suite = getSuite(name[0]);
+            TestCaseResult result = new TestCaseResult(name[1], TestResult.DURATION_UNKNOWN, status, message);
+            suite.addCase(result);
         }
     }
 
@@ -88,21 +88,21 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
             Element testElement = elements.get(i);
             String[] name = getTestName(testElement);
 
-            PersistentTestSuiteResult suite = getSuite(name[0]);
-            PersistentTestCaseResult result = new PersistentTestCaseResult(name[1]);
-            suite.add(result);
+            TestSuiteResult suite = getSuite(name[0]);
+            TestCaseResult result = new TestCaseResult(name[1]);
+            suite.addCase(result);
         }
     }
 
-    private void addSuites(PersistentTestSuiteResult tests)
+    private void addSuites(TestSuiteResult tests)
     {
-        for(PersistentTestSuiteResult suite: suites.values())
+        for(TestSuiteResult suite: suites.values())
         {
-            tests.add(suite);
+            tests.addSuite(suite);
         }
     }
 
-    private PersistentTestSuiteResult getSuite(String name)
+    private TestSuiteResult getSuite(String name)
     {
         if(suites.containsKey(name))
         {
@@ -110,7 +110,7 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
         }
         else
         {
-            PersistentTestSuiteResult suite = new PersistentTestSuiteResult(name);
+            TestSuiteResult suite = new TestSuiteResult(name);
             suites.put(name, suite);
             return suite;
         }
@@ -141,9 +141,9 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
         }
     }
 
-    private PersistentTestCaseResult.Status getStatus(Element element)
+    private TestStatus getStatus(Element element)
     {
-        PersistentTestCaseResult.Status status = PersistentTestCaseResult.Status.FAILURE;
+        TestStatus status = TestStatus.FAILURE;
 
         Element typeElement = element.getFirstChildElement(ELEMENT_FAILURE_TYPE);
         if(typeElement != null)
@@ -151,7 +151,7 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
             String type = XMLUtils.getText(typeElement);
             if(type != null && type.equals(FAILURE_TYPE_ERROR))
             {
-                status = PersistentTestCaseResult.Status.ERROR;
+                status = TestStatus.ERROR;
             }
         }
 

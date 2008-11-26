@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core.postprocessors.ocunit;
 
-import com.zutubi.pulse.core.model.PersistentTestCaseResult;
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.TestReportPostProcessorSupport;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -39,7 +40,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
         setName(name);
     }
     
-    protected void process(File file, PersistentTestSuiteResult suite, PostProcessorContext ppContext)
+    protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult suite)
     {
         try
         {
@@ -68,7 +69,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
         }
     }
 
-    private void processFile(PersistentTestSuiteResult tests) throws IOException
+    private void processFile(TestSuiteResult tests) throws IOException
     {
         // look for a TestSuite.
         currentLine = nextLine();
@@ -78,13 +79,13 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
             if (START_SUITE_PATTERN.matcher(currentLine).matches())
             {
                 // we have a test suite.
-                tests.add(processSuite());
+                tests.addSuite(processSuite());
             }
             currentLine = nextLine();
         }
     }
 
-    private PersistentTestSuiteResult processSuite() throws IOException
+    private TestSuiteResult processSuite() throws IOException
     {
         // varify that we have a start suite here.
         Matcher m = START_SUITE_PATTERN.matcher(currentLine);
@@ -94,7 +95,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
         }
 
         // start the suite.
-        PersistentTestSuiteResult suite = new PersistentTestSuiteResult(m.group(1));
+        TestSuiteResult suite = new TestSuiteResult(m.group(1));
 
         currentLine = nextLine();
 
@@ -105,7 +106,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
             // if new suite, then recurse.
             if (START_SUITE_PATTERN.matcher(currentLine).matches())
             {
-                suite.add(processSuite());
+                suite.addSuite(processSuite());
             }
             // if test case, then create it.
             else if (CASE_SUMMARY_PATTERN.matcher(currentLine).matches())
@@ -113,20 +114,20 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
                 Matcher caseMatch = CASE_SUMMARY_PATTERN.matcher(currentLine);
                 caseMatch.matches();
 
-                PersistentTestCaseResult result = new PersistentTestCaseResult(caseMatch.group(2));
+                TestCaseResult result = new TestCaseResult(caseMatch.group(2));
                 result.setMessage(caseOutput);
 
                 String statusString = caseMatch.group(3);
                 if (statusString.compareTo("passed") == 0)
                 {
-                    result.setStatus(PersistentTestCaseResult.Status.PASS);
+                    result.setStatus(TestStatus.PASS);
                 }
                 else if (statusString.compareTo("failed") == 0)
                 {
-                    result.setStatus(PersistentTestCaseResult.Status.FAILURE);
+                    result.setStatus(TestStatus.FAILURE);
                 }
                 result.setDuration((long) (Double.parseDouble(caseMatch.group(4)) * 1000));
-                suite.add(result);
+                suite.addCase(result);
                 caseOutput = "";
             }
             else

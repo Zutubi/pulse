@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
 import com.zutubi.util.StringUtils;
@@ -162,7 +163,7 @@ public class DefaultTestManager implements TestManager
                 element.addAttribute(new Attribute(TestSuitePersister.ATTRIBUTE_BROKEN_NUMBER, Long.toString(caseIndex.getBrokenNumber())));
                 markChanged();
             }
-            else if (!caseIndex.isHealthy() && caseResult.getStatus() == PersistentTestCaseResult.Status.PASS)
+            else if (!caseIndex.isHealthy() && caseResult.getStatus() == TestStatus.PASS)
             {
                 // Fixed in this build
                 element.addAttribute(new Attribute(TestSuitePersister.ATTRIBUTE_FIXED, "true"));

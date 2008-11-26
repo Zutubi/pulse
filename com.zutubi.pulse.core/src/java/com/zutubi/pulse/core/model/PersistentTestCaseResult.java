@@ -1,23 +1,17 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.postprocessors.api.TestResult;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+
 /**
  * Represents the result of a single test case.
  */
 public class PersistentTestCaseResult extends PersistentTestResult
 {
-    public enum Status
-    {
-        // These are deliberately ordered from least to most "severe".
-        // Keep it that way! :)
-        PASS,
-        FAILURE,
-        ERROR
-    }
-
     /**
      * The status of the case (i.e. the actual result).
      */
-    private Status status;
+    private TestStatus status;
     /**
      * Error/failure message when things have gone pear-shaped.
      */
@@ -44,27 +38,27 @@ public class PersistentTestCaseResult extends PersistentTestResult
 
     public PersistentTestCaseResult(String name)
     {
-        this(name, UNKNOWN_DURATION);
+        this(name, TestResult.DURATION_UNKNOWN);
     }
 
     public PersistentTestCaseResult(String name, long duration)
     {
-        this(name, duration, Status.PASS, null);
+        this(name, duration, TestStatus.PASS, null);
     }
 
-    public PersistentTestCaseResult(String name, long duration, Status status, String message)
+    public PersistentTestCaseResult(String name, long duration, TestStatus status, String message)
     {
         super(name, duration);
         this.status = status;
         this.message = message;
     }
-
-    public Status getStatus()
+    
+    public TestStatus getStatus()
     {
         return status;
     }
 
-    public void setStatus(Status status)
+    public void setStatus(TestStatus status)
     {
         this.status = status;
     }
@@ -76,7 +70,7 @@ public class PersistentTestCaseResult extends PersistentTestResult
 
     public void setStatusName(String statusName)
     {
-        status = Status.valueOf(statusName);
+        status = TestStatus.valueOf(statusName);
     }
 
     public String getMessage()
@@ -91,12 +85,12 @@ public class PersistentTestCaseResult extends PersistentTestResult
 
     public int getErrors()
     {
-        return status == Status.ERROR ? 1 : 0;
+        return status == TestStatus.ERROR ? 1 : 0;
     }
 
     public int getFailures()
     {
-        return status == Status.FAILURE ? 1 : 0;
+        return status == TestStatus.FAILURE ? 1 : 0;
     }
 
     public int getTotal()
