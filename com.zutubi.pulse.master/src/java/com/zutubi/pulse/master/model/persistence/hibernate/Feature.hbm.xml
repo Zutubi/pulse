@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-
-    <class name="com.zutubi.pulse.core.model.PersistentFeature" table="FEATURE" lazy="false">
-
+    <class name="com.zutubi.pulse.core.model.PersistentFeature" table="FEATURE" lazy="false" discriminator-value="FEATURE">
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
         
         <discriminator column="FEATURE_TYPE" type="string" length="255"/>
-                
+
         <property name="levelName" column="LEVEL" type="string" length="255"/>
         
         <property name="summary" column="SUMMARY" type="string" length="4095"/>
@@ -21,7 +19,5 @@
 
             <property name="lineNumber" column="LINE" type="long"/>
         </subclass>
-        
     </class>
-
 </hibernate-mapping>
