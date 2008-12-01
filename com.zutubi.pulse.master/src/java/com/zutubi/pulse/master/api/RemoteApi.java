@@ -69,14 +69,15 @@ public class RemoteApi
     }
 
     /**
-     * @return the version of this Pulse installation as a build number.  The
-     *         number is of the form:
-     *         &lt;major&gt;&lt;minor&gt;&lt;build&gt;&lt;patch&gt;
-     *         where &lt;major&gt; and &lt;minor&gt; are two digits and
-     *         &lt;build&gt; and &lt;patch&gt; are three digits.  The value
-     *         of &lt;patch&gt; will always be 000 in regular builds.  For
-     *         example, version 2.0.12 would have build number 0200012000, so
-     *         this method would return 200012000.
+     * Retrieves the version number of this Pulse installation.  The number is of the form:
+     * <p/>
+     *     &lt;major&gt;&lt;minor&gt;&lt;build&gt;&lt;patch&gt;
+     * <p/>
+     * where &lt;major&gt; and &lt;minor&gt; are two digits and &lt;build&gt; and &lt;patch&gt; are
+     * three digits.  The value of &lt;patch&gt; will always be 000 in regular builds.  For example,
+     * version 2.0.12 would have build number 0200012000, so this method would return 200012000.
+     *
+     * @return the version of this Pulse installation as a build number.
      */
     public int getVersion()
     {
@@ -99,7 +100,7 @@ public class RemoteApi
      * @throws AuthenticationException if the user does not exist or the
      *         password does not match
      */
-    public String login(String username, String password) throws AuthenticationException
+    public String login(String username, String password)
     {
         return tokenManager.login(username, password);
     }
@@ -136,9 +137,9 @@ public class RemoteApi
      * @param path the path to test, e.g. "projects/my project"
      * @return true iff the given configuration path exists and is visible to
      *         the logged in user
-     * @throws AuthenticationException if the given token is invalid
+     * @access available to all users
      */
-    public boolean configPathExists(String token, String path) throws AuthenticationException
+    public boolean configPathExists(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -161,10 +162,10 @@ public class RemoteApi
      * @param path the path to list the sub paths of
      * @return all sub paths of the given path that are visible to the logged
      *         in user
-     * @throws AuthenticationException if the given token in invalid
      * @throws IllegalArgumentException if the given path is invalid
+     * @access available to all users (paths not visible to the user are filtered)
      */
-    public Vector<String> getConfigListing(String token, String path) throws AuthenticationException
+    public Vector<String> getConfigListing(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -216,11 +217,11 @@ public class RemoteApi
      * @param path  path of the template to retrieve the parent for
      * @return the key of the template parent for the given path or the empty
      *         string if the path refers to the template root
-     * @throws AuthenticationException if the given token is invalid
      * @throws IllegalArgumentException if the given path does not refer to
      *         an element of a templated collection
+     * @access available to users with view permission for the given path
      */
-    public String getTemplateParent(String token, String path) throws AuthenticationException
+    public String getTemplateParent(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -244,11 +245,12 @@ public class RemoteApi
      * @param path  path of the template to retrieve the children for
      * @return the keys of all template children for the given path that are
      *         visible to the logged-in user
-     * @throws AuthenticationException if the given token is invalid
      * @throws IllegalArgumentException if the given path does not refer to
      *         an element of a templated collection
+     * @access available to users with view permission for the path; paths
+     *         not visible to the user are filtered out of the result
      */
-    public Vector<String> getTemplateChildren(String token, String path) throws AuthenticationException
+    public Vector<String> getTemplateChildren(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -274,6 +276,7 @@ public class RemoteApi
 
     private TemplateNode getTemplateNode(String path)
     {
+        configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
         TemplateNode node = configurationTemplateManager.getTemplateNode(path);
         if(node == null)
         {
@@ -289,12 +292,13 @@ public class RemoteApi
      * @param token        authentication token (see {@link #login})
      * @param symbolicName symbolic name of the configuration type to create
      *                     an instance of, e.g. "zutubi.projectConfig"
-     * @return a default configuration object of the given type
-     * @throws AuthenticationException if the given token is invalid
+     * @return {@xtype [config|Configuration Objects]}
+     *         a default configuration object of the given type
      * @throws IllegalArgumentException if the given symbolic name is invalid
      * @throws TypeException if there is an error constructing the object
+     * @access available to all users
      */
-    public Hashtable<String, Object> createDefaultConfig(String token, String symbolicName) throws AuthenticationException, TypeException
+    public Hashtable<String, Object> createDefaultConfig(String token, String symbolicName) throws TypeException
     {
         tokenManager.verifyUser(token);
         CompositeType type = typeRegistry.getType(symbolicName);
@@ -307,7 +311,33 @@ public class RemoteApi
         return type.toXmlRpc(record);
     }
 
-    public Object getConfig(String token, String path) throws AuthenticationException, TypeException
+    /**
+     * Returns the configuration object at the given path.  Configuration paths use forward slashes
+     * as a separator, and are split into a few main scopes:
+     * <ul>
+     *   <li>projects</li>
+     *   <li>agents</li>
+     *   <li>users</li>
+     *   <li>groups</li>
+     *   <li>settings</li>
+     * </ul>
+     * So, for example, to retrieve the SCM for a project named "my project", you would use the path
+     * "projects/my project/scm".  To discover other paths, use
+     * {@link #getConfigListing(String, String)}.
+     * <p/>
+     * If the path refers to a templated object, this function will return the full configuration
+     * including values inherited from template ancestors.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  the configuration path to look up (e.g. "projects/my project")
+     * @return {@xtype [config|Configuration Objects]} the object at the given path
+     * @throws IllegalArgumentException if the given path does not exist
+     * @throws TypeException if there is an error processing the configuration object
+     * @access available to users with view access for the path
+     * @see #getConfigListing(String, String)
+     * @see #getRawConfig(String, String) 
+     */
+    public Object getConfig(String token, String path) throws TypeException
     {
         tokenManager.loginUser(token);
 
@@ -330,10 +360,19 @@ public class RemoteApi
         }
     }
 
-    public String getConfigHandle(String token, String path) throws AuthenticationException, TypeException
+    /**
+     * Returns the unique handle for the configuration object at the given path.  Handles are
+     * constant, unique identifiers assigned to each configuration objects when they are created.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  the path to retrieve the handle for
+     * @return the handle for the given path, as a 64-bit integer in string format
+     * @throws IllegalArgumentException if the given path is invalid
+     * @access available to users with view permission for the given path
+     */
+    public String getConfigHandle(String token, String path)
     {
         tokenManager.loginUser(token);
-
         try
         {
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
@@ -352,7 +391,23 @@ public class RemoteApi
         }
     }
 
-    public Object getRawConfig(String token, String path) throws AuthenticationException, TypeException
+    /**
+     * Retrieves the raw configuration object for the given path.  This may differ from the full
+     * configuration returned by {@link #getConfig(String, String)} when the path refers to an
+     * object in a templated scope.  No values inherited from template ancestors are included in the
+     *  result, only values defined directly at this path.  This information can be used to
+     * determine which values are inherited, overridden or introduced at this level in the template
+     * hierarchy.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  the path to retrieve the aw configuration for
+     * @return the raw configuration (i.e. with no inherited values) at the given path
+     * @throws IllegalArgumentException if the given path does not exist
+     * @throws TypeException if there is an error converting the object
+     * @access available to users with view access to the given path
+     * @see #getConfig(String, String) 
+     */
+    public Object getRawConfig(String token, String path) throws TypeException
     {
         tokenManager.loginUser(token);
         try
@@ -364,7 +419,6 @@ public class RemoteApi
             }
 
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
-
             Type t = configurationTemplateManager.getType(path);
             return t.toXmlRpc(record);
         }
@@ -374,7 +428,17 @@ public class RemoteApi
         }
     }
 
-    public boolean isConfigPermanent(String token, String path) throws AuthenticationException
+    /**
+     * Indicates if the configuration object at the given path is marked as permanent.  Permanent
+     * objects may not be cloned or deleted.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  the configuration path to test
+     * @throws IllegalArgumentException if the given path does not exist
+     * @return true if the given configuration object is marked permanent
+     * @access available to users with view access for the given path
+     */
+    public boolean isConfigPermanent(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -394,7 +458,17 @@ public class RemoteApi
         }
     }
 
-    public boolean isConfigValid(String token, String path) throws AuthenticationException
+    /**
+     * Tests if the configuration object at the given path is valid, i.e. that all fields on the
+     * object pass validation rules.  Nested objects are not included in this check.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  the configuration path to check the validity of
+     * @return true if the fields on the given configuration object are all valid, false otherwise
+     * @throws IllegalArgumentException if the given path is invalid
+     * @access available to users with view permission for the given path
+     */
+    public boolean isConfigValid(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -414,7 +488,34 @@ public class RemoteApi
         }
     }
 
-    public String insertConfig(String token, String path, Hashtable config) throws AuthenticationException, TypeException, ValidationException
+    /**
+     * Adds a new configuration object to this server.  Configuration objects can be inserted into
+     * collection paths (e.g. the project properties collecction), and also to paths that expect a
+     * single complex object but are not yet configured (e.g. a project scm).  Objects that already
+     * exist may not be updated using this function, use {@link #saveConfig(String, String, java.util.Hashtable, boolean)}
+     * instead.
+     * <p/>
+     * The inserted object will be checked for type-correctness and validated before it is inserted.
+     * A fault will be thrown if either check fails, and the path will remain unchanged.
+     * <p/>
+     * This function cannot be used to insert projects or agents, where more information regarding
+     * the template hiearchy is required (see {@link #insertTemplatedConfig(String, String, java.util.Hashtable, boolean)}).
+     * 
+     * @param token  authentication token (see {@link #login})
+     * @param path   the path to insert into, either a collection (e.g. "projects/my project/properties"
+     *               or the path of a not-yet-configured singular nested object (e.g.
+     *               "projects/my project/scm")
+     * @param config the configuration object to insert (refer to [Configuration Objects])
+     * @return the path of the inserted configuration
+     * @throws IllegalArgumentException if the given path does not refer to a path the may be
+     *         inserted into, or the the type of the given config does not match
+     * @throws TypeException if the given config is malformed
+     * @throws ValidationException if the given config fails validation
+     * @access available to users with write permission for the given path
+     * @see #insertTemplatedConfig(String, String, java.util.Hashtable, boolean)
+     * @see #saveConfig(String, String, java.util.Hashtable, boolean)
+     */
+    public String insertConfig(String token, String path, Hashtable config) throws TypeException, ValidationException
     {
         tokenManager.loginUser(token);
         try
@@ -458,7 +559,34 @@ public class RemoteApi
         }
     }
 
-    public String insertTemplatedConfig(String token, String templateParentPath, Hashtable config, boolean template) throws AuthenticationException, TypeException, ValidationException
+    /**
+     * Adds a new configuration object to a templated collection on this server.  Currently two
+     * templated collections are available, projects and agents.  the object may be either a
+     * template or a concrete instance.  Objects that already exist may not be updated using this
+     * function, see {@link #saveConfig(String, String, java.util.Hashtable, boolean)}.
+     * <p/>
+     * The inserted object will be type-checked and validated prior to being inserted.  A fault will
+     * be thrown if either check fails and the configuration will remain unaffected.
+     * <p/>
+     * This function is only used for inserting into the top level of a templated collection.  To
+     * insert at any other path, use {@link #insertConfig(String, String, java.util.Hashtable)}.
+     *
+     * @param token              authentication token (see {@link #login})
+     * @param templateParentPath the path of the template parent that this new config should inherit
+     *                           from, this also determines which templated collection the config is
+     *                           being inserted into
+     * @param config             the configuration object to insert (see [Configuration Objects])
+     * @param template           if true, the object will be inserted as a template, if false it
+     *                           will be inserted as a concrete instance
+     * @return the path of the inserted configuration
+     * @throws IllegalArgumentException if the given template parent path does not refer to an
+     *         existing template, or the given config is of a different type
+     * @throws TypeException if the given config is malformed
+     * @throws ValidationException if the given config fails validation
+     * @see #insertConfig(String, String, java.util.Hashtable)
+     * @see #saveConfig(String, String, java.util.Hashtable, boolean) 
+     */
+    public String insertTemplatedConfig(String token, String templateParentPath, Hashtable config, boolean template) throws TypeException, ValidationException
     {
         tokenManager.loginUser(token);
         try
@@ -510,7 +638,7 @@ public class RemoteApi
         }
     }
 
-    public String saveConfig(String token, String path, Hashtable config, boolean deep) throws AuthenticationException, TypeException, ValidationException
+    public String saveConfig(String token, String path, Hashtable config, boolean deep) throws TypeException, ValidationException
     {
         tokenManager.loginUser(token);
         try
@@ -561,7 +689,7 @@ public class RemoteApi
      * @return true if the given path exists and is cloneable
      * @throws AuthenticationException if the given token is invalid
      */
-    public boolean canCloneConfig(String token, String path) throws AuthenticationException
+    public boolean canCloneConfig(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -620,7 +748,7 @@ public class RemoteApi
      * @throws AuthenticationException if the given token is invalid
      * @throws IllegalArgumentException if a given path or key is invalid
      */
-    public boolean cloneConfig(String token, String parentPath, Hashtable<String, String> keyMap) throws AuthenticationException
+    public boolean cloneConfig(String token, String parentPath, Hashtable<String, String> keyMap)
     {
         tokenManager.loginUser(token);
         try
@@ -634,7 +762,7 @@ public class RemoteApi
         }
     }
 
-    public boolean deleteConfig(String token, String path) throws AuthenticationException
+    public boolean deleteConfig(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -653,7 +781,7 @@ public class RemoteApi
         }
     }
 
-    public int deleteAllConfigs(String token, String pathPattern) throws AuthenticationException
+    public int deleteAllConfigs(String token, String pathPattern)
     {
         tokenManager.loginUser(token);
         try
@@ -666,7 +794,7 @@ public class RemoteApi
         }
     }
 
-    public boolean restoreConfig(String token, String path) throws AuthenticationException
+    public boolean restoreConfig(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -680,7 +808,7 @@ public class RemoteApi
         }
     }
 
-    public boolean setConfigOrder(String token, String path, Vector<String> order) throws AuthenticationException
+    public boolean setConfigOrder(String token, String path, Vector<String> order)
     {
         tokenManager.loginUser(token);
         try
@@ -694,7 +822,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<String> getConfigActions(String token, String path) throws AuthenticationException
+    public Vector<String> getConfigActions(String token, String path)
     {
         tokenManager.loginUser(token);
         try
@@ -708,7 +836,7 @@ public class RemoteApi
         }
     }
 
-    public boolean doConfigAction(String token, String path, String action) throws AuthenticationException
+    public boolean doConfigAction(String token, String path, String action)
     {
         tokenManager.loginUser(token);
         try
@@ -724,7 +852,15 @@ public class RemoteApi
 
     }
 
-    public boolean doConfigActionWithArgument(String token, String path, String action, Hashtable argument) throws AuthenticationException, TypeException, ValidationException
+    /**
+     *
+     * @param token
+     * @param path
+     * @param action
+     * @param argument {@xtype struct<[config|RemoteApi Configuration Objects]>}
+     * @return
+     */
+    public boolean doConfigActionWithArgument(String token, String path, String action, Hashtable argument) throws TypeException, ValidationException
     {
         tokenManager.loginUser(token);
         try
@@ -751,14 +887,22 @@ public class RemoteApi
 
     }
 
-    public boolean logError(String token, String message) throws AuthenticationException
+    /**
+     * Writes an error message to the log for testing.
+     *
+     * @param token   authentication token
+     * @param message message to write
+     * @return true
+     * @internal
+     */
+    public boolean logError(String token, String message)
     {
         tokenManager.verifyAdmin(token);
         LOG.severe(message);
         return true;
     }
 
-    public boolean logWarning(String token, String message) throws AuthenticationException
+    public boolean logWarning(String token, String message)
     {
         tokenManager.verifyAdmin(token);
         LOG.warning(message);
@@ -772,7 +916,7 @@ public class RemoteApi
      * @return the total number of users
      * @throws AuthenticationException if the given token is invalid
      */
-    public int getUserCount(String token) throws AuthenticationException
+    public int getUserCount(String token)
     {
         tokenManager.loginUser(token);
         try
@@ -785,7 +929,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<String> getAllUserLogins(String token) throws AuthenticationException
+    public Vector<String> getAllUserLogins(String token)
     {
         tokenManager.loginUser(token);
         try
@@ -812,7 +956,7 @@ public class RemoteApi
      * @return the total number of concrete projects
      * @throws AuthenticationException if the given token is invalid
      */
-    public int getProjectCount(String token) throws AuthenticationException
+    public int getProjectCount(String token)
     {
         tokenManager.loginUser(token);
         try
@@ -825,7 +969,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<String> getAllProjectNames(String token) throws AuthenticationException
+    public Vector<String> getAllProjectNames(String token)
     {
         tokenManager.loginUser(token);
         try
@@ -839,7 +983,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<String> getMyProjectNames(String token) throws AuthenticationException
+    public Vector<String> getMyProjectNames(String token)
     {
         User user = tokenManager.loginAndReturnUser(token);
         try
@@ -858,7 +1002,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<String> getAllProjectGroups(String token) throws AuthenticationException
+    public Vector<String> getAllProjectGroups(String token)
     {
         tokenManager.loginUser(token);
         try
@@ -878,7 +1022,7 @@ public class RemoteApi
         }
     }
 
-    public Hashtable<String, Object> getProjectGroup(String token, String name) throws AuthenticationException, IllegalArgumentException
+    public Hashtable<String, Object> getProjectGroup(String token, String name) throws IllegalArgumentException
     {
         tokenManager.loginUser(token);
         try
@@ -921,7 +1065,7 @@ public class RemoteApi
      * @return the total number of concrete agents
      * @throws AuthenticationException if the given token is invalid
      */
-    public int getAgentCount(String token) throws AuthenticationException
+    public int getAgentCount(String token)
     {
         tokenManager.loginUser(token);
         try
@@ -934,7 +1078,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<String> getAllAgentNames(String token) throws AuthenticationException
+    public Vector<String> getAllAgentNames(String token)
     {
         tokenManager.loginUser(token);
         try
@@ -957,7 +1101,14 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id) throws AuthenticationException
+    /**
+     *
+     * @param token
+     * @param projectName
+     * @param id
+     * @return {@xtype array<[RemoteApi.BuildResult]>}
+     */
+    public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id)
     {
         tokenManager.loginUser(token);
         try
@@ -979,7 +1130,7 @@ public class RemoteApi
         }
     }
 
-    public boolean deleteBuild(String token, String projectName, int id) throws AuthenticationException
+    public boolean deleteBuild(String token, String projectName, int id)
     {
         tokenManager.loginUser(token);
         try
@@ -1001,7 +1152,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, String[] resultStates, int firstResult, int maxResults, boolean mostRecentFirst) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, Vector<String> resultStates, int firstResult, int maxResults, boolean mostRecentFirst)
     {
         tokenManager.loginUser(token);
         try
@@ -1024,7 +1175,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, Object>> getBuildRange(String token, String projectName, int afterBuild, int toBuild) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getBuildRange(String token, String projectName, int afterBuild, int toBuild)
     {
         tokenManager.loginUser(token);
         try
@@ -1045,7 +1196,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, Object>> getPreviousBuild(String token, String projectName, int id) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getPreviousBuild(String token, String projectName, int id)
     {
         tokenManager.loginUser(token);
         try
@@ -1067,14 +1218,15 @@ public class RemoteApi
         }
     }
 
-    private ResultState[] mapStates(String[] stateNames)
+    private ResultState[] mapStates(Vector<String> stateNames)
     {
-        if(stateNames.length > 0)
+        if(stateNames.size() > 0)
         {
-            ResultState[] states = new ResultState[stateNames.length];
-            for(int i = 0; i < stateNames.length; i++)
+            ResultState[] states = new ResultState[stateNames.size()];
+            int i = 0;
+            for(String stateName: stateNames)
             {
-                states[i] = ResultState.fromPrettyString(stateNames[i]);
+                states[i++] = ResultState.fromPrettyString(stateName);
             }
 
             return states;
@@ -1085,7 +1237,7 @@ public class RemoteApi
         }
     }
 
-    public int getNextBuildNumber(String token, String projectName) throws AuthenticationException
+    public int getNextBuildNumber(String token, String projectName)
     {
         tokenManager.loginUser(token);
         try
@@ -1099,7 +1251,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, boolean completedOnly, int maxResults) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, boolean completedOnly, int maxResults)
     {
         tokenManager.loginUser(token);
         try
@@ -1128,12 +1280,12 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, Object>> getLatestBuildForProject(String token, String projectName, boolean completedOnly) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getLatestBuildForProject(String token, String projectName, boolean completedOnly)
     {
         return getLatestBuildsForProject(token, projectName, completedOnly, 1);
     }
 
-    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, String projectName, int maxResults) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, String projectName, int maxResults)
     {
         tokenManager.verifyUser(token);
 
@@ -1149,12 +1301,12 @@ public class RemoteApi
         return result;
     }
 
-    public Vector<Hashtable<String, Object>> getLatestBuildWithWarnings(String token, String projectName) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getLatestBuildWithWarnings(String token, String projectName)
     {
         return getLatestBuildsWithWarnings(token, projectName, 1);
     }
 
-    public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id)
     {
         Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
 
@@ -1176,7 +1328,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, boolean completedOnly, int maxResults) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, boolean completedOnly, int maxResults)
     {
         User user = tokenManager.loginAndReturnUser(token);
         try
@@ -1215,7 +1367,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, Object>> getLatestPersonalBuild(String token, boolean completedOnly) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuild(String token, boolean completedOnly)
     {
         return getLatestPersonalBuilds(token, completedOnly, 1);
     }
@@ -1277,7 +1429,7 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id)
     {
         tokenManager.loginUser(token);
         try
@@ -1359,7 +1511,7 @@ public class RemoteApi
         return result;
     }
 
-    public Vector<Hashtable<String, Object>> getArtifactsInBuild(String token, final String projectName, final int id) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getArtifactsInBuild(String token, final String projectName, final int id)
     {
         tokenManager.loginUser(token);
         try
@@ -1414,7 +1566,7 @@ public class RemoteApi
         return result;
     }
 
-    public Vector<Hashtable<String, String>> getMessagesInBuild(String token, String projectName, final int id) throws AuthenticationException
+    public Vector<Hashtable<String, String>> getMessagesInBuild(String token, String projectName, final int id)
     {
         tokenManager.loginUser(token);
         try
@@ -1481,22 +1633,22 @@ public class RemoteApi
         }
     }
 
-    public Vector<Hashtable<String, String>> getErrorMessagesInBuild(String token, String projectName, final int id) throws AuthenticationException
+    public Vector<Hashtable<String, String>> getErrorMessagesInBuild(String token, String projectName, final int id)
     {
         return getMessagesOfLevel(token, projectName, id, Feature.Level.ERROR);
     }
 
-    public Vector<Hashtable<String, String>> getWarningMessagesInBuild(String token, String projectName, final int id) throws AuthenticationException
+    public Vector<Hashtable<String, String>> getWarningMessagesInBuild(String token, String projectName, final int id)
     {
         return getMessagesOfLevel(token, projectName, id, Feature.Level.WARNING);
     }
 
-    public Vector<Hashtable<String, String>> getInfoMessagesInBuild(String token, String projectName, final int id) throws AuthenticationException
+    public Vector<Hashtable<String, String>> getInfoMessagesInBuild(String token, String projectName, final int id)
     {
         return getMessagesOfLevel(token, projectName, id, Feature.Level.INFO);
     }
 
-    private Vector<Hashtable<String, String>> getMessagesOfLevel(String token, String projectName, int id, Feature.Level level) throws AuthenticationException
+    private Vector<Hashtable<String, String>> getMessagesOfLevel(String token, String projectName, int id, Feature.Level level)
     {
         Vector<Hashtable<String, String>> result = getMessagesInBuild(token, projectName, id);
         Iterator<Hashtable<String, String>> it = result.iterator();
@@ -1541,12 +1693,12 @@ public class RemoteApi
         return result;
     }
 
-    public boolean triggerBuild(String token, String projectName) throws AuthenticationException
+    public boolean triggerBuild(String token, String projectName)
     {
         return triggerBuild(token, projectName, null);
     }
 
-    public boolean triggerBuild(String token, String projectName, final String revision) throws AuthenticationException
+    public boolean triggerBuild(String token, String projectName, final String revision)
     {
         tokenManager.loginUser(token);
         try
@@ -1600,7 +1752,7 @@ public class RemoteApi
      *         user does not have permission to cancel builds for the project
      * @throws IllegalArgumentException if the given project name is invalid
      */
-    public boolean cancelBuild(String token, String projectName, int id) throws AuthenticationException
+    public boolean cancelBuild(String token, String projectName, int id)
     {
         tokenManager.loginUser(token);
         try
@@ -1624,6 +1776,7 @@ public class RemoteApi
     }
 
     /**
+     * <p>
      * Retrieves the state of the given project.  Possible states include:
      * <ul>
      *   <li>initialising</li>
@@ -1633,17 +1786,16 @@ public class RemoteApi
      *   <li>initialise on idle</li>
      *   <li>pause on idle</li>
      * </ul>
-     * <p/>
-     * The user indicated by the token must have permission to view the
-     * project.
+     * </p>
      *
      * @param token        authentication token (see {@link #login})
      * @param projectName  name of the project to retrieve the state for
      * @return the current project state
      * @throws AuthenticationException if the given token is invalid
      * @throws IllegalArgumentException if the project name is invalid
+     * @access requires view permission for the project
      */
-    public String getProjectState(String token, String projectName) throws AuthenticationException
+    public String getProjectState(String token, String projectName)
     {
         tokenManager.loginUser(token);
         try
@@ -1657,7 +1809,7 @@ public class RemoteApi
         }
     }
 
-    public Hashtable<String, String> preparePersonalBuild(String token, String projectName) throws AuthenticationException, ScmException
+    public Hashtable<String, String> preparePersonalBuild(String token, String projectName) throws ScmException
     {
         User user = tokenManager.loginAndReturnUser(token);
         if(!accessManager.hasPermission(userManager.getPrinciple(user), ServerPermission.PERSONAL_BUILD.toString(), null))
@@ -1702,7 +1854,7 @@ public class RemoteApi
      *
      * @see #resumeProject(String, String)
      */
-    public boolean pauseProject(String token, String projectName) throws AuthenticationException
+    public boolean pauseProject(String token, String projectName)
     {
         return doProjectStateTransition(token, projectName, Project.Transition.PAUSE);
     }
@@ -1719,7 +1871,7 @@ public class RemoteApi
      * @throws AccessDeniedException if the user indicated by the token does
      *                               not have pause authority for the project
      */
-    public boolean resumeProject(String token, String projectName) throws AuthenticationException
+    public boolean resumeProject(String token, String projectName)
     {
         return doProjectStateTransition(token, projectName, Project.Transition.RESUME);
     }
@@ -1740,12 +1892,12 @@ public class RemoteApi
      * @throws AccessDeniedException if the user indicated by the token does
      *                               not have write authority for the project
      */
-    public boolean initialiseProject(String token, String projectName) throws AuthenticationException
+    public boolean initialiseProject(String token, String projectName)
     {
         return doProjectStateTransition(token, projectName, Project.Transition.INITIALISE);
     }
 
-    private boolean doProjectStateTransition(String token, String projectName, Project.Transition transition) throws AuthenticationException
+    private boolean doProjectStateTransition(String token, String projectName, Project.Transition transition)
     {
         try
         {
@@ -1759,7 +1911,7 @@ public class RemoteApi
         }
     }
 
-    public String getAgentStatus(String token, String name) throws AuthenticationException
+    public String getAgentStatus(String token, String name)
     {
         tokenManager.loginUser(token);
         try
@@ -1778,7 +1930,7 @@ public class RemoteApi
         }
     }
 
-    public boolean enableAgent(String token, String name) throws AuthenticationException
+    public boolean enableAgent(String token, String name)
     {
         tokenManager.loginUser(token);
         try
@@ -1798,7 +1950,7 @@ public class RemoteApi
         }
     }
 
-    public boolean disableAgent(String token, String name) throws AuthenticationException
+    public boolean disableAgent(String token, String name)
     {
         tokenManager.loginUser(token);
         try
@@ -1818,7 +1970,7 @@ public class RemoteApi
         }
     }
 
-    public boolean shutdown(String token, boolean force, boolean exitJvm) throws AuthenticationException
+    public boolean shutdown(String token, boolean force, boolean exitJvm)
     {
         tokenManager.verifyAdmin(token);
 
@@ -1828,7 +1980,7 @@ public class RemoteApi
         return true;
     }
 
-    public boolean stopService(String token) throws AuthenticationException
+    public boolean stopService(String token)
     {
         tokenManager.verifyAdmin(token);
         shutdownManager.delayedStop();
