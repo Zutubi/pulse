@@ -292,7 +292,7 @@ public class RemoteApi
      * @param token        authentication token (see {@link #login})
      * @param symbolicName symbolic name of the configuration type to create
      *                     an instance of, e.g. "zutubi.projectConfig"
-     * @return {@xtype [config|Configuration Objects]}
+     * @return {@xtype struct<[config|Remote API Configuration Objects]>}
      *         a default configuration object of the given type
      * @throws IllegalArgumentException if the given symbolic name is invalid
      * @throws TypeException if there is an error constructing the object
@@ -330,7 +330,8 @@ public class RemoteApi
      *
      * @param token authentication token (see {@link #login})
      * @param path  the configuration path to look up (e.g. "projects/my project")
-     * @return {@xtype [config|Configuration Objects]} the object at the given path
+     * @return {@xtype struct<[config|Remote API Configuration Objects]>} the object at the given
+     *         path
      * @throws IllegalArgumentException if the given path does not exist
      * @throws TypeException if there is an error processing the configuration object
      * @access available to users with view access for the path
@@ -505,7 +506,7 @@ public class RemoteApi
      * @param path   the path to insert into, either a collection (e.g. "projects/my project/properties"
      *               or the path of a not-yet-configured singular nested object (e.g.
      *               "projects/my project/scm")
-     * @param config the configuration object to insert (refer to [Configuration Objects])
+     * @param config the configuration object to insert (refer to [Remote API Configuration Objects])
      * @return the path of the inserted configuration
      * @throws IllegalArgumentException if the given path does not refer to a path the may be
      *         inserted into, or the the type of the given config does not match
@@ -575,7 +576,7 @@ public class RemoteApi
      * @param templateParentPath the path of the template parent that this new config should inherit
      *                           from, this also determines which templated collection the config is
      *                           being inserted into
-     * @param config             the configuration object to insert (see [Configuration Objects])
+     * @param config             the configuration object to insert (see [Remote API Configuration Objects])
      * @param template           if true, the object will be inserted as a template, if false it
      *                           will be inserted as a concrete instance
      * @return the path of the inserted configuration
@@ -857,7 +858,7 @@ public class RemoteApi
      * @param token
      * @param path
      * @param action
-     * @param argument {@xtype struct<[config|RemoteApi Configuration Objects]>}
+     * @param argument {@xtype struct<[config|Remote API Configuration Objects]>}
      * @return
      */
     public boolean doConfigActionWithArgument(String token, String path, String action, Hashtable argument) throws TypeException, ValidationException
@@ -888,12 +889,12 @@ public class RemoteApi
     }
 
     /**
+     * @internal
      * Writes an error message to the log for testing.
      *
      * @param token   authentication token
      * @param message message to write
      * @return true
-     * @internal
      */
     public boolean logError(String token, String message)
     {
@@ -902,6 +903,14 @@ public class RemoteApi
         return true;
     }
 
+    /**
+     * @internal
+     * Writes a warning message to the log for testing.
+     *
+     * @param token   authentication token
+     * @param message message to write
+     * @return true
+     */
     public boolean logWarning(String token, String message)
     {
         tokenManager.verifyAdmin(token);
@@ -1511,6 +1520,18 @@ public class RemoteApi
         return result;
     }
 
+    /**
+     * Returns an array of all artifacts captured in a given build.  Artifacts from all stages are
+     * returned.  The returned structures indicate the context (stage and command) in which each
+     * artifact was captured.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName name of the project that owns the build
+     * @param id          id of the build to retrieve the artifacts for
+     * @return {@xtype array<[RemoteApi.Artifact]>} all artifacts captured in the given build
+     * @throws IllegalArgumentException if the given project name or build is invalid
+     * @access requires view permission for th given project
+     */
     public Vector<Hashtable<String, Object>> getArtifactsInBuild(String token, final String projectName, final int id)
     {
         tokenManager.loginUser(token);
@@ -1566,6 +1587,21 @@ public class RemoteApi
         return result;
     }
 
+    /**
+     * Returns an array of all messages (errors, warnings and information) in a build.  Messages are
+     * gathered at all levels: build, stage, command and artifact.  The returned structures contain
+     * information about the context where the message was found.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project owning the build
+     * @param id          id of the build to get the messages for
+     * @return {@xtype array<[RemoteApi.Feature]>} all messages found for the given build
+     * @throws IllegalArgumentException if the given project or build does not exist
+     * @access requires view permission for the given project
+     * @see #getInfoMessagesInBuild(String, String, int)
+     * @see #getWarningMessagesInBuild(String, String, int)
+     * @see #getErrorMessagesInBuild(String, String, int)
+     */
     public Vector<Hashtable<String, String>> getMessagesInBuild(String token, String projectName, final int id)
     {
         tokenManager.loginUser(token);
@@ -1633,16 +1669,64 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns an array of all <strong>error</strong> messages in a build.  Messages are
+     * gathered at all levels: build, stage, command and artifact.  The returned structures contain
+     * information about the context where the message was found.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project owning the build
+     * @param id          id of the build to get the messages for
+     * @return {@xtype array<[RemoteApi.Feature]>} all error messages found for the given
+     *         build
+     * @throws IllegalArgumentException if the given project or build does not exist
+     * @access requires view permission for the given project
+     * @see #getMessagesInBuild(String, String, int)
+     * @see #getInfoMessagesInBuild(String, String, int)
+     * @see #getWarningMessagesInBuild(String, String, int)
+     */
     public Vector<Hashtable<String, String>> getErrorMessagesInBuild(String token, String projectName, final int id)
     {
         return getMessagesOfLevel(token, projectName, id, Feature.Level.ERROR);
     }
 
+    /**
+     * Returns an array of all <strong>warning</strong> messages in a build.  Messages are
+     * gathered at all levels: build, stage, command and artifact.  The returned structures contain
+     * information about the context where the message was found.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project owning the build
+     * @param id          id of the build to get the messages for
+     * @return {@xtype array<[RemoteApi.Feature]>} all warning messages found for the given
+     *         build
+     * @throws IllegalArgumentException if the given project or build does not exist
+     * @access requires view permission for the given project
+     * @see #getMessagesInBuild(String, String, int)
+     * @see #getInfoMessagesInBuild(String, String, int)
+     * @see #getErrorMessagesInBuild(String, String, int)
+     */
     public Vector<Hashtable<String, String>> getWarningMessagesInBuild(String token, String projectName, final int id)
     {
         return getMessagesOfLevel(token, projectName, id, Feature.Level.WARNING);
     }
 
+    /**
+     * Returns an array of all <strong>information</strong> messages in a build.  Messages are
+     * gathered at all levels: build, stage, command and artifact.  The returned structures contain
+     * information about the context where the message was found.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project owning the build
+     * @param id          id of the build to get the messages for
+     * @return {@xtype array<[RemoteApi.Feature]>} all information messages found for the given
+     *         build
+     * @throws IllegalArgumentException if the given project or build does not exist
+     * @access requires view permission for the given project
+     * @see #getMessagesInBuild(String, String, int)
+     * @see #getWarningMessagesInBuild(String, String, int)
+     * @see #getErrorMessagesInBuild(String, String, int)
+     */
     public Vector<Hashtable<String, String>> getInfoMessagesInBuild(String token, String projectName, final int id)
     {
         return getMessagesOfLevel(token, projectName, id, Feature.Level.INFO);
@@ -1693,11 +1777,32 @@ public class RemoteApi
         return result;
     }
 
+    /**
+     * Triggers a build of the given project at a floating revision.  The revision will be fixed as
+     * laate as possible.  This function returns as soon as the request has been made.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project to trigger
+     * @return true
+     * @access requires trigger permission for the given project
+     * @see #triggerBuild(String, String, String) 
+     */
     public boolean triggerBuild(String token, String projectName)
     {
         return triggerBuild(token, projectName, null);
     }
 
+    /**
+     * Triggers a build of the given project at the given revision.  The revision will be verified
+     * before requesting the build.  This function returns as soon as the request has been made.
+     * 
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project to trigger
+     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number)
+     * @return true
+     * @access requires trigger permission for the given project
+     * @see #triggerBuild(String, String) 
+     */
     public boolean triggerBuild(String token, String projectName, final String revision)
     {
         tokenManager.loginUser(token);
@@ -1741,16 +1846,16 @@ public class RemoteApi
     }
 
     /**
-     * Request that the given build is cancelled.
+     * Request that the given active build is cancelled.  This function returns when the request is
+     * made, which is likely to be before the build is cancelled (if indeed it is cancelled).
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project that is building
      * @param id          the id of the build to cancel
-     * @return true if cancellation was requested, false if the build was not
-     *         found or was not in progress
-     * @throws AuthenticationException if the given token is invalid, or the
-     *         user does not have permission to cancel builds for the project
+     * @return true if cancellation was requested, false if the build was not found or was not in
+     *         progress
      * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires cancel build permission for the given project
      */
     public boolean cancelBuild(String token, String projectName, int id)
     {
@@ -1776,7 +1881,6 @@ public class RemoteApi
     }
 
     /**
-     * <p>
      * Retrieves the state of the given project.  Possible states include:
      * <ul>
      *   <li>initialising</li>
@@ -1786,12 +1890,10 @@ public class RemoteApi
      *   <li>initialise on idle</li>
      *   <li>pause on idle</li>
      * </ul>
-     * </p>
      *
      * @param token        authentication token (see {@link #login})
      * @param projectName  name of the project to retrieve the state for
      * @return the current project state
-     * @throws AuthenticationException if the given token is invalid
      * @throws IllegalArgumentException if the project name is invalid
      * @access requires view permission for the project
      */
@@ -1809,6 +1911,15 @@ public class RemoteApi
         }
     }
 
+    /**
+     * @internal
+     * Performs checks before a personal build is requested.
+     *
+     * @param token       authentication token (see {@link #login})
+     * @param projectName name of the projec that the user wishes to run a personal build of
+     * @return SCM configuration details for the project
+     * @throws ScmException if there is an error retrieving SCM details
+     */
     public Hashtable<String, String> preparePersonalBuild(String token, String projectName) throws ScmException
     {
         User user = tokenManager.loginAndReturnUser(token);
@@ -1838,20 +1949,16 @@ public class RemoteApi
     }
 
     /**
-     * Pauses the given project.  When a project is paused, new triggers are
-     * ignored.  If the project is currently building, it will be marked to
-     * pause on idle.  If it is currently initialising, this request is
-     * ignored.
+     * Pauses the given project.  When a project is paused, new triggers are ignored.  If the
+     * project is currently building, it will be marked to pause on idle.  If it is currently
+     * initialising, this request is ignored.
      *
      * @param token       authentication token (see {@link #login})
      * @param projectName name of the project to pause
-     * @return true if the project was paused (or marked for pause on idle),
-     *         false if pausing is not possible in the current project state
-     * @throws AuthenticationException if the given token is invalid
+     * @return true if the project was paused (or marked for pause on idle), false if pausing is not
+     *         possible in the current project state
      * @throws IllegalArgumentException if the project name is invalid
-     * @throws AccessDeniedException if the user indicated by the token does
-     *                               not have pause authority for the project
-     *
+     * @access available to users with pause permission for the project
      * @see #resumeProject(String, String)
      */
     public boolean pauseProject(String token, String projectName)
@@ -1860,16 +1967,17 @@ public class RemoteApi
     }
 
     /**
-     * Resumes the given project if it is currently paused.
+     * Resumes the given project if it is currently paused.  If the project is currently marked to
+     * pause on idle, it will return to the building state.  If the project is currently
+     * initialising, this request is ignored.
      *
      * @param token       authentication token (see {@link #login})
      * @param projectName name of the project to resume
-     * @return true if the project was resumed, false if resuming is not
-     *         possible in the current project state
-     * @throws AuthenticationException if the given token is invalid
+     * @return true if the project was resumed, false if resuming is not possible in the current
+     *         project state
      * @throws IllegalArgumentException if the project name is invalid
-     * @throws AccessDeniedException if the user indicated by the token does
-     *                               not have pause authority for the project
+     * @access available to users with pause permission for the project
+     * @see #pauseProject(String, String)
      */
     public boolean resumeProject(String token, String projectName)
     {
@@ -1878,7 +1986,7 @@ public class RemoteApi
 
     /**
      * Requests initialisation of the given project.  This will force the
-     * project to repeat the initialisation cycle from ther beginning, even if
+     * project to repeat the initialisation cycle from the beginning, even if
      * it was already successfully initialised.  If the project is currently
      * building, it will be marked to initialise on idle.
      *
@@ -1887,10 +1995,8 @@ public class RemoteApi
      * @return true if initialisation was requested for the project (or it was
      *         marked initialise on idle), false if initialising is not
      *         possible in the current project state
-     * @throws AuthenticationException if the given token is invalid
      * @throws IllegalArgumentException if the project name is invalid
-     * @throws AccessDeniedException if the user indicated by the token does
-     *                               not have write authority for the project
+     * @access available to users with write permission for the given project
      */
     public boolean initialiseProject(String token, String projectName)
     {
@@ -1911,6 +2017,31 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the state of the given agent as a simple string.  Possible states are:
+     * <ul>
+     *   <li>awaiting ping</li>
+     *   <li>building</li>
+     *   <li>building invalid</li>
+     *   <li>disabled</li>
+     *   <li>idle</li>
+     *   <li>initial</li>
+     *   <li>invalid master</li>
+     *   <li>offline</li>
+     *   <li>post recipe</li>
+     *   <li>recipe assigned</li>
+     *   <li>token mismatch</li>
+     *   <li>version mismatch</li>
+     * </ul>
+     *
+     * @param token authentication token (see {@link #login})
+     * @param name the name of the agent to retrieve the state for
+     * @return the current state of the given agent
+     * @throws IllegalArgumentException if the given agent does not exist
+     * @access available to users with view permission for the given agent
+     * @see #disableAgent(String, String)
+     * @see #enableAgent(String, String)
+     */
     public String getAgentStatus(String token, String name)
     {
         tokenManager.loginUser(token);
@@ -1919,7 +2050,7 @@ public class RemoteApi
             Agent agent = agentManager.getAgent(name);
             if (agent == null)
             {
-                return "";
+                throw new IllegalArgumentException("Unknown agent '" + name + "'");
             }
 
             return agent.getStatus().getPrettyString();
@@ -1930,6 +2061,19 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Enables a given disabled agent, allowing it to once more begin processing builds.  If the
+     * agent is curently marked to disable on idle, it will be returned to the building
+     * state.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param name  the name of the agent to enable
+     * @return true
+     * @throws IllegalArgumentException if the given agent does not exist
+     * @access available to users with disable permission for the given agent
+     * @see #disableAgent(String, String)
+     * @see #getAgentStatus(String, String)
+     */
     public boolean enableAgent(String token, String name)
     {
         tokenManager.loginUser(token);
@@ -1950,6 +2094,20 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Disables the given agent, preventing it from processing builds until it is reenabled.  If the
+     * agent is currently running a build, it will be marked to disable on idle.  If the agent is
+     * already marked to disable on idle, it will be forcably disabled (terminating the build with
+     * an error).
+     *
+     * @param token authentication token (see {@link #login})
+     * @param name  the name of the agent to disable
+     * @return true
+     * @throws IllegalArgumentException if the given agent does not exist
+     * @access available to users with disable permission for the given agent
+     * @see #enableAgent(String, String)
+     * @see #getAgentStatus(String, String)
+     */
     public boolean disableAgent(String token, String name)
     {
         tokenManager.loginUser(token);
@@ -1970,6 +2128,17 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Request that this server shut down.  This method will return after the request is made, which
+     * is likely to be before the shutdown is complete.
+     *
+     * @param token   authentication token (see {@link #login})
+     * @param force   if true, running builds will be terminated to force a faster shutdown, if
+     *                false running builds will be allowed to complete
+     * @param exitJvm if true, the JVM will be explicitly exited (rather than being allowed to exit
+     *                when there are no more non-daemon threads)
+     * @return true
+     */
     public boolean shutdown(String token, boolean force, boolean exitJvm)
     {
         tokenManager.verifyAdmin(token);
@@ -1980,6 +2149,13 @@ public class RemoteApi
         return true;
     }
 
+    /**
+     * @internal
+     * Shutdown function used by the service wrapper.
+     *
+     * @param token authentication token (see {@link #login})
+     * @return true
+     */
     public boolean stopService(String token)
     {
         tokenManager.verifyAdmin(token);
