@@ -737,7 +737,8 @@ public class RemoteApi
      * @param token authentication token (see {@link #login})
      * @param path  path to test
      * @return true if the given path exists and is cloneable
-     * @access requires view permission for the given path
+     * @access available to all users, but will always return false for users that cannot clone the
+     *         path (be that because it does not exist or otherwise)
      * @see #cloneConfig(String, String, java.util.Hashtable)
      */
     public boolean canCloneConfig(String token, String path)
@@ -745,7 +746,6 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
             return configurationRefactoringManager.canClone(path);
         }
         finally
