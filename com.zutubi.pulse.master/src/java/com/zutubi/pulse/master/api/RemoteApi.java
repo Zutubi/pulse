@@ -341,7 +341,6 @@ public class RemoteApi
     public Object getConfig(String token, String path) throws TypeException
     {
         tokenManager.loginUser(token);
-
         try
         {
             Configuration instance = configurationProvider.get(path, Configuration.class);
@@ -402,7 +401,8 @@ public class RemoteApi
      *
      * @param token authentication token (see {@link #login})
      * @param path  the path to retrieve the aw configuration for
-     * @return the raw configuration (i.e. with no inherited values) at the given path
+     * @return {@xtype struct<[config|Remote API Configuration Objects]>} the raw configuration
+     *         (i.e. with no inherited values) at the given path
      * @throws IllegalArgumentException if the given path does not exist
      * @throws TypeException if there is an error converting the object
      * @access available to users with view access to the given path
@@ -499,6 +499,9 @@ public class RemoteApi
      * The inserted object will be checked for type-correctness and validated before it is inserted.
      * A fault will be thrown if either check fails, and the path will remain unchanged.
      * <p/>
+     * Properties not set in the passed in config will be given default values (where a default
+     * exists).
+     * <p/>
      * This function cannot be used to insert projects or agents, where more information regarding
      * the template hiearchy is required (see {@link #insertTemplatedConfig(String, String, java.util.Hashtable, boolean)}).
      * 
@@ -506,7 +509,8 @@ public class RemoteApi
      * @param path   the path to insert into, either a collection (e.g. "projects/my project/properties"
      *               or the path of a not-yet-configured singular nested object (e.g.
      *               "projects/my project/scm")
-     * @param config the configuration object to insert (refer to [Remote API Configuration Objects])
+     * @param config {@xtype struct<[config|Remote API Configuration Objects]>} the configuration
+     *               object to insert
      * @return the path of the inserted configuration
      * @throws IllegalArgumentException if the given path does not refer to a path the may be
      *         inserted into, or the the type of the given config does not match
@@ -515,6 +519,7 @@ public class RemoteApi
      * @access available to users with write permission for the given path
      * @see #insertTemplatedConfig(String, String, java.util.Hashtable, boolean)
      * @see #saveConfig(String, String, java.util.Hashtable, boolean)
+     * @see #deleteConfig(String, String)
      */
     public String insertConfig(String token, String path, Hashtable config) throws TypeException, ValidationException
     {
@@ -569,6 +574,9 @@ public class RemoteApi
      * The inserted object will be type-checked and validated prior to being inserted.  A fault will
      * be thrown if either check fails and the configuration will remain unaffected.
      * <p/>
+     * Properties not set in the passed in config will be given default values (where a default
+     * exists).
+     * <p/>
      * This function is only used for inserting into the top level of a templated collection.  To
      * insert at any other path, use {@link #insertConfig(String, String, java.util.Hashtable)}.
      *
@@ -576,7 +584,8 @@ public class RemoteApi
      * @param templateParentPath the path of the template parent that this new config should inherit
      *                           from, this also determines which templated collection the config is
      *                           being inserted into
-     * @param config             the configuration object to insert (see [Remote API Configuration Objects])
+     * @param config             {@xtype struct<[config|Remote API Configuration Objects]>} the
+     *                           configuration object to insert
      * @param template           if true, the object will be inserted as a template, if false it
      *                           will be inserted as a concrete instance
      * @return the path of the inserted configuration
@@ -584,8 +593,10 @@ public class RemoteApi
      *         existing template, or the given config is of a different type
      * @throws TypeException if the given config is malformed
      * @throws ValidationException if the given config fails validation
+     * @access requires the server create permission for either projects or agents as appropriate
      * @see #insertConfig(String, String, java.util.Hashtable)
-     * @see #saveConfig(String, String, java.util.Hashtable, boolean) 
+     * @see #saveConfig(String, String, java.util.Hashtable, boolean)
+     * @see #deleteConfig(String, String)
      */
     public String insertTemplatedConfig(String token, String templateParentPath, Hashtable config, boolean template) throws TypeException, ValidationException
     {
@@ -639,6 +650,44 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Updates the configuration object at the given path to match the given object.  A config
+     * object must already exist at the given path, to add new configuration use
+     * {@link #insertConfig(String, String, java.util.Hashtable)}.
+     * <p/>
+     * The given config object must be of exactly the same type as the existing config and will be
+     * validated before being saved.  If the type check or validation fails a fault is raised and
+     * the configuration is unchanged.
+     * <p/>
+     * If deep is true, then objects nested as complex properties of the given object will also be
+     * updated.  During this process new configuration objects may be inserted, and existing ones
+     * updated or deleted.  For example, if the given config contains a nested collection, the items
+     * of the existing collection will be synchronised to match by inserting and deleting as
+     * necessary.
+     * <p/>
+     * Properties not set in the passed in config will be given default values (where a default
+     * exists).
+     * <p/>
+     * Collections may not be directly updated by saving to the collection path, rather their items
+     * should be updated using {@link #insertConfig(String, String, java.util.Hashtable)} and
+     * {@link #deleteConfig(String, String)}.
+     *
+     * @param token  authentication token (see {@link #login})
+     * @param path   path to be updated with the new configuration
+     * @param config {@xtype struct<[config|Remote API Configuration Objects]>} the new
+     *               configuration
+     * @param deep   if true, nested complex objects are updated recursively using the passed in
+     *               configuration, if false, nested complex objects are unaffected by this call
+     * @return the path of the saved configuration (may differ from the path passed in if the
+     *         configuration is renamed)
+     * @throws IllegalArgumentException if the path does not exist, the path refers to a collection,
+     *         or the type of the given config does not match
+     * @throws TypeException if the given config is malformed
+     * @throws ValidationException if the given config fails validation
+     * @access requires write permission for the given path
+     * @see #insertConfig(String, String, java.util.Hashtable)
+     * @see #deleteConfig(String, String)
+     */
     public String saveConfig(String token, String path, Hashtable config, boolean deep) throws TypeException, ValidationException
     {
         tokenManager.loginUser(token);
@@ -680,21 +729,23 @@ public class RemoteApi
     }
 
     /**
-     * Tests whether the given configuration path can be cloned.  Only map
-     * elements that are not the root of a template hierarchy may be cloned.
-     * This method does <b>not</b> verify whether the user actually has
-     * permission to perform the clone: only that the path is cloneable.
+     * Tests whether the given configuration path can be cloned.  Only map elements (generally all
+     * named configuration objects) that are not the root of a template hierarchy may be cloned.
+     * This method does <b>not</b> verify whether the user actually has permission to perform the
+     * clone: only that the path is cloneable.
      *
      * @param token authentication token (see {@link #login})
      * @param path  path to test
      * @return true if the given path exists and is cloneable
-     * @throws AuthenticationException if the given token is invalid
+     * @access requires view permission for the given path
+     * @see #cloneConfig(String, String, java.util.Hashtable)
      */
     public boolean canCloneConfig(String token, String path)
     {
         tokenManager.loginUser(token);
         try
         {
+            configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
             return configurationRefactoringManager.canClone(path);
         }
         finally
@@ -704,15 +755,13 @@ public class RemoteApi
     }
 
     /**
-     * <p>
      * Clones elements of a map, producing exact replicas with the exception
      * of the keys which are changed.  The map can be a top-level map
      * (including templated collections) or a map nested anywhere in a
      * persistent scope.  The clone operation performs similarly in both
      * cases with only the parent references in templates being treated
      * specially (see below).
-     * </p>
-     * <p>
+     * <p/>
      * Note that this method allows multiple elements of the same map to be
      * cloned in a single operation.  Multiple elements should be cloned
      * together when it is desirable to update references between them
@@ -728,26 +777,27 @@ public class RemoteApi
      * a template collection that is cloned without its parent being involved
      * in the same operation will result in a clone that has the original
      * parent.
-     * </p>
-     * <p>
-     * Each original key must refer to an existing item in the map.
-     * </p>
-     * <p>
+     * <p/>
+     * The keys are the names of the objects to clone, so for example the key
+     * for a property name "ant.bin" is simply "ant.bin".  Each original key
+     * must refer to an existing item in the map.
+     * <p/>
      * Each new clone key must be unique in its template hierarchy and also
      * in the map itself.  For this reason no duplicate new keys are allowed.
-     * </p>
-     * <p>
+     * <p/>
      * The root of a template hierarchy cannot be cloned as each hierarchy
      * can only have one root.
-     * <p>
      *
      * @param token      authentication token (see {@link #login})
      * @param parentPath path of the map to clone elements of
-     * @param keyMap     map from original keys (denoting the elements to
-     *                   clone) to clone keys (the new key for each clone)
+     * @param keyMap     {@xtype struct<string:string>} map from original keys
+     *                   (denoting the elements to clone) to clone keys (the
+     *                   new key for each clone)
      * @return true
-     * @throws AuthenticationException if the given token is invalid
      * @throws IllegalArgumentException if a given path or key is invalid
+     * @access requires write permission for the map path, or server create
+     *         permission for projects or agents when cloning in those scopes
+     * @see #canCloneConfig(String, String)
      */
     public boolean cloneConfig(String token, String parentPath, Hashtable<String, String> keyMap)
     {
@@ -763,11 +813,39 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Deletes the configuration object at the given path, if one exists.  If the object is complex,
+     * all nested objects will be deleted with it.  Further cleanup actions (e.g. deleting all build
+     * results for a project) may also be triggered by a delete.  These actions are not reversible.
+     * <p/>
+     * The path must refer to either a collection item or an already-configured singular nested
+     * object.  It is not possible to update simple properties this way (use
+     * {@link #saveConfig(String, String, java.util.Hashtable, boolean)} on the parent path) or to
+     * delete collections.
+     * <p/>
+     * If the path refers to a collection item that is inherited from an ancestor template, the item
+     * will actually be <em>hidden</em>.  This has the same effect as deleting it from this path
+     * (and all descendent paths), but the item will still exist in the template ancestor and may
+     * later be restored using {@link #restoreConfig(String, String)}.  Note that in this case
+     * cleanup actions may still be run, and those actions are not undone by restoration.
+     * 
+     * @param token authentication token (see {@link #login})
+     * @param path  path of the configuration object to delete
+     * @return true if the path existed and was deleted, false of the path did not exist
+     * @access requires write access to the parent path, or the server delete permission for
+     *         projects or agents when deleting those objects
+     * @see #insertConfig(String, String, java.util.Hashtable)
+     * @see #saveConfig(String, String, java.util.Hashtable, boolean)
+     * @see #restoreConfig(String, String)
+     * @see #deleteAllConfigs(String, String) 
+     */
     public boolean deleteConfig(String token, String path)
     {
         tokenManager.loginUser(token);
         try
         {
+            // Check view permission before giving information about the existence of a path
+            configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
             if (configurationTemplateManager.getRecord(path) == null)
             {
                 return false;
@@ -782,6 +860,31 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Deletes all objects that match a certain path pattern.  The pattern may include the character
+     * '&#42;' as a wildcard to mean "any path element".  For example, to delete all properties in
+     * project "my project", you could use path:
+     * <p/>
+     * projects/my project/properties/&#42;
+     * <p/>
+     * To delete all properties for all projects:
+     * <p/>
+     * projects/&#42;/properties/&#42;
+     * <p/>
+     * The wildcard may <strong>not</strong> be used to match a partial path element (hence
+     * projects/my project/properties/foo&#42; is <strong>not</strong> valid).
+     * <p/>
+     * Any configuration objects matched by the path which may not be deleted (e.g. permanent
+     * objects, or those which the user does not have permission to delete) will be left unchanged.
+     * <p/>
+     * Note that if the configuration
+     *
+     * @param token       authentication token (see {@link #login})
+     * @param pathPattern pattern used to match paths to delete, may include the &#42; wildcard
+     * @return the number of configuration objects delete (not counting nested objects)
+     * @access available to all users, objects that may not be deleted by the user are ignored
+     * @see #deleteConfig(String, String)
+     */
     public int deleteAllConfigs(String token, String pathPattern)
     {
         tokenManager.loginUser(token);
@@ -795,6 +898,19 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Restores a hidden inherited collection item at the given path.  The item must have previously
+     * been hidden (perhaps by deleting the path using this API).  Restoring a hidden item has a
+     * similar effect to adding a new item at the path, where the item inherits all details from an
+     * existing item in a template ancestor.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  path of the item to restore
+     * @return true
+     * @throws IllegalArgumentException if the given path does not refer to a hidden collection item
+     * @access requires write permission for the parent path
+     * @see #deleteConfig(String, String)
+     */
     public boolean restoreConfig(String token, String path)
     {
         tokenManager.loginUser(token);
@@ -809,6 +925,22 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Sets the order of items in a collection.  The path given must refer to an existing ordered
+     * collection.  The order is expressed as an array of keys, where keys match the names of
+     * the collection items for maps or handles of collection items for lists.  Any items not
+     * mentioned in the order will appear at the end of the collection in an arbitrary order.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  path of the collection to set the order of
+     * @param order array of item keys in the desired order
+     * @return true
+     * @throws IllegalArgumentException if the path does not refer to an ordered collection, or any
+     *         of the keys is invalid
+     * @access requires write access to the given path
+     * @see #getConfigHandle(String, String)
+     * @see #getConfigListing(String, String)
+     */
     public boolean setConfigOrder(String token, String path, Vector<String> order)
     {
         tokenManager.loginUser(token);
@@ -823,6 +955,22 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns all available "actions" for a given configuration path.  Actions are dependent on the
+     * configuration type.  For example, projects support a "trigger" action and agents a "ping"
+     * action.  Only actions that the user has permission to perform are returned.
+     * <p/>
+     * Available actions can depend on the state of the configuration, for example only a disabled
+     * agent may be enabled.
+     * 
+     * @param token authentication token (see {@link #login})
+     * @param path  path of the configuration to retrieve the actions for
+     * @return available actions for the given configuration path
+     * @access available to all users, but the returned actions are filtered based on the actions
+     *         the user has permission to perform
+     * @see #doConfigAction(String, String, String)
+     * @see #doConfigActionWithArgument(String, String, String, java.util.Hashtable)  
+     */
     public Vector<String> getConfigActions(String token, String path)
     {
         tokenManager.loginUser(token);
