@@ -527,6 +527,16 @@
               if="test.failed"/>
     </target>
 
+    <target name="apidoc" depends="init">
+        <property name="apidir" value="build/docs/api"/>
+        <delete dir="${apidir}"/>
+        <javadoc destdir="${apidir}">
+            <doclet path="etc/com.zutubi.xmlrpc.doclet-0.1.jar:etc/Tidy.jar" name="com.zutubi.xmlrpc.doclet.XmlRpcDoclet"/>
+            <source file="com.zutubi.pulse.master/src/java/com/zutubi/pulse/master/api/RemoteApi.java"/>
+            <arg line="-quiet -s"/>
+        </javadoc>
+    </target>
+
     <target name="idea" depends="build.all"
             description="Adds modules to an IDEA project file (pulse.ipr) for all Pulse modules and plugins.">
 
@@ -674,5 +684,4 @@
             </exec>
         </sequential>
     </macrodef>
-
 </project>
