@@ -19,7 +19,6 @@ import com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
-import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.servercore.bootstrap.*;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.config.*;
@@ -727,16 +726,6 @@ public class DefaultSetupManager implements SetupManager
         }
 
         requestRestoreComplete(false);
-    }
-
-    // continue selected on the restoration preview page.
-    public void doExecuteRestorationRequest()
-    {
-        Monitor monitor = restoreManager.getTaskMonitor();
-        if (!monitor.isStarted())
-        {
-            restoreManager.restoreArchive();
-        }
     }
 
     public void doCancelRestorationRequest() throws IOException

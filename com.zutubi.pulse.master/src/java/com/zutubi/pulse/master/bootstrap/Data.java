@@ -45,7 +45,6 @@ public class Data implements MasterUserPaths
 
     private final File pulseData;
 
-    private Version dataVersion;
     private File userConfigRoot;
     private File projectRoot;
     private File userRoot;
@@ -56,8 +55,6 @@ public class Data implements MasterUserPaths
 
     private File backupRoot;
     private File restoreRoot;
-
-    private Config config = null;
 
     public Data(File dataDir)
     {
@@ -168,10 +165,11 @@ public class Data implements MasterUserPaths
      */
     public void updateVersion(Version version)
     {
-        getConfig().setProperty(Version.BUILD_DATE, version.getBuildDate());
-        getConfig().setProperty(Version.BUILD_NUMBER, version.getBuildNumber());
-        getConfig().setProperty(Version.RELEASE_DATE, version.getReleaseDate());
-        getConfig().setProperty(Version.VERSION_NUMBER, version.getVersionNumber());
+        Config config = loadConfig();
+        config.setProperty(Version.BUILD_DATE, version.getBuildDate());
+        config.setProperty(Version.BUILD_NUMBER, version.getBuildNumber());
+        config.setProperty(Version.RELEASE_DATE, version.getReleaseDate());
+        config.setProperty(Version.VERSION_NUMBER, version.getVersionNumber());
     }
 
     public void transferExampleTemplates(SystemPaths systemPaths)
@@ -240,9 +238,8 @@ public class Data implements MasterUserPaths
 
     public void setBuildNumber(int i)
     {
-        Config config = getConfig();
+        Config config = loadConfig();
         config.setProperty(Version.BUILD_NUMBER, Integer.toString(i));
-        dataVersion = null;
     }
 
     /**
@@ -252,16 +249,13 @@ public class Data implements MasterUserPaths
      */
     public Version getVersion()
     {
-        if (dataVersion == null)
-        {
-            Properties prop = new Properties();
-            prop.setProperty(Version.BUILD_DATE, getConfig().getProperty(Version.BUILD_DATE));
-            prop.setProperty(Version.BUILD_NUMBER, getConfig().getProperty(Version.BUILD_NUMBER));
-            prop.setProperty(Version.RELEASE_DATE, getConfig().getProperty(Version.RELEASE_DATE));
-            prop.setProperty(Version.VERSION_NUMBER, getConfig().getProperty(Version.VERSION_NUMBER));
-            dataVersion = Version.read(prop);
-        }
-        return dataVersion;
+        Config config = loadConfig();
+        Properties prop = new Properties();
+        prop.setProperty(Version.BUILD_DATE, config.getProperty(Version.BUILD_DATE));
+        prop.setProperty(Version.BUILD_NUMBER, config.getProperty(Version.BUILD_NUMBER));
+        prop.setProperty(Version.RELEASE_DATE, config.getProperty(Version.RELEASE_DATE));
+        prop.setProperty(Version.VERSION_NUMBER, config.getProperty(Version.VERSION_NUMBER));
+        return Version.read(prop);
     }
 
     //---( implementation of the data resolver interface. )---
@@ -350,13 +344,9 @@ public class Data implements MasterUserPaths
         return driverRoot;
     }
 
-    public Config getConfig()
+    public Config loadConfig()
     {
-        if (config == null)
-        {
-            config = new FileConfig(getConfigFile());
-        }
-        return config;
+        return new FileConfig(getConfigFile());
     }
 
     public File getBackupRoot()

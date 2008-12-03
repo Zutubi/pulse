@@ -1,7 +1,5 @@
 package com.zutubi.pulse.master.xwork.actions.restore;
 
-import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
-import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.util.monitor.Task;
 
@@ -9,12 +7,14 @@ import java.io.File;
 import java.util.List;
 
 /**
+ * Trigger the archive restoration process.
  *
- *
+ * NOTE: This action waits for the restoration to complete before returning.
  */
 public class ExecuteRestoreAction extends RestoreActionSupport
 {
-    private SetupManager setupManager;
+    private static final long WAIT_TIME = 300;
+
     private File backedUpArchive;
 
     public boolean isArchiveBackedUp()
@@ -46,19 +46,15 @@ public class ExecuteRestoreAction extends RestoreActionSupport
             return SUCCESS;
         }
 
-        if (monitor.isStarted())
+        restoreManager.restoreArchive();
+
+        while (!monitor.isFinished())
         {
-            return "wait";
+            Thread.sleep(WAIT_TIME);
         }
-        
-        ((DefaultSetupManager)setupManager).doExecuteRestorationRequest();
+
         backedUpArchive = restoreManager.postRestore();
 
         return SUCCESS;
-    }
-
-    public void setSetupManager(SetupManager setupManager)
-    {
-        this.setupManager = setupManager;
     }
 }
