@@ -985,6 +985,24 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Performs the given action on the object at the given configuration path.  Available actions
+     * are dependent on the type and state of the configuration object, examples include "trigger"
+     * for projects and "ping" for agents.  Available actions may be discovered using
+     * {@link #getConfigActions(String, String)}.
+     *
+     * @param token  authentication token (see {@link #login})
+     * @param path   path to perform the action upon
+     * @param action the action to perform
+     * @return true
+     * @throws IllegalArgumentException if the given path does not exist, the given action does not
+     *         apply to the path, or the action requires an argument
+     * @access Permissions are controlled on an action-by-action basis.  Generally if a permission
+     *         with the same name as the action (or inverse action) exists that permission applies.
+     *         Otherwise, the normal default is write access to the path.
+     * @see #doConfigActionWithArgument(String, String, String, java.util.Hashtable)
+     * @see #getConfigActions(String, String)
+     */
     public boolean doConfigAction(String token, String path, String action)
     {
         tokenManager.loginUser(token);
@@ -998,16 +1016,34 @@ public class RemoteApi
         {
             tokenManager.logoutUser();
         }
-
     }
 
     /**
+     * Performs the given action on the object at the given configuration path, passing the given
+     * configuration object as an argument.  Available actions are dependent on the type and state
+     * of the configuration object, examples include "trigger" "setpassword" for users.
+     * Available actions may be discovered using {@link #getConfigActions(String, String)}.
+     * <p/>
+     * The given argument is type checked and validated before invoking the action.  If either check
+     * fails, the action is not performed.
+     * <p/>
+     * Not all actions accept arguments, and not all those that do require them.
      *
-     * @param token
-     * @param path
-     * @param action
-     * @param argument {@xtype struct<[config|Remote API Configuration Objects]>}
-     * @return
+     * @param token    authentication token (see {@link #login})
+     * @param path     path to perform the action upon
+     * @param action   the action to perform
+     * @param argument {@xtype struct<[config|Remote API Configuration Objects]>} argument to pass
+     *                 to the action
+     * @return true
+     * @throws IllegalArgumentException if the given path does not exist, the given action does not
+     *         apply to the path, or the action does not accept an argument
+     * @throws TypeException if the given argument object is malformed
+     * @throws ValidationException if the given argument object fails validation
+     * @access Permissions are controlled on an action-by-action basis.  Generally if a permission
+     *         with the same name as the action (or inverse action) exists that permission applies.
+     *         Otherwise, the normal default is write access to the path.
+     * @see #doConfigAction(String, String, String) 
+     * @see #getConfigActions(String, String)
      */
     public boolean doConfigActionWithArgument(String token, String path, String action, Hashtable argument) throws TypeException, ValidationException
     {
@@ -1071,13 +1107,15 @@ public class RemoteApi
      *
      * @param token authentication token, see {@link #login}
      * @return the total number of users
-     * @throws AuthenticationException if the given token is invalid
+     * @access requires server administration permission
+     * @see #getAllUserLogins(String)
      */
     public int getUserCount(String token)
     {
         tokenManager.loginUser(token);
         try
         {
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
             return userManager.getUserCount();
         }
         finally
@@ -1086,11 +1124,20 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the logins for all users configured on this server.
+     *
+     * @param token authentication token, see {@link #login}
+     * @return an array with the logins of all users on this server
+     * @access requires server administration permission
+     * @see #getUserCount(String) 
+     */
     public Vector<String> getAllUserLogins(String token)
     {
         tokenManager.loginUser(token);
         try
         {
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
             Collection<User> users = userManager.getAllUsers();
             Vector<String> result = new Vector<String>(users.size());
             for (User user : users)
@@ -1107,11 +1154,14 @@ public class RemoteApi
     }
 
     /**
-     * Indicates the number of concrete projects configured on this server.
+     * Indicates the number of concrete projects configured on this server that are visible to the
+     * calling user.
      *
      * @param token authentication token, see {@link #login}
-     * @return the total number of concrete projects
-     * @throws AuthenticationException if the given token is invalid
+     * @return the total number of concrete projects visible to the calling user
+     * @access available to all users, although the result is affected by the visibility of projects
+     *         to the calling user
+     * @see #getAllProjectNames(String)
      */
     public int getProjectCount(String token)
     {
@@ -1126,6 +1176,17 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the names of all concrete projects configured on this server that are visible to the
+     * calling user.
+     *
+     * @param token authentication token, see {@link #login}
+     * @return the names of all concrete projects visible to the calling user
+     * @access available to all users, although the result is filtered according to the visibility
+     *         of projects to the user
+     * @see #getProjectCount(String)
+     * @see #getMyProjectNames(String)
+     */
     public Vector<String> getAllProjectNames(String token)
     {
         tokenManager.loginUser(token);
@@ -1140,6 +1201,16 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns all the names of all projects shown on the calling user's dashboard.  Users can
+     * control the appearance of projects on their dashboard using their preferences.
+     *
+     * @param token authentication token, see {@link #login}
+     * @return the names of all projects shown in the "my projects" section of the calling users
+     *         dashboard
+     * @access available to all users
+     * @see #getAllProjectNames(String)
+     */
     public Vector<String> getMyProjectNames(String token)
     {
         User user = tokenManager.loginAndReturnUser(token);
@@ -1159,6 +1230,18 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the names of all project groups configured on this server that are visible to the
+     * calling user.  Groups are defined by adding <em>labels</em> to projects.  Thus this method
+     * effectively returns the set of all labels assigned to concrete projects visible to the
+     * calling user.
+     *
+     * @param token authentication token, see {@link #login}
+     * @return the names of all project groups visible to the calling user
+     * @access available to all users, the results are filtered according to project visibility
+     * @see #getProjectGroup(String, String) 
+     * @see #getAllProjectNames(String)
+     */
     public Vector<String> getAllProjectGroups(String token)
     {
         tokenManager.loginUser(token);
@@ -1179,6 +1262,21 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the project group with the given name.  Project groups are defined by assigning
+     * <em>labels</em> to projects, all concrete projects that share a label are viewed as forming a
+     * group with that label as the name.
+     *
+     * @param token authentication token, see {@link #login}
+     * @param name  the name of the project group to retrieve (the same as the label that
+     *              categorises the projects)
+     * @return {@xtype [RemoteApi.ProjectGroup]} the project group with the given name
+     * @throws IllegalArgumentException if there is no group with the given name visible to the
+     *         calling user
+     * @access available to all users, although the results are filtered based on visibility of
+     *         projects to the user
+     * @see #getAllProjectGroups(String) 
+     */
     public Hashtable<String, Object> getProjectGroup(String token, String name) throws IllegalArgumentException
     {
         tokenManager.loginUser(token);
@@ -1216,11 +1314,15 @@ public class RemoteApi
     }
 
     /**
-     * Indicates the number of concrete agents configured on this server.
+     * Indicates the number of concrete agents configured on this server that are visible to the
+     * calling user.
      *
      * @param token authentication token, see {@link #login}
-     * @return the total number of concrete agents
+     * @return the total number of concrete agents visible to the calling user
      * @throws AuthenticationException if the given token is invalid
+     * @access available to all users, although the result is affected by the visibility of agents
+     *         to the user
+     * @see #getAllAgentNames(String)
      */
     public int getAgentCount(String token)
     {
@@ -1235,6 +1337,16 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the names of all concrete agents configured on this server that are visible to the
+     * calling user.
+     *
+     * @param token authentication token, see {@link #login}
+     * @return the naames of all concrete projects visible to the calling user
+     * @access available to all users, although the result is filtered based on the visibility of
+     *         agents to the calling user
+     * @see #getProjectCount(String) 
+     */
     public Vector<String> getAllAgentNames(String token)
     {
         tokenManager.loginUser(token);
@@ -1259,11 +1371,26 @@ public class RemoteApi
     }
 
     /**
+     * Returns details of the given build of the given project.  This includes the state and timing
+     * of the build and all stages, along with several other simple fields.  It does not include
+     * possibly larger collections of data such as captured features or artifacts.
+     * <p/>
+     * The result of this function is either a single-element array, or an empty array if the build
+     * does not exist.
      *
-     * @param token
-     * @param projectName
-     * @param id
-     * @return {@xtype array<[RemoteApi.BuildResult]>}
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project to retrieve the build for
+     * @param id          id of the project to retrieve
+     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the build
+     *         details as a struct, or an empty array if the build does not exist.
+     * @throws IllegalArgumentException if the given project does not exist
+     * @access requires view permission for the given project
+     * @see #getPreviousBuild(String, String, int)
+     * @see #getBuildRange(String, String, int, int)
+     * @see #getLatestBuildForProject(String, String, boolean)
+     * @see #getLatestBuildsForProject(String, String, boolean, int) 
+     * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
+     * @see #getPersonalBuild(String, int)
      */
     public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id)
     {
@@ -1287,6 +1414,17 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Deletes the build result for the given project and id, if such a build exists.  All details
+     * of the build, including artifacts, are permanently removed and may not be recoevered.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the projec that owns the build to delete
+     * @param id          id of the build to delete
+     * @return true if the build was found and deleted, false if the build does not exist
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires write permission for the given project
+     */
     public boolean deleteBuild(String token, String projectName, int id)
     {
         tokenManager.loginUser(token);
@@ -1309,6 +1447,29 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Finds and returns build results for the given project that meet the given criteria.  Paging
+     * is supported using the firstResult and maxResults parameters.
+     * 
+     * @param token           authentication token, see {@link #login}
+     * @param projectName     name of the project to query the build results of
+     * @param resultStates    if not empty, only return results with the given statuses (available
+     *                        states are given on the [RemoteApi.BuildResult] page.
+     * @param firstResult     one-based index of the first result to return, allows paging through
+     *                        results
+     * @param maxResults      the maximum number of results to return
+     * @param mostRecentFirst if true, more recent build results will appear earlier in the array,
+     *                        if false they will appear later
+     * @return {@xtype array<[RemoteApi.BuildResult]>} all build results that meet the given
+     *         criteria
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires view permission for the given project
+     * @see #getBuild(String, String, int)
+     * @see #getPreviousBuild(String, String, int)
+     * @see #getBuildRange(String, String, int, int)
+     * @see #getLatestBuildForProject(String, String, boolean)
+     * @see #getLatestBuildsForProject(String, String, boolean, int) 
+     */
     public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, Vector<String> resultStates, int firstResult, int maxResults, boolean mostRecentFirst)
     {
         tokenManager.loginUser(token);
@@ -1332,6 +1493,25 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Selects and returns a range of builds for the given project that fall within given bounds.
+     * Builds are returned in decreasing order of age, i.e. the most recent builds appear last in
+     * the returned array.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project to retrieve the builds for
+     * @param afterBuild  one less than the lowest build id that may be included in the range
+     * @param toBuild     the highest build id that may be included in the range
+     * @return {@xtype array<[RemoteApi.BuildResult]>} all builds of the given project that fall
+     *         within the given range (most recent last)
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires view permission for the given project
+     * @see #getBuild(String, String, int)
+     * @see #getPreviousBuild(String, String, int)
+     * @see #getLatestBuildForProject(String, String, boolean)
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
+     * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
+     */
     public Vector<Hashtable<String, Object>> getBuildRange(String token, String projectName, int afterBuild, int toBuild)
     {
         tokenManager.loginUser(token);
@@ -1353,6 +1533,26 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the build immediately preceeding the given build when all builds of the given project
+     * are ordered by id, if such a build exists.
+     * <p/>
+     * The result of this function is either a single-element array, or an empty array if no such
+     * build exists.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the projec to retrieve the build for
+     * @param id          id of the build immediately following the build to return
+     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the
+     *         previous build, or an empty array if there is no previous build
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires view permission for the given project
+     * @see #getBuild(String, String, int)
+     * @see #getBuildRange(String, String, int, int) 
+     * @see #getLatestBuildForProject(String, String, boolean)
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
+     * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
+     */
     public Vector<Hashtable<String, Object>> getPreviousBuild(String token, String projectName, int id)
     {
         tokenManager.loginUser(token);
@@ -1394,6 +1594,16 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the id that will be used for the next build of the given project.  Ids form an
+     * increasing sequence starting at one.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project to retrieve the next build number of
+     * @return the id that will be assigned to the next build of the given project
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires view permission for the given project
+     */
     public int getNextBuildNumber(String token, String projectName)
     {
         tokenManager.loginUser(token);
@@ -1408,6 +1618,25 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the most recent build results for the given project that meet the specified criteria.
+     * The returned results are ordered most recent first.
+     *
+     * @param token         authentication token, see {@link #login}
+     * @param projectName   name of the project to retrieve the builds for
+     * @param completedOnly if true, only completed builds will be returned, if false the result may
+     *                      contain in progress builds
+     * @param maxResults    the maximum number of results to return
+     * @return {@xtype array<[RemoteApi.BuildResult]>} the latest build results for the given
+     *         project which meet the given criteria, sorted most recent first
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires view permission for the given project
+     * @see #getBuild(String, String, int)
+     * @see #getBuildRange(String, String, int, int)
+     * @see #getLatestBuildForProject(String, String, boolean)
+     * @see #getPreviousBuild(String, String, int)
+     * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
+     */
     public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, boolean completedOnly, int maxResults)
     {
         tokenManager.loginUser(token);
@@ -1437,11 +1666,48 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Identical to calling {@link #getLatestBuildsForProject(String, String, boolean, int)} with
+     * maxResults set to one.
+     * <p/>
+     * The result of this function is either a single-element array, or an empty array if no such
+     * build exists.
+     *
+     * @param token         authentication token, see {@link #login}
+     * @param projectName   name of the project to retrieve the builds for
+     * @param completedOnly if true, only completed builds will be considered, if false the result
+     *                      may be an in progress build
+     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array continaing the latest
+     *         build result for the given project which meets the given criteria, or an empty array
+     *         if no such build exists
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires view permission for the given project
+     * @see #getBuild(String, String, int)
+     * @see #getBuildRange(String, String, int, int)
+     * @see #getLatestBuildsForProject(String, String, boolean, int) 
+     * @see #getPreviousBuild(String, String, int)
+     * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
+     */
     public Vector<Hashtable<String, Object>> getLatestBuildForProject(String token, String projectName, boolean completedOnly)
     {
         return getLatestBuildsForProject(token, projectName, completedOnly, 1);
     }
 
+    /**
+     * Returns the latest build results for the given project that contain build warnings.  The
+     * returned results will only include completed builds, and are ordered most recent first.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project to retrieve the builds for
+     * @param maxResults  the maximum number of builds to return
+     * @return {@xtype array<[RemoteApi.BuildResult]>} the latest completed builds for the given
+     *         project in which warning features were detected, ordered most recent first
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires view permission for the given project
+     * @see #getLatestBuildWithWarnings(String, String)
+     * @see #getLatestBuildForProject(String, String, boolean)
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
+     */
     public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, String projectName, int maxResults)
     {
         tokenManager.verifyUser(token);
@@ -1458,11 +1724,42 @@ public class RemoteApi
         return result;
     }
 
+    /**
+     * Equivalent to calling {@link #getLatestBuildsWithWarnings(String, String, int)} with
+     * maxResults set to one.
+     * <p/>
+     * The result of this function is either a single-element array, or an empty array if no such
+     * build exists.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project to retrieve the builds for
+     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the latest
+     *         completed build for the given project in which warning features were detected, or an
+     *         empty array if no such build exists
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires view permission for the given project
+     * @see #getLatestBuildsWithWarnings(String, String, int) 
+     * @see #getLatestBuildForProject(String, String, boolean)
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
+     */
     public Vector<Hashtable<String, Object>> getLatestBuildWithWarnings(String token, String projectName)
     {
         return getLatestBuildsWithWarnings(token, projectName, 1);
     }
 
+    /**
+     * Returns the given personal build result for the calling user, if such a build exists.
+     * <p/>
+     * The result of this function is either a single-element array, or an empty array if no such
+     * build exists.
+     *
+     * @param token authentication token, see {@link #login}
+     * @param id    id of the personal build to retrieve
+     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the
+     *         specified personal build, or an empty array if no such build exists
+     * @access available to all users (users can only access their own personal builds)
+     * @see #getLatestPersonalBuilds(String, boolean, int) 
+     */
     public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id)
     {
         Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
@@ -1485,6 +1782,19 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns the latest personal build results for the calling user that meet the given criteria,
+     * ordered most recent first.
+     *
+     * @param token         authentication token, see {@link #login}
+     * @param completedOnly if true, only completed builds will be considered, if false the result
+     *                      may contain in progress builds
+     * @param maxResults    the maximum number of builds to return
+     * @return {@xtype array<[RemoteApi.BuildResult]>} the latest personal build results for the
+     *         calling user, ordered most recent first
+     * @access available to all users (users can only access their own personal builds)
+     * @see #getPersonalBuild(String, int)  
+     */
     public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, boolean completedOnly, int maxResults)
     {
         User user = tokenManager.loginAndReturnUser(token);
@@ -1524,6 +1834,22 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Equivalent to calling {@link #getLatestPersonalBuilds(String, boolean, int)} with maxResults
+     * set to one.
+     * <p/>
+     * The result of this function is either a single-element array, or an empty array if no such
+     * build exists.
+     *
+     * @param token         authentication token, see {@link #login}
+     * @param completedOnly if true, only completed builds will be considered, if false the result
+     *                      may be an in progress build
+     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the latest
+     *         personal build for the calling user that meets the given criteria, or an empty array
+     *         if no such build exists
+     * @access available to all users (users can only access their own personal builds)
+     * @see #getPersonalBuild(String, int)
+     */
     public Vector<Hashtable<String, Object>> getLatestPersonalBuild(String token, boolean completedOnly)
     {
         return getLatestPersonalBuilds(token, completedOnly, 1);
@@ -1586,6 +1912,22 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Returns an array of new changes detected in the given build.  These are the changes between
+     * the given build's revision and the previous build's revision.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project that owns the build
+     * @param id          id of the build to retrieve the changes for
+     * @return {@xtype array<[RemoteApi.Changelist]>} all new code changes that participated in the
+     *         given build
+     * @throws IllegalArgumentException if the given project name is invalid, or the given build
+     *         does not exist
+     * @access requires view permission for the given project
+     * @see #getBuild(String, String, int)
+     * @see #getLatestBuildForProject(String, String, boolean) 
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
+     */
     public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id)
     {
         tokenManager.loginUser(token);
