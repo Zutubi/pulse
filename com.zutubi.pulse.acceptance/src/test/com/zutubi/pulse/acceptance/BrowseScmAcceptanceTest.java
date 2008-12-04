@@ -173,8 +173,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     private AntTypeForm insertTestSvnProjectAndNavigateToTypeConfig() throws Exception
     {
-        Hashtable<String, Object> svnConfig = xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY);
-        svnConfig.put("url", Constants.TEST_ANT_REPOSITORY);
+        Hashtable<String, Object> svnConfig = xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY);
         xmlRpcHelper.loginAsAdmin();
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, xmlRpcHelper.getAntConfig());
         xmlRpcHelper.logout();

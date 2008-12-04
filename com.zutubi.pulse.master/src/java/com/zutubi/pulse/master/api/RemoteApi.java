@@ -1455,7 +1455,7 @@ public class RemoteApi
      * @param projectName     name of the project to query the build results of
      * @param resultStates    if not empty, only return results with the given statuses (available
      *                        states are given on the [RemoteApi.BuildResult] page.
-     * @param firstResult     one-based index of the first result to return, allows paging through
+     * @param firstResult     zero-based index of the first result to return, allows paging through
      *                        results
      * @param maxResults      the maximum number of results to return
      * @param mostRecentFirst if true, more recent build results will appear earlier in the array,
