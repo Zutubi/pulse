@@ -146,7 +146,7 @@ public class PerforceClient extends CachingScmClient
         if (toDirectory == null)
         {
             toDirectory = new File(".");
-            clientRoot = toDirectory;
+            clientRoot = new File(FileSystemUtils.getNormalisedAbsolutePath(toDirectory));
         }
 
         String clientName = getClientName(id);
@@ -622,7 +622,7 @@ public class PerforceClient extends CachingScmClient
         {
             if (start <= end)
             {
-                PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
+                PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + clientName + "/...@" + Long.toString(start) + "," + Long.toString(end));
                 Matcher matcher = core.getChangesPattern().matcher(p4Result.stdout);
 
                 while (matcher.find())
@@ -649,49 +649,6 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public boolean hasChangedSince(Revision since) throws ScmException
-    {
-        String clientName = updateClient(null, null, null);
-        try
-        {
-            String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
-            long latestRevision = Long.valueOf(core.getLatestRevisionForFiles(clientName, root).toString());
-            long sinceRevision = Long.valueOf(since.toString());
-            if (latestRevision > sinceRevision)
-            {
-                if (excludedPaths != null && excludedPaths.size() > 0)
-                {
-                    // We have to find a change that includes a non-excluded
-                    // path.
-                    return nonExcludedChange(clientName, sinceRevision, latestRevision);
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        finally
-        {
-            deleteClient(clientName);
-        }
-    }
-
-    private boolean nonExcludedChange(String clientName, long sinceRevision, long latestRevision) throws ScmException
-    {
-        for (long revision = sinceRevision + 1; revision <= latestRevision; revision++)
-        {
-            if (getChangelist(clientName, revision) != null)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         sync(getId(context), context.getWorkingDir(), rev, handler, false);
@@ -712,7 +669,7 @@ public class PerforceClient extends CachingScmClient
                 throw new ScmException("Cannot create label '" + name + "': label already exists");
             }
 
-            core.runP4(false, null, getP4Command(COMMAND_LABELSYNC), FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, clientRoot.getAbsoluteFile() + "/...@" + revision.toString());
+            core.runP4(false, null, getP4Command(COMMAND_LABELSYNC), FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, "//" + clientName + "/...@" + revision.toString());
         }
         finally
         {
@@ -765,77 +722,6 @@ public class PerforceClient extends CachingScmClient
         }, null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
 
         return eol[0];
-    }
-
-    public String getFileRevision(String path, Revision repoRevision) throws ScmException
-    {
-        //    jsankey@shiny:~/p4test$ p4 fstat //depot/build.xml@34
-        //    //depot/build.xml@34 - no file(s) at that changelist number.
-        //    jsankey@shiny:~/p4test$ p4 fstat //depot/jsankey/bob.xml@34
-        //    ... depotFile //depot/jsankey/bob.xml
-        //    ... clientFile /home/jsankey/sandbox/bob.xml
-        //    ... isMapped
-        //    ... headAction edit
-        //    ... headType text
-        //    ... headTime 1142667022
-        //    ... headRev 34
-        //    ... headChange 34
-        //    ... headModTime 1142667014
-        //    ... haveRev 36
-        //
-        //    jsankey@shiny:~/p4test$ p4 fstat //depot/build.xml@37
-        //    ... depotFile //depot/build.xml
-        //    ... headAction add
-        //    ... headType text
-        //    ... headTime 1162177253
-        //    ... headRev 1
-        //    ... headChange 37
-        //    ... headModTime 1162177235
-        //    ... ... otherOpen0 jsankey@p4test
-        //    ... ... otherAction0 edit
-        //    ... ... otherChange0 38
-        //    ... ... otherOpen 1
-        String clientName = updateClient(null, null, repoRevision);
-        try
-        {
-            File f = new File(clientRoot.getAbsoluteFile(), path);
-            PerforceCore.P4Result result = core.runP4(false, null, getP4Command(COMMAND_FSTAT), FLAG_CLIENT, clientName, COMMAND_FSTAT, f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
-            if (result.stderr.length() > 0)
-            {
-                String error = result.stderr.toString();
-                if (error.contains("no file(s) at that changelist number") || error.contains("no such file(s)"))
-                {
-                    return null;
-                }
-                else
-                {
-                    throw new ScmException("Error running p4 fstat: " + result.stderr);
-                }
-            }
-            else if (result.stdout.toString().contains("... headAction delete"))
-            {
-                return null;
-            }
-            else
-            {
-                Pattern revPattern = Pattern.compile("... headRev ([0-9]+)");
-                for (String line : core.splitLines(result))
-                {
-                    Matcher m = revPattern.matcher(line);
-                    if (m.matches())
-                    {
-                        return m.group(1);
-                    }
-                }
-
-                return null;
-            }
-        }
-        finally
-        {
-            deleteClient(clientName);
-        }
-
     }
 
     public Revision parseRevision(ScmContext context, String revision) throws ScmException

@@ -279,10 +279,7 @@ public class PerforceCore
         args.add(FLAG_MAXIMUM);
         args.add("1");
 
-        for (String file : files)
-        {
-            args.add(file);
-        }
+        args.addAll(Arrays.asList(files));
 
         PerforceCore.P4Result result = runP4(null, args.toArray(new String[args.size()]));
         Matcher matcher = changesPattern.matcher(result.stdout);
