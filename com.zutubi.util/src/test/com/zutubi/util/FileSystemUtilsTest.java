@@ -627,17 +627,11 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         {
             final String CONTENT = "content";
 
-            File linkTarget = new File(tmpDir, "target");
-            File link = new File(tmpDir, "link");
+            File link = createSymlink(CONTENT);
             File dest = new File(tmpDir, "dest");
-            FileSystemUtils.createFile(linkTarget, CONTENT);
-            assertTrue(FileSystemUtils.createSymlink(link, linkTarget));
 
             FileSystemUtils.copy(dest, link);
-
-            assertTrue(dest.isFile());
-            assertFalse(FileSystemUtils.isRelativeSymlink(dest));
-            assertEquals(CONTENT, IOUtils.fileToString(dest));
+            assertSymlinkContentCopied(dest, CONTENT);
         }
     }
 
@@ -647,20 +641,30 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         {
             final String CONTENT = "content";
 
-            File linkTarget = new File(tmpDir, "target");
-            File link = new File(tmpDir, "link");
+            File link = createSymlink(CONTENT);
             File destDir = new File(tmpDir, "dest");
             File dest = new File(destDir, link.getName());
-            FileSystemUtils.createFile(linkTarget, CONTENT);
-            assertTrue(FileSystemUtils.createSymlink(link, linkTarget));
             assertTrue(destDir.mkdir());
             
             FileSystemUtils.copy(destDir, link);
-
-            assertTrue(dest.isFile());
-            assertFalse(FileSystemUtils.isRelativeSymlink(dest));
-            assertEquals(CONTENT, IOUtils.fileToString(dest));
+            assertSymlinkContentCopied(dest, CONTENT);
         }
+    }
+
+    private File createSymlink(String content) throws IOException
+    {
+        File linkTarget = new File(tmpDir, "target");
+        FileSystemUtils.createFile(linkTarget, content);
+        File link = new File(tmpDir, "link");
+        assertTrue(FileSystemUtils.createSymlink(link, linkTarget));
+        return link;
+    }
+
+    private void assertSymlinkContentCopied(File dest, String content) throws IOException
+    {
+        assertTrue(dest.isFile());
+        assertFalse(FileSystemUtils.isRelativeSymlink(dest));
+        assertEquals(content, IOUtils.fileToString(dest));
     }
 
     public void testIsSymlinkRegularFile() throws IOException
