@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.util.IOUtils;
@@ -47,7 +48,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
             // read until you locate the start of a test suite.
             try
             {
-                processFile(suite);
+                processFile(suite, result);
             }
             catch (IllegalStateException e)
             {
@@ -67,7 +68,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
         }
     }
 
-    private void processFile(TestSuiteResult tests) throws IOException
+    private void processFile(TestSuiteResult tests, CommandResult commandResult) throws IOException
     {
         // look for a TestSuite.
         currentLine = nextLine();
@@ -77,13 +78,13 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
             if (START_SUITE_PATTERN.matcher(currentLine).matches())
             {
                 // we have a test suite.
-                tests.add(processSuite(), getResolveConflicts());
+                tests.add(processSuite(commandResult), getResolveConflicts());
             }
             currentLine = nextLine();
         }
     }
 
-    private TestSuiteResult processSuite() throws IOException
+    private TestSuiteResult processSuite(CommandResult commandResult) throws IOException
     {
         // varify that we have a start suite here.
         Matcher m = START_SUITE_PATTERN.matcher(currentLine);
@@ -99,12 +100,12 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
 
         // now we are in the suite, looking for the end suite...
         String caseOutput = "";
-        while (!END_SUITE_PATTERN.matcher(currentLine).matches())
+        while (currentLine != null && !END_SUITE_PATTERN.matcher(currentLine).matches())
         {
             // if new suite, then recurse.
             if (START_SUITE_PATTERN.matcher(currentLine).matches())
             {
-                suite.add(processSuite(), getResolveConflicts());
+                suite.add(processSuite(commandResult), getResolveConflicts());
             }
             // if test case, then create it.
             else if (CASE_SUMMARY_PATTERN.matcher(currentLine).matches())
@@ -136,29 +137,49 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
             currentLine = nextLine();
         }
 
-        // verify that we are reading the end suite here.
-        m = END_SUITE_PATTERN.matcher(currentLine);
-        if (!m.matches())
+        if (currentLine == null)
         {
-            throw new IllegalStateException();
+            // Hit EOF looking for end of suite, warn and just process what
+            // we have.
+            commandResult.addFeature(Feature.Level.WARNING, String.format("Reached end of file looking for end of suite '%s' in OCUnit report", suite.getName()));
         }
-
-        if (m.group(1).compareTo(suite.getName()) != 0)
+        else
         {
-            throw new IllegalStateException();
-        }
+            m = END_SUITE_PATTERN.matcher(currentLine);
+            // verify that we are reading the end suite here.
+            if (!m.matches())
+            {
+                throw new IllegalStateException();
+            }
 
-        currentLine = nextLine();
+            if (m.group(1).compareTo(suite.getName()) != 0)
+            {
+                // Mismatched suites
+                commandResult.addFeature(Feature.Level.WARNING, String.format("Suite name mismatch in OCUnit report: expecting '%s' found '%s'", suite.getName(), m.group(1)));
+            }
 
-        // Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
-        m = SUITE_SUMMARY_PATTERN.matcher(currentLine);
-        while (!m.matches())
-        {
             currentLine = nextLine();
-            m = SUITE_SUMMARY_PATTERN.matcher(currentLine);
-        }
+            while (currentLine != null)
+            {
+                // Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+                m = SUITE_SUMMARY_PATTERN.matcher(currentLine);
+                if (m.matches())
+                {
+                    break;
+                }
 
-        suite.setDuration((long) (Double.parseDouble(m.group(4)) * 1000));
+                currentLine = nextLine();
+            }
+
+            if (currentLine == null)
+            {
+                commandResult.addFeature(Feature.Level.WARNING, String.format("Reached end of file looking for summary for suite '%s' in OCUnit report", suite.getName()));
+            }
+            else
+            {
+                suite.setDuration((long) (Double.parseDouble(m.group(4)) * 1000));
+            }
+        }
 
         return suite;
     }
