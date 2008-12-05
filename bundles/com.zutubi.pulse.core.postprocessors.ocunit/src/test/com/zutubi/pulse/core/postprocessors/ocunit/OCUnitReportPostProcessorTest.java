@@ -15,9 +15,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/**
- * <class-comment/>
- */
 public class OCUnitReportPostProcessorTest extends PulseTestCase
 {
     private File tmpDir = null;
@@ -103,11 +100,47 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
 
     public void testSingleSuiteWithTests()
     {
-        PersistentTestSuiteResult tests = process();
+        assertSingleSuite(process(), 7);
+    }
+
+    public void testIncompleteSuite()
+    {
+        assertSingleSuite(process(), -1);
+    }
+
+    public void testMissingSummary()
+    {
+        assertSingleSuite(process(), -1);
+    }
+
+    public void testMismatchedSuiteName()
+    {
+        assertSingleSuite(process(), 7);
+    }
+
+    public void testIncompleteNestedSuites()
+    {
+        PersistentTestSuiteResult suite = process();
+        suite  = assertOneNestedSuite(suite, "All tests");
+        suite = assertOneNestedSuite(suite, "/System/Library/Frameworks/SenTestingKit.framework(Tests)");
+        assertOneNestedSuite(suite, "SenInterfaceTestCase");
+    }
+
+    private PersistentTestSuiteResult assertOneNestedSuite(PersistentTestSuiteResult suite, String name)
+    {
+        assertEquals(0, suite.getCases().size());
+        assertEquals(1, suite.getSuites().size());
+        suite = suite.getSuites().get(0);
+        assertEquals(name, suite.getName());
+        return suite;
+    }
+
+    private void assertSingleSuite(PersistentTestSuiteResult tests, long duration)
+    {
         assertEquals(1, tests.getSuites().size());
         PersistentTestSuiteResult suite = tests.getSuites().get(0);
         assertEquals("TestCNYieldSorting", suite.getName());
-        assertEquals(7, suite.getDuration());
+        assertEquals(duration, suite.getDuration());
         assertEquals(0, suite.getErrors());
         assertEquals(0, suite.getFailures());
         assertEquals(4, suite.getTotal());
