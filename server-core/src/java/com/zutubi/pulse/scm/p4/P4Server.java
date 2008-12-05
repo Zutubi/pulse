@@ -154,7 +154,7 @@ public class P4Server extends CachingSCMServer
         if (toDirectory == null)
         {
             toDirectory = new File(".");
-            clientRoot = toDirectory;
+            clientRoot = new File(FileSystemUtils.getNormalisedAbsolutePath(toDirectory));
         }
 
         String clientName = getClientName(id);
