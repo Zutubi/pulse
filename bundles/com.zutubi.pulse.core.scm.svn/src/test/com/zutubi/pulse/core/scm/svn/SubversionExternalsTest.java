@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
@@ -216,7 +215,6 @@ public class SubversionExternalsTest extends PulseTestCase
         doCheckout(2);
         PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(checkoutDir);
-        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         server.update(context, new Revision("5"), null);
 
         assertFile("file1", "edited bundle file1\n");
@@ -229,7 +227,6 @@ public class SubversionExternalsTest extends PulseTestCase
     {
         PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(checkoutDir);
-        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         server.addExternalPath(".");
         server.checkout(context, new Revision(Integer.toString(rev)), new ScmFeedbackHandler()
         {

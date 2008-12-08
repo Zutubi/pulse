@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
@@ -103,7 +102,6 @@ public class SubversionClientTest extends PulseTestCase
         gotDir.mkdirs();
 
         context = new PulseExecutionContext();
-        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         context.setWorkingDir(gotDir);
 
         ZipUtils.extractZip(dataFile, repoDir);

@@ -199,7 +199,6 @@ public class PulseScope implements Scope
         return result;
     }
 
-    @SuppressWarnings({"unchecked"})
     public <T> T getReferenceValue(String name, Class<T> type)
     {
         Reference r = getReference(name);

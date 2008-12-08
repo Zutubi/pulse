@@ -523,7 +523,6 @@ public class PerforceClientTest extends PulseTestCase
     private ExecutionContext createExecutionContext(File dir, String project, String agent)
     {
         PulseExecutionContext context = new PulseExecutionContext();
-        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         context.setWorkingDir(dir);
         if (project != null)
         {
