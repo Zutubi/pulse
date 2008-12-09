@@ -6,7 +6,7 @@ import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 
 /**
- * Helper base class for implementing fieldd validators.  Includes support
+ * Helper base class for implementing field validators.  Includes support
  * for getting the field value and addition of field error messages.
  */
 public abstract class FieldValidatorSupport extends ValidatorSupport implements FieldValidator

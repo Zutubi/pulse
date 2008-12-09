@@ -5,9 +5,6 @@ import com.zutubi.validation.ValidationException;
 
 import java.util.Arrays;
 
-/**
- * <class-comment/>
- */
 public class NumericValidatorTest extends FieldValidatorTestCase
 {
     public NumericValidatorTest(String testName)
@@ -21,6 +18,7 @@ public class NumericValidatorTest extends FieldValidatorTestCase
         
         textProvider.addText("field.min", "field.min");
         textProvider.addText("field.max", "field.max");
+        textProvider.addText("field.invalid", "field.invalid");
     }
 
     protected FieldValidator createValidator()
@@ -28,49 +26,98 @@ public class NumericValidatorTest extends FieldValidatorTestCase
         return new NumericValidator();
     }
 
-    public void testMinValidation() throws ValidationException
+    public void testStringIsNumeric() throws ValidationException
     {
-        ((NumericValidator)validator).setMin(5);
-        validator.validate(new FieldProvider(3));
-        assertTrue(validationAware.hasFieldErrors());
-        assertEquals(Arrays.asList("field.min"), validationAware.getFieldErrors("field"));
+        assertValidation(Long.MIN_VALUE, Long.MAX_VALUE, "1");
+        assertValidation(Long.MIN_VALUE, Long.MAX_VALUE, "a", "field.invalid");
     }
 
-    public void testMaxValidation() throws ValidationException
+    public void testMinMaxValidation() throws ValidationException
     {
-        ((NumericValidator)validator).setMax(2);
-        validator.validate(new FieldProvider(3));
-        assertTrue(validationAware.hasFieldErrors());
-        assertEquals(Arrays.asList("field.max"), validationAware.getFieldErrors("field"));
+        assertValidation(5, 10, 7);
+    }
+
+    public void testMinInclusiveValidation() throws ValidationException
+    {
+        assertValidation(5, 5, 5);
+    }
+
+    public void testMinValidationInt() throws ValidationException
+    {
+        assertValidation(5, Long.MAX_VALUE, 3, "field.min");
+    }
+
+    public void testMaxValidationInt() throws ValidationException
+    {
+        assertValidation(Long.MIN_VALUE, 2, 3, "field.max");
+    }
+
+    public void testMinValidationShort() throws ValidationException
+    {
+        assertValidation(5, Long.MAX_VALUE, (short)3, "field.min");
+    }
+
+    public void testMaxValidationShort() throws ValidationException
+    {
+        assertValidation(Long.MIN_VALUE, 2, (short)3, "field.max");
+    }
+
+    public void testMinValidationByte() throws ValidationException
+    {
+        assertValidation(5, Long.MAX_VALUE, (byte)3, "field.min");
+    }
+
+    public void testMaxValidationByte() throws ValidationException
+    {
+        assertValidation(Long.MIN_VALUE, 2, (byte)3, "field.max");
     }
 
     public void testMinValidationLong() throws ValidationException
     {
-        ((NumericValidator)validator).setMin(5);
-        validator.validate(new FieldProvider((long) 3));
-        assertTrue(validationAware.hasFieldErrors());
-        assertEquals(Arrays.asList("field.min"), validationAware.getFieldErrors("field"));
+        assertValidation(5, Long.MAX_VALUE, (long)3, "field.min");
     }
 
     public void testMaxValidationLong() throws ValidationException
     {
-        ((NumericValidator)validator).setMax(2);
-        validator.validate(new FieldProvider((long) 3));
-        assertTrue(validationAware.hasFieldErrors());
-        assertEquals(Arrays.asList("field.max"), validationAware.getFieldErrors("field"));
+        assertValidation(Long.MIN_VALUE, 2, (long)3, "field.max");
     }
 
     public void testUnsetInt() throws ValidationException
     {
-        ((NumericValidator)validator).setMin(0);
-        validator.validate(new FieldProvider(Integer.MIN_VALUE));
-        assertFalse(validationAware.hasFieldErrors());
+        assertValidation(0, Long.MAX_VALUE, Integer.MIN_VALUE);
+    }
+
+    public void testUnsetNull() throws ValidationException
+    {
+        assertValidation(0, Long.MAX_VALUE, null);
     }
 
     public void testUnsetLong() throws ValidationException
     {
-        ((NumericValidator)validator).setMin(0);
-        validator.validate(new FieldProvider(Long.MIN_VALUE));
-        assertFalse(validationAware.hasFieldErrors());
+        assertValidation(0, Long.MAX_VALUE, Long.MIN_VALUE);
+    }
+
+    private void assertValidation(long min, long max, Object value, String... errors) throws ValidationException
+    {
+        if (min != Long.MIN_VALUE)
+        {
+            ((NumericValidator)validator).setMin(min);
+        }
+        if (max != Long.MAX_VALUE)
+        {
+            ((NumericValidator)validator).setMax(max);
+        }
+
+        validator.validate(new FieldProvider(value));
+
+        assertEquals(errors.length > 0, validationAware.hasFieldErrors());
+        if (errors.length > 0)
+        {
+            assertEquals(Arrays.asList(errors), validationAware.getFieldErrors("field"));
+        }
+        else
+        {
+            assertNull(validationAware.getFieldErrors("field"));
+        }
     }
 }

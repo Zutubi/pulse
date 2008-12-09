@@ -37,37 +37,57 @@ public class NumericValidator extends FieldValidatorSupport
 
     public void validateField(Object value) throws ValidationException
     {
-        if (value instanceof Integer)
+        if (value instanceof String)
         {
-            Integer integerValue = (Integer) value;
-            if (integerValue != Integer.MIN_VALUE)
+            try
             {
-                if (integerValue < min)
+                value = Long.valueOf((String)value);
+            }
+            catch (NumberFormatException e)
+            {
+                addError();
+                return;
+            }
+        }
+
+        if (value instanceof Number)
+        {
+            Number number = (Number) value;
+            if (isSet(number))
+            {
+                if (number.longValue() < min)
                 {
                     addError(MIN);
                 }
-
-                if (max < integerValue)
+                if (max < number.longValue())
                 {
                     addError(MAX);
                 }
             }
         }
-        else if (value instanceof Long)
-        {
-            Long longValue = (Long) value;
-            if (longValue != Long.MIN_VALUE)
-            {
-                if (longValue < min)
-                {
-                    addError(MIN);
-                }
+    }
 
-                if (max < longValue)
-                {
-                    addError(MAX);
-                }
+    private boolean isSet(Number number)
+    {
+        if (number != null)
+        {
+            if (number instanceof Long)
+            {
+                return number.longValue() != Long.MIN_VALUE;
+            }
+            else if (number instanceof Integer)
+            {
+                return number.intValue() != Integer.MIN_VALUE;
+            }
+            else if (number instanceof Short)
+            {
+                return number.intValue() != Short.MIN_VALUE;
+            }
+            else if (number instanceof Byte)
+            {
+                return number.intValue() != Byte.MIN_VALUE;
             }
         }
+        return false;
     }
 }
