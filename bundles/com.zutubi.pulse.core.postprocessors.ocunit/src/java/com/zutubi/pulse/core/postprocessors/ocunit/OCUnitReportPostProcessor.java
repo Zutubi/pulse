@@ -87,7 +87,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
         Matcher m = START_SUITE_PATTERN.matcher(currentLine);
         if (!m.matches())
         {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Should only get here by already checking we are at the start of suite marker");
         }
 
         // start the suite.
@@ -146,7 +146,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
             // verify that we are reading the end suite here.
             if (!m.matches())
             {
-                throw new IllegalStateException();
+                throw new IllegalStateException("Should only get here by already checking we are at the end of suite marker");
             }
 
             if (m.group(1).compareTo(suite.getName()) != 0)
