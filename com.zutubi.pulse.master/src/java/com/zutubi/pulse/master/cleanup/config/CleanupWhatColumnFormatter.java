@@ -1,17 +1,16 @@
 package com.zutubi.pulse.master.cleanup.config;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.master.tove.table.ColumnFormatter;
+import com.zutubi.tove.annotations.Formatter;
 
 /**
  *
  *
  */
-public class CleanupWhatColumnFormatter implements ColumnFormatter
+public class CleanupWhatColumnFormatter implements Formatter<CleanupWhat>
 {
-    public String format(Object obj)
+    public String format(CleanupWhat what)
     {
-        CleanupWhat what = (CleanupWhat) obj;
         if (what == CleanupWhat.WHOLE_BUILDS)
         {
             return Messages.format(CleanupConfiguration.class, "what.WHOLE_BUILDS.label");

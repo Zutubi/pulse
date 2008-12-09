@@ -25,6 +25,11 @@ public @interface Form
      */
     String[] fieldOrder();
 
+    /**
+     * Specify the form actions to be displayed for this form.
+     * 
+     * @return an array of strings representing the actions available for this form.
+     */
     String[] actions() default { "save", "cancel" };
 
     int labelWidth() default 150;

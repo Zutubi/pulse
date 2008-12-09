@@ -35,31 +35,26 @@ public class TableDescriptorFactory
         {
             for (String columnName : tableAnnotation.columns())
             {
-                ColumnDescriptor cd = newColumnDescriptor(columnName);
-                cd.setType(type);
-                td.addColumn(cd);
+                td.addColumn(newColumnDescriptor(columnName, type));
             }
         }
         else
         {
-            // By default, we extract all of the primitive properties and make them available to the table.
-            // render properties as columns.
+            // By default, we extract all of the primitive properties and make them available.
             for (String primitivePropertyName : type.getPropertyNames(PrimitiveType.class))
             {
-                ColumnDescriptor cd = newColumnDescriptor(primitivePropertyName);
-                cd.setType(type);
-                td.addColumn(cd);
+                td.addColumn(newColumnDescriptor(primitivePropertyName, type));
             }
         }
 
         return td;
     }
 
-    private ColumnDescriptor newColumnDescriptor(String name)
+    private ColumnDescriptor newColumnDescriptor(String name, CompositeType type)
     {
         try
         {
-            return objectFactory.buildBean(ColumnDescriptor.class, new Class[]{String.class}, new Object[]{name});
+            return objectFactory.buildBean(ColumnDescriptor.class, new Class[]{String.class, CompositeType.class}, new Object[]{name, type});
         }
         catch (Exception e)
         {

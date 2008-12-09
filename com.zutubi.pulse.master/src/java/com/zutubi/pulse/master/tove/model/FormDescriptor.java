@@ -1,12 +1,8 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
-import com.zutubi.pulse.master.tove.model.Field;
-import com.zutubi.pulse.master.tove.model.Form;
-import com.zutubi.pulse.master.tove.model.SubmitFieldDescriptor;
-import com.zutubi.tove.type.record.Record;
-import com.zutubi.pulse.master.tove.model.AbstractParameterised;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
@@ -23,6 +19,11 @@ import java.util.List;
 public class FormDescriptor extends AbstractParameterised implements Descriptor
 {
     private static final String DEFAULT_ACTION = "save";
+
+    private static final String ACTION_NEXT = "next";
+    private static final String ACTION_FINISH = "finish";
+
+    private static final String PARAMETER_FIELDORDER = "fieldOrder";
 
     private String name;
     private String id;
@@ -144,14 +145,14 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
 
     private String getDefaultSubmit()
     {
-        String defaultAction = actions.size() > 0 ? actions.get(0) : "save";
-        if (actions.contains("next"))
+        String defaultAction = actions.size() > 0 ? actions.get(0) : DEFAULT_ACTION;
+        if (actions.contains(ACTION_NEXT))
         {
-            defaultAction = "next";
+            defaultAction = ACTION_NEXT;
         }
-        else if (actions.contains("finish"))
+        else if (actions.contains(ACTION_FINISH))
         {
-            defaultAction = "finish";
+            defaultAction = ACTION_FINISH;
         }
 
         return defaultAction;
@@ -161,9 +162,9 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
     {
         // If a field order is defined, lets us it as the starting point.
         LinkedList<String> ordered = new LinkedList<String>();
-        if (hasParameter("fieldOrder"))
+        if (hasParameter(PARAMETER_FIELDORDER))
         {
-            ordered.addAll(Arrays.asList((String[])getParameter("fieldOrder")));
+            ordered.addAll(Arrays.asList((String[])getParameter(PARAMETER_FIELDORDER)));
         }
 
         return ToveUtils.evaluateFieldOrder(ordered, CollectionUtils.map(getFieldDescriptors(), new Mapping<FieldDescriptor, String>()

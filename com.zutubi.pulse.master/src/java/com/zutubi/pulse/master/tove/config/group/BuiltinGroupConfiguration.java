@@ -5,7 +5,6 @@ import com.zutubi.tove.annotations.*;
 /**
  */
 @SymbolicName("zutubi.builtinGroupConfig")
-@Internal
 @Classification(single = "group")
 @Form(fieldOrder = {"name", "serverPermissions"})
 public class BuiltinGroupConfiguration extends AbstractGroupConfiguration

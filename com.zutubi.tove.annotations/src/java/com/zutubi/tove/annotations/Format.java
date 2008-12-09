@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * The format annotation allows an implementation of the formatter to be associated with a property, type, or
- * another annotation. 
+ * annotation.
  *
  */
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE})

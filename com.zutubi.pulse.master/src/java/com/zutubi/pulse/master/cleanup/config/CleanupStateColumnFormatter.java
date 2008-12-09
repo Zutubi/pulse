@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.cleanup.config;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.master.tove.table.ColumnFormatter;
+import com.zutubi.tove.annotations.Formatter;
 
 import java.util.List;
 
@@ -9,12 +9,10 @@ import java.util.List;
  *
  *
  */
-public class CleanupStateColumnFormatter implements ColumnFormatter
+public class CleanupStateColumnFormatter implements Formatter<List<ResultState>>
 {
-    public String format(Object obj)
+    public String format(List<ResultState> states)
     {
-        List<ResultState> states = (List<ResultState>) obj;
-
         if(states == null || states.size() == 0)
         {
             return "any";

@@ -15,6 +15,8 @@ public class ColumnDescriptor
      */
     private String name;
 
+    private CompositeType type;
+
     /**
      * Indicate whether or not this column is sortable.  This is an optional setting that does not need to
      * be supported by the UI. 
@@ -27,19 +29,9 @@ public class ColumnDescriptor
      */
     private boolean required;
 
-    private CompositeType type;
-
-    public ColumnDescriptor()
-    {
-    }
-
-    public ColumnDescriptor(String name)
+    public ColumnDescriptor(String name, CompositeType type)
     {
         this.name = name;
-    }
-
-    public void setType(CompositeType type)
-    {
         this.type = type;
     }
 
@@ -47,7 +39,7 @@ public class ColumnDescriptor
     {
         try
         {
-            FormattingWrapper wrapper = objectFactory.buildBean(FormattingWrapper.class, new Class[]{Object.class, CompositeType.class}, new Object[]{instance, type});
+            FormattingWrapper wrapper = newWrapper(instance);
             Object value = wrapper.get(name);
             if (value != null)
             {
@@ -59,6 +51,11 @@ public class ColumnDescriptor
         {
             return "";
         }
+    }
+
+    private FormattingWrapper newWrapper(Object instance) throws Exception
+    {
+        return objectFactory.buildBean(FormattingWrapper.class, new Class[]{Object.class, CompositeType.class}, new Object[]{instance, type});
     }
 
     public String getName()

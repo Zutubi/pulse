@@ -33,7 +33,7 @@ public abstract class AbstractConfiguration implements Configuration
         String m = getMeta(HANDLE_KEY);
         if(m == null)
         {
-            return 0;
+            return UNDEFINED;
         }
         
         return Long.parseLong(m);
@@ -66,6 +66,7 @@ public abstract class AbstractConfiguration implements Configuration
 
     public boolean isPermanent()
     {
+        // will return false if getMeta(PERMANENT_KEY) returns null.
         return Boolean.parseBoolean(getMeta(PERMANENT_KEY));
     }
 
@@ -94,7 +95,7 @@ public abstract class AbstractConfiguration implements Configuration
 
     public List<String> getInstanceErrors()
     {
-        return instanceErrors;
+        return Collections.unmodifiableList(instanceErrors);
     }
 
     public void addInstanceError(String message)
@@ -109,7 +110,7 @@ public abstract class AbstractConfiguration implements Configuration
 
     public Map<String, List<String>> getFieldErrors()
     {
-        return fieldErrors;
+        return Collections.unmodifiableMap(fieldErrors);
     }
 
     public void clearFieldErrors()

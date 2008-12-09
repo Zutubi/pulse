@@ -7,7 +7,6 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
 /**
- * <class-comment/>
  */
 public class BeanUtils
 {
@@ -45,7 +44,7 @@ public class BeanUtils
             Method readMethod = descriptor.getReadMethod();
             if (readMethod == null)
             {
-                throw new BeanPropertyException();
+                throw new BeanPropertyException("property does not have a getter.");
             }
             return readMethod.invoke(target);
         }
@@ -78,5 +77,4 @@ public class BeanUtils
             throw new BeanException(e);
         }
     }
-
 }

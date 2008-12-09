@@ -1,18 +1,18 @@
 package com.zutubi.pulse.master.tove.table;
 
-import com.zutubi.tove.annotations.Format;
-import com.zutubi.pulse.master.tove.table.ColumnFormatter;
 import com.zutubi.tove.ConventionSupport;
+import com.zutubi.tove.annotations.Format;
+import com.zutubi.tove.annotations.Formatter;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.bean.BeanUtils;
 
 import java.lang.reflect.Method;
 
 /**
- * A wrapper object that provides access to formatted property values via the #FormattingWrapper.get(String name) method.
- *
+ * A wrapper object that provides access to formatted property values.
  */
 public class FormattingWrapper
 {
@@ -32,21 +32,24 @@ public class FormattingWrapper
     {
         this.instance = instance;
         this.type = type;
+
+        if (instance.getClass() != type.getClazz())
+        {
+            throw new IllegalArgumentException("Instance: " + instance + " not of the expected type: " + type.getClazz());
+        }
     }
 
+    @SuppressWarnings({"unchecked"})
     public Object get(String name) throws Exception
     {
-        // type class level formatting
         try
         {
-            // very inefficient. should record the class level formatter class somewhere.
-
             Class<Object> formatter = ConventionSupport.getFormatter(type);
             if (formatter != null)
             {
                 Object formatterInstance = objectFactory.buildBean(formatter);
 
-                String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+                String methodName = getGetterMethodName(name);
                 Method getter;
                 try
                 {
@@ -60,41 +63,35 @@ public class FormattingWrapper
                 {
                     // noop
                 }
-
-                // handle the case when the accepted arg is of the base type.
-                try
-                {
-                    getter = formatter.getMethod(methodName, type.getClazz());
-                    if (getter != null)
-                    {
-                        return getter.invoke(formatterInstance, instance);
-                    }
-                }
-                catch (NoSuchMethodException e)
-                {
-                    // noop
-                }
             }
         }
         catch (Exception e)
         {
-            // noop.
+            // should we be warning about this exception? if so, how/where is most appropriate.
         }
 
-        // column level formatting
+        Object fieldValue = getFieldValue(name);
+
         TypeProperty property = type.getProperty(name);
         if (property != null)
         {
-            Format columnFormatter = property.getAnnotation(Format.class);
-            if (columnFormatter != null)
+            Format formatAnnotation = property.getAnnotation(Format.class);
+            if (formatAnnotation != null)
             {
-                Class formatter = ClassLoaderUtils.loadAssociatedClass(type.getClazz(), columnFormatter.value());
-                ColumnFormatter formatterInstance = (ColumnFormatter) formatter.newInstance();
-                Object fieldValue = getFieldValue(name);
-                return formatterInstance.format(fieldValue);
+                Class clazz = ClassLoaderUtils.loadAssociatedClass(type.getClazz(), formatAnnotation.value());
+                if (Formatter.class.isAssignableFrom(clazz))
+                {
+                    Formatter formatterInstance = (Formatter) objectFactory.buildBean(clazz);
+                    return formatterInstance.format(fieldValue);
+                }
+                else
+                {
+                    // should we be warning about this? if so, how/where is most appropriate.
+                }
             }
         }
-        return getFieldValue(name);
+        
+        return fieldValue;
     }
 
     private Object getFieldValue(String name) throws Exception
@@ -104,21 +101,25 @@ public class FormattingWrapper
         {
             return property.getValue(instance);
         }
-
-        // default method invocation.
-        try
+        else
         {
-            Method getter = instance.getClass().getMethod("get" + name.substring(0,1).toUpperCase() + name.substring(1));
-            if (getter != null)
+            // should we ever end up here?. Any requested property will surely
+            // refer to a defined property.
+            try
             {
-                return getter.invoke(instance);
+                return BeanUtils.getProperty(name, instance);
             }
+            catch (Exception e)
+            {
+                // should we be warning about this exception? if so, how/where is most appropriate.
+            }
+            return null;
         }
-        catch (Exception e)
-        {
-            // noop.
-        }
-        return null;
+    }
+
+    private String getGetterMethodName(String name)
+    {
+        return "get" + name.substring(0,1).toUpperCase() + name.substring(1);
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)
