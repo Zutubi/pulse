@@ -5,12 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD})
-
 /**
+ * This annotation validates that the content of the field is a valid URL.
  */
 @Constraint("com.zutubi.validation.validators.URLValidator")
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.FIELD})
 public @interface Url
 {
     static final String DEFAULT_defaultKeySuffix = "";

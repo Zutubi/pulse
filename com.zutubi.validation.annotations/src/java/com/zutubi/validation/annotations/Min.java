@@ -1,7 +1,8 @@
 package com.zutubi.validation.annotations;
 
 /**
- * <class-comment/>
+ * This annotation marks the field as numeric, constrained by the configured
+ * minimum value.
  */
 @Constraint("com.zutubi.validation.validators.NumericValidator")
 public @interface Min
@@ -14,5 +15,10 @@ public @interface Min
 
     public abstract boolean shortCircuit() default DEFAULT_shortCircuit;
 
+    /**
+     * The minimum allowed value for the annotated field.
+     *
+     * @return the minimum value.
+     */
     @ConstraintProperty("min") public abstract int value();
 }

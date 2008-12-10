@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <class-comment/>
+ * This annotation validates that the content of the field matches
+ * the given regex pattern.
  */
 @Constraint("com.zutubi.validation.validators.RegexValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

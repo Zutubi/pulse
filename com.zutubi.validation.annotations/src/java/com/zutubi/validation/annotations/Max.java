@@ -1,7 +1,8 @@
 package com.zutubi.validation.annotations;
 
 /**
- * <class-comment/>
+ * This annotation marks the field as numeric, constrained by the configured
+ * maximum value.
  */
 @Constraint("com.zutubi.validation.validators.NumericValidator")
 public @interface Max
@@ -14,6 +15,10 @@ public @interface Max
 
     boolean shortCircuit() default DEFAULT_shortCircuit;
 
-    @ConstraintProperty("max")
-    int value();
+    /**
+     * The maximum allowed value for the annotated field.
+     *
+     * @return the maximum value.
+     */
+    @ConstraintProperty("max") int value();
 }

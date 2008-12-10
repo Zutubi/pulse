@@ -6,7 +6,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <class-comment/>
+ * This annotation marks the field as a numeric field.  Optionally, the
+ * numeric value can be constrained by the min and max constraints.
+ * <p>
+ * This annotation can be applied to integral and string fields.
+ * <p>
+ * For example
+ * <code>
+ *     @Numeric(min = 0, max = 100)
+ *     public String getNumber()
+ *     {
+ *         return "093";
+ *     }
+ * </code>
  */
 @Constraint("com.zutubi.validation.validators.NumericValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

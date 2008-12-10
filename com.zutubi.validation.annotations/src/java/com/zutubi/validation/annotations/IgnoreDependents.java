@@ -6,7 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * <class-comment/>
  */
 @Constraint("com.zutubi.validation.validators.IgnoreDependentsFieldValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

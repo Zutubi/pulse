@@ -22,9 +22,27 @@ public @interface File
 
     boolean shortCircuit() default DEFAULT_shortCircuit;
 
+    /**
+     * @return true if the field value must be a valid file.
+     * @see java.io.File#isFile()
+     */
     boolean verifyFile() default false;
+
+    /**
+     * @return true if the field value must be a valid directory.
+     * @see java.io.File#isDirectory()
+     */
     boolean verifyDirectory() default false;
 
+    /**
+     * @return true if the field value must be readable
+     * @see java.io.File#canRead()
+     */
     boolean verifyReadable() default false;
+
+    /**
+     * @return true if the field value must be writeable
+     * @see java.io.File#canWrite()
+     */
     boolean verifyWritable() default false;
 }

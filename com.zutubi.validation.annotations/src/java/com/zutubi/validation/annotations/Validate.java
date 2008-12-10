@@ -6,7 +6,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <class-comment/>
+ * This annotation indicates that the marked property should
+ * itself be validated.
+ * <p>
+ * For example, by marking the door property with the validate annotation,
+ * each of the properties on the door will also be validated as part of the
+ * validation of the house. That is, the house will not be considered valid
+ * unless the door is also valid.  Without the validate annotation, the
+ * door would be ignored.
+ * <code>
+ * public class House
+ * {
+ *     @Validate
+ *     public Door getDoor()
+ *     {
+ *
+ *     }
+ * }
+ * </code>
  */
 @Constraint("com.zutubi.validation.validators.DelegateValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

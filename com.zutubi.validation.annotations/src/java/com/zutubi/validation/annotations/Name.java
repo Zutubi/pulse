@@ -6,7 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <class-comment/>
+ * This annotation marks the field as a name.  A valid name needs to conform to
+ * the following
+ * <ul>
+ * <li>must not begin or end with a whitespace character</li>
+ * <li>must not contain the '/', '\' or '$' characters. </li>
+ * </ul>
+ *
  */
 @Constraint("com.zutubi.validation.validators.NameValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

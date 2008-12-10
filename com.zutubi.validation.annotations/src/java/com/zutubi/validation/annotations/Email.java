@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <class-comment/>
+ * The email annotation is used on a string property that is required to conform
+ * to <a href="http://www.ietf.org/rfc/rfc822.txt">rfc822</a>
  */
 @Constraint("com.zutubi.validation.validators.EmailValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})
