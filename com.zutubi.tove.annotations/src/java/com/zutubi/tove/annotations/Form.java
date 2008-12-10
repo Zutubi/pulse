@@ -26,7 +26,7 @@ public @interface Form
     String[] fieldOrder();
 
     /**
-     * Specify the form actions to be displayed for this form.
+     * Specify the submit actions available for this form.
      * 
      * @return an array of strings representing the actions available for this form.
      */

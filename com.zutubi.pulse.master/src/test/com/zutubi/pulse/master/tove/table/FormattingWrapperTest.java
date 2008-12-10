@@ -6,14 +6,12 @@ import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.tove.annotations.Format;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Formatter;
+import com.zutubi.tove.annotations.api.Formatter;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 
-/**
- */
 public class FormattingWrapperTest extends ZutubiTestCase
 {
     private CompositeType type;
@@ -44,6 +42,13 @@ public class FormattingWrapperTest extends ZutubiTestCase
     public void testVirtualFormatting() throws Exception
     {
         assertFormatting("<f>" + value + "</f>", "c");
+    }
+
+    public void testVirtualFormattingOnExtendedInstance() throws Exception
+    {
+        Sample s = new ExtendedSample(value);
+        FormattingWrapper wrapper = newFormattingWrapper(s, type);
+        assertEquals("<f><e>" + value + "</e></f>", wrapper.get("c"));
     }
 
     public void testFormattingWrapperCreation() throws TypeException
@@ -103,16 +108,18 @@ public class FormattingWrapperTest extends ZutubiTestCase
 
     public static class ExtendedSample extends Sample
     {
-        private String extendedValue;
-
-        public String getExtendedValue()
+        public ExtendedSample()
         {
-            return extendedValue;
         }
 
-        public void setExtendedValue(String extendedValue)
+        public ExtendedSample(String value)
         {
-            this.extendedValue = extendedValue;
+            super(value);
+        }
+
+        public String getA()
+        {
+            return "<e>" + super.getA() + "</e>";
         }
     }
 

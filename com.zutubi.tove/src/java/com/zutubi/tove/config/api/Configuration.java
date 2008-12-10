@@ -12,15 +12,17 @@ import java.util.Set;
  * Configurations are essentially data holders with some added properties as listed below:
  * <ul>
  * <li>permanent</li> a permanent configuration instance can not be deleted.
- * <li>handle</li> the unique identifier for this configuration instance.  This identifier does not change over time.
- * <li>concrete</li> indicates whether or not the configuration is a concrete node in the templated hierarchy (a leaf)
- * or if it is extended by another instance.
- * <li>configuration path</li> a string that uniquely identifies the configuration instance.  A configuration
- * instances path may change over time.
+ * <li>handle</li> the unique identifier for this configuration instance.  This identifier
+ * does not change over time.
+ * <li>concrete</li> indicates whether or not the configuration is a concrete node in the
+ * templated hierarchy. Only concrete nodes are instantiated into configuration instances.
+ * <li>configuration path</li> a string that uniquely identifies the configuration instance
+ * within the configuration hierarchy. For instance, 'users/John' uniquely identifies the
+ * user 'John'. Note that the path of a configuration instance may change over time.
  * </ul>
  * <p>
- * The meta properties are used to hold descriptive information about a configuration instance. For instance, the
- * handle property value is stored as a configuration meta property.
+ * The meta properties are used to hold descriptive information about a configuration instance.
+ * For instance, the handle property value is stored as a configuration meta property.
  */
 public interface Configuration
 {
@@ -39,8 +41,8 @@ public interface Configuration
     static final String PERMANENT_KEY = "permanent";
 
     /**
-     * Retrieve the named meta property
-     * @param key   the key identifying the meta property
+     * Retrieve the named meta property.
+     * @param key   the key identifying the meta property.
      * @return the value of the meta property, or null if the property does not exist.
      */
     String getMeta(String key);
@@ -59,14 +61,14 @@ public interface Configuration
     void setConfigurationPath(String configurationPath);
 
     /**
-     * @return true if this configuration instance is marked as concrete, false otherwise.
+     * @return true if this configuration instance is marked as concrete.
      */
     @Transient
     boolean isConcrete();
     void setConcrete(boolean concrete);
 
     /**
-     * @return true if this configuration instance is marked as permanent, false otherwise.
+     * @return true if this configuration instance is marked as permanent.
      */
     @Transient
     boolean isPermanent();
@@ -74,7 +76,7 @@ public interface Configuration
     /**
      * Mark this configuration instance as permanent.
      *
-     * @param permanent     if true, this instance is marked as permanent, false otherwise.
+     * @param permanent if true, this instance is marked as permanent.
      */
     void setPermanent(boolean permanent);
 

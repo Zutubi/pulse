@@ -3,8 +3,6 @@ package com.zutubi.util.bean;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.RandomUtils;
 
-/**
- */
 public class BeanUtilsTest extends ZutubiTestCase
 {
     public void testGetProperty() throws BeanException

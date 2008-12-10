@@ -1,7 +1,8 @@
-package com.zutubi.tove.annotations;
+package com.zutubi.tove.annotations.api;
 
 /**
- * The Formatter interface.
+ * Defines an interface that can format objects of type T into human-readable
+ * string representations.
  *
  * @see com.zutubi.tove.annotations.Format
  */

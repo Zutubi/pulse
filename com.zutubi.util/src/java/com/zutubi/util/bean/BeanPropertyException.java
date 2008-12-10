@@ -1,8 +1,5 @@
 package com.zutubi.util.bean;
 
-/**
- * <class-comment/>
- */
 public class BeanPropertyException extends BeanException
 {
     public BeanPropertyException()

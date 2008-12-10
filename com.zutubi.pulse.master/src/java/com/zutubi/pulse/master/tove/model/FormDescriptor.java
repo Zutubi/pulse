@@ -23,7 +23,7 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
     private static final String ACTION_NEXT = "next";
     private static final String ACTION_FINISH = "finish";
 
-    private static final String PARAMETER_FIELDORDER = "fieldOrder";
+    private static final String PARAMETER_FIELD_ORDER = "fieldOrder";
 
     private String name;
     private String id;
@@ -162,9 +162,9 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
     {
         // If a field order is defined, lets us it as the starting point.
         LinkedList<String> ordered = new LinkedList<String>();
-        if (hasParameter(PARAMETER_FIELDORDER))
+        if (hasParameter(PARAMETER_FIELD_ORDER))
         {
-            ordered.addAll(Arrays.asList((String[])getParameter(PARAMETER_FIELDORDER)));
+            ordered.addAll(Arrays.asList((String[])getParameter(PARAMETER_FIELD_ORDER)));
         }
 
         return ToveUtils.evaluateFieldOrder(ordered, CollectionUtils.map(getFieldDescriptors(), new Mapping<FieldDescriptor, String>()

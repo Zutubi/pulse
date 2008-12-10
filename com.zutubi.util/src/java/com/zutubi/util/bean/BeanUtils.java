@@ -7,6 +7,9 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
 /**
+ * A utility class for working with Java Beans.  See the
+ * <a href="http://java.sun.com/products/javabeans/docs/index.html">JavaBeans specification</a>
+ * for further details.
  */
 public class BeanUtils
 {
@@ -19,11 +22,11 @@ public class BeanUtils
             Method writeMethod = descriptor.getWriteMethod();
             if (writeMethod == null)
             {
-                throw new BeanPropertyException("No write method exists for property '" + propertyName + "'");
+                throw new BeanPropertyException(String.format(
+                        "No write method exists for property '%s'", propertyName)
+                );
             }
-
             writeMethod.invoke(target, propertyValue);
-
         }
         catch (BeanException e)
         {
@@ -44,7 +47,10 @@ public class BeanUtils
             Method readMethod = descriptor.getReadMethod();
             if (readMethod == null)
             {
-                throw new BeanPropertyException("property does not have a getter.");
+                throw new BeanPropertyException(String.format(
+                        "Property '%s' does not have a getter on class %s.",
+                        propertyName, target.getClass())
+                );
             }
             return readMethod.invoke(target);
         }

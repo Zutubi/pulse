@@ -2,10 +2,11 @@ package com.zutubi.pulse.master.tove.table;
 
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Format;
-import com.zutubi.tove.annotations.Formatter;
+import com.zutubi.tove.annotations.api.Formatter;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.bean.BeanUtils;
 
@@ -16,6 +17,8 @@ import java.lang.reflect.Method;
  */
 public class FormattingWrapper
 {
+    private static final Logger LOG = Logger.getLogger(FormattingWrapper.class);
+
     private ObjectFactory objectFactory;
 
     /**
@@ -54,10 +57,17 @@ public class FormattingWrapper
                 try
                 {
                     getter = formatter.getMethod(methodName, instance.getClass());
-                    if (getter != null)
-                    {
-                        return getter.invoke(formatterInstance, instance);
-                    }
+                    return getter.invoke(formatterInstance, instance);
+                }
+                catch (NoSuchMethodException e)
+                {
+                    // noop
+                }
+
+                try
+                {
+                    getter = formatter.getMethod(methodName, type.getClazz());
+                    return getter.invoke(formatterInstance, instance);
                 }
                 catch (NoSuchMethodException e)
                 {
@@ -67,7 +77,7 @@ public class FormattingWrapper
         }
         catch (Exception e)
         {
-            // should we be warning about this exception? if so, how/where is most appropriate.
+            LOG.warning(e);
         }
 
         Object fieldValue = getFieldValue(name);
@@ -86,7 +96,9 @@ public class FormattingWrapper
                 }
                 else
                 {
-                    // should we be warning about this? if so, how/where is most appropriate.
+                    LOG.warning("Property %s of type %s is marked using @Format with " +
+                            "formatter that does not implement com.zutubi.tove.annotations.api.Formatter.",
+                            name, type.getClazz());
                 }
             }
         }
@@ -103,15 +115,13 @@ public class FormattingWrapper
         }
         else
         {
-            // should we ever end up here?. Any requested property will surely
-            // refer to a defined property.
             try
             {
                 return BeanUtils.getProperty(name, instance);
             }
             catch (Exception e)
             {
-                // should we be warning about this exception? if so, how/where is most appropriate.
+                LOG.warning(e);
             }
             return null;
         }

@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The format annotation allows an implementation of the formatter to be associated with a property, type, or
- * annotation.
+ * The @Format annotation is used to associate a formatter with a specific type or property,
+ * either directly or indirectly (by application to another annotation)
  *
  */
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
