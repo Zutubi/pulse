@@ -39,4 +39,25 @@ public class GroupsPage extends ListPage
         form.waitFor();
         return form;
     }
+
+    public boolean isGroupPresent(String groupName)
+    {
+        try
+        {
+            int i = 0;
+            while (true)
+            {
+                String locatedGroupName = getCellContent(i, 0);
+                if (locatedGroupName.equals(groupName))
+                {
+                    return true;
+                }
+                i++;
+            }
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
 }

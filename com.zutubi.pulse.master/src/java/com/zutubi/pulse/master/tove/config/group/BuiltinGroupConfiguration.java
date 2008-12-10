@@ -4,6 +4,7 @@ import com.zutubi.tove.annotations.*;
 
 /**
  */
+@Internal
 @SymbolicName("zutubi.builtinGroupConfig")
 @Classification(single = "group")
 @Form(fieldOrder = {"name", "serverPermissions"})

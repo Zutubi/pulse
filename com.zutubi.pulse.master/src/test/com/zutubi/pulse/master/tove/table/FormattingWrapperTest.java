@@ -9,6 +9,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Formatter;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 
 /**
@@ -37,12 +38,27 @@ public class FormattingWrapperTest extends ZutubiTestCase
 
     public void testReturnFormatting() throws Exception
     {
-        assertFormatting("<r>"+value+"</r>", "b");
+        assertFormatting("<r>" + value + "</r>", "b");
     }
 
     public void testVirtualFormatting() throws Exception
     {
-        assertFormatting("<f>"+value+"</f>", "c");
+        assertFormatting("<f>" + value + "</f>", "c");
+    }
+
+    public void testFormattingWrapperCreation() throws TypeException
+    {
+        new FormattingWrapper(new ExtendedSample(), type);
+
+        try
+        {
+            new FormattingWrapper(this, type);
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertTrue(e.getMessage().contains("not of the expected type"));
+        }
     }
 
     private void assertFormatting(String expected, String propertyName) throws Exception
@@ -82,6 +98,21 @@ public class FormattingWrapperTest extends ZutubiTestCase
         public String getB()
         {
             return value;
+        }
+    }
+
+    public static class ExtendedSample extends Sample
+    {
+        private String extendedValue;
+
+        public String getExtendedValue()
+        {
+            return extendedValue;
+        }
+
+        public void setExtendedValue(String extendedValue)
+        {
+            this.extendedValue = extendedValue;
         }
     }
 

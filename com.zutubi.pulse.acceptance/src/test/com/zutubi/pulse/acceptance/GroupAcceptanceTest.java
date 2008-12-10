@@ -17,6 +17,20 @@ import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NA
  */
 public class GroupAcceptanceTest extends SeleniumTestBase
 {
+    public void testDefaultGroupsTable()
+    {
+        loginAsAdmin();
+
+        GroupsPage groupsPage = new GroupsPage(selenium, urls);
+        groupsPage.goTo();
+
+        assertTrue(groupsPage.isGroupPresent("administrators"));
+        assertTrue(groupsPage.isGroupPresent("all users"));
+        assertTrue(groupsPage.isGroupPresent("anonymous users"));
+        assertTrue(groupsPage.isGroupPresent("developers"));
+        assertTrue(groupsPage.isGroupPresent("project administrators"));
+    }
+
     public void testCreateEmptyGroup()
     {
         loginAsAdmin();

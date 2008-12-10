@@ -33,7 +33,7 @@ public class FormattingWrapper
         this.instance = instance;
         this.type = type;
 
-        if (instance.getClass() != type.getClazz())
+        if (!type.getClazz().isAssignableFrom(instance.getClass()))
         {
             throw new IllegalArgumentException("Instance: " + instance + " not of the expected type: " + type.getClazz());
         }
