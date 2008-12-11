@@ -46,7 +46,7 @@ public class VersionedTypeConfiguration extends TypeConfiguration
         try
         {
             ScmConfiguration scm = projectConfig.getScm();
-            ScmContext context = scmManager.createContext(projectConfig.getProjectId(), scm);
+            ScmContext context = scmManager.createContext(projectConfig);
             scmClient = scmManager.createClient(scm);
             is = scmClient.retrieve(context, pulseFileName, revision);
             return IOUtils.inputStreamToString(is);

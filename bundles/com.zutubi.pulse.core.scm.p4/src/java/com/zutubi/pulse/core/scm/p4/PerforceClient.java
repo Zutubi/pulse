@@ -1,24 +1,20 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.ReferenceResolver;
-import com.zutubi.pulse.core.engine.api.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
 import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.core.util.process.AsyncProcess;
-import com.zutubi.pulse.core.util.process.BufferingCharHandler;
+import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
-import com.zutubi.util.logging.Logger;
 
 import java.io.*;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,192 +22,36 @@ public class PerforceClient extends CachingScmClient
 {
     public static final String TYPE = "p4";
 
-    private static final Logger LOG = Logger.getLogger(PerforceClient.class);
+    // Output of p4 sync -f:
+    //   <depot file>#<revision> - (refreshing|added as) <local file>
+    //   <depot file>#<revision> - (refreshing|updating|added as|deleted as) <local file>
+    //   ...
+    private static final Pattern SYNC_PATTERN = Pattern.compile("^(.+)#([0-9]+) - (refreshing|updating|added as|deleted as) (.+)$", Pattern.MULTILINE);
 
-    private static final long RESOLVE_COMMAND_TIMEOUT = Long.getLong("pulse.p4.client.command.timeout", 300);
-
+    private PerforceConfiguration configuration;
     private PerforceCore core;
-    private String templateClient;
-    private String resolvedClient;
-    private File clientRoot;
-    private String port;
-    private Pattern syncPattern;
-    private List<String> excludedPaths = Collections.emptyList();
+    private PerforceWorkspaceManager workspaceManager;
 
-    public void setExcludedPaths(List<String> filteredPaths)
-    {
-        this.excludedPaths = filteredPaths;
-    }
-
-    private String resolveClient(Revision revision) throws ScmException
-    {
-        return resolveClient(revision, true);
-    }
-
-    private String resolveClient(Revision revision, boolean cache) throws ScmException
-    {
-        String resolved;
-        if (resolvedClient == null)
-        {
-            if (templateClient.startsWith("!"))
-            {
-                String commandLine = templateClient.substring(1);
-
-                HashReferenceMap referenceMap = new HashReferenceMap();
-                String revisionSpec = (revision == null) ?  "#head" : "@" + revision.getRevisionString();
-                referenceMap.add(new Property("revision.spec", revisionSpec));
-
-                Process p;
-                try
-                {
-                    List<String> command = ReferenceResolver.splitAndResolveReferences(commandLine, referenceMap, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
-                    p = Runtime.getRuntime().exec(command.toArray(new String[command.size()]));
-                }
-                catch(Exception e)
-                {
-                    throw new ScmException("Error starting template client generation command: " + e.getMessage(), e);
-                }
-
-                BufferingCharHandler handler = new BufferingCharHandler();
-                AsyncProcess ap = new AsyncProcess(p, handler, false);
-
-                try
-                {
-                    ap.waitForSuccessOrThrow(RESOLVE_COMMAND_TIMEOUT, TimeUnit.SECONDS);
-                    resolved = handler.getStdout().trim();
-                }
-                catch (Exception e)
-                {
-                    LOG.severe(e);
-                    throw new ScmException("Error running template client generation command: " + e.getMessage(), e);
-                }
-                finally
-                {
-                    ap.destroy();
-                }
-            }
-            else
-            {
-                resolved = templateClient;
-            }
-
-            if(cache)
-            {
-                resolvedClient = resolved;
-            }
-
-            return resolved;
-        }
-        else
-        {
-            return resolvedClient;
-        }
-    }
-
-    private void createClient(String clientName, File toDirectory, Revision revision) throws ScmException
-    {
-        core.createClient(resolveClient(revision), clientName, toDirectory);
-    }
-
-    private boolean clientExists(String clientName) throws ScmException
-    {
-        PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_CLIENTS), COMMAND_CLIENTS);
-        String[] lines = core.splitLines(result);
-        for (String line : lines)
-        {
-            String[] parts = line.split(" ");
-            if (parts.length > 1 && parts[1].equals(clientName))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-//    private void ensureClient(String clientName, File toDirectory) throws SCMException
-//    {
-//        if(clientExists(clientName))
-//        {
-//            // Just check mapping/root
-//        }
-//        else
-//        {
-//            createClient(clientName, toDirectory);
-//        }
-//    }
-
-    private String updateClient(String id, File toDirectory, Revision revision) throws ScmException
-    {
-        if (toDirectory == null)
-        {
-            toDirectory = new File(".");
-            clientRoot = new File(FileSystemUtils.getNormalisedAbsolutePath(toDirectory));
-        }
-
-        String clientName = getClientName(id);
-
-        // If the client exists, perforce will just update the details.  This
-        // is important in case the template is changed.
-        createClient(clientName, toDirectory, revision);
-
-        return clientName;
-    }
-
-    private String getClientName(String id)
-    {
-        String clientPrefix = System.getProperty("pulse.p4.client.prefix", "pulse-");
-        String clientName;
-
-        if (id == null)
-        {
-            id = Long.toString((long) (Math.random() * 100000));
-            clientName = clientPrefix + "temp-" + id;
-        }
-        else
-        {
-            try
-            {
-                id = URLEncoder.encode(id, "UTF-8");
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                // Use raw ID
-            }
-            clientName = clientPrefix + id;
-        }
-        return clientName;
-    }
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
-        return getLatestRevision((String)null);
-    }
-
-    private Revision getLatestRevision(String clientName) throws ScmException
-    {
-        boolean cleanup = false;
-
-        if (clientName == null)
-        {
-            clientName = updateClient(null, null, null);
-            cleanup = true;
-        }
-
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
         try
         {
-            return core.getLatestRevisionForFiles(clientName, "//" + clientName + "/...");
+            return getLatestRevision(workspace);
         }
         finally
         {
-            if (cleanup)
-            {
-                deleteClient(clientName);
-            }
+            workspaceManager.freeWorkspace(core, workspace);
         }
     }
 
-    public void populate(ScmFileCache.CacheItem item) throws ScmException
+    private Revision getLatestRevision(PerforceWorkspace workspace) throws ScmException
+    {
+        return core.getLatestRevisionForFiles(workspace.getName(), "//" + workspace.getName() + "/...");
+    }
+
+    public void populate(ScmContext context, ScmFileCache.CacheItem item) throws ScmException
     {
         item.cachedRevision = getLatestRevision((ScmContext)null);
         item.cachedListing = new TreeMap<String, CachingScmFile>();
@@ -219,18 +59,17 @@ public class PerforceClient extends CachingScmClient
         CachingScmFile rootFile = new CachingScmFile("", true);
         item.cachedListing.put("", rootFile);
 
-        String clientName = updateClient(null, null, null);
-
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
         try
         {
-            PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
-            Matcher matcher = syncPattern.matcher(result.stdout);
+            PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
+            Matcher matcher = SYNC_PATTERN.matcher(result.stdout);
             while (matcher.find())
             {
                 String localFile = matcher.group(4);
-                if (localFile.startsWith(clientRoot.getAbsolutePath()))
+                if (localFile.startsWith(workspace.getRoot()))
                 {
-                    localFile = localFile.substring(clientRoot.getAbsolutePath().length());
+                    localFile = localFile.substring(workspace.getRoot().length());
                 }
 
                 // Separators must be normalised
@@ -245,19 +84,7 @@ public class PerforceClient extends CachingScmClient
         }
         finally
         {
-            deleteClient(clientName);
-        }
-    }
-
-    private void deleteClient(String clientName)
-    {
-        try
-        {
-            core.runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, clientName);
-        }
-        catch (ScmException e)
-        {
-            LOG.warning("Unable to delete client: " + e.getMessage(), e);
+            workspaceManager.freeWorkspace(core, workspace);
         }
     }
 
@@ -337,7 +164,7 @@ public class PerforceClient extends CachingScmClient
         String comment = getChangelistComment(lines, affectedFilesIndex);
 
         Revision revision = new Revision(Long.toString(number));
-        ExcludePathFilter filter = new ExcludePathFilter(excludedPaths);
+        ExcludePathFilter filter = new ExcludePathFilter(configuration.getFilterPaths());
         List<FileChange> changes = new LinkedList<FileChange>();
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
@@ -401,15 +228,14 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    private Revision sync(String id, File toDirectory, Revision revision, ScmFeedbackHandler handler, boolean force) throws ScmException
+    private Revision sync(ExecutionContext context, Revision revision, ScmFeedbackHandler handler, boolean force) throws ScmException
     {
-        String clientName = updateClient(id, toDirectory, revision);
-
+        PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
         {
             if (revision == null)
             {
-                revision = getLatestRevision(clientName);
+                revision = getLatestRevision(workspace);
             }
 
             long number = Long.valueOf(revision.toString());
@@ -417,19 +243,16 @@ public class PerforceClient extends CachingScmClient
 
             if (force)
             {
-                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
+                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
             }
             else
             {
-                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, clientName, COMMAND_SYNC, "@" + Long.toString(number));
+                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, "@" + Long.toString(number));
             }
         }
         finally
         {
-            if (id == null)
-            {
-                deleteClient(clientName);
-            }
+            workspaceManager.freeWorkspace(core, workspace);
         }
 
         return revision;
@@ -460,27 +283,18 @@ public class PerforceClient extends CachingScmClient
         return result;
     }
 
-    public PerforceClient(String port, String user, String password, String client) throws ScmException
+    public PerforceClient(PerforceConfiguration configuration, PerforceWorkspaceManager workspaceManager) throws ScmException
     {
+        this.configuration = configuration;
+        this.workspaceManager = workspaceManager;
+
         this.core = new PerforceCore();
-        templateClient = client;
-        this.port = port;
-
-        // Output of p4 sync -f:
-        //   <depot file>#<revision> - (refreshing|added as) <local file>
-        //   <depot file>#<revision> - (refreshing|updating|added as|deleted as) <local file>
-        //   ...
-        syncPattern = Pattern.compile("^(.+)#([0-9]+) - (refreshing|updating|added as|deleted as) (.+)$", Pattern.MULTILINE);
-
-        this.core.setEnv(ENV_PORT, port);
-        this.core.setEnv(ENV_USER, user);
-
-        if (TextUtils.stringSet(password))
+        this.core.setEnv(ENV_PORT, configuration.getPort());
+        this.core.setEnv(ENV_USER, configuration.getUser());
+        if (TextUtils.stringSet(configuration.getPassword()))
         {
-            this.core.setEnv(ENV_PASSWORD, password);
+            this.core.setEnv(ENV_PASSWORD, configuration.getPassword());
         }
-
-        this.core.setEnv(ENV_CLIENT, resolveClient(null, false));
     }
 
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
@@ -497,19 +311,14 @@ public class PerforceClient extends CachingScmClient
         return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
     }
 
-    public Map<String, String> getServerInfo() throws ScmException
-    {
-        return core.getServerInfo(resolveClient(null));
-    }
-
     public String getUid()
     {
-        return port;
+        return configuration.getPort();
     }
 
     public String getLocation()
     {
-        return templateClient + "@" + port;
+        return configuration.getSpec() + "@" + configuration.getPort();
     }
 
     public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException
@@ -520,45 +329,30 @@ public class PerforceClient extends CachingScmClient
             result.add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
         }
 
-        String id = getId(context);
-        result.add(new ResourceProperty("P4CLIENT", getClientName(id), true, false, false));
+        result.add(new ResourceProperty("P4CLIENT", workspaceManager.getSyncWorkspaceName(context), true, false, false));
         return result;
-    }
-
-    private String getId(ExecutionContext context)
-    {
-        if (context.getBoolean(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, false))
-        {
-            return context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT) + "-" +
-                context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT);
-        }
-        else
-        {
-            return null;
-        }
     }
 
     public void testConnection() throws ScmException
     {
-        String client = resolveClient(null);
-        if (!clientExists(client))
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, null);
+        if (!core.workspaceExists(workspace.getName()))
         {
-            throw new ScmException("Client '" + client + "' does not exist");
+            throw new ScmException("Client '" + workspace.getName() + "' does not exist");
         }
     }
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
-        return sync(getId(context), context.getWorkingDir(), revision, handler, true);
+        return sync(context, revision, handler, true);
     }
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
-        String clientName = updateClient(null, null, revision);
-
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
         try
         {
-            File fullFile = new File(clientRoot, path);
+            File fullFile = new File(workspace.getRoot(), path);
 
             String fileArgument = fullFile.getAbsolutePath();
             if (revision != null)
@@ -566,7 +360,7 @@ public class PerforceClient extends CachingScmClient
                 fileArgument = fileArgument + "@" + revision;
             }
 
-            PerforceCore.P4Result result = core.runP4(null, getP4Command("print"), FLAG_CLIENT, clientName, "print", "-q", fileArgument);
+            PerforceCore.P4Result result = core.runP4(null, getP4Command("print"), FLAG_CLIENT, workspace.getName(), "print", "-q", fileArgument);
             return new ByteArrayInputStream(result.stdout.toString().getBytes("US-ASCII"));
         }
         catch (ScmException e)
@@ -588,47 +382,46 @@ public class PerforceClient extends CachingScmClient
         }
         finally
         {
-            deleteClient(clientName);
+            workspaceManager.freeWorkspace(core, workspace);
         }
     }
 
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
         List<Changelist> result = new LinkedList<Changelist>();
-        getRevisions(from, to, result);
+        getRevisions(context, from, to, result);
         return result;
     }
 
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        return getRevisions(from, to, null);
+        return getRevisions(context, from, to, null);
     }
 
-    private List<Revision> getRevisions(Revision from, Revision to, List<Changelist> changes) throws ScmException
+    private List<Revision> getRevisions(ScmContext scmContext, Revision from, Revision to, List<Changelist> changes) throws ScmException
     {
         List<Revision> result = new LinkedList<Revision>();
 
-        String clientName = updateClient(null, null, null);
-
-        if (to == null)
-        {
-            to = getLatestRevision(clientName);
-        }
-
-        long start = Long.valueOf(from.toString()) + 1;
-        long end = Long.valueOf(to.toString());
-
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, scmContext);
         try
         {
+            if (to == null)
+            {
+                to = getLatestRevision(workspace);
+            }
+
+            long start = Long.valueOf(from.toString()) + 1;
+            long end = Long.valueOf(to.toString());
+
             if (start <= end)
             {
-                PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + clientName + "/...@" + Long.toString(start) + "," + Long.toString(end));
+                PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, workspace.getName(), COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + workspace.getName() + "/...@" + Long.toString(start) + "," + Long.toString(end));
                 Matcher matcher = core.getChangesPattern().matcher(p4Result.stdout);
 
                 while (matcher.find())
                 {
                     Revision revision = new Revision(matcher.group(1));
-                    Changelist list = getChangelist(clientName, Long.valueOf(revision.toString()));
+                    Changelist list = getChangelist(workspace.getName(), Long.valueOf(revision.toString()));
                     if (list != null)
                     {
                         result.add(0, revision);
@@ -645,44 +438,45 @@ public class PerforceClient extends CachingScmClient
         }
         finally
         {
-            deleteClient(clientName);
+            workspaceManager.freeWorkspace(core, workspace);
         }
     }
 
     public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
-        sync(getId(context), context.getWorkingDir(), rev, handler, false);
+        sync(context, rev, handler, false);
         return rev;
     }
 
-    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
-        String clientName = updateClient(null, null, revision);
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, scmContent);
         try
         {
-            if (!labelExists(clientName, name))
+            if (!labelExists(workspace.getName(), name))
             {
-                createLabel(clientName, name);
+                createLabel(workspace.getName(), name);
             }
             else if (!moveExisting)
             {
                 throw new ScmException("Cannot create label '" + name + "': label already exists");
             }
 
-            core.runP4(false, null, getP4Command(COMMAND_LABELSYNC), FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, "//" + clientName + "/...@" + revision.toString());
+            core.runP4(false, null, getP4Command(COMMAND_LABELSYNC), FLAG_CLIENT, workspace.getName(), COMMAND_LABELSYNC, FLAG_LABEL, name, "//" + workspace.getName() + "/...@" + revision.toString());
         }
         finally
         {
-            deleteClient(clientName);
+            workspaceManager.freeWorkspace(core, workspace);
         }
     }
 
-    public void storeConnectionDetails(File outputDir) throws ScmException, IOException
+    public void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException
     {
-        PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_INFO), FLAG_CLIENT, resolveClient(null), COMMAND_INFO);
+        String clientName = workspaceManager.getSyncWorkspaceName(context);
+        PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_INFO), FLAG_CLIENT, clientName, COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 
-        result = core.runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
+        result = core.runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, clientName, COMMAND_CLIENT, FLAG_OUTPUT);
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
@@ -690,50 +484,58 @@ public class PerforceClient extends CachingScmClient
     {
         final EOLStyle[] eol = new EOLStyle[]{EOLStyle.NATIVE};
 
-        core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
+        try
         {
-            public void handleStdout(String line)
+            core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
             {
-                if (line.startsWith("LineEnd:"))
+                public void handleStdout(String line)
                 {
-                    String ending = line.substring(8).trim();
-                    if (ending.equals("local"))
+                    if (line.startsWith("LineEnd:"))
                     {
-                        eol[0] = EOLStyle.NATIVE;
-                    }
-                    else if (ending.equals("unix") || ending.equals("share"))
-                    {
-                        eol[0] = EOLStyle.LINEFEED;
-                    }
-                    else if (ending.equals("mac"))
-                    {
-                        eol[0] = EOLStyle.CARRIAGE_RETURN;
-                    }
-                    else if (ending.equals("win"))
-                    {
-                        eol[0] = EOLStyle.CARRIAGE_RETURN_LINEFEED;
+                        String ending = line.substring(8).trim();
+                        if (ending.equals("local"))
+                        {
+                            eol[0] = EOLStyle.NATIVE;
+                        }
+                        else if (ending.equals("unix") || ending.equals("share"))
+                        {
+                            eol[0] = EOLStyle.LINEFEED;
+                        }
+                        else if (ending.equals("mac"))
+                        {
+                            eol[0] = EOLStyle.CARRIAGE_RETURN;
+                        }
+                        else if (ending.equals("win"))
+                        {
+                            eol[0] = EOLStyle.CARRIAGE_RETURN_LINEFEED;
+                        }
                     }
                 }
-            }
 
-            public void checkCancelled() throws ScmCancelledException
-            {
-            }
-        }, null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
+                public void checkCancelled() throws ScmCancelledException
+                {
+                }
+            }, null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, workspace.getName(), COMMAND_CLIENT, FLAG_OUTPUT);
+        }
+        finally
+        {
+            workspaceManager.freeWorkspace(core, workspace);
+        }
 
         return eol[0];
     }
 
     public Revision parseRevision(ScmContext context, String revision) throws ScmException
     {
-        String clientName = updateClient(null, null, null);
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
         try
         {
             try
             {
                 long revisionNumber = Long.parseLong(revision);
                 // Run a quick check to ensure that the change exists.
-                core.runP4(true, null, getP4Command(COMMAND_CHANGE), FLAG_CLIENT, clientName, COMMAND_CHANGE, FLAG_OUTPUT, revision);
+                core.runP4(true, null, getP4Command(COMMAND_CHANGE), FLAG_CLIENT, workspace.getName(), COMMAND_CHANGE, FLAG_OUTPUT, revision);
                 return new Revision(revisionNumber);
             }
             catch (NumberFormatException e)
@@ -743,7 +545,7 @@ public class PerforceClient extends CachingScmClient
         }
         finally
         {
-            deleteClient(clientName);
+            workspaceManager.freeWorkspace(core, workspace);
         }
     }
 
@@ -788,7 +590,7 @@ public class PerforceClient extends CachingScmClient
     {
         try
         {
-            PerforceClient client = new PerforceClient("localhost:1666", "jsankey", "", "pulse-demo");
+            PerforceClient client = new PerforceClient(new PerforceConfiguration("localhost:1666", "jsankey", "", "pulse-demo"), new PerforceWorkspaceManager());
             client.retrieve(null, "file", new Revision("2"));
             List<Changelist> cls = client.getChanges(null, new Revision("2"), new Revision("6"));
 

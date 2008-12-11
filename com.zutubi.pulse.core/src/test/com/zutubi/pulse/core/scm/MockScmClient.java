@@ -108,12 +108,12 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         throw new RuntimeException("Method not implemented");
     }
 
-    public void storeConnectionDetails(File outputDir) throws ScmException, IOException
+    public void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException
     {
         throw new RuntimeException("Method not implemented.");
     }

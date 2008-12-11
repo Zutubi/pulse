@@ -8,9 +8,9 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileFilter;
 import java.util.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -272,7 +272,7 @@ public class GitClient implements ScmClient
         }
     }
 
-    public void storeConnectionDetails(File outputDir) throws ScmException, IOException
+    public void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException
     {
 
     }
@@ -466,7 +466,7 @@ public class GitClient implements ScmClient
         }
     }
 
-    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContext, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         // not yet implemented.
     }

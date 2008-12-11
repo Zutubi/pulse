@@ -1,0 +1,190 @@
+package com.zutubi.pulse.core.scm.p4;
+
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.util.FileSystemUtils;
+import static org.mockito.Mockito.*;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedList;
+
+public class PerforceWorkspaceManagerTest extends PulseTestCase
+{
+    private static final File TEST_DIR = new File("some/dir");
+    private static final String TEST_ROOT = FileSystemUtils.getNormalisedAbsolutePath(TEST_DIR);
+
+    private static final String TEST_AGENT = "master";
+    private static final String TEST_PROJECT = "my project";
+
+    private static final String TEST_PORT = ":1234";
+    private static final String TEST_USER = "user";
+    private static final String TEST_PASSWORD = "pass";
+    private static final String TEST_TEMPLATE_CLIENT = "template";
+    private static final PerforceConfiguration TEST_PERFORCE_CONFIGURATION = new PerforceConfiguration(TEST_PORT, TEST_USER, TEST_PASSWORD, TEST_TEMPLATE_CLIENT);
+
+    private PerforceWorkspaceManager workspaceManager = new PerforceWorkspaceManager();
+    private PerforceCore core;
+
+    @Override
+    protected void setUp() throws Exception
+    {
+        core = mock(PerforceCore.class);
+        stub(core.createWorkspace(anyString(), anyString(), anyString(), anyString())).toAnswer(new Answer<PerforceWorkspace>()
+        {
+            public PerforceWorkspace answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                PerforceWorkspace workspace = new PerforceWorkspace(
+                        (String) invocationOnMock.getArguments()[1],
+                        (String) invocationOnMock.getArguments()[3],
+                        new LinkedList<String>()
+                );
+                workspace.setDescription(Arrays.asList((String) invocationOnMock.getArguments()[2]));
+                return workspace;
+            }
+        });
+    }
+
+    public void testGetSyncWorkspaceNameConsistent()
+    {
+        assertEquals(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(1, 1)), PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(1, 1)));
+    }
+
+    public void testGetSyncWorkspaceNameDependsOnProject()
+    {
+        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(1, 0)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(2, 0))));
+    }
+
+    public void testGetSyncWorkspaceNameDependsOnAgent()
+    {
+        assertFalse(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(0, 1)).equals(PerforceWorkspaceManager.getSyncWorkspaceName(createExecutionContext(0, 2))));
+    }
+
+    public void testGetSyncWorkspaceDescriptionIncludesAgent()
+    {
+        assertTrue(PerforceWorkspaceManager.getSyncWorkspaceDescription(createExecutionContext(0, 1)).contains(TEST_AGENT));
+    }
+
+    public void testGetSyncWorkspaceDescriptionIncludesProject()
+    {
+        assertTrue(PerforceWorkspaceManager.getSyncWorkspaceDescription(createExecutionContext(0, 1)).contains(TEST_PROJECT));
+    }
+
+    public void testGetTemporaryWorkspaceDescription()
+    {
+        assertTrue(PerforceWorkspaceManager.getTemporaryWorkspaceDescription().startsWith("Temporary"));
+    }
+
+    public void testGetPersistentWorkspaceDescriptionIncludesProject()
+    {
+        assertTrue(PerforceWorkspaceManager.getPersistentWorkspaceDescription(createScmContext(1)).contains(TEST_PROJECT));
+    }
+    
+    public void testGetSyncWorkspaceBasicProperties() throws ScmException
+    {
+        ExecutionContext context = createExecutionContext(1, 1);
+        String workspaceName = PerforceWorkspaceManager.getSyncWorkspaceName(context);
+
+        PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, TEST_PERFORCE_CONFIGURATION, context);
+        assertEquals(workspaceName, workspace.getName());
+        assertEquals(TEST_ROOT, workspace.getRoot());
+        assertFalse(workspace.isTemporary());
+    }
+
+    public void testGetSyncWorkspaceCreatesExpectedClient() throws ScmException
+    {
+        ExecutionContext context = createExecutionContext(1, 1);
+        PerforceConfiguration config = new PerforceConfiguration(TEST_PORT, TEST_USER, TEST_PASSWORD, TEST_TEMPLATE_CLIENT);
+        final PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, config, context);
+        verify(core).createWorkspace(TEST_TEMPLATE_CLIENT, workspace.getName(), PerforceWorkspaceManager.getSyncWorkspaceDescription(context), TEST_ROOT);
+        verifyNoMoreInteractions(core);
+    }
+
+    public void testAllocateWorkspaceBasicProperties() throws ScmException
+    {
+        ScmContextImpl context = createScmContext(11223344);
+        
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, context);
+        assertTrue(workspace.getName().contains(Long.toString(context.getProjectHandle())));
+        assertEquals(TEST_ROOT, workspace.getRoot());
+        assertFalse(workspace.isTemporary());
+    }
+
+    public void testAllocateWorkspaceNullContextCreatesTempClient() throws ScmException
+    {
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, null);
+        assertTrue(workspace.isTemporary());
+    }
+
+    public void testAllocateWorkspaceCreatesExpectedClient() throws ScmException
+    {
+        ScmContextImpl scmContext = createScmContext(88);
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
+        verify(core).createWorkspace(TEST_TEMPLATE_CLIENT, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT);
+        verifyNoMoreInteractions(core);
+    }
+
+    public void testFreePersistentWorkspaceDoesNotDeleteClient() throws ScmException
+    {
+        ScmContextImpl scmContext = createScmContext(88);
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
+        verify(core).createWorkspace(TEST_TEMPLATE_CLIENT, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT);
+        workspaceManager.freeWorkspace(core, workspace);
+        verifyNoMoreInteractions(core);
+    }
+
+    public void testFreeTempWorkspaceDeletesClient() throws ScmException
+    {
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, null);
+        verify(core).createWorkspace(eq(TEST_TEMPLATE_CLIENT), eq(workspace.getName()), anyString(), anyString());
+        workspaceManager.freeWorkspace(core, workspace);
+        verify(core).deleteWorkspace(workspace.getName());
+        verifyNoMoreInteractions(core);
+    }
+
+    public void testAllocatedWorkspaceNotReused() throws ScmException
+    {
+        ScmContextImpl context = createScmContext(99);
+        PerforceWorkspace workspace1 = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, context);
+        PerforceWorkspace workspace2 = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, context);
+
+        assertFalse(workspace1.getName().equals(workspace2.getName()));
+    }
+
+    public void testFreedWorkspaceIsReused() throws ScmException
+    {
+        ScmContextImpl scmContext = createScmContext(23);
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
+        String allocatedName = workspace.getName();
+        workspaceManager.freeWorkspace(core, workspace);
+        workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
+        assertEquals(allocatedName, workspace.getName());
+    }
+
+    private ExecutionContext createExecutionContext(long projectHandle, long agentHandle)
+    {
+        PulseExecutionContext context = new PulseExecutionContext();
+        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, TEST_AGENT);
+        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE, agentHandle);
+        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT, TEST_PROJECT);
+        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT_HANDLE, projectHandle);
+        context.setWorkingDir(TEST_DIR);
+        return context;
+    }
+
+    private ScmContextImpl createScmContext(int projectHandle)
+    {
+        ScmContextImpl scmContext = new ScmContextImpl();
+        scmContext.setProjectName(TEST_PROJECT);
+        scmContext.setProjectHandle(projectHandle);
+        scmContext.setPersistentWorkingDir(TEST_DIR);
+        return scmContext;
+    }
+}

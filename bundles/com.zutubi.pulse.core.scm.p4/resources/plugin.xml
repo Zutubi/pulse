@@ -5,6 +5,6 @@
         <config class="com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.scms">
-        <scm name="p4" factory-class="com.zutubi.pulse.core.scm.p4.PerforceClientFactory" working-copy-class="com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy"/>
+        <scm name="p4" factory-class="com.zutubi.pulse.core.scm.p4.PerforceWorkspaceManager" working-copy-class="com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy"/>
     </extension>
 </plugin>

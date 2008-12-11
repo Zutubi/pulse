@@ -184,7 +184,7 @@ public class DefaultScmManager implements ScmManager
             projectManager.updateLastPollTime(projectId, now);
 
             // when was the last time that we checked? if never, get the latest revision.
-            ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), projectConfig.getScm());
+            ScmContext context = scmContextFactory.createContext(projectConfig);
             client = scmClientFactory.createClient(projectConfig.getScm());
             if (!latestRevisions.containsKey(projectId))
             {
@@ -314,9 +314,9 @@ public class DefaultScmManager implements ScmManager
         return true;
     }
 
-    public ScmContext createContext(long projectId, ScmConfiguration scm) throws ScmException
+    public ScmContext createContext(ProjectConfiguration projectConfiguration) throws ScmException
     {
-        return scmContextFactory.createContext(projectId, scm);
+        return scmContextFactory.createContext(projectConfiguration);
     }
 
     public ScmClient createClient(ScmConfiguration config) throws ScmException

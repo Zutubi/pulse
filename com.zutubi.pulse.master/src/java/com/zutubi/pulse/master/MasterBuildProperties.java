@@ -50,6 +50,7 @@ public class MasterBuildProperties extends BuildProperties
         ProjectConfiguration projectConfig = project.getConfig();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildResult.getNumber()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, projectConfig.getName());
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, projectConfig.getHandle());
         if (buildOutputDir != null)
         {
             context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_DIRECTORY, buildOutputDir.getAbsolutePath());
@@ -139,6 +140,7 @@ public class MasterBuildProperties extends BuildProperties
         }
 
         context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_AGENT, node.getHostSafe());
+        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_AGENT_HANDLE, node.getHostSafe());
         if(result != null)
         {
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());

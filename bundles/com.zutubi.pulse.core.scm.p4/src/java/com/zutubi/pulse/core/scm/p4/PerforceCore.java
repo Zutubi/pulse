@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -200,17 +199,41 @@ public class PerforceCore
         }
     }
 
-    public void createClient(String templateClient, String clientName, File toDirectory) throws ScmException
+    public boolean workspaceExists(String clientName) throws ScmException
+    {
+        P4Result result = runP4(null, getP4Command(COMMAND_CLIENTS), COMMAND_CLIENTS);
+        String[] lines = splitLines(result);
+        for (String line : lines)
+        {
+            String[] parts = line.split(" ");
+            if (parts.length > 1 && parts[1].equals(clientName))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public PerforceWorkspace createWorkspace(String templateClient, String clientName, String description, String root) throws ScmException
     {
         PerforceCore.P4Result result = runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
-        String clientSpec = result.stdout.toString();
 
-        clientSpec = clientSpec.replaceAll("(\nOptions:.*) locked(.*)", "$1$2");
-        clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + FileSystemUtils.getNormalisedAbsolutePath(toDirectory)));
-        clientSpec = clientSpec.replaceAll("\nHost:.*", Matcher.quoteReplacement("\nHost: "));
-        clientSpec = clientSpec.replaceAll("\nClient:.*" + Pattern.quote(templateClient), Matcher.quoteReplacement("\nClient: " + clientName));
-        clientSpec = clientSpec.replaceAll("//" + Pattern.quote(templateClient) + "/", Matcher.quoteReplacement("//" + clientName + "/"));
-        runP4(clientSpec, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_INPUT);
+        PerforceWorkspace workspace = PerforceWorkspace.parseSpecification(result.stdout.toString());
+        workspace.rename(clientName);
+        workspace.setHost(null);
+        workspace.setDescription(Arrays.asList(description));
+        workspace.setRoot(root);
+        workspace.deleteOption(OPTION_LOCKED);
+
+        runP4(workspace.toSpecification(), getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_INPUT);
+
+        return workspace;
+    }
+
+    public void deleteWorkspace(String clientName) throws ScmException
+    {
+        runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, clientName);
     }
 
     public File getClientRoot() throws ScmException

@@ -714,7 +714,7 @@ public class BuildController implements EventListener
                     Set<ScmCapability> capabilities = getCapabilities(scm, scmManager, project.isInitialised());
                     if(capabilities.contains(ScmCapability.CHANGESETS))
                     {
-                        ScmContext context = scmManager.createContext(projectConfig.getProjectId(), scm);
+                        ScmContext context = scmManager.createContext(projectConfig);
                         client = scmManager.createClient(scm);
 
                         List<Changelist> scmChanges = client.getChanges(context, previousRevision, revision);

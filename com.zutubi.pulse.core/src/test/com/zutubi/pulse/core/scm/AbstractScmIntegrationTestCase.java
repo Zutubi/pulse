@@ -35,6 +35,8 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
         persistentWorkingDir = new File(tmp, "pwd");
 
         context = new ScmContextImpl();
+        context.setProjectName("test project");
+        context.setProjectHandle(101);
         context.setPersistentWorkingDir(persistentWorkingDir);
     }
 

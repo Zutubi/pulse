@@ -46,6 +46,10 @@ public interface ScmContext
      */
     void unlock();
 
+    String getProjectName();
+
+    long getProjectHandle();
+
     /**
      * @return a persistent working directory available for use by the scm
      * implementation to persist data between invocations.

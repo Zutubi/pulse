@@ -75,7 +75,7 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
             client = scmManager.createClient(scm);
             if(client.getCapabilities(project.isInitialised()).contains(ScmCapability.TAG))
             {
-                client.tag(context, revision, tagName, moveExisting);
+                client.tag(scmManager.createContext(project.getConfig()), context, revision, tagName, moveExisting);
             }
             else
             {

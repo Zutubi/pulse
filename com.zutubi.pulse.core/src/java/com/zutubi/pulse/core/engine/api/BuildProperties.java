@@ -43,11 +43,13 @@ public class BuildProperties
      */
     public static final String PROPERTY_PERSONAL_BUILD          = "personal.build";
     public static final String PROPERTY_PROJECT                 = "project";
+    public static final String PROPERTY_PROJECT_HANDLE          = "project.handle";
     public static final String PROPERTY_SUCCESS_COUNT           = "success.count";
     public static final String PROPERTY_TEST_SUMMARY            = "test.summary";
 
     // Stage/Recipe level properties
     public static final String PROPERTY_AGENT                   = "agent";
+    public static final String PROPERTY_AGENT_HANDLE            = "agent.handle";
     public static final String PROPERTY_BASE_DIR                = "base.dir";
     public static final String PROPERTY_FILE_REPOSITORY         = "file.repository";
     public static final String PROPERTY_RECIPE                  = "recipe";

@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IFilter;
 import org.osgi.framework.Bundle;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -153,10 +154,7 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         {
             if (candidate.getExtensionPointUniqueIdentifier().equals(CONFIG_EXTENSION_POINT))
             {
-                for (IConfigurationElement configElement : candidate.getConfigurationElements())
-                {
-                    configElements.add(configElement);
-                }
+                configElements.addAll(Arrays.asList(candidate.getConfigurationElements()));
             }
         }
 

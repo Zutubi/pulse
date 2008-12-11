@@ -208,7 +208,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         });
     }
 
-    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         assertRevisionArgValid(revision);
         for (String module: modules)
@@ -217,7 +217,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         }
     }
 
-    public void storeConnectionDetails(File outputDir) throws ScmException, IOException
+    public void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException
     {
         Properties props = new Properties();
         props.put("root", root);

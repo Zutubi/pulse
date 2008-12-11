@@ -4,7 +4,10 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.FLAG_CLIENT;
+import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -22,8 +25,10 @@ public class PerforceClientTest extends PulseTestCase
     private static final String TEST_CLIENT = "test-client";
 
     private static final String TEST_PROJECT = "test project";
+    private static final long   TEST_PROJECT_HANDLE = 11;
     private static final String TEST_AGENT = "test agent";
-    
+    private static final long   TEST_AGENT_HANDLE = 22;
+
     private PerforceCore core;
     private PerforceClient client;
     private File tmpDir;
@@ -102,7 +107,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testCheckoutHead() throws Exception
     {
         getServer(DEPOT_CLIENT);
-        List<String> statuses = checkoutChanges(null, null, workDir, null, 4);
+        List<String> statuses = checkoutChanges(workDir, null, 4);
 
         assertEquals(10, statuses.size());
         for (int i = 0; i < 10; i++)
@@ -135,9 +140,18 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer(DEPOT_CLIENT);
 
-        Revision revision = client.checkout(createExecutionContext(workDir, null, null), createRevision(1), null);
+        Revision revision = client.checkout(createExecutionContext(workDir, false), createRevision(1), null);
         assertEquals("1", revision.getRevisionString());
         checkDirectory("checkoutRevision");
+    }
+
+    public void testSyncWorkspacePersists() throws ScmException, IOException
+    {
+        getServer(DEPOT_CLIENT);
+
+        ExecutionContext context = createExecutionContext(workDir, false);
+        client.checkout(context, createRevision(1), null);
+        assertTrue(core.workspaceExists(PerforceWorkspaceManager.getSyncWorkspaceName(context)));
     }
 
     public void testCheckoutFile() throws ScmException, IOException
@@ -152,6 +166,19 @@ public class PerforceClientTest extends PulseTestCase
         getServer(DEPOT_CLIENT);
         String content = IOUtils.inputStreamToString(client.retrieve(null, FileSystemUtils.composeFilename("depot", "file2"), createRevision(2)));
         assertEquals("content of file2\n", content);
+    }
+
+    public void testProjectWorkspacePersists() throws ScmException
+    {
+        getServer(DEPOT_CLIENT);
+
+        ScmContextImpl scmContext = new ScmContextImpl();
+        scmContext.setProjectHandle(TEST_PROJECT_HANDLE);
+        scmContext.setProjectName(TEST_PROJECT);
+        scmContext.setPersistentWorkingDir(workDir);
+
+        client.retrieve(scmContext, FileSystemUtils.composeFilename("depot", "file2"), null);
+        assertTrue(core.workspaceExists("pulse-" + TEST_PROJECT_HANDLE));
     }
 
     public void testGetChanges() throws Exception
@@ -288,7 +315,7 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer(TEST_CLIENT);
         assertFalse(client.labelExists(TEST_CLIENT, "test-tag"));
-        client.tag(null, createRevision(5), "test-tag", false);
+        client.tag(null, null, createRevision(5), "test-tag", false);
         assertTrue(client.labelExists(TEST_CLIENT, "test-tag"));
         PerforceCore.P4Result result = core.runP4(null, "p4", "-c", TEST_CLIENT, "sync", "-f", "-n", "@test-tag");
         assertTrue(result.stdout.toString().contains("//depot2/file9#1"));
@@ -297,7 +324,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testMoveTag() throws ScmException
     {
         testTag();
-        client.tag(null, createRevision(7), "test-tag", true);
+        client.tag(null, null, createRevision(7), "test-tag", true);
         assertTrue(client.labelExists(TEST_CLIENT, "test-tag"));
         PerforceCore.P4Result result = core.runP4(null, "p4", "-c", TEST_CLIENT, "sync", "-f", "-n", "@test-tag");
         assertTrue(result.stdout.toString().contains("//depot2/file9#2"));
@@ -306,11 +333,11 @@ public class PerforceClientTest extends PulseTestCase
     public void testUnmovableTag() throws ScmException
     {
         getServer(TEST_CLIENT);
-        client.tag(null, createRevision(5), "test-tag", false);
+        client.tag(null, null, createRevision(5), "test-tag", false);
         assertTrue(client.labelExists(TEST_CLIENT, "test-tag"));
         try
         {
-            client.tag(null, createRevision(7), "test-tag", false);
+            client.tag(null, null, createRevision(7), "test-tag", false);
             fail();
         }
         catch(ScmException e)
@@ -322,9 +349,9 @@ public class PerforceClientTest extends PulseTestCase
     public void testTagSameRevision() throws ScmException
     {
         getServer(TEST_CLIENT);
-        client.tag(null, createRevision(5), "test-tag", false);
+        client.tag(null, null, createRevision(5), "test-tag", false);
         assertTrue(client.labelExists(TEST_CLIENT, "test-tag"));
-        client.tag(null, createRevision(5), "test-tag", true);
+        client.tag(null, null, createRevision(5), "test-tag", true);
     }
 
     public void testGetRevisionsSince() throws ScmException
@@ -345,8 +372,7 @@ public class PerforceClientTest extends PulseTestCase
 
     public void testGetRevisionsSinceFiltered() throws ScmException
     {
-        getServer(TEST_CLIENT);
-        client.setExcludedPaths(Arrays.asList("//depot2/*"));
+        getServer(TEST_CLIENT, "//depot2/*");
         List<Revision> revisions = client.getRevisions(null, createRevision(5), null);
         assertEquals(1, revisions.size());
         assertEquals("7", revisions.get(0).getRevisionString());
@@ -356,11 +382,11 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer(DEPOT_CLIENT);
 
-        Revision got = client.checkout(createExecutionContext(workDir, TEST_PROJECT, TEST_AGENT), createRevision(1), null);
+        Revision got = client.checkout(createExecutionContext(workDir, true), createRevision(1), null);
         assertEquals("1", got.getRevisionString());
         checkDirectory("checkoutRevision");
 
-        List<String> statuses = updateChanges(TEST_PROJECT, TEST_AGENT, workDir, createRevision(8));
+        List<String> statuses = updateChanges(workDir, createRevision(8));
         checkDirectory("checkoutHead");
         assertEquals(1, statuses.size());
         assertTrue(statuses.get(0).startsWith("//depot/file2#2 - updating"));
@@ -370,9 +396,9 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer(DEPOT_CLIENT);
 
-        client.checkout(createExecutionContext(workDir, TEST_PROJECT, TEST_AGENT), null, null);
+        client.checkout(createExecutionContext(workDir, true), null, null);
 
-        List<String> statuses = updateChanges(TEST_PROJECT, TEST_AGENT, workDir, null);
+        List<String> statuses = updateChanges(workDir, null);
         checkDirectory("checkoutHead");
         assertEquals(0, statuses.size());
     }
@@ -381,12 +407,12 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer(TEST_CLIENT);
 
-        client.checkout(createExecutionContext(workDir, TEST_PROJECT, TEST_AGENT), createRevision(1), null);
+        client.checkout(createExecutionContext(workDir, true), createRevision(1), null);
 
         for(int i = 2; i <= 8; i++)
         {
             Revision updateRevision = createRevision(i);
-            updateChanges(TEST_PROJECT, TEST_AGENT, workDir, updateRevision);
+            updateChanges(workDir, updateRevision);
         }
     }
 
@@ -433,7 +459,7 @@ public class PerforceClientTest extends PulseTestCase
         SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
 
         PerforceCore core = getClient();
-        core.createClient(TEST_CLIENT, "unlocked-client", tmpDir);
+        core.createWorkspace(TEST_CLIENT, "unlocked-client", "description", tmpDir.getAbsolutePath());
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_CLIENT);
         assertTrue(spec.contains(" locked"));
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "unlocked-client");
@@ -443,28 +469,25 @@ public class PerforceClientTest extends PulseTestCase
     public void testDeletedChangelist() throws Exception
     {
         // CIB-1010
-        getServer(TEST_CLIENT);
+        getServer(TEST_CLIENT, "//depot/file2");
 
         PerforceCore core = getClient();
-        core.setEnv(PerforceConstants.ENV_CLIENT, TEST_CLIENT);
         core.runP4("Change: new\n" +
                      "Client: test-client\n" +
                      "User: test-user\n" +
                      "Status: new\n" +
                      "Description:\n" +
                      "    Dead changelist",
-                     "p4", "change", "-i");
-        core.runP4(null, "p4", "change", "-d", "9");
+                     "p4", FLAG_CLIENT, TEST_CLIENT, "change", "-i");
+        core.runP4(null, "p4", FLAG_CLIENT, TEST_CLIENT, "change", "-d", "9");
 
-        core.createClient(TEST_CLIENT, "edit-client", workDir);
+        core.createWorkspace(TEST_CLIENT, "edit-client", "description", workDir.getAbsolutePath());
         core.setEnv(PerforceConstants.ENV_CLIENT, "edit-client");
         core.runP4(null, "p4", "sync");
         core.runP4(null, "p4", "edit", "//depot/file1");
         core.submit("test edit");
-        core.setEnv(PerforceConstants.ENV_CLIENT, TEST_CLIENT);
         core.runP4(null, "p4", "client", "-d", "edit-client");
 
-        client.setExcludedPaths(Arrays.asList("//depot/file2"));
         assertTrue(client.getRevisions(null, new Revision(7), null).size() > 0);
     }
 
@@ -476,9 +499,11 @@ public class PerforceClientTest extends PulseTestCase
         return core;
     }
 
-    private void getServer(String client) throws ScmException
+    private void getServer(String client, String... excludedPaths) throws ScmException
     {
-        this.client = new PerforceClient(":6666", "test-user", "", client);
+        PerforceConfiguration configuration = new PerforceConfiguration(":6666", "test-user", "", client);
+        configuration.setFilterPaths(Arrays.asList(excludedPaths));
+        this.client = new PerforceClient(configuration, new PerforceWorkspaceManager());
         this.core.setEnv(PerforceConstants.ENV_PORT, ":6666");
         this.core.setEnv(PerforceConstants.ENV_USER, "test-user");
     }
@@ -503,33 +528,32 @@ public class PerforceClientTest extends PulseTestCase
         return new File(getPulseRoot(), FileSystemUtils.composeFilename("bundles", "com.zutubi.pulse.core.scm.p4", "src", "test", "com", "zutubi", "pulse", "core", "scm", "p4", "data"));
     }
 
-    private List<String> checkoutChanges(String project, String agent, File dir, Revision revision, long expectedRevision) throws ScmException
+    private List<String> checkoutChanges(File dir, Revision revision, long expectedRevision) throws ScmException
     {
-        ExecutionContext context = createExecutionContext(dir, project, agent);
+        ExecutionContext context = createExecutionContext(dir, false);
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         Revision rev = client.checkout(context, revision, handler);
         assertEquals(expectedRevision, Long.parseLong(rev.getRevisionString()));
         return handler.getStatusMessages();
     }
 
-    private List<String> updateChanges(String project, String agent, File dir, Revision revision) throws ScmException
+    private List<String> updateChanges(File dir, Revision revision) throws ScmException
     {
-        ExecutionContext context = createExecutionContext(dir, project, agent);
+        ExecutionContext context = createExecutionContext(dir, true);
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         client.update(context, revision, handler);
         return handler.getStatusMessages();
     }
 
-    private ExecutionContext createExecutionContext(File dir, String project, String agent)
+    private ExecutionContext createExecutionContext(File dir, boolean incrementalBootstrap)
     {
         PulseExecutionContext context = new PulseExecutionContext();
         context.setWorkingDir(dir);
-        if (project != null)
-        {
-            context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, true);
-            context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT, project);
-            context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, agent);
-        }
+        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, incrementalBootstrap);
+        context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT, TEST_PROJECT);
+        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT_HANDLE, TEST_PROJECT_HANDLE);
+        context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, TEST_AGENT);
+        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE, TEST_AGENT_HANDLE);
         return context;
     }
 

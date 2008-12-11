@@ -58,7 +58,7 @@ public class ScmClientUtils
         {
             ScmConfiguration scm = project.getScm();
             client = scmManager.createClient(scm);
-            ScmContext context = scmManager.createContext(project.getProjectId(), scm);
+            ScmContext context = scmManager.createContext(project);
             return action.process(client, context);
         }
         finally

@@ -1,0 +1,6 @@
+Client:
+
+Root:   /root
+
+View:
+        //depot/... //caeser/...

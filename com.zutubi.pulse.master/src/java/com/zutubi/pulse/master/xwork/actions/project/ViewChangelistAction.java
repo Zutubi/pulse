@@ -247,7 +247,7 @@ public class ViewChangelistAction extends ActionSupport
         ScmClient scmClient = null;
         try
         {
-            ScmContext scmContext = scmManager.createContext(projectWithViewer.getProjectId(), scmConfiguration);
+            ScmContext scmContext = scmManager.createContext(projectWithViewer);
             scmClient = scmManager.createClient(scmConfiguration);
             final ChangeContext context = new ChangeContextImpl(changelist.asChangelist(), scmConfiguration, scmClient, scmContext);
 

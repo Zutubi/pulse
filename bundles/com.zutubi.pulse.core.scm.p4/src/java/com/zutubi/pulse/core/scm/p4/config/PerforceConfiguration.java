@@ -23,6 +23,18 @@ public class PerforceConfiguration extends PollableScmConfiguration
     @Required
     private String spec;
 
+    public PerforceConfiguration()
+    {
+    }
+
+    public PerforceConfiguration(String port, String user, String password, String spec)
+    {
+        this.port = port;
+        this.user = user;
+        this.password = password;
+        this.spec = spec;
+    }
+
     public String getPort()
     {
         return port;

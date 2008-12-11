@@ -149,12 +149,13 @@ public interface ScmClient extends Closeable
      * <p/>
      * Required for all implementations (but may be a no-op).
      *
+     * @param context   defines the scm context in which the operation is being run
      * @param outputDir location to store files containing the connection
      *                  details
      * @throws ScmException on error obtaining the details
      * @throws IOException  if an I/O error occurs writing the details to disk
      */
-    void storeConnectionDetails(File outputDir) throws ScmException, IOException;
+    void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException;
 
     /**
      * Returns the policy for line endings enforced at a client level, if any.
@@ -237,6 +238,7 @@ public interface ScmClient extends Closeable
      * <p/>
      * Required for {@link ScmCapability#TAG}.
      *
+     * @param scmContext   defines the scm context in which the operation is being run
      * @param context      defines the execution context in which the operation is being run
      * @param revision     the revision to be tagged
      * @param name         the name of the tag, which has an SCM-specific format
@@ -245,7 +247,7 @@ public interface ScmClient extends Closeable
      *
      * @throws ScmException on error
      */
-    void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException;
+    void tag(ScmContext scmContext, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException;
 
     /**
      * Converts a string into a revision.  The string is input from the user,

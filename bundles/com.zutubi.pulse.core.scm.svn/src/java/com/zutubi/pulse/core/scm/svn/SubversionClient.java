@@ -674,7 +674,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         try
         {
@@ -705,7 +705,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public void storeConnectionDetails(File outputDir) throws ScmException, IOException
+    public void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException
     {
         Properties props = new Properties();
         props.put("location", getLocation());

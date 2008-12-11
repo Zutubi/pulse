@@ -168,7 +168,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         {
             public void pollActiveScms() { }
 
-            public ScmContext createContext(long projectId, ScmConfiguration scm) throws ScmException
+            public ScmContext createContext(ProjectConfiguration projectConfiguration) throws ScmException
             {
                 return new ScmContextImpl();
             }

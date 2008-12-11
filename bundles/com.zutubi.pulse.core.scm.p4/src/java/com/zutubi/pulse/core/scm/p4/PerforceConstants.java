@@ -41,18 +41,19 @@ public class PerforceConstants
     public static final String FLAG_CHANGELIST = "-c";
     public static final String FLAG_CLIENT = "-c";
     public static final String FLAG_DELETE = "-d";
-    public static final String FLAG_FILES_OPENED = "-Ro";
+    public static final String FLAG_FILES_OPENED = "-W";
     public static final String FLAG_FORCE = "-f";
     public static final String FLAG_INPUT = "-i";
     public static final String FLAG_LABEL = "-l";
     public static final String FLAG_MAXIMUM = "-m";
     public static final String FLAG_OUTPUT = "-o";
-    public static final String FLAG_PATH_IN_DEPOT_FORMAT = "-Op";
+    public static final String FLAG_PATH_IN_DEPOT_FORMAT = "-P";
     public static final String FLAG_PREVIEW = "-n";
     public static final String FLAG_RESTRICT_TO_CLIENT = "-Rc";
     public static final String FLAG_SHORT = "-s";
     public static final String FLAG_STATUS = "-s";
     public static final String FLAG_TYPE = "-t";
+    public static final String OPTION_LOCKED = "locked";
     public static final String VALUE_SUBMITTED = "submitted";
     public static final String VALUE_ALL_FILES = "...";
 

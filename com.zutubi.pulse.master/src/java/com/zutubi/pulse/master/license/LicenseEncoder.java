@@ -199,7 +199,7 @@ public class LicenseEncoder implements LicenseKeyFactory
     {
         public static void main(String[] args)
         {
-            String projectName = "insert name here";
+            String projectName = "Google";
 
             // code, name, expiry
             SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -12,6 +12,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ScmContextImpl implements ScmContext
 {
+    private String projectName;
+    private long projectHandle;
+    private long projectId;
     private File persistentWorkingDir;
     private ReentrantLock lock = new ReentrantLock();
 
@@ -38,6 +41,26 @@ public class ScmContextImpl implements ScmContext
     public void unlock()
     {
         lock.unlock();
+    }
+
+    public String getProjectName()
+    {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName)
+    {
+        this.projectName = projectName;
+    }
+
+    public long getProjectHandle()
+    {
+        return projectHandle;
+    }
+
+    public void setProjectHandle(long projectHandle)
+    {
+        this.projectHandle = projectHandle;
     }
 
     public File getPersistentWorkingDir()

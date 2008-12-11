@@ -13,14 +13,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-/**
- */
 public class PerforceWorkingCopyTest extends PulseTestCase
 {
     private static final String P4_COMMAND = "p4";
     private static final String CLIENT_NAME = "test-client-1";
     private static final String OTHER_CLIENT_NAME = "test-client-2";
-    private static final String HEAD_REVISION = "2";
 
     private File tempDir;
     private Process p4dProcess;
@@ -77,7 +74,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         core.setEnv("PWD", clientRoot.getAbsolutePath());
         core.setWorkingDir(clientRoot);
 
-        core.createClient("client-1", CLIENT_NAME, clientRoot);
+        core.createWorkspace("client-1", CLIENT_NAME, "description", clientRoot.getAbsolutePath());
         core.runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE);
 
         otherClientRoot = new File(tempDir, OTHER_CLIENT_NAME);
@@ -90,7 +87,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         otherCore.setEnv("PWD", otherClientRoot.getAbsolutePath());
         otherCore.setWorkingDir(otherClientRoot);
 
-        otherCore.createClient("client-1", OTHER_CLIENT_NAME, otherClientRoot);
+        otherCore.createWorkspace("client-1", OTHER_CLIENT_NAME, "description", otherClientRoot.getAbsolutePath());
         otherCore.runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE);
     }
 
@@ -329,6 +326,20 @@ public class PerforceWorkingCopyTest extends PulseTestCase
 
         WorkingCopyStatus status = wc.getLocalStatus(context, ":" + Long.toString(changelist));
         assertEquals(0, status.getFileStatuses().size());
+    }
+
+    public void testLocalStatusCompatibleSpecifyChangelist() throws ScmException
+    {
+        context.getConfig().setProperty(PerforceWorkingCopy.PROPERTY_PRE_2004_2, "true");
+        try
+        {
+            wc.getLocalStatus(context, ":q");
+            fail("Should not be able to specify changelist when using compatibility option");
+        }
+        catch (ScmException e)
+        {
+            assertTrue(e.getMessage().contains("Unable to specify a changelist"));
+        }
     }
 
     public void testUpdateAlreadyUpToDate() throws ScmException

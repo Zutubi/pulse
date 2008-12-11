@@ -1,0 +1,8 @@
+Client:
+    multi
+    values
+
+Root:   /root
+
+View:
+        //depot/... //caeser/...

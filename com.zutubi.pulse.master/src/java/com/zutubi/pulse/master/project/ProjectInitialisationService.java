@@ -56,7 +56,7 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                 try
                 {
                     ScmConfiguration scmConfiguration = projectConfiguration.getScm();
-                    ScmContext scmContext = scmManager.createContext(projectConfiguration.getProjectId(), scmConfiguration);
+                    ScmContext scmContext = scmManager.createContext(projectConfiguration);
                     scmContext.lock();
                     try
                     {

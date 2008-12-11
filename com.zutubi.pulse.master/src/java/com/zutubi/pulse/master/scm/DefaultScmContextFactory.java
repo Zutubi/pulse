@@ -1,9 +1,10 @@
 package com.zutubi.pulse.master.scm;
 
 import com.zutubi.pulse.core.scm.ScmContextImpl;
-import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,16 +20,19 @@ public class DefaultScmContextFactory implements ScmContextFactory
 
     private final Map<Long, ScmContextImpl> contexts = new HashMap<Long, ScmContextImpl>();
 
-    public ScmContext createContext(long id, ScmConfiguration config) throws ScmException
+    public ScmContext createContext(ProjectConfiguration projectConfiguration) throws ScmException
     {
         try
         {
+            ScmConfiguration config = projectConfiguration.getScm();
             synchronized(contexts)
             {
                 if (!contexts.containsKey(config.getHandle()))
                 {
                     ScmContextImpl context = new ScmContextImpl();
-                    context.setPersistentWorkingDir(getPersistentWorkingDir(id));
+                    context.setProjectName(projectConfiguration.getName());
+                    context.setProjectHandle(projectConfiguration.getHandle());
+                    context.setPersistentWorkingDir(getPersistentWorkingDir(projectConfiguration.getProjectId()));
                     contexts.put(config.getHandle(), context);
                 }
             }

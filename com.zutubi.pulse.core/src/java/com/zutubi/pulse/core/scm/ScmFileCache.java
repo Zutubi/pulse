@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmException;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -48,13 +48,13 @@ public class ScmFileCache
                 item = cache.get(uid);
                 if (populator.requiresRefresh(context, item.cachedRevision))
                 {
-                    populator.populate(item);
+                    populator.populate(context, item);
                 }
             }
             else
             {
                 item = new CacheItem();
-                populator.populate(item);
+                populator.populate(context, item);
                 cache.put(uid, item);
             }
         }

@@ -80,7 +80,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
         {
             try
             {
-                client.storeConnectionDetails(outDir);
+                client.storeConnectionDetails(context, outDir);
             }
             catch (Exception e)
             {
