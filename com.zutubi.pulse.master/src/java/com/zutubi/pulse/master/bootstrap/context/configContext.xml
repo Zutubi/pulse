@@ -34,14 +34,10 @@
     <bean id="configurationCleanupManager" class="com.zutubi.tove.config.cleanup.ConfigurationCleanupManager" autowire="byName"/>
     <bean id="configurationDocsManager" class="com.zutubi.tove.config.docs.ConfigurationDocsManager" autowire="byName"/>
     <bean id="configurationStateManager" class="com.zutubi.tove.config.ConfigurationStateManager" autowire="byName">
-        <property name="transactionManager">
-            <ref bean="pulseTransactionManager"/>
-        </property>
+        <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>
     <bean id="configurationTemplateManager" class="com.zutubi.tove.config.ConfigurationTemplateManager" autowire="byName">
-        <property name="transactionManager">
-            <ref bean="pulseTransactionManager"/>
-        </property>
+        <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>
     <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager" autowire="byName"/>
     <bean id="stateDisplayManager" class="com.zutubi.pulse.master.tove.format.StateDisplayManager" autowire="byName"/>

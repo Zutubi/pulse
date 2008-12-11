@@ -5,9 +5,7 @@
     <bean id="velocityEngine" class="com.zutubi.pulse.master.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
     <bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>
@@ -19,7 +17,7 @@
           init-method="init"/>
     <bean id="buildManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref bean="buildManagerTarget"/>
+            <ref local="buildManagerTarget"/>
         </property>
         <property name="interceptorNames">
             <list>
@@ -38,7 +36,7 @@
     <bean id="projectManagerTarget" class="com.zutubi.pulse.master.model.DefaultProjectManager" autowire="byName"/>
     <bean id="projectManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <!-- specifying the target this way since using the 'target' property is causing an assertion failure. -->
-        <property name="targetName"><value>projectManagerTarget</value></property>
+        <property name="targetName" value="projectManagerTarget"/>
         <property name="interceptorNames">
             <list>
                 <value>securityInterceptor</value>
@@ -50,7 +48,7 @@
     <bean id="resourceManagerTarget" class="com.zutubi.pulse.master.model.DefaultResourceManager" autowire="byName"/>
     <bean id="resourceManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref bean="resourceManagerTarget"/>
+            <ref local="resourceManagerTarget"/>
         </property>
         <property name="interceptorNames">
             <list>
@@ -63,7 +61,7 @@
           init-method="init"/>
     <bean id="agentStateManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref bean="agentStateManagerTarget"/>
+            <ref local="agentStateManagerTarget"/>
         </property>
         <property name="interceptorNames">
             <list>
@@ -75,7 +73,7 @@
     <bean id="testManagerTarget" class="com.zutubi.pulse.master.model.DefaultTestManager" autowire="byName"/>
     <bean id="testManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref bean="testManagerTarget"/>
+            <ref local="testManagerTarget"/>
         </property>
         <property name="interceptorNames">
             <list>
@@ -87,7 +85,7 @@
     <bean id="agentManagerTarget" class="com.zutubi.pulse.master.agent.DefaultAgentManager" autowire="byName"/>
     <bean id="agentManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref bean="agentManagerTarget"/>
+            <ref local="agentManagerTarget"/>
         </property>
         <property name="interceptorNames">
             <list>
@@ -113,39 +111,23 @@
     <bean id="buildResultRenderer" class="com.zutubi.pulse.master.renderer.FreemarkerBuildResultRenderer" autowire="byName"/>
 
     <bean id="masterConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>appConfig</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="appConfig"/>
     </bean>
 
     <bean id="systemConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>systemConfig</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="systemConfig"/>
     </bean>
 
     <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>userPaths.userConfigRoot</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="userPaths.userConfigRoot"/>
     </bean>
 
     <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>systemPaths.configRoot</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="systemPaths.configRoot"/>
     </bean>
 
     <bean id="slaveProxyFactory" class="com.zutubi.pulse.master.SlaveProxyFactory" autowire="byName"/>
@@ -183,9 +165,7 @@
     <bean id="serverMessagesHandler" class="com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler" init-method="init"/>
 
     <bean id="notifyConditionFactory" class="com.zutubi.pulse.master.condition.NotifyConditionFactory">
-        <property name="objectFactory">
-            <ref bean="objectFactory"/>
-        </property>
+        <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
     <bean id="jabberManager" class="com.zutubi.pulse.master.jabber.JabberManager" autowire="byName"/>
@@ -205,7 +185,7 @@
         <property name="agentManager"><ref local="agentManager"/></property>
         <property name="slaveProxyFactory"><ref local="slaveProxyFactory"/></property>
         <property name="serviceTokenManager"><ref local="serviceTokenManager"/></property>
-        <property name="objectFactory"><ref bean="objectFactory"/></property>
+        <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
     <bean id="cleanupManager" class="com.zutubi.pulse.master.cleanup.CleanupManager" autowire="byName" init-method="init"/>
@@ -219,12 +199,8 @@
     <bean id="scmContextFactory" class="com.zutubi.pulse.master.scm.DefaultScmContextFactory">
         <property name="projectsDir">
             <bean id="projectDir" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName">
-                    <value>configurationManager</value>
-                </property>
-                <property name="propertyPath">
-                    <value>userPaths.projectRoot</value>
-                </property>
+                <property name="targetBeanName" value="configurationManager"/>
+                <property name="propertyPath" value="userPaths.projectRoot"/>
             </bean>
         </property>
     </bean>

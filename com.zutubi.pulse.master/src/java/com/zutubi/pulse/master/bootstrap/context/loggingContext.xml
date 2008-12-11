@@ -36,36 +36,31 @@ This context requires:
         <property name="logManager">
             <ref local="logManager"/>
         </property>
-        <property name="eventManager">
-            <ref bean="eventManager"/>
-        </property>
+        <property name="eventManager" ref="eventManager"/>
     </bean>
 
     <bean id="logConfiguration" class="com.zutubi.pulse.master.bootstrap.MasterLogConfiguration" init-method="init" autowire="byName"/>
 
     <bean id="systemPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>systemPaths</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="systemPaths"/>
     </bean>
 
     <bean id="logManager" class="com.zutubi.pulse.core.util.logging.LogManager">
         <property name="factories">
             <map>
-                <entry><key><value>FileHandler</value></key><ref local="fileHandlerFactory"/></entry>
-                <entry><key><value>ConsoleHandler</value></key><ref local="consoleHandlerFactory"/></entry>
-                <entry><key><value>MemoryHandler</value></key><ref local="memoryHandlerFactory"/></entry>
+                <entry key="FileHandler">
+                    <ref local="fileHandlerFactory"/></entry>
+                <entry key="ConsoleHandler">
+                    <ref local="consoleHandlerFactory"/></entry>
+                <entry key="MemoryHandler">
+                    <ref local="memoryHandlerFactory"/></entry>
             </map>
         </property>
     </bean>
 
     <bean id="fileHandlerFactory" class="com.zutubi.pulse.servercore.util.logging.FileHandlerFactory">
-        <property name="objectFactory">
-            <ref bean="objectFactory"/>
-        </property>
+        <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
     <bean id="consoleHandlerFactory" class="com.zutubi.pulse.core.util.logging.ConsoleHandlerFactory"/>

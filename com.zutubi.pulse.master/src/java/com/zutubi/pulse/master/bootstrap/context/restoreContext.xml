@@ -6,23 +6,15 @@
 <beans default-autowire="byName">
 
     <bean id="userPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>userPaths</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="userPaths"/>
     </bean>
 
     <bean id="archiveManager" class="com.zutubi.pulse.master.restore.DefaultRestoreManager">
         <property name="tmpDirectory">
             <bean id="tmpRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName">
-                    <value>configurationManager</value>
-                </property>
-                <property name="propertyPath">
-                    <value>systemPaths.tmpRoot</value>
-                </property>
+                <property name="targetBeanName" value="configurationManager"/>
+                <property name="propertyPath" value="systemPaths.tmpRoot"/>
             </bean>
         </property>
         <property name="paths">
@@ -41,22 +33,14 @@
     <bean id="backupManager" class="com.zutubi.pulse.master.restore.BackupManager" autowire="byName" init-method="init">
         <property name="backupDir">
             <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName">
-                    <value>userPaths</value>
-                </property>
-                <property name="propertyPath">
-                    <value>backupRoot</value>
-                </property>
+                <property name="targetBeanName" value="userPaths"/>
+                <property name="propertyPath" value="backupRoot"/>
             </bean>
         </property>
         <property name="tmpDirectory">
             <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName">
-                    <value>systemPaths</value>
-                </property>
-                <property name="propertyPath">
-                    <value>tmpRoot</value>
-                </property>
+                <property name="targetBeanName" value="systemPaths"/>
+                <property name="propertyPath" value="tmpRoot"/>
             </bean>
         </property>
         <property name="backupableComponents">
@@ -70,9 +54,7 @@
     <bean id="recordsArchive" class="com.zutubi.pulse.master.restore.RecordsArchive"/>
     
     <bean id="databaseArchive" class="com.zutubi.pulse.master.restore.DatabaseArchive">
-        <property name="mappings">
-            <ref bean="hibernateMappings"/>
-        </property>
+        <property name="mappings" ref="hibernateMappings"/>
     </bean>
 
     <bean id="dataDirectoryArchive" class="com.zutubi.pulse.master.restore.DataDirectoryArchive">
@@ -87,12 +69,8 @@
         </property>
         <property name="systemConfiguration">
             <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName">
-                    <value>configurationManager</value>
-                </property>
-                <property name="propertyPath">
-                    <value>systemConfig</value>
-                </property>
+                <property name="targetBeanName" value="configurationManager"/>
+                <property name="propertyPath" value="systemConfig"/>
             </bean>
         </property>
     </bean>

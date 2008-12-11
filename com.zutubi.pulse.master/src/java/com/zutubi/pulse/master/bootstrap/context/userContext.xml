@@ -13,12 +13,8 @@ This context exports:
     <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
 
     <bean id="userManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="userManagerTarget"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="target" ref="userManagerTarget"/>
         <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>

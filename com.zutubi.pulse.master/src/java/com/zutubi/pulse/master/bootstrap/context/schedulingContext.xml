@@ -20,11 +20,9 @@ This context requires:
 <beans>
 
     <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="configLocation">
-            <value>classpath:com/zutubi/pulse/master/bootstrap/quartz/quartz.properties</value>
-        </property>
+        <property name="configLocation" value="classpath:com/zutubi/pulse/master/bootstrap/quartz/quartz.properties"/>
         <property name="taskExecutor">
-            <ref bean="taskExecutor"/>
+            <ref local="taskExecutor"/>
         </property>
     </bean>
 
@@ -36,9 +34,7 @@ This context requires:
         <property name="scheduler">
             <ref local="quartzScheduler"/>
         </property>
-        <property name="objectFactory">
-            <ref bean="objectFactory"/>
-        </property>
+        <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
     <!-- We don't initialise the scheduler here: it must wait for the startup event. -->
@@ -52,11 +48,9 @@ This context requires:
         </property>
     </bean>
     <bean id="scheduler" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="schedulerTarget"/>
+            <ref local="schedulerTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -77,12 +71,8 @@ This context requires:
     </bean>
 
     <bean id="eventSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.EventSchedulerStrategy">
-        <property name="eventManager">
-            <ref bean="eventManager"/>
-        </property>
-        <property name="objectFactory">
-            <ref bean="objectFactory"/>
-        </property>
+        <property name="eventManager" ref="eventManager"/>
+        <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
     <!--
@@ -90,11 +80,9 @@ This context requires:
     any changes to the state of the trigger are persisted.
      -->
     <bean id="triggerHandler" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="triggerHandlerTarget"/>
+            <ref local="triggerHandlerTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -104,13 +92,8 @@ This context requires:
     </bean>
 
     <bean id="triggerHandlerTarget" class="com.zutubi.pulse.master.scheduling.DefaultTriggerHandler">
-        <!-- not sure why this is needs to be wired directly. -->
-        <property name="objectFactory">
-            <ref bean="objectFactory"/>
-        </property>
-        <property name="triggerDao">
-            <ref bean="triggerDao"/>
-        </property>
+        <property name="objectFactory" ref="objectFactory"/>
+        <property name="triggerDao" ref="triggerDao"/>
     </bean>
 
 </beans>

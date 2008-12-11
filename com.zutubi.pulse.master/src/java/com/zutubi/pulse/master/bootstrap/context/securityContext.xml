@@ -17,21 +17,15 @@ The beans defined within the security subsystem need not be accessed by other co
      doing so else the FilterToBeanProxy will be unable to locate the defined beans.
      -->
     <bean id="securityManager" class="com.zutubi.pulse.master.security.AcegiSecurityManager">
-        <property name="jettyManager">
-            <ref bean="jettyManager"/>
-        </property>
+        <property name="jettyManager" ref="jettyManager"/>
         <property name="authenticationManager">
-            <ref bean="authenticationManager"/>
+            <ref local="authenticationManager"/>
         </property>
     </bean>
 
     <bean id="ldapManager" class="com.zutubi.pulse.master.security.ldap.AcegiLdapManager">
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-        <property name="eventManager">
-            <ref bean="eventManager"/>
-        </property>
+        <property name="userManager" ref="userManager"/>
+        <property name="eventManager" ref="eventManager"/>
     </bean>
 
     <!-- ============================================================= -->
@@ -47,14 +41,10 @@ The beans defined within the security subsystem need not be accessed by other co
     </bean>
 
     <bean id="customAuthenticationProvider" class="com.zutubi.pulse.master.security.CustomAuthenticationProvider">
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-        <property name="passwordEncoder">
-            <ref bean="passwordEncoder"/>
-        </property>
+        <property name="userManager" ref="userManager"/>
+        <property name="passwordEncoder" ref="passwordEncoder"/>
         <property name="ldapManager">
-            <ref bean="ldapManager"/>
+            <ref local="ldapManager"/>
         </property>
     </bean>
 
@@ -85,16 +75,10 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="authenticationManager">
             <ref local="authenticationManager"/>
         </property>
-        <property name="authenticationFailureUrl">
-            <value>/login!input.action?error=true</value>
-        </property>
+        <property name="authenticationFailureUrl" value="/login!input.action?error=true"/>
         <!-- this default is only used when the target url is not available via the session.-->
-        <property name="defaultTargetUrl">
-            <value>/</value>
-        </property>
-        <property name="filterProcessesUrl">
-            <value>/j_acegi_security_check</value>
-        </property>
+        <property name="defaultTargetUrl" value="/"/>
+        <property name="filterProcessesUrl" value="/j_acegi_security_check"/>
         <property name="rememberMeServices">
             <ref local="rememberMeServices"/>
         </property>
@@ -116,9 +100,7 @@ The beans defined within the security subsystem need not be accessed by other co
     </bean>
 
     <bean id="basicProcessingFilterEntryPoint" class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
-        <property name="realmName">
-            <value>Pulse Realm</value>
-        </property>
+        <property name="realmName" value="Pulse Realm"/>
     </bean>
 
     <!--
@@ -133,12 +115,8 @@ The beans defined within the security subsystem need not be accessed by other co
     -->
     <bean id="authenticationProcessingFilterEntryPoint"
           class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
-        <property name="loginFormUrl">
-            <value>/login!input.action</value>
-        </property>
-        <property name="forceHttps">
-            <value>false</value>
-        </property>
+        <property name="loginFormUrl" value="/login!input.action"/>
+        <property name="forceHttps" value="false"/>
         <property name="portResolver">
             <ref local="portResolver"/>
         </property>
@@ -153,7 +131,7 @@ The beans defined within the security subsystem need not be accessed by other co
     <bean id="portMapper" class="org.acegisecurity.util.PortMapperImpl">
         <property name="portMappings">
             <map>
-                <entry key="80"><value>80</value></entry>
+                <entry key="80" value="80"/>
             </map>
         </property>
     </bean>
@@ -161,9 +139,7 @@ The beans defined within the security subsystem need not be accessed by other co
     <bean id="ajaxEntryPoint" class="com.zutubi.pulse.master.security.AjaxAuthenticationEntryPoint"/>
 
     <bean id="httpRequestAccessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased">
-        <property name="allowIfAllAbstainDecisions">
-            <value>false</value>
-        </property>
+        <property name="allowIfAllAbstainDecisions" value="false"/>
         <property name="decisionVoters">
             <list>
                 <ref local="roleVoter"/>
@@ -192,19 +168,13 @@ The beans defined within the security subsystem need not be accessed by other co
     </bean>
 
     <bean id="rememberMeServices" class="org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices">
-        <property name="userDetailsService">
-            <ref bean="userManager"/>
-        </property>
-        <property name="key">
-            <value>pulse</value>
-        </property>
+        <property name="userDetailsService" ref="userManager"/>
+        <property name="key" value="pulse"/>
     </bean>
 
     <bean id="rememberMeAuthenticationProvider"
           class="org.acegisecurity.providers.rememberme.RememberMeAuthenticationProvider">
-        <property name="key">
-            <value>pulse</value>
-        </property>
+        <property name="key" value="pulse"/>
     </bean>
 
     <!--
@@ -213,37 +183,13 @@ The beans defined within the security subsystem need not be accessed by other co
     held there.
     -->
     <bean id="anonymousProcessingFilter" class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
-        <property name="key">
-            <value>foobar</value>
-        </property>
-        <property name="userAttribute">
-            <value>anonymous,ROLE_ANONYMOUS</value>
-        </property>
+        <property name="key" value="foobar"/>
+        <property name="userAttribute" value="anonymous,ROLE_ANONYMOUS"/>
     </bean>
 
     <bean id="anonymousAuthenticationProvider"
           class="org.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
-        <property name="key">
-            <value>foobar</value>
-        </property>
-    </bean>
-
-    <!--
-    Filter used to switch the user context. Note: the switch and exit url must be secured
-    based on the role granted the ability to 'switch' to another user
-    -->
-    <!-- In this example 'marissa' has ROLE_SUPERVISOR that can switch to regular ROLE_USER(s) -->
-    <bean id="switchUserProcessingFilter" class="org.acegisecurity.ui.switchuser.SwitchUserProcessingFilter">
-        <property name="userDetailsService" ref="userManager"/>
-        <property name="switchUserUrl">
-            <value>/j_acegi_switch_user</value>
-        </property>
-        <property name="exitUserUrl">
-            <value>/j_acegi_exit_user</value>
-        </property>
-        <property name="targetUrl">
-            <value>/acegi-security-sample-contacts-filter/secure/index.htm</value>
-        </property>
+        <property name="key" value="foobar"/>
     </bean>
 
     <!--
@@ -263,9 +209,7 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="authenticationEntryPoint">
             <ref local="ajaxEntryPoint"/>
         </property>
-        <property name="createSessionAllowed">
-            <value>false</value>
-        </property>
+        <property name="createSessionAllowed" value="false"/>
     </bean>
 
     <!--
@@ -285,10 +229,6 @@ The beans defined within the security subsystem need not be accessed by other co
             <value>
                 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
                 PATTERN_TYPE_APACHE_ANT
-<!--
-                /switchuser.vm=ROLE_ADMINISTRATOR
-                /j_acegi_switch_user=ROLE_ADMINISTRATOR
--->
                 /login*.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /signup*.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /logout.action=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER

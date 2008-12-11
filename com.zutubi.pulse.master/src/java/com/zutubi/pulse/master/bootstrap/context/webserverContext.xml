@@ -17,15 +17,11 @@ This context exports:
         <property name="jettyServer">
             <ref local="jettyServer"/>
         </property>
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
+        <property name="configurationManager" ref="configurationManager"/>
     </bean>
 
     <bean id="jettyServer" class="com.zutubi.pulse.servercore.jetty.JettyServerFactoryBean" destroy-method="shutdown">
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
+        <property name="configurationManager" ref="configurationManager"/>
     </bean>
 
     <bean id="webManager" class="com.zutubi.pulse.master.bootstrap.WebManager">
@@ -44,12 +40,8 @@ This context exports:
     <bean id="adminTokenManager" class="com.zutubi.pulse.servercore.api.AdminTokenManager" autowire="byName" init-method="init">
         <property name="configRoot">
             <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName">
-                    <value>configurationManager</value>
-                </property>
-                <property name="propertyPath">
-                    <value>systemPaths.configRoot</value>
-                </property>
+                <property name="targetBeanName" value="configurationManager"/>
+                <property name="propertyPath" value="systemPaths.configRoot"/>
             </bean>
         </property>
     </bean>

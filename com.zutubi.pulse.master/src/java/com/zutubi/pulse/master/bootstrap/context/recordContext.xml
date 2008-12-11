@@ -3,12 +3,8 @@
 <beans default-autowire="byName">
 
     <bean id="recordRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>userPaths.recordRoot</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="userPaths.recordRoot"/>
     </bean>
 
     <bean id="recordSerialiser" class="com.zutubi.tove.type.record.DefaultRecordSerialiser">
@@ -18,18 +14,14 @@
     </bean>
     
     <bean id="recordManager" class="com.zutubi.tove.type.record.RecordManager">
-        <property name="transactionManager">
-            <ref bean="pulseTransactionManager"/>
-        </property>
+        <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>
 
     <bean id="recordStore" class="com.zutubi.tove.type.record.store.FileSystemRecordStore" init-method="initAndStartAutoCompaction" destroy-method="stopAutoCompaction">
         <property name="persistenceDirectory">
             <ref local="recordRoot"/>
         </property>
-        <property name="transactionManager">
-            <ref bean="pulseTransactionManager"/>
-        </property>
+        <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>    
 </beans>
         

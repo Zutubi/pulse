@@ -21,53 +21,43 @@ This context requires:
     <import resource="classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateMappingsContext.xml"/>
 
     <bean id="databaseConsole" class="com.zutubi.pulse.master.database.DatabaseConsoleBeanFactory" autowire="byName">
-        <property name="hibernateMappings"><ref bean="hibernateMappings"/></property>
+        <property name="hibernateMappings" ref="hibernateMappings"/>
     </bean>
 
     <bean id="configurationInjector" class="com.zutubi.pulse.master.tove.config.ConfigurationInjector" autowire="byName"/>
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-        <property name="mappingResources">
-            <ref bean="hibernateMappings"/>
-        </property>
+        <property name="mappingResources" ref="hibernateMappings"/>
         <property name="hibernateProperties">
-            <ref bean="hibernateProperties"/>
+            <ref local="hibernateProperties"/>
         </property>
-        <property name="dataSource">
-            <ref bean="dataSource"/>
-        </property>
+        <property name="dataSource" ref="dataSource"/>
         <property name="entityInterceptor">
-            <ref bean="configurationInjector"/>
+            <ref local="configurationInjector"/>
         </property>
     </bean>
 
     <bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>databaseConfig</value>
-        </property>
-        <property name="propertyPath">
-            <value>hibernateProperties</value>
-        </property>
+        <property name="targetBeanName" value="databaseConfig"/>
+        <property name="propertyPath" value="hibernateProperties"/>
     </bean>
 
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
 
 
     <bean id="anyTypeDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAnyTypeDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
     <bean id="anyTypeDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="anyTypeDaoTarget"/>
+            <ref local="anyTypeDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -79,15 +69,13 @@ This context requires:
 
     <bean id="artifactDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateArtifactDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
     <bean id="artifactDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="artifactDaoTarget"/>
+            <ref local="artifactDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -98,15 +86,13 @@ This context requires:
 
     <bean id="buildResultDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
     <bean id="buildResultDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="buildResultDaoTarget"/>
+            <ref local="buildResultDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -117,15 +103,13 @@ This context requires:
 
     <bean id="changelistDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateChangelistDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
     <bean id="changelistDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="changelistDaoTarget"/>
+            <ref local="changelistDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -136,15 +120,13 @@ This context requires:
 
     <bean id="fileArtifactDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateFileArtifactDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
     <bean id="fileArtifactDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="fileArtifactDaoTarget"/>
+            <ref local="fileArtifactDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -153,18 +135,15 @@ This context requires:
         </property>
     </bean>
 
-
     <bean id="projectDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateProjectDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
     <bean id="projectDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="projectDaoTarget"/>
+            <ref local="projectDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -175,15 +154,13 @@ This context requires:
 
     <bean id="testCaseIndexDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateTestCaseIndexDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
     <bean id="testCaseIndexDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="testCaseIndexDaoTarget"/>
+            <ref local="testCaseIndexDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -194,15 +171,13 @@ This context requires:
 
     <bean id="agentStateDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAgentStateDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
     <bean id="agentStateDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="agentStateDaoTarget"/>
+            <ref local="agentStateDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -213,16 +188,13 @@ This context requires:
 
     <bean id="triggerDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateTriggerDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
-
     <bean id="triggerDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="triggerDaoTarget"/>
+            <ref local="triggerDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -233,16 +205,13 @@ This context requires:
 
     <bean id="userDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateUserDao">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref local="sessionFactory"/>
         </property>
     </bean>
-
     <bean id="userDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <ref bean="userDaoTarget"/>
+            <ref local="userDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>
