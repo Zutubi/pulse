@@ -37,6 +37,11 @@ public class MockScmClient implements ScmClient, DataCacheAware
         // noop
     }
 
+    public void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // noop
+    }
+
     public void close()
     {
     }

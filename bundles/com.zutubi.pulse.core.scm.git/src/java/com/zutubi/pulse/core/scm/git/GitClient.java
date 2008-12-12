@@ -115,6 +115,11 @@ public class GitClient implements ScmClient
         handler.status("Checkout complete.");
     }
 
+    public void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // Nothing to do - the directory is deleted for us.
+    }
+
     public void close()
     {
         // noop.  We do not keep any processes active, and the persistent directory

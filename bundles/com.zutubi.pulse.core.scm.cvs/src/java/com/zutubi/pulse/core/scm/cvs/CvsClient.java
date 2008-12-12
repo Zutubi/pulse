@@ -93,6 +93,11 @@ public class CvsClient implements ScmClient, DataCacheAware
         // noop - could checkout to provide browse functionality?.
     }
 
+    public void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // noop
+    }
+
     public void close()
     {
     }

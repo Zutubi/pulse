@@ -46,8 +46,18 @@ public interface ScmContext
      */
     void unlock();
 
+    /**
+     * Name of the project to which this context applies.
+     *
+     * @return the project name
+     */
     String getProjectName();
 
+    /**
+     * Handle of the project to which this context applies.
+     *
+     * @return the project handle (a unique, permanant id for the project)
+     */
     long getProjectHandle();
 
     /**

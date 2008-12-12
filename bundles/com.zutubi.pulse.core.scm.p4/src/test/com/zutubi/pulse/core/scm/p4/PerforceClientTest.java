@@ -154,6 +154,19 @@ public class PerforceClientTest extends PulseTestCase
         assertTrue(core.workspaceExists(PerforceWorkspaceManager.getSyncWorkspaceName(context)));
     }
 
+    public void testSyncWorkspaceCleanedOnDestroy() throws ScmException, IOException
+    {
+        getServer(DEPOT_CLIENT);
+
+        ExecutionContext context = createExecutionContext(workDir, false);
+        client.checkout(context, createRevision(1), null);
+        String workspaceName = PerforceWorkspaceManager.getSyncWorkspaceName(context);
+        assertTrue(core.workspaceExists(workspaceName));
+
+        client.destroy(createScmContext(), new RecordingScmFeedbackHandler());
+        assertFalse(core.workspaceExists(workspaceName));
+    }
+
     public void testCheckoutFile() throws ScmException, IOException
     {
         getServer(DEPOT_CLIENT);
@@ -172,13 +185,21 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer(DEPOT_CLIENT);
 
-        ScmContextImpl scmContext = new ScmContextImpl();
-        scmContext.setProjectHandle(TEST_PROJECT_HANDLE);
-        scmContext.setProjectName(TEST_PROJECT);
-        scmContext.setPersistentWorkingDir(workDir);
-
-        client.retrieve(scmContext, FileSystemUtils.composeFilename("depot", "file2"), null);
+        client.retrieve(createScmContext(), FileSystemUtils.composeFilename("depot", "file2"), null);
         assertTrue(core.workspaceExists("pulse-" + TEST_PROJECT_HANDLE));
+    }
+
+    public void testProjectWorkspaceCleanedOnDestroy() throws ScmException
+    {
+        getServer(DEPOT_CLIENT);
+
+        ScmContextImpl context = createScmContext();
+        client.retrieve(context, FileSystemUtils.composeFilename("depot", "file2"), null);
+        String workspace = PerforceWorkspaceManager.getWorkspacePrefix(TEST_PROJECT_HANDLE);
+        assertTrue(core.workspaceExists(workspace));
+
+        client.destroy(context, new RecordingScmFeedbackHandler());
+        assertFalse(core.workspaceExists(workspace));
     }
 
     public void testGetChanges() throws Exception
@@ -555,6 +576,15 @@ public class PerforceClientTest extends PulseTestCase
         context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, TEST_AGENT);
         context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE, TEST_AGENT_HANDLE);
         return context;
+    }
+
+    private ScmContextImpl createScmContext()
+    {
+        ScmContextImpl scmContext = new ScmContextImpl();
+        scmContext.setProjectHandle(TEST_PROJECT_HANDLE);
+        scmContext.setProjectName(TEST_PROJECT);
+        scmContext.setPersistentWorkingDir(workDir);
+        return scmContext;
     }
 
     private Revision createRevision(long rev)

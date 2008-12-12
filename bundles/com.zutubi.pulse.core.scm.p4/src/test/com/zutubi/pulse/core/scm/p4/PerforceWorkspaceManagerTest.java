@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.p4;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
@@ -14,6 +15,7 @@ import org.mockito.stubbing.Answer;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class PerforceWorkspaceManagerTest extends PulseTestCase
@@ -166,6 +168,39 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
         workspaceManager.freeWorkspace(core, workspace);
         workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
         assertEquals(allocatedName, workspace.getName());
+    }
+
+    public void testCleanupPersistentWorkspacesNoneToFree() throws ScmException
+    {
+        stub(core.getAllWorkspaceNames()).toReturn(Collections.<String>emptyList());
+        workspaceManager.cleanupPersistentWorkspaces(core, createScmContext(1), new RecordingScmFeedbackHandler());
+        verify(core).getAllWorkspaceNames();
+        verifyNoMoreInteractions(core);
+    }
+
+    public void testCleanupPersistentWorkspacesOneToFree() throws ScmException
+    {
+        final String WORKSPACE_NAME = "pulse-1-free-me";
+        stub(core.getAllWorkspaceNames()).toReturn(Arrays.asList(WORKSPACE_NAME));
+        workspaceManager.cleanupPersistentWorkspaces(core, createScmContext(1), new RecordingScmFeedbackHandler());
+        verify(core).getAllWorkspaceNames();
+        verify(core).deleteWorkspace(WORKSPACE_NAME);
+        verifyNoMoreInteractions(core);
+    }
+
+    public void testCleanupPersistentWorkspacesSomeToFree() throws ScmException
+    {
+        final String MATCHING_WORKSPACE_NAME1 = "pulse-1-free-me";
+        final String MATCHING_WORKSPACE_NAME2 = "pulse-1$";
+        final String NON_MATCHING_WORKSPACE_NAME1 = "pulse-2-keep-me";
+        final String NON_MATCHING_WORKSPACE_NAME2 = "pulse-and-keep-me";
+
+        stub(core.getAllWorkspaceNames()).toReturn(Arrays.asList(MATCHING_WORKSPACE_NAME1, NON_MATCHING_WORKSPACE_NAME1, NON_MATCHING_WORKSPACE_NAME2, MATCHING_WORKSPACE_NAME2));
+        workspaceManager.cleanupPersistentWorkspaces(core, createScmContext(1), new RecordingScmFeedbackHandler());
+        verify(core).getAllWorkspaceNames();
+        verify(core).deleteWorkspace(MATCHING_WORKSPACE_NAME1);
+        verify(core).deleteWorkspace(MATCHING_WORKSPACE_NAME2);
+        verifyNoMoreInteractions(core);
     }
 
     private ExecutionContext createExecutionContext(long projectHandle, long agentHandle)

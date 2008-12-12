@@ -2,18 +2,15 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
-import com.zutubi.pulse.core.scm.api.ScmContext;
-import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,22 +23,22 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
 {
     private static final Logger LOG = Logger.getLogger(PerforceWorkspaceManager.class);
 
-    private static final String WORKSPACE_NAME_SEPARATOR  = "-";
+    private static final String WORKSPACE_NAME_SEPARATOR = "-";
     private static final String PROPERTY_WORKSPACE_PREFIX = "pulse.p4.client.prefix";
-    private static final String DEFAULT_WORKSPACE_PREFIX  = "pulse" + WORKSPACE_NAME_SEPARATOR;
-    private static final String TEMP_WORKSPACE_TAG        = "temp" + WORKSPACE_NAME_SEPARATOR;
-    private static final String WORKSPACE_UNIQUE_SUFFIX   = "$";
+    private static final String DEFAULT_WORKSPACE_PREFIX = "pulse" + WORKSPACE_NAME_SEPARATOR;
+    private static final String TEMP_WORKSPACE_TAG = "temp" + WORKSPACE_NAME_SEPARATOR;
+    private static final String WORKSPACE_UNIQUE_SUFFIX = "$";
 
     private final Set<String> workspacesInUse = new HashSet<String>();
 
-    private String allocateWorkspaceName(String handle)
+    private String allocateWorkspaceName(long handle)
     {
-        String name = composeWorkspaceName(handle);
+        String name = getWorkspacePrefix(handle);
         synchronized (workspacesInUse)
         {
             while (workspacesInUse.contains(name))
             {
-                name+= WORKSPACE_UNIQUE_SUFFIX;
+                name += WORKSPACE_UNIQUE_SUFFIX;
             }
 
             workspacesInUse.add(name);
@@ -58,17 +55,21 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         return workspace;
     }
 
-    static private String composeWorkspaceName(String... parts)
+    static String getWorkspacePrefix()
     {
-        return System.getProperty(PROPERTY_WORKSPACE_PREFIX, DEFAULT_WORKSPACE_PREFIX) + StringUtils.join(WORKSPACE_NAME_SEPARATOR, parts);
+        return System.getProperty(PROPERTY_WORKSPACE_PREFIX, DEFAULT_WORKSPACE_PREFIX);
+    }
+
+    static String getWorkspacePrefix(long projectHandle)
+    {
+        return getWorkspacePrefix() + projectHandle;
     }
 
     static String getSyncWorkspaceName(ExecutionContext context)
     {
-        return composeWorkspaceName(
-                Long.toString(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT_HANDLE)),
-                Long.toString(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE))
-        );
+        return getWorkspacePrefix(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT_HANDLE)) +
+                WORKSPACE_NAME_SEPARATOR +
+                Long.toString(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE));
     }
 
     static String getSyncWorkspaceDescription(ExecutionContext context)
@@ -84,7 +85,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
      * workspaces persist so that they may be reused for future builds.  If
      * the client already exists at the time of this call, it may be updated
      * to reflect changes in the template workspace.
-     * 
+     *
      * @param core          core used to interact with Perforce
      * @param configuration configuration describing how t connect to Perforce
      *                      and what template workspace to use
@@ -122,8 +123,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
      * @param scmContext    context in which the SCM operation is executing
      * @return details of the allocated workspace
      * @throws ScmException on any error
-     *
-     * @see #freeWorkspace(PerforceCore, PerforceWorkspace) 
+     * @see #freeWorkspace(PerforceCore, PerforceWorkspace)
      */
     public PerforceWorkspace allocateWorkspace(PerforceCore core, PerforceConfiguration configuration, ScmContext scmContext) throws ScmException
     {
@@ -133,14 +133,14 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         boolean temporary;
         if (scmContext == null)
         {
-            workspaceName = TEMP_WORKSPACE_TAG + RandomUtils.randomString(10);
+            workspaceName = getWorkspacePrefix() + TEMP_WORKSPACE_TAG + RandomUtils.randomString(10);
             root = new File(".");
             description = getTemporaryWorkspaceDescription();
             temporary = true;
         }
         else
         {
-            workspaceName = allocateWorkspaceName(Long.toString(scmContext.getProjectHandle()));
+            workspaceName = allocateWorkspaceName(scmContext.getProjectHandle());
             root = scmContext.getPersistentWorkingDir();
             description = getPersistentWorkspaceDescription(scmContext);
             temporary = false;
@@ -156,8 +156,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
      *
      * @param core      core to use to talk to Perforce
      * @param workspace the workspace to free
-     *
-     * @see #allocateWorkspace(PerforceCore, com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration, com.zutubi.pulse.core.scm.api.ScmContext) 
+     * @see #allocateWorkspace(PerforceCore, com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration, com.zutubi.pulse.core.scm.api.ScmContext)
      */
     public void freeWorkspace(PerforceCore core, PerforceWorkspace workspace)
     {
@@ -174,12 +173,38 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
                     LOG.warning("Unable to delete client: " + e.getMessage(), e);
                 }
             }
-            
+
             synchronized (workspacesInUse)
             {
                 workspacesInUse.remove(workspace.getName());
             }
         }
+    }
+
+    /**
+     * Deletes all persistent workspaces associated with a given project, as
+     * defined by the SCM context.
+     *
+     * @param core    core used to communicate with Perforce
+     * @param context context in which the SCM operation is executing
+     * @param handler used to report feedback on progress
+     * @throws ScmException on any error
+     */
+    public void cleanupPersistentWorkspaces(PerforceCore core, ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        handler.status("Cleaning up all persistent workspaces for project...");
+        String prefix = getWorkspacePrefix(context.getProjectHandle());
+        List<String> allWorkspaces = core.getAllWorkspaceNames();
+        for (String workspace: allWorkspaces)
+        {
+            if (workspace.startsWith(prefix))
+            {
+                handler.status("  Deleting workspace '" + workspace + "'...");
+                core.deleteWorkspace(workspace);
+                handler.status("  Workspace deleted.");
+            }
+        }
+        handler.status("Workspaces cleanup complete.");
     }
 
     public ScmClient createClient(PerforceConfiguration config) throws ScmException

@@ -42,8 +42,9 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
      * initialisation.
      *
      * @param projectConfiguration project to be initialised
+     * @param reinitialise         true if the project is being reinitialised, false if this is the first initialise
      */
-    public void requestInitialisation(final ProjectConfiguration projectConfiguration)
+    public void requestInitialisation(final ProjectConfiguration projectConfiguration, final boolean reinitialise)
     {
         getExecutorService().submit(new Runnable()
         {
@@ -60,10 +61,7 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                     scmContext.lock();
                     try
                     {
-                        cleanupScmDirectoryIfRequired(scmContext.getPersistentWorkingDir());
-
-                        scmClient = scmManager.createClient(scmConfiguration);
-                        scmClient.init(scmContext, new ScmFeedbackHandler()
+                        ScmFeedbackHandler handler = new ScmFeedbackHandler()
                         {
                             public void status(String message)
                             {
@@ -74,7 +72,16 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                             {
                                 // not cancellable
                             }
-                        });
+                        };
+
+                        scmClient = scmManager.createClient(scmConfiguration);
+                        if (reinitialise)
+                        {
+                            scmClient.destroy(scmContext, handler);
+                        }
+
+                        cleanupScmDirectoryIfRequired(scmContext.getPersistentWorkingDir());
+                        scmClient.init(scmContext, handler);
                     }
                     finally
                     {

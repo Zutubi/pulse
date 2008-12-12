@@ -302,6 +302,12 @@ public class PerforceClient extends CachingScmClient
         // noop
     }
 
+    public void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // Clean up the persistent clients for this project.
+        workspaceManager.cleanupPersistentWorkspaces(core, context, handler);
+    }
+
     public void close()
     {
     }
@@ -336,9 +342,16 @@ public class PerforceClient extends CachingScmClient
     public void testConnection() throws ScmException
     {
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, null);
-        if (!core.workspaceExists(workspace.getName()))
+        try
         {
-            throw new ScmException("Client '" + workspace.getName() + "' does not exist");
+            if (!core.workspaceExists(workspace.getName()))
+            {
+                throw new ScmException("Client '" + workspace.getName() + "' does not exist");
+            }
+        }
+        finally
+        {
+            workspaceManager.freeWorkspace(core, workspace);
         }
     }
 

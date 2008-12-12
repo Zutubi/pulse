@@ -578,6 +578,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             if (project.isTransitionValid(transition))
             {
+                Project.State oldState = project.getState();
                 Project.State state = project.stateTransition(transition);
                 projectDao.save(project);
                 
@@ -585,7 +586,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 {
                     case INITIALISING:
                     {
-                        projectInitialisationService.requestInitialisation(project.getConfig());
+                        projectInitialisationService.requestInitialisation(project.getConfig(), oldState.isInitialised());
                         break;
                     }
                     case DELETING:

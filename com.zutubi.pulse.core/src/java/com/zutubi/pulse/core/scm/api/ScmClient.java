@@ -32,8 +32,33 @@ public interface ScmClient extends Closeable
      * @param handler handler for receipt of feedback during long-running initialisation
      *
      * @throws ScmException if there is a problem
+     *
+     * @see #destroy(ScmContext, ScmFeedbackHandler)
      */
     void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException;
+
+    /**
+     * The destroy method is called when a project is deleted or the user manually
+     * requests reinitialisation of the project that has previously been initialised
+     * successfully.  Destroy is <strong>not</strong> called on reinitialisation if
+     * the last initialisation attempt failed.
+     * <p/>
+     * During this callback the implementation should cleanup any persistent artifacts
+     * it stores for the project, particularly those store in an external system such
+     * as an external SCM server.
+     * <p/>
+     * Note that it is not necessary to delete the persistent working directory in
+     * the SCM context, as this will be done by Pulse after the destroy operation is
+     * complete.
+     *
+     * @param context the scm context that has been used for previous calls
+     * @param handler handler for receipt of feedback for long-running tasks
+
+     * @throws ScmException if there is a problem
+     *
+     * @see #init(ScmContext, ScmFeedbackHandler)
+     */
+    void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException;
 
     /**
      * Must be called to release resources when this client is not longer

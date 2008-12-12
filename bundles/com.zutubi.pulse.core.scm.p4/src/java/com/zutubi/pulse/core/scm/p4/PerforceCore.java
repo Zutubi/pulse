@@ -199,28 +199,35 @@ public class PerforceCore
         }
     }
 
-    public boolean workspaceExists(String clientName) throws ScmException
+    public List<String> getAllWorkspaceNames() throws ScmException
     {
+        List<String> workspaces = new LinkedList<String>();
         P4Result result = runP4(null, getP4Command(COMMAND_CLIENTS), COMMAND_CLIENTS);
         String[] lines = splitLines(result);
         for (String line : lines)
         {
             String[] parts = line.split(" ");
-            if (parts.length > 1 && parts[1].equals(clientName))
+            if (parts.length > 1)
             {
-                return true;
+                workspaces.add(parts[1]);
             }
         }
 
-        return false;
+        return workspaces;
+
     }
 
-    public PerforceWorkspace createWorkspace(String templateClient, String clientName, String description, String root) throws ScmException
+    public boolean workspaceExists(String workspaceName) throws ScmException
+    {
+        return getAllWorkspaceNames().contains(workspaceName);
+    }
+
+    public PerforceWorkspace createWorkspace(String templateClient, String workspaceName, String description, String root) throws ScmException
     {
         PerforceCore.P4Result result = runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
 
         PerforceWorkspace workspace = PerforceWorkspace.parseSpecification(result.stdout.toString());
-        workspace.rename(clientName);
+        workspace.rename(workspaceName);
         workspace.setHost(null);
         workspace.setDescription(Arrays.asList(description));
         workspace.setRoot(root);
@@ -231,9 +238,9 @@ public class PerforceCore
         return workspace;
     }
 
-    public void deleteWorkspace(String clientName) throws ScmException
+    public void deleteWorkspace(String workspaceName) throws ScmException
     {
-        runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, clientName);
+        runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, workspaceName);
     }
 
     public File getClientRoot() throws ScmException

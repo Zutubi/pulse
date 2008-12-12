@@ -230,6 +230,11 @@ public class SubversionClient implements ScmClient
         // noop
     }
 
+    public void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException
+    {
+        // noop
+    }
+
     public void close()
     {
         if (repository != null)
