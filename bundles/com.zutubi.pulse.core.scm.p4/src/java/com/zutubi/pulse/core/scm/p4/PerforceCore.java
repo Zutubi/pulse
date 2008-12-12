@@ -217,16 +217,40 @@ public class PerforceCore
 
     }
 
-    public boolean workspaceExists(String workspaceName) throws ScmException
+    private PerforceWorkspace getWorkspace(String name, boolean allowDefault) throws ScmException
     {
-        return getAllWorkspaceNames().contains(workspaceName);
+        P4Result result = runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, name, COMMAND_CLIENT, FLAG_OUTPUT);
+        PerforceWorkspace workspace = PerforceWorkspace.parseSpecification(result.stdout.toString());
+        if (!allowDefault && workspace.getAccess() == null)
+        {
+            // This indicates perforce created it by default.
+            return null;
+        }
+
+        return workspace;
     }
 
-    public PerforceWorkspace createOrUpdateWorkspace(String templateClient, String workspaceName, String description, String root) throws ScmException
+    public boolean workspaceExists(String workspaceName) throws ScmException
     {
-        PerforceCore.P4Result result = runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+        return getWorkspace(workspaceName, false) != null;
+    }
 
-        PerforceWorkspace workspace = PerforceWorkspace.parseSpecification(result.stdout.toString());
+    public PerforceWorkspace createOrUpdateWorkspace(String templateWorkspace, String workspaceName, String description, String root) throws ScmException
+    {
+        PerforceWorkspace workspace;
+        if (templateWorkspace == null)
+        {
+            workspace = getWorkspace(workspaceName, true);
+        }
+        else
+        {
+            workspace = getWorkspace(templateWorkspace, false);
+            if (workspace == null)
+            {
+                throw new ScmException("Template client '" + templateWorkspace + "' does not exist.");
+            }
+        }
+
         workspace.rename(workspaceName);
         workspace.setHost(null);
         workspace.setDescription(Arrays.asList(description));

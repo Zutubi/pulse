@@ -22,7 +22,7 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
 
     public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException
     {
-        // Location is <template client>@<port>
+        // Location is <template workspace>@<port>
         String[] pieces = location.split("@");
 
         // $ p4 set

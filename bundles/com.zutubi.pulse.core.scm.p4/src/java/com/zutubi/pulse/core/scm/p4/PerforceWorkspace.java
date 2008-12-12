@@ -19,6 +19,7 @@ public class PerforceWorkspace
 
     // The tags we actually interpret.
     private static final String TAG_CLIENT = "Client";
+    private static final String TAG_ACESS = "Access";
     private static final String TAG_HOST = "Host";
     private static final String TAG_DESCRIPTION = "Description";
     private static final String TAG_ROOT = "Root";
@@ -29,6 +30,7 @@ public class PerforceWorkspace
     private static final String SEPARATOR = ":";
 
     private String name;
+    private String access;
     private String host;
     private List<String> description;
     private String root;
@@ -60,7 +62,13 @@ public class PerforceWorkspace
         root = extractRequiredSingleValue(taggedValues, TAG_ROOT);
         view = extractRequiredFieldValue(taggedValues, TAG_VIEW);
 
-        List<String> value = taggedValues.remove(TAG_HOST);
+        List<String> value = taggedValues.remove(TAG_ACESS);
+        if (value != null && value.size() == 1)
+        {
+            access = value.get(0);
+        }
+
+        value = taggedValues.remove(TAG_HOST);
         if (value != null)
         {
             host = StringUtils.join("", value);
@@ -213,6 +221,7 @@ public class PerforceWorkspace
         PrintWriter writer = new PrintWriter(stringWriter);
 
         writeSingleValue(writer, TAG_CLIENT, name);
+        // We don't write out the access field, it is managed by the server
         writeSingleValue(writer, TAG_HOST, host);
         writeMultiValue(writer, TAG_DESCRIPTION, description);
         writeSingleValue(writer, TAG_ROOT, root);
@@ -287,6 +296,15 @@ public class PerforceWorkspace
     public String getName()
     {
         return name;
+    }
+
+    /**
+     * @return the last access time for the client (may be null for a new
+     *         client)
+     */
+    public String getAccess()
+    {
+        return access;
     }
 
     /**

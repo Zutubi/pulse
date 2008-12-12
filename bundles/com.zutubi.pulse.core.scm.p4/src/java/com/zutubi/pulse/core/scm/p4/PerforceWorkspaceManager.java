@@ -76,7 +76,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
     {
         String projectName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT);
         String agentName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT);
-        return "Sync workspace for project '" + projectName + "' on agent '" + agentName;
+        return "Sync workspace for project '" + projectName + "' on agent '" + agentName + "'.";
     }
 
     /**
@@ -105,7 +105,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
 
     static String getPersistentWorkspaceDescription(ScmContext scmContext)
     {
-        return "Persistent master workspace for project '" + scmContext.getProjectName() + "'";
+        return "Persistent master workspace for project '" + scmContext.getProjectName() + "'.";
     }
 
     /**
