@@ -150,8 +150,8 @@ public class PerforceWorkspace
                     }
 
                     currentTag = tag;
-                    String value = getTaggedValue(line);
-                    if (value != null)
+                    String value = getTaggedValue(line).trim();
+                    if (value.length() > 0)
                     {
                         currentValue.add(value);
                     }
@@ -198,15 +198,7 @@ public class PerforceWorkspace
             throw new ScmException("Internal error: trying to extract value from line '" + line + "'");
         }
 
-        String rest = matcher.group(2).trim();
-        if (rest.length() == 0)
-        {
-            return null;
-        }
-        else
-        {
-            return rest;
-        }
+        return matcher.group(2);
     }
 
     /**

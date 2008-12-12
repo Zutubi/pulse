@@ -67,13 +67,13 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
         PerforceFStatHandler handler = new PerforceFStatHandler(getUI(), status);
 
         ConfigSupport configSupport = new ConfigSupport(context.getConfig());
-        boolean compatible = configSupport.getBooleanProperty(PROPERTY_PRE_2004_2, false);
+        boolean pre2004_2 = configSupport.getBooleanProperty(PROPERTY_PRE_2004_2, false);
 
         // Spec can be either a changelist # or a list of files
         String changelist;
         if(spec.length == 1 && spec[0].startsWith(":"))
         {
-            if (compatible)
+            if (pre2004_2)
             {
                 throw new ScmException("Unable to specify a changelist with configuration property '" + PROPERTY_PRE_2004_2 + "' set to true");
             }
@@ -102,7 +102,7 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
         else
         {
             // Emulate submit behaviour: default changelist
-            if (compatible)
+            if (pre2004_2)
             {
                 core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_FILES_OPENED, "//...");
             }

@@ -50,7 +50,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
     private PerforceWorkspace updateWorkspace(PerforceCore core, PerforceConfiguration configuration, String workspaceName, File root, String description, boolean temporary) throws ScmException
     {
         String rootPath = FileSystemUtils.getNormalisedAbsolutePath(root);
-        PerforceWorkspace workspace = core.createWorkspace(configuration.getSpec(), workspaceName, description, rootPath);
+        PerforceWorkspace workspace = core.createOrUpdateWorkspace(configuration.getSpec(), workspaceName, description, rootPath);
         workspace.setTemporary(temporary);
         return workspace;
     }
@@ -83,8 +83,8 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
      * Ensures an appropriate workspace exists for bootstrapping builds with
      * the given configuration and context, and returns the details.  Such
      * workspaces persist so that they may be reused for future builds.  If
-     * the client already exists at the time of this call, it may be updated
-     * to reflect changes in the template workspace.
+     * the workspace already exists at the time of this call, it may be
+     * updated to reflect changes in the template workspace.
      *
      * @param core          core used to interact with Perforce
      * @param configuration configuration describing how t connect to Perforce

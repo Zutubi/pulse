@@ -140,7 +140,6 @@ public class MasterBuildProperties extends BuildProperties
         }
 
         context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_AGENT, node.getHostSafe());
-        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_AGENT_HANDLE, node.getHostSafe());
         if(result != null)
         {
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());

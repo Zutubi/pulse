@@ -222,7 +222,7 @@ public class PerforceCore
         return getAllWorkspaceNames().contains(workspaceName);
     }
 
-    public PerforceWorkspace createWorkspace(String templateClient, String workspaceName, String description, String root) throws ScmException
+    public PerforceWorkspace createOrUpdateWorkspace(String templateClient, String workspaceName, String description, String root) throws ScmException
     {
         PerforceCore.P4Result result = runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
 

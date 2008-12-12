@@ -174,7 +174,8 @@ public interface ScmClient extends Closeable
      * <p/>
      * Required for all implementations (but may be a no-op).
      *
-     * @param context   defines the scm context in which the operation is being run
+     * @param context   defines the execution context in which the operation is
+     *                  being run
      * @param outputDir location to store files containing the connection
      *                  details
      * @throws ScmException on error obtaining the details

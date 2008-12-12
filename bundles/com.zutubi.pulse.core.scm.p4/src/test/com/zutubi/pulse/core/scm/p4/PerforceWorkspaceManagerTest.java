@@ -39,7 +39,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         core = mock(PerforceCore.class);
-        stub(core.createWorkspace(anyString(), anyString(), anyString(), anyString())).toAnswer(new Answer<PerforceWorkspace>()
+        stub(core.createOrUpdateWorkspace(anyString(), anyString(), anyString(), anyString())).toAnswer(new Answer<PerforceWorkspace>()
         {
             public PerforceWorkspace answer(InvocationOnMock invocationOnMock) throws Throwable
             {
@@ -105,7 +105,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
         ExecutionContext context = createExecutionContext(1, 1);
         PerforceConfiguration config = new PerforceConfiguration(TEST_PORT, TEST_USER, TEST_PASSWORD, TEST_TEMPLATE_CLIENT);
         final PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, config, context);
-        verify(core).createWorkspace(TEST_TEMPLATE_CLIENT, workspace.getName(), PerforceWorkspaceManager.getSyncWorkspaceDescription(context), TEST_ROOT);
+        verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_CLIENT, workspace.getName(), PerforceWorkspaceManager.getSyncWorkspaceDescription(context), TEST_ROOT);
         verifyNoMoreInteractions(core);
     }
 
@@ -129,7 +129,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     {
         ScmContextImpl scmContext = createScmContext(88);
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
-        verify(core).createWorkspace(TEST_TEMPLATE_CLIENT, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT);
+        verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_CLIENT, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT);
         verifyNoMoreInteractions(core);
     }
 
@@ -137,7 +137,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     {
         ScmContextImpl scmContext = createScmContext(88);
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
-        verify(core).createWorkspace(TEST_TEMPLATE_CLIENT, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT);
+        verify(core).createOrUpdateWorkspace(TEST_TEMPLATE_CLIENT, workspace.getName(), PerforceWorkspaceManager.getPersistentWorkspaceDescription(scmContext), TEST_ROOT);
         workspaceManager.freeWorkspace(core, workspace);
         verifyNoMoreInteractions(core);
     }
@@ -145,7 +145,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
     public void testFreeTempWorkspaceDeletesClient() throws ScmException
     {
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, null);
-        verify(core).createWorkspace(eq(TEST_TEMPLATE_CLIENT), eq(workspace.getName()), anyString(), anyString());
+        verify(core).createOrUpdateWorkspace(eq(TEST_TEMPLATE_CLIENT), eq(workspace.getName()), anyString(), anyString());
         workspaceManager.freeWorkspace(core, workspace);
         verify(core).deleteWorkspace(workspace.getName());
         verifyNoMoreInteractions(core);
