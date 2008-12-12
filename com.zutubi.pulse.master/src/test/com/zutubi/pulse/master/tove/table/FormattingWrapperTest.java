@@ -6,7 +6,7 @@ import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.tove.annotations.Format;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.api.Formatter;
+import com.zutubi.tove.config.api.Formatter;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.TypeException;

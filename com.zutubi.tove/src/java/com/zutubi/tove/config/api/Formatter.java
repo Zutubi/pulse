@@ -1,4 +1,4 @@
-package com.zutubi.tove.annotations.api;
+package com.zutubi.tove.config.api;
 
 /**
  * Defines an interface that can format objects of type T into human-readable

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.table;
 
 import com.zutubi.tove.ConventionSupport;
+import com.zutubi.tove.config.api.Formatter;
 import com.zutubi.tove.annotations.Format;
-import com.zutubi.tove.annotations.api.Formatter;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
@@ -97,8 +97,8 @@ public class FormattingWrapper
                 else
                 {
                     LOG.warning("Property %s of type %s is marked using @Format with " +
-                            "formatter that does not implement com.zutubi.tove.annotations.api.Formatter.",
-                            name, type.getClazz());
+                            "formatter that does not implement %s.",
+                            name, type.getClazz(), Formatter.class);
                 }
             }
         }

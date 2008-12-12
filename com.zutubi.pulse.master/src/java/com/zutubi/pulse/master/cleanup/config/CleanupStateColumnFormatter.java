@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.cleanup.config;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.tove.annotations.api.Formatter;
+import com.zutubi.tove.config.api.Formatter;
 
 import java.util.List;
 

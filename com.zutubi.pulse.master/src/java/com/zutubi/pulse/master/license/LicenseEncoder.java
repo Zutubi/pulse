@@ -11,9 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * <class-comment/>
- */
 public class LicenseEncoder implements LicenseKeyFactory
 {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
@@ -199,7 +196,7 @@ public class LicenseEncoder implements LicenseKeyFactory
     {
         public static void main(String[] args)
         {
-            String projectName = "Google";
+            String projectName = "insert name here";
 
             // code, name, expiry
             SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
