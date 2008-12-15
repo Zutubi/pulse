@@ -13,7 +13,6 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     private File logFile;
     private RecipeLogger logger;
 
-
     @Override
     protected void setUp() throws Exception
     {
@@ -37,6 +36,6 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         final String SHORT_STRING = "1";
 
         logger.log(SHORT_STRING.getBytes());
-        assertEquals(SHORT_STRING, IOUtils.fileToString(logFile));
+        assertTrue(IOUtils.fileToString(logFile).length() > SHORT_STRING.length());
     }
 }
