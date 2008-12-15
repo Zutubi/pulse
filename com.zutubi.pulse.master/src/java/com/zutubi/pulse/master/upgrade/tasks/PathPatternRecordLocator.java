@@ -4,6 +4,7 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * A locator that finds all records matching a path pattern.  Path patterns are
@@ -12,20 +13,25 @@ import java.util.Map;
  */
 class PathPatternRecordLocator implements RecordLocator
 {
-    private String pathPattern;
+    private String[] pathPatterns;
 
     /**
-     * @param pathPattern pattern to use for finding records, may include
+     * @param pathPatterns patterns to use for finding records, may include
      *                    wildcards
      * @see com.zutubi.tove.type.record.RecordManager#selectAll(String)
      */
-    public PathPatternRecordLocator(String pathPattern)
+    public PathPatternRecordLocator(String... pathPatterns)
     {
-        this.pathPattern = pathPattern;
+        this.pathPatterns = pathPatterns;
     }
 
     public Map<String, Record> locate(RecordManager recordManager)
     {
-        return recordManager.selectAll(pathPattern);
+        Map<String, Record> result = new HashMap<String, Record>();
+        for (String pathPattern : pathPatterns)
+        {
+            result.putAll(recordManager.selectAll(pathPattern));
+        }
+        return result;
     }
 }

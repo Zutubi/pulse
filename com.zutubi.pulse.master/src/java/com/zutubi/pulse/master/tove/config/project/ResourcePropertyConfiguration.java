@@ -6,11 +6,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
-/**
- *
- *
- */
-@Form(fieldOrder = { "name", "value", "addToEnvironment", "addToPath", "resolveVariables" })
+@Form(fieldOrder = { "name", "value", "description", "addToEnvironment", "addToPath", "resolveVariables" })
 @Table(columns = {"name", "value"})
 @SymbolicName("zutubi.resourceProperty")
 public class ResourcePropertyConfiguration extends AbstractNamedConfiguration
@@ -19,6 +15,7 @@ public class ResourcePropertyConfiguration extends AbstractNamedConfiguration
     private boolean addToEnvironment = false;
     private boolean addToPath = false;
     private boolean resolveVariables = false;
+    private String description;
 
     public ResourcePropertyConfiguration()
     {
@@ -86,6 +83,16 @@ public class ResourcePropertyConfiguration extends AbstractNamedConfiguration
     public void setResolveVariables(boolean resolveVariables)
     {
         this.resolveVariables = resolveVariables;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     public ResourceProperty asResourceProperty()

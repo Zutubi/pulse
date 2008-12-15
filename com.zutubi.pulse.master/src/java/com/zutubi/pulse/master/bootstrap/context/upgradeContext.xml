@@ -41,6 +41,7 @@
                 <ref local="triggerState"/>
                 <ref local="dashboardBuildPreferences"/>
                 <ref local="featureDiscriminator"/>
+                <ref local="addResourcePropertyDescription"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -116,4 +117,9 @@
     <bean id="featureDiscriminator" class="com.zutubi.pulse.master.upgrade.tasks.FeatureDiscriminatorUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200016001"/>
     </bean>
+
+    <bean id="addResourcePropertyDescription" class="com.zutubi.pulse.master.upgrade.tasks.AddResourcePropertyDescriptionUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200018001"/>
+    </bean>
+
 </beans>
