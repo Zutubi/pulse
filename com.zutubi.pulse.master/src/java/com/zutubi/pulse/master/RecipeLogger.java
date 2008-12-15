@@ -33,5 +33,5 @@ public interface RecipeLogger extends HookLogger
     void postStage();
     void postStageComplete();
 
-    void done();
+    void close();
 }

@@ -4,11 +4,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 
 import java.io.File;
 
-/**
- *
- *
- */
-public class DefaultBuildLogger extends AbstractOutputLogger implements BuildLogger
+public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogger
 {
     private static final String PRE_MARKER = "============================[ task output below ]============================";
     private static final String POST_MARKER = "============================[ task output above ]============================";
@@ -16,11 +12,6 @@ public class DefaultBuildLogger extends AbstractOutputLogger implements BuildLog
     public DefaultBuildLogger(File logFile)
     {
         super(logFile);
-    }
-
-    public void prepare()
-    {
-        openWriter();
     }
 
     public void preBuild()
@@ -76,10 +67,5 @@ public class DefaultBuildLogger extends AbstractOutputLogger implements BuildLog
     public void postBuildCompleted()
     {
         logMarker("Post build hooks complete.");
-    }
-
-    public void done()
-    {
-        closeWriter();
     }
 }

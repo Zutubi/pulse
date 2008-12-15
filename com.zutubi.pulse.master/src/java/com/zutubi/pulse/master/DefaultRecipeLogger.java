@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * A logger that writes the details out to a log file.
  */
-public class DefaultRecipeLogger extends AbstractOutputLogger implements RecipeLogger
+public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLogger
 {
     private static final String PRE_RULE = "============================[ command output below ]============================";
     private static final String POST_RULE = "============================[ command output above ]============================";
@@ -22,11 +22,6 @@ public class DefaultRecipeLogger extends AbstractOutputLogger implements RecipeL
     public DefaultRecipeLogger(File logFile)
     {
         super(logFile);
-    }
-
-    public void prepare()
-    {
-        openWriter();
     }
 
     public void log(RecipeAssignedEvent event)
@@ -167,10 +162,5 @@ public class DefaultRecipeLogger extends AbstractOutputLogger implements RecipeL
             writer.println(POST_RULE);
             writer.flush();
         }
-    }
-
-    public void done()
-    {
-        closeWriter();
     }
 }

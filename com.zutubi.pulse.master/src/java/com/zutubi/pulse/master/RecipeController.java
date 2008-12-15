@@ -375,7 +375,7 @@ public class RecipeController
         }
         finally
         {
-            logger.done();
+            logger.close();
         }
     }
 

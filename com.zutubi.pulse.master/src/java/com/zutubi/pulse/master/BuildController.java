@@ -49,9 +49,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 
-/**
- *
- */
 public class BuildController implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(BuildController.class);
@@ -865,7 +862,7 @@ public class BuildController implements EventListener
         eventManager.unregister(asyncListener);
         publishEvent(new BuildCompletedEvent(this, buildResult, buildContext));
 
-        buildLogger.done();
+        buildLogger.close();
 
         // this must be last since we are in fact stopping the thread running this method.., we are
         // after all responding to an event on this listener.

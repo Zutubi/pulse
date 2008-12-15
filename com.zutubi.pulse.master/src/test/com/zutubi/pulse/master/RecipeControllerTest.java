@@ -678,7 +678,7 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Not implemented");
         }
 
-        public void done()
+        public void close()
         {
             throw new RuntimeException("Not implemented");
         }

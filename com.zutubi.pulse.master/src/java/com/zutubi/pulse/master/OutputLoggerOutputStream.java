@@ -25,8 +25,10 @@ public class OutputLoggerOutputStream extends OutputStream
         logger.log(new byte[]{(byte)b});
     }
 
-    public void write(byte b[], int off, int len) throws IOException
+    public void write(byte[] source, int offset, int length) throws IOException
     {
-        logger.log(b, off, len);
+        byte[] target = new byte[length];
+        System.arraycopy(source, offset, target, 0, length);
+        logger.log(target);
     }
 }

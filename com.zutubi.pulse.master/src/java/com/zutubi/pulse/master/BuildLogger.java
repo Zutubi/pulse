@@ -2,18 +2,8 @@ package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.master.model.BuildResult;
 
-/**
- *
- *
- */
 public interface BuildLogger extends HookLogger
 {
-    /**
-     * Initialise any required resources.  This method will be called before any logging
-     * requestes are made.
-     */
-    void prepare();
-
     void preBuild();
     void preBuildCompleted();
 
@@ -26,10 +16,5 @@ public interface BuildLogger extends HookLogger
     void postBuild();
     void postBuildCompleted();
 
-    /**
-     * Close any held resources.  This method will be called after the final logging
-     * request is made.
-     */
-    void done();
 
 }

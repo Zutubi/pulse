@@ -27,7 +27,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     @Override
     protected void tearDown() throws Exception
     {
-        logger.done();
+        logger.close();
         removeDirectory(tmpDir);
         super.tearDown();
     }
