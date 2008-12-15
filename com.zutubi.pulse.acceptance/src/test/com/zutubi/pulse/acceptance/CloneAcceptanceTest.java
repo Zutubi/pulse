@@ -5,15 +5,12 @@ import com.zutubi.pulse.acceptance.forms.admin.ResourcePropertyForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getParentPath;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
@@ -23,7 +20,6 @@ import java.util.Hashtable;
  * Tests for cloning both of top-level template collection items and of
  * normal map elements.
  */
-@Test(dependsOnGroups = {"init.*"})
 public class CloneAcceptanceTest extends SeleniumTestBase
 {
     private static final String TEST_PROPERTY_NAME   = "aprop";
@@ -31,14 +27,12 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     private static final String CLONE_PROPERTY_NAME  = "aclone";
     private static final String PARENT_PROPERTY_NAME = "atemplate";
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();
@@ -122,7 +116,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         ResourcePropertyForm propertyForm = new ResourcePropertyForm(selenium);
         propertyForm.waitFor();
-        assertFormElements(propertyForm, CLONE_PROPERTY_NAME, TEST_PROPERTY_VALUE, "false", "false", "false");
+        assertFormElements(propertyForm, CLONE_PROPERTY_NAME, TEST_PROPERTY_VALUE, "", "false", "false", "false");
 
         labelList.goTo();
         assertTrue(labelList.isItemPresent(CLONE_PROPERTY_NAME));
