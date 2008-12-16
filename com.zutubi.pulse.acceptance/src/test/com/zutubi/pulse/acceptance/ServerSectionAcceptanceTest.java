@@ -19,17 +19,6 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         super.tearDown();
     }
 
-    public void testServerActivity() throws Exception
-    {
-        loginAsAdmin();
-        ServerActivityPage page = new ServerActivityPage(selenium, urls);
-        page.goTo();
-
-        assertTextPresent("build queue");
-        assertTextPresent("active builds");
-        assertTextPresent("recipe queue");
-    }
-
     public void testServerMessages() throws Exception
     {
         loginAsAdmin();

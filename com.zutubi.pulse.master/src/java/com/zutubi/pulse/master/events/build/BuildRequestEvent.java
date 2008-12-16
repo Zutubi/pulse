@@ -9,14 +9,12 @@ import com.zutubi.pulse.master.model.*;
  */
 public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
-    private BuildReason reason;
     private Project owner;
 
     public BuildRequestEvent(Object source, BuildReason reason, Project project, BuildRevision revision, String requestSource, boolean replaceable)
     {
-        super(source, revision, project.getConfig(), requestSource, replaceable);
+        super(source, revision, project.getConfig(), reason, requestSource, replaceable);
         this.owner = project;
-        this.reason = reason;
     }
 
     public Entity getOwner()
@@ -29,15 +27,10 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
         return false;
     }
 
-    public BuildReason getReason()
-    {
-        return reason;
-    }
-
     public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
     {
         Project project = projectManager.getProject(getProjectConfig().getProjectId(), false);
-        return new BuildResult(reason, project, projectManager.getNextBuildNumber(project), getRevision().isUser());
+        return new BuildResult(getReason(), project, projectManager.getNextBuildNumber(project), getRevision().isUser());
     }
 
     public String toString()

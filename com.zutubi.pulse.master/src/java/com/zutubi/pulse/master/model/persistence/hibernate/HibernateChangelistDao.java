@@ -51,7 +51,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
     public List<PersistentChangelist> findLatestByUser(final User user, final int max)
     {
         final List<String> allLogins = new LinkedList<String>();
-        allLogins.add(user.getConfig().getLogin());
+        allLogins.add(user.getLogin());
         allLogins.addAll(user.getPreferences().getAliases());
 
         return findUnique(new ChangelistQuery()

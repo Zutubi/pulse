@@ -1142,7 +1142,7 @@ public class RemoteApi
             Vector<String> result = new Vector<String>(users.size());
             for (User user : users)
             {
-                result.add(user.getConfig().getLogin());
+                result.add(user.getLogin());
             }
 
             return result;
@@ -2295,7 +2295,7 @@ public class RemoteApi
      */
     public boolean triggerBuild(String token, String projectName, final String revision)
     {
-        tokenManager.loginUser(token);
+        User user = tokenManager.loginAndReturnUser(token);
         try
         {
             final Project project = internalGetProject(projectName, false);
@@ -2326,7 +2326,7 @@ public class RemoteApi
                 }
             }
 
-            projectManager.triggerBuild(project.getConfig(), new RemoteTriggerBuildReason(), r, "remote api", false, true);
+            projectManager.triggerBuild(project.getConfig(), new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
             return true;
         }
         finally

@@ -47,7 +47,7 @@ public class BuildActivatedEvent extends BuildEvent
         if (event.isPersonal())
         {
             builder.append(" Personal Build: ");
-            builder.append(((User) event.getOwner()).getConfig().getLogin());
+            builder.append(((User) event.getOwner()).getLogin());
         }
 
         builder.append(" Project: ");

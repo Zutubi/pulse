@@ -127,7 +127,7 @@ public class BuildQueueTestCase extends PulseTestCase
     protected AbstractBuildRequestEvent createRequest(final Project owner, final long buildId, String source, boolean replaceable, Revision revision)
     {
         BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, "pulse file", false);
-        return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), source, replaceable)
+        return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), null, source, replaceable)
         {
             public Entity getOwner()
             {

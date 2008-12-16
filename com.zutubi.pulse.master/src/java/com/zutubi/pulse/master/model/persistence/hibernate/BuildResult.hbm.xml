@@ -67,7 +67,9 @@
             <property name="user" type="string" column="LOCAL_USER" length="255"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.master.model.RemoteTriggerBuildReason" discriminator-value="REMOTE_TRIGGER" lazy="false"/>
+        <subclass name="com.zutubi.pulse.master.model.RemoteTriggerBuildReason" discriminator-value="REMOTE_TRIGGER" lazy="false">
+            <property name="username" type="string" column="DETAILS" length="255"/>
+        </subclass>
 
         <subclass name="com.zutubi.pulse.master.model.TriggerBuildReason" discriminator-value="TRIGGER" lazy="false">
             <property name="triggerName" type="string" column="DETAILS" length="255"/>

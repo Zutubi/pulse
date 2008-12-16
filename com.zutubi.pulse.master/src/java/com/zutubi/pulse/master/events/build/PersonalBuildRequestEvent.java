@@ -17,7 +17,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
 
     public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, ProjectConfiguration projectConfig)
     {
-        super(source, revision, projectConfig, null, false);
+        super(source, revision, projectConfig, null, null, false);
         this.number = number;
         this.user = user;
         this.patch = patch;
@@ -59,7 +59,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
         String result = "Personal Build Request Event: " + number;
         if(user != null)
         {
-            result += ": " + user.getConfig().getLogin();
+            result += ": " + user.getLogin();
         }
         return result;
     }

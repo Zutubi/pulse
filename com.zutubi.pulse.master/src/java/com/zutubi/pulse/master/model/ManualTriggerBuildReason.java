@@ -23,7 +23,7 @@ public class ManualTriggerBuildReason extends AbstractBuildReason
 
     public String getSummary()
     {
-        return "manual trigger by " + username;
+        return "manual trigger by " + (username != null ? username : "'unknown'");
     }
 
     public String getUsername()

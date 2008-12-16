@@ -1,14 +1,15 @@
     <table id="server.activity" class="columns">
     <tr><td>
 
-    <table class="fill-content">
-        #headingRow("build.queue" 6)
+    <table id="server.activity.build.queue" class="fill-content">
+        #headingRow("build.queue" 7)
         <tr>
             #contentHeading("queue.owner" 1)
             #contentHeading("build.id" 1)
             #contentHeading("project" 1)
             #contentHeading("queue.revision" 1)
             #contentHeading("queue.when" 1)
+            #contentHeading("reason" 1)
             #contentHeading("actions" 1)
         </tr>
 #if($buildQueue.size() > 0)
@@ -29,6 +30,7 @@
             #contentCell("queue.revision.floating")
         #end
             #contentCell($request.prettyQueueTime)
+            #staticCell($request.reason.summary)
         #if($action.canCancel($request))
             #actionCell("cancel" "$base/cancelQueuedBuild.action?id=$request.id" "cancel.gif")
         #else
@@ -38,21 +40,22 @@
     #end
 #else
     <tr>
-        <td class="content" colspan="6">#wwtext("name=build.queue.empty")</td>
+        <td class="content" colspan="7">#wwtext("name=build.queue.empty")</td>
     </tr>
 #end
     </table>
 
     </td></tr><tr><td>
 
-    <table class="fill-content">
-        #headingRow("active.builds" 8)
+    <table id="server.activity.active.builds" class="fill-content">
+        #headingRow("active.builds" 9)
         <tr>
             #contentHeading("queue.owner" 1)
             #contentHeading("build.id" 1)
             #contentHeading("project" 1)
             #contentHeading("build.status" 2)
             #contentHeading("build.when" 1)
+            #contentHeading("reason" 1)
             #contentHeading("build.elapsed" 1)
             #contentHeading("actions" 1)
         </tr>
@@ -67,6 +70,7 @@
             <td class="content"><a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a></td>
             #statusCell($buildResult true)
             #dateClassCell($buildResult)
+            #staticCell($buildResult.reason.summary)
             #elapsedCell($buildResult)
 
         #if($action.canCancel($buildResult))
@@ -78,14 +82,14 @@
     #end
 #else
     <tr>
-        <td class="content" colspan="8">#wwtext("name=no.active.builds")</td>
+        <td class="content" colspan="9">#wwtext("name=no.active.builds")</td>
     </tr>
 #end
     </table>
 
     </td></tr><tr><td>
 
-    <table class="fill-content">
+    <table id="server.activity.recipe.queue" class="fill-content">
 
 #if($recipeQueueRunning)
         #restrictedHeadingRow("recipe.queue" 6 "ADMINISTER" "queue.pause" "$base/admin/actions?toggleRecipeQueue" "control_pause_blue.gif" false)

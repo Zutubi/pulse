@@ -45,6 +45,16 @@ public class User extends Entity
         return config;
     }
 
+    public String getName()
+    {
+        return config != null ? config.getName() : "";
+    }
+
+    public String getLogin()
+    {
+        return config != null ? config.getLogin() : "";
+    }
+
     public void setConfig(UserConfiguration config)
     {
         this.config = config;

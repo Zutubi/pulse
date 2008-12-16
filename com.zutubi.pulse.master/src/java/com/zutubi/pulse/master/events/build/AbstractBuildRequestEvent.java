@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.model.BuildReason;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.TimeStamps;
 
@@ -20,6 +21,7 @@ public abstract class AbstractBuildRequestEvent extends Event
     protected ProjectConfiguration projectConfig;
     protected String requestSource;
     protected boolean replaceable;
+    protected BuildReason reason;
 
     /**
      * @param source        the event source
@@ -27,6 +29,7 @@ public abstract class AbstractBuildRequestEvent extends Event
      *                      initialised if the revision should float
      * @param projectConfig configuration of the project to build, snapshotted
      *                      in time for this entire build
+     * @param buildReason   the reason why this build request event was generated.
      * @param requestSource the source of the request - requests from the same
      *                      source may replace each other if replaceable is
      *                      true
@@ -34,12 +37,12 @@ public abstract class AbstractBuildRequestEvent extends Event
      *                      requests with the same request source, provided the
      *                      build has not yet commenced
      */
-    public AbstractBuildRequestEvent(Object source, BuildRevision revision, ProjectConfiguration projectConfig, String requestSource, boolean replaceable)
+    public AbstractBuildRequestEvent(Object source, BuildRevision revision, ProjectConfiguration projectConfig, BuildReason buildReason, String requestSource, boolean replaceable)
     {
         super(source);
         this.revision = revision;
         this.projectConfig = projectConfig;
-
+        this.reason = buildReason;
         this.queued = System.currentTimeMillis();
         this.requestSource = requestSource;
         this.replaceable = replaceable;
@@ -48,6 +51,11 @@ public abstract class AbstractBuildRequestEvent extends Event
     public abstract Entity getOwner();
     public abstract boolean isPersonal();
     public abstract BuildResult createResult(ProjectManager projectManager, UserManager userManager);
+
+    public BuildReason getReason()
+    {
+        return reason;
+    }
 
     public BuildRevision getRevision()
     {
