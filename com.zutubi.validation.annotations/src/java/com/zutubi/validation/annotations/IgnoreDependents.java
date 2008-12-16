@@ -6,6 +6,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * The IgnoreDependents annotation should be added to fields that are used
+ * to toggle the availability of a set of fields via the interface.  In doing
+ * so, when the fields are 'disabled', the validation requirements of those
+ * dependent fields can be ignored.
  */
 @Constraint("com.zutubi.validation.validators.IgnoreDependentsFieldValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

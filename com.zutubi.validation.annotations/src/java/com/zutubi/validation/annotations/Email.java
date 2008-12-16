@@ -7,7 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * The email annotation is used on a string property that is required to conform
- * to <a href="http://www.ietf.org/rfc/rfc822.txt">rfc822</a>
+ * to <a href="http://www.ietf.org/rfc/rfc822.txt">rfc822</a>, i.e. the property
+ * value must be a valid email address.
  */
 @Constraint("com.zutubi.validation.validators.EmailValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation validates that the content of the field matches
- * the given regex pattern.
+ * the given regular expression.
  */
 @Constraint("com.zutubi.validation.validators.RegexValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

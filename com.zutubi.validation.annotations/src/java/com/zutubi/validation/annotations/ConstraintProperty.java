@@ -11,7 +11,7 @@ import java.lang.annotation.ElementType;
  * validator.
  * <p>
  * In the following example, the Max annotation is marked with the Constraint annotation
- * and has its value mapped to the validators max property.
+ * and has its value mapped to the validator's max property.
  * {code}
  * @Constraint("com.zutubi.validation.validators.NumericValidator")
  * public @interface Max
