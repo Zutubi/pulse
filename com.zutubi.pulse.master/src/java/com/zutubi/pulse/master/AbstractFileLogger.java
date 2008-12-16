@@ -7,6 +7,11 @@ import java.io.*;
 import java.text.DateFormat;
 import java.util.Date;
 
+/**
+ * The base output logger implementation that supports logging to a file.
+ *
+ * Each line that is logged will be prefixed with a timestamp. 
+ */
 public abstract class AbstractFileLogger implements OutputLogger
 {
     private static final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
@@ -48,7 +53,7 @@ public abstract class AbstractFileLogger implements OutputLogger
         if (output.length > 0)
         {
             // we want to log each line separately.
-            BufferedReader reader = new BufferedReader(new StringReader(new String(output)));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(output)));
             try
             {
                 String line;

@@ -49,6 +49,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 
+/**
+ * The BuildController is responsible for executing and coordinating a single
+ * build request.
+ */
 public class BuildController implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(BuildController.class);

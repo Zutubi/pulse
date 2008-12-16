@@ -1,10 +1,12 @@
 package com.zutubi.pulse.master;
 
+import java.io.Closeable;
+
 /**
  * The output logger defines a sink for output messages generated during the
  * various stages of a build.
  */
-public interface OutputLogger
+public interface OutputLogger extends Closeable
 {
     /**
      * Initialise any required resources.  This method will be called before any logging
@@ -13,10 +15,4 @@ public interface OutputLogger
     void prepare();
 
     void log(byte[] output);
-
-    /**
-     * Close any held resources.  This method will be called after the final logging
-     * request is made.
-     */
-    void close();
 }
