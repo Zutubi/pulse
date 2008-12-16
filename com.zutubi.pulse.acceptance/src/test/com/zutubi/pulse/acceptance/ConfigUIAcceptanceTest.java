@@ -257,7 +257,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
-        form.finishFormElements("p1", "value", null, null, null);
+        form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use, please select another name");
     }
@@ -276,7 +276,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
-        form.finishFormElements("p1", "value", null, null, null);
+        form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use, please select another name");
     }
@@ -297,7 +297,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
-        form.finishFormElements("p1", "value", null, null, null);
+        form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use in descendent \"" + childName + "\", please select another name");
     }
@@ -321,7 +321,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
-        form.finishFormElements("p1", "value", null, null, null);
+        form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use in descendents [" + child1Name + ", " + child2Name + "], please select another name");
     }
@@ -345,7 +345,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ResourcePropertyForm form = new ResourcePropertyForm(selenium);
         form.waitFor();
-        form.finishFormElements("p1", "value", null, null, null);
+        form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
         assertTextPresent("name is already in use in ancestor \"" + parentName + "\", please select another name");
     }

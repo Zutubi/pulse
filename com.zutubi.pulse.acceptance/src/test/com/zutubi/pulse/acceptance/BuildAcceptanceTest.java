@@ -375,8 +375,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         SeleniumUtils.assertLinkPresent(selenium, logLinkId);
 
-        selenium.getAllLinks();
-
         selenium.click("id=" + logLinkId);
         selenium.waitForPageToLoad("10000");
 
