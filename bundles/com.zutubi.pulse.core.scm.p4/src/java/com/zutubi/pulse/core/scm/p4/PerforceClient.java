@@ -238,16 +238,15 @@ public class PerforceClient extends CachingScmClient
                 revision = getLatestRevision(workspace);
             }
 
-            long number = Long.valueOf(revision.toString());
             PerforceCheckoutHandler perforceHandler = new PerforceCheckoutHandler(force, handler);
 
             if (force)
             {
-                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
+                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, FLAG_FORCE, "@" + revision.getRevisionString());
             }
             else
             {
-                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, "@" + Long.toString(number));
+                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, "@" + revision.getRevisionString());
             }
         }
         finally
@@ -335,7 +334,7 @@ public class PerforceClient extends CachingScmClient
             result.add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
         }
 
-        result.add(new ResourceProperty("P4CLIENT", workspaceManager.getSyncWorkspaceName(context), true, false, false));
+        result.add(new ResourceProperty("P4CLIENT", PerforceWorkspaceManager.getSyncWorkspaceName(context), true, false, false));
         return result;
     }
 
@@ -423,8 +422,8 @@ public class PerforceClient extends CachingScmClient
                 to = getLatestRevision(workspace);
             }
 
-            long start = Long.valueOf(from.toString()) + 1;
-            long end = Long.valueOf(to.toString());
+            long start = getChangelistForRevision(workspace, from) + 1;
+            long end = getChangelistForRevision(workspace, to);
 
             if (start <= end)
             {
@@ -452,6 +451,36 @@ public class PerforceClient extends CachingScmClient
         finally
         {
             workspaceManager.freeWorkspace(core, workspace);
+        }
+    }
+
+    private long getChangelistForRevision(PerforceWorkspace workspace, Revision revision) throws ScmException
+    {
+        try
+        {
+            // Optimisation - in this method we are not validating the
+            // revision, if it is a number we assume it is good.
+            return Long.parseLong(revision.toString());
+        }
+        catch(NumberFormatException e)
+        {
+            return mapRevisionToChangelist(workspace, revision);
+        }
+    }
+
+    private long mapRevisionToChangelist(PerforceWorkspace workspace, Revision revision) throws ScmException
+    {
+        // It is a label, date or similar.  Get the highest changelist in
+        // that revision spec, which is the best approximation we have.
+        PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, workspace.getName(), COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + workspace.getName() + "/...@" + revision);
+        Matcher matcher = core.getChangesPattern().matcher(p4Result.stdout);
+        if (matcher.find())
+        {
+            return Long.parseLong(matcher.group(1));
+        }
+        else
+        {
+            throw new ScmException("No changelists found for revision '" + revision + "'");
         }
     }
 
@@ -485,7 +514,7 @@ public class PerforceClient extends CachingScmClient
 
     public void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException
     {
-        String clientName = workspaceManager.getSyncWorkspaceName(context);
+        String clientName = PerforceWorkspaceManager.getSyncWorkspaceName(context);
         PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_INFO), FLAG_CLIENT, clientName, COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 
@@ -544,21 +573,37 @@ public class PerforceClient extends CachingScmClient
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
         try
         {
-            try
+            Revision candidateRevision = new Revision(revision);
+            // See if we can reasonably convert this to a changelist,
+            // implying it has some validity.
+            long changelist = mapRevisionToChangelist(workspace, candidateRevision);
+            if (isNumeric(revision))
             {
-                long revisionNumber = Long.parseLong(revision);
-                // Run a quick check to ensure that the change exists.
-                core.runP4(true, null, getP4Command(COMMAND_CHANGE), FLAG_CLIENT, workspace.getName(), COMMAND_CHANGE, FLAG_OUTPUT, revision);
-                return new Revision(revisionNumber);
+                // If the given value was numeric but the latest changelist it
+                // maps to is different (quite possible as Perforce will take
+                // non-existant numbers or those that do not exist in a
+                // workspace's view), prefer what it maps to.
+                candidateRevision = new Revision(changelist);
             }
-            catch (NumberFormatException e)
-            {
-                throw new ScmException("Invalid revision '" + revision + "': must be a valid Perforce changelist number");
-            }
+
+            return candidateRevision;
         }
         finally
         {
             workspaceManager.freeWorkspace(core, workspace);
+        }
+    }
+
+    private boolean isNumeric(String s)
+    {
+        try
+        {
+            Long.parseLong(s);
+            return true;
+        }
+        catch(NumberFormatException e)
+        {
+            return false;
         }
     }
 

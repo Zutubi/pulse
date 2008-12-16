@@ -29,6 +29,9 @@ public class PerforceClientTest extends PulseTestCase
     private static final String TEST_AGENT = "test agent";
     private static final long   TEST_AGENT_HANDLE = 22;
 
+    private static final String LABEL_TWO = "two";
+    private static final String LABEL_LATEST = "latest";
+    
     private PerforceCore core;
     private PerforceClient client;
     private File tmpDir;
@@ -48,7 +51,7 @@ public class PerforceClientTest extends PulseTestCase
         ZipUtils.extractZip(repoZip, repoDir);
 
         // Restore from checkpoint
-        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-jr", "checkpoint.1"});
+        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-jr", "checkpoint.2"});
         p4dProcess.waitFor();
 
         p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-p", "6666"});
@@ -119,6 +122,16 @@ public class PerforceClientTest extends PulseTestCase
         List<Revision> revisions = client.getRevisions(null, latest.calculatePreviousNumericalRevision(), null);
         assertEquals(1, revisions.size());
         assertEquals(latest, revisions.get(0));
+    }
+
+    public void testGetRevisionsBetweenLabels() throws ScmException
+    {
+        getServer(TEST_WORKSPACE);
+        List<Revision> revisions = client.getRevisions(null, new Revision(LABEL_TWO), new Revision(LABEL_LATEST));
+        // The latest thing in our view is revision 7, so we expect revisions 3-7.
+        assertEquals(5, revisions.size());
+        assertEquals("3", revisions.get(0).getRevisionString());
+        assertEquals("7", revisions.get(4).getRevisionString());
     }
 
     public void testCheckoutHead() throws Exception
@@ -454,7 +467,7 @@ public class PerforceClientTest extends PulseTestCase
         }
     }
 
-    public void testGetRevisionLatest() throws ScmException
+    public void testParseRevisionLatest() throws ScmException
     {
         getServer(TEST_WORKSPACE);
         Revision latest = client.getLatestRevision(null);
@@ -462,31 +475,48 @@ public class PerforceClientTest extends PulseTestCase
         assertEquals(latest.getRevisionString(), rev.getRevisionString());
     }
 
-    public void testGetRevisionPostLatest() throws ScmException
+    public void testParseRevisionLabel() throws ScmException
     {
         getServer(TEST_WORKSPACE);
-        try
-        {
-            client.parseRevision(null, "10000");
-            fail();
-        }
-        catch (ScmException e)
-        {
-            assertTrue(e.getMessage().matches(".*Change [0-9]+ unknown.*"));
-        }
+        Revision rev = client.parseRevision(null, LABEL_TWO);
+        assertEquals(LABEL_TWO, rev.getRevisionString());
     }
 
-    public void testGetRevisionInvalid() throws ScmException
+    public void testParseRevisionNegative() throws ScmException
+    {
+        failedParseRevisionHelper("-1", "Invalid changelist/client/label/date");
+    }
+
+    public void testParseRevisionZero() throws ScmException
+    {
+        failedParseRevisionHelper("0", "No changelists found for revision '0'");
+    }
+
+    public void testParseRevisionPostLatest() throws ScmException
+    {
+        // Perforce happily accepts such a revision, but we will map it to
+        // the equivalent that makes sense.
+        getServer(TEST_WORKSPACE);
+        Revision rev = client.parseRevision(null, "10000");
+        assertEquals(client.getLatestRevision(null).toString(), rev.getRevisionString());
+    }
+
+    public void testParseRevisionInvalid() throws ScmException
+    {
+        failedParseRevisionHelper("bullet", "Invalid changelist/client/label/date");
+    }
+
+    private void failedParseRevisionHelper(String revision, String expectedMessage) throws ScmException
     {
         getServer(TEST_WORKSPACE);
         try
         {
-            client.parseRevision(null, "bullet");
+            client.parseRevision(null, revision);
             fail();
         }
         catch (ScmException e)
         {
-            assertEquals("Invalid revision 'bullet': must be a valid Perforce changelist number", e.getMessage());
+            assertTrue(e.getMessage().contains(expectedMessage));
         }
     }
 

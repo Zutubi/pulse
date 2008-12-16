@@ -7,14 +7,12 @@ import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import static com.zutubi.util.FileSystemUtils.getNormalisedAbsolutePath;
-import static com.zutubi.util.FileSystemUtils.copy;
-import static com.zutubi.util.FileSystemUtils.rmdir;
+import static com.zutubi.util.FileSystemUtils.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 /**
  * The Project Repo Bootstrapper checks out a project into the:
@@ -87,7 +85,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             {
                 // log this action to the build log.
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(context.getOutputStream()));
-                out.write("Copying source from " + getNormalisedAbsolutePath(paths.getPersistentWorkDir()) +
+                out.println("Copying source from " + getNormalisedAbsolutePath(paths.getPersistentWorkDir()) +
                         " to " + getNormalisedAbsolutePath(paths.getBaseDir()) + ".  This may take some time.");
                 out.flush();
 
