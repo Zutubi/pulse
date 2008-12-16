@@ -1,19 +1,18 @@
 package com.zutubi.pulse.master.project;
 
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.scm.api.ScmCancelledException;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmContext;
-import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCommencedEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 
@@ -23,6 +22,8 @@ import java.io.File;
  */
 public class ProjectInitialisationService extends BackgroundServiceSupport
 {
+    private static final Logger LOG = Logger.getLogger(ProjectInitialisationService.class);
+
     private EventManager eventManager;
     private ScmManager scmManager;
 
@@ -107,6 +108,53 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                 if (dir.exists())
                 {
                     FileSystemUtils.rmdir(dir);
+                }
+            }
+        });
+    }
+
+    /**
+     * Requests an asynchronous call to destroy on an {@link ScmClient} for the
+     * given project.  This is should be called when the project is being
+     * deleted.
+     * <p/>
+     * <strong>Note</strong>: destroy may also be called when re-initialising a
+     * project, to do so call {@link #requestInitialisation(com.zutubi.pulse.master.tove.config.project.ProjectConfiguration, boolean)}
+     * with reinitialise set to true.
+     *
+     * @param projectConfiguration configuration of the project to call destory
+     *                             for
+     */
+    public void requestDestruction(final ProjectConfiguration projectConfiguration)
+    {
+        getExecutorService().submit(new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    ScmClientUtils.withScmClient(projectConfiguration, scmManager, new ScmClientUtils.ScmContextualAction<Object>()
+                    {
+                        public Object process(ScmClient scmClient, ScmContext scmContext) throws ScmException
+                        {
+                            scmContext.lock();
+                            try
+                            {
+                                scmClient.destroy(scmContext, new ScmFeedbackAdapter());
+                            }
+                            finally
+                            {
+                                scmContext.unlock();
+                            }
+                            return null;
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    // The project log may be gone by now, so we don't write
+                    // to it.
+                    LOG.severe(e);
                 }
             }
         });

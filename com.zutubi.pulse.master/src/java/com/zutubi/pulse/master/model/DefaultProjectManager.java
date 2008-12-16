@@ -443,6 +443,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void deleteProject(Project entity)
     {
+        projectInitialisationService.requestDestruction(entity.getConfig());
         buildManager.deleteAllBuilds(entity);
 
         // Remove test case index
