@@ -47,12 +47,12 @@ public class User extends Entity
 
     public String getName()
     {
-        return config != null ? config.getName() : "";
+        return config != null ? config.getName() : null;
     }
 
     public String getLogin()
     {
-        return config != null ? config.getLogin() : "";
+        return config != null ? config.getLogin() : null;
     }
 
     public void setConfig(UserConfiguration config)

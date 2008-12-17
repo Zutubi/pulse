@@ -30,7 +30,11 @@
             #contentCell("queue.revision.floating")
         #end
             #contentCell($request.prettyQueueTime)
+        #if($request.reason)
             #staticCell($request.reason.summary)
+        #else
+            #contentCell("empty.cell")
+        #end
         #if($action.canCancel($request))
             #actionCell("cancel" "$base/cancelQueuedBuild.action?id=$request.id" "cancel.gif")
         #else
@@ -70,7 +74,11 @@
             <td class="content"><a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a></td>
             #statusCell($buildResult true)
             #dateClassCell($buildResult)
-            #staticCell($buildResult.reason.summary)
+            #if($request.reason)
+                #staticCell($buildResult.reason.summary)
+            #else
+                #contentCell("empty.cell")
+            #end
             #elapsedCell($buildResult)
 
         #if($action.canCancel($buildResult))

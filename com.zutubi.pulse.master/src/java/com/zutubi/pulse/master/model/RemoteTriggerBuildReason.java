@@ -23,7 +23,7 @@ public class RemoteTriggerBuildReason extends AbstractBuildReason
 
     public String getSummary()
     {
-        return "trigger via remote api by " + (username != null ? username : "'unknown'");
+        return "trigger via remote api by " + username;
     }
 
     public String getUsername()
