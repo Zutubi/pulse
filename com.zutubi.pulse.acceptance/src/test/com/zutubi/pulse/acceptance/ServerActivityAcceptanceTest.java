@@ -32,6 +32,12 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
     protected void tearDown() throws Exception
     {
+        // finish any builds that are left over.
+        for (int i = 1; i < nextBuild; i++)
+        {
+            waitForBuildToComplete(i);
+        }
+        
         logout();
         xmlRpcHelper.logout();
         super.tearDown();
@@ -43,7 +49,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         page.goTo();
 
         assertEmptyTable(ID_BUILD_QUEUE_TABLE, "build queue", BuildQueueTable.EMPTY_MESSAGE);
-        assertEmptyTable(ID_ACTIVITY_TABLE, "active builds", ActivityTable.EMPTY_MESSAGE);
+        assertEmptyTable(ID_ACTIVITY_TABLE, "active builds", ActiveBuildsTable.EMPTY_MESSAGE);
         assertEmptyTable(ID_RECIPE_QUEUE_TABLE, "recipe queue", "no recipe requests queued");
     }
 
@@ -51,13 +57,8 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     {
         // we use contains here since the recipe queue table header gets merged with the
         // pause action when returned by selenium.
-        assertTrue(getTableHeader(id).contains(header));
+        assertTrue(new Table(id).getHeader().contains(header));
         assertEquals(message, SeleniumUtils.getCellContents(selenium, id, 2, 0));
-    }
-
-    private String getTableHeader(String id)
-    {
-        return new Table(id).getHeader();
     }
 
     /**
@@ -75,19 +76,19 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         ServerActivityPage page = new ServerActivityPage(selenium, urls);
         page.goTo();
 
-        ActivityTable table = new ActivityTable();
-        assertEquals(1, table.getRowCount());
-        assertEquals("trigger via remote api by admin", table.getReason());
-        assertEquals(random, table.getOwner());
-        assertEquals("1", table.getBuildId());
-        assertEquals(random, table.getProject());
-        assertEquals("in progress", table.getStatus());
+        ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
+        assertEquals(1, activeBuildsTable.getRowCount());
+        assertEquals("trigger via remote api by admin", activeBuildsTable.getReason());
+        assertEquals(random, activeBuildsTable.getOwner());
+        assertEquals("1", activeBuildsTable.getBuildId());
+        assertEquals(random, activeBuildsTable.getProject());
+        assertEquals("in progress", activeBuildsTable.getStatus());
 
         waitForBuildToComplete(1);
 
         // force page refresh.
         page.goTo();
-        assertEquals(0, table.getRowCount());
+        assertEquals(0, activeBuildsTable.getRowCount());
     }
 
     /**
@@ -108,8 +109,8 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         ServerActivityPage page = new ServerActivityPage(selenium, urls);
         page.goTo();
 
-        ActivityTable activityTable = new ActivityTable();
-        assertEquals(1, activityTable.getRowCount());
+        ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
+        assertEquals(1, activeBuildsTable.getRowCount());
 
         BuildQueueTable buildQueueTable = new BuildQueueTable();
         assertEquals(1, buildQueueTable.getRowCount());
@@ -123,7 +124,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         // force refresh
         page.goTo();
         assertEquals(0, buildQueueTable.getRowCount());
-        assertEquals(1, activityTable.getRowCount());
+        assertEquals(1, activeBuildsTable.getRowCount());
 
         waitForBuildToComplete(2);
     }
@@ -156,7 +157,11 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
     private void waitForBuildToComplete(int buildId) throws Exception
     {
-        FileSystemUtils.createFile(waitFiles.get(buildId), "test");
+        File waitFile = waitFiles.get(buildId);
+        if (!waitFile.isFile())
+        {
+            FileSystemUtils.createFile(waitFile, "test");
+        }
 
         xmlRpcHelper.waitForBuildToComplete(random, buildId, TIMEOUT);
     }
@@ -233,6 +238,9 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         }
     }
 
+    /**
+     * The build queue table.
+     */
     public class BuildQueueTable extends Table
     {
         private int row = 1;
@@ -265,13 +273,16 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         }
     }
 
-    public class ActivityTable extends Table
+    /**
+     * The active builds table.
+     */
+    public class ActiveBuildsTable extends Table
     {
         private int row = 1;
 
         public static final String EMPTY_MESSAGE = "no builds active";
 
-        public ActivityTable()
+        public ActiveBuildsTable()
         {
             super(ID_ACTIVITY_TABLE, EMPTY_MESSAGE);
         }

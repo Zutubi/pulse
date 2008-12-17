@@ -74,7 +74,7 @@
             <td class="content"><a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a></td>
             #statusCell($buildResult true)
             #dateClassCell($buildResult)
-            #if($request.reason)
+            #if($buildResult.reason)
                 #staticCell($buildResult.reason.summary)
             #else
                 #contentCell("empty.cell")
