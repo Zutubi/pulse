@@ -20,19 +20,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Core methods used for interaction with the p4 command.
  */
 public class PerforceCore
 {
     private static final Logger LOG = Logger.getLogger(PerforceCore.class);
 
-    private static final String ASCII_CHARSET = "US-ASCII";
     private static final long P4_TIMEOUT = Long.getLong("pulse.p4.inactivity.timeout", 300);
+
+    private static final String ROOT_PREFIX = "Root:";
+
+    private static final Pattern PATTERN_LINE_SPLITTER = Pattern.compile("\\r?\\n");
 
     private Map<String, String> p4Env = new HashMap<String, String>();
     private ProcessBuilder p4Builder;
-    private Pattern changesPattern;
-    private Pattern lineSplitterPattern;
-    private static final String ROOT_PREFIX = "Root:";
 
     public class P4Result
     {
@@ -50,10 +51,6 @@ public class PerforceCore
     public PerforceCore()
     {
         p4Builder = new ProcessBuilder();
-        // Output of p4 changes -s submitted -m 1:
-        //   Change <number> on <date> by <user>@<client>
-        changesPattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
-        lineSplitterPattern = Pattern.compile("\r?\n");
     }
 
     public Map<String, String> getEnv()
@@ -133,7 +130,7 @@ public class PerforceCore
             {
                 OutputStream stdinStream = child.getOutputStream();
 
-                stdinStream.write(input.getBytes(ASCII_CHARSET));
+                stdinStream.write(input.getBytes());
                 stdinStream.close();
             }
             catch (IOException e)
@@ -336,7 +333,7 @@ public class PerforceCore
         args.addAll(Arrays.asList(files));
 
         PerforceCore.P4Result result = runP4(null, args.toArray(new String[args.size()]));
-        Matcher matcher = changesPattern.matcher(result.stdout);
+        Matcher matcher = PATTERN_CHANGES.matcher(result.stdout);
 
         if (matcher.find())
         {
@@ -378,11 +375,6 @@ public class PerforceCore
 
     public String[] splitLines(P4Result result)
     {
-        return lineSplitterPattern.split(result.stdout);
-    }
-
-    public Pattern getChangesPattern()
-    {
-        return changesPattern;
+        return PATTERN_LINE_SPLITTER.split(result.stdout);
     }
 }

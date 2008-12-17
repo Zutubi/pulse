@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Required;
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "spec", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "port", "user", "password", "spec", "useTicketAuth", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -22,6 +22,7 @@ public class PerforceConfiguration extends PollableScmConfiguration
     private String password;
     @Required
     private String spec;
+    private boolean useTicketAuth = false;
 
     public PerforceConfiguration()
     {
@@ -78,5 +79,15 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public String getType()
     {
         return PerforceClient.TYPE;
+    }
+
+    public boolean getUseTicketAuth()
+    {
+        return useTicketAuth;
+    }
+
+    public void setUseTicketAuth(boolean useTicketAuth)
+    {
+        this.useTicketAuth = useTicketAuth;
     }
 }

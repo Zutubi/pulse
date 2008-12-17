@@ -8,8 +8,6 @@ import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.FLAG_CLIENT;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -19,64 +17,46 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class PerforceClientTest extends PulseTestCase
+public class PerforceClientTest extends PerforceTestBase
 {
+    private static final String FILE_CHECKPOINT = "checkpoint.2";
+
     private static final String DEPOT_WORKSPACE = "depot-client";
     private static final String TEST_WORKSPACE = "test-client";
-
-    private static final String TEST_PROJECT = "test project";
-    private static final long   TEST_PROJECT_HANDLE = 11;
-    private static final String TEST_AGENT = "test agent";
-    private static final long   TEST_AGENT_HANDLE = 22;
 
     private static final String LABEL_TWO = "two";
     private static final String LABEL_LATEST = "latest";
     
     private PerforceCore core;
     private PerforceClient client;
-    private File tmpDir;
     private File workDir;
-    private Process p4dProcess;
-    private boolean generateMode = false;
+
+    public PerforceClientTest()
+    {
+        super(FILE_CHECKPOINT);
+    }
+
+    public PerforceClientTest(String name)
+    {
+        super(name, FILE_CHECKPOINT);
+    }
 
     protected void setUp() throws Exception
     {
         super.setUp();
         core = new PerforceCore();
 
-        tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
-        File repoDir = new File(tmpDir, "repo");
-
-        File repoZip = getTestDataFile("bundles/com.zutubi.pulse.core.scm.p4", "repo", "zip");
-        ZipUtils.extractZip(repoZip, repoDir);
-
-        // Restore from checkpoint
-        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-jr", "checkpoint.2"});
-        p4dProcess.waitFor();
-
-        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-p", "6666"});
-
-        workDir = new File(tmpDir, "work");
+        workDir = new File(getTempDir(), "work");
         if(!workDir.mkdirs())
         {
             throw new RuntimeException("Unable to make work directory '" + workDir.getAbsolutePath() + "'");
         }
-
-        waitForServer(6666);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        p4dProcess.destroy();
-        Thread.sleep(400);
-        removeDirectory(tmpDir);
-        super.tearDown();
     }
 
     public void testGetLocation() throws ScmException
     {
         getServer(TEST_WORKSPACE);
-        assertEquals(client.getLocation(), "test-client@:6666");
+        assertEquals(client.getLocation(), "test-client@" + getP4Port());
     }
 
     public void testNonExistantTemplateWorkspaceFails() throws ScmException
@@ -527,7 +507,7 @@ public class PerforceClientTest extends PulseTestCase
         SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
 
         PerforceCore core = getClient();
-        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", tmpDir.getAbsolutePath());
+        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", getTempDir().getAbsolutePath());
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_WORKSPACE);
         assertTrue(spec.contains(" locked"));
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "unlocked-client");
@@ -562,33 +542,23 @@ public class PerforceClientTest extends PulseTestCase
     private PerforceCore getClient()
     {
         PerforceCore core = new PerforceCore();
-        core.setEnv(PerforceConstants.ENV_PORT, ":6666");
+        core.setEnv(PerforceConstants.ENV_PORT, getP4Port());
         core.setEnv(PerforceConstants.ENV_USER, "test-user");
         return core;
     }
 
     private void getServer(String workspace, String... excludedPaths) throws ScmException
     {
-        PerforceConfiguration configuration = new PerforceConfiguration(":6666", "test-user", "", workspace);
+        PerforceConfiguration configuration = new PerforceConfiguration(getP4Port(), "test-user", "", workspace);
         configuration.setFilterPaths(Arrays.asList(excludedPaths));
         this.client = new PerforceClient(configuration, new PerforceWorkspaceManager());
-        this.core.setEnv(PerforceConstants.ENV_PORT, ":6666");
+        this.core.setEnv(PerforceConstants.ENV_PORT, getP4Port());
         this.core.setEnv(PerforceConstants.ENV_USER, "test-user");
     }
 
     private void checkDirectory(String name) throws IOException
     {
-        File expectedRoot = getDataRoot();
-        File expectedDir = new File(expectedRoot, name);
-
-        if (generateMode)
-        {
-            assertTrue(workDir.renameTo(expectedDir));
-        }
-        else
-        {
-            assertDirectoriesEqual(expectedDir, workDir);
-        }
+        assertDirectoriesEqual(new File(getDataRoot(), name), workDir);
     }
 
     private File getDataRoot()
@@ -611,18 +581,6 @@ public class PerforceClientTest extends PulseTestCase
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         client.update(context, revision, handler);
         return handler.getStatusMessages();
-    }
-
-    private ExecutionContext createExecutionContext(File dir, boolean incrementalBootstrap)
-    {
-        PulseExecutionContext context = new PulseExecutionContext();
-        context.setWorkingDir(dir);
-        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, incrementalBootstrap);
-        context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT, TEST_PROJECT);
-        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT_HANDLE, TEST_PROJECT_HANDLE);
-        context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, TEST_AGENT);
-        context.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE, TEST_AGENT_HANDLE);
-        return context;
     }
 
     private ScmContextImpl createScmContext()

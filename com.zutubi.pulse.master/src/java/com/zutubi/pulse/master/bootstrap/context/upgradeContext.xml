@@ -42,6 +42,7 @@
                 <ref local="dashboardBuildPreferences"/>
                 <ref local="featureDiscriminator"/>
                 <ref local="addResourcePropertyDescription"/>
+                <ref local="addPerforceTicketAuthentication"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -122,4 +123,7 @@
         <property name="buildNumber" value="200018001"/>
     </bean>
 
+    <bean id="addPerforceTicketAuthentication" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceTicketAuthenticationUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200018002"/>
+    </bean>
 </beans>

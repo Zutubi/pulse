@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.p4;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Shared constants used in Perforce implementations.
@@ -32,6 +33,7 @@ public class PerforceConstants
     public static final String COMMAND_LABEL = "label";
     public static final String COMMAND_LABELS = "labels";
     public static final String COMMAND_LABELSYNC = "labelsync";
+    public static final String COMMAND_LOGIN = "login";
     public static final String COMMAND_RESOLVE = "resolve";
     public static final String COMMAND_SET = "set";
     public static final String COMMAND_SUBMIT = "submit";
@@ -41,6 +43,7 @@ public class PerforceConstants
     public static final String FLAG_CHANGELIST = "-c";
     public static final String FLAG_CLIENT = "-c";
     public static final String FLAG_DELETE = "-d";
+    public static final String FLAG_DISPLAY_TICKET = "-p";
     public static final String FLAG_FILES_OPENED = "-W";
     public static final String FLAG_FORCE = "-f";
     public static final String FLAG_INPUT = "-i";
@@ -88,6 +91,10 @@ public class PerforceConstants
     public static final String ACTION_INTEGRATE = "integrate";
 
     public static final String REVISION_NONE = "none";
+
+    // Output of p4 changes -s submitted -m 1:
+    //   Change <number> on <date> by <user>@<client>
+    public static final Pattern PATTERN_CHANGES = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
 
     public static final String[] EXECUTABLE_TYPES = {
             "xtext",

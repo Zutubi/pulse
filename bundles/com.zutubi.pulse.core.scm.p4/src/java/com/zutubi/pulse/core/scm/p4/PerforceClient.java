@@ -290,9 +290,30 @@ public class PerforceClient extends CachingScmClient
         this.core = new PerforceCore();
         this.core.setEnv(ENV_PORT, configuration.getPort());
         this.core.setEnv(ENV_USER, configuration.getUser());
-        if (TextUtils.stringSet(configuration.getPassword()))
+
+        String password = determinePassword(core, configuration);
+        if (TextUtils.stringSet(password))
         {
-            this.core.setEnv(ENV_PASSWORD, configuration.getPassword());
+            this.core.setEnv(ENV_PASSWORD, password);
+        }
+    }
+
+    private String determinePassword(PerforceCore core, PerforceConfiguration configuration) throws ScmException
+    {
+        if (configuration.getUseTicketAuth())
+        {
+            PerforceCore.P4Result result = core.runP4(configuration.getPassword(), getP4Command(COMMAND_LOGIN), COMMAND_LOGIN, FLAG_DISPLAY_TICKET);
+            String[] lines = core.splitLines(result);
+            if (lines.length == 0)
+            {
+                throw new ScmException("No output from p4 login");
+            }
+
+            return lines[lines.length - 1];
+        }
+        else
+        {
+            return configuration.getPassword();
         }
     }
 
@@ -428,7 +449,7 @@ public class PerforceClient extends CachingScmClient
             if (start <= end)
             {
                 PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, workspace.getName(), COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + workspace.getName() + "/...@" + Long.toString(start) + "," + Long.toString(end));
-                Matcher matcher = core.getChangesPattern().matcher(p4Result.stdout);
+                Matcher matcher = PATTERN_CHANGES.matcher(p4Result.stdout);
 
                 while (matcher.find())
                 {
@@ -473,7 +494,7 @@ public class PerforceClient extends CachingScmClient
         // It is a label, date or similar.  Get the highest changelist in
         // that revision spec, which is the best approximation we have.
         PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, workspace.getName(), COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + workspace.getName() + "/...@" + revision);
-        Matcher matcher = core.getChangesPattern().matcher(p4Result.stdout);
+        Matcher matcher = PATTERN_CHANGES.matcher(p4Result.stdout);
         if (matcher.find())
         {
             return Long.parseLong(matcher.group(1));

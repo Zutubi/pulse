@@ -4,8 +4,6 @@ import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
 
@@ -13,14 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class PerforceWorkingCopyTest extends PulseTestCase
+public class PerforceWorkingCopyTest extends PerforceTestBase
 {
+    private static final String FILE_CHECKPOINT = "checkpoint.1";
+
     private static final String P4_COMMAND = "p4";
     private static final String CLIENT_NAME = "test-client-1";
     private static final String OTHER_CLIENT_NAME = "test-client-2";
 
-    private File tempDir;
-    private Process p4dProcess;
     private File clientRoot;
     private PerforceCore core;
     private File otherClientRoot;
@@ -30,22 +28,19 @@ public class PerforceWorkingCopyTest extends PulseTestCase
     private PerforceWorkingCopy wc;
     private TestPersonalBuildUI ui;
 
+    public PerforceWorkingCopyTest()
+    {
+        super(FILE_CHECKPOINT);
+    }
+
+    public PerforceWorkingCopyTest(String name)
+    {
+        super(name, FILE_CHECKPOINT);
+    }
+
     protected void setUp() throws Exception
     {
-        tempDir = FileSystemUtils.createTempDir(PerforceWorkingCopyTest.class.getName(), "");
-        tempDir = tempDir.getCanonicalFile();
-        File repoDir = new File(tempDir, "repo");
-        repoDir.mkdir();
-
-        File repoZip = getTestDataFile("bundles/com.zutubi.pulse.core.scm.p4", "repo", "zip");
-        ZipUtils.extractZip(repoZip, repoDir);
-
-        // Restore from checkpoint
-        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-jr", "checkpoint.1"});
-        p4dProcess.waitFor();
-        
-        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath()});
-        waitForServer(1666);
+        super.setUp();
 
         createClients();
 
@@ -56,7 +51,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase
 
         PropertiesConfig config = new PropertiesConfig();
         config.setProperty(PerforceWorkingCopy.PROPERTY_CLIENT, CLIENT_NAME);
-        config.setProperty(PerforceWorkingCopy.PROPERTY_PORT, ":1666");
+        config.setProperty(PerforceWorkingCopy.PROPERTY_PORT, getP4Port());
         config.setProperty(PerforceWorkingCopy.PROPERTY_USER, "test-user");
 
         context = new WorkingCopyContextImpl(clientRoot, config);
@@ -64,12 +59,12 @@ public class PerforceWorkingCopyTest extends PulseTestCase
 
     private void createClients() throws ScmException
     {
-        clientRoot = new File(tempDir, CLIENT_NAME);
+        clientRoot = new File(getTempDir(), CLIENT_NAME);
         clientRoot.mkdir();
 
         core = new PerforceCore();
         core.setEnv(ENV_CLIENT, CLIENT_NAME);
-        core.setEnv(ENV_PORT, ":1666");
+        core.setEnv(ENV_PORT, getP4Port());
         core.setEnv(ENV_USER, "test-user");
         core.setEnv("PWD", clientRoot.getAbsolutePath());
         core.setWorkingDir(clientRoot);
@@ -77,12 +72,12 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         core.createOrUpdateWorkspace("client-1", CLIENT_NAME, "description", clientRoot.getAbsolutePath());
         core.runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE);
 
-        otherClientRoot = new File(tempDir, OTHER_CLIENT_NAME);
+        otherClientRoot = new File(getTempDir(), OTHER_CLIENT_NAME);
         otherClientRoot.mkdir();
 
         otherCore = new PerforceCore();
         otherCore.setEnv(ENV_CLIENT, OTHER_CLIENT_NAME);
-        otherCore.setEnv(ENV_PORT, ":1666");
+        otherCore.setEnv(ENV_PORT, getP4Port());
         otherCore.setEnv(ENV_USER, "test-user");
         otherCore.setEnv("PWD", otherClientRoot.getAbsolutePath());
         otherCore.setWorkingDir(otherClientRoot);
@@ -91,27 +86,15 @@ public class PerforceWorkingCopyTest extends PulseTestCase
         otherCore.runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE);
     }
 
-    protected void tearDown() throws Exception
-    {
-        p4dProcess.destroy();
-        p4dProcess.waitFor();
-        p4dProcess = null;
-        Thread.sleep(100);
-
-        FileSystemUtils.rmdir(tempDir);
-
-        ui = null;
-    }
-
     public void testLocationMatches() throws ScmException
     {
-        assertTrue(wc.matchesLocation(context, "foo@:1666"));
+        assertTrue(wc.matchesLocation(context, "foo@" + getP4Port()));
     }
 
     public void testLocationDoesntMatch() throws ScmException
     {
-        assertFalse(wc.matchesLocation(context, "foo@anotherhost:1666"));
-        assertWarning("P4PORT setting ':1666' does not match Pulse project's P4PORT 'anotherhost:1666'");
+        assertFalse(wc.matchesLocation(context, "foo@anotherhost:6666"));
+        assertWarning("P4PORT setting ':6666' does not match Pulse project's P4PORT 'anotherhost:6666'");
     }
 
     public void testLocalStatusNoChanges() throws ScmException
