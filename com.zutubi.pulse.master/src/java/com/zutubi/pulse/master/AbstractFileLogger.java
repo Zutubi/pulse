@@ -50,10 +50,15 @@ public abstract class AbstractFileLogger implements OutputLogger
 
     public void log(byte[] output)
     {
-        if (output.length > 0)
+        log(output, 0, output.length);
+    }
+
+    public void log(byte[] output, int offset, int length)
+    {
+        if (length > 0)
         {
             // we want to log each line separately.
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(output)));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(output, offset, length)));
             try
             {
                 String line;
