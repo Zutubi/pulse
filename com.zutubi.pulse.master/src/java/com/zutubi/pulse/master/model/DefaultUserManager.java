@@ -245,6 +245,12 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         return projects;
     }
 
+    public AcegiUser getPrinciple(UserConfiguration userConfig)
+    {
+        User user = getUser(userConfig.getLogin());
+        return getPrinciple(user);
+    }
+
     public AcegiUser getPrinciple(User user)
     {
         AcegiUser principle = new AcegiUser(user, groupsByUser.get(user.getConfig()));

@@ -70,7 +70,7 @@ public class GroupXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         try
         {
-            call("getConfig", getGroupPath(groupName));
+            xmlRpcHelper.getConfig(getGroupPath(groupName));
         }
         catch (Exception e)
         {
@@ -80,7 +80,7 @@ public class GroupXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private Hashtable<String, Object> assertGroupExists(String groupName) throws Exception
     {
-        Hashtable<String, Object> group = call("getConfig", getGroupPath(groupName));
+        Hashtable<String, Object> group = xmlRpcHelper.getConfig(getGroupPath(groupName));
         assertNotNull(group);
         return group;
     }

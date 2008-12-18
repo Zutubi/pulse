@@ -12,13 +12,17 @@ import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.renderer.BuildResultRenderer;
+import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SubscriptionConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 
 import java.io.StringWriter;
@@ -48,6 +52,8 @@ public class ResultNotifier implements EventListener
     private EventManager eventManager;
     private BuildManager buildManager;
     private ThreadFactory threadFactory;
+    private AccessManager accessManager;
+    private UserManager userManager;
 
     public void init()
     {
@@ -98,13 +104,23 @@ public class ResultNotifier implements EventListener
             // determine which of these subscriptions should be notified.
             if (subscription.conditionSatisfied(buildResult))
             {
-                String templateName = subscription.getTemplate();
-                RenderedResult rendered = renderResult(buildResult, dataMap, buildResultRenderer, templateName, renderCache);
-                notifiedContactPoints.add(contactPoint.getHandle());
+                UserConfiguration userConfig = configurationProvider.getAncestorOfType(subscription, UserConfiguration.class);
+                if (canView(userConfig, buildResult))
+                {
+                    String templateName = subscription.getTemplate();
+                    RenderedResult rendered = renderResult(buildResult, dataMap, buildResultRenderer, templateName, renderCache);
+                    notifiedContactPoints.add(contactPoint.getHandle());
 
-                notifyContactPoint(contactPoint, buildResult, rendered, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
+                    notifyContactPoint(contactPoint, buildResult, rendered, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
+                }
             }
         }
+    }
+
+    private boolean canView(UserConfiguration userConfig, BuildResult buildResult)
+    {
+        AcegiUser user = userManager.getPrinciple(userConfig);
+        return accessManager.hasPermission(user, AccessManager.ACTION_VIEW, buildResult);
     }
 
     private void notifyContactPoint(ContactConfiguration contactPoint, BuildResult buildResult, RenderedResult rendered, String mimeType)
@@ -279,6 +295,16 @@ public class ResultNotifier implements EventListener
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 
     public static class RenderedResult

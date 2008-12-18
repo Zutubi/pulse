@@ -52,6 +52,8 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
 
     Set<Project> getUserProjects(User user, ProjectManager projectManager);
 
+    AcegiUser getPrinciple(UserConfiguration user);
+    
     AcegiUser getPrinciple(User user);
 
     void setPassword(UserConfiguration user, String rawPassword);
