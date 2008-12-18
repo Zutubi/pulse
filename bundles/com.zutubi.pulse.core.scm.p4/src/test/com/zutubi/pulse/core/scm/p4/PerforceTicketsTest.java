@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackAdapter;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 
 import java.io.File;
@@ -16,14 +17,9 @@ public class PerforceTicketsTest extends PerforceTestBase
 
     private PerforceConfiguration configuration;
 
-    public PerforceTicketsTest()
+    protected String getCheckpointFilename()
     {
-        super(FILE_CHECKPOINT);
-    }
-
-    public PerforceTicketsTest(String name)
-    {
-        super(name, FILE_CHECKPOINT);
+        return FILE_CHECKPOINT;
     }
 
     protected void setUp() throws Exception

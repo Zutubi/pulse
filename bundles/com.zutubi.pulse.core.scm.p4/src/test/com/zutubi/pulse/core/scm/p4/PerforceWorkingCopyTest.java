@@ -28,14 +28,9 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
     private PerforceWorkingCopy wc;
     private TestPersonalBuildUI ui;
 
-    public PerforceWorkingCopyTest()
+    protected String getCheckpointFilename()
     {
-        super(FILE_CHECKPOINT);
-    }
-
-    public PerforceWorkingCopyTest(String name)
-    {
-        super(name, FILE_CHECKPOINT);
+        return FILE_CHECKPOINT;
     }
 
     protected void setUp() throws Exception
@@ -60,7 +55,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
     private void createClients() throws ScmException
     {
         clientRoot = new File(getTempDir(), CLIENT_NAME);
-        clientRoot.mkdir();
+        assertTrue(clientRoot.mkdir());
 
         core = new PerforceCore();
         core.setEnv(ENV_CLIENT, CLIENT_NAME);
@@ -73,7 +68,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         core.runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE);
 
         otherClientRoot = new File(getTempDir(), OTHER_CLIENT_NAME);
-        otherClientRoot.mkdir();
+        assertTrue(otherClientRoot.mkdir());
 
         otherCore = new PerforceCore();
         otherCore.setEnv(ENV_CLIENT, OTHER_CLIENT_NAME);

@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
@@ -31,14 +29,9 @@ public class PerforceClientTest extends PerforceTestBase
     private PerforceClient client;
     private File workDir;
 
-    public PerforceClientTest()
+    protected String getCheckpointFilename()
     {
-        super(FILE_CHECKPOINT);
-    }
-
-    public PerforceClientTest(String name)
-    {
-        super(name, FILE_CHECKPOINT);
+        return FILE_CHECKPOINT;
     }
 
     protected void setUp() throws Exception
