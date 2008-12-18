@@ -45,6 +45,17 @@ public class PathPatternRecordLocatorTest extends ZutubiTestCase
         assertEquals(RECORD_B, result.get("otherpath"));
     }
 
+    public void testOverlappingPaths()
+    {
+        doReturn(createMockResult("path/blah", RECORD_A)).when(recordManager).selectAll("path/*");
+        doReturn(createMockResult("path/blah", RECORD_A)).when(recordManager).selectAll("path/blah");
+
+        PathPatternRecordLocator locator = new PathPatternRecordLocator("path/*", "path/blah");
+        Map<String, Record> result = locator.locate(recordManager);
+        assertEquals(1, result.size());
+        assertEquals(RECORD_A, result.get("path/blah"));
+    }
+
     private Map<String, Record> createMockResult(String path, Record record)
     {
         Map<String, Record> mockResult = new HashMap<String, Record>();

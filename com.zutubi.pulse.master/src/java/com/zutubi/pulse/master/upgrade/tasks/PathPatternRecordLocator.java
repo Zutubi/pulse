@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * A locator that finds all records matching a path pattern.  Path patterns are
+ * A locator that finds all records matching a set of path patterns.  Path patterns are
  * defined by the {@link com.zutubi.tove.type.record.RecordManager#selectAll(String)}
  * method.
  */

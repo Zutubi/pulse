@@ -21,12 +21,12 @@ public class RecordLocators
      * Create a new locator that finds records by their path pattern.  Patterns
      * are defined by {@link com.zutubi.tove.type.record.RecordManager#selectAll(String)}.
      *
-     * @param pathPattern path patterns used for location, may contain wildcards
+     * @param pathPatterns path patterns used for location, may contain wildcards
      * @return a locator which will find all records matching the given pattern
      */
-    public static RecordLocator newPathPattern(String... pathPattern)
+    public static RecordLocator newPathPattern(String... pathPatterns)
     {
-        return new PathPatternRecordLocator(pathPattern);
+        return new PathPatternRecordLocator(pathPatterns);
     }
 
     /**

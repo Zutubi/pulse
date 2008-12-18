@@ -14,6 +14,8 @@ ${form.name}.items.last().on('render', function(field)
 <#assign helpmsg>${helpkey?i18n}</#assign>
 <#if helpmsg?exists && helpkey != helpmsg>
     addFieldHelp(${form.name}, field, '${helpmsg?js_string}');
+<#elseif parameters.help?exists>
+    addFieldHelp(${form.name}, field, '${parameters.help?js_string}');
 </#if>
 });
 

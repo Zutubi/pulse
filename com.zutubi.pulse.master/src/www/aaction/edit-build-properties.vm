@@ -5,3 +5,7 @@
     </div>
     #standardFormEvents("form")
 </div>
+
+<script type="text/javascript">
+    detailPanel.setHelp('#jss(${projectPath})', 'manualTrigger');
+</script>

@@ -133,6 +133,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             field = new Field(FieldType.TEXT, PROPERTY_PREFIX + property.getName());
             field.setLabel(property.getName());
             field.setValue(property.getValue());
+            field.addParameter("help", property.getDescription());
             form.add(field);
         }
 
@@ -181,6 +182,11 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String getPath()
     {
         return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, getProjectName());
+    }
+
+    public String getProjectPath()
+    {
+        return getPath();
     }
 
     private void setupResponse()
