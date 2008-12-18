@@ -25,6 +25,7 @@
         <dependency org="zutubi" name="com.zutubi.pulse.slave" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.master" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.svn" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.scm.p4" rev="latest.integration" conf="*->@"/>
 
         <dependency org="openqa" name="selenium" rev="1.0.b1" conf="external,build->default"/>
         <dependency org="quintanasoft" name="dumbster" rev="1.6" conf="external,build->default"/>
