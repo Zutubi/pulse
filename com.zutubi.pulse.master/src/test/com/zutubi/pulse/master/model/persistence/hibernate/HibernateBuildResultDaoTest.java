@@ -899,7 +899,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private BuildResult createIncompletePersonalBuild(User user, Project project, long number)
     {
-        BuildResult result = new BuildResult(user, project, number);
+        BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, number);
         result.commence(time++);
         return result;
     }

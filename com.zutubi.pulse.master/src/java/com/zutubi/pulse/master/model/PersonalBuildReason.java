@@ -25,6 +25,11 @@ public class PersonalBuildReason extends AbstractBuildReason
         return user;
     }
 
+    /**
+     * Used by hibernate.
+     *
+     * @param user value
+     */
     private void setUser(String user)
     {
         this.user = user;

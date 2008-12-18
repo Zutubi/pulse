@@ -82,7 +82,7 @@ public class BuildAborterTest extends PulseTestCase
     {
         Project project = new Project();
         User user = newUser();
-        BuildResult result = new BuildResult(user, project, 1);
+        BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, 1);
         result.commence(10);
         result.complete();
 
@@ -100,7 +100,7 @@ public class BuildAborterTest extends PulseTestCase
     {
         Project project = new Project();
         User user = newUser();
-        BuildResult result = new BuildResult(user, project, 1);
+        BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, 1);
         result.commence(10);
 
         buildManager.save(result);

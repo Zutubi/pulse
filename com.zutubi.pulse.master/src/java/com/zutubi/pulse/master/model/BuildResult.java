@@ -69,9 +69,9 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         hasWorkDir = true;
     }
 
-    public BuildResult(User user, Project project, long number)
+    public BuildResult(BuildReason reason, User user, Project project, long number)
     {
-        this(new PersonalBuildReason(getLogin(user)), project, number, false);
+        this(reason, project, number, false);
         this.user = user;
     }
 

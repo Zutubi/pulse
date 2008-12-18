@@ -4,10 +4,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.UnknownBuildReason;
-import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
@@ -146,7 +143,7 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
         User user = new User();
         UserConfiguration config = new UserConfiguration("test", "test");
         user.setConfig(config);
-        BuildResult result = new BuildResult(user, project, 1);
+        BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, 1);
         result.setState(ResultState.SUCCESS);
         assertFalse(filter.accept(createTrigger("SUCCESS"), new BuildCompletedEvent(this, result, null), new TaskExecutionContext()));
     }

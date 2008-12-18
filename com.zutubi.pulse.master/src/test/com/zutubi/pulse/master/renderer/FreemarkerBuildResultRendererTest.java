@@ -319,7 +319,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         User user = new User();
         user.setConfig(userConfig);
         Project project = createProject();
-        BuildResult result = new BuildResult(user, project, 12);
+        BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, 12);
         initialiseResult(result);
 
         result.failure("test failed tests");
