@@ -9,6 +9,9 @@ import com.zutubi.tove.config.docs.TypeDocs;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This action generates the help panel content for the manual trigger page.
+ */
 public class ManualTriggerHelpAction extends HelpActionSupport
 {
     private ConfigurationProvider provider;
@@ -24,21 +27,6 @@ public class ManualTriggerHelpAction extends HelpActionSupport
     public List<String> getFormProperties()
     {
         return formProperties;
-    }
-
-    public boolean isExpandable(PropertyDocs docs)
-    {
-        return hasExamples(docs) || isAbbreviated(docs);
-    }
-
-    public boolean hasExamples(PropertyDocs docs)
-    {
-        return docs.getExamples().size() > 0;
-    }
-
-    private boolean isAbbreviated(PropertyDocs docs)
-    {
-        return docs.getVerbose() != null && !docs.getVerbose().equals(docs.getBrief());
     }
 
     public String execute() throws Exception

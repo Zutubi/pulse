@@ -2,8 +2,11 @@ package com.zutubi.pulse.master.tove.webwork.help;
 
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.util.TextUtils;
+import com.zutubi.tove.config.docs.PropertyDocs;
 
 /**
+ * This is the base support class for actions that generate content for the
+ * UI help panels. 
  */
 public class HelpActionSupport extends ActionSupport
 {
@@ -37,5 +40,20 @@ public class HelpActionSupport extends ActionSupport
         }
 
         return s;
+    }
+
+    public boolean isExpandable(PropertyDocs docs)
+    {
+        return hasExamples(docs) || isAbbreviated(docs);
+    }
+
+    public boolean hasExamples(PropertyDocs docs)
+    {
+        return docs.getExamples().size() > 0;
+    }
+
+    private boolean isAbbreviated(PropertyDocs docs)
+    {
+        return docs.getVerbose() != null && !docs.getVerbose().equals(docs.getBrief());
     }
 }

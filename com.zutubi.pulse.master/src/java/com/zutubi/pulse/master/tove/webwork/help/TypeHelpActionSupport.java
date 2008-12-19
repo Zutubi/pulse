@@ -32,21 +32,6 @@ public abstract class TypeHelpActionSupport extends HelpActionSupport
         return formProperties;
     }
 
-    public boolean isExpandable(PropertyDocs docs)
-    {
-        return hasExamples(docs) || isAbbreviated(docs);
-    }
-
-    public boolean hasExamples(PropertyDocs docs)
-    {
-        return docs.getExamples().size() > 0;
-    }
-
-    private boolean isAbbreviated(PropertyDocs docs)
-    {
-        return docs.getVerbose() != null && !docs.getVerbose().equals(docs.getBrief());
-    }
-
     public String execute() throws Exception
     {
         CompositeType composite = getType();
