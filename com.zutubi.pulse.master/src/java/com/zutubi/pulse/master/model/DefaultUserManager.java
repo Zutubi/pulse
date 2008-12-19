@@ -247,7 +247,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     public AcegiUser getPrinciple(UserConfiguration userConfig)
     {
-        User user = getUser(userConfig.getLogin());
+        User user = getUser(userConfig.getUserId());
         return getPrinciple(user);
     }
 
