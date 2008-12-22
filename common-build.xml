@@ -125,7 +125,7 @@
 
         <!-- ivy configuration -->
         <property file="${project.root.dir}/ivy.properties"/>
-        <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
+        <ivy:configure file="${project.root.dir}/ivyconf.xml" override="true"/>
 
         <patternset id="release.excludes">
             <exclude name="**/LicenseEncoder*"/>

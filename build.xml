@@ -48,7 +48,7 @@
     <target name="clean" depends="clean.all, clean.dev"/>
 
     <target name="buildlist" depends="init">
-        <ivy:buildlist reference="build.path" skipbuildwithoutivy="true">
+        <ivy:buildlist reference="build.path" onMissingDescriptor="skip">
             <fileset dir="${project.root.dir}" includes="*/build.xml"/>
             <fileset dir="${project.root.dir}/bundles" includes="*/build.xml"/>
         </ivy:buildlist>
@@ -634,7 +634,7 @@
     <macrodef name="build-package-deps">
         <attribute name="module"/>
         <sequential>
-            <ivy:buildlist reference="build.path.@{module}" root="com.zutubi.pulse.@{module}-package" ivyfilepath="ivy.xml" excluderoot="true" skipbuildwithoutivy="true">
+            <ivy:buildlist reference="build.path.@{module}" root="com.zutubi.pulse.@{module}-package" ivyfilepath="ivy.xml" excluderoot="true" onMissingDescriptor="skip">
                 <fileset dir="${project.root.dir}/">
                     <include name="*/build.xml"/>
                     <include name="bundles/*/build.xml"/>
