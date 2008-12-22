@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
+<project xmlns:ivy="antlib:org.apache.ivy.ant">
     <dirname property="current.dir" file="ivy.xml"/>
 
     <target name="build.module">
@@ -7,8 +7,8 @@
 
         <!-- Just publish our Ivy file -->
         <property file="../../ivy.properties"/>
-        <ivy:configure file="../../ivyconf.xml"/>
-        <ivy:resolve useOrigin="true" conf="build"/>
+        <ivy:settings file="../../ivysettings.xml"/>
+        <ivy:resolve conf="build"/>
         <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
     </target>
 </project>
