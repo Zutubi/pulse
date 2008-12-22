@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="svn module" basedir="." default="build.module">
+<project name="svn module" basedir="." default="build.module">
 
     <import file="../common-build.xml"/>
 

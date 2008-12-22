@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Pulse" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant" xmlns:zutubi="antlib:com.zutubi.ant">
+<project name="Pulse" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:zutubi="antlib:com.zutubi.ant">
     <!-- Import general purpose macros. -->
     <import file="macros.xml"/>
 
@@ -583,7 +583,8 @@
         <!-- retrieve the internal plugins -->
         <!-- use the default ivy configuration properties. -->
         <property file="ivy.properties"/>
-        <ivy:configure/>
+        
+        <ivy:settings/>
 
         <retrieve-dependencies ivyfile="package/core/ivy.xml" conf="equinox-bundles" dest="plugins/internal"/>
         <subant buildpath="bundles" target="explode.prepackaged.deps"/>
