@@ -533,6 +533,19 @@
             </fileset>
         </path>
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
+
+        <if>
+            <not>
+                <typefound uri="antlib:fr.jayasoft.ivy.ant" name="info"/>
+            </not>
+            <then>
+                <echo>Loading ivy from project.root/etc</echo>
+                <path id="ivy.task.path">
+                    <fileset dir="${project.root.dir}/etc" includes="ivy-*.jar"/>
+                </path>
+                <taskdef uri="antlib:fr.jayasoft.ivy.ant" resource="fr/jayasoft/ivy/ant/antlib.xml" classpathref="ivy.task.path"/>
+            </then>
+        </if>
     </target>
 
     <!--

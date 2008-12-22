@@ -31,6 +31,27 @@
 
         <dirname property="current.dir" file="ivy.xml"/>
 
+        <path id="custom.task.path">
+            <fileset dir="${project.root.dir}/etc">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
+        <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
+
+        <if>
+            <not>
+                <typefound uri="antlib:fr.jayasoft.ivy.ant" name="info"/>
+            </not>
+            <then>
+                <echo>Loading ivy from project.root/etc</echo>
+                <path id="ivy.task.path">
+                    <fileset dir="${project.root.dir}/etc" includes="ivy-*.jar"/>
+                </path>
+                <taskdef uri="antlib:fr.jayasoft.ivy.ant" resource="fr/jayasoft/ivy/ant/antlib.xml" classpathref="ivy.task.path"/>
+            </then>
+        </if>
+
         <property file="${project.root.dir}/ivy.properties"/>
         <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
 
@@ -41,11 +62,6 @@
         <path id="lib.path">
             <fileset refid="module.libs"/>
         </path>
-
-        <path id="custom.task.path">
-            <pathelement path="${project.root.dir}/etc/copyrighttask.jar"/>
-        </path>
-        <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
 
         <!-- resources / properties definition-->
         <patternset id="resources">
