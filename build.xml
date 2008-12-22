@@ -532,6 +532,7 @@
                 <include name="**/*.jar"/>
             </fileset>
         </path>
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
 
         <if>
