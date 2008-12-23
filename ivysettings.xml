@@ -1,34 +1,22 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivysettings>
-    <settings defaultResolver="resolvers"/>
+    <settings defaultResolver="ivy-repository"/>
 
     <resolvers>
+        <url name="ivy-repository">
+            <ivy pattern="http://ivy.zutubi.com/[organisation]/[module]/ivy-[revision].xml"/>
+            <artifact pattern="http://ivy.zutubi.com/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+        </url>
 
-        <dual name="resolvers">
-            <chain name="ivy">
-                <filesystem name="ivy-repository">
-                    <ivy pattern="${ivy.conf.dir}/ivy-repository/[organisation]/[module]/ivy-[revision].xml"/>
-                </filesystem>
-            </chain>
-            <chain name="artifact">
-                <url name="artifact-repository">
-                    <artifact pattern="http://ivy.zutubi.com/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
-                </url>
-            </chain>
-        </dual>
-
-        <filesystem name="build" local="true">
-            <ivy pattern="${ivy.conf.dir}/build/repository/[module]/ivy-[revision].xml"/>
-            <artifact pattern="${ivy.conf.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[type]"/>
+        <filesystem name="build" local="true" checkmodified="true" changingPattern="*">
+            <ivy pattern="${ivy.settings.dir}/build/repository/[module]/ivy-[revision].xml"/>
+            <artifact pattern="${ivy.settings.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[type]"/>
         </filesystem>
-
     </resolvers>
 
     <modules>
-        <!-- we know where all of the pulse packages are located, no point searching through the others -->
-        <module organisation="zutubi" name="pulse-.*" resolver="build"/>
+        <!-- We know where all of our own packages are located, no point searching through the others. -->
         <module organisation="zutubi" name="com.zutubi.*" resolver="build"/>
     </modules>
 </ivysettings>
-

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
-<ivy-module version="1.0">
-    <info organisation="xom" module="xom" revision="20080314" status="release"/>
-    <publications>
-        <artifact name="xom" type="jar"/>
-        <artifact name="xom-license" type="txt"/>
-    </publications>
-</ivy-module>

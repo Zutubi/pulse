@@ -17,12 +17,6 @@
     <macrodef name="load-ivy-taskdef">
         <sequential>
             <if>
-                <typefound uri="antlib:org.apache.ivy.ant" name="info"/>
-                <then>
-                    <echo>Ivy already loaded, either by a previous call to load-ivy-taskdef or from ant.lib</echo>
-                </then>
-            </if>
-            <if>
                 <not>
                     <typefound uri="antlib:org.apache.ivy.ant" name="info"/>
                 </not>
