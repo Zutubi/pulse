@@ -15,16 +15,23 @@ fi
 
 version="$1"
 
-if [[ ! "$version" =~ [1-9]+\.[0-9]+\.[0-9]+ ]]
+if [[ "$version" =~ [1-9]+\.[0-9]+\.[0-9]+ ]]
 then
+    major=$(echo $version | cut -d. -f1)
+    minor=$(echo $version | cut -d. -f2)
+    build=$(echo $version | cut -d. -f3)
+    patch="0"
+elif [[ "$version" =~ [1-9]+\.[0-9]+\.[0-9]+\.[0-9]+ ]]
+    major=$(echo $version | cut -d. -f1)
+    minor=$(echo $version | cut -d. -f2)
+    build=$(echo $version | cut -d. -f3)
+    patch=$(echo $version | cut -d. -f4)
+else
     fatal "Invalid version '$version'"
 fi
 
-major=$(echo $version | cut -d. -f1)
-minor=$(echo $version | cut -d. -f2)
-build=$(echo $version | cut -d. -f3)
 
-build=$(printf "%02d%02d%03d000" $major $minor $build)
+build=$(printf "%02d%02d%03d%03d" $major $minor $build $patch)
 
 tmpFile=/tmp/tmp.$$
 

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivysettings>
-    <settings defaultResolver="ivy-repository"/>
+    <typedef name="svn" classname="fm.last.ivy.plugins.svnresolver.SvnResolver"/>
+
+    <settings defaultResolver="public"/>
 
     <resolvers>
-        <url name="ivy-repository">
+        <url name="public">
             <ivy pattern="http://ivy.zutubi.com/[organisation]/[module]/ivy-[revision].xml"/>
             <artifact pattern="http://ivy.zutubi.com/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
         </url>
@@ -13,6 +15,11 @@
             <ivy pattern="${ivy.settings.dir}/build/repository/[module]/ivy-[revision].xml"/>
             <artifact pattern="${ivy.settings.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[type]"/>
         </filesystem>
+
+        <svn name="private" repositoryRoot="svn+ssh://zutubi.com/svnroot" userName="${svn.user.name}" userPassword="${svn.user.password}">
+            <ivy pattern="repository/[organisation]/[module]/ivy-[revision].xml"/>
+            <artifact pattern="repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+        </svn>
     </resolvers>
 
     <modules>

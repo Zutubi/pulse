@@ -23,7 +23,9 @@
         <load-ivy-taskdef/>
         <ivy:settings/>
 
-        <!-- load the modules properties first to allow them to override the default root level properties. -->
+        <!-- Load the user's properties, then the module's properties to allow them to
+             override the default root level properties. -->
+        <property file="${project.root.dir}/local.properties"/>
         <property file="build.properties"/>
         <property file="${project.root.dir}/build.properties"/>
 
@@ -292,6 +294,17 @@
         <dirname property="current.dir" file="ivy.xml"/>
         <!-- copy built artifacts to the build/repository -->
         <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
+    </target>
+
+    <target name="dist" depends="init, module-pre-dist, common-dist, module-post-dist"/>
+
+    <target name="module-pre-dist"/>
+
+    <target name="module-post-dist"/>
+
+    <target name="common-dist">
+        <dirname property="current.dir" file="ivy.xml"/>
+        <ivy:publish resolver="private" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
     </target>
 
     <macrodef name="package-src">
