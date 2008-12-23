@@ -82,7 +82,7 @@
 
     <target name="dist.all" depends="buildlist"
             description="Publishes built artifacts to the Subversion repository, assuming they are already built.">
-        <subant inheritall="false" target="dist.module" buildpathref="build.path"/>
+        <subant inheritall="false" target="dist" buildpathref="build.path"/>
     </target>
 
     <target name="clean.dev" description="Cleans up data created during development.">
