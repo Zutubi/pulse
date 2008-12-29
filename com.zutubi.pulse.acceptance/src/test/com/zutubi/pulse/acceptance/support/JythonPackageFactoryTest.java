@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.support;
 
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import org.testng.annotations.AfterMethod;
@@ -30,7 +31,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         factory = new JythonPackageFactory();
 
-        pkgFile = getPulsePackage();
+        pkgFile = AcceptanceTestUtils.getPulsePackage();
     }
 
     @AfterMethod

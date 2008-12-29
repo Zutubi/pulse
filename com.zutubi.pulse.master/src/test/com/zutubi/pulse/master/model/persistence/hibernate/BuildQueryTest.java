@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.UnknownBuildReason;
@@ -116,56 +117,56 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     public void testQueryAll()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, null, -1, -1, true);
-        assertEquals(allResults, results);
+        EqualityAssertions.assertEquals(allResults, results);
     }
 
     public void testAllOldestFirst()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, null, -1, -1, false);
-        assertEquals(getReversed(), results);
+        EqualityAssertions.assertEquals(getReversed(), results);
     }
 
     public void testProjectP1()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1 }, null, 0, 0, null, -1, -1, true);
-        assertEquals(getFiltered(p1), results);
+        EqualityAssertions.assertEquals(getFiltered(p1), results);
     }
 
     public void testProjectBoth()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(new Project[]{ p1, p2 }, null, 0, 0, null, -1, -1, true);
-        assertEquals(allResults, results);
+        EqualityAssertions.assertEquals(allResults, results);
     }
 
     public void testSuccessful()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, new ResultState[] { ResultState.SUCCESS } , 0, 0, null, -1, -1, true);
-        assertEquals(getFiltered(ResultState.SUCCESS), results);
+        EqualityAssertions.assertEquals(getFiltered(ResultState.SUCCESS), results);
     }
 
     public void testErrorOrFail()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, ResultState.getBrokenStates() , 0, 0, null, -1, -1, true);
-        assertEquals(getFiltered(ResultState.getBrokenStates()), results);
+        EqualityAssertions.assertEquals(getFiltered(ResultState.getBrokenStates()), results);
     }
 
     public void testEarliestTime()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, null, 15000, 0, null, -1, -1, true);
-        assertEquals(getFiltered(15000, 0), results);
+        EqualityAssertions.assertEquals(getFiltered(15000, 0), results);
     }
 
     public void testLatestTime()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 15000, null, -1, -1, true);
-        assertEquals(getFiltered(0, 15000), results);
+        EqualityAssertions.assertEquals(getFiltered(0, 15000), results);
     }
 
     public void testEarliestAndLatestTime()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, null, 15000, 15000, null, -1, -1, true);
         assertEquals(1, results.size());
-        assertEquals(getFiltered(15000, 15000), results);
+        EqualityAssertions.assertEquals(getFiltered(15000, 15000), results);
     }
 
     public void testEarliestTimeBeyond()
@@ -183,19 +184,19 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     public void testHasWorkDir()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, true, -1, -1, true);
-        assertEquals(getFiltered(true), results);
+        EqualityAssertions.assertEquals(getFiltered(true), results);
     }
 
     public void testHasNoWorkDir()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, false, -1, -1, true);
-        assertEquals(getFiltered(false), results);
+        EqualityAssertions.assertEquals(getFiltered(false), results);
     }
 
     public void testPage()
     {
         List<BuildResult> results = buildResultDao.queryBuilds(null, null, 0, 0, null, 2, 5, true);
-        assertEquals(getPaged(2, 5), results);
+        EqualityAssertions.assertEquals(getPaged(2, 5), results);
     }
 
     private List<BuildResult> getFiltered(final Project project)

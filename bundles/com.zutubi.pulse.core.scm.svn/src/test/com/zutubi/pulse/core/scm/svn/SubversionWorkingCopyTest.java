@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.core.util.process.ProcessControl;
 import com.zutubi.util.FileSystemUtils;
@@ -89,7 +90,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
 
         // Start svn server
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnserve", "--foreground", "-dr", "."}, null, repoDir);
-        waitForServer(3690);
+        TestUtils.waitForServer(3690);
 
         clientManager = SVNClientManager.newInstance();
         createWC();

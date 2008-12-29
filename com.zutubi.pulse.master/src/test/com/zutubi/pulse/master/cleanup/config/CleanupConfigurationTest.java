@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.cleanup.config;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.TriggerBuildReason;
@@ -67,42 +67,42 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     {
         CleanupConfiguration workBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_DIRECTORIES_ONLY, null, 2, CleanupUnit.BUILDS);
         List<BuildResult> results = workBuildsRule.getMatchingResults(p1, buildResultDao);
-        PulseTestCase.assertEquals(Arrays.asList(b3), results);
+        EqualityAssertions.assertEquals(Arrays.asList(b3), results);
     }
 
     public void testAllAfterBuilds()
     {
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, null, 2, CleanupUnit.BUILDS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
-        PulseTestCase.assertEquals(Arrays.asList(b1, b2, b3), results);
+        EqualityAssertions.assertEquals(Arrays.asList(b1, b2, b3), results);
     }
 
     public void testWorkAfterDays()
     {
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_DIRECTORIES_ONLY, null, 2, CleanupUnit.DAYS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
-        PulseTestCase.assertEquals(Arrays.asList(b3, b4), results);
+        EqualityAssertions.assertEquals(Arrays.asList(b3, b4), results);
     }
 
     public void testAllAfterDays()
     {
         CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, null, 2, CleanupUnit.DAYS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao);
-        PulseTestCase.assertEquals(Arrays.asList(b1, b2, b3, b4), results);
+        EqualityAssertions.assertEquals(Arrays.asList(b1, b2, b3, b4), results);
     }
 
     public void testStatesBuilds()
     {
         CleanupConfiguration rule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.BUILDS);
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
-        PulseTestCase.assertEquals(Arrays.asList(b1, b3), results);
+        EqualityAssertions.assertEquals(Arrays.asList(b1, b3), results);
     }
 
     public void testStatesDays()
     {
         CleanupConfiguration rule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao);
-        PulseTestCase.assertEquals(Arrays.asList(b1, b3, b4), results);
+        EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);
     }
 
     private BuildResult createBuild(Project project, long number, long startTime, ResultState state, boolean hasWorkDir)

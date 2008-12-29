@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.plugins;
 
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginManagerTest;
 import com.zutubi.pulse.core.plugins.PluginPaths;
@@ -36,7 +37,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         // base directory will be cleaned up at the end of the test.
         tmpDir = FileSystemUtils.createTempDir(PluginManagerTest.class.getName(), "");
 
-        File pkgFile = getPulsePackage();
+        File pkgFile = AcceptanceTestUtils.getPulsePackage();
 
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         paths = pluginSystem.getPluginPaths();

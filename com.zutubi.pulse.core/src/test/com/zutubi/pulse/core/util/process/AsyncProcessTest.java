@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.util.process;
 
+import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
@@ -41,8 +42,8 @@ public class AsyncProcessTest extends PulseTestCase
             BufferingLineHandler lineHandler = new BufferingLineHandler();
             AsyncProcess ap = new AsyncProcess(p, lineHandler, true);
             ap.waitForSuccess();
-            assertListEquals(lineHandler.getStdout(), "line 1", "line 2", "line 3");
-            assertListEquals(lineHandler.getStderr());
+            EqualityAssertions.assertListEquals(lineHandler.getStdout(), "line 1", "line 2", "line 3");
+            EqualityAssertions.assertListEquals(lineHandler.getStderr());
         }
     }
 
@@ -54,8 +55,8 @@ public class AsyncProcessTest extends PulseTestCase
             BufferingLineHandler lineHandler = new BufferingLineHandler();
             AsyncProcess ap = new AsyncProcess(p, lineHandler, true);
             ap.waitForSuccess();
-            assertListEquals(lineHandler.getStdout());
-            assertListEquals(lineHandler.getStderr(), "line 1", "line 2", "line 3");
+            EqualityAssertions.assertListEquals(lineHandler.getStdout());
+            EqualityAssertions.assertListEquals(lineHandler.getStderr(), "line 1", "line 2", "line 3");
         }
     }
 
@@ -92,7 +93,7 @@ public class AsyncProcessTest extends PulseTestCase
             BufferingLineHandler lineHandler = new BufferingLineHandler();
             AsyncProcess ap = new AsyncProcess(p, lineHandler, true);
             ap.waitForSuccess();
-            assertListEquals(lineHandler.getStdout(), genArray(1000));
+            EqualityAssertions.assertListEquals(lineHandler.getStdout(), genArray(1000));
         }
     }
 
@@ -104,8 +105,8 @@ public class AsyncProcessTest extends PulseTestCase
             BufferingLineHandler lineHandler = new BufferingLineHandler();
             AsyncProcess ap = new AsyncProcess(p, lineHandler, true);
             ap.waitForSuccess();
-            assertListEquals(lineHandler.getStdout(), multiplyArray(genArray(1000), 4));
-            assertListEquals(lineHandler.getStderr(), multiplyArray(genArray(1000), 4));
+            EqualityAssertions.assertListEquals(lineHandler.getStdout(), multiplyArray(genArray(1000), 4));
+            EqualityAssertions.assertListEquals(lineHandler.getStderr(), multiplyArray(genArray(1000), 4));
         }
     }
 

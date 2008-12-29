@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.util;
 
+import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
@@ -378,7 +379,7 @@ public class ZipUtilsTest extends PulseTestCase
             {
                 createAndExtract("top");
                 assertTrue(symlink.delete());
-                assertDirectoriesEqual(inDir, unzipDir);
+                IOAssertions.assertDirectoriesEqual(inDir, unzipDir);
             }
         }
     }
@@ -398,7 +399,7 @@ public class ZipUtilsTest extends PulseTestCase
             {
                 createAndExtract("top");
                 assertTrue(symlink.delete());
-                assertDirectoriesEqual(inDir, unzipDir);
+                IOAssertions.assertDirectoriesEqual(inDir, unzipDir);
             }
         }
     }
@@ -574,7 +575,7 @@ public class ZipUtilsTest extends PulseTestCase
     {
         ZipUtils.createZip(getZipName(), inDir, null);
         ZipUtils.extractZip(getZipName(), unzipDir);
-        assertDirectoriesEqual(inDir, unzipDir);
+        IOAssertions.assertDirectoriesEqual(inDir, unzipDir);
     }
 
     private void createAndExtract(Boolean externalZip, Boolean externalUnzip) throws IOException
@@ -610,7 +611,7 @@ public class ZipUtilsTest extends PulseTestCase
     private void createExtractAndVerify(Boolean externalZip, Boolean externalUnzip) throws IOException
     {
         createAndExtract(externalZip, externalUnzip);
-        assertDirectoriesEqual(inDir, unzipDir);
+        IOAssertions.assertDirectoriesEqual(inDir, unzipDir);
     }
 
     private void createAndExtract(String path) throws IOException
@@ -633,7 +634,7 @@ public class ZipUtilsTest extends PulseTestCase
     private void createExtractAndVerify(String path) throws IOException
     {
         createAndExtract(path);
-        assertDirectoriesEqual(inDir, unzipDir);
+        IOAssertions.assertDirectoriesEqual(inDir, unzipDir);
     }
 
     private void extractTestZipToTmp() throws IOException

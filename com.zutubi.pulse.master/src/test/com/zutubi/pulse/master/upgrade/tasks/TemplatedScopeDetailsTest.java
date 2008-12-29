@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.core.api.PulseRuntimeException;
+import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.record.*;
@@ -227,7 +228,7 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
         });
 
         Collections.sort(gotChildIds, new Sort.StringComparator());
-        assertListEquals(gotChildIds, expectedChildIds);
+        EqualityAssertions.assertListEquals(gotChildIds, expectedChildIds);
     }
 
 }

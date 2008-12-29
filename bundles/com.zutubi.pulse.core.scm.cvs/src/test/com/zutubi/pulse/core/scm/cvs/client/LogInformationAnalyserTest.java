@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.StringAssertions;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -343,7 +344,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
 
     private static void assertChangeValues(FileChange change, String file, FileChange.Action action, String revision)
     {
-        assertEndsWith(file, change.getPath());
+        StringAssertions.assertEndsWith(file, change.getPath());
         assertEquals(action, change.getAction());
         assertEquals(revision, change.getRevision().getRevisionString());
     }

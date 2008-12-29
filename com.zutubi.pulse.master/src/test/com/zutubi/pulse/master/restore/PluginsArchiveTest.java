@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.core.plugins.PluginPaths;
+import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import static org.mockito.Mockito.mock;
@@ -53,6 +54,6 @@ public class PluginsArchiveTest extends PulseTestCase
         stub(paths.getPluginStorageDir()).toReturn(newPluginBase);
         archiver.restore(archiveDir);
 
-        assertDirectoriesEqual(pluginBase, newPluginBase);
+        IOAssertions.assertDirectoriesEqual(pluginBase, newPluginBase);
     }
 }

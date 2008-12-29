@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.plugins;
 
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.core.PulseFile;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
@@ -29,7 +30,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         // base directory will be cleaned up at the end of the test.
         tmpDir = FileSystemUtils.createTempDir();
 
-        File pkgFile = getPulsePackage();
+        File pkgFile = AcceptanceTestUtils.getPulsePackage();
         if (!pkgFile.exists())
         {
             fail("Pulse package file '" + pkgFile.getAbsolutePath() + "'does not exist.");

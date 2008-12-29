@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
@@ -268,7 +269,7 @@ public class CommandGroupTest extends CommandTestBase
         String commandDirName = String.format("00000000-%s", result.getCommandName());
         File destDir = new File(outputDir, FileSystemUtils.composeFilename(commandDirName, storedArtifact.getName()));
         assertTrue(destDir.isDirectory());
-        assertDirectoriesEqual(base, destDir);
+        IOAssertions.assertDirectoriesEqual(base, destDir);
     }
 
     private void checkAllButFoo(CommandResult result) throws IOException

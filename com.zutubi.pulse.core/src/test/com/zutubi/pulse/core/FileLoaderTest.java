@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.test.StringAssertions;
 
 public class FileLoaderTest extends FileLoaderTestBase
 {
@@ -105,7 +106,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
         catch (PulseException e)
         {
-            assertMatches("Processing element 'macro-ref': starting at line 9 column (9|10): While expanding macro defined at line 4 column (5|6): Processing element 'no-such-type': starting at line 5 column (9|10): Undefined type 'no-such-type'", e.getMessage());
+            StringAssertions.assertMatches("Processing element 'macro-ref': starting at line 9 column (9|10): While expanding macro defined at line 4 column (5|6): Processing element 'no-such-type': starting at line 5 column (9|10): Undefined type 'no-such-type'", e.getMessage());
         }
     }
 
@@ -154,7 +155,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
         catch (ParseException e)
         {
-            assertMatches("Processing element 'validateable': starting at line 4 column [56]: error\n", e.getMessage());
+            StringAssertions.assertMatches("Processing element 'validateable': starting at line 4 column [56]: error\n", e.getMessage());
         }
     }
 

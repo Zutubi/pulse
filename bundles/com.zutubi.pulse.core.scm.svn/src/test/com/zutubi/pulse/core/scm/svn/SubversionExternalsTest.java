@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.svn;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -127,7 +128,7 @@ public class SubversionExternalsTest extends PulseTestCase
 
         // Start svn server
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnserve", "--foreground", "-dr", "."}, null, repoDir);
-        waitForServer(3690);
+        TestUtils.waitForServer(3690);
 
         server = new SubversionClient("svn://localhost/bundle/trunk");
     }

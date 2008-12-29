@@ -137,7 +137,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         // unpack and start master
         // master-port
         // tmp/master-data
-        File pulsePackage = getPulsePackage();
+        File pulsePackage = AcceptanceTestUtils.getPulsePackage();
         PulsePackage masterPackage = packageFactory.createPackage(pulsePackage);
         master = masterPackage.extractTo(new File(tmp, "master").getCanonicalPath());
         master.setUserHome(new File(tmp, "user-home").getCanonicalPath());

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
 
@@ -31,11 +32,11 @@ public class PerforceWorkspaceTest extends PulseTestCase
         PerforceWorkspace workspace = parseHelper();
         assertEquals("my-client", workspace.getName());
         assertEquals("caeser", workspace.getHost());
-        assertEquals(Arrays.asList("Created by p4.", "Munted by Jason."), workspace.getDescription());
+        EqualityAssertions.assertEquals(Arrays.asList("Created by p4.", "Munted by Jason."), workspace.getDescription());
         assertEquals("c:\\my\\root path\\has\\a\\space", workspace.getRoot());
-        assertEquals(new HashSet<String>(Arrays.asList("noallwrite", "noclobber", "nocompress", "unlocked", "nomodtime", "normdir")), workspace.getOptions());
-        assertEquals(Arrays.asList("//spec/... //caeser/spec/...", "//depot/... //caeser/depot/..."), workspace.getView());
-        assertEquals(Arrays.asList("local"), workspace.getUnrecognised().get("LineEnd"));
+        EqualityAssertions.assertEquals(new HashSet<String>(Arrays.asList("noallwrite", "noclobber", "nocompress", "unlocked", "nomodtime", "normdir")), workspace.getOptions());
+        EqualityAssertions.assertEquals(Arrays.asList("//spec/... //caeser/spec/...", "//depot/... //caeser/depot/..."), workspace.getView());
+        EqualityAssertions.assertEquals(Arrays.asList("local"), workspace.getUnrecognised().get("LineEnd"));
     }
 
     public void testRename()
@@ -45,7 +46,7 @@ public class PerforceWorkspaceTest extends PulseTestCase
         PerforceWorkspace workspace = new PerforceWorkspace("name", "root", Arrays.asList("//depot/... //name/..."));
         workspace.rename(NEW_NAME);
         assertEquals(NEW_NAME, workspace.getName());
-        assertEquals(Arrays.asList("//depot/... //" + NEW_NAME + "/..."), workspace.getView());
+        EqualityAssertions.assertEquals(Arrays.asList("//depot/... //" + NEW_NAME + "/..."), workspace.getView());
     }
 
     private String loadSpecification()  throws IOException

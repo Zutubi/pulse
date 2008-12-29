@@ -1,11 +1,12 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.test.EqualityAssertions;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 
@@ -123,7 +124,7 @@ public class PulseScopeTest extends PulseTestCase
 
         Collection<Reference> references = child.getReferences();
         assertEquals(3, references.size());
-        assertEquals(Arrays.asList("parent", "child", "both"), CollectionUtils.map(references, new Mapping<Reference, String>()
+        EqualityAssertions.assertEquals(Arrays.asList("parent", "child", "both"), CollectionUtils.map(references, new Mapping<Reference, String>()
         {
             public String map(Reference reference)
             {

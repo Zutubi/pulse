@@ -3,7 +3,9 @@ package com.zutubi.pulse.core.scm.svn;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -107,7 +109,7 @@ public class SubversionClientTest extends PulseTestCase
         ZipUtils.extractZip(dataFile, repoDir);
         serverProcess = Runtime.getRuntime().exec("svnserve --foreground -dr .", null, repoDir);
 
-        waitForServer(3690);
+        TestUtils.waitForServer(3690);
 
         client = new SubversionClient("svn://localhost/test/trunk", USER, PASSWORD);
     }
@@ -357,7 +359,7 @@ public class SubversionClientTest extends PulseTestCase
             removeDirectory(expectedTestDir);
         }
         ZipUtils.extractZip(dataFile, expectedDir);
-        assertDirectoriesEqual(new File(expectedTestDir, "trunk"), dir);
+        IOAssertions.assertDirectoriesEqual(new File(expectedTestDir, "trunk"), dir);
     }
 
     private List<ScmFile> getSortedListing(SubversionClient confirmServer)

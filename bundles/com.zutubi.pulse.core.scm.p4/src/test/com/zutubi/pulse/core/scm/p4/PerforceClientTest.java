@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.FLAG_CLIENT;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
+import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -551,7 +552,7 @@ public class PerforceClientTest extends PerforceTestBase
 
     private void checkDirectory(String name) throws IOException
     {
-        assertDirectoriesEqual(new File(getDataRoot(), name), workDir);
+        IOAssertions.assertDirectoriesEqual(new File(getDataRoot(), name), workDir);
     }
 
     private File getDataRoot()

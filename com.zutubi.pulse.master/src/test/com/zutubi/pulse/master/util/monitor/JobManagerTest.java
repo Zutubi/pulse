@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.TestUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -73,7 +74,7 @@ public class JobManagerTest extends PulseTestCase
         NeverEndingJob job = new NeverEndingJob();
         jobManager.register("test", job);
 
-        Thread thread = executeOnSeparateThread(new Runnable()
+        Thread thread = TestUtils.executeOnSeparateThread(new Runnable()
         {
             public void run()
             {

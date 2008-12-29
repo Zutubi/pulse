@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.util.Constants;
 
 public class JobRunnerTest extends PulseTestCase
@@ -101,13 +102,13 @@ public class JobRunnerTest extends PulseTestCase
     {
         final boolean[] success = new boolean[]{false};
         
-        executeOnSeparateThreadAndWait(new Runnable()
+        TestUtils.executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
                 final RemoteControlTask task = new RemoteControlTask();
 
-                executeOnSeparateThread(new Runnable()
+                TestUtils.executeOnSeparateThread(new Runnable()
                 {
                     public void run()
                     {

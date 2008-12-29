@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 
@@ -50,7 +51,7 @@ public abstract class PerforceTestBase extends PulseTestCase
         p4dProcess.waitFor();
 
         p4dProcess = Runtime.getRuntime().exec(new String[] {COMMAND_P4D, FLAG_ROOT_DIRECTORY, repoDir.getAbsolutePath(), FLAG_PORT,  Integer.toString(P4D_PORT)});
-        waitForServer(P4D_PORT);
+        TestUtils.waitForServer(P4D_PORT);
     }
 
     @Override
