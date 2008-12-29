@@ -111,6 +111,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
         p4Config.put("user", P4USER);
         p4Config.put("password", P4PASSWD);
         p4Config.put("spec", P4CLIENT);
+        p4Config.put("monitor", false);
         return p4Config;
     }
 }
