@@ -28,6 +28,11 @@ public class Constants
      * appear.
      */
     public static final String WAIT_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "waitant";
+    /**
+     * Subversion URL for an ant project that will fail with an unknown default target exception.
+     * The ant file has no targets.
+     */
+    public static final String FAIL_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "failant";
 
     /**
      * The constants for the property names in the ProjectConfiguration class.
