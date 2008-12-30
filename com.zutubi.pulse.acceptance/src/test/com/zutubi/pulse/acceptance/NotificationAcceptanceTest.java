@@ -21,10 +21,10 @@ import java.util.*;
 
 /**
  * Sanity acceptance tests for notifications.
- *
+ * <p/>
  * The tested notifications use emails since they are easily captured.
- *
- * The more details specifics of each type of notification and more complex conditions
+ * <p/>
+ * The specifics of each type of notification and more complex conditions
  * are tested at the unit level.
  */
 public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
@@ -40,6 +40,15 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private SimpleSmtpServer server;
     private String random;
+
+    private static final String BUILDS_ALL = "A";
+    private static final String BUILDS_SUCCESSFUL = "B";
+    private static final String BUILDS_FAILED = "C";
+    private static final String BUILDS_PROJECT_SUCCESS = "D";
+    private static final String BUILDS_PROJECT_FAIL = "E";
+
+    private static final String PROJECT_SUCCESS = "S";
+    private static final String PROJECT_FAIL = "F";
 
     protected void setUp() throws Exception
     {
@@ -69,19 +78,13 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.saveConfig("settings/email", emailSettings, false);
     }
 
-    /**
-     * Simple sanity check to ensure that an email notification is generated
-     * correctly on a successful build.
-     *
-     * @throws Exception on error
-     */
     public void testEmailNotification() throws Exception
     {
         setupData();
 
-        triggerAndCheckProjectA();
+        triggerAndCheckSuccessfulBuild();
         clearSmtpServer();
-        triggerAndCheckProjectB();
+        triggerAndCheckFailedBuild();
     }
 
     private void clearSmtpServer()
@@ -90,24 +93,22 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         server = SimpleSmtpServer.start();
     }
 
-    private void triggerAndCheckProjectA() throws Exception
+    private void triggerAndCheckSuccessfulBuild() throws Exception
     {
-        // trigger and wait for build of project a.
-        String projectA = random + "projectA";
-        xmlRpcHelper.triggerBuild(projectA);
-        xmlRpcHelper.waitForBuildToComplete(projectA, 1, TIMEOUT);
-
-        assertEmailsFrom("userA", "userB", "userD");
+        String projectName = random + "project" + PROJECT_SUCCESS;
+        int buildNumber = xmlRpcHelper.runBuild(projectName, TIMEOUT);
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
+        assertEquals("success", build.get("status"));
+        assertEmailsFrom(BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_PROJECT_SUCCESS);
     }
 
-    private void triggerAndCheckProjectB() throws Exception
+    private void triggerAndCheckFailedBuild() throws Exception
     {
-        // trigger and wait for build of project a.
-        String projectB = random + "projectB";
-        xmlRpcHelper.triggerBuild(projectB);
-        xmlRpcHelper.waitForBuildToComplete(projectB, 1, TIMEOUT);
-
-        assertEmailsFrom("userA", "userC", "userE");
+        String projectName = random + "project" + PROJECT_FAIL;
+        int buildNumber = xmlRpcHelper.runBuild(projectName, TIMEOUT);
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
+        assertEquals("failure", build.get("status"));
+        assertEmailsFrom(BUILDS_ALL, BUILDS_FAILED, BUILDS_PROJECT_FAIL);
     }
 
     private void assertEmailsFrom(final String... recipients)
@@ -119,7 +120,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
             {
                 return server.getReceivedEmailSize() == recipients.length;
             }
-        }, TIMEOUT, "Expected "+recipients.length+" emails.");
+        }, TIMEOUT, "Expected " + recipients.length + " emails.");
 
         assertEquals(recipients.length, server.getReceivedEmailSize());
         Set<String> emailRecipients = new HashSet<String>();
@@ -130,9 +131,9 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
             emailRecipients.add(email.getHeaderValue("To"));
         }
 
-        for (String recipient : recipients)
+        for (String nameSuffix : recipients)
         {
-            assertTrue(emailRecipients.contains(random + recipient + EMAIL_DOMAIN));
+            assertTrue(emailRecipients.contains(random + "user" + nameSuffix + EMAIL_DOMAIN));
         }
     }
 
@@ -141,43 +142,41 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // Firstly, remove all existing subscriptions as we do not want them to interfer / slow things down.
         xmlRpcHelper.deleteAllConfigs("users/*/preferences/subscriptions/*");
 
-        // user a, all builds, all projects, can view all.
-        createUser(random + "userA", CONDITION_ALL_BUILDS);
-        createGroup(random + "groupA", random + "userA");
+        // all builds, all projects, can view all.
+        createUserAndGroup(BUILDS_ALL, CONDITION_ALL_BUILDS);
 
-        // user b, successful builds, all projects, can view all.
-        createUser(random + "userB", CONDITION_SUCCESSFUL_BUILDS);
-        createGroup(random + "groupB", random + "userB");
+        // successful builds, all projects, can view all.
+        createUserAndGroup(BUILDS_SUCCESSFUL, CONDITION_SUCCESSFUL_BUILDS);
 
-        // user c, failed builds, all projects, can view all.
-        createUser(random + "userC", CONDITION_FAILED_BUILDS);
-        createGroup(random + "groupC", random + "userC");
+        // failed builds, all projects, can view all.
+        createUserAndGroup(BUILDS_FAILED, CONDITION_FAILED_BUILDS);
 
-        // user d, all builds, all projects, can view project a.
-        createUser(random + "userD", CONDITION_ALL_BUILDS);
-        createGroup(random + "groupD", random + "userD");
+        // all builds, all projects, can view project a.
+        createUserAndGroup(BUILDS_PROJECT_SUCCESS, CONDITION_ALL_BUILDS);
 
-        // user e, all builds, all projects, can view project b.
-        createUser(random + "userE", CONDITION_ALL_BUILDS);
-        createGroup(random + "groupE", random + "userE");
+        // all builds, all projects, can view project b.
+        createUserAndGroup(BUILDS_PROJECT_FAIL, CONDITION_ALL_BUILDS);
 
-        // project a succeeds.
-        createProject(true, random + "projectA", random + "groupA", random + "groupB", random + "groupC", random + "groupD");
-        // project b fails.
-        createProject(false, random + "projectB", random + "groupA", random + "groupB", random + "groupC", random + "groupE");
+        createProject(true, PROJECT_SUCCESS, BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_FAILED, BUILDS_PROJECT_SUCCESS);
+        createProject(false, PROJECT_FAIL, BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_FAILED, BUILDS_PROJECT_FAIL);
+    }
+
+    void createUserAndGroup(String nameSuffix, int condition) throws Exception
+    {
+        createUser(random + "user" + nameSuffix, condition);
+        createGroup(random + "group" + nameSuffix, random + "user" + nameSuffix);
     }
 
     private void createUser(String name, int condition) throws Exception
     {
         String userPath = xmlRpcHelper.insertTrivialUser(name);
-        
+
         // create email contact point.
         Hashtable<String, Object> contactPoint = xmlRpcHelper.createDefaultConfig(EmailContactConfiguration.class);
         contactPoint.put("name", "email");
         contactPoint.put("address", name + EMAIL_DOMAIN);
         xmlRpcHelper.insertConfig(userPath + "/preferences/contacts", contactPoint);
 
-        // create all projects all builds subscription for email contact point.
         Hashtable<String, Object> projectSubscription = xmlRpcHelper.createDefaultConfig(ProjectSubscriptionConfiguration.class);
         projectSubscription.put("name", "all projects");
         projectSubscription.put("projects", new Vector());
@@ -200,7 +199,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
                 projectSubscription.put("condition", failedCondition);
                 break;
         }
-        
+
         xmlRpcHelper.insertConfig(userPath + "/preferences/subscriptions", projectSubscription);
     }
 
@@ -215,8 +214,9 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }));
     }
 
-    private void createProject(boolean successful, String name, String... viewableBy) throws Exception
+    private void createProject(boolean successful, String nameSuffix, String... viewableBy) throws Exception
     {
+        String name = random + "project" + nameSuffix;
         if (successful)
         {
             xmlRpcHelper.insertSimpleProject(name, false);
@@ -234,12 +234,12 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
             assertTrue(xmlRpcHelper.deleteConfig(permissionsPath + "/" + path));
         }
 
-        for (String groupName : viewableBy)
+        for (String groupNameSuffix : viewableBy)
         {
             Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
-            acl.put("group", "groups/" + groupName);
+            acl.put("group", "groups/"+random + "group" + groupNameSuffix);
             acl.put("allowedActions", new Vector(Arrays.asList(AccessManager.ACTION_VIEW)));
-            xmlRpcHelper.insertConfig("projects/"+name+"/permissions", acl);
+            xmlRpcHelper.insertConfig("projects/" + name + "/permissions", acl);
         }
     }
 
