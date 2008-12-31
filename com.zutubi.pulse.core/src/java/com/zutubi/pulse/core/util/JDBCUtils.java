@@ -233,7 +233,15 @@ public class JDBCUtils
 
         // 4) execute the sql.
         String[] sql = statements.toArray(new String[statements.size()]);
-        JDBCUtils.executeSchemaScript(con, sql);
+        try
+        {
+            dialect.preDrop(con);
+            JDBCUtils.executeSchemaScript(con, sql);
+        }
+        finally
+        {
+            dialect.postDrop(con);
+        }
     }
 
 
@@ -554,13 +562,47 @@ public class JDBCUtils
         }
     }
 
+    /**
+     * The mini dialect is used to define the differences between the databases
+     * when dealing with dropping tables.
+     */
     private static interface MiniDialect
     {
+        /**
+         * This method is called prior to the sql drop table statements being executed.
+         * @param con connection on which the tables will be dropped.
+         * @throws SQLException on error.
+         */
+        public void preDrop(Connection con) throws SQLException;
+
+        /**
+         * Generate a drop table sql statement for the specified tablename
+         *
+         * @param tableName of the table being dropped.
+         * @return the sql statement that will drop the named table.
+         */
         public String sqlDropTable(String tableName);
+
+        /**
+         * This method is called after all the sql drop table statements have been executed.
+         * @param con connetion on which the tables are dropped.
+         * @throws SQLException on error
+         */
+        public void postDrop(Connection con) throws SQLException;
     }
 
     private static class HSQLMiniDialect implements MiniDialect
     {
+        public void preDrop(Connection con)
+        {
+
+        }
+
+        public void postDrop(Connection con)
+        {
+
+        }
+
         public String sqlDropTable(String tableName)
         {
             return "DROP TABLE " + tableName + " IF EXISTS CASCADE";
@@ -569,14 +611,34 @@ public class JDBCUtils
 
     private static class MySQLMiniDialect implements MiniDialect
     {
+        public void preDrop(Connection con) throws SQLException
+        {
+            JDBCUtils.execute(con, "SET FOREIGN_KEY_CHECKS=0");
+        }
+
         public String sqlDropTable(String tableName)
         {
-            return "DROP TABLE " + tableName + " IF EXISTS CASCADE";
+            return "DROP TABLE IF EXISTS " + tableName.toUpperCase() + " CASCADE";
+        }
+
+        public void postDrop(Connection con) throws SQLException
+        {
+            JDBCUtils.execute(con, "SET FOREIGN_KEY_CHECKS=1");
         }
     }
 
     private static class PostgresMiniDialect implements MiniDialect
     {
+        public void preDrop(Connection con)
+        {
+
+        }
+
+        public void postDrop(Connection con)
+        {
+
+        }
+
         public String sqlDropTable(String tableName)
         {
             return "DROP TABLE " + tableName + " CASCADE";
