@@ -6,7 +6,6 @@ import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
@@ -32,14 +31,15 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     private static final String HOOKS_BASENAME = "buildHooks";
     private static final String HOOKS_PATH   = PathUtils.getPath(PROJECT_PATH, HOOKS_BASENAME);
 
-    private static final File DUMPENV_JAR = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.acceptance", "src", "test", "misc", "dumpenv.jar"));
-
     private File tempDir;
+    private File dumpEnv;
 
     protected void setUp() throws Exception
     {
         super.setUp();
         tempDir = FileSystemUtils.createTempDir(BuildHookAcceptanceTest.class.getName(), "");
+        dumpEnv = copyInputToDirectory("dumpenv", "jar", tempDir);
+
         xmlRpcHelper.loginAsAdmin();
         xmlRpcHelper.ensureProject(PROJECT_NAME);
         xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(HOOKS_PATH, PathUtils.WILDCARD_ANY_ELEMENT));
@@ -334,7 +334,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     {
         ConfigurationForm taskForm = new ConfigurationForm(selenium, RunExecutableTaskConfiguration.class);
         taskForm.waitFor();
-        taskForm.finishFormElements("java", "-jar \"" + DUMPENV_JAR.getAbsolutePath().replace('\\', '/') + "\" " + arguments, tempDir.getAbsolutePath(), null, null);
+        taskForm.finishFormElements("java", "-jar \"" + dumpEnv.getAbsolutePath().replace('\\', '/') + "\" " + arguments, tempDir.getAbsolutePath(), null, null);
         return waitForHook(projectName);
     }
 

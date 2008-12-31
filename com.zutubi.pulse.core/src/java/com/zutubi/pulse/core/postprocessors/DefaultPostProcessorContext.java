@@ -12,8 +12,7 @@ import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 
 /**
  * Holds contextual information for the post processing of a single artifact
- * file.  Supports the addition of features to the result, with fail on error
- * and fail on warning handling built in.
+ * file.
  */
 public class DefaultPostProcessorContext implements PostProcessorContext
 {

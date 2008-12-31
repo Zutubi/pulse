@@ -2,13 +2,14 @@ package com.zutubi.pulse.acceptance;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
-import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
+import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -16,20 +17,18 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ExceptionWrappingRunnable;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.junit.ZutubiTestCase;
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
 
-import junit.framework.TestCase;
-import junit.framework.Assert;
-
 /**
  * Helper base class for web UI acceptance tests that use Selenium.
  */
-public class SeleniumTestBase extends ZutubiTestCase
+public class SeleniumTestBase extends PulseTestCase
 {
     /**
      * Shared agent used for simple single-agent builds.  Makes it easier to

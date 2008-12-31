@@ -18,7 +18,6 @@ import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -383,8 +382,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
 
     private CommandResult statusMappingHelper(int exitCode, int mappedCode, ResultState mappedStatus) throws Exception
     {
-        File jarFile = new File(baseDir, "exit.jar");
-        IOUtils.joinStreams(getInput("exit", "jar"), new FileOutputStream(jarFile), true);
+        File jarFile = copyInputToDirectory("exit", "jar", baseDir);
 
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("java");

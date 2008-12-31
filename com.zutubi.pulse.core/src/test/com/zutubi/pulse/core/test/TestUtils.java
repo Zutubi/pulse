@@ -48,6 +48,13 @@ public class TestUtils
         throw new RuntimeException("Unable to determine Pulse source root");
     }
 
+    /**
+     * Creates a new thread to execture the giving runnable, and starts the
+     * thread.
+     *
+     * @param r the runnable for the thread to execute
+     * @return the new thread
+     */
     public static Thread executeOnSeparateThread(final Runnable r)
     {
         Thread thread = new Thread(new Runnable()
@@ -61,6 +68,19 @@ public class TestUtils
         return thread;
     }
 
+    /**
+     * Runs the given runnable on a new thread and waits for the thread to
+     * complete.  If a test assertion fails in the thread the exception is
+     * propagated into the calling thread (so the calling test case will fail).
+     * If the timeout is non-negative, this method will wait for at most that
+     * timeout for the runnable to complete before giving up and returning.
+     *
+     * @param r       the runnable to execute
+     * @param timeout timeout to wait for the runnable to complete in
+     *                milliseconds -- non-positive means wait forever
+     * @throws AssertionFailedError if such an assertion is detected in the
+     *         launched thread
+     */
     public static void executeOnSeparateThreadAndWait(final Runnable r, long timeout)
     {
         try
@@ -81,7 +101,7 @@ public class TestUtils
                 }
             });
             thread.start();
-            if (timeout == -1)
+            if (timeout >= 0)
             {
                 thread.join();
             }
@@ -101,12 +121,32 @@ public class TestUtils
         }
     }
 
+    /**
+     * Equivalent to executeOnSeparateThreadAndWait(r, -1): executes the
+     * runnable on a new background thread and waits indefinitely for it to
+     * complete.
+     *
+     * @see #executeOnSeparateThreadAndWait(Runnable, long)
+     *
+     * @param r the runnable to execute
+     */
     public static void executeOnSeparateThreadAndWait(final Runnable r)
     {
         executeOnSeparateThreadAndWait(r, -1);
     }
 
-    public static void waitForServer(int port) throws IOException, InterruptedException
+    /**
+     * Waits for about a second for a TCP server to start listening on the
+     * given port on this host.  A successful socket connection will be deemed
+     * as indication that the server has started.
+     *
+     * @param port the port to wait for
+     *
+     * @throws InterruptedException if this thread is interrupted while
+     *         sleeping
+     * @throws RuntimeException if no server starts within about 1 second
+     */
+    public static void waitForServer(int port) throws InterruptedException
     {
         int retries = 0;
 

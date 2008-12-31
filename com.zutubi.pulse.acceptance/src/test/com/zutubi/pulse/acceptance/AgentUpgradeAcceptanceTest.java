@@ -13,7 +13,6 @@ import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
@@ -173,10 +172,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     {
         // get old agent package that we are upgrading from.
         // a) start with a predefined package, later move to a range of older packages that we can test from.
-        File oldAgentPackage = new File(tmp, "pulse-agent-2.0.0.zip");
-        IOUtils.joinStreams(getInput("pulse-agent-2.0.0", "zip"), new FileOutputStream(oldAgentPackage), true);
-
-        // ensure that the two packages exist.
+        File oldAgentPackage = copyInputToDirectory("pulse-agent-2.0.0", "zip", tmp);
 
         // unpack and start old agent.
         // agent-port

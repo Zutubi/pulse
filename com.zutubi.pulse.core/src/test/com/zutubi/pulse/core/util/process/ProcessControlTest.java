@@ -2,11 +2,9 @@ package com.zutubi.pulse.core.util.process;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.FileOutputStream;
 
 
 public class ProcessControlTest extends PulseTestCase
@@ -30,8 +28,7 @@ public class ProcessControlTest extends PulseTestCase
         System.setProperty(ProcessControl.NATIVE_PROCESS_KILL, "true");
         if(ProcessControl.init())
         {
-            File buildFile = new File(tempDir, "build.xml");
-            IOUtils.joinStreams(getInput("xml"), new FileOutputStream(buildFile), true);
+            File buildFile = copyInputToDirectory("xml", tempDir);
             ProcessBuilder processBuilder = new ProcessBuilder("ant.bat", "-f", buildFile.getAbsolutePath(), "doit");
             processBuilder.redirectErrorStream(true);
             final Process p = processBuilder.start();

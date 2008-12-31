@@ -1,15 +1,16 @@
 package com.zutubi.pulse.core.test;
 
+import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
-import com.zutubi.pulse.core.util.ZipUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -72,6 +73,7 @@ public abstract class PulseTestCase extends ZutubiTestCase
      * test name and given extension.  Equivalent to getInputFile(getName(), extension).
      *
      * @see #getInputFile(String, String)
+     * @see #copyInputToDirectory(String, String, java.io.File)
      *
      * @param extension the extension of the test data file
      * @return a file object pointed to the input data: note that as this file
@@ -91,14 +93,15 @@ public abstract class PulseTestCase extends ZutubiTestCase
      * the classpath with name &lt;simple classname&gt;.name.extension.
      *
      * @see #getInputURL(String, String)
+     * @see #copyInputToDirectory(String, String, java.io.File)
      *
      * @param name      the name of the test data file
      * @param extension the extension of the test data file
      * @return a file object pointed to the input data: note that as this file
      *         is from the classpath it may not always be possible to use it
-     *         directly
+     *         directly (instead consider {@link #copyInputToDirectory(String, String, java.io.File)}
      */
-    public  File getInputFile(String name, String extension)
+    public File getInputFile(String name, String extension)
     {
         try
         {
@@ -177,6 +180,43 @@ public abstract class PulseTestCase extends ZutubiTestCase
     public URL getInputURL(String name, String extension)
     {
         return getClass().getResource(getClass().getSimpleName() + "." + name + "." + extension);
+    }
+
+    /**
+     * Copies a test data file from its location on the classpath to a new file
+     * in the given directory.  Equivalent to copyInputToDirectory(getName(), extension, directory).
+     *
+     * @param extension the extension of the test data file
+     * @param directory directory to copy the data file to
+     * @return the new file that holds the test data (named after the data on
+     *         the classpath)
+     * @throws IOException if there is an error creating the file from the data
+     */
+    public File copyInputToDirectory(String extension, File directory) throws IOException
+    {
+        return copyInputToDirectory(getName(), extension, directory);
+    }
+
+    /**
+     * Copies a test data file from its location on the classpath to a new file
+     * in the given directory.  The data file is located on the classpath using
+     * {@link #getInput(String, String)}, then copied to a new file with the
+     * name name.extension in the given directory.
+     *
+     * @see #getInput(String, String)
+     *
+     * @param name      the name of the test data file
+     * @param extension the extension of the test data file
+     * @param directory directory to copy the data file to
+     * @return the new file that holds the test data (named after the data on
+     *         the classpath)
+     * @throws IOException if there is an error creating the file from the data
+     */
+    public File copyInputToDirectory(String name, String extension, File directory) throws IOException
+    {
+        File destinationFile = new File(directory, name + "." + extension);
+        IOUtils.joinStreams(getInput(name, extension), new FileOutputStream(destinationFile));
+        return destinationFile;
     }
 
     /**

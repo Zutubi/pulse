@@ -10,11 +10,9 @@ import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 
 public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 {
@@ -40,8 +38,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
             fail("Pulse package file '" + pkgFile.getAbsolutePath() + "'does not exist.");
         }
 
-        samplePostProcessorPlugin = new File(tmpDir, JAR_NAME + ".jar");
-        IOUtils.joinStreams(getInput(JAR_NAME, "jar"), new FileOutputStream(samplePostProcessorPlugin), true);
+        samplePostProcessorPlugin = copyInputToDirectory(JAR_NAME, "jar", tmpDir);
 
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         pluginSystem.startup();

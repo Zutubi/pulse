@@ -12,7 +12,15 @@ import java.util.Map;
  */
 public class EqualityAssertions
 {
-    protected static void assertObjectEquals(Object a, Object b)
+    /**
+     * Asserts two objects are equal, handling null and giving special
+     * consideration to common collection types (Maps, Lists, Collections and
+     * arrays).  Other objects are passed through to {@link Assert#assertEquals(String, Object, Object)}.
+     *
+     * @param a first object
+     * @param b second object
+     */
+    public static void assertObjectEquals(Object a, Object b)
     {
         assertObjectEquals(null, a, b);
     }
@@ -47,12 +55,12 @@ public class EqualityAssertions
         }
     }
 
-    protected static void assertEquals(Map a, Map b)
+    public static void assertEquals(Map a, Map b)
     {
         assertEquals(null, a, b);
     }
 
-    protected static void assertEquals(String msg, Map a, Map b)
+    public static void assertEquals(String msg, Map a, Map b)
     {
         if (msg == null)
         {
@@ -70,7 +78,7 @@ public class EqualityAssertions
         assertEquals(null, a, b);
     }
 
-    protected static void assertEquals(String msg, List a, List b)
+    public static void assertEquals(String msg, List a, List b)
     {
         Assert.assertEquals(msg, a.size(), b.size());
         for (int i = 0; i < a.size(); i++)
@@ -84,7 +92,7 @@ public class EqualityAssertions
         assertEquals(null, a, b);
     }
 
-    protected static void assertEquals(String msg, Collection a, Collection b)
+    public static void assertEquals(String msg, Collection a, Collection b)
     {
         Assert.assertEquals(msg, a.size(), b.size());
         for (Object aA : a)

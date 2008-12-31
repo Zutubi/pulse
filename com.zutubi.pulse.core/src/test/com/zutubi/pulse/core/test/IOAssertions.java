@@ -84,7 +84,7 @@ public class IOAssertions
      * @throws junit.framework.AssertionFailedError if the contents of the files differ
      * @throws java.io.IOException if there is an error reading the files
      */
-    protected static void assertFilesEqual(File file1, File file2) throws IOException
+    public static void assertFilesEqual(File file1, File file2) throws IOException
     {
         if (!file1.isFile())
         {
@@ -129,43 +129,6 @@ public class IOAssertions
         {
             IOUtils.close(rs1);
             IOUtils.close(rs2);
-        }
-    }
-
-    protected static void assertStreamsEqual(InputStream is1, InputStream is2) throws IOException
-    {
-        try
-        {
-            BufferedReader rs1 = new BufferedReader(new InputStreamReader(is1));
-            BufferedReader rs2 = new BufferedReader(new InputStreamReader(is2));
-            while (true)
-            {
-                String line1 = rs1.readLine();
-                String line2 = rs2.readLine();
-
-                if (line1 == null)
-                {
-                    if (line2 == null)
-                    {
-                        return;
-                    }
-                    throw new AssertionFailedError("Contents of stream 1 differ from contents of stream 2. ");
-                }
-                else
-                {
-                    if (line2 == null)
-                    {
-                        throw new AssertionFailedError("Contents of stream 1 differ from contents of stream 2. ");
-                    }
-                    Assert.assertEquals(line1, line2);
-                }
-            }
-        }
-        finally
-        {
-            // close the streams for convenience.
-            IOUtils.close(is1);
-            IOUtils.close(is2);
         }
     }
 }
