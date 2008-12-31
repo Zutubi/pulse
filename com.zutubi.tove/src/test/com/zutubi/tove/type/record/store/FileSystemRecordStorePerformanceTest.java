@@ -9,10 +9,6 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- *
- */
 public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
 {
     private RecordStore recordStore;
@@ -57,7 +53,7 @@ public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
             records.add(createSampleRecord(3, 5));
         }
 
-        failAfterXTime(1100, new Runnable()
+        failAfterXTime(2000, new Runnable()
         {
             public void run()
             {
@@ -79,7 +75,7 @@ public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
             records.add(createSampleRecord(3, 5));
         }
 
-        failAfterXTime(1100, new Runnable()
+        failAfterXTime(2000, new Runnable()
         {
             public void run()
             {
@@ -161,6 +157,4 @@ public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
             fail("Execution time of process has exceeded the allowed " + timeout + " milliseconds. Actual runtime: " + runtime);    
         }
     }
-
-
 }

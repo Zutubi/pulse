@@ -26,7 +26,7 @@ public class ExecutableCommandLoaderTest extends FileLoaderTestBase
     private List<ExecutableCommand.Arg> executableArgsHelper(int commandIndex) throws Exception
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("testExecutableArgs"), bf);
+        loader.load(getInput("testExecutableArgs", "xml"), bf);
 
         List<Recipe> recipes = bf.getRecipes();
         assertEquals(1, recipes.size());
@@ -91,7 +91,7 @@ public class ExecutableCommandLoaderTest extends FileLoaderTestBase
     public void testExecutableStatusMapping() throws PulseException
     {
         PulseFile pf = new PulseFile();
-        loader.load(getInput(getName()), pf);
+        loader.load(getInput(getName(), "xml"), pf);
 
         Recipe recipe = pf.getRecipe("wow");
         ExecutableCommand command = (ExecutableCommand) recipe.getCommand("test");

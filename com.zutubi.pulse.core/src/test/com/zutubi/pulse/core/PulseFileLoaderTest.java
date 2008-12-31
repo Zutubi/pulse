@@ -45,6 +45,6 @@ public class PulseFileLoaderTest extends FileLoaderTestBase
 
     private String getPulseFile(String name) throws IOException
     {
-        return IOUtils.inputStreamToString(getInput(name));
+        return IOUtils.inputStreamToString(getInput(name, "xml"));
     }
 }

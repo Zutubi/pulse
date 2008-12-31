@@ -31,13 +31,13 @@ public class FileLoaderSanityTest extends FileLoaderTestBase
         Property property = new Property("base.dir", "/whatever");
         scope.add(property);
 
-        loader.load(getInput("testSampleProject"), bf, scope, new FileResourceRepository(), null);
+        loader.load(getInput("testSampleProject", "xml"), bf, scope, new FileResourceRepository(), null);
     }
 
     public void testScope() throws Exception
     {
         PulseFile pf = new PulseFile();
-        loader.load(getInput("testScope"), pf);
+        loader.load(getInput("testScope", "xml"), pf);
 
         Recipe recipe = pf.getRecipe("r1");
         assertNotNull(recipe);
@@ -48,7 +48,7 @@ public class FileLoaderSanityTest extends FileLoaderTestBase
     public void testScoping() throws Exception
     {
         PulseFile pf = new PulseFile();
-        loader.load(getInput("testScoping"), pf);
+        loader.load(getInput("testScoping", "xml"), pf);
 
         Recipe recipe = pf.getRecipe("global");
         assertNotNull(recipe);
@@ -62,7 +62,7 @@ public class FileLoaderSanityTest extends FileLoaderTestBase
     public void testMacro() throws Exception
     {
         PulseFile pf = new PulseFile();
-        loader.load(getInput("testMacro"), pf);
+        loader.load(getInput("testMacro", "xml"), pf);
 
         Recipe recipe = pf.getRecipe("r1");
         assertNotNull(recipe);
@@ -87,7 +87,7 @@ public class FileLoaderSanityTest extends FileLoaderTestBase
         try
         {
             PulseFile bf = new PulseFile();
-            loader.load(getInput("testProcessNoProcessor"), bf);
+            loader.load(getInput("testProcessNoProcessor", "xml"), bf);
             fail();
         }
         catch (ParseException e)
@@ -99,7 +99,7 @@ public class FileLoaderSanityTest extends FileLoaderTestBase
     public void testSpecificRecipe() throws PulseException
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("testSpecificRecipe"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, "default"));
+        loader.load(getInput("testSpecificRecipe", "xml"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, "default"));
         assertEquals(2, bf.getRecipes().size());
         assertNotNull(bf.getRecipe("default"));
         assertNotNull(bf.getRecipe("default").getCommand("build"));
@@ -109,7 +109,7 @@ public class FileLoaderSanityTest extends FileLoaderTestBase
     public void testSpecificRecipeDefault() throws PulseException
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("testSpecificRecipe"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, null));
+        loader.load(getInput("testSpecificRecipe", "xml"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, null));
         assertEquals(2, bf.getRecipes().size());
         assertNotNull(bf.getRecipe("default"));
         assertNotNull(bf.getRecipe("default").getCommand("build"));

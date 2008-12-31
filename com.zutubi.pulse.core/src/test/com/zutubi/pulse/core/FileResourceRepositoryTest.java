@@ -27,7 +27,7 @@ public class FileResourceRepositoryTest extends PulseTestCase
 
     public void testEmptyRepo() throws Exception
     {
-        repo = ResourceFileLoader.load(getInput("testEmptyRepo"));
+        repo = ResourceFileLoader.load(getInput("testEmptyRepo", "xml"));
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(0, resources.size());
@@ -35,7 +35,7 @@ public class FileResourceRepositoryTest extends PulseTestCase
 
     public void testResource() throws Exception
     {
-        repo = ResourceFileLoader.load(getInput("testResource"));
+        repo = ResourceFileLoader.load(getInput("testResource", "xml"));
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(1, resources.size());
@@ -49,7 +49,7 @@ public class FileResourceRepositoryTest extends PulseTestCase
 
     public void testResourceWithVersion() throws Exception
     {
-        repo = ResourceFileLoader.load(getInput("testResourceWithVersion"));
+        repo = ResourceFileLoader.load(getInput("testResourceWithVersion", "xml"));
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(1, resources.size());
@@ -68,7 +68,7 @@ public class FileResourceRepositoryTest extends PulseTestCase
 
     public void testMultipleResources() throws Exception
     {
-        repo = ResourceFileLoader.load(getInput("testMultipleResources"));
+        repo = ResourceFileLoader.load(getInput("testMultipleResources", "xml"));
 
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);

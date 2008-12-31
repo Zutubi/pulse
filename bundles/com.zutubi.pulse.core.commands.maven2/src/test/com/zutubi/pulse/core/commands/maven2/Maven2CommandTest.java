@@ -9,12 +9,8 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.List;
 
-/**
- * <class-comment/>
- */
 public class Maven2CommandTest extends ExecutableCommandTestBase
 {
     public void testBasic() throws Exception
@@ -110,46 +106,12 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
         assertOutputContains(features.get(0).getSummary(), "Running com.zutubi.maven2.test.AppTest", "Tests run: 1, Failures: 1, Errors: 0,");
     }
 
-    private void prepareBaseDir(String name) throws Exception
+    private void prepareBaseDir(String name) throws IOException
     {
-        try
-        {
-            File sourceDir = getSource(name);
-            FileSystemUtils.rmdir(baseDir);
-            FileSystemUtils.copy(baseDir, sourceDir);
+        FileSystemUtils.rmdir(baseDir);
+        assertTrue(baseDir.mkdir());
 
-            // Remove the .in extension from all files
-            removeInExtension(baseDir);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    private void removeInExtension(File f)
-    {
-        if (f.isDirectory())
-        {
-            for (String name : f.list())
-            {
-                removeInExtension(new File(f, name));
-            }
-        }
-        else
-        {
-            if (f.getName().endsWith(".in"))
-            {
-                String path = f.getAbsolutePath();
-                FileSystemUtils.rename(f, new File(path.substring(0, path.length() - 3)));
-            }
-        }
-    }
-
-    private File getSource(String name) throws URISyntaxException
-    {
-        return getTestDataDir("bundles/com.zutubi.pulse.core.commands.maven2", getClass().getSimpleName() + "." + name);
+        unzipInput(name, baseDir);
     }
 
     protected File getCommandOutput(CommandResult commandResult) throws IOException

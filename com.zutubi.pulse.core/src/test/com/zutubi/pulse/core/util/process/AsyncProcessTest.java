@@ -6,12 +6,9 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-/**
- */
 public class AsyncProcessTest extends PulseTestCase
 {
     private File tempDir;
@@ -19,14 +16,7 @@ public class AsyncProcessTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         tempDir = FileSystemUtils.createTempDir(AsyncProcessTest.class.getName(), "");
-        File scriptsDir = getTestDataFile("com.zutubi.pulse.core", null, "scripts");
-        FileSystemUtils.copy(tempDir, scriptsDir.listFiles(new FileFilter()
-        {
-            public boolean accept(File pathname)
-            {
-                return pathname.isFile();
-            }
-        }));
+        unzipInput("scripts", tempDir);
     }
 
     protected void tearDown() throws Exception

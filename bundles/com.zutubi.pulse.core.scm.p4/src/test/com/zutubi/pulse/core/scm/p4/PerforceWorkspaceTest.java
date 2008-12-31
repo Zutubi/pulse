@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -51,8 +50,7 @@ public class PerforceWorkspaceTest extends PulseTestCase
 
     private String loadSpecification()  throws IOException
     {
-        File f = getTestDataFile("bundles/com.zutubi.pulse.core.scm.p4", getName(), "txt");
-        return IOUtils.fileToString(f);
+        return IOUtils.inputStreamToString(getInput(getName(), "txt"));
     }
 
     private PerforceWorkspace parseHelper() throws ScmException, IOException

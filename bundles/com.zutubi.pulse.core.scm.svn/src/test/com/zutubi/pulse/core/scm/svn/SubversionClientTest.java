@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNURL;
@@ -19,7 +18,6 @@ import java.util.List;
 
 public class SubversionClientTest extends PulseTestCase
 {
-    private static final String MODULE_PATH = "bundles/com.zutubi.pulse.core.scm.svn";
     private static final String USER = "jsankey";
     private static final String PASSWORD = "password";
 
@@ -92,7 +90,6 @@ public class SubversionClientTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        File dataFile = getTestDataFile(MODULE_PATH, "data", "zip");
         tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
         File repoDir = new File(tmpDir, "repo");
         repoDir.mkdirs();
@@ -106,7 +103,7 @@ public class SubversionClientTest extends PulseTestCase
         context = new PulseExecutionContext();
         context.setWorkingDir(gotDir);
 
-        ZipUtils.extractZip(dataFile, repoDir);
+        unzipInput("data", repoDir);
         serverProcess = Runtime.getRuntime().exec("svnserve --foreground -dr .", null, repoDir);
 
         TestUtils.waitForServer(3690);
@@ -352,13 +349,12 @@ public class SubversionClientTest extends PulseTestCase
 
     private void assertRevision(File dir, int revision) throws IOException
     {
-        File dataFile = getTestDataFile(MODULE_PATH, Integer.toString(revision), "zip");
         File expectedTestDir = new File(expectedDir, "test");
         if (expectedTestDir.isDirectory())
         {
             removeDirectory(expectedTestDir);
         }
-        ZipUtils.extractZip(dataFile, expectedDir);
+        unzipInput(Integer.toString(revision), expectedDir);
         IOAssertions.assertDirectoriesEqual(new File(expectedTestDir, "trunk"), dir);
     }
 

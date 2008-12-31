@@ -42,10 +42,9 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         paths = pluginSystem.getPluginPaths();
 
-        File bundleDir = new File(getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.core", "src", "test", "com", "zutubi", "pulse", "core", "plugins", "test-bundles"));
-        producer1 = new File(bundleDir, "com.zutubi.bundles.producer_1.0.0.jar");
-        producer2 = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar");
-        producer3 = new File(bundleDir, "com.zutubi.bundles.producer_3.0.0.jar");
+        producer1 = getInputFile("com.zutubi.bundles.producer_1.0.0", "jar");
+        producer2 = getInputFile("com.zutubi.bundles.producer_2.0.0", "jar");
+        producer3 = getInputFile("com.zutubi.bundles.producer_3.0.0", "jar");
 
         objectFactory = new DefaultObjectFactory();
     }
@@ -53,18 +52,8 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         pluginSystem.shutdown();
-        pluginSystem = null;
-        paths = null;
-
-        objectFactory = null;
-
-        producer1 = null;
-        producer2 = null;
-        producer3 = null;
-
         removeDirectory(tmpDir);
-        tmpDir = null;
-        
+
         super.tearDown();
     }
 

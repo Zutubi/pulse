@@ -31,14 +31,14 @@ public abstract class FileLoaderTestBase extends PulseTestCase
     protected PulseFile load(String name) throws PulseException
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput(name), bf);
+        loader.load(getInput(name, "xml"), bf);
         return bf;
     }
 
     protected <T extends Reference> T referenceHelper(String name) throws PulseException
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("basic"), bf);
+        loader.load(getInput("basic", "xml"), bf);
 
         Reference r = bf.getReference(name);
         assertNotNull(r);
@@ -48,7 +48,7 @@ public abstract class FileLoaderTestBase extends PulseTestCase
     protected <T extends Command> T commandHelper(String name) throws PulseException
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("basic"), bf);
+        loader.load(getInput("basic", "xml"), bf);
 
         Recipe recipe = bf.getRecipes().get(0);
         return (T)recipe.getCommand(name);

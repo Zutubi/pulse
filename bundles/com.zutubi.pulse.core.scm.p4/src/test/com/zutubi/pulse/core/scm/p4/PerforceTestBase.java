@@ -12,9 +12,6 @@ import java.io.File;
 
 public abstract class PerforceTestBase extends PulseTestCase
 {
-    private static final String DIR_MODULE = "bundles/com.zutubi.pulse.core.scm.p4";
-    private static final String EXTENSION_ZIP = "zip";
-
     private static final String DIR_REPO = "repo";
 
     private static final String COMMAND_P4D = "p4d";
@@ -43,8 +40,7 @@ public abstract class PerforceTestBase extends PulseTestCase
         File repoDir = new File(tempDir, DIR_REPO);
         assertTrue(repoDir.mkdir());
 
-        File repoZip = getTestDataFile(DIR_MODULE, DIR_REPO, EXTENSION_ZIP);
-        ZipUtils.extractZip(repoZip, repoDir);
+        unzipInput("repo", repoDir);
 
         // Restore from checkpoint
         p4dProcess = Runtime.getRuntime().exec(new String[] {COMMAND_P4D, FLAG_ROOT_DIRECTORY, repoDir.getAbsolutePath(), FLAG_JOURNAL_RESTORE, getCheckpointFilename()});

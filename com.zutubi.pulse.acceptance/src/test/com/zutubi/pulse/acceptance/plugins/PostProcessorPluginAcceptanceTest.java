@@ -10,12 +10,16 @@ import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 {
+    private static final String JAR_NAME = "com.zutubi.bundles.postprocessor.sample_1.0.0";
+
     private PostProcessorExtensionManager extensionManager;
 
     private PulseFileLoaderFactory loaderFactory;
@@ -36,8 +40,8 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
             fail("Pulse package file '" + pkgFile.getAbsolutePath() + "'does not exist.");
         }
 
-        File dataDir = new File(getPulseRoot(), FileSystemUtils.join("com.zutubi.pulse.acceptance", "src", "test", "data"));
-        samplePostProcessorPlugin = new File(dataDir, "com.zutubi.bundles.postprocessor.sample_1.0.0.jar");
+        samplePostProcessorPlugin = new File(tmpDir, JAR_NAME + ".jar");
+        IOUtils.joinStreams(getInput(JAR_NAME, "jar"), new FileOutputStream(samplePostProcessorPlugin), true);
 
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         pluginSystem.startup();
@@ -75,7 +79,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         PulseFile pf = new PulseFile();
 
         PulseFileLoader loader = loaderFactory.createLoader();
-        loader.load(getInput("testPostProcessorPlugin"), pf);
+        loader.load(getInput("testPostProcessorPlugin", "xml"), pf);
 
         Reference ref = pf.getReference("sample.pp");
 

@@ -35,7 +35,6 @@ public abstract class PostProcessorTestBase extends PulseTestCase
     public void tearDown()
     {
         FileSystemUtils.rmdir(tempDir);
-        artifact = null;
     }
 
     protected CommandResult createAndProcessArtifact(String name, PostProcessor pp) throws Exception
@@ -61,13 +60,13 @@ public abstract class PostProcessorTestBase extends PulseTestCase
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
 
-        PostProcessorContext ppContext = createContext(pp, commandResult, context);
+        PostProcessorContext ppContext = createContext(commandResult, context);
         pp.process(new File(tempDir, artifact.getPath()), ppContext);
         commandResult.complete();
         return commandResult;
     }
 
-    private PostProcessorContext createContext(PostProcessor pp, CommandResult commandResult, ExecutionContext context)
+    private PostProcessorContext createContext(CommandResult commandResult, ExecutionContext context)
     {
         return new DefaultPostProcessorContext(artifact, commandResult, context);
     }

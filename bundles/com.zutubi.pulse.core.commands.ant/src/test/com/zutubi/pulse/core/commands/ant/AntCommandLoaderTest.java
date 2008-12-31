@@ -22,7 +22,7 @@ public class AntCommandLoaderTest extends FileLoaderTestBase
     private AntCommand antCommandHelper(int commandIndex) throws Exception
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("testAntCommand"), bf);
+        loader.load(getInput("testAntCommand", "xml"), bf);
 
         List<Recipe> recipes = bf.getRecipes();
         assertEquals(recipes.size(), 1);

@@ -1,3 +1,0 @@
-Test foo: passed
-Test bar: passed
-Test baz: passed

@@ -423,7 +423,7 @@ public class ZipUtilsTest extends PulseTestCase
 
     public void testExtractEmptyFile() throws Exception
     {
-        extractTestZipToTmp();
+        unzipInput(tmpDir);
 
         // ensure that the expected directories exist.
         assertTrue(new File(tmpDir, "dir").isDirectory());
@@ -433,7 +433,7 @@ public class ZipUtilsTest extends PulseTestCase
 
     public void testExtractNonEmptyFiles() throws Exception
     {
-        extractTestZipToTmp();
+        unzipInput(tmpDir);
         assertNonEmptyFiles(tmpDir);
     }
 
@@ -441,7 +441,7 @@ public class ZipUtilsTest extends PulseTestCase
     {
         File dir = new File(tmpDir, "nonexistent");
         assertFalse(dir.isDirectory());
-        extractTestZipToDir(dir, "testExtractNonEmptyFiles");
+        unzipInput("testExtractNonEmptyFiles", dir);
         assertNonEmptyFiles(dir);
     }
 
@@ -635,25 +635,6 @@ public class ZipUtilsTest extends PulseTestCase
     {
         createAndExtract(path);
         IOAssertions.assertDirectoriesEqual(inDir, unzipDir);
-    }
-
-    private void extractTestZipToTmp() throws IOException
-    {
-        extractTestZipToDir(tmpDir, getName());
-    }
-
-    private void extractTestZipToDir(File tmpDir, String name) throws IOException
-    {
-        InputStream is = null;
-        try
-        {
-            File dataFile = getTestDataFile("com.zutubi.pulse.core", name, "zip");
-            ZipUtils.extractZip(dataFile, tmpDir);
-        }
-        finally
-        {
-            IOUtils.close(is);
-        }
     }
 
     private File getZipName()

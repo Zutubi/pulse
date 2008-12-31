@@ -27,32 +27,24 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     {
         super.setUp();
 
-        File bundleDir = getTestDataDir("com.zutubi.pulse.core", "test-bundles");
-        producer1 = new File(bundleDir, "com.zutubi.bundles.producer_1.0.0.jar");
-        producer11 = new File(bundleDir, "com.zutubi.bundles.producer_1.1.0.jar");
-        producer2 = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar");
-        producer3 = new File(bundleDir, "com.zutubi.bundles.producer_3.0.0.jar");
-        consumer1 = new File(bundleDir, "com.zutubi.bundles.consumer_1.0.0.jar");
+        producer1 = getInputFile("com.zutubi.bundles.producer_1.0.0", "jar");
+        producer11 = getInputFile("com.zutubi.bundles.producer_1.1.0", "jar");
+        producer2 = getInputFile("com.zutubi.bundles.producer_2.0.0", "jar");
+        producer3 = getInputFile("com.zutubi.bundles.producer_3.0.0", "jar");
+        consumer1 = getInputFile("com.zutubi.bundles.consumer_1.0.0", "jar");
 
-        failonstartup = new File(bundleDir, "com.zutubi.bundles.failonstartup_1.0.0.jar");
-        failonshutdown = new File(bundleDir, "com.zutubi.bundles.failonshutdown_1.0.0.jar");
+        failonstartup = getInputFile("com.zutubi.bundles.failonstartup_1.0.0", "jar");
+        failonshutdown = getInputFile("com.zutubi.bundles.failonshutdown_1.0.0", "jar");
 
         // should rename this - this is an empty file..
-        bad = new File(bundleDir, "bad.jar");
+        bad = getInputFile("bad", "jar");
     }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
-    // test installation.
 
     public void testInstallPlugin() throws Exception
     {
         startupPluginCore();
 
-        File installedPluginFile = new File(paths.getPluginStorageDir(), "com.zutubi.bundles.producer_1.0.0.jar");
+        File installedPluginFile = new File(paths.getPluginStorageDir(), producer1.getName());
         assertFalse(installedPluginFile.isFile());
 
         Plugin installedPlugin = manager.install(producer1.toURI());

@@ -19,7 +19,7 @@ public class MakePostProcessorLoadTest extends FileLoaderTestBase
     private MakePostProcessor helper(String ppName) throws PulseException
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("basic"), bf);
+        loader.load(getInput("basic", "xml"), bf);
 
         Reference r = bf.getReference(ppName);
         assertNotNull(r);

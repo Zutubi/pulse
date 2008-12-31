@@ -18,6 +18,8 @@ import java.util.List;
 
 public class PerforceClientTest extends PerforceTestBase
 {
+    private static final String DIR_EXPECTED = "expected";
+
     private static final String FILE_CHECKPOINT = "checkpoint.2";
 
     private static final String DEPOT_WORKSPACE = "depot-client";
@@ -552,12 +554,12 @@ public class PerforceClientTest extends PerforceTestBase
 
     private void checkDirectory(String name) throws IOException
     {
-        IOAssertions.assertDirectoriesEqual(new File(getDataRoot(), name), workDir);
-    }
+        File expectedDir = new File(getTempDir(), DIR_EXPECTED);
+        removeDirectory(expectedDir);
+        assertTrue(expectedDir.mkdirs());
+        unzipInput(name, expectedDir);
 
-    private File getDataRoot()
-    {
-        return new File(getPulseRoot(), FileSystemUtils.composeFilename("bundles", "com.zutubi.pulse.core.scm.p4", "src", "test", "com", "zutubi", "pulse", "core", "scm", "p4", "data"));
+        IOAssertions.assertDirectoriesEqual(expectedDir, workDir);
     }
 
     private List<String> checkoutChanges(File dir, Revision revision, long expectedRevision) throws ScmException

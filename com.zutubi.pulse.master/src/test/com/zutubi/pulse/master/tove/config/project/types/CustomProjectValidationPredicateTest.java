@@ -10,7 +10,7 @@ public class CustomProjectValidationPredicateTest extends FileLoaderTestBase
     public void testCustomProjectValidation() throws Exception
     {
         PulseFile pulseFile = new PulseFile();
-        loader.load(getInput("customValidation"), pulseFile, new PulseScope(), new FileResourceRepository(), new CustomProjectValidationPredicate());
+        loader.load(getInput("customValidation", "xml"), pulseFile, new PulseScope(), new FileResourceRepository(), new CustomProjectValidationPredicate());
         assertNotNull(pulseFile.getRecipe("bar"));
     }
 }

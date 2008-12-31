@@ -8,12 +8,12 @@ import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.Constants;
 import com.zutubi.util.FileSystemUtils;
 import static com.zutubi.util.FileSystemUtils.createTempDir;
-import static com.zutubi.util.FileSystemUtils.join;
 import com.zutubi.util.NullUnaryProcedure;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
@@ -33,10 +33,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        packageFactory = null;
         removeDirectory(tmp);
-        tmp = null;
-
         super.tearDown();
     }
 
@@ -176,7 +173,8 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     {
         // get old agent package that we are upgrading from.
         // a) start with a predefined package, later move to a range of older packages that we can test from.
-        File oldAgentPackage = new File(getPulseRoot(), join("com.zutubi.pulse.acceptance", "src", "test", "data", "pulse-agent-2.0.0.zip"));
+        File oldAgentPackage = new File(tmp, "pulse-agent-2.0.0.zip");
+        IOUtils.joinStreams(getInput("pulse-agent-2.0.0", "zip"), new FileOutputStream(oldAgentPackage), true);
 
         // ensure that the two packages exist.
 

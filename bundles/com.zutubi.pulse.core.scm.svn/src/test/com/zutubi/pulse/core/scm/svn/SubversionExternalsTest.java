@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -115,8 +114,7 @@ public class SubversionExternalsTest extends PulseTestCase
         FileSystemUtils.createFile(conf, "[general]\nanon-access = write\nauth-access = write\n");
 
         // Restore from dump
-        File repoZip = getTestDataFile("bundles/com.zutubi.pulse.core.scm.svn", "repo", "zip");
-        ZipUtils.extractZip(repoZip, tempDir);
+        unzipInput("repo", tempDir);
 
         File dump = new File(tempDir, "SubversionExternalsTest.repo");
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "load", "-q", repoDir.getAbsolutePath() });
@@ -136,7 +134,6 @@ public class SubversionExternalsTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         IOUtils.close(server);
-        server = null;
         svnProcess.destroy();
         svnProcess.waitFor();
         Thread.sleep(1000);

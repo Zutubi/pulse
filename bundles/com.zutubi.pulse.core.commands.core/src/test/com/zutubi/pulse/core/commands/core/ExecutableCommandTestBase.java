@@ -7,9 +7,6 @@ import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
 
-/**
- * <class comment/>
- */
 public abstract class ExecutableCommandTestBase extends CommandTestBase
 {
     protected ExecutableCommandTestBase()

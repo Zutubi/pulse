@@ -18,16 +18,11 @@ import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 
-/**
- * 
- *
- */
 public class ExecutableCommandTest extends ExecutableCommandTestBase
 {
     public void testExecuteSuccessExpected() throws Exception
@@ -161,46 +156,6 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
 
         CommandResult result = runCommand(command);
         assertTrue(result.succeeded());
-    }
-
-    public void testExtraPathInScope() throws Exception
-    {
-/*
-        File data = getTestDataFile("scope", "bin");
-        System.out.println(data.getAbsolutePath());
-        assertTrue(data.isDirectory());
-
-        Scope scope = new Scope();
-        scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true, false));
-
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("custom");
-        command.setScope(scope);
-
-        CommandResult result = runCommand(command);
-        assertTrue(result.succeeded());
-*/
-    }
-
-    public void testEnvironmentVariableFromScope() throws Exception
-    {
-/*
-        File data = getTestDataFile("scope", "bin");
-        assertTrue(data.isDirectory());
-
-        Scope scope = new Scope();
-        scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true, false));
-        scope.add(new ResourceProperty("TESTVAR", "test variable value", true, false, false));
-
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("custom");
-        command.setScope(scope);
-
-        CommandResult result = runCommand(command);
-        assertTrue(result.succeeded());
-
-        checkOutput(result, "test variable value");
-*/
     }
 
     public void testEnvironmentDetailsAreCaptured() throws Exception
@@ -337,7 +292,6 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         }
     }
 
-
     public void testAcceptableNamesOnWindows()
     {
         if (!SystemUtils.IS_WINDOWS)
@@ -429,9 +383,12 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
 
     private CommandResult statusMappingHelper(int exitCode, int mappedCode, ResultState mappedStatus) throws Exception
     {
+        File jarFile = new File(baseDir, "exit.jar");
+        IOUtils.joinStreams(getInput("exit", "jar"), new FileOutputStream(jarFile), true);
+
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("java");
-        command.addArguments("-jar", getTestDataFile("bundles/com.zutubi.pulse.core.commands.core", "exit", "jar").getAbsolutePath(), Integer.toString(exitCode));
+        command.addArguments("-jar", jarFile.getAbsolutePath(), Integer.toString(exitCode));
         StatusMapping mapping = command.createStatusMapping();
         mapping.setCode(mappedCode);
         mapping.setStatus(mappedStatus.getPrettyString());
@@ -453,14 +410,6 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     protected String getBuildFileExt()
     {
         return null;
-    }
-
-    protected File getTestDataFile(String testName, String extension) throws URISyntaxException
-    {
-        URL resource = getClass().getResource("ExecutableCommandLoaderTest.testExecutableArgs.xml");
-        String resourcePath = new File(resource.toURI()).getAbsolutePath();
-        File moduleDir = new File(resourcePath.substring(0, resourcePath.lastIndexOf("com.zutubi.pulse.core.commands.core") + 12));
-        return new File(moduleDir, FileSystemUtils.composeFilename("src", "test", getClass().getName().replace('.', File.separatorChar) + "." + testName + "." + extension));
     }
 
     protected void checkEnv(CommandResult commandResult, String ...contents) throws IOException

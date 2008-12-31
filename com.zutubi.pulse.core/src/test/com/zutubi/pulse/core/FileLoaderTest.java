@@ -20,7 +20,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testSimpleReference() throws Exception
     {
         SimpleRoot root = new SimpleRoot();
-        loader.load(getInput("testSimpleReference"), root);
+        loader.load(getInput("testSimpleReference", "xml"), root);
 
         Object o = root.getReference("a");
         assertNotNull(o);
@@ -33,7 +33,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testResolveReference() throws Exception
     {
         SimpleRoot root = new SimpleRoot();
-        loader.load(getInput("testResolveReference"), root);
+        loader.load(getInput("testResolveReference", "xml"), root);
 
         Object a = root.getReference("a");
         assertNotNull(a);
@@ -50,7 +50,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testNestedType() throws Exception
     {
         SimpleRoot root = new SimpleRoot();
-        loader.load(getInput("testNestedType"), root);
+        loader.load(getInput("testNestedType", "xml"), root);
 
         assertNotNull(root.getReference("a"));
 
@@ -62,7 +62,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testNonBeanName() throws Exception
     {
         SimpleRoot root = new SimpleRoot();
-        loader.load(getInput("testNonBeanName"), root);
+        loader.load(getInput("testNonBeanName", "xml"), root);
 
         Object a = root.getReference("a");
         assertNotNull(a);
@@ -74,14 +74,14 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testRegister() throws Exception
     {
         PulseFile pf = new PulseFile();
-        loader.load(getInput("testRegister"), pf);
+        loader.load(getInput("testRegister", "xml"), pf);
         assertNotNull(pf.getRecipe("default"));
     }
 
     public void testScopeTopLevel() throws Exception
     {
         PulseFile pf = new PulseFile();
-        loader.load(getInput("testScopeTopLevel"), pf);
+        loader.load(getInput("testScopeTopLevel", "xml"), pf);
 
         assertNotNull(pf.getRecipe("first"));
         assertNotNull(pf.getRecipe("second"));
@@ -90,7 +90,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testMacroEmpty() throws Exception
     {
         PulseFile pf = new PulseFile();
-        loader.load(getInput("testMacroEmpty"), pf);
+        loader.load(getInput("testMacroEmpty", "xml"), pf);
 
         Recipe recipe = pf.getRecipe("r1");
         assertNotNull(recipe);
@@ -150,7 +150,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         try
         {
             PulseFile bf = new PulseFile();
-            loader.load(getInput("testValidateable"), bf);
+            loader.load(getInput("testValidateable", "xml"), bf);
             fail();
         }
         catch (ParseException e)
@@ -162,7 +162,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testAdderTypeScope() throws PulseException
     {
         ScopeAcceptingRoot root = new ScopeAcceptingRoot();
-        loader.load(getInput(getName()), root);
+        loader.load(getInput(getName(), "xml"), root);
         assertNotNull(root.getReference("a"));
         assertNotNull(root.getScope("a"));
     }
@@ -171,7 +171,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     {
         loader.register("ref", SimpleReference.class);
         ScopeAcceptingRoot root = new ScopeAcceptingRoot();
-        loader.load(getInput(getName()), root);
+        loader.load(getInput(getName(), "xml"), root);
         assertNotNull(root.getReference("a"));
         assertNotNull(root.getScope("a"));
     }
@@ -181,7 +181,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         try
         {
             PulseFile bf = new PulseFile();
-            loader.load(getInput("testSpecificRecipe"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, "don't load!"));
+            loader.load(getInput("testSpecificRecipe", "xml"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, "don't load!"));
             fail();
         }
         catch (PulseException e)
@@ -195,7 +195,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         try
         {
             PulseFile bf = new PulseFile();
-            loader.load(getInput("testDuplicateRecipe"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, "don't load!"));
+            loader.load(getInput("testDuplicateRecipe", "xml"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, "don't load!"));
             fail();
         }
         catch (PulseException e)
@@ -208,7 +208,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     {
         try
         {
-            loader.load(getInput("testUnknownAttribute"), new SimpleType());
+            loader.load(getInput("testUnknownAttribute", "xml"), new SimpleType());
             fail();
         }
         catch (PulseException e)

@@ -6,6 +6,7 @@ import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -19,8 +20,6 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 
-/**
- */
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
     private boolean generate = false;
@@ -31,7 +30,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     {
         super.setUp();
         renderer = new FreemarkerBuildResultRenderer();
-        File pulseRoot = new File(getPulseRoot(), "com.zutubi.pulse.master/src/templates");
+        File pulseRoot = new File(TestUtils.getPulseRoot(), "com.zutubi.pulse.master/src/templates");
 
         Configuration freemarkerConfiguration = new Configuration();
         freemarkerConfiguration.setDirectoryForTemplateLoading(pulseRoot);
@@ -476,7 +475,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         if (generate)
         {
-            File expected = getTestDataFile("master", expectedName, extension);
+            File expected = new File(getClass().getSimpleName() + "." + getName() + "." + extension);
             OutputStream outStream = null;
             Writer writer = null;
 
@@ -491,6 +490,8 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
                 IOUtils.close(outStream);
                 IOUtils.close(writer);
             }
+
+            System.out.println("Generated expected output in '" + expected.getAbsolutePath() + "'");
         }
         else
         {

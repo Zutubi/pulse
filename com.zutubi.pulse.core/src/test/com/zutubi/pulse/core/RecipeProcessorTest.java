@@ -372,7 +372,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     private String getPulseFile(String name) throws IOException
     {
-        return IOUtils.inputStreamToString(getInput(name));
+        return IOUtils.inputStreamToString(getInput(name, "xml"));
     }
 
     public void handleEvent(Event evt)

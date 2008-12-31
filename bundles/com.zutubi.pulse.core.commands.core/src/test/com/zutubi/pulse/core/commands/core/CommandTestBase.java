@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-/**
- * <class-comment/>
- */
 public abstract class CommandTestBase extends PulseTestCase implements EventListener
 {
     protected File baseDir;
@@ -60,8 +57,6 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
 
     public void tearDown() throws IOException
     {
-        events = null;
-        eventManager = null;
         removeDirectory(baseDir);
         removeDirectory(outputDir);
     }

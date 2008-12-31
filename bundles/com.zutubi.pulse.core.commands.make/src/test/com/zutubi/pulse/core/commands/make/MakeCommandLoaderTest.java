@@ -22,7 +22,7 @@ public class MakeCommandLoaderTest extends FileLoaderTestBase
     private MakeCommand makeCommandHelper(int commandIndex) throws Exception
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("testMakeCommand"), bf);
+        loader.load(getInput("testMakeCommand", "xml"), bf);
 
         List<Recipe> recipes = bf.getRecipes();
         assertEquals(recipes.size(), 1);

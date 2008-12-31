@@ -77,8 +77,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         FileSystemUtils.createFile(conf, "[general]\nanon-access = write\nauth-access = write\n");
 
         // Restore from dump
-        File repoZip = getTestDataFile("bundles/com.zutubi.pulse.core.scm.svn", "repo", "zip");
-        ZipUtils.extractZip(repoZip, tempDir);
+        unzipInput("repo", tempDir);
 
         File dump = new File(tempDir, "SubversionWorkingCopyTest.dump");
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "load", "-q", repoDir.getAbsolutePath() });
