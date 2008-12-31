@@ -547,7 +547,7 @@ public class JDBCUtils
 
     private static MiniDialect getMiniDialect(Connection con) throws SQLException
     {
-        String driverName = con.getMetaData().getDriverName();
+        String driverName = con.getMetaData().getURL();
         if (driverName.contains("hsql"))
         {
             return new HSQLMiniDialect();
