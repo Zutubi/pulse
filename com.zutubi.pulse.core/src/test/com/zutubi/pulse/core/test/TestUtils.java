@@ -36,7 +36,7 @@ public class TestUtils
         File candidate = new File(System.getProperty(PROPERTY_WORKING_DIRECTORY));
         while (candidate != null)
         {
-            File master = new File(MODULE_MASTER);
+            File master = new File(candidate, MODULE_MASTER);
             if (master.isDirectory())
             {
                 return candidate.getAbsoluteFile();
