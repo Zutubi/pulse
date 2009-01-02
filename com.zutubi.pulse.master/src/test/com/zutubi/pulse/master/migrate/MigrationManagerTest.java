@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.migrate;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
@@ -13,6 +12,7 @@ import com.zutubi.pulse.master.hibernate.SchemaRefactor;
 import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.dbcp.BasicDataSource;

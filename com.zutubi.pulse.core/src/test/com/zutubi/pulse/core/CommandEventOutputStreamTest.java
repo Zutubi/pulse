@@ -7,7 +7,7 @@ import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.CommandEventOutputStream.DISABLE_AUTO_FLUSH;
 import static com.zutubi.pulse.core.CommandEventOutputStream.MINIMUM_SIZE;
 import com.zutubi.pulse.core.events.OutputEvent;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.io.IOException;
 import java.util.LinkedList;

@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.model.PersistentPlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.io.File;
 import java.net.URISyntaxException;

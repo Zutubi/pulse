@@ -1,0 +1,80 @@
+package com.zutubi.pulse.core.test.api;
+
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+
+import java.util.Arrays;
+
+/**
+ * Static factory methods for Pulse's own Hamcrest matchers.
+ */
+public class Matchers
+{
+    /**
+     * Converts a variable number of items into an iterable of matchers that
+     * test quality to those items (using the standard Hamcrest
+     * {@link org.hamcrest.Matchers#equalTo} matcher).  This iterable may then
+     * be used to construct another matcher that tests against those matchers.
+     *
+     * @param items items to build matchers out of
+     * @param <T> type of the items
+     * @return an iterable of matchers that test equality to the given items
+     */
+    public static <T> Iterable<Matcher<? super T>> getEqualToMatchers(T... items)
+    {
+        return CollectionUtils.map(items, new Mapping<T, Matcher<? super T>>()
+        {
+            public Matcher<? super T> map(T t)
+            {
+                return org.hamcrest.Matchers.equalTo(t);
+            }
+        });
+    }
+
+    /**
+     * Creates a matcher that tests an iterable for items matching the given
+     * matchers.  The iterable matched must contain items that match the given
+     * matchers in order, with the same number of items as their are matchers.
+     *
+     * @param matchers iterable of matchers to match against
+     * @param <T> type of the items in the iterable to be matched
+     * @return a matcher that tests an iterable against the given matchers in
+     *         order
+     */
+    public static <T> IsOrderedIterable<T> hasOrderedItems(Iterable<Matcher<? super T>> matchers)
+    {
+        return new IsOrderedIterable<T>(matchers);
+    }
+
+    /**
+     * Convenience equivalent to {@link #hasOrderedItems(Iterable)} that
+     * accepts a variable number of matchers to build the matchers iterable.
+     *
+     * @param matchers variable number of matchers to match against
+     * @param <T> type of the items in the iterable to be matched
+     * @return a matcher that tests an iterable against the given matchers in
+     *         order
+     */
+    public static <T> Matcher<Iterable<? extends T>> hasOrderedItems(Matcher<? super T>... matchers)
+    {
+        return new IsOrderedIterable<T>(Arrays.asList(matchers));
+    }
+
+    /**
+     * Convenience equivalent to {@link #hasOrderedItems(Iterable)} that
+     * accepts a variable number of items and converts them to equalTo
+     * matchers to build the matchers iterable.
+     *
+     * @param items variable number of items to match against using
+     *              {@link org.hamcrest.Matchers#equalTo}
+     * @param <T> type of the items in the iterable to be matched
+     * @return a matcher that tests an iterable against the given items in
+     *         order
+     */
+    public static <T> TypeSafeMatcher<Iterable<? extends T>> hasOrderedItems(T... items)
+    {
+        return new IsOrderedIterable<T>(getEqualToMatchers(items));
+    }
+}

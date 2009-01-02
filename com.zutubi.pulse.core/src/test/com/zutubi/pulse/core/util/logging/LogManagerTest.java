@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.util.logging;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.util.HashMap;
 import java.util.Map;

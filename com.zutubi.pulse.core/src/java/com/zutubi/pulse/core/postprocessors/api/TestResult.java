@@ -64,4 +64,38 @@ public abstract class TestResult
     {
         this.duration = duration;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        TestResult that = (TestResult) o;
+
+        if (duration != that.duration)
+        {
+            return false;
+        }
+        if (name != null ? !name.equals(that.name) : that.name != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (int) (duration ^ (duration >>> 32));
+        return result;
+    }
 }

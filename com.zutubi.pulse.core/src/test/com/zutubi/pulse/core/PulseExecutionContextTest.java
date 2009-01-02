@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

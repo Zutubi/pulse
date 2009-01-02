@@ -146,4 +146,59 @@ public class Feature
     {
         return lastLine;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        Feature feature = (Feature) o;
+
+        if (firstLine != feature.firstLine)
+        {
+            return false;
+        }
+        if (lastLine != feature.lastLine)
+        {
+            return false;
+        }
+        if (lineNumber != feature.lineNumber)
+        {
+            return false;
+        }
+        if (level != feature.level)
+        {
+            return false;
+        }
+        if (!summary.equals(feature.summary))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = level.hashCode();
+        result = 31 * result + summary.hashCode();
+        result = 31 * result + (int) (lineNumber ^ (lineNumber >>> 32));
+        result = 31 * result + (int) (firstLine ^ (firstLine >>> 32));
+        result = 31 * result + (int) (lastLine ^ (lastLine >>> 32));
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return level.toString() + ":" + lineNumber + "(" + firstLine + "," + lastLine + "): " + summary;
+    }
 }

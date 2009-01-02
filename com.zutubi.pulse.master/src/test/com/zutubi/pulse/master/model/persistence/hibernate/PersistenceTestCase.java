@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.EqualityAssertions;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.util.logging.Logger;

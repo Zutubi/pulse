@@ -7,8 +7,7 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.events.AgentUpgradeCompleteEvent;
 import com.zutubi.pulse.master.model.AgentState;
@@ -18,6 +17,7 @@ import com.zutubi.pulse.servercore.bootstrap.DefaultSystemPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
+import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.concurrent.Executors;

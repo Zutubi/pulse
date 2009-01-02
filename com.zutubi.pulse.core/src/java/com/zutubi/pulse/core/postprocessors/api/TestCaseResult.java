@@ -94,4 +94,54 @@ public class TestCaseResult extends TestResult
     {
         this.message = message;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if (!super.equals(o))
+        {
+            return false;
+        }
+
+        TestCaseResult that = (TestCaseResult) o;
+
+        if (message != null ? !message.equals(that.message) : that.message != null)
+        {
+            return false;
+        }
+        if (status != that.status)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + status.hashCode();
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        String result = "TestCase(name: " + getName() + ", duration: " + getDuration() + ", status: " + status + ")";
+        if (message != null)
+        {
+            result += " '" + message + "'";
+        }
+        return result;
+    }
 }

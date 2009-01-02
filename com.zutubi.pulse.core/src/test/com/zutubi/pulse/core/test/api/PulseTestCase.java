@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.test;
+package com.zutubi.pulse.core.test.api;
 
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -145,7 +145,13 @@ public abstract class PulseTestCase extends ZutubiTestCase
      */
     public InputStream getInput(String name, String extension)
     {
-        return getClass().getResourceAsStream(getClass().getSimpleName() + "." + name + "." + extension);
+        String fullName = getClass().getSimpleName() + "." + name + "." + extension;
+        InputStream stream = getClass().getResourceAsStream(fullName);
+        if (stream == null)
+        {
+            fail("Required input '" + fullName + "' not found");
+        }
+        return stream;
     }
 
     /**

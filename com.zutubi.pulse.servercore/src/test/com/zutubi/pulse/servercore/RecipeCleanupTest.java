@@ -2,7 +2,7 @@ package com.zutubi.pulse.servercore;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.events.RecipeStatusEvent;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystem;
 import org.mockito.InOrder;
 import static org.mockito.Mockito.*;

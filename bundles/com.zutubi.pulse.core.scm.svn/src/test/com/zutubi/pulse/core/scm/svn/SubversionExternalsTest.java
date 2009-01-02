@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 

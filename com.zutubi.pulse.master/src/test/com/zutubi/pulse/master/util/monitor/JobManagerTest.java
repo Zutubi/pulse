@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.util.monitor;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.util.Iterator;
 import java.util.LinkedList;

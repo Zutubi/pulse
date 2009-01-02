@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.core.plugins.PluginPaths;
 import com.zutubi.pulse.core.test.IOAssertions;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;

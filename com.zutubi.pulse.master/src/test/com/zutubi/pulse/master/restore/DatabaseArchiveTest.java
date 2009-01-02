@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.util.FileSystemUtils;

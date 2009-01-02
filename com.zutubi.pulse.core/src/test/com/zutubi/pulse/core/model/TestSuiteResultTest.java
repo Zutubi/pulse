@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.model;
 
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.PASS;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.util.List;
 

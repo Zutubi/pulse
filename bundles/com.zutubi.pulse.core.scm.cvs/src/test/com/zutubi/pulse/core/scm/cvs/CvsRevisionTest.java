@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.text.ParseException;
 

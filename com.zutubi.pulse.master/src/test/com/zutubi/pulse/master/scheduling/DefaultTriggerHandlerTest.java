@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.scheduling;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
 import com.zutubi.util.bean.DefaultObjectFactory;
 

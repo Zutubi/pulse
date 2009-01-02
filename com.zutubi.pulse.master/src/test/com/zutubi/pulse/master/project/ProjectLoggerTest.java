@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.project;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;

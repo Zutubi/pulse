@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.util;
 
 import com.zutubi.pulse.core.test.IOAssertions;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;

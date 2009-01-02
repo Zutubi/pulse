@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.core.test.IOAssertions;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.FileSystemUtils;

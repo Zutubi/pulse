@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.security;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.util.Sort;
 
 import java.util.*;

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.PostProcessorManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;

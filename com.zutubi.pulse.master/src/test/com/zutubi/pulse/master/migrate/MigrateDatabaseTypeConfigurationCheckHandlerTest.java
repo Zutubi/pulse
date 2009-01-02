@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.migrate;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.setup.DatabaseType;
 
 /**

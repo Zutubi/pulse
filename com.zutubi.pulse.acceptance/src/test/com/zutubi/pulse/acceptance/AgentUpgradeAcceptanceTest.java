@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
 import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.Constants;
 import com.zutubi.util.FileSystemUtils;
 import static com.zutubi.util.FileSystemUtils.createTempDir;

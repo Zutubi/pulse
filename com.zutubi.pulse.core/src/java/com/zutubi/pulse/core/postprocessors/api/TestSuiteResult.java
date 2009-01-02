@@ -3,6 +3,9 @@ package com.zutubi.pulse.core.postprocessors.api;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -129,5 +132,86 @@ public class TestSuiteResult extends TestResult
     public void addAllCases(Collection<? extends TestCaseResult> cases)
     {
         this.cases.addAll(cases);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if (!super.equals(o))
+        {
+            return false;
+        }
+
+        TestSuiteResult that = (TestSuiteResult) o;
+
+        if (!cases.equals(that.cases))
+        {
+            return false;
+        }
+        if (!suites.equals(that.suites))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + suites.hashCode();
+        result = 31 * result + cases.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append("TestSuite(name: ");
+        builder.append(getName());
+        builder.append(", duration: ");
+        builder.append(getDuration());
+        builder.append(")\n");
+
+        for (TestSuiteResult suite: suites)
+        {
+            appendObject(builder, suite);
+        }
+
+        for (TestCaseResult caseResult: cases.toArray(new TestCaseResult[cases.size()]))
+        {
+            appendObject(builder, caseResult);
+        }
+
+        return builder.toString();
+    }
+
+    private void appendObject(StringBuilder builder, Object o)
+    {
+        BufferedReader r = new BufferedReader(new StringReader(o.toString()));
+        String line;
+        try
+            {
+                while ((line = r.readLine()) != null)
+            {
+                builder.append("  ");
+                builder.append(line);
+                builder.append("\n");
+            }
+        }
+        catch (IOException e)
+        {
+            // Never happens
+        }
     }
 }

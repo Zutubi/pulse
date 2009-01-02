@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.bootstrap;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.DefaultSystemPaths;
+import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

@@ -2,6 +2,8 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.test.StringAssertions;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class FileLoaderTest extends FileLoaderTestBase
 {
@@ -181,12 +183,12 @@ public class FileLoaderTest extends FileLoaderTestBase
         try
         {
             PulseFile bf = new PulseFile();
-            loader.load(getInput("testSpecificRecipe", "xml"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, "don't load!"));
+            loader.load(getInput("xml"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, "don't load!"));
             fail();
         }
         catch (PulseException e)
         {
-            e.printStackTrace();
+            assertThat(e.getMessage(), containsString("Undefined type 'resource'"));
         }
     }
 

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.util.List;
 import java.util.Map;
