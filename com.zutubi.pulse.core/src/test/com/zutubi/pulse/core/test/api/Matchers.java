@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.test.api;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 
 import java.util.Arrays;
 
@@ -57,7 +56,7 @@ public class Matchers
      * @return a matcher that tests an iterable against the given matchers in
      *         order
      */
-    public static <T> Matcher<Iterable<? extends T>> hasOrderedItems(Matcher<? super T>... matchers)
+    public static <T> IsOrderedIterable<T> hasOrderedItems(Matcher<? super T>... matchers)
     {
         return new IsOrderedIterable<T>(Arrays.asList(matchers));
     }
@@ -73,8 +72,22 @@ public class Matchers
      * @return a matcher that tests an iterable against the given items in
      *         order
      */
-    public static <T> TypeSafeMatcher<Iterable<? extends T>> hasOrderedItems(T... items)
+    public static <T> IsOrderedIterable<T> hasOrderedItems(T... items)
     {
         return new IsOrderedIterable<T>(getEqualToMatchers(items));
+    }
+
+    /**
+     * Creates a matcher that matches strings against the given regular
+     * expression.
+     *
+     * @see java.util.regex.Pattern
+     *
+     * @param expression the regular expresion to match against
+     * @return a matcher that matches against the given expression
+     */
+    public static MatchesRegex matchesRegex(String expression)
+    {
+        return new MatchesRegex(expression);
     }
 }
