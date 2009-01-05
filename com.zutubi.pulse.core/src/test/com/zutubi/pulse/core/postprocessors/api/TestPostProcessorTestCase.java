@@ -4,7 +4,7 @@ import java.io.IOException;
 
 /**
  * Support base class for test report post-processor test cases.  This case
- * provides a convenience methods for running a processor and getting the test
+ * provides convenience methods for running a processor and getting the test
  * results, and for constructing test suites for comparison with the returned
  * results.  A typical test case is expected to look like:
  * <pre>{@code
@@ -75,8 +75,8 @@ public class TestPostProcessorTestCase extends PostProcessorTestCase
      * within it.
      * <p/>
      * The processor is run using {@link com.zutubi.pulse.core.postprocessors.api.PostProcessorTestCase#runProcessor(PostProcessor, String, String)},
-     * which uses {@link com.zutubi.pulse.core.test.api.PulseTestCase#copyInputToDirectory(String, java.io.File)}
-     * to retrieve the input file for post-processing.
+     * thus the input file for post-processing should be located alongside the
+     * test class in the classpath.
      *
      * @see #runProcessor(PostProcessor)
      * @see #runProcessor(PostProcessor, String)

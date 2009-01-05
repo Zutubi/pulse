@@ -118,7 +118,8 @@ public class PostProcessorTestCase extends PulseTestCase
      * given execution context, and returns a post-processor context that has
      * captured all information added by the processor for verification.
      * <p/>
-     * The test input file is retrieved using {@link #copyInputToDirectory(String, String, java.io.File)}.
+     * The test input file is retrieved using {@link #copyInputToDirectory(String, String, java.io.File)},
+     * thus it should be located alongside the test class in the classpath.
      *
      * @see #runProcessor(PostProcessor)
      * @see #runProcessor(PostProcessor, String)

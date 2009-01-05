@@ -13,7 +13,7 @@ public class Matchers
 {
     /**
      * Converts a variable number of items into an iterable of matchers that
-     * test quality to those items (using the standard Hamcrest
+     * test equality to those items (using the standard Hamcrest
      * {@link org.hamcrest.Matchers#equalTo} matcher).  This iterable may then
      * be used to construct another matcher that tests against those matchers.
      *
@@ -48,7 +48,7 @@ public class Matchers
     }
 
     /**
-     * Convenience equivalent to {@link #hasOrderedItems(Iterable)} that
+     * Convenience method equivalent to {@link #hasOrderedItems(Iterable)} that
      * accepts a variable number of matchers to build the matchers iterable.
      *
      * @param matchers variable number of matchers to match against
