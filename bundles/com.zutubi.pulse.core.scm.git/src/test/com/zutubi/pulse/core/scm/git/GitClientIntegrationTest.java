@@ -16,8 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- */
 public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
 {
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss Z");
@@ -41,11 +39,6 @@ public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
         this.prefix = ""; // hmm, this is duplicated in the expected test results instance as well.
 
         this.client.init(context, new ScmFeedbackAdapter());
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
     }
 
     public void testPrepareACleanDirectory() throws ScmException, ParseException

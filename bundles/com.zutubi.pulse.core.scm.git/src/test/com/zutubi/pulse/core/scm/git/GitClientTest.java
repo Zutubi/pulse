@@ -9,6 +9,8 @@ import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.IOUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +73,7 @@ public class GitClientTest extends PulseTestCase
         assertFiles(workingDir, "a.txt", "b.txt", "c.txt");
         assertGitDir(workingDir);
 
-        assertEquals(7, handler.getStatusMessages().size());
+        assertThat(handler.getStatusMessages().size(), greaterThan(0));
     }
 
     public void testCheckoutOnBranch() throws ScmException, ParseException
@@ -94,7 +96,7 @@ public class GitClientTest extends PulseTestCase
         assertFiles(workingDir, "a.txt", "b.txt", "c.txt");
         assertGitDir(workingDir);
 
-        assertEquals(7, handler.getStatusMessages().size());
+        assertThat(handler.getStatusMessages().size(), greaterThan(0));
     }
 
     public void testCheckoutToRevisionOnBranch() throws ScmException, ParseException
@@ -158,24 +160,28 @@ public class GitClientTest extends PulseTestCase
     public void testUpdate() throws ScmException
     {
         client.checkout(context, null, handler);
-        assertEquals(7, handler.getStatusMessages().size());
+        assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertTrue(handler.getStatusMessages().contains("Branch local set up to track remote branch refs/remotes/origin/master."));
 
+        handler.reset();
+
         client.update(context, null, handler);
-        assertEquals(11, handler.getStatusMessages().size());
-        assertEquals("Already up-to-date.", handler.getStatusMessages().get(10));
+        assertThat(handler.getStatusMessages().size(), greaterThan(0));
+        assertEquals("Already up-to-date.", handler.getStatusMessages().get(handler.getStatusMessages().size() - 1));
     }
 
     public void testUpdateOnBranch() throws ScmException
     {
         client.setBranch("branch");
         client.checkout(context, null, handler);
-        assertEquals(7, handler.getStatusMessages().size());
+        assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertTrue(handler.getStatusMessages().contains("Branch local set up to track remote branch refs/remotes/origin/branch."));
 
+        handler.reset();
+
         client.update(context, null, handler);
-        assertEquals(11, handler.getStatusMessages().size());
-        assertEquals("Already up-to-date.", handler.getStatusMessages().get(10));
+        assertThat(handler.getStatusMessages().size(), greaterThan(0));
+        assertEquals("Already up-to-date.", handler.getStatusMessages().get(handler.getStatusMessages().size() - 1));
     }
 
     public void testUpdateToRevision() throws ScmException, IOException, ParseException
