@@ -47,6 +47,14 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         return name;
     }
 
+    private void freeWorkspaceName(String name)
+    {
+        synchronized (workspacesInUse)
+        {
+            workspacesInUse.remove(name);
+        }
+    }
+
     private PerforceWorkspace updateWorkspace(PerforceCore core, PerforceConfiguration configuration, String workspaceName, File root, String description, boolean temporary) throws ScmException
     {
         String rootPath = FileSystemUtils.getNormalisedAbsolutePath(root);
@@ -146,7 +154,19 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
             temporary = false;
         }
 
-        return updateWorkspace(core, configuration, workspaceName, root, description, temporary);
+        try
+        {
+            return updateWorkspace(core, configuration, workspaceName, root, description, temporary);
+        }
+        catch (ScmException e)
+        {
+            if (!temporary)
+            {
+                freeWorkspaceName(workspaceName);
+            }
+
+            throw new ScmException("Unable to update allocated workspace: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -173,10 +193,9 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
                     LOG.warning("Unable to delete client: " + e.getMessage(), e);
                 }
             }
-
-            synchronized (workspacesInUse)
+            else
             {
-                workspacesInUse.remove(workspace.getName());
+                freeWorkspaceName(workspace.getName());
             }
         }
     }

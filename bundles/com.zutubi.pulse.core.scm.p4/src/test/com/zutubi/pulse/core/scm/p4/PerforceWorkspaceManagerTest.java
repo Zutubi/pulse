@@ -9,6 +9,8 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -168,6 +170,37 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
         workspaceManager.freeWorkspace(core, workspace);
         workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
         assertEquals(allocatedName, workspace.getName());
+    }
+
+    public void testErrorOnWorkspaceUpdateDoesNotConsumeName() throws ScmException
+    {
+        // CIB-1765: Perforce workspace name leaks on error updating workspace
+        final String ERROR_MESSAGE = "I failed";
+
+        ScmContextImpl scmContext = createScmContext(23);
+
+        // The most reliable way to figure out the next name is to allocate it
+        // successfuly and free it for reuse.
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
+        String nextName = workspace.getName();
+        workspaceManager.freeWorkspace(core, workspace);
+
+        // Now do a broken allocation, which should not hold onto the name
+        PerforceCore brokenCore = mock(PerforceCore.class);
+        stub(brokenCore.createOrUpdateWorkspace(anyString(), anyString(), anyString(), anyString())).toThrow(new ScmException(ERROR_MESSAGE));
+        try
+        {
+            workspaceManager.allocateWorkspace(brokenCore, TEST_PERFORCE_CONFIGURATION, scmContext);
+            fail("Allocation should throw using broken mock");
+        }
+        catch (ScmException e)
+        {
+            assertThat(e.getMessage(), containsString(ERROR_MESSAGE));
+        }
+
+        // Finally the successful allocation should reuse the original name
+        workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, scmContext);
+        assertEquals(nextName, workspace.getName());
     }
 
     public void testCleanupPersistentWorkspacesNoneToFree() throws ScmException
