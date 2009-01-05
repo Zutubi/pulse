@@ -743,37 +743,37 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         private List<Agent> onlineAgents = new LinkedList<Agent>();
         private List<Agent> availableAgents = new LinkedList<Agent>();
 
-        public List<Agent> getAllAgents()
+        public synchronized List<Agent> getAllAgents()
         {
             return new LinkedList<Agent>(agents.values());
         }
 
-        public List<Agent> getOnlineAgents()
+        public synchronized List<Agent> getOnlineAgents()
         {
-            return onlineAgents;
+            return new LinkedList<Agent>(onlineAgents);
         }
 
-        public List<Agent> getAvailableAgents()
+        public synchronized List<Agent> getAvailableAgents()
         {
-            return availableAgents;
+            return new LinkedList<Agent>(availableAgents);
         }
 
-        public Agent getAgent(long handle)
+        public synchronized Agent getAgent(long handle)
         {
             return agents.get(handle);
         }
 
-        public Agent getAgent(AgentConfiguration agent)
+        public synchronized Agent getAgent(AgentConfiguration agent)
         {
             return agents.get(agent.getHandle());
         }
 
-        public void addAgent(Agent agent)
+        public synchronized void addAgent(Agent agent)
         {
             agents.put(agent.getConfig().getHandle(), agent);
         }
 
-        public void online(Agent agent)
+        public synchronized void online(Agent agent)
         {
             if (!onlineAgents.contains(agent))
             {
@@ -781,18 +781,18 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             }
         }
 
-        public void offline(Agent agent)
+        public synchronized void offline(Agent agent)
         {
             onlineAgents.remove(agent);
         }
 
-        public void available(Agent agent)
+        public synchronized void available(Agent agent)
         {
             if (!availableAgents.contains(agent))
             {
                 availableAgents.add(agent);
                 // Ensure a consistent sorting order, so we can test the
- 	        // agent sorter is actually doing something.
+ 	            // agent sorter is actually doing something.
                 Collections.sort(availableAgents, new Comparator<Agent>()
                 {
                     public int compare(Agent o1, Agent o2)
@@ -803,7 +803,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             }
         }
 
-        public void unavailable(Agent agent)
+        public synchronized void unavailable(Agent agent)
         {
             availableAgents.remove(agent);
         }
