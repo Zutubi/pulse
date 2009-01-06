@@ -129,9 +129,6 @@ public class DefaultSetupManager implements SetupManager
         requestDataComplete();
     }
 
-    //TODO: move this into the configuration managers.  It is specific to them, and should not be here.
-    // Part of the configuration system initialisation.  This is picked up by the configuration manager next time
-    // round.
     private void createExternalConfigFileIfRequired()
     {
         try
@@ -208,11 +205,6 @@ public class DefaultSetupManager implements SetupManager
         handleDbSetup();
     }
 
-    //TODO: replace this with a configuration listener that monitors for the DataDirectoryLocatedEvent, and
-    //TODO: loads the system.properties file accordingly.  Why? To keep all of the config work in one place.
-    //TODO: At the moment, it is split up into little bits in lots of places which makes it awkward.
-    // I don't get this: won't moving this code into a listener split things up more?  Currently this class
-    // is the closest thing we have to 'one place' to look for startup stuff.
     private void loadSystemProperties()
     {
         File propFile = new File(configurationManager.getUserPaths().getUserConfigRoot(), "system.properties");
@@ -641,11 +633,11 @@ public class DefaultSetupManager implements SetupManager
         {
             return false;
         }
-        if (archive.exists())
+        if (archive.exists() && archive.length() > 0)
         {
             return true;
         }
-        printConsoleMessage("Specified restore archive file " + archive.getAbsolutePath() + " does not exist. Skipping restore.");
+        printConsoleMessage("Specified restore archive file " + archive.getAbsolutePath() + " does not exist or is blank. Skipping restore.");
         return false;
     }
 
@@ -655,7 +647,6 @@ public class DefaultSetupManager implements SetupManager
      *
      * @return the zip file containing the archive.
      */
-    //TODO: 1) pick the latest archive if multiple are detected?
     private File getArchiveFile()
     {
         // there are two ways to trigger a restore.
