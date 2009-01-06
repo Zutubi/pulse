@@ -633,7 +633,7 @@ public class DefaultSetupManager implements SetupManager
         {
             return false;
         }
-        if (archive.exists() && archive.length() > 0)
+        if (archive.exists())
         {
             return true;
         }
@@ -704,16 +704,16 @@ public class DefaultSetupManager implements SetupManager
             try
             {
                 restoreManager.prepareRestore(backup);
+
+                // show restoration preview page.
+                state = SetupState.RESTORE;
+                showPrompt();
+                return;
             }
             catch (ArchiveException e)
             {
-                LOG.severe("Restore preparation failed: " + e.getMessage(), e);
+                LOG.severe("Restore preparation failed: " + e.getMessage() + ", skipping restoration.", e);
             }
-
-            // show restoration preview page.
-            state = SetupState.RESTORE;
-            showPrompt();
-            return;
         }
 
         requestRestoreComplete(false);
