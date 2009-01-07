@@ -67,7 +67,7 @@ public class FileLoader
 
     public void load(InputStream input, Object root, Scope globalScope, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
     {
-        if(predicate == null)
+        if (predicate == null)
         {
             predicate = new DefaultTypeLoadPredicate();
         }
@@ -130,12 +130,12 @@ public class FileLoader
 
         try
         {
-            if(depth > MAX_RECURSION_DEPTH)
+            if (depth > MAX_RECURSION_DEPTH)
             {
                 throw new FileLoadException(String.format("Maximum recursion depth %s exceeded", MAX_RECURSION_DEPTH));
             }
 
-            if(handleInternalElement(e, parent, scope, parentHelper, depth, resourceRepository, predicate))
+            if (handleInternalElement(e, parent, scope, parentHelper, depth, resourceRepository, predicate))
             {
                 return;
             }
@@ -169,7 +169,7 @@ public class FileLoader
             }
 
             boolean loadType = predicate.loadType(type, e);
-            if(loadType)
+            if (loadType)
             {
                 scope = scope.createChild();
 
@@ -185,7 +185,7 @@ public class FileLoader
 
                 if (FileLoaderAware.class.isAssignableFrom(type.getClass()))
                 {
-                    ((FileLoaderAware)type).setFileLoader(this);
+                    ((FileLoaderAware) type).setFileLoader(this);
                 }
 
                 if (InitComponent.class.isAssignableFrom(type.getClass()))
@@ -207,7 +207,7 @@ public class FileLoader
                 parentHelper.add(parent, type, scope);
             }
 
-            if(loadType)
+            if (loadType)
             {
                 if (InitComponent.class.isAssignableFrom(type.getClass()))
                 {
@@ -248,13 +248,22 @@ public class FileLoader
 
     private void validate(Object obj) throws CommandValidationException, ValidationException
     {
-        validationManager = new PulseValidationManager();
         ValidationContext validationContext = new PulseValidationContext(new MessagesTextProvider(obj));
-        validationManager.validate(obj, validationContext);
+        getValidationManager().validate(obj, validationContext);
         if (validationContext.hasErrors())
         {
             throw new CommandValidationException(validationContext);
         }
+    }
+
+    private synchronized ValidationManager getValidationManager()
+    {
+        // If the validation manager has not been provided externally, then we create a default one.
+        if (validationManager == null)
+        {
+            validationManager = new PulseValidationManager();
+        }
+        return validationManager;
     }
 
     private void loadSubElements(Element e, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate)
@@ -299,7 +308,7 @@ public class FileLoader
         ReferenceResolver.ResolutionStrategy resolutionStrategy = ReferenceResolver.ResolutionStrategy.RESOLVE_NONE;
         if (predicate.resolveReferences(type, e))
         {
-            if(predicate.allowUnresolved(type, e))
+            if (predicate.allowUnresolved(type, e))
             {
                 resolutionStrategy = ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
             }
@@ -314,15 +323,15 @@ public class FileLoader
     private boolean handleInternalElement(Element element, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws Exception
     {
         String localName = element.getLocalName();
-        if(localName.equals("macro"))
+        if (localName.equals("macro"))
         {
             // Macro definition, get name and store child elements
             boolean found = false;
 
-            for(int i = 0; i < element.getAttributeCount(); i++)
+            for (int i = 0; i < element.getAttributeCount(); i++)
             {
                 Attribute attribute = element.getAttribute(i);
-                if(attribute.getLocalName().equals("name"))
+                if (attribute.getLocalName().equals("name"))
                 {
                     scope.addUnique(new Macro(attribute.getValue(), element));
                     found = true;
@@ -333,27 +342,27 @@ public class FileLoader
                 }
             }
 
-            if(!found)
+            if (!found)
             {
                 throw new FileLoadException("Required attribute 'name' not found");
             }
 
             return true;
         }
-        else if(localName.equals("macro-ref"))
+        else if (localName.equals("macro-ref"))
         {
             // Macro referece.  Lookup macro, and load all it's children now.
             boolean found = false;
 
-            for(int i = 0; i < element.getAttributeCount(); i++)
+            for (int i = 0; i < element.getAttributeCount(); i++)
             {
                 Attribute attribute = element.getAttribute(i);
-                if(attribute.getLocalName().equals("macro"))
+                if (attribute.getLocalName().equals("macro"))
                 {
                     String macroName = attribute.getValue();
 
                     Object o = ReferenceResolver.resolveReference(macroName, scope);
-                    if(!LocationAwareElement.class.isAssignableFrom(o.getClass()))
+                    if (!LocationAwareElement.class.isAssignableFrom(o.getClass()))
                     {
                         throw new FileLoadException("Reference '" + macroName + "' does not resolve to a macro");
                     }
@@ -364,7 +373,7 @@ public class FileLoader
                     {
                         loadSubElements(lae, type, scope, typeHelper, depth, resourceRepository, predicate);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         throw new FileLoadException("While expanding macro defined at line " + lae.getLineNumber() + " column " + lae.getColumnNumber() + ": " + e.getMessage(), e);
                     }
@@ -376,14 +385,14 @@ public class FileLoader
                 }
             }
 
-            if(!found)
+            if (!found)
             {
                 throw new FileLoadException("Required attribute 'macro' not found");
             }
 
             return true;
         }
-        else if(localName.equals("scope"))
+        else if (localName.equals("scope"))
         {
             // Just load children in new scope and redirect to parent
             loadSubElements(element, type, scope.createChild(), typeHelper, depth, resourceRepository, predicate);
@@ -417,7 +426,7 @@ public class FileLoader
         }
 
         message.append(t.getMessage());
-        
+
         ParseException parseException = new ParseException(line, column, message.toString());
         parseException.initCause(t);
         return parseException;

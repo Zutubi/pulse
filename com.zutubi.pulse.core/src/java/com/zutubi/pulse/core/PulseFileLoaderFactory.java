@@ -20,18 +20,25 @@ public class PulseFileLoaderFactory
         register("property", Property.class);
         register("recipe", Recipe.class);
         register("def", ComponentDefinition.class);
+        register("register", Register.class);
+        register("version", Version.class);
     }
 
     public PulseFileLoader createLoader()
     {
-        PulseFileLoader loader = new PulseFileLoader();
-        loader.setObjectFactory(objectFactory);
-        for(Map.Entry<String, Class> entry: types.entrySet())
+        try
         {
-            loader.register(entry.getKey(), entry.getValue());
+            PulseFileLoader loader = objectFactory.buildBean(PulseFileLoader.class);
+            for(Map.Entry<String, Class> entry: types.entrySet())
+            {
+                loader.register(entry.getKey(), entry.getValue());
+            }
+            return loader;
         }
-
-        return loader;
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to create file loader instance. Cause: " + e.getMessage(), e);
+        }
     }
 
     public void register(String name, Class type)

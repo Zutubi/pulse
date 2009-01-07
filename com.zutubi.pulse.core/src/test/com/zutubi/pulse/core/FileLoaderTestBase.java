@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.bean.WiringObjectFactory;
 
 /**
  * Helper base class for file loader tests.
@@ -12,12 +13,15 @@ import com.zutubi.util.bean.ObjectFactory;
 public abstract class FileLoaderTestBase extends PulseTestCase
 {
     protected PulseFileLoader loader;
+    private WiringObjectFactory objectFactory;
 
     public void setUp() throws Exception
     {
         super.setUp();
 
-        ObjectFactory objectFactory = new DefaultObjectFactory();
+        objectFactory = new WiringObjectFactory();
+        objectFactory.initProperties(this);
+        
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
         fileLoaderFactory.setObjectFactory(objectFactory);
 

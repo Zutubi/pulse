@@ -14,12 +14,11 @@ import java.util.List;
 public class PulseFileLoader extends FileLoader
 {
     /**
-     * Package protected: use PulseFileLoaderFactory to create.
+     * Use the PulseFileLoaderFactory to create a correctly configured instance of
+     * the PulseFileLoader.
      */
-    PulseFileLoader()
+    public PulseFileLoader()
     {
-        register("register", Register.class);
-        register("version", Version.class);
     }
 
     public List<ResourceRequirement> loadRequiredResources(String pulseFile, String recipe) throws PulseException

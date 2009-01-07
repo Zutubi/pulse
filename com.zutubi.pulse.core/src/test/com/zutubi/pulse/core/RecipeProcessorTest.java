@@ -14,6 +14,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -23,10 +24,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-/**
- * 
- *
- */
 public class RecipeProcessorTest extends PulseTestCase implements EventListener
 {
     private File baseDir;
@@ -34,6 +31,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private RecipePaths paths;
     private RecipeProcessor recipeProcessor;
     private EventManager eventManager;
+    private WiringObjectFactory objectFactory;
     private BlockingQueue<Event> events;
     private boolean waitMode = false;
     private Semaphore semaphore = new Semaphore(0);
@@ -52,22 +50,11 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         events = new LinkedBlockingQueue<Event>(10);
         eventManager.register(this);
 
-        // just a little bit of wiring tomfoolary to inject the event manager into the recipe.
-        ObjectFactory factory = new DefaultObjectFactory()
-        {
-            public <T> T buildBean(Class<? extends T> clazz) throws Exception
-            {
-                T bean = super.buildBean(clazz);
-                if (bean instanceof Recipe)
-                {
-                    ((Recipe)bean).setEventManager(eventManager);
-                }
-                return bean;
-            }
-        };
-
+        objectFactory = new WiringObjectFactory();
+        objectFactory.initProperties(this);
+        
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
-        fileLoaderFactory.setObjectFactory(factory);
+        fileLoaderFactory.setObjectFactory(objectFactory);
         fileLoaderFactory.register("noop", NoopCommand.class);
         fileLoaderFactory.register("failure", FailureCommand.class);
         fileLoaderFactory.register("exception", ExceptionCommand.class);
@@ -80,10 +67,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         removeDirectory(baseDir);
         removeDirectory(outputDir);
-        paths = null;
-        recipeProcessor = null;
-        eventManager = null;
-        events = null;
+
         super.tearDown();
     }
 
