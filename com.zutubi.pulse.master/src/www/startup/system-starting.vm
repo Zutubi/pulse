@@ -3,18 +3,26 @@
     <meta http-equiv="refresh" content='5;$base/'/>
     <title>#wwtext("name=startup.heading")</title>
 </head>
-
 <body>
-
-<h1>:: #wwtext("name=startup.heading") ::</h1>
-
-<p>
-    The system is currently starting up and will be available shortly.
-</p>
-<p>
-    This page should refresh periodically. If it doesn't, click <a href="$base/">here</a> to refresh this page.
-</p>
-
-
+    <h1>:: #wwtext("name=startup.heading") ::</h1>
+    <p>
+        The system is currently starting up and will be available shortly.
+    </p>
+    <p>
+        This page should refresh periodically. If it doesn't, click <a href="$base/">here</a> to refresh this page.
+    </p>
+#if($errorRecords.size() > 0)
+    <div style="text-align: left">
+        <h2 class="section">#wwtext("name=startup.errors")</h2>
+        <p>
+            #wwtext("name=startup.errors.blurb")
+        </p>
+        <p>
+    #foreach($record in $errorRecords)
+            #serverMessage($record)
+    #end
+        </p>
+    </div>
+#end
 </body>
 </html>

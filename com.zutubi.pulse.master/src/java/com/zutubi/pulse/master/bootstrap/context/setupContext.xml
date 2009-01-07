@@ -52,6 +52,8 @@
         </property>
     </bean>
 
+    <bean id="serverMessagesHandler" class="com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler" init-method="init"/>
+
     <!--
     this spring object factory will ensure that WebWork Actions are autowired, required each
     time the spring context is updated

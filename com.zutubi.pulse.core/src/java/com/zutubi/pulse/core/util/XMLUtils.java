@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.util;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.io.IOUtils;
 import nu.xom.*;
 
 import java.io.*;
@@ -107,7 +107,7 @@ public class XMLUtils
         return result;
     }
 
-    public static String getAttributeDefault(Element e, String attribute, String defaultValue) throws ParsingException
+    public static String getAttributeDefault(Element e, String attribute, String defaultValue)
     {
         String result = e.getAttributeValue(attribute);
         if (result == null)

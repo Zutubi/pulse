@@ -144,7 +144,7 @@
     <package name="startup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="starting" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
+        <action name="starting" class="com.zutubi.pulse.master.xwork.actions.setup.SystemStartingAction">
             <result name="success" type="velocity">system-starting.vm</result>
         </action>
     </package>

@@ -162,8 +162,6 @@
 
     <bean id="tokenManager" class="com.zutubi.pulse.master.api.DefaultTokenManager" autowire="byName" init-method="init"/>
 
-    <bean id="serverMessagesHandler" class="com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler" init-method="init"/>
-
     <bean id="notifyConditionFactory" class="com.zutubi.pulse.master.condition.NotifyConditionFactory">
         <property name="objectFactory" ref="objectFactory"/>
     </bean>

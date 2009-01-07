@@ -12,13 +12,6 @@ public class WebManager
 {
     private JettyManager jettyManager;
 
-    public void deployShutdown()
-    {
-        ensureJettyStarted();
-
-        loadXworkConfiguration("xwork-shutdown.xml");
-    }
-
     public void deploySetup()
     {
         ensureJettyStarted();
