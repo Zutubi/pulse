@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.util.monitor.Task;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,27 +55,34 @@ public class DefaultRestoreManager implements RestoreManager
 
     public Archive prepareRestore(File source) throws ArchiveException
     {
-        this.source = source;
-
-        ArchiveFactory factory = new ArchiveFactory();
-        factory.setTmpDirectory(tmpDirectory);
-
-        archive = factory.importArchive(source);
-
-        for (ArchiveableComponent component : archiveableComponents)
+        try
         {
-            String name = component.getName();
-            File archiveComponentBase = new File(archive.getBase(), name);
+            this.source = source.getCanonicalFile();
 
-            // does it matter if this does not exist, do we need to process something regardless?
+            ArchiveFactory factory = new ArchiveFactory();
+            factory.setTmpDirectory(tmpDirectory);
 
-            RestoreComponentTask task = new RestoreComponentTask(component, archiveComponentBase);
-            tasks.add(task);
+            archive = factory.importArchive(source);
+
+            for (ArchiveableComponent component : archiveableComponents)
+            {
+                String name = component.getName();
+                File archiveComponentBase = new File(archive.getBase(), name);
+
+                // does it matter if this does not exist, do we need to process something regardless?
+
+                RestoreComponentTask task = new RestoreComponentTask(component, archiveComponentBase);
+                tasks.add(task);
+            }
+
+            jobManager.register(ARCHIVE_JOB_KEY, tasks);
+
+            return archive;
         }
-
-        jobManager.register(ARCHIVE_JOB_KEY, tasks);
-
-        return archive;
+        catch (IOException e)
+        {
+            throw new ArchiveException(e);
+        }
     }
 
     public Archive getArchive()

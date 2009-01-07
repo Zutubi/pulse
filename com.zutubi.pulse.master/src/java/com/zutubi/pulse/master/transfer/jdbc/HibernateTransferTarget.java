@@ -39,6 +39,8 @@ public class HibernateTransferTarget implements TransferTarget
     private boolean originalAutoCommitSetting = false;
     private int rowCount = 0;
 
+    private boolean verbose = false;
+
     public void start() throws TransferException
     {
         try
@@ -60,6 +62,12 @@ public class HibernateTransferTarget implements TransferTarget
         try
         {
             this.table = table;
+
+            if (table.getName().equals("PROJECT"))
+            {
+                System.out.printf("<PROJECT>");
+                verbose = true;
+            }
 
             // Check that table somewhat matches the schemaTable it will be inserted into.  This verifies
             // that the data from the transfer source tables matches the data for this transfer target.
@@ -110,6 +118,10 @@ public class HibernateTransferTarget implements TransferTarget
                 insert.setObject(i + 1, obj);
             }
             String sql = insertSql.replace("?", "%s");
+            if (verbose)
+            {
+                System.out.println(String.format(sql, data.toArray()));
+            }
             LOG.fine(String.format(sql, data.toArray()));
             insert.execute();
 
@@ -126,6 +138,11 @@ public class HibernateTransferTarget implements TransferTarget
 
     public void endTable() throws TransferException
     {
+        if (verbose)
+        {
+            verbose = false;
+        }
+        
         try
         {
             connection.commit();
