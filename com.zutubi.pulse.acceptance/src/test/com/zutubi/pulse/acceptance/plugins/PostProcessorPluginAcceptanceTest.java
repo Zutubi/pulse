@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.bean.WiringObjectFactory;
 
 import java.io.File;
 
@@ -21,6 +21,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
     private PostProcessorExtensionManager extensionManager;
 
     private PulseFileLoaderFactory loaderFactory;
+    private WiringObjectFactory objectFactory;
     private File tmpDir;
     private PluginSystem pluginSystem;
     private File samplePostProcessorPlugin;
@@ -43,14 +44,18 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         pluginSystem.startup();
 
+        objectFactory = new WiringObjectFactory();
+
         loaderFactory = new PulseFileLoaderFactory();
-        loaderFactory.setObjectFactory(new DefaultObjectFactory());
+        loaderFactory.setObjectFactory(objectFactory);
 
         extensionManager = new PostProcessorExtensionManager();
         extensionManager.setPluginManager(pluginSystem.getPluginManager());
         extensionManager.setFileLoaderFactory(loaderFactory);
         extensionManager.init();
         extensionManager.initialiseExtensions();
+
+        objectFactory.initProperties(this);
     }
 
     protected void tearDown() throws Exception
