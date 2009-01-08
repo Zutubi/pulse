@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * An option provider for the agent field of a build stage.
+ * An option provider for the recipe field of a build stage.
  */
 public class BuildStageRecipeOptionProvider extends ListOptionProvider
 {
