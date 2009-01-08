@@ -1,15 +1,15 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,8 @@ import java.util.Map;
  */
 public class ProjectConfigurationWizard extends AbstractTypeWizard
 {
+    public static final String DEFAULT_STAGE = "default";
+
     private CompositeType projectType;
     private CompositeType scmType;
     private CompositeType typeType;
@@ -55,8 +57,8 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             CompositeType stageType = (CompositeType) stagesType.getTargetType();
             MutableRecord stagesRecord = stagesType.createNewRecord(true);
             MutableRecord stageRecord = stageType.createNewRecord(true);
-            stageRecord.put("name", "default");
-            stagesRecord.put("default", stageRecord);
+            stageRecord.put("name", DEFAULT_STAGE);
+            stagesRecord.put(DEFAULT_STAGE, stageRecord);
             record.put("stages", stagesRecord);
         }
 

@@ -29,10 +29,23 @@ public @interface Select
     public static final int DEFAULT_size = 1;
 
     /**
+     * By default, users are restricted to the presented options.
+     */
+    public static final boolean DEFAULT_editable = false;
+
+    /**
      * The size property defined the number of options that will be visible in the select widget at the same
      * time.
      * 
      * @return the number of visible options in the select widget.
      */
     public int size() default DEFAULT_size;
+
+    /**
+     * If true, the user may manually enter a value rather than being
+     * restricted to the available options.
+     *
+     * @return whether the field is editable by the user
+     */
+    public boolean editable() default DEFAULT_editable;
 }

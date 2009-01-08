@@ -4,9 +4,7 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.StringUtils;
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Map;
@@ -68,7 +66,7 @@ public abstract class SeleniumForm
         return selenium.isElementPresent(getFormName());
     }
 
-    protected String getFieldId(String name)
+    public String getFieldId(String name)
     {
         return "zfid." + name;
     }

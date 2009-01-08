@@ -3,39 +3,16 @@
 (function()
 {
     var data = [];
+<#list parameters.list as item>
+    data.push('${item?js_string}');
+</#list>
 
-    <#list parameters.list as item>
-        <#if parameters.listKey?exists>
-            <#assign itemKey = item[parameters.listKey]/>
-        <#else>
-            <#assign itemKey = item/>
-        </#if>
-        <#if parameters.listValue?exists>
-            <#assign itemValue = item[parameters.listValue]/>
-        <#else>
-            <#assign itemValue = item/>
-        </#if>
-
-        <#if itemValue == "">
-            <#assign itemValue = "[not set]"/>
-        </#if>
-    data.push(['${itemKey?js_string}', '${itemValue?js_string}']);
-    </#list>
-
-    var store = new Ext.data.SimpleStore({
-        fields: ['value', 'text'],
-        data: data
-    });
-
-    fc.store = store;
+    fc.store = data;
     fc.mode = 'local';
-    fc.hiddenName = fc.name;
-    fc.name = 'combo.' + fc.hiddenName;
-    fc.displayField = 'text';
-    fc.valueField = 'value';
-    fc.editable = false;
-    fc.forceSelection = true;
+    fc.emptyText = '[default]';
     fc.triggerAction = 'all';
+    fc.editable = true;
+    fc.forceSelection = false;
 <#if parameters.width?exists>
     fc.width = ${parameters.width};
 </#if>
@@ -44,12 +21,13 @@
 <#else>
     if(data.length > 0)
     {
-        fc.value = data[0][0];
+        fc.value = data[0];
     }
 </#if>
     var combo = new Ext.form.ComboBox(fc);
     ${form.name}.add(combo);
     combo.on('select', updateButtons);
+    combo.on('keyup', function() { combo.setValue(combo.getRawValue()); });
 }());
 
 <#include "/tove/xhtml/controlfooter.ftl" />

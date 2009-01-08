@@ -1,19 +1,18 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
-/**
- */
 public class PulseFileLoaderTest extends FileLoaderTestBase
 {
     public void setUp() throws Exception
     {
         super.setUp();
-
         loader.register("resource", ResourceReference.class);
     }
 
@@ -41,6 +40,11 @@ public class PulseFileLoaderTest extends FileLoaderTestBase
         {
             assertTrue(e.getMessage().contains("Required attribute name not specified"));
         }
+    }
+
+    public void testRecipeListing() throws PulseException, IOException
+    {
+        assertEquals(Arrays.asList("default", "two", "three"), loader.loadAvailableRecipes(getPulseFile(getName())));
     }
 
     private String getPulseFile(String name) throws IOException

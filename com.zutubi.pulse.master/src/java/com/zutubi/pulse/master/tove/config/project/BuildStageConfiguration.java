@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  A build stage is a component of a build that represents the execution of a
+ * A build stage is a component of a build that represents the execution of a
  * single recipe on an agent.  Stages execute independently and in parallel
  * where possible, and the build result is the aggregation of all stage
  * results.
@@ -28,6 +28,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
 
     @Reference(optionProvider = "BuildStageAgentOptionProvider")
     private AgentConfiguration agent;
+    @Select(optionProvider = "BuildStageRecipeOptionProvider", editable = true)
     private String recipe;
     @Ordered
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();

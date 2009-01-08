@@ -570,7 +570,6 @@ public abstract class AbstractTypeWizard implements Wizard
 
                 SelectFieldDescriptor select = new SelectFieldDescriptor();
                 select.setName(SELECT_FIELD_NAME);
-                select.setType("select");
                 select.addParameter("width", 300);
 
                 ExtensionOptionProvider optionProvider = new ExtensionOptionProvider(extensions);

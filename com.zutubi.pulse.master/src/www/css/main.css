@@ -1072,6 +1072,11 @@ table.template-actions
     overflow: visible;
 }
 
+.x-combo-list-item
+{
+    height: 1.1em;
+}
+
 /*
  * Config pages
  */

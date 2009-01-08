@@ -39,6 +39,7 @@ public class Constants
      */
     public static class Project
     {
+        public static final String STAGES = "stages";
         public static final String TYPE = "type";
 
         /**
@@ -50,11 +51,27 @@ public class Constants
         }
 
         /**
+         * Property names in the versioned type class.
+         */
+        public static class VersionedType
+        {
+            public static final String PULSE_FILE_NAME = "pulseFileName";
+        }
+        
+        /**
          * The constants for the property names in the project template type class.
          */
         public static class Type
         {
             public static final String ARTIFACTS = "artifacts";
+        }
+
+        /**
+         * Build stage properties.
+         */
+        public static class Stage
+        {
+            public static final String RECIPE = "recipe";
         }
     }
 

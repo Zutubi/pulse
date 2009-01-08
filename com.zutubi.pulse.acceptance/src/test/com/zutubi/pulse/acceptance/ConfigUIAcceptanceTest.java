@@ -5,12 +5,15 @@ import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 
+import static java.util.Arrays.asList;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
@@ -776,6 +779,32 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         form.waitFor();
         assertFormElements(form, null, null, originalUrl, null, null, null, null, null, null);
+    }
+
+    public void testComboListing()
+    {
+        addProject(random, true);
+        checkListedRecipes(asList("", "ant build"));
+    }
+
+    public void testComboInvalidVersionedProject() throws Exception
+    {
+        Hashtable<String, Object> versionedType = xmlRpcHelper.createDefaultConfig("zutubi.versionedTypeConfig");
+        versionedType.put(Constants.Project.VersionedType.PULSE_FILE_NAME, "invalid.xml");
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), versionedType);
+
+        checkListedRecipes(asList(""));
+    }
+
+    private void checkListedRecipes(List<String> expectedRecipes)
+    {
+        loginAsAdmin();
+        goTo(urls.adminProject(random) + Constants.Project.STAGES + "/" + ProjectConfigurationWizard.DEFAULT_STAGE + "/");
+
+        BuildStageForm stageForm = new BuildStageForm(selenium, false);
+        stageForm.waitFor();
+        String[] stages = stageForm.getComboBoxOptions(Constants.Project.Stage.RECIPE);
+        assertEquals(expectedRecipes, asList(stages));
     }
 
     private void insertProperty(String projectPath) throws Exception

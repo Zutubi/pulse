@@ -1,7 +1,9 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 
 import java.io.ByteArrayInputStream;
@@ -46,5 +48,27 @@ public class PulseFileLoader extends FileLoader
         }
 
         return requirements;
+    }
+
+    /**
+     * Retrieves a list of available recipes from a pulse file.
+     *
+     * @param pulseFile source of the pulse file (an XML string)
+     * @return a list of all recipe names in the file
+     * @throws PulseException if the file cannot be loaded
+     */
+    public List<String> loadAvailableRecipes(String pulseFile) throws PulseException
+    {
+        PulseFile file = new PulseFile();
+        RecipeListingPredicate predicate = new RecipeListingPredicate();
+        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), new FileResourceRepository(), predicate);
+
+        return CollectionUtils.map(file.getRecipes(), new Mapping<Recipe, String>()
+        {
+            public String map(Recipe recipe)
+            {
+                return recipe.getName();
+            }
+        });
     }
 }

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.tove.type.record.Record;
 
 import java.util.List;
@@ -9,11 +8,22 @@ import java.util.List;
  */
 public class OptionFieldDescriptor extends FieldDescriptor
 {
+    public static final String PARAMETER_EDITABLE = "editable";
     public static final String PARAMETER_EMPTY_OPTION = "emptyOption";
     public static final String PARAMETER_LIST = "list";
     public static final String PARAMETER_MULTIPLE = "multiple";
     public static final String PARAMETER_SIZE = "size";
 
+    public boolean isEditable()
+    {
+        return getParameter(PARAMETER_EDITABLE, false);
+    }
+
+    public void setEditable(boolean editable)
+    {
+        addParameter(PARAMETER_EDITABLE, editable);
+    }
+    
     public Object getEmptyOption()
     {
         return getParameter(PARAMETER_EMPTY_OPTION);
@@ -66,16 +76,23 @@ public class OptionFieldDescriptor extends FieldDescriptor
 
     public Field instantiate(String path, Record instance)
     {
-        if(transformToSelect())
+        if (!displayMultiple())
         {
-            setType("combobox");
+            if (isEditable())
+            {
+                setType("combobox");
+            }
+            else
+            {
+                setType("dropdown");
+            }
         }
 
         return super.instantiate(path, instance);
     }
 
-    protected boolean transformToSelect()
+    protected boolean displayMultiple()
     {
-        return !getMultiple() && (!hasParameter(PARAMETER_SIZE) || getSize() == 1);
+        return getMultiple() || (hasParameter(PARAMETER_SIZE) && getSize() > 1);
     }
 }

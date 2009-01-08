@@ -1,4 +1,4 @@
-<#include "/tove/xhtml/combobox.ftl" />
+<#include "/tove/xhtml/dropdown.ftl" />
 (function()
 {
     function shouldEnable(select)

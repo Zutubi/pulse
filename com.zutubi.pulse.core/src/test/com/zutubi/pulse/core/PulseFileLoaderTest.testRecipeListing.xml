@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<project default-recipe="default">
+    <recipe name="default"/>
+    <recipe name="two"/>
+    <recipe name="three"/>
+</project>
