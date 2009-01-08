@@ -1,20 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.junit.ZutubiTestCase;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.net.URL;
 import java.util.Vector;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 /**
  * Helper base class for test cases that call the remote api.  Provides
  * simple functions for logging in and out and calling the API with a
  * token.
  */
-public class BaseXmlRpcAcceptanceTest extends ZutubiTestCase
+public class BaseXmlRpcAcceptanceTest extends PulseTestCase
 {
     public static final String SYMBOLIC_NAME_KEY = XmlRpcHelper.SYMBOLIC_NAME_KEY;
 
@@ -42,12 +39,6 @@ public class BaseXmlRpcAcceptanceTest extends ZutubiTestCase
         }
 
         xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", port, "/xmlrpc"));
-    }
-
-    protected void tearDown() throws Exception
-    {
-        xmlRpcHelper = null;
-        super.tearDown();
     }
 
     protected String randomName()

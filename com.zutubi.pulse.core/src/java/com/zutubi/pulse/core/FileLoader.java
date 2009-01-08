@@ -33,7 +33,7 @@ public class FileLoader
     private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
     private ObjectFactory factory;
 
-    private ValidationManager validationManager;
+    private ValidationManager validationManager = new PulseValidationManager();
 
     public FileLoader()
     {
@@ -249,21 +249,11 @@ public class FileLoader
     private void validate(Object obj) throws CommandValidationException, ValidationException
     {
         ValidationContext validationContext = new PulseValidationContext(new MessagesTextProvider(obj));
-        getValidationManager().validate(obj, validationContext);
+        validationManager.validate(obj, validationContext);
         if (validationContext.hasErrors())
         {
             throw new CommandValidationException(validationContext);
         }
-    }
-
-    private synchronized ValidationManager getValidationManager()
-    {
-        // If the validation manager has not been provided externally, then we create a default one.
-        if (validationManager == null)
-        {
-            validationManager = new PulseValidationManager();
-        }
-        return validationManager;
     }
 
     private void loadSubElements(Element e, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate)

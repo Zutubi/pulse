@@ -324,6 +324,13 @@ public class XmlRpcHelper
         return type;
     }
 
+    public Hashtable<String, Object> getCustomTypeConfig(String pulseFileString)
+    {
+        Hashtable<String, Object> type = createEmptyConfig("zutubi.customTypeConfig");
+        type.put("pulseFileString", pulseFileString);
+        return type;
+    }
+
     public void waitForProjectToInitialise(String name) throws Exception
     {
         long startTime = System.currentTimeMillis();
