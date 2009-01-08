@@ -21,6 +21,7 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.servercore.bootstrap.*;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
+import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
 import com.zutubi.tove.type.record.RecordManager;
@@ -57,6 +58,7 @@ public class DefaultSetupManager implements SetupManager
     private UpgradeManager upgradeManager;
     private MigrationManager migrationManager;
     private EventManager eventManager;
+    private ShutdownManager shutdownManager;
 
     /**
      * Contexts for Stage A: the config subsystem.
@@ -633,12 +635,7 @@ public class DefaultSetupManager implements SetupManager
         {
             return false;
         }
-        if (archive.exists())
-        {
-            return true;
-        }
-        printConsoleMessage("Specified restore archive file " + archive.getAbsolutePath() + " does not exist or is blank. Skipping restore.");
-        return false;
+        return true;
     }
 
     /**
@@ -690,20 +687,27 @@ public class DefaultSetupManager implements SetupManager
 
         if (isRestoreRequested())
         {
-            File backup = getArchiveFile();
+            File archive = getArchiveFile();
             try
             {
-                printConsoleMessage("Restoring from archive file: " + backup.getCanonicalPath());
+                printConsoleMessage("Restoring from archive file: " + archive.getCanonicalPath());
             }
             catch (IOException e)
             {
-                printConsoleMessage("Restoring from archive file: " + backup.getAbsolutePath());
+                printConsoleMessage("Restoring from archive file: " + archive.getAbsolutePath());
             }
 
+            if (!archive.exists() || archive.length() == 0)
+            {
+                printConsoleMessage("Specified restore archive file " + archive.getAbsolutePath() + " does not exist or is blank.");
+                // shutdown, the archive is invalid.
+                shutdownManager.shutdown(true, true);
+                return;
+            }
 
             try
             {
-                restoreManager.prepareRestore(backup);
+                restoreManager.prepareRestore(archive);
 
                 // show restoration preview page.
                 state = SetupState.RESTORE;
@@ -794,5 +798,10 @@ public class DefaultSetupManager implements SetupManager
     public void setMigrationManager(MigrationManager migrationManager)
     {
         this.migrationManager = migrationManager;
+    }
+
+    public void setShutdownManager(ShutdownManager shutdownManager)
+    {
+        this.shutdownManager = shutdownManager;
     }
 }
