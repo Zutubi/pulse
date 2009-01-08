@@ -13,7 +13,6 @@ import com.zutubi.tove.type.record.PathUtils;
 
 import static java.util.Arrays.asList;
 import java.util.Hashtable;
-import java.util.List;
 
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
@@ -784,7 +783,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testComboListing()
     {
         addProject(random, true);
-        checkListedRecipes(asList("", "ant build"));
+        checkListedRecipes("", "ant build");
     }
 
     public void testComboInvalidVersionedProject() throws Exception
@@ -793,10 +792,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         versionedType.put(Constants.Project.VersionedType.PULSE_FILE_NAME, "invalid.xml");
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), versionedType);
 
-        checkListedRecipes(asList(""));
+        checkListedRecipes("");
     }
 
-    private void checkListedRecipes(List<String> expectedRecipes)
+    private void checkListedRecipes(String... expectedRecipes)
     {
         loginAsAdmin();
         goTo(urls.adminProject(random) + Constants.Project.STAGES + "/" + ProjectConfigurationWizard.DEFAULT_STAGE + "/");
@@ -804,7 +803,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         BuildStageForm stageForm = new BuildStageForm(selenium, false);
         stageForm.waitFor();
         String[] stages = stageForm.getComboBoxOptions(Constants.Project.Stage.RECIPE);
-        assertEquals(expectedRecipes, asList(stages));
+        assertEquals(asList(expectedRecipes), asList(stages));
     }
 
     private void insertProperty(String projectPath) throws Exception
