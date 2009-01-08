@@ -22,7 +22,7 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
 {
     private static final Logger LOG = Logger.getLogger(BuildStageRecipeOptionProvider.class);
 
-    private static final int TIMEOUT_SECONDS = 5;
+    private static final int TIMEOUT_SECONDS = 10;
     
     private ConfigurationProvider configurationProvider;
     private PulseFileLoaderFactory fileLoaderFactory;
