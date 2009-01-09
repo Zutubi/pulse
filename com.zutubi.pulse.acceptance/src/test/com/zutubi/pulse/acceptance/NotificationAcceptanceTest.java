@@ -63,6 +63,8 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     protected void tearDown() throws Exception
     {
+        // Remove subscriptions so that subsequent tests are not affected.
+        xmlRpcHelper.deleteAllConfigs("users/*/preferences/subscriptions/*");
         xmlRpcHelper.logout();
 
         server.stop();
