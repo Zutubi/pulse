@@ -1,5 +1,6 @@
 <#include "/tove/xhtml/controlheader.ftl" />
 
+fc.autoCreate = {tag: "input", type: "text", size: "20"};
 <#if parameters.value?exists>
     fc.value = '${parameters.value?js_string}';
 </#if>
