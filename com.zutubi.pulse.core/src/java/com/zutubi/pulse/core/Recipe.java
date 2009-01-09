@@ -258,7 +258,7 @@ public class Recipe extends SelfReference
 
         commandResult.commence();
         commandResult.setOutputDir(commandOutput.getPath());
-        long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID);
+        long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
         eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
 
         try

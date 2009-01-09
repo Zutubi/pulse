@@ -75,9 +75,9 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
 
     static String getSyncWorkspaceName(ExecutionContext context)
     {
-        return getWorkspacePrefix(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT_HANDLE)) +
+        return getWorkspacePrefix(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT_HANDLE, 0)) +
                 WORKSPACE_NAME_SEPARATOR +
-                Long.toString(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE));
+                Long.toString(context.getLong(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT_HANDLE, 0));
     }
 
     static String getSyncWorkspaceDescription(ExecutionContext context)

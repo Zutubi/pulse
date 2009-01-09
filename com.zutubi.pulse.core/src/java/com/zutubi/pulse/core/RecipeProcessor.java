@@ -3,7 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
@@ -22,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -196,7 +196,7 @@ public class RecipeProcessor
     {
         context.push();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP, BuildProperties.TIMESTAMP_FORMAT.format(new Date(recipeStartTime)));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(recipeStartTime)));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
 

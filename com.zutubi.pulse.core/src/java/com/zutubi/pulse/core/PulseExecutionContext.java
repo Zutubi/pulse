@@ -88,17 +88,17 @@ public class PulseExecutionContext implements ExecutionContext
         return defaultValue;
     }
 
-    public long getLong(String namespace, String name)
+    public long getLong(String namespace, String name, long defaultValue)
     {
-        return asLong(getValue(namespace, name, Object.class));
+        return asLong(getValue(namespace, name, Object.class), defaultValue);
     }
 
-    public long getLong(String name)
+    public long getLong(String name, long defaultValue)
     {
-        return asLong(getValue(name, Object.class));
+        return asLong(getValue(name, Object.class), defaultValue);
     }
 
-    private long asLong(Object value)
+    private long asLong(Object value, long defaultValue)
     {
         if (value != null)
         {
@@ -119,7 +119,7 @@ public class PulseExecutionContext implements ExecutionContext
             }
         }
 
-        return 0;
+        return defaultValue;
     }
 
     public File getFile(String namespace, String name)
@@ -157,11 +157,6 @@ public class PulseExecutionContext implements ExecutionContext
     public <T> T getValue(String name, Class<T> type)
     {
         return scopeStack.getScope().getReferenceValue(name, type);
-    }
-
-    public PulseScope getScope()
-    {
-        return scopeStack.getScope();
     }
 
     public void add(String namespace, Reference reference)
@@ -228,6 +223,18 @@ public class PulseExecutionContext implements ExecutionContext
             // Never happens, just return split anyway.
             return StringUtils.split(input);
         }
+    }
+
+    /**
+     * Get the root level scope associated with this execution context.  For ease of use,
+     * numerous convenience methods have been added to this interface that provide access
+     * to the contents of the scope through the Execution Context interface.
+     *
+     * @return the root level scope of this execution context.
+     */
+    public PulseScope getScope()
+    {
+        return scopeStack.getScope();
     }
 
     public void push()

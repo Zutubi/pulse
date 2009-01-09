@@ -111,7 +111,7 @@ public abstract class LocalArtifact extends ArtifactSupport
      */
     protected boolean captureFile(StoredArtifact artifact, File fromFile, String path, CommandResult result, ExecutionContext context, String type)
     {
-        if (ignoreStale && fromFile.lastModified() < context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS))
+        if (ignoreStale && fromFile.lastModified() < context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, 0))
         {
             return false;
         }

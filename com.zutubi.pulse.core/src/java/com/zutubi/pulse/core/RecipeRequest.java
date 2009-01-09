@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -52,7 +52,7 @@ public class RecipeRequest
 
     public long getId()
     {
-        return context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID);
+        return context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
     }
 
     public Bootstrapper getBootstrapper()

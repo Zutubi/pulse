@@ -59,35 +59,35 @@ public class PulseExecutionContextTest extends PulseTestCase
     public void testGetLongNotSet()
     {
         ExecutionContext context = new PulseExecutionContext();
-        assertEquals(0L, context.getLong("foo"));
+        assertEquals(0L, context.getLong("foo", 0));
     }
 
     public void testGetLongLong()
     {
         ExecutionContext context = new PulseExecutionContext();
         context.addValue("foo", 1L);
-        assertEquals(1L, context.getLong("foo"));
+        assertEquals(1L, context.getLong("foo", 0));
     }
 
     public void testGetLongString()
     {
         ExecutionContext context = new PulseExecutionContext();
         context.addValue("foo", "33");
-        assertEquals(33L, context.getLong("foo"));
+        assertEquals(33L, context.getLong("foo", 0));
     }
 
     public void testGetLongUnparseableString()
     {
         ExecutionContext context = new PulseExecutionContext();
         context.addValue("foo", "eek");
-        assertEquals(0L, context.getLong("foo"));
+        assertEquals(0L, context.getLong("foo", 0));
     }
 
     public void testGetLongOther()
     {
         ExecutionContext context = new PulseExecutionContext();
         context.addValue("foo", new Object());
-        assertEquals(0L, context.getLong("foo"));
+        assertEquals(0L, context.getLong("foo", 0));
     }
 
     public void testGetFileNotSet()
@@ -138,7 +138,7 @@ public class PulseExecutionContextTest extends PulseTestCase
     public void testCopyProducesUniqueScopes()
     {
         PulseExecutionContext context = makeNonTrivialContext();
-        ExecutionContext copy = new PulseExecutionContext(context);
+        PulseExecutionContext copy = new PulseExecutionContext(context);
         for(Scope scopeCopy = copy.getScope(); scopeCopy != null; scopeCopy = scopeCopy.getParent())
         {
             for(Scope scope = context.getScope(); scope != null; scope = scope.getParent())

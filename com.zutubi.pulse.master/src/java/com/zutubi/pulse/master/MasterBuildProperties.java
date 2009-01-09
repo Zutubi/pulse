@@ -15,6 +15,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -39,7 +40,7 @@ public class MasterBuildProperties extends BuildProperties
         {
             context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, result.getRevision().getRevisionString());
         }
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(result.getStamps().getStartTime()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(result.getStamps().getStartTime()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(result.getStamps().getStartTime()));
         addProjectProperties(context, result.getProject().getConfig());
         addCompletedBuildProperties(context, result, configurationManager);
@@ -81,7 +82,7 @@ public class MasterBuildProperties extends BuildProperties
     public static void addRevisionProperties(ExecutionContext context, BuildRevision buildRevision)
     {
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, buildRevision.getRevision().getRevisionString());
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(buildRevision.getTimestamp())));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildRevision.getTimestamp()));
     }
 
@@ -148,7 +149,7 @@ public class MasterBuildProperties extends BuildProperties
             File recipeDir = recipeResult.getRecipeDir(configurationManager.getDataDirectory());
             if (recipeDir != null)
             {
-                context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, recipeDir.getAbsolutePath());
+                context.addString(NAMESPACE_INTERNAL, prefix + SUFFIX_DIRECTORY, recipeDir.getAbsolutePath());
             }
 
             for(CommandResult command: recipeResult.getCommandResults())
@@ -175,7 +176,7 @@ public class MasterBuildProperties extends BuildProperties
         File outputDir = commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
         if (outputDir != null)
         {
-            context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, outputDir.getAbsolutePath());
+            context.addString(NAMESPACE_INTERNAL, prefix + SUFFIX_DIRECTORY, outputDir.getAbsolutePath());
         }
     }
 }
