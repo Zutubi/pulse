@@ -3,8 +3,8 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.config.Resource;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
@@ -170,6 +170,7 @@ public class LocalBuild
 
             PulseExecutionContext context = new PulseExecutionContext();
             context.setWorkingDir(baseDir);
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_LOCAL_BUILD, Boolean.toString(true));
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repository);
             context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipe);

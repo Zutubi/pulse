@@ -169,15 +169,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
     public String getPassStatus()
     {
-        for(Map.Entry<String, TestStatus> entry: statusMap.entrySet())
-        {
-            if(entry.getValue().equals(TestStatus.PASS))
-            {
-                return entry.getKey();
-            }
-        }
-
-        return null;
+        return findStatus(TestStatus.PASS);
     }
 
     public void setPassStatus(String status)
@@ -187,20 +179,35 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
     public String getFailureStatus()
     {
+        return findStatus(TestStatus.FAILURE);
+    }
+
+    public void setFailureStatus(String status)
+    {
+        this.statusMap.put(status, TestStatus.FAILURE);
+    }
+
+    public String getErrorStatus()
+    {
+        return findStatus(TestStatus.ERROR);
+    }
+
+    public void setErrorStatus(String status)
+    {
+        this.statusMap.put(status, TestStatus.ERROR);
+    }
+
+    private String findStatus(TestStatus status)
+    {
         for(Map.Entry<String, TestStatus> entry: statusMap.entrySet())
         {
-            if(entry.getValue().equals(TestStatus.FAILURE))
+            if(entry.getValue().equals(status))
             {
                 return entry.getKey();
             }
         }
 
         return null;
-    }
-
-    public void setFailureStatus(String status)
-    {
-        this.statusMap.put(status, TestStatus.FAILURE);
     }
 
     public void setText(String txt)

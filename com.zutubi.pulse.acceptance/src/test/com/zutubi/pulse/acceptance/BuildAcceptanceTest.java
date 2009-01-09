@@ -5,10 +5,8 @@ import com.zutubi.pulse.acceptance.forms.admin.SpecifyBuildPropertiesForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
-import com.zutubi.pulse.acceptance.pages.browse.BuildChangesPage;
-import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.acceptance.pages.browse.ViewChangelistPage;
+import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -82,6 +80,12 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         addProject(random, true);
 
         triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+
+        // Check some properties
+        EnvironmentArtifactPage envPage = new EnvironmentArtifactPage(selenium, urls, random, 1, "default", "build");
+        envPage.goTo();
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(false)));
     }
 
     public void testChangesBetweenBuilds() throws Exception

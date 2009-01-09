@@ -37,6 +37,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_INCREMENTAL_BOOTSTRAP   = "incremental.bootstrap";
     public static final String PROPERTY_INCREMENTAL_BUILD       = "incremental.build";
+    /**
+     * Set to "true" for a local build, "false" otherwise.
+     */
+    public static final String PROPERTY_LOCAL_BUILD             = "local.build";
     public static final String PROPERTY_MASTER_URL              = "master.url";
     /**
      * Set to "true" for a personal build, "false" otherwise.

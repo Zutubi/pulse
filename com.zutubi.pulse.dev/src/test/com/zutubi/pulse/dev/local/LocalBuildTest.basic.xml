@@ -6,6 +6,10 @@
         <print name="chowdy" message="bye now"/>
     </recipe>
 
+    <recipe name="properties">
+        <print name="local" message="${local.build}"/>
+    </recipe>
+    
     <post-processor name="my-pp">
         <regex.pp>
             <pattern category="info" expression="info:.*"/>

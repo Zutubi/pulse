@@ -63,6 +63,7 @@ public class MasterBuildProperties extends BuildProperties
             context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TRIGGER, ((TriggerBuildReason)buildReason).getTriggerName());
         }
 
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_LOCAL_BUILD, Boolean.toString(false));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSONAL_BUILD, Boolean.toString(buildResult.isPersonal()));
 
         context.addString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL, masterUrl);
@@ -73,7 +74,7 @@ public class MasterBuildProperties extends BuildProperties
         context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(!buildResult.isPersonal() && checkoutScheme != CheckoutScheme.CLEAN_CHECKOUT));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!buildResult.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE));
 
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, "true");
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, Boolean.toString(true));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_WORKING_DIR, Boolean.toString(projectConfig.getOptions().getRetainWorkingCopy()));
     }
 

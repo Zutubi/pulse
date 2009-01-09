@@ -86,7 +86,8 @@ public class ZipUtils
         }
         else
         {
-            if (!zipFile.getParentFile().isDirectory() && !zipFile.getParentFile().mkdirs())
+            File parent = zipFile.getAbsoluteFile().getParentFile();
+            if (!parent.isDirectory() && !parent.mkdirs())
             {
                 throw new IOException(String.format("Failed to create the directory '%s'", zipFile.getParentFile().getAbsolutePath()));
             }

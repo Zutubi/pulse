@@ -100,7 +100,7 @@ public class FileLoader
 
             if (ScopeAware.class.isAssignableFrom(root.getClass()))
             {
-                ((ScopeAware) root).setScope(globalScope.copy());
+                ((ScopeAware) root).setScope(globalScope);
             }
 
             mapAttributesToProperties(rootElement, root, predicate, globalScope);
@@ -175,7 +175,7 @@ public class FileLoader
 
                 if (ScopeAware.class.isAssignableFrom(type.getClass()))
                 {
-                    ((ScopeAware) type).setScope(scope.copy());
+                    ((ScopeAware) type).setScope(scope);
                 }
 
                 if (ResourceAware.class.isAssignableFrom(type.getClass()))

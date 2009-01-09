@@ -80,8 +80,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         PersonalEnvironmentArtifactPage envPage = new PersonalEnvironmentArtifactPage(selenium, urls, PROJECT_NAME, buildNumber, "default", "build");
         envPage.goTo();
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, "false"));
-        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, "true"));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(false)));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(true)));
         // Make sure this view is not decorated (CIB-1711).
         assertTextNotPresent("logout");
     }
