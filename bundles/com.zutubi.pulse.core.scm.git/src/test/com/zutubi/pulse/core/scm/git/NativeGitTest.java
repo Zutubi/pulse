@@ -6,6 +6,8 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -90,9 +92,8 @@ public class NativeGitTest extends PulseTestCase
         git.setWorkingDirectory(tmp);
         git.clone(handler,  repository, "base");
 
-        assertEquals(2, handler.getStatusMessages().size());
-        String message = handler.getStatusMessages().get(1);
-        assertTrue(message.startsWith("Initialized empty Git repository"));
+        assertThat(handler.getStatusMessages().size(), greaterThan(1));
+        assertThat(handler.getStatusMessages(), hasItem(startsWith("Initialized empty Git repository")));
     }
 
     public void testLog() throws ScmException
