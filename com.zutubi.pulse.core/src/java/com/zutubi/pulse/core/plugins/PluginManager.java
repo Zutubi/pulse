@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.plugins;
 import com.zutubi.pulse.core.plugins.osgi.Equinox;
 import com.zutubi.pulse.core.plugins.osgi.OSGiFramework;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -316,11 +315,6 @@ public class PluginManager
         return versionChangeDetected;
     }
 
-    protected void completeStartup()
-    {
-
-    }
-
     private void scanForManualUninstalls() throws PluginException
     {
         for (String id : registry.getRegistrations())
@@ -354,39 +348,9 @@ public class PluginManager
                     // process the pending actions.
                     if (entry.containsKey(PLUGIN_PENDING_KEY))
                     {
-                        String pendingAction = entry.get(PLUGIN_PENDING_KEY);
-                        if (!TextUtils.stringSet(pendingAction))
-                        {
-                            LOG.warning("Registry entry for plugin '" + id + "' is corrupt. Missing pending action.");
-                            continue;
-                        }
-                        if (pendingAction.equals(DISABLE_PENDING_ACTION))
-                        {
-                            entry.setState(State.DISABLED);
-                        }
-                        else if (pendingAction.equals(UNINSTALL_PENDING_ACTION))
-                        {
-                            if (entry.hasSource())
-                            {
-                                File plugin = getPluginSourceFile(entry.getSource());
-                                delete(plugin);
-                                entry.remove(PLUGIN_SOURCE_KEY);
-                            }
-                            entry.setState(State.UNINSTALLED);
-                        }
-                        else if (pendingAction.equals(UPGRADE_PENDING_ACTION))
-                        {
-                            URI newSource = getUpgradeSourceFile(entry.get(UPGRADE_SOURCE_KEY)).toURI();
-                            upgradePluginSource(id, newSource);
-
-                            // cleanup the temporary file.
-                            File tmpPluginFile = new File(newSource);
-                            delete(tmpPluginFile);
-
-                            entry.remove(UPGRADE_SOURCE_KEY);
-                        }
+                        processPendingAction(id, entry);
                         entry.remove(PLUGIN_PENDING_KEY);
-                        saveRegistry(); // this may be overly aggressive flushing.
+                        saveRegistry(); // this may be overly aggressive flushing.                        
                     }
                 }
                 catch (URISyntaxException e)
@@ -398,6 +362,42 @@ public class PluginManager
         catch (IOException e)
         {
             throw new PluginException(e);
+        }
+    }
+
+    private void processPendingAction(String id, PluginRegistryEntry entry) throws PluginException, IOException, URISyntaxException
+    {
+        String pendingAction = entry.get(PLUGIN_PENDING_KEY);
+        if (!TextUtils.stringSet(pendingAction))
+        {
+            LOG.warning("Registry entry for plugin '" + id + "' is corrupt. Missing pending action.");
+            return;
+        }
+
+        if (pendingAction.equals(DISABLE_PENDING_ACTION))
+        {
+            entry.setState(State.DISABLED);
+        }
+        else if (pendingAction.equals(UNINSTALL_PENDING_ACTION))
+        {
+            if (entry.hasSource())
+            {
+                File plugin = getPluginSourceFile(entry.getSource());
+                delete(plugin);
+                entry.remove(PLUGIN_SOURCE_KEY);
+            }
+            entry.setState(State.UNINSTALLED);
+        }
+        else if (pendingAction.equals(UPGRADE_PENDING_ACTION))
+        {
+            URI newSource = getUpgradeSourceFile(entry.get(UPGRADE_SOURCE_KEY)).toURI();
+            upgradePluginSource(id, newSource);
+
+            // cleanup the temporary file.
+            File tmpPluginFile = new File(newSource);
+            delete(tmpPluginFile);
+
+            entry.remove(UPGRADE_SOURCE_KEY);
         }
     }
 
@@ -568,7 +568,7 @@ public class PluginManager
             // register the plugin with the registry
             registerPlugin(installedPlugin);
         }
-        catch (PluginException e)
+        catch (Exception e)
         {
             try
             {
@@ -578,7 +578,7 @@ public class PluginManager
             {
                 LOG.error(e1);
             }
-            throw e;
+            throw new PluginException(e);
         }
 
         installedPlugin.setState(Plugin.State.INSTALLED);
@@ -1178,5 +1178,4 @@ public class PluginManager
             extensionManager.initialiseExtensions();
         }
     }
-
 }

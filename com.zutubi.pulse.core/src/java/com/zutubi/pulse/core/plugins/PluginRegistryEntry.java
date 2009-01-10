@@ -109,17 +109,17 @@ public class PluginRegistryEntry
 
     public Collection<String> keySet()
     {
-        return this.entry.keySet();
+        return entry.keySet();
     }
 
     public boolean containsKey(String key)
     {
-        return this.entry.containsKey(key);
+        return entry.containsKey(key);
     }
 
     public void remove(String key)
     {
-        this.entry.remove(key);
+        entry.remove(key);
     }
 
 }
