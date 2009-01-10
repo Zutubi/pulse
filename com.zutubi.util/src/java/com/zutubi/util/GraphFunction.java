@@ -21,7 +21,7 @@ public interface GraphFunction<T>
     void process(T t);
 
     /**
-     * Called after a node is processed, when returning rfom the traversed
+     * Called after a node is processed, when returning from the traversed
      * edge.
      */
     void pop();

@@ -2,15 +2,16 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.tove.annotations.FieldAction;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileSystemManager;
@@ -28,6 +29,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
     private FileSystemManager fileSystemManager;
     private ScmManager scmManager;
     private ProjectManager projectManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     public boolean satisfied(FieldDescriptor field, FieldAction annotation)
     {
@@ -50,7 +52,9 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
                 Project project = projectManager.getProject(projectConfig.getProjectId(), true);
 
                 ScmConfiguration config = projectConfig.getScm();
-                if(config != null && config.isValid())
+                if (config != null &&
+                    configurationTemplateManager.isDeeplyComplete(config) &&
+                    configurationTemplateManager.isDeeplyValid(config.getConfigurationPath()))
                 {
                     Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(config, scmManager, project != null && project.isInitialised());
                     return capabilities.contains(ScmCapability.BROWSE);
@@ -78,5 +82,10 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

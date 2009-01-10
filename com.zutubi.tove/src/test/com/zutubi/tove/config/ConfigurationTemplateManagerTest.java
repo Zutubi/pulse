@@ -1428,6 +1428,41 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.save(a);
     }
 
+    public void testIsDeeplyCompleteDirectInstanceComplete()
+    {
+        MockB b = new MockB();
+        b.setB("set");
+        assertTrue(configurationTemplateManager.isDeeplyComplete(b));
+    }
+
+    public void testIsDeeplyCompleteDirectInstanceIncomplete()
+    {
+        assertFalse(configurationTemplateManager.isDeeplyComplete(new MockB()));
+    }
+
+    public void testIsDeeplyCompleteIndirectInstanceComplete()
+    {
+        MockB b = new MockB();
+        b.setB("set");
+        MockA a = new MockA("a");
+        a.setMock(b);
+
+        assertTrue(configurationTemplateManager.isDeeplyComplete(a));
+    }
+
+    public void testIsDeeplyCompleteIndirectInstanceIncomplete()
+    {
+        MockA a = new MockA("a");
+        a.setMock(new MockB());
+
+        assertFalse(configurationTemplateManager.isDeeplyComplete(a));
+    }
+
+    public void testIsDeeplyCompleteIndirectInstanceNull()
+    {
+        assertTrue(configurationTemplateManager.isDeeplyComplete(new MockA("a")));
+    }
+
     private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException
     {
         MutableRecord record = typeA.unstantiate(parent);
@@ -1437,7 +1472,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         record = typeA.unstantiate(child);
         configurationTemplateManager.setParentTemplate(record, parentHandle);
-        return new Pair(parentPath, configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record));
+        return new Pair<String, String>(parentPath, configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record));
     }
 
     private String[] insertParentChildAndGrandchildA(MockA parent, MockA child, MockA grandchild) throws TypeException

@@ -3,8 +3,8 @@ package com.zutubi.tove.config;
 import com.zutubi.events.DemultiplexingListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.FilteringListener;
-import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.util.NullaryFunction;
 
 import java.util.*;
@@ -84,13 +84,13 @@ public class MockConfigurationProvider implements ConfigurationProvider
         }
     }
 
-    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, Class clazz)
+    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, Class<? extends Configuration> clazz)
     {
         // slight similification - dont worry so much about the path..
         registerEventListener(listener, synchronous, clazz);
     }
 
-    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class clazz)
+    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class<? extends Configuration> clazz)
     {
         ClassPredicate classPredicate = new ClassPredicate(clazz);
         FilteringListener filter = new FilteringListener(classPredicate, new Listener(listener));

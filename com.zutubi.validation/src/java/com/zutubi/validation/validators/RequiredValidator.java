@@ -16,10 +16,17 @@ public class RequiredValidator extends FieldValidatorSupport
 
     public void validateField(Object fieldValue) throws ValidationException
     {
-        if (fieldValue == null)
+        if (!isValueSet(fieldValue))
         {
             addError();
-            return;
+        }
+    }
+
+    public static boolean isValueSet(Object fieldValue)
+    {
+        if (fieldValue == null)
+        {
+            return false;
         }
 
         if (fieldValue instanceof String)
@@ -27,9 +34,11 @@ public class RequiredValidator extends FieldValidatorSupport
             String str = ((String)fieldValue);
             if (str.length() == 0)
             {
-                addError();
+                return false;
             }
         }
+
+        return true;
     }
 
     public boolean isIgnorable()

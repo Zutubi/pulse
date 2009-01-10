@@ -1,7 +1,7 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.util.NullaryFunction;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.util.NullaryFunction;
 
 import java.util.Collection;
 
@@ -82,29 +82,33 @@ public interface ConfigurationProvider
     boolean isDeeplyValid(String path);
 
     /**
-     * Register a configuration event listener.  This listener will receive events from configuration instances identified
-     * by the defined paths.  If includeChildPaths is true, then changes to child configuration instances will also be
-     * passed through to the registered listener.
+     * Register a configuration event listener.  This listener will receive events from
+     * configuration instances identified by the defined paths.  If includeChildPaths is true, then
+     * changes to child configuration instances (those that are nested under the given paths) will
+     * also be passed through to the listener.
      *
-     * @param listener the event listener that will receive the event notifications.
-     * @param synchronous indicates whether or not the event notification should be on the same thread that generated
-     * the event (synchronous), or a separate thread.  Synchronous event handlers must be careful not to take up too
-     * much time.
-     * @param includeChildPaths indicates whether or not to include the child configurations.
-     * @param paths defines the paths the event listener will be listening to.
+     * @param listener          the event listener to register
+     * @param synchronous       indicates whether or not the event notification should be on the
+     *                          same thread that generated the event (synchronous), or a separate
+     *                          thread.  Synchronous event handlers must be careful not to take up
+     *                          too much time.
+     * @param includeChildPaths indicates whether or not to include notifications for nested paths
+     * @param paths             the paths the event listener will be listening to
      */
     void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, String... paths);
-    void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, Class clazz);
+    void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, Class<? extends Configuration> clazz);
 
     /**
-     * Register an event listener to be triggered whenever an instance of the specified class is the subject of the
-     * event.
+     * Register an event listener to be triggered whenever an instance of the specified class is the
+     * subject of a configuration event.
      *
-     * @param listener to be triggered.
-     * @param synchronous
-     * @param clazz
+     * @param listener    the listener to register
+     * @param synchronous if true, the listener is called synchronously during the event publishing,
+     *                    otherwise it is invoked at some later time in a separate thread
+     * @param clazz       the class to listen to events for -- all instances of this type (including
+     *                    subtypes) will trigger callbacks
      */
-    void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class clazz);
+    void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class<? extends Configuration> clazz);
 
     void unregisterEventListener(ConfigurationEventListener listener);
 

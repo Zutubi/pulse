@@ -14,7 +14,9 @@ import java.util.List;
 public abstract class TypeProperty
 {
     /**
-     * Annotations associated with this property.
+     * Annotations associated with this property.  This includes annotations
+     * directly on the property, on the property in supertypes, and meta-
+     * annotations recursively.
      */
     private List<Annotation> annotations = new LinkedList<Annotation>();
 
@@ -60,26 +62,15 @@ public abstract class TypeProperty
 
     public <T extends Annotation> T getAnnotation(final Class<T> type)
     {
-        return (T) CollectionUtils.find(annotations, new Predicate<Annotation>()
+        return type.cast(CollectionUtils.find(annotations, new Predicate<Annotation>()
         {
             public boolean satisfied(Annotation annotation)
             {
                 return annotation.annotationType() == type;
             }
-        });
+        }));
     }
 
-    public <T extends Annotation> List<T> getAnnotations(final Class<T> type)
-    {
-        return (List<T>) CollectionUtils.filter(annotations, new Predicate<Annotation>()
-        {
-            public boolean satisfied(Annotation annotation)
-            {
-                return annotation.annotationType() == type;
-            }
-        });
-    }
-    
     public String getName()
     {
         return name;

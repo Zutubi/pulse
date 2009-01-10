@@ -9,16 +9,15 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.transaction.*;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Sort;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
+import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
+import com.zutubi.validation.validators.RequiredValidator;
 
 import java.util.*;
 
@@ -892,6 +891,83 @@ public class ConfigurationTemplateManager
     public boolean isDeeplyValid(String path)
     {
         return getState().instances.isValid(path, true);
+    }
+
+    /**
+     * Indicates if an instance and all instances reachable via its properties
+     * are complete - i.e. have all required properties set.  This is useful
+     * for testing completeness of templated instances, which are normally
+     * considered to be valid even if required fields are missing.
+     *
+     * @param instance the root instance to test -- note that it may not yet
+     *                 have been persisted, so may not have a path
+     * @return true if all required fields are set in all complex instances
+     *         under (and including) the instance
+     */
+    public boolean isDeeplyComplete(Configuration instance)
+    {
+        CompositeType type = typeRegistry.getType(instance.getClass());
+        if (type == null)
+        {
+            return false;
+        }
+
+
+        final List<Pair<Configuration, CompositeType>> composites = new LinkedList<Pair<Configuration, CompositeType>>();
+        try
+        {
+            type.forEachComplex(instance, new GraphFunction<Object>()
+            {
+                public void push(String edge)
+                {
+                }
+
+                public void process(Object o)
+                {
+                    CompositeType type = typeRegistry.getType(o.getClass());
+                    if (type != null)
+                    {
+                        composites.add(new Pair<Configuration, CompositeType>((Configuration) o, type));
+                    }
+                }
+
+                public void pop()
+                {
+                }
+            });
+
+            for (Pair<Configuration, CompositeType> composite: composites)
+            {
+                if (isMissingARequiredProperty(composite.first, composite.second))
+                {
+                    return false;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.warning(e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isMissingARequiredProperty(Configuration instance, CompositeType type) throws Exception
+    {
+        for (String propertyName: type.getSimplePropertyNames())
+        {
+            TypeProperty typeProperty = type.getProperty(propertyName);
+            if (typeProperty.getAnnotation(Required.class) != null)
+            {
+                if (!RequiredValidator.isValueSet(typeProperty.getValue(instance)))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
