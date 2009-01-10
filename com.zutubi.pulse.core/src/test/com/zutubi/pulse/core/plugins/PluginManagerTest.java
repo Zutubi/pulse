@@ -2,6 +2,8 @@ package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,10 +16,11 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     private static final String PRODUCER_ID = "com.zutubi.bundles.producer";
     private static final String CONSUMER_ID = "com.zutubi.bundles.consumer";
 
+    private static final String EXTENSION_JAR = "jar";
+
     private File producer1;
     private File producer11;
     private File producer2;
-    private File producer3;
     private File consumer1;
     private File bad;
     private File failonstartup;
@@ -27,17 +30,16 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     {
         super.setUp();
 
-        producer1 = getInputFile("com.zutubi.bundles.producer_1.0.0", "jar");
-        producer11 = getInputFile("com.zutubi.bundles.producer_1.1.0", "jar");
-        producer2 = getInputFile("com.zutubi.bundles.producer_2.0.0", "jar");
-        producer3 = getInputFile("com.zutubi.bundles.producer_3.0.0", "jar");
-        consumer1 = getInputFile("com.zutubi.bundles.consumer_1.0.0", "jar");
+        producer1 = getInputFile("com.zutubi.bundles.producer_1.0.0", EXTENSION_JAR);
+        producer11 = getInputFile("com.zutubi.bundles.producer_1.1.0", EXTENSION_JAR);
+        producer2 = getInputFile("com.zutubi.bundles.producer_2.0.0", EXTENSION_JAR);
+        consumer1 = getInputFile("com.zutubi.bundles.consumer_1.0.0", EXTENSION_JAR);
 
-        failonstartup = getInputFile("com.zutubi.bundles.failonstartup_1.0.0", "jar");
-        failonshutdown = getInputFile("com.zutubi.bundles.failonshutdown_1.0.0", "jar");
+        failonstartup = getInputFile("com.zutubi.bundles.failonstartup_1.0.0", EXTENSION_JAR);
+        failonshutdown = getInputFile("com.zutubi.bundles.failonshutdown_1.0.0", EXTENSION_JAR);
 
         // should rename this - this is an empty file..
-        bad = getInputFile("bad", "jar");
+        bad = getInputFile("bad", EXTENSION_JAR);
     }
 
     public void testInstallPlugin() throws Exception
@@ -80,6 +82,43 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertEquals(null, installedPlugin.getErrorMessage());
 
         assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
+    }
+
+    public void testDefaultManifest() throws Exception
+    {
+        startupPluginCore();
+
+        try
+        {
+            manager.install(getInputURL(EXTENSION_JAR).toURI());
+            fail("Should not be able to install jar with default manifest");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Required header 'Bundle-Name' not present"));
+        }
+        assertNoInstalledJars();
+    }
+
+    public void testBadVersion() throws Exception
+    {
+        startupPluginCore();
+
+        try
+        {
+            manager.install(getInputURL(EXTENSION_JAR).toURI());
+            fail("Should not be able to install jar with a poorly formatted version");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Version contains less than three segments"));
+        }
+        assertNoInstalledJars();
+    }
+
+    private void assertNoInstalledJars()
+    {
+        assertEquals(0, paths.getPluginStorageDir().list().length);
     }
 
     public void testInstallWithMissingDependency() throws Exception
@@ -443,8 +482,6 @@ public class PluginManagerTest extends BasePluginSystemTestCase
      *
      * A side complication is that it is difficult to distinguish between a plugin that is manually installed and a
      * plugin that is uninstalled - but we fail to delete the jar file.
-     * 
-     * @throws Exception
      */
     public void testUninstallAndReinstallPlugin() throws Exception
     {
@@ -592,7 +629,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         // this differs from the previous in that we install and then restart the plugin manager.  This
         // better tests the init processing.
         Plugin producer = manager.install(producer1.toURI());
-        Plugin consumer = manager.install(consumer1.toURI());
+        manager.install(consumer1.toURI());
 
         producer.disable();
 
@@ -613,7 +650,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         // this differs from the previous in that we install and then restart the plugin manager.  This
         // better tests the init processing.
         Plugin producer = manager.install(producer1.toURI());
-        Plugin consumer = manager.install(consumer1.toURI());
+        manager.install(consumer1.toURI());
 
         producer.uninstall();
 

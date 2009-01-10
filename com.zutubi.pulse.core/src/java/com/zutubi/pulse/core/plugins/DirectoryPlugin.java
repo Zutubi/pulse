@@ -28,7 +28,7 @@ public class DirectoryPlugin extends LocalPlugin
             InputStream manifestIn = new FileInputStream(new File(pluginFile, FileSystemUtils.composeFilename("META-INF", "MANIFEST.MF")));
             try
             {
-                return Headers.parseManifest(manifestIn);
+                return parseManifest(manifestIn);
             }
             finally
             {

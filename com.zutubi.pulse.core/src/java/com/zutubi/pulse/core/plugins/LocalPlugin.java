@@ -4,8 +4,10 @@ import com.zutubi.util.StringUtils;
 import org.eclipse.osgi.framework.util.Headers;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
@@ -299,6 +301,27 @@ public abstract class LocalPlugin implements Plugin
     }
 
     protected abstract Headers loadPluginManifest(File pluginFile);
+
+    protected Headers parseManifest(InputStream manifestIn) throws BundleException
+    {
+        Headers headers = Headers.parseManifest(manifestIn);
+        checkRequiredHeader(headers, HEADER_NAME);
+        checkRequiredHeader(headers, HEADER_SYMBOLICNAME);
+        checkRequiredHeader(headers, HEADER_VERSION);
+
+        // Validates the version
+        new PluginVersion((String) headers.get(HEADER_VERSION));
+
+        return headers;
+    }
+
+    private void checkRequiredHeader(Headers headers, String header)
+    {
+        if (!headers.containsKey(header))
+        {
+            throw new IllegalArgumentException("Required header '" + header + "' not present in manifest");
+        }
+    }
 
     public Bundle getBundle()
     {

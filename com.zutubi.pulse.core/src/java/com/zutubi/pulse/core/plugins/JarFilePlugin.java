@@ -39,7 +39,7 @@ public class JarFilePlugin extends LocalPlugin
                 InputStream manifestIn = jarFile.getInputStream(entry);
                 try
                 {
-                    return Headers.parseManifest(manifestIn);
+                    return parseManifest(manifestIn);
                 }
                 finally
                 {
