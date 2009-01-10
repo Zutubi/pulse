@@ -74,7 +74,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         // Do nothing by default
     }
 
-    public Object getPrinciple()
+    public String getPrinciple()
     {
         // note, need to be careful - the returned user is likely to be
         // hopelessly out of sync if any changes have been made to the user during the

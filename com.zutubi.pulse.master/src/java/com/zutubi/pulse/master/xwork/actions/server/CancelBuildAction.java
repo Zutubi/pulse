@@ -54,7 +54,8 @@ public class CancelBuildAction extends ActionSupport
             throw new IllegalArgumentException("Unknown build '" + buildId + "'");
         }
 
-        fatController.terminateBuild(build, false);
+        String user = getPrinciple();
+        fatController.terminateBuild(build, user == null ? null : "requested by '" + user + "'");
         Thread.sleep(500);
         return SUCCESS;
     }

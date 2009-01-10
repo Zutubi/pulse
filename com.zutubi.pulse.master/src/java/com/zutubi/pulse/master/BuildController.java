@@ -487,7 +487,7 @@ public class BuildController implements EventListener
         {
             // Tell every running recipe to stop, and mark the build terminating
             // (so it will go into the error state on completion).
-            buildResult.terminate(event.isTimeout());
+            buildResult.terminate(event.getMessage());
             List<TreeNode<RecipeController>> completedNodes = new ArrayList<TreeNode<RecipeController>>(executingControllers.size());
 
             if (executingControllers.size() > 0)
@@ -495,7 +495,7 @@ public class BuildController implements EventListener
                 for (TreeNode<RecipeController> controllerNode : executingControllers)
                 {
                     RecipeController controller = controllerNode.getData();
-                    controller.terminateRecipe(event.isTimeout());
+                    controller.terminateRecipe("Terminated");
                     if (checkControllerStatus(controller, false))
                     {
                         completedNodes.add(controllerNode);
@@ -529,7 +529,7 @@ public class BuildController implements EventListener
         if (found != null)
         {
             RecipeController controller = found.getData();
-            controller.terminateRecipe(true);
+            controller.terminateRecipe("Timed out");
             if (checkControllerStatus(controller, false))
             {
                 executingControllers.remove(found);

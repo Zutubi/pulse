@@ -32,7 +32,7 @@
             #contentCell($request.prettyQueueTime)
             #staticCell($request.reason.summary)
         #if($action.canCancel($request))
-            #actionCell("cancel" "$base/cancelQueuedBuild.action?id=$request.id" "cancel.gif")
+            #actionCellId("cancel" "$base/cancelQueuedBuild.action?id=$request.id" "cancel.gif" "cancel.queued.${request.id}" false)
         #else
             #contentCell("empty.cell")
         #end
@@ -74,7 +74,8 @@
             #elapsedCell($buildResult)
 
         #if($action.canCancel($buildResult))
-            #actionCell("cancel" "$base/cancelBuild.action?buildId=$buildResult.id" "cancel.gif")
+            #set($cancelStr = "cancel.active.${buildResult.owner.name}.${buildResult.number}")
+            #actionCellId("cancel" "$base/cancelBuild.action?buildId=$buildResult.id" "cancel.gif" "#id($cancelStr)" false)
         #else
             #contentCell("empty.cell")
         #end

@@ -415,21 +415,21 @@ public class RecipeController
         complete();
     }
 
-    public void terminateRecipe(boolean timeout)
+    public void terminateRecipe(String message)
     {
         if (recipeResult.commenced())
         {
             // Tell the build service that it can stop trying to execute this
             // recipe.  We *must* have received the commenced event before we
             // can do this.
-            recipeResult.terminate(timeout);
+            recipeResult.terminate(message);
             agentService.terminateRecipe(recipeResult.getId());
         }
         else
         {
             // Not yet commanced, try and catch it at the recipe queue. If
             // we don't catch it, then we wait for the RecipeCommencedEvent.
-            recipeResult.terminate(timeout);
+            recipeResult.terminate(message);
             if(recipeQueue.cancelRequest(recipeResult.getId()))
             {
                 // We caught it now, so we are complete.

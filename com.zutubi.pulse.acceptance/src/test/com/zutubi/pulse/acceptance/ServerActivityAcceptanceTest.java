@@ -1,13 +1,14 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
+import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Acceptance tests for the server/activity page.
@@ -89,6 +90,22 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         // force page refresh.
         page.goTo();
         assertEquals(0, activeBuildsTable.getRowCount());
+    }
+
+    public void testCancelBuild() throws Exception
+    {
+        createAndTriggerProjectBuild();
+
+        ServerActivityPage page = new ServerActivityPage(selenium, urls);
+        page.goTo();
+
+        ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
+        activeBuildsTable.clickCancel(random, 1);
+
+        xmlRpcHelper.waitForBuildToComplete(random, 1, TIMEOUT);
+        BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, random, 1);
+        summaryPage.goTo();
+        assertTextPresent("Forceful termination requested by 'admin'");
     }
 
     /**
@@ -311,6 +328,11 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         public String getStatus()
         {
             return getCell(row, 5);
+        }
+
+        public void clickCancel(String owner, long number)
+        {
+            selenium.click("cancel.active." + owner + "." + Long.toString(number));
         }
     }
 }

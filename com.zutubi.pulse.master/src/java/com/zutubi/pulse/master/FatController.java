@@ -144,7 +144,7 @@ public class FatController implements EventListener, Stoppable
             if (force)
             {
                 // Notify controllers to stop forcefully
-                eventManager.publish(new BuildTerminationRequestEvent(this, -1, false));
+                eventManager.publish(new BuildTerminationRequestEvent(this, -1, "due to server shutdown"));
             }
             else
             {
@@ -258,10 +258,10 @@ public class FatController implements EventListener, Stoppable
         }
     }
 
-    public void terminateBuild(BuildResult buildResult, boolean timeout)
+    public void terminateBuild(BuildResult buildResult, String reason)
     {
         accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, buildResult);
-        eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), timeout));
+        eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), reason));
     }
 
     private void handleBuildCompleted(BuildCompletedEvent event)

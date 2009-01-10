@@ -186,17 +186,10 @@ public abstract class Result extends Entity
         addFeature(Feature.Level.WARNING, message);
     }
 
-    public void terminate(boolean timeout)
+    public void terminate(String message)
     {
         state = ResultState.TERMINATING;
-        if (timeout)
-        {
-            addFeature(Feature.Level.ERROR, "Timed out");
-        }
-        else
-        {
-            addFeature(Feature.Level.ERROR, "Forcefully terminated");
-        }
+        addFeature(Feature.Level.ERROR, message);
     }
 
     public void error(BuildException e)

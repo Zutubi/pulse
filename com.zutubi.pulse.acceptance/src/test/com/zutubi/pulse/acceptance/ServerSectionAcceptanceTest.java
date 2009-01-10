@@ -8,16 +8,6 @@ import com.zutubi.pulse.acceptance.pages.server.ServerMessagesPage;
  */
 public class ServerSectionAcceptanceTest extends SeleniumTestBase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testServerMessages() throws Exception
     {
         loginAsAdmin();

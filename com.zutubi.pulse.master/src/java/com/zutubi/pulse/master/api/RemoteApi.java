@@ -2349,7 +2349,7 @@ public class RemoteApi
      */
     public boolean cancelBuild(String token, String projectName, int id)
     {
-        tokenManager.loginUser(token);
+        User user = tokenManager.loginAndReturnUser(token);
         try
         {
             Project project = internalGetProject(projectName, true);
@@ -2360,7 +2360,7 @@ public class RemoteApi
             }
             else
             {
-                fatController.terminateBuild(build, false);
+                fatController.terminateBuild(build, "requested by '" + user.getLogin() + "' via remote API");
                 return true;
             }
         }
