@@ -40,6 +40,7 @@ public class Constants
     public static class Project
     {
         public static final String STAGES = "stages";
+        public static final String SCM = "scm";
         public static final String TYPE = "type";
 
         /**
@@ -57,7 +58,15 @@ public class Constants
         {
             public static final String PULSE_FILE_NAME = "pulseFileName";
         }
-        
+
+        /**
+         * Properties shared by all SCMs.
+         */
+        public static class Scm
+        {
+            public static final String QUIET_PERIOD_ENABLED = "quietPeriodEnabled";
+        }
+
         /**
          * The constants for the property names in the project template type class.
          */

@@ -40,7 +40,6 @@
         <property name="interceptorNames">
             <list>
                 <value>securityInterceptor</value>
-                <value>transactionInterceptor</value>
             </list>
         </property>
     </bean>

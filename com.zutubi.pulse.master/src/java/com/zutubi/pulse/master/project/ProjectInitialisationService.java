@@ -3,9 +3,7 @@ package com.zutubi.pulse.master.project;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.master.project.events.ProjectInitialisationCommencedEvent;
-import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
-import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
+import com.zutubi.pulse.master.project.events.*;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -13,8 +11,11 @@ import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.i18n.Messages;
 
 import java.io.File;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * A background service to run project initialisation, as this may take some
@@ -23,6 +24,14 @@ import java.io.File;
 public class ProjectInitialisationService extends BackgroundServiceSupport
 {
     private static final Logger LOG = Logger.getLogger(ProjectInitialisationService.class);
+    private static final Messages I18N = Messages.getInstance(ProjectInitialisationService.class);
+
+    /**
+     * A mapping from project handle to configuration for projects that have
+     * been initialised.  This is used to guarantee that we destroy with the
+     * same config that we used to initialise.
+     */
+    private final Map<Long, ProjectConfiguration> initialisedConfigurations = new HashMap<Long, ProjectConfiguration>();
 
     private EventManager eventManager;
     private ScmManager scmManager;
@@ -30,6 +39,19 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
     public ProjectInitialisationService()
     {
         super("Project Initialisation");
+    }
+
+    /**
+     * Registers that a project is already initialised on startup.
+     *
+     * @param projectConfig the project to register
+     */
+    public void registerInitialised(ProjectConfiguration projectConfig)
+    {
+        synchronized (initialisedConfigurations)
+        {
+            initialisedConfigurations.put(projectConfig.getHandle(), projectConfig);
+        }
     }
 
     /**
@@ -43,9 +65,8 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
      * initialisation.
      *
      * @param projectConfiguration project to be initialised
-     * @param reinitialise         true if the project is being reinitialised, false if this is the first initialise
      */
-    public void requestInitialisation(final ProjectConfiguration projectConfiguration, final boolean reinitialise)
+    public void requestInitialisation(final ProjectConfiguration projectConfiguration)
     {
         getExecutorService().submit(new Runnable()
         {
@@ -57,6 +78,8 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                 ScmClient scmClient = null;
                 try
                 {
+                    checkExistingInitialisation(projectConfiguration);
+
                     ScmConfiguration scmConfiguration = projectConfiguration.getScm();
                     ScmContext scmContext = scmManager.createContext(projectConfiguration);
                     scmContext.lock();
@@ -76,17 +99,17 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                         };
 
                         scmClient = scmManager.createClient(scmConfiguration);
-                        if (reinitialise)
-                        {
-                            scmClient.destroy(scmContext, handler);
-                        }
-
                         cleanupScmDirectoryIfRequired(scmContext.getPersistentWorkingDir());
                         scmClient.init(scmContext, handler);
                     }
                     finally
                     {
                         scmContext.unlock();
+                    }
+
+                    synchronized (initialisedConfigurations)
+                    {
+                        initialisedConfigurations.put(projectConfiguration.getHandle(), projectConfiguration);
                     }
 
                     completedEvent = new ProjectInitialisationCompletedEvent(ProjectInitialisationService.this, projectConfiguration, true, null);
@@ -113,51 +136,93 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
         });
     }
 
+    private void checkExistingInitialisation(ProjectConfiguration projectConfiguration)
+    {
+        synchronized (initialisedConfigurations)
+        {
+            ProjectConfiguration initialised = initialisedConfigurations.remove(projectConfiguration.getHandle());
+            if (initialised != null)
+            {
+                eventManager.publish(new ProjectStatusEvent(this, projectConfiguration, I18N.format("reinitialise.message")));
+                doDestroy(initialised);
+                eventManager.publish(new ProjectStatusEvent(this, projectConfiguration, I18N.format("reinitialise.complete.message")));
+            }
+        }
+    }
+
     /**
      * Requests an asynchronous call to destroy on an {@link ScmClient} for the
      * given project.  This is should be called when the project is being
      * deleted.
      * <p/>
-     * <strong>Note</strong>: destroy may also be called when re-initialising a
-     * project, to do so call {@link #requestInitialisation(com.zutubi.pulse.master.tove.config.project.ProjectConfiguration, boolean)}
-     * with reinitialise set to true.
+     * <strong>Note</strong>: destruction may also occur when re-initialising a
+     * project, i.e. via a call to {@link #requestInitialisation(com.zutubi.pulse.master.tove.config.project.ProjectConfiguration)}
+     * for an already-initialised project.
      *
-     * @param projectConfiguration configuration of the project to call destory
+     * @param projectConfiguration configuration of the project to call destroy
      *                             for
+     * @param deleted              should be true if the entire project has
+     *                             been deleted
      */
-    public void requestDestruction(final ProjectConfiguration projectConfiguration)
+    public void requestDestruction(final ProjectConfiguration projectConfiguration, final boolean deleted)
     {
         getExecutorService().submit(new Runnable()
         {
             public void run()
             {
-                try
+                if (!deleted)
                 {
-                    ScmClientUtils.withScmClient(projectConfiguration, scmManager, new ScmClientUtils.ScmContextualAction<Object>()
-                    {
-                        public Object process(ScmClient scmClient, ScmContext scmContext) throws ScmException
-                        {
-                            scmContext.lock();
-                            try
-                            {
-                                scmClient.destroy(scmContext, new ScmFeedbackAdapter());
-                            }
-                            finally
-                            {
-                                scmContext.unlock();
-                            }
-                            return null;
-                        }
-                    });
+                    eventManager.publish(new ProjectDestructionCommencedEvent(ProjectInitialisationService.this, projectConfiguration));
                 }
-                catch (Exception e)
+
+                ProjectConfiguration initialisedConfiguration;
+                synchronized (initialisedConfigurations)
                 {
-                    // The project log may be gone by now, so we don't write
-                    // to it.
-                    LOG.severe(e);
+                    initialisedConfiguration = initialisedConfigurations.remove(projectConfiguration.getHandle());
+                }
+
+                // If we have no initialised configuration, destroy is a no-op.
+                if (initialisedConfiguration != null)
+                {
+                    doDestroy(initialisedConfiguration);
+                }
+
+                if (!deleted)
+                {
+                    eventManager.publish(new ProjectDestructionCompletedEvent(ProjectInitialisationService.this, projectConfiguration));
                 }
             }
         });
+    }
+
+    private void doDestroy(final ProjectConfiguration projectConfiguration)
+    {
+        try
+        {
+            ScmClientUtils.withScmClient(projectConfiguration, scmManager, new ScmClientUtils.ScmContextualAction<Object>()
+            {
+                public Object process(ScmClient scmClient, ScmContext scmContext) throws ScmException
+                {
+                    scmContext.lock();
+                    try
+                    {
+                        scmClient.destroy(scmContext, new ScmFeedbackAdapter());
+                    }
+                    finally
+                    {
+                        scmContext.unlock();
+                    }
+
+                    return null;
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            // The project log may be gone by now, so we don't write
+            // to it.
+            LOG.severe(e);
+        }
     }
 
     public void setEventManager(EventManager eventManager)

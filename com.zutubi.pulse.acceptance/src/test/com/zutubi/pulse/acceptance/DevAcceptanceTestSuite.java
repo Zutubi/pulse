@@ -2,8 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import junit.framework.TestSuite;
 
-/**
- */
 public class DevAcceptanceTestSuite
 {
     public static TestSuite suite()
@@ -35,6 +33,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
         suite.addTestSuite(LicenseAcceptanceTest.class);
         suite.addTestSuite(DashboardAcceptanceTest.class);
+        suite.addTestSuite(ProjectLifecycleAcceptanceTest.class);
         suite.addTestSuite(ProjectsSummaryAcceptanceTest.class);
         suite.addTestSuite(ServerSectionAcceptanceTest.class);
         suite.addTestSuite(ServerActivityAcceptanceTest.class);

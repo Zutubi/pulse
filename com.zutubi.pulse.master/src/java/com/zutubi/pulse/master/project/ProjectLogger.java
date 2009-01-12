@@ -83,7 +83,7 @@ public class ProjectLogger implements Closeable
             }
             else
             {
-                write("Project initialisation failed" + pice.getError() == null ? "" : (": " + pice.getError()));
+                write("Project initialisation failed" + (pice.getError() == null ? "" : (": " + pice.getError())));
             }
         }
         else if (event instanceof ScmChangeEvent)

@@ -296,6 +296,45 @@
         <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
     </target>
 
+    <!-- generate public api docs -->
+    <target name="doc" depends="init, module-pre-doc, common-doc, module-post-doc"/>
+
+    <target name="module-pre-doc"/>
+
+    <target name="module-post-doc"/>
+
+    <target name="common-doc">
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: doc ${ivy.module}              "/>
+        <echo message="----------------------------------------------"/>
+
+        <property name="doc.dir" value="${build.dir}/javadoc"/>
+        <delete dir="${doc.dir}"/>
+
+        <javadoc destdir="${doc.dir}">
+            <packageset>
+                
+            </packageset>
+        </javadoc>
+
+        <jar file="build/${ivy.module}.jar" basedir="${classes.dir}">
+            <patternset refid="release.excludes"/>
+        </jar>
+
+        <package-src name="${ivy.module}-src.jar" pathref="src.export.selection"/>
+
+        <if>
+            <not><isset property="no.tests"/></not>
+            <then>
+                <jar file="build/${ivy.module}-test.jar" basedir="${test.classes.dir}">
+                    <patternset refid="release.excludes"/>
+                </jar>
+
+                <package-src name="${ivy.module}-test-src.jar" pathref="test.export.selection"/>
+            </then>
+        </if>
+    </target>
+
     <target name="dist" depends="init, module-pre-dist, common-dist, module-post-dist"/>
 
     <target name="module-pre-dist"/>
@@ -325,11 +364,9 @@
             <jar file="build/@{name}">
                 <fileset dir="${build.tmp.dir}"/>
             </jar>
-            
         </sequential>
     </macrodef>
 
     <!-- build this module. -->
     <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
-
 </project>

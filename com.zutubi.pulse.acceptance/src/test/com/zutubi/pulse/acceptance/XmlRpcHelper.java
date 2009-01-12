@@ -241,6 +241,19 @@ public class XmlRpcHelper
         return call("getProjectGroup", name);
     }
 
+    /**
+     * Retrieves the current state of a project.
+     *
+     * @param projectName the project to get the state of
+     * @return the project's current state
+     * @throws Exception on error
+     */
+    public Project.State getProjectState(String projectName) throws Exception
+    {
+        String stateString = call("getProjectState", projectName);
+        return Project.State.valueOf(stateString.replace(' ', '_').toUpperCase());
+    }
+
     @SuppressWarnings({"unchecked"})
     public Hashtable<String, Object> getProjectArtifact(String projectName, String artifactName) throws Exception
     {
@@ -337,17 +350,16 @@ public class XmlRpcHelper
         Project.State state;
         while (true)
         {
-            String stateString = call("getProjectState", name);
-            state = Project.State.valueOf(stateString.replace(' ', '_').toUpperCase());
+            state = getProjectState(name);
             if (state.isInitialised())
             {
                 break;
             }
 
-            Thread.sleep(10);
+            Thread.sleep(50);
             if (System.currentTimeMillis() - startTime > 30000)
             {
-                throw new RuntimeException("Timed out waiting for project '" + name + "' to init");
+                throw new RuntimeException("Timed out waiting for project '" + name + "' to init (state is '" + state + "')");
             }
         }
     }
