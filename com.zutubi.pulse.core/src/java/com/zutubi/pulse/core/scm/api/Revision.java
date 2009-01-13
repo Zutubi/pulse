@@ -99,7 +99,7 @@ public class Revision
     }
 
     /**
-     * Inidicates if the revision string has an abbreviated form that differs
+     * Indicates if the revision string has an abbreviated form that differs
      * from its full form (i.e. {@link #getRevisionString()} returns a
      * different value to {@link #getAbbreviatedRevisionString()}).
      *
