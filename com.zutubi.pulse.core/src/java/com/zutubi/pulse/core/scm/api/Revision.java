@@ -99,8 +99,9 @@ public class Revision
     }
 
     /**
-     * Inidicates if the revision string can be abbreviated for display in a
-     * UI.
+     * Inidicates if the revision string has an abbreviated form that differs
+     * from its full form (i.e. {@link #getRevisionString()} returns a
+     * different value to {@link #getAbbreviatedRevisionString()}).
      *
      * @return true iff this revision has an abbreviated form
      */
