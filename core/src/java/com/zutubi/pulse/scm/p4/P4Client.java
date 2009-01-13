@@ -279,13 +279,11 @@ public class P4Client
         args.add(FLAG_MAXIMUM);
         args.add("1");
 
-        for (String file : files)
-        {
-            args.add(file);
-        }
+        args.addAll(Arrays.asList(files));
 
         P4Client.P4Result result = runP4(null, args.toArray(new String[args.size()]));
-        Matcher matcher = changesPattern.matcher(result.stdout);
+        String response = result.stdout.toString().trim();
+        Matcher matcher = changesPattern.matcher(response);
 
         if (matcher.find())
         {
@@ -293,7 +291,7 @@ public class P4Client
         }
         else
         {
-            return new NumericalRevision(0);
+            throw new SCMException("Unrecognised response from p4 changes '" + response + "'");
         }
     }
 
