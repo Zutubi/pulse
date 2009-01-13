@@ -890,21 +890,27 @@ public class ConfigurationTemplateManager
      */
     public boolean isDeeplyValid(String path)
     {
+        if (path == null)
+        {
+            throw new NullPointerException("Path is required");
+        }
         return getState().instances.isValid(path, true);
     }
 
     /**
      * Indicates if an instance and all instances reachable via its properties
-     * are complete - i.e. have all required properties set.  This is useful
-     * for testing completeness of templated instances, which are normally
-     * considered to be valid even if required fields are missing.
+     * are complete and free of validation errors - i.e. have all required
+     * properties set, and no field or instance errors recorded.  This is
+     * useful for testing if a templated instance can safely be used (they are
+     * normally considered to be valid even if required fields are missing).
      *
      * @param instance the root instance to test -- note that it may not yet
      *                 have been persisted, so may not have a path
-     * @return true if all required fields are set in all complex instances
-     *         under (and including) the instance
+     * @return true if all required fields are set and no validation errors
+     *         are recorded in all complex instances under (and including)
+     *         the instance
      */
-    public boolean isDeeplyComplete(Configuration instance)
+    public boolean isDeeplyCompleteAndValid(Configuration instance)
     {
         CompositeType type = typeRegistry.getType(instance.getClass());
         if (type == null)
@@ -938,7 +944,7 @@ public class ConfigurationTemplateManager
 
             for (Pair<Configuration, CompositeType> composite: composites)
             {
-                if (isMissingARequiredProperty(composite.first, composite.second))
+                if (!composite.first.isValid() || isMissingARequiredProperty(composite.first, composite.second))
                 {
                     return false;
                 }

@@ -27,7 +27,9 @@ import java.util.Vector;
 public class XmlRpcHelper
 {
     public static final String SYMBOLIC_NAME_KEY = "meta.symbolicName";
-    
+
+    private static final int INTIALISATION_TIMEOUT = 90000;
+
     protected XmlRpcClient xmlRpcClient;
     protected String token = null;
 
@@ -357,7 +359,7 @@ public class XmlRpcHelper
             }
 
             Thread.sleep(50);
-            if (System.currentTimeMillis() - startTime > 30000)
+            if (System.currentTimeMillis() - startTime > INTIALISATION_TIMEOUT)
             {
                 throw new RuntimeException("Timed out waiting for project '" + name + "' to init (state is '" + state + "')");
             }

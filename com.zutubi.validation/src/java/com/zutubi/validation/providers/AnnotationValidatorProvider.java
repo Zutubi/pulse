@@ -46,7 +46,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
 
     public List<Validator> getValidators(Object obj, ValidationContext context)
     {
-        Class<? extends Object> clazz = obj.getClass();
+        Class<?> clazz = obj.getClass();
         List<Validator> validators = secondLevelCache.get(clazz);
         if(validators == null)
         {

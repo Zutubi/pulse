@@ -2,14 +2,11 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.AntTypeForm;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
-import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.windows.BrowseScmWindow;
 import com.zutubi.pulse.master.model.ProjectManager;
 
-import java.util.Hashtable;
 import java.io.File;
+import java.util.Hashtable;
 
 /**
  * A high level acceptance test that checks the ability to browse and select
@@ -198,15 +195,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     private AntTypeForm navigateToTypeConfig()
     {
-        // go to the type configuration pages.
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, random, false);
-        globalPage.goTo();
-        globalPage.waitFor();
-        ProjectConfigPage configPage = globalPage.clickConfigure();
-        configPage.waitFor();
-        CompositePage page = configPage.clickComposite("type", "ant command and artifacts");
-        page.waitFor();
-
+        goTo(urls.adminProject(random) + "/" + Constants.Project.TYPE);
         AntTypeForm antForm = new AntTypeForm(selenium);
         antForm.waitFor();
         return antForm;

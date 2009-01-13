@@ -1432,12 +1432,20 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         MockB b = new MockB();
         b.setB("set");
-        assertTrue(configurationTemplateManager.isDeeplyComplete(b));
+        assertTrue(configurationTemplateManager.isDeeplyCompleteAndValid(b));
     }
 
     public void testIsDeeplyCompleteDirectInstanceIncomplete()
     {
-        assertFalse(configurationTemplateManager.isDeeplyComplete(new MockB()));
+        assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(new MockB()));
+    }
+
+    public void testIsDeeplyCompleteDirectInstanceInvalid()
+    {
+        MockB b = new MockB();
+        b.setB("set");
+        b.addFieldError("b", "nasty");
+        assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(new MockB()));
     }
 
     public void testIsDeeplyCompleteIndirectInstanceComplete()
@@ -1447,7 +1455,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MockA a = new MockA("a");
         a.setMock(b);
 
-        assertTrue(configurationTemplateManager.isDeeplyComplete(a));
+        assertTrue(configurationTemplateManager.isDeeplyCompleteAndValid(a));
     }
 
     public void testIsDeeplyCompleteIndirectInstanceIncomplete()
@@ -1455,12 +1463,23 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MockA a = new MockA("a");
         a.setMock(new MockB());
 
-        assertFalse(configurationTemplateManager.isDeeplyComplete(a));
+        assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(a));
+    }
+
+    public void testIsDeeplyCompleteIndirectInstanceInvalid()
+    {
+        MockB b = new MockB();
+        b.setB("set");
+        b.addFieldError("b", "nasty");
+        MockA a = new MockA("a");
+        a.setMock(b);
+
+        assertFalse(configurationTemplateManager.isDeeplyCompleteAndValid(a));
     }
 
     public void testIsDeeplyCompleteIndirectInstanceNull()
     {
-        assertTrue(configurationTemplateManager.isDeeplyComplete(new MockA("a")));
+        assertTrue(configurationTemplateManager.isDeeplyCompleteAndValid(new MockA("a")));
     }
 
     private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException

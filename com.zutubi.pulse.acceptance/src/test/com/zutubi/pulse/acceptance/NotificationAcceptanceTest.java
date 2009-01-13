@@ -2,18 +2,18 @@ package com.zutubi.pulse.acceptance;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
-import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
-import com.zutubi.pulse.master.tove.config.user.AllBuildsConditionConfiguration;
-import com.zutubi.pulse.master.tove.config.user.ProjectSubscriptionConfiguration;
-import com.zutubi.pulse.master.tove.config.user.SelectedBuildsConditionConfiguration;
-import com.zutubi.pulse.master.tove.config.user.CustomConditionConfiguration;
-import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
-import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.master.condition.NotifyConditionFactory;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.master.tove.config.user.AllBuildsConditionConfiguration;
+import com.zutubi.pulse.master.tove.config.user.CustomConditionConfiguration;
+import com.zutubi.pulse.master.tove.config.user.ProjectSubscriptionConfiguration;
+import com.zutubi.pulse.master.tove.config.user.SelectedBuildsConditionConfiguration;
+import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.Condition;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Condition;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
 
@@ -32,7 +32,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private static final String DEFAULT_HOST = "localhost";
     private static final String EMAIL_DOMAIN = "@zutubi.com";
     private static final String DEFAULT_FROM = "testing" + EMAIL_DOMAIN;
-    private static final int TIMEOUT = 30000;
+    private static final int TIMEOUT = 90000;
 
     private static final int CONDITION_ALL_BUILDS = 1;
     private static final int CONDITION_SUCCESSFUL_BUILDS = 2;

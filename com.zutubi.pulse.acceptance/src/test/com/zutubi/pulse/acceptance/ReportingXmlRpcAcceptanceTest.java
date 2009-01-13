@@ -17,6 +17,8 @@ import java.util.Vector;
  */
 public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
+    private static final int TIMEOUT = 90000;
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -218,7 +220,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String projectName = randomName();
         insertSimpleProject(projectName);
-        xmlRpcHelper.runBuild(projectName, 60000);
+        xmlRpcHelper.runBuild(projectName, TIMEOUT);
 
         assertTrue(xmlRpcHelper.deleteBuild(projectName, 1));
         assertNull(xmlRpcHelper.getBuild(projectName, 1));

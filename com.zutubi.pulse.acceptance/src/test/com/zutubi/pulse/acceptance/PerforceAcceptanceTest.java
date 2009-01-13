@@ -23,7 +23,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private static final String WORKSPACE_PREFIX = "pulse-";
 
-    private static final long TIMEOUT_MILLIS = 30000;
+    private static final long TIMEOUT_MILLIS = 90000;
     
     private PerforceCore core;
 

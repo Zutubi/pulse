@@ -26,6 +26,8 @@ import java.util.List;
  */
 public class BuildHookAcceptanceTest extends SeleniumTestBase
 {
+    private static final int TIMEOUT = 90000;
+
     private static final String PROJECT_NAME = "hook-test-project";
     private static final String PROJECT_PATH = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, "hook-test-project");
     private static final String HOOKS_BASENAME = "buildHooks";
@@ -63,7 +65,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         addTask("${project} ${status}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
         assertArgs(PROJECT_NAME, "${status}");
     }
 
@@ -72,7 +74,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         postBuildHelper();
         addTask("${project} ${status}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
         assertArgs(PROJECT_NAME, "success");
     }
 
@@ -81,7 +83,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         postBuildHelper();
         addTask("${build.dir}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
         List<String> args = getArgs();
 
         // The build directory contains the build log.
@@ -103,7 +105,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         selectFromAllTasks();
         addTask(random, "${project} ${some.property}");
 
-        xmlRpcHelper.runBuild(random, 60000);
+        xmlRpcHelper.runBuild(random, TIMEOUT);
         assertArgs(random, "some.value");
     }
 
@@ -112,7 +114,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         postStageHelper();
         addTask("${project} ${stage} ${recipe} ${status}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
     }
 
@@ -121,7 +123,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         postStageHelper();
         addTask("${stage.dir}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
         List<String> args = getArgs();
 
         // The stage directory contains the recipe log.
@@ -140,14 +142,14 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         selectFromAllTasks();
 
         CompositePage hookPage = addTask("${build.number} ${project} ${status}");
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
         triggerHook(hookPage, buildNumber);
         assertArgs(Long.toString(buildNumber), PROJECT_NAME, "success");
     }
 
     public void testManuallyTriggerPreBuildHook() throws Exception
     {
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
 
         chooseHookType("zutubi.preBuildHookConfig");
 
@@ -162,7 +164,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     public void testManuallyTriggerPostStageHook() throws Exception
     {
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
 
         postStageHelper();
         CompositePage hookPage = addTask("${project} ${stage} ${recipe} ${status}");
@@ -184,7 +186,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         taskForm.finishFormElements("nosuchexe", null, tempDir.getAbsolutePath(), null, null);
 
         waitForHook(PROJECT_NAME);
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
         Hashtable<String,Object> build = xmlRpcHelper.getBuild(PROJECT_NAME, buildNumber);
         assertEquals("error", build.get("status"));
     }
@@ -200,7 +202,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         selectFromAllTasks();
         addTask("${project}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
         assertFalse(new File(tempDir, "args.txt").exists());
     }
 
@@ -211,7 +213,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookPage.clickActionAndWait("disable");
         assertEquals("disabled", hookPage.getStateField("state"));
 
-        xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
         assertFalse(new File(tempDir, "args.txt").exists());
     }
 
@@ -226,7 +228,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         selectFromAllTasks();
 
         addTask("${build.number} ${project} ${status}");
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
+        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, TIMEOUT);
 
         BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, PROJECT_NAME, buildNumber);
         summaryPage.goTo();
@@ -281,7 +283,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         long startTime = System.currentTimeMillis();
         while(!envFile.exists())
         {
-            assertTrue(System.currentTimeMillis() - startTime < 60000);
+            assertTrue(System.currentTimeMillis() - startTime < TIMEOUT);
             Thread.sleep(500);
         }
     }

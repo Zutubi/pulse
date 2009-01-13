@@ -15,7 +15,7 @@ import java.util.Hashtable;
  */
 public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
 {
-    private static final int TIMEOUT = 30000;
+    private static final int TIMEOUT = 90000;
 
     private static final String STATUS_NONE_BUILDING = "no projects building";
     private static final String STATUS_ONE_BUILDING = "1 project building";
