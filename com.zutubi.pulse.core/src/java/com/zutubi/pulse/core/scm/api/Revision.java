@@ -12,6 +12,12 @@ public class Revision
      * Represents whatever the latest revision is at the time.
      */
     public static final Revision HEAD = null;
+    /**
+     * Maximum length of a non-numeric revision string before it will be
+     * abbreviated.
+     */
+    public static final int ABBREVIATION_LIMIT = 9;
+    public static final String ELLIPSIS = "...";
 
     private String revisionString;
 
@@ -72,6 +78,55 @@ public class Revision
             return new Revision(String.valueOf(number - 1));
         }
         return null;
+    }
+
+    /**
+     * Tests if this revision is a simple number.
+     *
+     * @return true iff the revision is a simple number
+     */
+    public boolean isNumeric()
+    {
+        try
+        {
+            Long.parseLong(revisionString);
+            return true;
+        }
+        catch (NumberFormatException e)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Inidicates if the revision string can be abbreviated for display in a
+     * UI.
+     *
+     * @return true iff this revision has an abbreviated form
+     */
+    public boolean isAbbreviated()
+    {
+        return !isNumeric() && revisionString.length() > ABBREVIATION_LIMIT;
+    }
+
+    /**
+     * Returns an abbreviated form of the revision string.  This will be
+     * identical to the full form unless {@link #isAbbreviated()} returns
+     * true, in which case it will be no longer than
+     * {@link #ABBREVIATION_LIMIT}.
+     *
+     * @return an abbreviated form of the revision string
+     */
+    public String getAbbreviatedRevisionString()
+    {
+        if (isAbbreviated())
+        {
+            return revisionString.substring(0, ABBREVIATION_LIMIT - ELLIPSIS.length()) + ELLIPSIS;
+        }
+        else
+        {
+            return revisionString;
+        }
     }
 
     public boolean equals(Object o)

@@ -1845,7 +1845,25 @@
             #staticClassCell("personal")
         #elseif($buildResult.revision)
             $action.updateChangeUrl($project, $buildResult.revision)
-            #dynamicRightLinkClassCell($buildResult.revision $action.getChangeUrl())
+            #if($buildResult.revision.numeric)
+            <td class="${cssClass}-right">
+            #else
+            <td class="${cssClass}">
+            #end
+            #if($buildResult.revision.abbreviated)
+                <span title="$!webwork.htmlEncode($buildResult.revision.revisionString)">
+            #end
+            #if($action.getChangeUrl())
+                <a href="$action.getChangeUrl()">
+            #end
+                $!webwork.htmlEncode($buildResult.revision.abbreviatedRevisionString)
+            #if($action.getChangeUrl())
+                </a>
+            #end
+            #if($buildResult.revision.abbreviated)
+                </span>
+            #end
+             </td>
         #else
             #contentClassCell("revision.none")
         #end
@@ -1945,7 +1963,13 @@
         #elseif($buildResult.revision)
             $action.updateChangeUrl($project, $buildResult.revision)
             #set($changeUrl = $action.getChangeUrl())
-            #if($changeUrl)<a href="$changeUrl">#end#html($buildResult.revision)#if($changeUrl)</a>#end
+            #if($buildResult.revision.abbreviated)
+                <span title="$!webwork.htmlEncode($buildResult.revision.revisionString)">
+            #end
+            #if($changeUrl)<a href="$changeUrl">#end#html($buildResult.revision.abbreviatedRevisionString)#if($changeUrl)</a>#end
+            #if($buildResult.revision.abbreviated)
+                </span>
+            #end
         #else
             none
         #end

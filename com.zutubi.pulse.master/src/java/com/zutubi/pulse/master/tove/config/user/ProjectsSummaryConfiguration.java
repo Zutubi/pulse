@@ -68,6 +68,6 @@ public abstract class ProjectsSummaryConfiguration extends AbstractConfiguration
 
     public static List<String> defaultColumns()
     {
-        return new LinkedList(Arrays.asList(BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS));
+        return new LinkedList<String>(Arrays.asList(BuildColumns.KEY_REVISION, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS));
     }
 }

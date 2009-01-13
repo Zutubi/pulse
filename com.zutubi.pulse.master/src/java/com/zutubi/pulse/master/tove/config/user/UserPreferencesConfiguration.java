@@ -224,6 +224,6 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
 
     public static String defaultProjectColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_REVISION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
     }
 }
