@@ -128,7 +128,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     nameToConfig.remove(old.getName());
                     validConfigs.remove(old);
                     removeFromLabelMap(old);
-
                 }
 
                 registerProjectConfig(instance);

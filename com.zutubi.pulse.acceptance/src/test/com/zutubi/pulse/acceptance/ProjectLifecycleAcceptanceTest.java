@@ -34,7 +34,6 @@ public class ProjectLifecycleAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.doConfigAction(path, ProjectConfigurationActions.ACTION_INITIALISE);
 
-        xmlRpcHelper.waitForProjectToInitialise(random);
         assertProjectHasReinitialised(random);
     }
 
@@ -48,7 +47,6 @@ public class ProjectLifecycleAcceptanceTest extends SeleniumTestBase
         scmConfig.put(Constants.Project.Scm.QUIET_PERIOD_ENABLED, true);
         xmlRpcHelper.saveConfig(scmPath, scmConfig, false);
 
-        xmlRpcHelper.waitForProjectToInitialise(random);
         assertProjectHasReinitialised(random);
     }
 
@@ -85,8 +83,10 @@ public class ProjectLifecycleAcceptanceTest extends SeleniumTestBase
         assertEquals(expectedState, xmlRpcHelper.getProjectState(project));
     }
 
-    private void assertProjectHasReinitialised(String project)
+    private void assertProjectHasReinitialised(String project) throws Exception
     {
+        xmlRpcHelper.waitForProjectToInitialise(random);
+
         loginAsAdmin();
         ProjectLogPage logPage = new ProjectLogPage(selenium, urls, project);
         logPage.goTo();
