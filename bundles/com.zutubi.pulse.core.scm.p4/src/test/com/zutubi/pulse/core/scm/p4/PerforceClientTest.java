@@ -10,6 +10,8 @@ import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +70,7 @@ public class PerforceClientTest extends PerforceTestBase
         {
             // The message is going to the user, and we label it as a client
             // in the interface.
-            assertEquals("Template client '" + WORKSPACE_NAME + "' does not exist.", e.getMessage());
+            assertThat(e.getMessage(), containsString("Template client '" + WORKSPACE_NAME + "' does not exist."));
         }
     }
 

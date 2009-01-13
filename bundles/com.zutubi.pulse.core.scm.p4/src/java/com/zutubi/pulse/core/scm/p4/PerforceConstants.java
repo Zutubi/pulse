@@ -94,7 +94,7 @@ public class PerforceConstants
 
     // Output of p4 changes -s submitted -m 1:
     //   Change <number> on <date> by <user>@<client>
-    public static final Pattern PATTERN_CHANGES = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
+    public static final Pattern PATTERN_CHANGES = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.*)'$", Pattern.MULTILINE);
 
     public static final String[] EXECUTABLE_TYPES = {
             "xtext",

@@ -333,15 +333,19 @@ public class PerforceCore
         args.addAll(Arrays.asList(files));
 
         PerforceCore.P4Result result = runP4(null, args.toArray(new String[args.size()]));
-        Matcher matcher = PATTERN_CHANGES.matcher(result.stdout);
+        return parseChange(result.stdout.toString().trim());
+    }
 
+    static Revision parseChange(String response) throws ScmException
+    {
+        Matcher matcher = PATTERN_CHANGES.matcher(response);
         if (matcher.find())
         {
             return new Revision(matcher.group(1));
         }
         else
         {
-            return new Revision(0);
+            throw new ScmException("Unrecognised response from p4 changes '" + response + "'");
         }
     }
 
