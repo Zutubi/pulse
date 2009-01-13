@@ -587,7 +587,7 @@ public class P4Server extends CachingSCMServer
             if (start <= end)
             {
                 P4Client.P4Result p4Result = client.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
-                Matcher matcher = client.getChangesPattern().matcher(p4Result.stdout);
+                Matcher matcher = PATTERN_CHANGES.matcher(p4Result.stdout);
 
                 while (matcher.find())
                 {

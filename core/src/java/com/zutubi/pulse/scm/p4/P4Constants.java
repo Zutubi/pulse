@@ -3,6 +3,7 @@ package com.zutubi.pulse.scm.p4;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Shared constants used in Perforce implementations.
@@ -87,6 +88,8 @@ public class P4Constants
     public static final String ACTION_INTEGRATE = "integrate";
 
     public static final String REVISION_NONE = "none";
+
+    public static final Pattern PATTERN_CHANGES = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.*)'$", Pattern.MULTILINE);
 
     public static final String[] EXECUTABLE_TYPES = {
             "xtext",

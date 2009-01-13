@@ -31,7 +31,6 @@ public class P4Client
 
     private Map<String, String> p4Env = new HashMap<String, String>();
     private ProcessBuilder p4Builder;
-    private Pattern changesPattern;
     private Pattern lineSplitterPattern;
     private static final String ROOT_PREFIX = "Root:";
 
@@ -53,7 +52,6 @@ public class P4Client
         p4Builder = new ProcessBuilder();
         // Output of p4 changes -s submitted -m 1:
         //   Change <number> on <date> by <user>@<client>
-        changesPattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
         lineSplitterPattern = Pattern.compile("\r?\n");
     }
 
@@ -282,8 +280,12 @@ public class P4Client
         args.addAll(Arrays.asList(files));
 
         P4Client.P4Result result = runP4(null, args.toArray(new String[args.size()]));
-        String response = result.stdout.toString().trim();
-        Matcher matcher = changesPattern.matcher(response);
+        return parseChange(result.stdout.toString().trim());
+    }
+
+    static NumericalRevision parseChange(String response) throws SCMException
+    {
+        Matcher matcher = PATTERN_CHANGES.matcher(response);
 
         if (matcher.find())
         {
@@ -326,10 +328,5 @@ public class P4Client
     public String[] splitLines(P4Result result)
     {
         return lineSplitterPattern.split(result.stdout);
-    }
-
-    public Pattern getChangesPattern()
-    {
-        return changesPattern;
     }
 }
