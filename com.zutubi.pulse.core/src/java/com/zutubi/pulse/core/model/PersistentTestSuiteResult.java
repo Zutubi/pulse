@@ -26,6 +26,7 @@ public class PersistentTestSuiteResult extends PersistentTestResult
     private int total;
     private int errors;
     private int failures;
+    private int skipped;
 
     public PersistentTestSuiteResult()
     {
@@ -39,7 +40,7 @@ public class PersistentTestSuiteResult extends PersistentTestResult
 
     public PersistentTestSuiteResult(String name, long duration)
     {
-        this(name, duration, -1, -1, -1);
+        this(name, duration, -1, -1, -1, -1);
         suites = new ArrayList<PersistentTestSuiteResult>();
         cases = new LinkedHashMap<String, PersistentTestCaseResult>();
     }
@@ -87,12 +88,13 @@ public class PersistentTestSuiteResult extends PersistentTestResult
         }
     }
 
-    public PersistentTestSuiteResult(String name, long duration, int total, int errors, int failures)
+    public PersistentTestSuiteResult(String name, long duration, int total, int errors, int failures, int skipped)
     {
         super(name, duration);
         this.total = total;
         this.errors = errors;
         this.failures = failures;
+        this.skipped = skipped;
     }
 
     public void add(PersistentTestSuiteResult suite)
@@ -190,6 +192,30 @@ public class PersistentTestSuiteResult extends PersistentTestResult
         else
         {
             return failures;
+        }
+    }
+
+    public int getSkipped()
+    {
+        if (skipped < 0)
+        {
+            int result = 0;
+
+            for (PersistentTestSuiteResult child : suites)
+            {
+                result += child.getSkipped();
+            }
+
+            for (PersistentTestCaseResult child : cases.values())
+            {
+                result += child.getSkipped();
+            }
+
+            return result;
+        }
+        else
+        {
+            return skipped;
         }
     }
 

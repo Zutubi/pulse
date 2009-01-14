@@ -35,7 +35,7 @@
 [/#if]
 
 [#assign testSummary = result.testSummary]
-[#if !testSummary.allPassed()]
+[#if testSummary.hasBroken()]
     [@buildFailedTestsHTML result=result/]
 [/#if]
 </table>

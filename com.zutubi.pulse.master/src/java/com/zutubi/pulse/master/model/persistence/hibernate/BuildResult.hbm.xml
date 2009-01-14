@@ -145,6 +145,7 @@
 
         <property name="errors" column="ERRORS" type="int"/>
         <property name="failures" column="FAILURES" type="int"/>
+        <property name="skipped" column="SKIPPED" type="int"/>
         <property name="total" column="TOTAL" type="int"/>
     </class>
 

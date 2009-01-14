@@ -42,6 +42,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
         this.statusMap.put("PASS", TestStatus.PASS);
         this.statusMap.put("FAILURE", TestStatus.FAILURE);
         this.statusMap.put("ERROR", TestStatus.ERROR);
+        this.statusMap.put("SKIPPED", TestStatus.SKIPPED);
     }
 
     public RegexTestPostProcessor(String name)
@@ -195,6 +196,16 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
     public void setErrorStatus(String status)
     {
         this.statusMap.put(status, TestStatus.ERROR);
+    }
+
+    public String getSkippedStatus()
+    {
+        return findStatus(TestStatus.SKIPPED);
+    }
+
+    public void setSkippedStatus(String status)
+    {
+        this.statusMap.put(status, TestStatus.SKIPPED);
     }
 
     private String findStatus(TestStatus status)

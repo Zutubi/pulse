@@ -28,9 +28,9 @@ Error messages:
     * tests let me down
 
 
-Test summary: total: 5, errors: 2, failures: 3
+Test summary: total: 5, errors: 2, failures: 3, skipped: 0
   - second stage :: second recipe@[pending]
-    Test summary: total: 5, errors: 2, failures: 3
+    Test summary: total: 5, errors: 2, failures: 3, skipped: 0
     * root test suite :: nested suite :: n1 failed (failure)
       a failure message which is bound to be detailed, potentially to
       the extreme but in this case just to wrap a bit

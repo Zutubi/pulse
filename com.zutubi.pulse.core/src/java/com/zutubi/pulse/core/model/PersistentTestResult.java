@@ -69,6 +69,8 @@ public abstract class PersistentTestResult
 
     public abstract int getFailures();
 
+    public abstract int getSkipped();
+
     public abstract int getTotal();
 
     public abstract boolean isSuite();
@@ -78,15 +80,21 @@ public abstract class PersistentTestResult
         return getSummary().getBroken() > 0;
     }
 
+    public boolean allTestsSkipped()
+    {
+        return getSkipped() == getTotal();
+    }
+
     public TestResultSummary getSummary()
     {
-        return new TestResultSummary(getErrors(), getFailures(), getTotal());
+        return new TestResultSummary(getErrors(), getFailures(), getSkipped(), getTotal());
     }
 
     public void accumulateSummary(TestResultSummary summary)
     {
         summary.addErrors(getErrors());
         summary.addFailures(getFailures());
+        summary.addSkipped(getSkipped());
         summary.addTotal(getTotal());
     }
 

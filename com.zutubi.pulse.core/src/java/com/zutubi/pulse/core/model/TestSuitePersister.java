@@ -24,6 +24,7 @@ public class TestSuitePersister
     public static final String ATTRIBUTE_TOTAL = "total";
     public static final String ATTRIBUTE_FAILURES = "failures";
     public static final String ATTRIBUTE_ERRORS = "errors";
+    public static final String ATTRIBUTE_SKIPPED = "skipped";
     public static final String ATTRIBUTE_NAME = "name";
     public static final String ATTRIBUTE_DURATION = "duration";
     public static final String ATTRIBUTE_STATUS = "status";
@@ -63,6 +64,7 @@ public class TestSuitePersister
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_TOTAL, Integer.toString(child.getTotal())));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_FAILURES, Integer.toString(child.getFailures())));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_ERRORS, Integer.toString(child.getErrors())));
+            suiteElement.addAttribute(new Attribute(ATTRIBUTE_SKIPPED, Integer.toString(child.getSkipped())));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_DURATION, Long.toString(child.getDuration())));
 
             root.appendChild(suiteElement);
@@ -167,6 +169,7 @@ public class TestSuitePersister
             int total = getIntAttribute(element, ATTRIBUTE_TOTAL);
             int errors = getIntAttribute(element, ATTRIBUTE_ERRORS);
             int failures = getIntAttribute(element, ATTRIBUTE_FAILURES);
+            int skipped = getIntAttribute(element, ATTRIBUTE_SKIPPED);
 
             if (name == null || failuresOnly && (errors == 0 && failures == 0))
             {
@@ -187,7 +190,7 @@ public class TestSuitePersister
             }
             else
             {
-                handler.startSuite(new PersistentTestSuiteResult(name, duration, total, errors, failures));
+                handler.startSuite(new PersistentTestSuiteResult(name, duration, total, errors, failures, skipped));
                 handler.endSuite();
             }
         }
@@ -246,7 +249,7 @@ public class TestSuitePersister
         {
             Element element = elements.get(i);
             TestStatus status = getStatus(element);
-            if (failuresOnly && status == TestStatus.PASS)
+            if (failuresOnly && !status.isBroken())
             {
                 continue;
             }

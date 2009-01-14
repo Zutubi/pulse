@@ -36,6 +36,17 @@ public enum TestStatus
         {
             return true;
         }
+    },
+    /**
+     * The test case was not executed, perhaps because it was explicitly disabled,
+     * perhaps because a dependent test failed.
+     */
+    SKIPPED
+    {
+        public boolean isBroken()
+        {
+            return false;
+        }
     };
 
     /**

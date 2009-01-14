@@ -982,7 +982,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    class ExternalDefinition
+    static class ExternalDefinition
     {
         String path;
         SVNURL url;

@@ -68,6 +68,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         pp.setCaseElement("customtestcase");
         pp.setFailureElement("customfailure");
         pp.setErrorElement("customerror");
+        pp.setSkippedElement("customskipped");
         pp.setNameAttribute("customname");
         pp.setPackageAttribute("custompackage");
         pp.setTimeAttribute("customtime");
@@ -84,13 +85,14 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         assertEquals(391, suite.getDuration());
 
         PersistentTestCaseResult[] children = suite.getCases().toArray(new PersistentTestCaseResult[suite.getCases().size()]);
-        assertEquals(3, children.length);
+        assertEquals(4, children.length);
         checkCase(children[0], "testSimple", PASS, 291, null);
-        checkCase(children[1], "testFailure", FAILURE, 10,
+        checkCase(children[1], "testSkipped", SKIPPED, 0, null);
+        checkCase(children[2], "testFailure", FAILURE, 10,
                 "junit.framework.AssertionFailedError\n" +
                         "\tat\n" +
                         "        com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest.testFailure(JUnitReportPostProcessorTest.java:63)");
-        checkCase(children[2], "testError", ERROR, 0,
+        checkCase(children[3], "testError", ERROR, 0,
                 "java.lang.RuntimeException: whoops!\n" +
                         "\tat\n" +
                         "        com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");

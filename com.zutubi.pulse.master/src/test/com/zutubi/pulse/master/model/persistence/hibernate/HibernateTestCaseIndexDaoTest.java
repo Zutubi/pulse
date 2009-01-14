@@ -28,6 +28,12 @@ public class HibernateTestCaseIndexDaoTest extends MasterPersistenceTestCase
     public void testLoadSave() throws Exception
     {
         TestCaseIndex index = new TestCaseIndex(101, 123, "some/test/case");
+        index.setBrokenSince(12);
+        index.setBrokenNumber(88);
+        index.setErrorCount(2);
+        index.setFailureCount(20);
+        index.setSkippedCount(3);
+        index.setTotalCount(100);
         testCaseIndexDao.save(index);
         commitAndRefreshTransaction();
 

@@ -4,6 +4,9 @@
     <property name="ivy.dep.file" value="ivy.xml"></property>
   </properties>
   <customtestcase classname="com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest" customname="testSimple" customtime="0.291"></customtestcase>
+  <customtestcase classname="com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest" customname="testSkipped" customtime="0.0">
+      <customskipped/>
+  </customtestcase>
   <customtestcase classname="com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest" customname="testFailure" customtime="0.01">
     <customfailure type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError
 	at

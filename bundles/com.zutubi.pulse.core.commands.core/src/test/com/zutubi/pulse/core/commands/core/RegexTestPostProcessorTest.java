@@ -1,147 +1,74 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.PulseExecutionContext;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.FileLoadException;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import com.zutubi.pulse.core.postprocessors.api.TestPostProcessorTestCase;
+import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
-import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class RegexTestPostProcessorTest extends PulseTestCase
+public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
 {
-    private File tmpDir = null;
-    private StoredFileArtifact artifact = null;
-    private CommandResult result = null;
-    private File tmpFile;
+    private static final String EXTENSION = "txt";
 
-    public RegexTestPostProcessorTest()
+    public void testSmokeTest() throws IOException
     {
-    }
-
-    public RegexTestPostProcessorTest(String name)
-    {
-        super(name);
-    }
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        tmpDir = FileSystemUtils.createTempDir("RegexTestPostProcessorTest", getName());
-
-        artifact = prepareArtifact(this.getName());
-
-        result = new CommandResult("output");
-    }
-
-    protected void tearDown() throws Exception
-    {
-        removeDirectory(tmpDir);
-        super.tearDown();
-    }
-
-    private StoredFileArtifact prepareArtifact(String name) throws IOException
-    {
-        tmpFile = new File(tmpDir, name + ".txt");
-        IOUtils.joinStreams(
-                this.getClass().getResourceAsStream("RegexTestPostProcessorTest."+name+".txt"),
-                new FileOutputStream(tmpFile),
-                true
-        );
-
-        return new StoredFileArtifact( name + ".txt");
-    }
-
-    public void testSmokeTest() throws FileLoadException
-    {
-        PersistentTestSuiteResult tests = process();
-        assertEquals(5, tests.getFailures());
+        TestSuiteResult tests = runProcessorAndGetTests(createProcessor(), EXTENSION);
+        assertEquals(5, tests.getTotalWithStatus(FAILURE));
         assertEquals(91, tests.getTotal());
-        assertEquals(0, tests.getErrors());
+        assertEquals(0, tests.getTotalWithStatus(ERROR));
     }
 
-    public void testConflictsAppend() throws FileLoadException
+    public void testAutoFail() throws IOException
     {
-        PersistentTestSuiteResult tests = process("append", false, -1);
+        TestSuiteResult tests = runProcessorAndGetTests(createProcessor(true, -1), EXTENSION);
         assertEquals(5, tests.getTotal());
-        assertTrue(tests.hasCase(" <TEST COMMAND0>"));
-        assertTrue(tests.hasCase(" <TEST COMMAND1>"));
-        assertTrue(tests.hasCase(" <TEST COMMAND1>2"));
-        assertTrue(tests.hasCase(" <TEST COMMAND1>3"));
-        assertTrue(tests.hasCase(" <TEST COMMAND2>"));
+        assertEquals(3, tests.getTotalWithStatus(FAILURE));
+        assertEquals(1, tests.getTotalWithStatus(ERROR));
+        assertEquals(PASS, tests.findCase("test1").getStatus());
+        assertEquals(ERROR, tests.findCase("test2").getStatus());
+        assertEquals(FAILURE, tests.findCase("test3").getStatus());
+        assertEquals(FAILURE, tests.findCase("test4").getStatus());
+        assertEquals(FAILURE, tests.findCase("test5").getStatus());
     }
 
-    public void testConflictsOff() throws FileLoadException
+    public void testUnrecognised() throws IOException
     {
-        PersistentTestSuiteResult tests = process();
+        TestSuiteResult tests = runProcessorAndGetTests(createProcessor(), EXTENSION);
         assertEquals(3, tests.getTotal());
-        assertTrue(tests.hasCase(" <TEST COMMAND0>"));
-        assertTrue(tests.hasCase(" <TEST COMMAND1>"));
-        assertTrue(tests.hasCase(" <TEST COMMAND2>"));
+        assertEquals(1, tests.getTotalWithStatus(FAILURE));
+        assertEquals(1, tests.getTotalWithStatus(ERROR));
+        assertEquals(PASS, tests.findCase("test1").getStatus());
+        assertEquals(ERROR, tests.findCase("test2").getStatus());
+        assertEquals(FAILURE, tests.findCase("test4").getStatus());
+        assertNull(tests.findCase("test3"));
+        assertNull(tests.findCase("test5"));
     }
 
-    public void testConflictsPrepend() throws FileLoadException
+    public void testDetails() throws IOException
     {
-        PersistentTestSuiteResult tests = process("prepend", false, -1);
-        assertEquals(5, tests.getTotal());
-        assertTrue(tests.hasCase(" <TEST COMMAND0>"));
-        assertTrue(tests.hasCase(" <TEST COMMAND1>"));
-        assertTrue(tests.hasCase("2 <TEST COMMAND1>"));
-        assertTrue(tests.hasCase("3 <TEST COMMAND1>"));
-        assertTrue(tests.hasCase(" <TEST COMMAND2>"));
-    }
-
-    public void testAutoFail() throws FileLoadException
-    {
-        PersistentTestSuiteResult tests = process("off", true, -1);
-        assertEquals(5, tests.getTotal());
-        assertEquals(3, tests.getFailures());
-        assertEquals(1, tests.getErrors());
-        assertEquals(PASS, tests.getCase("test1").getStatus());
-        assertEquals(ERROR, tests.getCase("test2").getStatus());
-        assertEquals(FAILURE, tests.getCase("test3").getStatus());
-        assertEquals(FAILURE, tests.getCase("test4").getStatus());
-        assertEquals(FAILURE, tests.getCase("test5").getStatus());
-    }
-
-    public void testUnrecognised() throws FileLoadException
-    {
-        PersistentTestSuiteResult tests = process();
-        assertEquals(3, tests.getTotal());
-        assertEquals(1, tests.getFailures());
-        assertEquals(1, tests.getErrors());
-        assertEquals(PASS, tests.getCase("test1").getStatus());
-        assertEquals(ERROR, tests.getCase("test2").getStatus());
-        assertEquals(FAILURE, tests.getCase("test4").getStatus());
-        assertFalse(tests.hasCase("test3"));
-        assertFalse(tests.hasCase("test5"));
-    }
-
-    public void testDetails() throws FileLoadException
-    {
-        PersistentTestSuiteResult tests = process("off", false, 3);
+        TestSuiteResult tests = runProcessorAndGetTests(createProcessor(false, 3), EXTENSION);
         assertEquals(4, tests.getTotal());
-        assertEquals(2, tests.getFailures());
-        assertEquals("fail 1 details", tests.getCase(" <FAIL1>").getMessage());
-        assertEquals("fail 2 details", tests.getCase(" <FAIL2>").getMessage());
+        assertEquals(2, tests.getTotalWithStatus(FAILURE));
+        assertEquals("fail 1 details", tests.findCase(" <FAIL1>").getMessage());
+        assertEquals("fail 2 details", tests.findCase(" <FAIL2>").getMessage());
     }
 
-    private PersistentTestSuiteResult process() throws FileLoadException
+    public void testSkipped() throws IOException
     {
-        return process("off", false, -1);
+        TestSuiteResult tests = runProcessorAndGetTests(createProcessor(), EXTENSION);
+        TestCaseResult skippedCase = tests.findCase(" <SKIPPY>");
+        assertNotNull(skippedCase);
+        assertEquals(TestStatus.SKIPPED, skippedCase.getStatus());
     }
 
-    private PersistentTestSuiteResult process(String resolution, boolean autoFail, int detailsGroup) throws FileLoadException
+    private RegexTestPostProcessor createProcessor()
+    {
+        return createProcessor(false, -1);
+    }
+
+    private RegexTestPostProcessor createProcessor(boolean autoFail, int detailsGroup)
     {
         RegexTestPostProcessor pp = new RegexTestPostProcessor();
         pp.setRegex("\\[(.*)\\] .*EDT:([^:]*)(?:\\: (.*))?");
@@ -150,15 +77,8 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         pp.setDetailsGroup(detailsGroup);
         pp.setPassStatus("PASS");
         pp.setFailureStatus("FAIL");
-        pp.setResolveConflicts(resolution);
+
         pp.setAutoFail(autoFail);
-
-        PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
-        ExecutionContext context = new PulseExecutionContext();
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tmpDir.getAbsolutePath());
-
-        pp.process(tmpFile, new DefaultPostProcessorContext(artifact, result, context));
-        return testResults;
+        return pp;
     }
 }

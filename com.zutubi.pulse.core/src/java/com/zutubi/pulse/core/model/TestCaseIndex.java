@@ -13,6 +13,7 @@ public class TestCaseIndex extends Entity
     private int totalCount;
     private int failureCount;
     private int errorCount;
+    private int skippedCount;
     private long brokenSince = 0;
     private long brokenNumber = 0;
 
@@ -44,6 +45,8 @@ public class TestCaseIndex extends Entity
                 brokenSince = 0;
                 brokenNumber = 0;
                 break;
+            case SKIPPED:
+                skippedCount++;
         }
     }
 
@@ -114,6 +117,16 @@ public class TestCaseIndex extends Entity
     public void setErrorCount(int errorCount)
     {
         this.errorCount = errorCount;
+    }
+
+    public int getSkippedCount()
+    {
+        return skippedCount;
+    }
+
+    public void setSkippedCount(int skippedCount)
+    {
+        this.skippedCount = skippedCount;
     }
 
     public boolean isHealthy()

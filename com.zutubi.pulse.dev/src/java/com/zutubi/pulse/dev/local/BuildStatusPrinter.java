@@ -221,26 +221,30 @@ public class BuildStatusPrinter implements EventListener
             else
             {
                 message += testSummary.getPassed() + " passed";
-                if(testSummary.getFailures() > 0)
+                if (testSummary.hasFailures())
                 {
                     message += ", " + testSummary.getFailures() + " failed";
                 }
-                if(testSummary.getErrors() > 0)
+                if (testSummary.hasErrors())
                 {
                     message += ", " + testSummary.getErrors() + " error" + (testSummary.getErrors() > 1 ? "s" : "");
+                }
+                if (testSummary.hasSkipped())
+                {
+                    message += ", " + testSummary.getSkipped() + " skipped";
                 }
             }
 
             message += ")";
             indenter.println(message);
 
-            showtestFailures(testSummary);
+            showBrokenTests(testSummary);
         }
     }
 
-    private void showtestFailures(TestResultSummary testSummary)
+    private void showBrokenTests(TestResultSummary testSummary)
     {
-        if (!testSummary.allPassed() && failureLimit > 0)
+        if (testSummary.hasBroken() && failureLimit > 0)
         {
             indenter.indent();
             if (testSummary.getBroken() > failureLimit)

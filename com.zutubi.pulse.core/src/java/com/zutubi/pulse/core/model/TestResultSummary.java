@@ -15,6 +15,10 @@ public class TestResultSummary extends Entity
      */
     private int failures;
     /**
+     * Number of cases that were skipped.
+     */
+    private int skipped;
+    /**
      * Total number of test cases.
      */
     private int total;
@@ -23,19 +27,26 @@ public class TestResultSummary extends Entity
     {
         errors = 0;
         failures = 0;
+        skipped = 0;
         total = 0;
     }
 
-    public TestResultSummary(int errors, int failures, int total)
+    public TestResultSummary(int errors, int failures, int skipped, int total)
     {
         this.errors = errors;
         this.failures = failures;
+        this.skipped = skipped;
         this.total = total;
     }
 
     public int getErrors()
     {
         return errors;
+    }
+
+    public boolean hasErrors()
+    {
+        return getErrors() > 0;
     }
 
     public void setErrors(int errors)
@@ -53,6 +64,11 @@ public class TestResultSummary extends Entity
         return failures;
     }
 
+    public boolean hasFailures()
+    {
+        return getFailures() > 0;
+    }
+    
     public void setFailures(int failures)
     {
         this.failures = failures;
@@ -61,6 +77,26 @@ public class TestResultSummary extends Entity
     public void addFailures(int failures)
     {
         this.failures += failures;
+    }
+
+    public int getSkipped()
+    {
+        return skipped;
+    }
+
+    public boolean hasSkipped()
+    {
+        return getSkipped() > 0;
+    }
+
+    public void setSkipped(int skipped)
+    {
+        this.skipped = skipped;
+    }
+
+    public void addSkipped(int skipped)
+    {
+        this.skipped += skipped;
     }
 
     public int getTotal()
@@ -80,7 +116,7 @@ public class TestResultSummary extends Entity
 
     public int getPassed()
     {
-        return total - getBroken();
+        return total - getBroken() - skipped;
     }
 
     public int getBroken()
@@ -88,14 +124,19 @@ public class TestResultSummary extends Entity
         return errors + failures;
     }
 
+    public boolean hasBroken()
+    {
+        return getBroken() > 0;
+    }
+
     public boolean allPassed()
     {
-        return errors == 0 && failures == 0;
+        return getPassed() == getTotal();
     }
 
     public int hashCode()
     {
-        return errors * 10000 + failures * 100 + total;
+        return 1000000 * skipped + errors * 10000 + failures * 100 + total;
     }
 
     public boolean equals(Object obj)
@@ -103,7 +144,7 @@ public class TestResultSummary extends Entity
         if(obj instanceof TestResultSummary)
         {
             TestResultSummary other = (TestResultSummary) obj;
-            return other.errors == errors && other.failures == failures && other.total == total;
+            return other.errors == errors && other.failures == failures && other.skipped == skipped && other.total == total;
         }
 
         return false;
@@ -113,6 +154,7 @@ public class TestResultSummary extends Entity
     {
         addErrors(summary.errors);
         addFailures(summary.failures);
+        addSkipped(summary.skipped);
         addTotal(summary.total);
     }
 
@@ -133,7 +175,7 @@ public class TestResultSummary extends Entity
         double rate = 0D;
         if (hasTests())
         {
-            rate = getPassed() * 100.0 / total;
+            rate = getPassed() * 100.0 / (total - skipped);
         }
         return String.format("%.2f", rate);
     }
@@ -141,20 +183,28 @@ public class TestResultSummary extends Entity
 
     public String toString()
     {
-        if(hasTests())
+        String result;
+        if (hasTests())
         {
-            if(allPassed())
+            if (hasBroken())
             {
-                return "all " + total + " passed";
+                result = Integer.toString(getBroken()) + " of " + (total  - skipped) + " broken";
             }
             else
             {
-                return Integer.toString(getBroken()) + " of " + total + " broken";
+                result = total - skipped + " passed";
+            }
+
+            if (hasSkipped())
+            {
+                result += " (" + skipped + " skipped)";
             }
         }
         else
         {
-            return "none";
+            result = "none";
         }
+
+        return result;
     }
 }

@@ -94,13 +94,18 @@ public class MasterBuildProperties extends BuildProperties
         String testSummary;
         if(tests.getTotal() > 0)
         {
-            if(tests.allPassed())
+            if(tests.hasBroken())
             {
-                testSummary = "all " + tests.getTotal() + " tests passed";
+                testSummary = Integer.toString(tests.getBroken()) + " of " + (tests.getTotal() - tests.getSkipped()) + " tests broken";
             }
             else
             {
-                testSummary = Integer.toString(tests.getBroken()) + " of " + tests.getTotal() + " tests broken";
+                testSummary = tests.getTotal() - tests.getSkipped() + " tests passed";
+            }
+
+            if (tests.hasSkipped())
+            {
+                testSummary += " (" + tests.getSkipped() + " skipped)";
             }
         }
         else

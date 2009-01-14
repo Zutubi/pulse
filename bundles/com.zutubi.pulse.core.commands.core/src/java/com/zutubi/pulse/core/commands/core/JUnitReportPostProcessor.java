@@ -11,6 +11,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
     private static final String ELEMENT_CASE    = "testcase";
     private static final String ELEMENT_ERROR   = "error";
     private static final String ELEMENT_FAILURE = "failure";
+    private static final String ELEMENT_SKIPPED = "skipped";
 
     private static final String ATTRIBUTE_CLASS   = "classname";
     private static final String ATTRIBUTE_MESSAGE = "message";
@@ -22,6 +23,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
     private String caseElement      = ELEMENT_CASE;
     private String errorElement     = ELEMENT_ERROR;
     private String failureElement   = ELEMENT_FAILURE;
+    private String skippedElement   = ELEMENT_SKIPPED;
     private String classAttribute   = ATTRIBUTE_CLASS;
     private String messageAttribute = ATTRIBUTE_MESSAGE;
     private String nameAttribute    = ATTRIBUTE_NAME;
@@ -133,6 +135,13 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         {
             caseResult.setStatus(TestStatus.FAILURE);
             getMessage(child, caseResult);
+            return;
+        }
+
+        child = element.getFirstChildElement(skippedElement);
+        if (child != null)
+        {
+            caseResult.setStatus(TestStatus.SKIPPED);
         }
     }
 
@@ -195,6 +204,11 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
     public void setFailureElement(String failureElement)
     {
         this.failureElement = failureElement;
+    }
+
+    public void setSkippedElement(String skippedElement)
+    {
+        this.skippedElement = skippedElement;
     }
 
     public void setClassAttribute(String classAttribute)

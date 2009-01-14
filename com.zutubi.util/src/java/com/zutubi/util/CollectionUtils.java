@@ -358,4 +358,28 @@ public class CollectionUtils
 
         return result;
     }
+
+    /**
+     * Caclulates the number of items in the given collection that satisfy the
+     * given predicate.
+     *
+     * @param c         collection to count items from
+     * @param predicate predicate that must be satisfied to include an item in
+     *                  the count
+     * @param <T> type of item in the collection
+     * @return the number of items in the collection that satisfy the predicate
+     */
+    public static <T> int count(Collection<T> c, Predicate<T> predicate)
+    {
+        int count = 0;
+        for (T t: c)
+        {
+            if (predicate.satisfied(t))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }

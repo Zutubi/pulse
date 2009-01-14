@@ -851,10 +851,13 @@
         #else
             <a href="$urls.buildTests($build)">
         #end
-        #if($summary.allPassed())
-            $action.getText("tests.all.passed", ["$summary.total"])
-        #else
+        #if($summary.hasBroken())
             $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
+        #else
+            $action.getText("tests.all.passed", ["$summary.total"])
+        #end
+        #if($summary.hasSkipped())
+            $action.getText("tests.some.skipped", ["$summary.skipped"])
         #end
         </a>
     #end
@@ -1526,12 +1529,19 @@
         #brokenTestStatusCell($test "test.error")
     #elseif($test.failures > 0)
         #brokenTestStatusCell($test "test.failure")
-    #elseif($tests.total == 0)
-    <td>
-        <img alt="success" src="$base/images/none_blue.gif"/>
+    #elseif($test.total == 0)
+    <td class="content">
+        <img alt="none" src="$base/images/none_blue.gif"/>
     </td>
-    <td>
+    <td class="content">
         #wwtext("name=test.none")
+    </td>
+    #elseif($test.allTestsSkipped())
+    <td class="content">
+        <img alt="skipped" src="$base/images/none_blue.gif"/>
+    </td>
+    <td class="test-skipped">
+        #wwtext("name=test.skipped")
     </td>
     #else
     <td class="success">
@@ -1553,6 +1563,8 @@
     #if($showPassed || $test.hasBrokenTests())
         #if($test.hasBrokenTests())
             #set($cssClass = "test-failure")
+        #elseif($test.allTestsSkipped())
+            #set($cssClass = "content")
         #else
             #set($cssClass = "success")
         #end
@@ -1573,7 +1585,7 @@
              </td>
             #testStatusCell($test)
         #if($test.isSuite())
-            #staticCell($action.getText("test.suite.details", ["$test.total", "$test.errors", "$test.failures"]))
+            #staticCell($action.getText("test.suite.details", ["$test.total", "$test.errors", "$test.failures", "$test.skipped"]))
         #else
             #if($test.message)
             <td class="content-wrap">
@@ -1732,12 +1744,13 @@
 ##    <h2 class="section">#wwtext("name=test.summary")</h2>
 
     <table class="fill-content">
-        #headingRow("test.summary" 6)
+        #headingRow("test.summary" 7)
         <tr>
             #contentHeading("test.status" 2)
             #contentHeading("test.total" 1)
             #contentHeading("test.failures" 1)
             #contentHeading("test.errors" 1)
+            #contentHeading("test.skipped" 1)
             #contentHeading("test.success.rate" 1)
         </tr>
         <tr>
@@ -1745,6 +1758,7 @@
             #rightCell($summary.total)
             #rightCell($summary.failures)
             #rightCell($summary.errors)
+            #rightCell($summary.skipped)
             #rightCell("${summary.successRate}%")
         </tr>
     </table>
@@ -1940,10 +1954,13 @@
             #wwtext("name=tests.none")
         #else
             <a href="$urls.buildTests($buildResult)">
-            #if($summary.allPassed())
-                $action.getText("tests.all.passed", ["$summary.total"])
-            #else
+            #if($summary.hasBroken())
                 $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
+            #else
+                $action.getText("tests.all.passed", ["$summary.total"])
+            #end
+            #if($summary.hasSkipped())
+                $action.getText("tests.some.skipped", ["$summary.skipped"])
             #end
             </a>
         #end

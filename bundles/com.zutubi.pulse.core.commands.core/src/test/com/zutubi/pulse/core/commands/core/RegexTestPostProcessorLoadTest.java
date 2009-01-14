@@ -4,14 +4,11 @@ import com.zutubi.pulse.core.FileLoaderTestBase;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
 
-/**
- */
 public class RegexTestPostProcessorLoadTest extends FileLoaderTestBase
 {
     public void setUp() throws Exception
     {
         super.setUp();
-
         loader.register("regex-test.pp", RegexTestPostProcessor.class);
     }
 

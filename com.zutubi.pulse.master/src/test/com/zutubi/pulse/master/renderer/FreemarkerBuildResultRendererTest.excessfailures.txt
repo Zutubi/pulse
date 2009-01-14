@@ -28,9 +28,9 @@ Error messages:
     * tests let me down
 
 
-Test summary: total: 5, errors: 2, failures: 126
+Test summary: total: 5, errors: 2, failures: 126, skipped: 0
   - second stage :: second recipe@[pending]
-    Test summary: total: 5, errors: 2, failures: 126
+    Test summary: total: 5, errors: 2, failures: 126, skipped: 0
     NOTE: This recipe has 123 more failures, see the full test report
     for details.
     * root test suite :: nested suite :: n1 failed (failure)

@@ -8,8 +8,6 @@ import nu.xom.ParsingException;
 import java.io.File;
 import java.io.IOException;
 
-/**
- */
 public class TestSuitePersisterTest extends PulseTestCase
 {
     private File tempDir;
@@ -46,6 +44,18 @@ public class TestSuitePersisterTest extends PulseTestCase
         suite.add(new PersistentTestCaseResult("case3", -1, FAILURE, null));
         suite.add(new PersistentTestCaseResult("case1", 24, PASS, "this is the message"));
         suite.add(new PersistentTestCaseResult("case2", 100, ERROR, null));
+        roundTrip(suite);
+    }
+
+    public void testSkippedCases() throws Exception
+    {
+        PersistentTestSuiteResult suite = new PersistentTestSuiteResult("asuite");
+        suite.add(new PersistentTestCaseResult("case1", 24, PASS, "this is the message"));
+        suite.add(new PersistentTestCaseResult("case2", 0, SKIPPED, null));
+        PersistentTestSuiteResult nestedSuite = new PersistentTestSuiteResult("anestedsuite");
+        nestedSuite.add(new PersistentTestCaseResult("case1", 100, ERROR, null));
+        nestedSuite.add(new PersistentTestCaseResult("case2", 0, SKIPPED, null));
+        suite.add(nestedSuite);
         roundTrip(suite);
     }
 

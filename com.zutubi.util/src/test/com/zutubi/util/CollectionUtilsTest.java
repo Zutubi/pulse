@@ -3,8 +3,9 @@ package com.zutubi.util;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 public class CollectionUtilsTest extends ZutubiTestCase
 {
@@ -128,5 +129,25 @@ public class CollectionUtilsTest extends ZutubiTestCase
         {
             assertSame(o, p);
         }
+    }
+
+    public void testCountEmpty()
+    {
+        assertEquals(0, CollectionUtils.count(Collections.emptyList(), new TruePredicate<Object>()));
+    }
+
+    public void testCountAllMatch()
+    {
+        assertEquals(3, CollectionUtils.count(Arrays.asList(1, 2, 3), new TruePredicate<Integer>()));
+    }
+
+    public void testCountNoneMatch()
+    {
+        assertEquals(0, CollectionUtils.count(Arrays.asList(1, 2, 3), new FalsePredicate<Integer>()));
+    }
+
+    public void testCountSomeMatch()
+    {
+        assertEquals(1, CollectionUtils.count(Arrays.asList(1, 2, 3), new EqualsPredicate<Integer>(2)));
     }
 }

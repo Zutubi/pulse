@@ -73,6 +73,48 @@ public class TestSuiteResult extends TestResult
     }
 
     /**
+     * Calculates the total number of cases in this and nested suites
+     * recursively.
+     *
+     * @return the total number of cases under this suite
+     */
+    public int getTotal()
+    {
+        int total = cases.size();
+        for (TestSuiteResult nestedSuite: suites)
+        {
+            total += nestedSuite.getTotal();
+        }
+
+        return total;
+    }
+
+    /**
+     * Calculates the total number of cases with the given statue in this and
+     * nested suites recursively.
+     *
+     * @param status the status to test for
+     * @return the total number of cases under this suite with the given status
+     */
+    public int getTotalWithStatus(final TestStatus status)
+    {
+        int total = CollectionUtils.count(cases, new Predicate<TestCaseResult>()
+        {
+            public boolean satisfied(TestCaseResult caseResult)
+            {
+                return caseResult.getStatus() == status;
+            }
+        });
+
+        for (TestSuiteResult nestedSuite: suites)
+        {
+            total += nestedSuite.getTotalWithStatus(status);
+        }
+
+        return total;
+    }
+
+    /**
      * Finds a nested suite by name.  Only directly-nested suites are searched.
      *
      * @param name the name to search for

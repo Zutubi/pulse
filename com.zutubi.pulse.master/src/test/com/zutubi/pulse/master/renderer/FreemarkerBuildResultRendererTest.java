@@ -475,7 +475,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         if (generate)
         {
-            File expected = new File(getClass().getSimpleName() + "." + getName() + "." + extension);
+            File expected = new File(getClass().getSimpleName() + "." + expectedName + "." + extension);
             OutputStream outStream = null;
             Writer writer = null;
 

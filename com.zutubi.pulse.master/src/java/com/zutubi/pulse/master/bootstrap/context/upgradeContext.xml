@@ -44,6 +44,7 @@
                 <ref local="addResourcePropertyDescription"/>
                 <ref local="addPerforceTicketAuthentication"/>
                 <ref local="deleteTempateProjectStates"/>
+                <ref local="skippedTestCases"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -130,5 +131,14 @@
 
     <bean id="deleteTempateProjectStates" class="com.zutubi.pulse.master.upgrade.tasks.DeleteTemplateProjectStateUpgradeTask">
         <property name="buildNumber" value="200019001"/>
+    </bean>
+
+    <bean id="skippedTestCases" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="200019002"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.19-patch-01.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>

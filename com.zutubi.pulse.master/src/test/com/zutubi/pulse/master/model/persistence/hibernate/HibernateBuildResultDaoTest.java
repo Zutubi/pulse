@@ -114,7 +114,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testSaveAndLoadTestSummary()
     {
-        TestResultSummary summary = new TestResultSummary(3, 323, 111111);
+        TestResultSummary summary = new TestResultSummary(3, 323, 8, 111111);
         RecipeResult result = createRecipe();
         result.setTestSummary(summary);
         saveAndLoadRecipe(result);

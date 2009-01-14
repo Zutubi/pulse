@@ -232,7 +232,7 @@ flat plain text list.
     [#local summary = result.testSummary]
     [#if summary.total &gt; 0]
   - ${renderer.wrapString(context, "    ")}
-    Test summary: total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}
+    Test summary: total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}, skipped: ${summary.skipped}
     [/#if]
     [#if result.hasBrokenTests()]
         [#local excess = result.excessFailureCount/]
@@ -269,9 +269,9 @@ tests as a flat plain text list.
 [#macro buildTestSummary result]
     [#local summary = result.testSummary]
     [#if summary.total &gt; 0]
-Test summary: total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}
+Test summary: total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}, skipped: ${summary.skipped}
     [/#if]
-    [#if !summary.allPassed()]
+    [#if summary.hasBroken()]
         [#list result.root.children as child]
             [@recipeNodeTestSummary node=child/]
         [/#list]
@@ -692,7 +692,7 @@ Outputs failing test cases for the given recipe node.
             [#local summary = node.result.testSummary/]
                 <tr><td>
                     [@openTable/]
-                        [@headingRow heading="stage ${node.stageName} :: broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures})" span=3/]
+                        [@headingRow heading="stage ${node.stageName} :: broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}, skipped: ${summary.skipped})" span=3/]
             [#local excess = node.result.excessFailureCount/]
             [#if excess &gt; 0]
                         <tr><th colspan="3" style="background-color: #ffffc0">This recipe has ${excess} further test failures, see the full test report for details.</th></tr>

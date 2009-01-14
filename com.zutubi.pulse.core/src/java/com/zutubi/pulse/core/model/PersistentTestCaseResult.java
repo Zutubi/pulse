@@ -93,6 +93,11 @@ public class PersistentTestCaseResult extends PersistentTestResult
         return status == TestStatus.FAILURE ? 1 : 0;
     }
 
+    public int getSkipped()
+    {
+        return status == TestStatus.SKIPPED ? 1 : 0;
+    }
+
     public int getTotal()
     {
         return 1;
