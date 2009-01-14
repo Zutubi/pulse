@@ -150,7 +150,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     {
                         if (instance.getScm() == null)
                         {
-                            makeStateTransition(instance.getProjectId(), Project.Transition.DESTROY);
+                            makeStateTransition(instance.getProjectId(), Project.Transition.CLEANUP);
                         }
                     }
                 }
@@ -670,7 +670,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                         projectInitialisationService.requestInitialisation(project.getConfig());
                         break;
                     }
-                    case DESTROYING:
+                    case CLEANING:
                     {
                         projectInitialisationService.requestDestruction(project.getConfig(), false);
                         break;
@@ -883,7 +883,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void handleDestructionCompleted(ProjectDestructionCompletedEvent event)
     {
-        makeStateTransition(event.getProjectConfiguration().getProjectId(), Project.Transition.DESTROYED);
+        makeStateTransition(event.getProjectConfiguration().getProjectId(), Project.Transition.CLEANED);
     }
 
     public void handleEvent(Event evt)

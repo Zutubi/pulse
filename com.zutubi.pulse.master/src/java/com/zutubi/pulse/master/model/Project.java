@@ -64,11 +64,11 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
          * Transition when a request is made to destroy a project, i.e. clean
          * up any initialisation artifacts.
          */
-        DESTROY,
+        CLEANUP,
         /**
          * Transition when a project destruction is complete.
          */
-        DESTROYED,
+        CLEANED,
         /**
          * Transition when a request is made to delete a project.
          */
@@ -224,7 +224,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
                     validTransitions = CollectionUtils.asMap(
                             CollectionUtils.asPair(Transition.STARTUP, INITIAL),
                             CollectionUtils.asPair(Transition.IDLE, INITIALISING),
-                            CollectionUtils.asPair(Transition.DESTROY, DESTROY_ON_IDLE)
+                            CollectionUtils.asPair(Transition.CLEANUP, CLEANUP_ON_IDLE)
                     );
                 }
 
@@ -262,7 +262,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
                             CollectionUtils.asPair(Transition.BUILDING, BUILDING),
                             CollectionUtils.asPair(Transition.INITIALISE, INITIALISING),
                             CollectionUtils.asPair(Transition.PAUSE, PAUSED),
-                            CollectionUtils.asPair(Transition.DESTROY, DESTROYING),
+                            CollectionUtils.asPair(Transition.CLEANUP, CLEANING),
                             CollectionUtils.asPair(Transition.DELETE, DELETING)
                     );
                 }
@@ -300,7 +300,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
                             CollectionUtils.asPair(Transition.IDLE, IDLE),
                             CollectionUtils.asPair(Transition.INITIALISE, INITIALISE_ON_IDLE),
                             CollectionUtils.asPair(Transition.PAUSE, PAUSE_ON_IDLE),
-                            CollectionUtils.asPair(Transition.DESTROY, DESTROY_ON_IDLE)
+                            CollectionUtils.asPair(Transition.CLEANUP, CLEANUP_ON_IDLE)
                     );
                 }
                 return validTransitions;
@@ -336,7 +336,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
                             CollectionUtils.asPair(Transition.STARTUP, PAUSED),
                             CollectionUtils.asPair(Transition.INITIALISE, INITIALISING),
                             CollectionUtils.asPair(Transition.RESUME, IDLE),
-                            CollectionUtils.asPair(Transition.DESTROY, DESTROYING),
+                            CollectionUtils.asPair(Transition.CLEANUP, CLEANING),
                             CollectionUtils.asPair(Transition.DELETE, DELETING)
                     );
                 }
@@ -375,7 +375,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
                             CollectionUtils.asPair(Transition.INITIALISE, INITIALISE_ON_IDLE),
                             CollectionUtils.asPair(Transition.IDLE, PAUSED),
                             CollectionUtils.asPair(Transition.RESUME, BUILDING),
-                            CollectionUtils.asPair(Transition.DESTROY, DESTROY_ON_IDLE)
+                            CollectionUtils.asPair(Transition.CLEANUP, CLEANUP_ON_IDLE)
                     );
                 }
 
@@ -386,7 +386,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
          * The project's initialisation artifacts are being cleaned up because
          * its SCM configuration has been deleted.
          */
-        DESTROYING
+        CLEANING
         {
             private Map<Transition, State> validTransitions;
 
@@ -411,7 +411,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
                 {
                     validTransitions = CollectionUtils.asMap(
                             CollectionUtils.asPair(Transition.STARTUP, INITIAL),
-                            CollectionUtils.asPair(Transition.DESTROYED, INITIAL)
+                            CollectionUtils.asPair(Transition.CLEANED, INITIAL)
                     );
                 }
 
@@ -420,9 +420,9 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         },
         /**
          * The project is currently building and on idle will commence move to
-         * the {@link #DESTROYING} state.
+         * the {@link #CLEANING} state.
          */
-        DESTROY_ON_IDLE
+        CLEANUP_ON_IDLE
         {
             private Map<Transition, State> validTransitions;
 
@@ -447,7 +447,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
                 {
                     validTransitions = CollectionUtils.asMap(
                             CollectionUtils.asPair(Transition.STARTUP, IDLE),
-                            CollectionUtils.asPair(Transition.IDLE, DESTROYING)
+                            CollectionUtils.asPair(Transition.IDLE, CLEANING)
                     );
                 }
 
