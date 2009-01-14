@@ -15,7 +15,7 @@ import java.util.Hashtable;
  */
 public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
 {
-    private static final int TIMEOUT = 90000;
+    private static final int BUILD_TIMEOUT = 90000;
 
     private static final String STATUS_NONE_BUILDING = "no projects building";
     private static final String STATUS_ONE_BUILDING = "1 project building";
@@ -70,7 +70,7 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
             assertEquals(STATUS_ONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
 
             FileSystemUtils.createFile(waitFile, "test");
-            xmlRpcHelper.waitForBuildToComplete(childProject, 1, TIMEOUT);
+            xmlRpcHelper.waitForBuildToComplete(childProject, 1, BUILD_TIMEOUT);
             selenium.refresh();
             selenium.waitForPageToLoad("30000");
             assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
@@ -90,6 +90,6 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
     private void triggerAndWaitForBuildToCommence(String project) throws Exception
     {
         xmlRpcHelper.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project, 1, TIMEOUT);
+        xmlRpcHelper.waitForBuildInProgress(project, 1, BUILD_TIMEOUT);
     }
 }

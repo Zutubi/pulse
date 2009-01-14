@@ -2,8 +2,6 @@ package com.zutubi.tove.config;
 
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.validation.EssentialValidator;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.Validator;
@@ -18,7 +16,13 @@ import java.util.List;
 
 public class ConfigurationValidatorProviderTest extends ZutubiTestCase
 {
-    private static final List<Validator> DELEGATE_VALIDATORS = Arrays.<Validator>asList(new EssentialValidator(), new RegexValidator(), new RequiredValidator());
+    private static final List<Validator> NON_REQUIRED_VALIDATORS = Arrays.<Validator>asList(new EssentialValidator(), new RegexValidator());
+    private static final List<Validator> DELEGATE_VALIDATORS = new LinkedList<Validator>();
+    static
+    {
+        DELEGATE_VALIDATORS.addAll(NON_REQUIRED_VALIDATORS);
+        DELEGATE_VALIDATORS.add(new RequiredValidator());
+    }
 
     private ConfigurationValidatorProvider provider;
     private TestValidatorProvider delegateProvider;
@@ -27,6 +31,7 @@ public class ConfigurationValidatorProviderTest extends ZutubiTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+
         delegateProvider = new TestValidatorProvider();
         provider = new ConfigurationValidatorProvider();
         provider.setDelegates(Arrays.<ValidatorProvider>asList(delegateProvider));
@@ -39,15 +44,7 @@ public class ConfigurationValidatorProviderTest extends ZutubiTestCase
 
     public void testNoRequiredValidators()
     {
-        List<Validator> expected = CollectionUtils.filter(DELEGATE_VALIDATORS, new Predicate<Validator>()
-        {
-            public boolean satisfied(Validator validator)
-            {
-                return !(validator instanceof RequiredValidator);
-            }
-        });
-
-        helper(createContext(true), expected, DELEGATE_VALIDATORS);
+        helper(createContext(true), NON_REQUIRED_VALIDATORS, DELEGATE_VALIDATORS);
     }
 
     public void testNonIgnorableRequiredValidator()
@@ -55,13 +52,7 @@ public class ConfigurationValidatorProviderTest extends ZutubiTestCase
         RequiredValidator nonIgnorable = new RequiredValidator();
         nonIgnorable.setIgnorable(false);
 
-        List<Validator> expected = CollectionUtils.filter(DELEGATE_VALIDATORS, new Predicate<Validator>()
-        {
-            public boolean satisfied(Validator validator)
-            {
-                return !(validator instanceof RequiredValidator);
-            }
-        });
+        List<Validator> expected = new LinkedList<Validator>(NON_REQUIRED_VALIDATORS);
         expected.add(nonIgnorable);
 
         List<Validator> delegate = new LinkedList<Validator>(DELEGATE_VALIDATORS);

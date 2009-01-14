@@ -12,7 +12,7 @@ import java.util.Vector;
  */
 public class MavenAcceptanceTest extends SeleniumTestBase
 {
-    private static final int TIMEOUT = 90000;
+    private static final int BUILD_TIMEOUT = 90000;
 
     public void testMavenDefaultTestArtifactConfiguration() throws Exception
     {
@@ -93,7 +93,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
         try
         {
             xmlRpcHelper.loginAsAdmin();
-            return xmlRpcHelper.runBuild(projectName, TIMEOUT);
+            return xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
         }
         finally
         {

@@ -32,7 +32,8 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private static final String DEFAULT_HOST = "localhost";
     private static final String EMAIL_DOMAIN = "@zutubi.com";
     private static final String DEFAULT_FROM = "testing" + EMAIL_DOMAIN;
-    private static final int TIMEOUT = 90000;
+    private static final int BUILD_TIMEOUT = 90000;
+    private static final int EMAIL_TIMEOUT = 30000;
 
     private static final int CONDITION_ALL_BUILDS = 1;
     private static final int CONDITION_SUCCESSFUL_BUILDS = 2;
@@ -98,7 +99,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void triggerAndCheckSuccessfulBuild() throws Exception
     {
         String projectName = random + "project" + PROJECT_SUCCESS;
-        int buildNumber = xmlRpcHelper.runBuild(projectName, TIMEOUT);
+        int buildNumber = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
         assertEquals("success", build.get("status"));
         assertEmailsFrom(BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_PROJECT_SUCCESS);
@@ -107,7 +108,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void triggerAndCheckFailedBuild() throws Exception
     {
         String projectName = random + "project" + PROJECT_FAIL;
-        int buildNumber = xmlRpcHelper.runBuild(projectName, TIMEOUT);
+        int buildNumber = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
         assertEquals("failure", build.get("status"));
         assertEmailsFrom(BUILDS_ALL, BUILDS_FAILED, BUILDS_PROJECT_FAIL);
@@ -122,7 +123,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
             {
                 return server.getReceivedEmailSize() == recipients.length;
             }
-        }, TIMEOUT, "Expected " + recipients.length + " emails.");
+        }, EMAIL_TIMEOUT, "Expected " + recipients.length + " emails.");
 
         assertEquals(recipients.length, server.getReceivedEmailSize());
         Set<String> emailRecipients = new HashSet<String>();

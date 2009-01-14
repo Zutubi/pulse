@@ -23,8 +23,9 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private static final String WORKSPACE_PREFIX = "pulse-";
 
-    private static final long TIMEOUT_MILLIS = 90000;
-    
+    private static final long BUILD_TIMEOUT = 90000;
+    private static final long WORKSPACE_TIMEOUT = 30000;
+
     private PerforceCore core;
 
     protected void setUp() throws Exception
@@ -50,7 +51,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String project = randomName();
         xmlRpcHelper.insertProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
-        int buildId = xmlRpcHelper.runBuild(project, TIMEOUT_MILLIS);
+        int buildId = xmlRpcHelper.runBuild(project, BUILD_TIMEOUT);
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(project, buildId);
         assertEquals("success", build.get("status"));
     }
@@ -61,7 +62,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         String project = randomName();
         String projectPath = xmlRpcHelper.insertProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
-        xmlRpcHelper.runBuild(project, TIMEOUT_MILLIS);
+        xmlRpcHelper.runBuild(project, BUILD_TIMEOUT);
 
         assertFalse(getAllPulseWorkspaces().isEmpty());
 
@@ -80,7 +81,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
                     return false;
                 }
             }
-        }, TIMEOUT_MILLIS, "Workspaces to be cleaned up");
+        }, WORKSPACE_TIMEOUT, "Workspaces to be cleaned up");
     }
 
     private List<String> getAllPulseWorkspaces() throws ScmException

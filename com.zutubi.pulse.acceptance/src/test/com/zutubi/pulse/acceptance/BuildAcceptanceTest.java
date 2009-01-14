@@ -46,7 +46,7 @@ import java.util.Vector;
  */
 public class BuildAcceptanceTest extends SeleniumTestBase
 {
-    private static final int TIMEOUT = 90000;
+    private static final int BUILD_TIMEOUT = 90000;
 
     private static final String CHANGE_AUTHOR = "pulse";
     private static final String CHANGE_COMMENT = "Edit build file.";
@@ -94,13 +94,13 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         // Run an initial build
         addProject(random, true);
-        xmlRpcHelper.runBuild(random, TIMEOUT);
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
         // Commit a change to the repository.  Note monitoring the SCM is
         // disabled for these projects, so no chance of a build being started
         // by this change.
         String revisionString = editAndCommitBuildFile();
-        int buildNumber = xmlRpcHelper.runBuild(random, TIMEOUT);
+        int buildNumber = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
         // Check the changes tab.
         loginAsAdmin();
@@ -131,9 +131,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         changeViewer.put("projectPath", FISHEYE_PROJECT);
         xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "changeViewer"), changeViewer);
 
-        xmlRpcHelper.runBuild(random, TIMEOUT);
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
         String revisionString = editAndCommitBuildFile();
-        int buildNumber = xmlRpcHelper.runBuild(random, TIMEOUT);
+        int buildNumber = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
         String changelistLink = FISHEYE_BASE + "/changelog/" + FISHEYE_PROJECT + "/?cs=" + revisionString;
 
@@ -360,7 +360,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         type.put("pulseFileString", "<?xml version=\"1.0\"?>\n" +
                 "<project default-recipe=\"default\"><recipe name=\"default\"><print name=\"mess\" message=\"${svn.url}\"/></recipe></project>");
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), type);
-        xmlRpcHelper.runBuild(random, TIMEOUT);
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
         loginAsAdmin();
         goToArtifact(random, 1, "mess", LOCATOR_OUTPUT_ARTIFACT);
@@ -391,7 +391,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         // CIB-1724: download raw artifacts via 2.0 url scheme.
         addProject(random, true);
-        int buildNumber = xmlRpcHelper.runBuild(random, TIMEOUT);
+        int buildNumber = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
         Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(random, buildNumber);
         Hashtable<String, Object> outputArtifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
         {
@@ -478,7 +478,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // go back to the properties page and ensure that the value is pvalue.
         ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(random));
         propertiesPage.goTo();
-        propertiesPage.waitFor();
 
         assertEquals("pname", propertiesPage.getCellContent(0, 0));
         assertEquals("pvalue", propertiesPage.getCellContent(0, 1));
@@ -559,8 +558,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         home.waitFor();
 
         String statusId = IDs.buildStatusCell(projectName, 1);
-        SeleniumUtils.refreshUntilElement(selenium, statusId, TIMEOUT);
-        SeleniumUtils.refreshUntilText(selenium, statusId, "success", TIMEOUT);
+        SeleniumUtils.refreshUntilElement(selenium, statusId, BUILD_TIMEOUT);
+        SeleniumUtils.refreshUntilText(selenium, statusId, "success", BUILD_TIMEOUT);
         SeleniumUtils.assertText(selenium, IDs.stageAgentCell(projectName, 1, "default"), agent);
     }
 }
