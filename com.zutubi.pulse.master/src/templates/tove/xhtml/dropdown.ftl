@@ -33,6 +33,8 @@
     fc.name = 'combo.' + fc.hiddenName;
     fc.displayField = 'text';
     fc.valueField = 'value';
+    fc.editable = false;
+    fc.forceSelection = true;
     fc.triggerAction = 'all';
 <#if parameters.width?exists>
     fc.width = ${parameters.width};
