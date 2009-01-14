@@ -545,6 +545,37 @@ public class JDBCUtils
         }
     }
 
+    /**
+     * Get the row count for the specified table.
+     * @param dataSource the datasource providing a connection to the table in question
+     * @param tableName the name of the table being queried.
+     * @return the number of rows currently in the named table.
+     * @throws SQLException on error, for instance if the named table does not exist.
+     */
+    public static long executeTableRowCount(DataSource dataSource, String tableName) throws SQLException
+    {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try
+        {
+            con = dataSource.getConnection();
+            ps = con.prepareStatement("SELECT count(*) FROM " + tableName);
+            rs = ps.executeQuery();
+            if (rs.next())
+            {
+                return rs.getLong(1);
+            }
+            return 0;
+        }
+        finally
+        {
+            JDBCUtils.close(rs);
+            JDBCUtils.close(ps);
+            JDBCUtils.close(con);
+        }
+    }
+
     private static MiniDialect getMiniDialect(Connection con) throws SQLException
     {
         String driverName = con.getMetaData().getURL();

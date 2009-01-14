@@ -3,13 +3,13 @@
 <!--
 
 -->
-<beans>
+<beans default-autowire="byName">
 
     <!-- WARNING: as of 05/05/06, the context is empty when this file is being loaded.
         In particular, NO DATASOURCE!. You have been warned.
     -->
 
-    <bean id="upgradeManager" class="com.zutubi.pulse.master.upgrade.DefaultUpgradeManager" autowire="byName">
+    <bean id="upgradeManager" class="com.zutubi.pulse.master.upgrade.DefaultUpgradeManager">
         <property name="upgradeableComponents">
             <list>
                 <ref local="pulseUpgradeableComponent"/>
@@ -22,9 +22,9 @@
         </property>
     </bean>
 
-    <bean id="pluginUpgradeManager" class="com.zutubi.pulse.master.plugins.PluginUpgradeManager" init-method="init" autowire="byName"/>
+    <bean id="pluginUpgradeManager" class="com.zutubi.pulse.master.plugins.PluginUpgradeManager" init-method="init"/>
 
-    <bean id="pulseUpgradeableComponent" class="com.zutubi.pulse.master.upgrade.tasks.PulseUpgradeableComponent" autowire="byName">
+    <bean id="pulseUpgradeableComponent" class="com.zutubi.pulse.master.upgrade.tasks.PulseUpgradeableComponent">
         <property name="tasks">
             <list>
                 <ref local="addBackupConfiguration"/>
@@ -43,6 +43,7 @@
                 <ref local="featureDiscriminator"/>
                 <ref local="addResourcePropertyDescription"/>
                 <ref local="addPerforceTicketAuthentication"/>
+                <ref local="deleteTempateProjectStates"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -52,41 +53,41 @@
         </property>
     </bean>
 
-    <bean id="backup" class="com.zutubi.pulse.master.upgrade.tasks.BackupUpgradeTask" autowire="byName"/>
+    <bean id="backup" class="com.zutubi.pulse.master.upgrade.tasks.BackupUpgradeTask"/>
 
-    <bean id="addBackupConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddBackupConfigurationToSettingsUpgradeTask" autowire="byName">
+    <bean id="addBackupConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddBackupConfigurationToSettingsUpgradeTask">
         <property name="buildNumber" value="200007001"/>
     </bean>
 
-    <bean id="addBrowseViewConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddBrowseViewConfigurationUpgradeTask" autowire="byName">
+    <bean id="addBrowseViewConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddBrowseViewConfigurationUpgradeTask">
         <property name="buildNumber" value="200007002"/>
     </bean>
 
-    <bean id="updateDefaultAction" class="com.zutubi.pulse.master.upgrade.tasks.UpdateDefaultActionUpgradeTask" autowire="byName">
+    <bean id="updateDefaultAction" class="com.zutubi.pulse.master.upgrade.tasks.UpdateDefaultActionUpgradeTask">
         <property name="buildNumber" value="200009001"/>
     </bean>
 
-    <bean id="addDefaultVersionToProjectResourceRequirements" class="com.zutubi.pulse.master.upgrade.tasks.AddDefaultVersionToResourceRequirementUpgradeTask" autowire="byName">
+    <bean id="addDefaultVersionToProjectResourceRequirements" class="com.zutubi.pulse.master.upgrade.tasks.AddDefaultVersionToResourceRequirementUpgradeTask">
         <property name="buildNumber" value="200009002"/>
     </bean>
 
-    <bean id="fixNPEOnLDAPRememberMe" class="com.zutubi.pulse.master.upgrade.tasks.FixNPEOnLDAPRememberMeUpgradeTask" autowire="byName">
+    <bean id="fixNPEOnLDAPRememberMe" class="com.zutubi.pulse.master.upgrade.tasks.FixNPEOnLDAPRememberMeUpgradeTask">
         <property name="buildNumber" value="200011001"/>
     </bean>
 
-    <bean id="buildCompletedTriggerPropagateRevision" class="com.zutubi.pulse.master.upgrade.tasks.BuildCompletedTriggerPropagateRevisionUpgradeTask" autowire="byName">
+    <bean id="buildCompletedTriggerPropagateRevision" class="com.zutubi.pulse.master.upgrade.tasks.BuildCompletedTriggerPropagateRevisionUpgradeTask">
         <property name="buildNumber" value="200011002"/>
     </bean>
 
-    <bean id="addAllowPersonalBuilds" class="com.zutubi.pulse.master.upgrade.tasks.AddAllowPersonalBuildsUpgradeTask" autowire="byName">
+    <bean id="addAllowPersonalBuilds" class="com.zutubi.pulse.master.upgrade.tasks.AddAllowPersonalBuildsUpgradeTask">
         <property name="buildNumber" value="200011003"/>
     </bean>
 
-    <bean id="ensureBackupConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureBackupConfigPermanentUpgradeTask" autowire="byName">
+    <bean id="ensureBackupConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureBackupConfigPermanentUpgradeTask">
         <property name="buildNumber" value="200011004"/>
     </bean>
 
-    <bean id="collapseRevisionRefactor" class="com.zutubi.pulse.master.upgrade.tasks.CollapseRevisionRefactorUpgradeTask" autowire="byName">
+    <bean id="collapseRevisionRefactor" class="com.zutubi.pulse.master.upgrade.tasks.CollapseRevisionRefactorUpgradeTask">
         <property name="buildNumber" value="200013001"/>
         <property name="mappings">
             <list>
@@ -95,35 +96,39 @@
         </property>
     </bean>
 
-    <bean id="fixPersistentTriggerState" class="com.zutubi.pulse.master.upgrade.tasks.FixPersistentTriggerStateUpgradeTask" autowire="byName">
+    <bean id="fixPersistentTriggerState" class="com.zutubi.pulse.master.upgrade.tasks.FixPersistentTriggerStateUpgradeTask">
         <property name="buildNumber" value="200013002"/>
     </bean>
 
-    <bean id="projectLifecycle" class="com.zutubi.pulse.master.upgrade.tasks.ProjectLifecycleUpgradeTask" autowire="byName">
+    <bean id="projectLifecycle" class="com.zutubi.pulse.master.upgrade.tasks.ProjectLifecycleUpgradeTask">
         <property name="buildNumber" value="200013003"/>
     </bean>
 
-    <bean id="triggerRepackaging" class="com.zutubi.pulse.master.upgrade.tasks.TriggerRepackagingUpgradeTask" autowire="byName">
+    <bean id="triggerRepackaging" class="com.zutubi.pulse.master.upgrade.tasks.TriggerRepackagingUpgradeTask">
         <property name="buildNumber" value="200013004"/>
     </bean>
 
-    <bean id="triggerState" class="com.zutubi.pulse.master.upgrade.tasks.TriggerStateUpgradeTask" autowire="byName">
+    <bean id="triggerState" class="com.zutubi.pulse.master.upgrade.tasks.TriggerStateUpgradeTask">
         <property name="buildNumber" value="200013005"/>
     </bean>
 
-    <bean id="dashboardBuildPreferences" class="com.zutubi.pulse.master.upgrade.tasks.DashboardBuildPreferencesUpgradeTask" autowire="byName">
+    <bean id="dashboardBuildPreferences" class="com.zutubi.pulse.master.upgrade.tasks.DashboardBuildPreferencesUpgradeTask">
         <property name="buildNumber" value="200014001"/>
     </bean>
 
-    <bean id="featureDiscriminator" class="com.zutubi.pulse.master.upgrade.tasks.FeatureDiscriminatorUpgradeTask" autowire="byName">
+    <bean id="featureDiscriminator" class="com.zutubi.pulse.master.upgrade.tasks.FeatureDiscriminatorUpgradeTask">
         <property name="buildNumber" value="200016001"/>
     </bean>
 
-    <bean id="addResourcePropertyDescription" class="com.zutubi.pulse.master.upgrade.tasks.AddResourcePropertyDescriptionUpgradeTask" autowire="byName">
+    <bean id="addResourcePropertyDescription" class="com.zutubi.pulse.master.upgrade.tasks.AddResourcePropertyDescriptionUpgradeTask">
         <property name="buildNumber" value="200018001"/>
     </bean>
 
-    <bean id="addPerforceTicketAuthentication" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceTicketAuthenticationUpgradeTask" autowire="byName">
+    <bean id="addPerforceTicketAuthentication" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceTicketAuthenticationUpgradeTask">
         <property name="buildNumber" value="200018002"/>
+    </bean>
+
+    <bean id="deleteTempateProjectStates" class="com.zutubi.pulse.master.upgrade.tasks.DeleteTemplateProjectStateUpgradeTask">
+        <property name="buildNumber" value="200019001"/>
     </bean>
 </beans>
