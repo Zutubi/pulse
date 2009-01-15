@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -25,6 +25,8 @@ import java.util.Date;
  */
 public class MasterBuildProperties extends BuildProperties
 {
+    private static final Messages I18N = Messages.getInstance(MasterBuildProperties.class);
+
     public static void addProjectProperties(ExecutionContext context, ProjectConfiguration projectConfiguration)
     {
         for(ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
@@ -89,31 +91,7 @@ public class MasterBuildProperties extends BuildProperties
     public static void addCompletedBuildProperties(ExecutionContext context, BuildResult result, MasterConfigurationManager configurationManager)
     {
         context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, result.getState().getString());
-
-        TestResultSummary tests = result.getTestSummary();
-        String testSummary;
-        if(tests.getTotal() > 0)
-        {
-            if(tests.hasBroken())
-            {
-                testSummary = Integer.toString(tests.getBroken()) + " of " + (tests.getTotal() - tests.getSkipped()) + " tests broken";
-            }
-            else
-            {
-                testSummary = tests.getTotal() - tests.getSkipped() + " tests passed";
-            }
-
-            if (tests.hasSkipped())
-            {
-                testSummary += " (" + tests.getSkipped() + " skipped)";
-            }
-        }
-        else
-        {
-            testSummary = "no tests";
-        }
-
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_TEST_SUMMARY, testSummary);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_TEST_SUMMARY, result.getTestSummary().format(I18N));
         for(RecipeResultNode node: result.getRoot().getChildren())
         {
             addStageProperties(context, result, node, configurationManager, true);
