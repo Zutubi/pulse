@@ -11,6 +11,7 @@ import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.annotations.Wire;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.annotations.Required;
 
@@ -41,20 +42,28 @@ public class VersionedTypeConfiguration extends TypeConfiguration
 
     public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
     {
-        ScmClient scmClient = null;
-        InputStream is = null;
-        try
+        String normalisedPath = FileSystemUtils.normaliseSeparators(pulseFileName);
+        if (patch == null || !patch.containsPath(normalisedPath))
         {
-            ScmConfiguration scm = projectConfig.getScm();
-            ScmContext context = scmManager.createContext(projectConfig);
-            scmClient = scmManager.createClient(scm);
-            is = scmClient.retrieve(context, pulseFileName, revision);
-            return IOUtils.inputStreamToString(is);
+            ScmClient scmClient = null;
+            InputStream is = null;
+            try
+            {
+                ScmConfiguration scm = projectConfig.getScm();
+                ScmContext context = scmManager.createContext(projectConfig);
+                scmClient = scmManager.createClient(scm);
+                is = scmClient.retrieve(context, pulseFileName, revision);
+                return IOUtils.inputStreamToString(is);
+            }
+            finally
+            {
+                IOUtils.close(scmClient);
+                IOUtils.close(is);
+            }
         }
-        finally
+        else
         {
-            IOUtils.close(scmClient);
-            IOUtils.close(is);
+            return patch.retrieveFile(normalisedPath);
         }
     }
 
