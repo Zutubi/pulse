@@ -3,7 +3,9 @@ package com.zutubi.pulse.master;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.util.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -17,6 +19,8 @@ public abstract class AbstractFileLogger implements OutputLogger
     private static final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
 
     private File logFile;
+
+    private byte lastByte = '\n';
 
     protected PrintWriter writer;
 
@@ -55,23 +59,34 @@ public abstract class AbstractFileLogger implements OutputLogger
 
     public void log(byte[] output, int offset, int length)
     {
-        if (length > 0)
+        if (length > 0 && writer != null)
         {
-            // we want to log each line separately.
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(output, offset, length)));
-            try
+            long timestamp = System.currentTimeMillis();
+            String marker = getMarker(timestamp);
+            if (lastByte == '\n' || (lastByte == '\r' && output[0] != '\n'))
             {
-                String line;
-                while ((line = reader.readLine()) != null)
-                {
-                    logMarker(line);
-                }
+                writer.print(marker);
             }
-            catch (IOException e)
-            {
-                // noop. We do not expect to have any problems reading a string.
-            }
+
+            String s = new String(output);
+            String markerReplacement = "$1" + marker + "$2";
+            String stamped = s.replaceAll("(\\r\\n?|\\n)(.)", markerReplacement);
+            writer.print(stamped);
+            writer.flush();
+
+            lastByte = output[output.length - 1];
         }
+    }
+
+    protected void completeOutput()
+    {
+        if ((lastByte != '\r' && lastByte != '\n') && writer != null)
+        {
+            writer.println();
+            writer.flush();
+        }
+
+        lastByte = '\n';
     }
 
     public void close()
@@ -86,12 +101,25 @@ public abstract class AbstractFileLogger implements OutputLogger
 
     protected void logMarker(String message, long time)
     {
+        logMarker(message, time, true);
+    }
+    
+    protected void logMarker(String message, long time, boolean newline)
+    {
         if (writer != null)
         {
-            writer.print(FORMAT.format(new Date(time)));
-            writer.print(": ");
-            writer.println(message);
+            writer.print(getMarker(time));
+            writer.print(message);
+            if (newline)
+            {
+                writer.println();
+            }
             writer.flush();
         }
+    }
+
+    private String getMarker(long time)
+    {
+        return FORMAT.format(new Date(time)) + ": ";
     }
 }

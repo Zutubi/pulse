@@ -38,6 +38,7 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
     {
         if (writer != null)
         {
+            completeOutput();
             writer.println(POST_MARKER);
             writer.flush();
         }

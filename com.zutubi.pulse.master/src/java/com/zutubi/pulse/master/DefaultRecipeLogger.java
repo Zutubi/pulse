@@ -16,8 +16,8 @@ import java.util.*;
  */
 public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLogger
 {
-    private static final String PRE_RULE = "============================[ command output below ]============================";
-    private static final String POST_RULE = "============================[ command output above ]============================";
+    static final String PRE_RULE = "============================[ command output below ]============================";
+    static final String POST_RULE = "============================[ command output above ]============================";
 
     public DefaultRecipeLogger(File logFile)
     {
@@ -146,7 +146,7 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
         logMarker("Hook '" + name + "' completed");
     }
 
-    private void writePreRule()
+    void writePreRule()
     {
         if (writer != null)
         {
@@ -155,10 +155,11 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
         }
     }
 
-    private void writePostRule()
+    void writePostRule()
     {
         if (writer != null)
         {
+            completeOutput();
             writer.println(POST_RULE);
             writer.flush();
         }
