@@ -218,7 +218,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     {
         for (int i = 1; i <= count; i++)
         {
-            assertThat(reader.readLine(), matchesRegex("[0-9][0-9]/[0-9][0-9]/[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]: line " +i));
+            assertThat(reader.readLine(), matchesRegex("[0-9][0-9]/[0-9][0-9]/[0-9][0-9] [0-9][0-9]?:[0-9][0-9]:[0-9][0-9]: line " +i));
         }
     }
 }
