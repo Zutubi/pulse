@@ -46,7 +46,7 @@ public class SelfReference implements Reference
     /**
      * @return this, as this is self-referential
      */
-    public Object getValue()
+    public Object referenceValue()
     {
         return this;
     }

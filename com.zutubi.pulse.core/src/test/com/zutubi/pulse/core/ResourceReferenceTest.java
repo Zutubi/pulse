@@ -32,8 +32,8 @@ public class ResourceReferenceTest extends PulseTestCase
 
         assertTrue(parent.containsReference("b"));
         assertTrue(parent.containsReference("d"));
-        assertEquals("c", parent.getReference("b").getValue());
-        assertEquals("e", parent.getReference("d").getValue());
+        assertEquals("c", parent.getReference("b").referenceValue());
+        assertEquals("e", parent.getReference("d").referenceValue());
 
         assertFalse(parent.containsReference("1"));
         assertFalse(parent.containsReference("3"));

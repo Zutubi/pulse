@@ -24,7 +24,7 @@ public class Macro implements Reference
         return name;
     }
 
-    public Element getValue()
+    public Element referenceValue()
     {
         return element;
     }

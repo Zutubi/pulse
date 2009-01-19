@@ -3,6 +3,6 @@
 <beans>
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml"/>
 
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName" init-method="init"/>
     <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 </beans>

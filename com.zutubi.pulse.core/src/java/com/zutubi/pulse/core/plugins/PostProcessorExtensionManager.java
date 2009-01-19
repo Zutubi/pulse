@@ -3,6 +3,10 @@ package com.zutubi.pulse.core.plugins;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.type.CompositeType;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
@@ -19,6 +23,7 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
 
     private Map<String, PostProcessorDescriptor> info = new HashMap<String, PostProcessorDescriptor>();
     private PulseFileLoaderFactory fileLoaderFactory;
+    private TypeRegistry typeRegistry;
 
     protected String getExtensionPointId()
     {
@@ -43,6 +48,23 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
             return;
         }
 
+        if (!Configuration.class.isAssignableFrom(clazz))
+        {
+            LOG.severe(String.format("Ignoring post-processor '%s': class '%s' does not implement Configuration", name, cls));
+            return;
+        }
+
+        // FIXME loader better error reporting
+        try
+        {
+            typeRegistry.register(clazz);
+        }
+        catch (TypeException e)
+        {
+            LOG.severe(e);
+            return;
+        }
+        
         String displayName = ConfigUtils.getString(config, "display-name", name);
         boolean defaultTemplate = ConfigUtils.getBoolean(config, "default-fragment", false);
         PostProcessorDescriptor descriptor = new PostProcessorDescriptor(name, displayName, defaultTemplate);
@@ -52,6 +74,7 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
             System.out.printf("Adding Post-Processor: %s -> %s\n", name, cls);
         }
         info.put(name, descriptor);
+
         fileLoaderFactory.register(name, clazz);
         tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
     }
@@ -85,5 +108,10 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
         this.fileLoaderFactory = fileLoaderFactory;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

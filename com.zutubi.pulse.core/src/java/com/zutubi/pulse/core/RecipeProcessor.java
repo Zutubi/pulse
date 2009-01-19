@@ -5,6 +5,8 @@ import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeStatusEvent;
@@ -74,24 +76,25 @@ public class RecipeProcessor
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
 
             // Now we can load the recipe from the pulse file
-            PulseFile pulseFile = loadPulseFile(request, context);
+            ProjectRecipesConfiguration recipesConfiguration= loadPulseFile(request, context);
 
             String recipeName = request.getRecipeName();
             if (!TextUtils.stringSet(recipeName))
             {
-                recipeName = pulseFile.getDefaultRecipe();
+                recipeName = recipesConfiguration.getDefaultRecipe();
                 if (!TextUtils.stringSet(recipeName))
                 {
                     throw new BuildException("Please specify a default recipe for your project.");
                 }
             }
 
-            Recipe recipe = pulseFile.getRecipe(recipeName);
-            if (recipe == null)
+            RecipeConfiguration recipeConfiguration = recipesConfiguration.getRecipes().get(recipeName);
+            if (recipeConfiguration == null)
             {
                 throw new BuildException("Undefined recipe '" + recipeName + "'");
             }
 
+            Recipe recipe = recipeConfiguration.createRecipe();
             recipe.addFirstCommand(bootstrapCommand);
 
             runningRecipeInstance = recipe;
@@ -219,7 +222,7 @@ public class RecipeProcessor
         }
     }
 
-    private PulseFile loadPulseFile(RecipeRequest request, PulseExecutionContext context) throws BuildException
+    private ProjectRecipesConfiguration loadPulseFile(RecipeRequest request, PulseExecutionContext context) throws BuildException
     {
         context.setLabel(SCOPE_RECIPE);
         PulseScope globalScope = new PulseScope(context.getScope());
@@ -237,10 +240,9 @@ public class RecipeProcessor
         {
             stream = new ByteArrayInputStream(pulseFileSource.getBytes());
 
-            ResourceRepository resourceRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
-            PulseFile result = new PulseFile();
+            ProjectRecipesConfiguration result = new ProjectRecipesConfiguration();
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-            fileLoader.load(stream, result, globalScope, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
+            fileLoader.load(stream, result, globalScope, new RecipeLoadPredicate(result, request.getRecipeName()));
             return result;
         }
         catch (Exception e)

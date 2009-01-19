@@ -182,7 +182,7 @@ public class Recipe extends SelfReference
             {
                 Pair<Command, Scope> pair = commands.get(i);
                 Command command = pair.first;
-                Scope scope = pair.second;
+//                Scope scope = pair.second;
 
                 if (success || command.isForce())
                 {
@@ -194,7 +194,8 @@ public class Recipe extends SelfReference
                         throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
                     }
 
-                    pushCommandContext(context, scope, commandOutput);
+                    // FIXME loader cheating with null scope
+                    pushCommandContext(context, null, commandOutput);
                     boolean recipeTerminated = !executeCommand(context, commandOutput, result, command);
                     context.popTo(LABEL_EXECUTE);
 

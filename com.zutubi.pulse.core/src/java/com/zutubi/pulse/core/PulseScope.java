@@ -148,7 +148,7 @@ public class PulseScope implements Scope
         {
             public boolean satisfied(ReferenceInfo referenceInfo)
             {
-                return type.isInstance(referenceInfo.reference.getValue());
+                return type.isInstance(referenceInfo.reference.referenceValue());
             }
         });
     }
@@ -188,9 +188,9 @@ public class PulseScope implements Scope
                     {
                         result = new Property(name, pathPrefix.substring(0, pathPrefix.length() - 1));
                     }
-                    else if((result.getValue() instanceof String))
+                    else if((result.referenceValue() instanceof String))
                     {
-                        result = new Property(name, pathPrefix + result.getValue());
+                        result = new Property(name, pathPrefix + result.referenceValue());
                     }
                 }
             }
@@ -202,12 +202,12 @@ public class PulseScope implements Scope
     public <T> T getReferenceValue(String name, Class<T> type)
     {
         Reference r = getReference(name);
-        if (r == null || !type.isInstance(r.getValue()))
+        if (r == null || !type.isInstance(r.referenceValue()))
         {
             return null;
         }
 
-        return type.cast(r.getValue());
+        return type.cast(r.referenceValue());
     }
 
     public void addUnique(Reference reference) throws IllegalArgumentException
@@ -257,14 +257,14 @@ public class PulseScope implements Scope
         {
             public boolean satisfied(ReferenceInfo referenceInfo)
             {
-                return referenceInfo.addToEnvironment && (referenceInfo.reference.getValue() instanceof String);
+                return referenceInfo.addToEnvironment && (referenceInfo.reference.referenceValue() instanceof String);
             }
         });
 
         Map<String, String> result = new HashMap<String, String>(references.size());
         for(Reference r: references)
         {
-            result.put(r.getName(), (String) r.getValue());
+            result.put(r.getName(), (String) r.referenceValue());
         }
 
         return result;
@@ -311,7 +311,7 @@ public class PulseScope implements Scope
         {
             public boolean satisfied(ReferenceInfo referenceInfo)
             {
-                return referenceInfo.addToPath && referenceInfo.reference.getValue() instanceof String;
+                return referenceInfo.addToPath && referenceInfo.reference.referenceValue() instanceof String;
             }
         });
         
@@ -319,7 +319,7 @@ public class PulseScope implements Scope
         {
             public String map(Reference reference)
             {
-                return (String) reference.getValue();
+                return (String) reference.referenceValue();
             }
         });
 

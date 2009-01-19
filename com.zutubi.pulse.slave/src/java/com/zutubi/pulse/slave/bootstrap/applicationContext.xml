@@ -90,7 +90,7 @@
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName" init-method="init"/>
 
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.servercore.hessian.CustomSerialiserFactory"/>
 

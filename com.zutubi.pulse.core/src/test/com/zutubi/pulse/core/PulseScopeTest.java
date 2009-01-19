@@ -274,7 +274,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         Reference reference = scope.getReference("env.PATH");
         assertNotNull(reference);
-        assertEquals(scope.getPathPrefix() + System.getenv("PATH"), reference.getValue());
+        assertEquals(scope.getPathPrefix() + System.getenv("PATH"), reference.referenceValue());
     }
 
     public void testEnvPathNoPathOrPrefix()
@@ -310,7 +310,7 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("test", "value", false, false, false));
         s.add(new ResourceProperty("test2", "${test}2", false, false, true));
-        assertEquals("value2", s.getReference("test2").getValue());
+        assertEquals("value2", s.getReference("test2").referenceValue());
     }
 
     public void testDontResolve()
@@ -318,14 +318,14 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("test", "value", false, false, false));
         s.add(new ResourceProperty("test2", "${test}2", false, false, false));
-        assertEquals("${test}2", s.getReference("test2").getValue());
+        assertEquals("${test}2", s.getReference("test2").referenceValue());
     }
 
     public void testSelfReference()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("testvar", "${testvar}", false, false, true));
-        assertEquals("${testvar}", s.getReference("testvar").getValue());
+        assertEquals("${testvar}", s.getReference("testvar").referenceValue());
     }
 
     public void testReferToParentProperty()
@@ -334,7 +334,7 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("test", "value", false, false, false));
         c.add(new ResourceProperty("test2", "${test}2", false, false, true));
-        assertEquals("value2", c.getReference("test2").getValue());
+        assertEquals("value2", c.getReference("test2").referenceValue());
     }
 
     public void testAddToPathPreservesOrder()
@@ -369,7 +369,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("testvar", "value", true, false, false));
-        assertEquals("value", s.getReference("env.testvar").getValue());
+        assertEquals("value", s.getReference("env.testvar").referenceValue());
     }
 
     public void testAddToParentEnvAddsEnvVar()
@@ -377,7 +377,7 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("testvar", "value", true, false, false));
-        assertEquals("value", c.getReference("env.testvar").getValue());
+        assertEquals("value", c.getReference("env.testvar").referenceValue());
     }
 
     public void testAddToEnvReferenceEnvVar()
@@ -385,7 +385,7 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("testvar", "value", true, false, false));
         s.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
-        assertEquals("value2", s.getReference("testvar2").getValue());
+        assertEquals("value2", s.getReference("testvar2").referenceValue());
     }
 
     public void testAddToParentEnvReferenceEnvVar()
@@ -394,7 +394,7 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("testvar", "value", true, false, false));
         c.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
-        assertEquals("value2", c.getReference("testvar2").getValue());
+        assertEquals("value2", c.getReference("testvar2").referenceValue());
     }
 
     public void testReferenceEnvPath()
@@ -403,14 +403,14 @@ public class PulseScopeTest extends PulseTestCase
         s.addEnvironmentProperty("PATH", "dummypath");
         s.add(new ResourceProperty("somevar", "someval", false, true, false));
         s.add(new ResourceProperty("refvar", "${env.PATH}?", false, false, true));
-        assertEquals("someval" + File.pathSeparatorChar + "dummypath?", s.getReference("refvar").getValue());
+        assertEquals("someval" + File.pathSeparatorChar + "dummypath?", s.getReference("refvar").referenceValue());
     }
 
     public void testSelfReferenceEnvVar()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("refvar", "${env.refvar}?", true, false, true));
-        assertEquals("${env.refvar}?", s.getReference("refvar").getValue());
+        assertEquals("${env.refvar}?", s.getReference("refvar").referenceValue());
     }
 
     public void testSelfReferenceEnvPath()
@@ -418,21 +418,21 @@ public class PulseScopeTest extends PulseTestCase
         PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PATH", "dummypath");
         s.add(new ResourceProperty("refvar", "${env.PATH}?", false, true, true));
-        assertEquals("dummypath?", s.getReference("refvar").getValue());
+        assertEquals("dummypath?", s.getReference("refvar").referenceValue());
     }
 
     public void testBackslash()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("myvar", "\\", false, true, true));
-        assertEquals("\\", s.getReference("myvar").getValue());
+        assertEquals("\\", s.getReference("myvar").referenceValue());
     }
 
     public void testBadSyntax()
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("myvar", "this ${ is invalid", false, true, true));
-        assertEquals("this ${ is invalid", s.getReference("myvar").getValue());        
+        assertEquals("this ${ is invalid", s.getReference("myvar").referenceValue());
     }
 
     public void testGetReferencesIncludesParents()
@@ -446,7 +446,7 @@ public class PulseScopeTest extends PulseTestCase
         assertEquals(1, references.size());
         Reference reference = references.iterator().next();
         assertEquals("name", reference.getName());
-        assertEquals("value", reference.getValue());
+        assertEquals("value", reference.referenceValue());
     }
 
     public void testCopy()
@@ -577,6 +577,6 @@ public class PulseScopeTest extends PulseTestCase
     private String getValue(String name)
     {
         Reference reference = scope.getReference(name);
-        return (String) reference.getValue();
+        return (String) reference.referenceValue();
     }
 }

@@ -545,7 +545,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         {
             if(acceptableName(reference.getName()))
             {
-                childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());
+                childEnvironment.put(convertName(reference.getName()), (String) reference.referenceValue());
             }
         }
 

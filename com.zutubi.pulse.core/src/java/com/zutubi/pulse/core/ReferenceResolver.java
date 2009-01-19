@@ -285,7 +285,7 @@ public class ReferenceResolver
         Reference ref = references.getReference(token.value);
         if (ref != null)
         {
-            return ref.getValue();
+            return ref.referenceValue();
         }
         throw new ResolutionException("Unknown reference '" + token.value + "'");
     }
@@ -374,9 +374,9 @@ public class ReferenceResolver
         if(resolutionStrategy.resolve())
         {
             Reference reference = references.getReference(token.value);
-            if (reference != null && reference.getValue() != null)
+            if (reference != null && reference.referenceValue() != null)
             {
-                return reference.getValue().toString();
+                return reference.referenceValue().toString();
             }
             else if(resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
             {

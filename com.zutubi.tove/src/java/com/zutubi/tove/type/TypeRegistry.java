@@ -181,7 +181,7 @@ public class TypeRegistry
             BeanInfo beanInfo;
             if (typeClass.isInterface() || typeClass == Object.class)
             {
-                beanInfo = Introspector.getBeanInfo(typeClass);
+                beanInfo = Introspector.getBeanInfo(typeClass, Introspector.USE_ALL_BEANINFO);
             }
             else
             {

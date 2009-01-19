@@ -4,8 +4,8 @@
     #parse("pulse-file/prologue.vm")
 
     <recipe name="executable build">
-        <command name="build">
-            <executable
+        <command>
+            <executable name="build"
 #if($executable)
                     exe="$executable"
 #end
