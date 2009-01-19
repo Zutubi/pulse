@@ -12,16 +12,6 @@ public class AddBrowseViewConfigurationUpgradeTask extends AbstractUpgradeTask
 {
     private RecordManager recordManager;
 
-    public String getName()
-    {
-        return "Browse View Configuration";
-    }
-
-    public String getDescription()
-    {
-        return "Add a new configuration record to each user for browse view settings.";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

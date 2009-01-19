@@ -27,16 +27,6 @@ public class DashboardBuildPreferencesUpgradeTask extends AbstractRecordProperti
     private static final String PROPERTY_BUILD_COUNT = "buildCount";
     private static final String PROPERTY_BUILDS_PER_PROJECT = "buildsPerProject";
 
-    public String getName()
-    {
-        return "Dashboard Build Preferences";
-    }
-
-    public String getDescription()
-    {
-        return "Updates user preferences to reflect an upgrade to the way builds are displayed.";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

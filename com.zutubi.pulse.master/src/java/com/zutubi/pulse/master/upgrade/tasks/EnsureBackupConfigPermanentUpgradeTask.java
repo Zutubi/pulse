@@ -14,16 +14,6 @@ public class EnsureBackupConfigPermanentUpgradeTask extends AbstractRecordProper
 {
     private static final String SCOPE_SETTINGS = "settings";
 
-    public String getName()
-    {
-        return "Ensure Backup Config Permanent";
-    }
-
-    public String getDescription()
-    {
-        return "Marks the backup configuration as permanent (it should not be deletable).";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

@@ -12,16 +12,6 @@ import java.sql.SQLException;
  */
 public class TriggerStateUpgradeTask extends DatabaseUpgradeTask
 {
-    public String getName()
-    {
-        return "Trigger state";
-    }
-
-    public String getDescription()
-    {
-        return "Reschedules triggers stuck in the NONE state";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

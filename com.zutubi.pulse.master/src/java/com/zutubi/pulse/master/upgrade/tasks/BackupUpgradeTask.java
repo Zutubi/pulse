@@ -13,16 +13,6 @@ public class BackupUpgradeTask extends AbstractUpgradeTask
     
     private BackupManager backupManager;
 
-    public String getName()
-    {
-        return "Backup";
-    }
-
-    public String getDescription()
-    {
-        return "Run a backup prior to upgrading.";
-    }
-
     public int getBuildNumber()
     {
         // -/ve indicates that this build number should not be recorded against the target data directory. 

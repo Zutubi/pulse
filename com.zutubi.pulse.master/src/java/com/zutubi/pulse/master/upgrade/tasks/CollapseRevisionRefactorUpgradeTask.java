@@ -19,16 +19,6 @@ public class CollapseRevisionRefactorUpgradeTask extends AbstractSchemaRefactorU
 {
     private static final Logger LOG = Logger.getLogger(CollapseRevisionRefactorUpgradeTask.class);
 
-    public String getName()
-    {
-        return "Scm revision refactor";
-    }
-
-    public String getDescription()
-    {
-        return "Remove the 'revision' from being a standalone persistent entity.";
-    }
-
     protected void doRefactor(Connection con, SchemaRefactor refactor) throws SQLException, IOException
     {
         // build result table
