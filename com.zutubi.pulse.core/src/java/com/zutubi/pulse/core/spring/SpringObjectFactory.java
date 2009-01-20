@@ -15,9 +15,9 @@ public class SpringObjectFactory extends DefaultObjectFactory
         return object;
     }
 
-    public <T> T buildBean(String className, Class<? super T> token)
+    public <T> T buildBean(String className, Class<? super T> supertype)
     {
-        return buildBean(this.<T>getClassInstance(className, token));
+        return buildBean(this.<T>getClassInstance(className, supertype));
     }
 
     public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args)
@@ -27,8 +27,8 @@ public class SpringObjectFactory extends DefaultObjectFactory
         return object;
     }
 
-    public <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args)
+    public <T> T buildBean(String className, Class<? super T> supertype, Class[] argTypes, Object[] args)
     {
-        return buildBean(this.<T>getClassInstance(className, token), argTypes, args);
+        return buildBean(this.<T>getClassInstance(className, supertype), argTypes, args);
     }
 }
