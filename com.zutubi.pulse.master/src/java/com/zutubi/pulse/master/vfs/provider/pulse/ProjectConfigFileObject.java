@@ -31,7 +31,7 @@ public class ProjectConfigFileObject extends AbstractPulseFileObject implements 
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
         if (nodesDefinitions.containsKey(name))

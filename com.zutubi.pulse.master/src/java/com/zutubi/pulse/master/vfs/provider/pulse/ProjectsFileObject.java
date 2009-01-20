@@ -16,7 +16,7 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(FileName fileName)
     {
         // the fileName may be project name or the project id.
         long projectId = convertToProjectId(fileName.getBaseName());

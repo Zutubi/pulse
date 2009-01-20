@@ -3,9 +3,9 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeException;
@@ -107,19 +107,9 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
 
     public void analyse()
     {
-        try
-        {
-            configuration = objectFactory.buildBean(ConfigurationUIModel.class, new Class[]{String.class}, new Object[]{path});
-            configuration.analyse();
-            type = (CompositeType) configuration.getType();
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-            // we can not really continue if analysis failed, information that is expected
-            // by the rest of the action will just not be here.
-            throw new RuntimeException(e);
-        }
+        configuration = objectFactory.buildBean(ConfigurationUIModel.class, new Class[]{String.class}, new Object[]{path});
+        configuration.analyse();
+        type = (CompositeType) configuration.getType();
     }
 
     public String doInput() throws Exception

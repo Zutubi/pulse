@@ -23,7 +23,7 @@ public class NamedFileArtifactFileObject extends AbstractPulseFileObject impleme
         this.file = file;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
         File newFile = new File(file, name);

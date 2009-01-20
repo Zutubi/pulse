@@ -8,24 +8,26 @@ import com.zutubi.util.bean.DefaultObjectFactory;
  */
 public class SpringObjectFactory extends DefaultObjectFactory
 {
-    public <T> T buildBean(Class<? extends T> clazz) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz)
     {
-        return SpringComponentContext.createBean(clazz);
+        T object = super.buildBean(clazz);
+        SpringComponentContext.autowire(object);
+        return object;
     }
 
-    public <T> T buildBean(String className, Class<? super T> token) throws Exception
+    public <T> T buildBean(String className, Class<? super T> token)
     {
         return buildBean(this.<T>getClassInstance(className, token));
     }
 
-    public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args)
     {
         T object = super.buildBean(clazz, argTypes, args);
         SpringComponentContext.autowire(object);
         return object;
     }
 
-    public <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args)
     {
         return buildBean(this.<T>getClassInstance(className, token), argTypes, args);
     }

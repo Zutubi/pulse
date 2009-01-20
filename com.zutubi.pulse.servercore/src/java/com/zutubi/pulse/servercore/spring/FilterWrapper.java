@@ -71,15 +71,8 @@ public class FilterWrapper implements Filter
             throw new ServletException("Required init parameter " + DELEGATE_CLASS_NAME + " is missing.");
         }
 
-        try
-        {
-            ObjectFactory objectFactory = (ObjectFactory) SpringComponentContext.getBean("objectFactory");
-            return objectFactory.buildBean(className, Filter.class);
-        }
-        catch (Exception e)
-        {
-            throw new ServletException("Error creating filter delegate.", e);
-        }
+        ObjectFactory objectFactory = (ObjectFactory) SpringComponentContext.getBean("objectFactory");
+        return objectFactory.buildBean(className, Filter.class);
     }
 
     protected Filter getDelegate()

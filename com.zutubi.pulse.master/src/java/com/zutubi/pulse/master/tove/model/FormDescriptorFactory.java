@@ -1,12 +1,15 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.tove.annotations.Handler;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
-import com.zutubi.tove.config.*;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.pulse.master.tove.handler.OptionAnnotationHandler;
+import com.zutubi.tove.annotations.FieldType;
+import com.zutubi.tove.annotations.Handler;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.ConfigurationValidationContext;
+import com.zutubi.tove.config.ConfigurationValidatorProvider;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -292,14 +295,6 @@ public class FormDescriptorFactory
                 {
                     AnnotationHandler handler = objectFactory.buildBean(handlerAnnotation.className(), AnnotationHandler.class);
                     handler.process(type, annotation, descriptor);
-                }
-                catch (InstantiationException e)
-                {
-                    LOG.warning("Failed to instantiate annotation handler.", e);
-                }
-                catch (IllegalAccessException e)
-                {
-                    LOG.warning("Failed to instantiate annotation handler.", e);
                 }
                 catch (Exception e)
                 {

@@ -37,14 +37,14 @@ public class WiringObjectFactory implements ObjectFactory
         }
     }
 
-    public <T> T buildBean(Class<? extends T> clazz) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz)
     {
         T bean = delegate.buildBean(clazz);
         wire(bean);
         return bean;
     }
 
-    public <T> T buildBean(String className, Class<? super T> token) throws Exception
+    public <T> T buildBean(String className, Class<? super T> token)
     {
         // javac requires this type argument
         //noinspection RedundantTypeArguments
@@ -53,14 +53,14 @@ public class WiringObjectFactory implements ObjectFactory
         return bean;
     }
 
-    public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args)
     {
         T bean = delegate.buildBean(clazz, argTypes, args);
         wire(bean);
         return bean;
     }
 
-    public <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args)
     {
         // javac requires this type argument
         //noinspection RedundantTypeArguments
@@ -69,7 +69,7 @@ public class WiringObjectFactory implements ObjectFactory
         return bean;
     }
 
-    public <T> Class<? extends T> getClassInstance(String className, Class<? super T> token) throws ClassNotFoundException
+    public <T> Class<? extends T> getClassInstance(String className, Class<? super T> token)
     {
         // javac requires this type argument
         //noinspection RedundantTypeArguments

@@ -37,7 +37,7 @@ public class BrowseAction extends ProjectActionSupport
     }
 
 
-    public String execute() throws Exception
+    public String execute()
     {
         User user = getLoggedInUser();
         if(user != null)

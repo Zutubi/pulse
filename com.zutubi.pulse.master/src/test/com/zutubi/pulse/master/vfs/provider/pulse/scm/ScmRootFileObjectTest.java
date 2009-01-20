@@ -233,7 +233,7 @@ public class ScmRootFileObjectTest extends PulseTestCase
             super(name, fs);
         }
 
-        public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+        public AbstractPulseFileObject createFile(final FileName fileName)
         {
             return objectFactory.buildBean(ScmRootFileObject.class,
                     new Class[]{FileName.class, AbstractFileSystem.class},

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.servercore.filesystem.FileSystemException;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -7,7 +8,6 @@ import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
@@ -50,7 +50,7 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
         this.value = value;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
         String childPath = PathUtils.getPath(path, fileName.getBaseName());
         Type childType = configurationTemplateManager.getType(childPath);

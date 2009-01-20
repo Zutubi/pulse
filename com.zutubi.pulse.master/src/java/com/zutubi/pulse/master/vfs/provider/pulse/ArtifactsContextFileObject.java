@@ -24,7 +24,7 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         // Should refer to a stage.  First, try to interpret the name as a
         // recipe result ID.  If that doesn't work, try looking at it as a

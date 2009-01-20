@@ -24,7 +24,7 @@ public class PluginsFileObject extends AbstractPulseFileObject
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         Plugin plugin = pluginManager.getPlugin(fileName.getBaseName());
         if(plugin == null)

@@ -11,10 +11,10 @@ import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModel;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelsHelper;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TruePredicate;
+import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 
 import java.util.*;
 
@@ -112,7 +112,7 @@ public class DashboardAction extends ActionSupport
         return contactPointsWithErrors;
     }
 
-    public String execute() throws Exception
+    public String execute()
     {
         String login = AcegiUtils.getLoggedInUsername();
         if (login == null)
