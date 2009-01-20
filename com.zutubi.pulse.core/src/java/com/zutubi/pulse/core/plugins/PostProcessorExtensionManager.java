@@ -2,11 +2,10 @@ package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
-import com.zutubi.util.logging.Logger;
+import com.zutubi.pulse.core.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.TypeException;
-import com.zutubi.tove.type.CompositeType;
+import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
@@ -23,7 +22,7 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
 
     private Map<String, PostProcessorDescriptor> info = new HashMap<String, PostProcessorDescriptor>();
     private PulseFileLoaderFactory fileLoaderFactory;
-    private TypeRegistry typeRegistry;
+    private ConfigurationRegistry configurationRegistry;
 
     protected String getExtensionPointId()
     {
@@ -42,6 +41,7 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
             return;
         }
 
+        // FIXME loader combine these to one check for new ppconfig class
         if(!PostProcessor.class.isAssignableFrom(clazz))
         {
             LOG.severe(String.format("Ignoring post-processor '%s': class '%s' does not implement PostProcessor", name, cls));
@@ -54,14 +54,13 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
             return;
         }
 
-        // FIXME loader better error reporting
         try
         {
-            typeRegistry.register(clazz);
+            configurationRegistry.registerConfigurationType(clazz);
         }
         catch (TypeException e)
         {
-            LOG.severe(e);
+            LOG.severe("Registering post-processor '" + name + "': " + e.getMessage(), e);
             return;
         }
         
@@ -110,8 +109,8 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         this.fileLoaderFactory = fileLoaderFactory;
     }
 
-    public void setTypeRegistry(TypeRegistry typeRegistry)
+    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
     {
-        this.typeRegistry = typeRegistry;
+        this.configurationRegistry = configurationRegistry;
     }
 }

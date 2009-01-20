@@ -10,7 +10,7 @@ import com.zutubi.pulse.master.scm.ScmClientUtils;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
@@ -82,7 +82,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public void setPath(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
-        if(elements.length == 2 && elements[0].equals(ConfigurationRegistry.PROJECTS_SCOPE))
+        if(elements.length == 2 && elements[0].equals(MasterConfigurationRegistry.PROJECTS_SCOPE))
         {
             setProjectName(elements[1]);
         }
@@ -181,7 +181,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
     private String getPath()
     {
-        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, getProjectName());
+        return PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, getProjectName());
     }
 
     public String getProjectPath()

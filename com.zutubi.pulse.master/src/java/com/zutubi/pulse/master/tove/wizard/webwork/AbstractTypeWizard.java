@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.wizard.webwork;
 
 import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.ExtensionOptionProvider;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.pulse.master.tove.model.FormDescriptor;
@@ -68,7 +68,7 @@ public abstract class AbstractTypeWizard implements Wizard
     protected TypeRegistry typeRegistry;
     protected ConfigurationPersistenceManager configurationPersistenceManager;
     protected ConfigurationTemplateManager configurationTemplateManager;
-    private ConfigurationRegistry configurationRegistry;
+    private MasterConfigurationRegistry configurationRegistry;
 
     protected List<AbstractChainableState> addWizardStates(List<AbstractChainableState> previousStates, String parentPath, CompositeType baseType, TemplateRecord templateParentRecord)
     {
@@ -280,7 +280,7 @@ public abstract class AbstractTypeWizard implements Wizard
         this.configurationTemplateManager = configurationTemplateManager;
     }
 
-    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
+    public void setConfigurationRegistry(MasterConfigurationRegistry configurationRegistry)
     {
         this.configurationRegistry = configurationRegistry;
     }

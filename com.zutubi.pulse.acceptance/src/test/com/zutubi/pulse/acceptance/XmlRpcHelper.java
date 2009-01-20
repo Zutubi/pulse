@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
@@ -259,7 +259,7 @@ public class XmlRpcHelper
     @SuppressWarnings({"unchecked"})
     public Hashtable<String, Object> getProjectArtifact(String projectName, String artifactName) throws Exception
     {
-        Hashtable<String, Object> projectConfig = getConfig(ConfigurationRegistry.PROJECTS_SCOPE + "/" + projectName);
+        Hashtable<String, Object> projectConfig = getConfig(MasterConfigurationRegistry.PROJECTS_SCOPE + "/" + projectName);
         Hashtable<String, Object> projectType = (Hashtable<String, Object>) projectConfig.get(Constants.Project.TYPE);
         Hashtable<String, Object> typeArtifacts = (Hashtable<String, Object>) projectType.get(Constants.Project.Type.ARTIFACTS);
         return (Hashtable<String, Object>) typeArtifacts.get(artifactName);
@@ -397,7 +397,7 @@ public class XmlRpcHelper
 
     public String insertProjectProperty(String project, String name, String value, boolean resolveVariables, boolean addToEnvironment, boolean addToPath) throws Exception
     {
-        String propertiesPath = getPath(ConfigurationRegistry.PROJECTS_SCOPE, project, "properties");
+        String propertiesPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, "properties");
         Hashtable<String, Object> property = createProperty(name, value, resolveVariables, addToEnvironment, addToPath);
         return insertConfig(propertiesPath, property);
     }
@@ -452,7 +452,7 @@ public class XmlRpcHelper
         Hashtable<String, Object> user = createDefaultConfig(UserConfiguration.class);
         user.put("login", login);
         user.put("name", login);
-        String path = insertConfig(ConfigurationRegistry.USERS_SCOPE, user);
+        String path = insertConfig(MasterConfigurationRegistry.USERS_SCOPE, user);
         Hashtable <String, Object> password = createEmptyConfig(SetPasswordConfiguration.class);
         password.put("password", "");
         password.put("confirmPassword", "");
@@ -466,7 +466,7 @@ public class XmlRpcHelper
         group.put("name", name);
         group.put("members", new Vector<String>(memberPaths));
         group.put("serverPermissions", new Vector<String>(Arrays.asList(serverPermissions)));
-        return insertConfig(ConfigurationRegistry.GROUPS_SCOPE, group);
+        return insertConfig(MasterConfigurationRegistry.GROUPS_SCOPE, group);
     }
 
     public void logError(String message) throws Exception

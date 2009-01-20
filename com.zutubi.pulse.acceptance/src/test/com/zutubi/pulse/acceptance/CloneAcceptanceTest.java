@@ -5,8 +5,8 @@ import com.zutubi.pulse.acceptance.forms.admin.ResourcePropertyForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
@@ -214,7 +214,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage cloneHierarchyPage = new ProjectHierarchyPage(selenium, urls, parentName + CLONE_PROPERTY_NAME, true);
         cloneHierarchyPage.waitFor();
 
-        assertEquals(0, xmlRpcHelper.getTemplateChildren(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, parentName + CLONE_PROPERTY_NAME)).size());
+        assertEquals(0, xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentName + CLONE_PROPERTY_NAME)).size());
     }
 
     public void testCloneProjectHierarchyWithChild() throws Exception
@@ -233,7 +233,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage cloneHierarchyPage = new ProjectHierarchyPage(selenium, urls, parentCloneName, true);
         cloneHierarchyPage.waitFor();
 
-        assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
+        assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
 
         assertTrue(hierarchyPage.isTreeItemPresent(parentCloneName));
         assertFalse(hierarchyPage.isTreeItemPresent(childCloneName));
@@ -330,7 +330,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage cloneHierarchyPage = new ProjectHierarchyPage(selenium, urls, parentCloneName, true);
         cloneHierarchyPage.waitFor();
 
-        assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
+        assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
 
         assertTrue(hierarchyPage.isTreeItemPresent(parentTemplateName));
         assertTrue(hierarchyPage.isTreeItemPresent(parentCloneName));

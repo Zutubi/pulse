@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 
 /**
  *
@@ -33,7 +33,7 @@ public class AgentConfigurationWizard extends AbstractTypeWizard
             configurationTemplateManager.markAsTemplate(record);
         }
 
-        successPath = configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, record);
+        successPath = configurationTemplateManager.insertRecord(MasterConfigurationRegistry.AGENTS_SCOPE, record);
     }
 
     public Type getType()

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
@@ -97,7 +97,7 @@ public class ProjectWizardFileObject extends AbstractPulseFileObject implements 
 
     private AbstractTypeWizard getWizardInstance()
     {
-        String path = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, getName().getBaseName());
+        String path = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, getName().getBaseName());
         return (AbstractTypeWizard) ConfigurationWizardAction.getWizardInstance(path);
     }
 

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
-import java.util.Hashtable;
-
 import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
 import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
-import com.zutubi.util.RandomUtils;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.RandomUtils;
+
+import java.util.Hashtable;
 
 public class GroupXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -92,6 +92,6 @@ public class GroupXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private String getGroupPath(String group)
     {
-        return PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, group);
+        return PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, group);
     }
 }

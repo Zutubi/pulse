@@ -11,7 +11,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ExceptionWrappingRunnable;
@@ -193,7 +193,7 @@ public class SeleniumTestBase extends PulseTestCase
             }
         }
 
-        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, name);
+        return PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, name);
     }
 
     protected boolean ensureProject(final String name) throws Exception

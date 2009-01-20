@@ -7,7 +7,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
@@ -30,7 +30,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     private static final int TASK_TIMEOUT = 30000;
 
     private static final String PROJECT_NAME = "hook-test-project";
-    private static final String PROJECT_PATH = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, "hook-test-project");
+    private static final String PROJECT_PATH = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, "hook-test-project");
     private static final String HOOKS_BASENAME = "buildHooks";
     private static final String HOOKS_PATH   = PathUtils.getPath(PROJECT_PATH, HOOKS_BASENAME);
 
@@ -309,7 +309,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     private String getHooksPath(String projectName)
     {
-        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, HOOKS_BASENAME);
+        return PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, HOOKS_BASENAME);
     }
 
     private void selectFromAllTasks()

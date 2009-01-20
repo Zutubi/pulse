@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.pulse.core.engine.CommandConfiguration;
+import com.zutubi.pulse.core.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.TypeException;
-import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -17,7 +17,7 @@ public class CommandExtensionManager extends AbstractExtensionManager
     private static final Logger LOG = Logger.getLogger(CommandExtensionManager.class);
 
     private PulseFileLoaderFactory fileLoaderFactory;
-    private TypeRegistry typeRegistry;
+    private ConfigurationRegistry configurationRegistry;
 
     protected String getExtensionPointId()
     {
@@ -29,33 +29,37 @@ public class CommandExtensionManager extends AbstractExtensionManager
         String name = config.getAttribute("name");
         String cls = config.getAttribute("class");
 
-        Class clazz = loadClass(extension, cls);
-        if(clazz != null)
+        Class<?> clazz = loadClass(extension, cls);
+        if(clazz == null)
         {
-            if (!Configuration.class.isAssignableFrom(clazz))
-            {
-                LOG.severe(String.format("Ignoring command '%s': class '%s' does not implement Configuration", name, cls));
-                return;
-            }
-
-            // FIXME loader better error reporting
-            try
-            {
-                typeRegistry.register(clazz);
-            }
-            catch (TypeException e)
-            {
-                LOG.severe(e);
-                return;
-            }
-
-            if (PluginManager.VERBOSE_EXTENSIONS)
-            {
-                System.out.println(String.format("Adding Command: %s -> %s", name, cls));
-            }
-            fileLoaderFactory.register(name, clazz);
-            tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
+            LOG.severe(String.format("Ignoring command '%s': class '%s' does not exist", name, cls));
+            return;
         }
+
+        if (!CommandConfiguration.class.isAssignableFrom(clazz))
+        {
+            LOG.severe(String.format("Ignoring command '%s': class '%s' does not implement CommandConfiguration", name, cls));
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
+        Class<? extends CommandConfiguration> commandClass = (Class<? extends CommandConfiguration>) clazz;
+        try
+        {
+            configurationRegistry.registerConfigurationType(commandClass);
+        }
+        catch (TypeException e)
+        {
+            LOG.severe("Registering command '" + name + "': " + e.getMessage(), e);
+            return;
+        }
+
+        if (PluginManager.VERBOSE_EXTENSIONS)
+        {
+            System.out.println(String.format("Adding Command: %s -> %s", name, cls));
+        }
+        fileLoaderFactory.register(name, clazz);
+        tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
     }
 
     public void removeExtension(IExtension extension, Object[] objects)
@@ -71,8 +75,8 @@ public class CommandExtensionManager extends AbstractExtensionManager
         this.fileLoaderFactory = fileLoaderFactory;
     }
 
-    public void setTypeRegistry(TypeRegistry typeRegistry)
+    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
     {
-        this.typeRegistry = typeRegistry;
+        this.configurationRegistry = configurationRegistry;
     }
 }

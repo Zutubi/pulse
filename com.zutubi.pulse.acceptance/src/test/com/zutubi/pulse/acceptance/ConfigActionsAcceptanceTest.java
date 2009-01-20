@@ -9,7 +9,7 @@ import com.zutubi.pulse.acceptance.pages.admin.AgentConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
@@ -98,7 +98,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialUser(random);
 
         loginAsAdmin();
-        ListPage usersPage = new ListPage(selenium, urls, ConfigurationRegistry.USERS_SCOPE);
+        ListPage usersPage = new ListPage(selenium, urls, MasterConfigurationRegistry.USERS_SCOPE);
         usersPage.goTo();
         usersPage.clickAction(random, "setPassword");
         return usersPage;

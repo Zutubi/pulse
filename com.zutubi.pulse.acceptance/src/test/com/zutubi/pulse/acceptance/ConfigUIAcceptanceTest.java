@@ -3,8 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
@@ -576,11 +576,11 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         addProject(random, false);
 
-        ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, random, "stages"));
+        ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "stages"));
         listPage.goTo();
         assertItemPresent(listPage, "default", null, "view", "delete");
 
-        listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, random, "triggers"));
+        listPage = new ListPage(selenium, urls, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "triggers"));
         listPage.goTo();
         assertItemPresent(listPage, "scm trigger", null, "view", "delete", "pause");
     }
@@ -594,11 +594,11 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         addProject(parentName, true, ProjectManager.GLOBAL_PROJECT_NAME, false);
         addInheritingProject(parentName, childName);
 
-        ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));
+        ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));
         listPage.goTo();
         assertItemPresent(listPage, "default", ListPage.ANNOTATION_INHERITED, "view", "delete");
 
-        listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, childName, "triggers"));
+        listPage = new ListPage(selenium, urls, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, "triggers"));
         listPage.goTo();
         assertItemPresent(listPage, "scm trigger", ListPage.ANNOTATION_INHERITED, "view", "delete", "pause");
     }

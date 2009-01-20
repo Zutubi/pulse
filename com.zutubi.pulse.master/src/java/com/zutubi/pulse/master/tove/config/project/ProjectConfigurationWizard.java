@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
@@ -80,7 +80,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             configurationTemplateManager.markAsTemplate(record);
         }
         
-        successPath = configurationTemplateManager.insertRecord(ConfigurationRegistry.PROJECTS_SCOPE, record);
+        successPath = configurationTemplateManager.insertRecord(MasterConfigurationRegistry.PROJECTS_SCOPE, record);
     }
 
     private boolean hasScmTrigger(ProjectConfiguration templateParentProject)

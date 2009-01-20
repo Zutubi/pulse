@@ -1,12 +1,10 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.Property;
-import com.zutubi.pulse.core.engine.RecipeConfiguration;
-import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
-import com.zutubi.tove.type.TypeException;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
@@ -24,16 +22,6 @@ public class PulseFileLoaderFactory
 
     public void init()
     {
-        try
-        {
-            typeRegistry.register(ProjectRecipesConfiguration.class);
-        }
-        catch (TypeException e)
-        {
-// FIXME
-            e.printStackTrace();
-        }
-
         register("property", Property.class);
         register("recipe", RecipeConfiguration.class);
         // FIXME loader scrap this?
@@ -55,15 +43,7 @@ public class PulseFileLoaderFactory
         CompositeType type = typeRegistry.getType(clazz);
         if (type == null)
         {
-            try
-            {
-                // FIXME loader actually the type should already be registered
-                typeRegistry.register(clazz);
-            }
-            catch (TypeException e)
-            {
-                throw new PulseRuntimeException("Unable to register type: " + e.getMessage(), e);
-            }
+            throw new PulseRuntimeException("Attempt to register unknown type with file loader: " + clazz.getName());
         }
 
         types.put(name, type);
