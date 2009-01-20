@@ -588,8 +588,13 @@
         <delete dir="plugins"/>
     </target>
 
-    <target name="refresh.plugins" depends="clean.plugins,build.all"
-            description="Removes current plugins, reloads the jars for internal plugins and explodes third party dependencies of plugins.">
+    <target name="refresh.plugins" description="Removes current plugins, reloads the jars for internal plugins and explodes third party dependencies of plugins.">
+        <antcall target="build.refresh.plugins">
+            <param name="skip.tests" value="true"/>
+        </antcall>
+    </target>
+
+    <target name="build.refresh.plugins" depends="clean.plugins,build.all">
         <!-- retrieve the internal plugins -->
         <!-- use the default ivy configuration properties. -->
         <property file="ivy.properties"/>

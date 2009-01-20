@@ -17,10 +17,8 @@ The beans defined within the security subsystem need not be accessed by other co
      doing so else the FilterToBeanProxy will be unable to locate the defined beans.
      -->
     <bean id="securityManager" class="com.zutubi.pulse.master.security.AcegiSecurityManager">
-        <property name="jettyManager" ref="jettyManager"/>
-        <property name="authenticationManager">
-            <ref local="authenticationManager"/>
-        </property>
+        <property name="jettyServerManager" ref="jettyServerManager"/>
+        <property name="configurationManager" ref="configurationManager"/>
     </bean>
 
     <bean id="ldapManager" class="com.zutubi.pulse.master.security.ldap.AcegiLdapManager">

@@ -3,13 +3,13 @@ package com.zutubi.pulse.master.bootstrap.tasks;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
-import com.zutubi.pulse.servercore.jetty.JettyManager;
+import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 
 /**
  *
  *
  */
-public class WebserverStartupTask implements StartupTask
+public class RegisterWebserverShutdownStartupTask implements StartupTask
 {
     private ShutdownManager shutdownManager;
 
@@ -17,8 +17,8 @@ public class WebserverStartupTask implements StartupTask
     {
         SpringComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/master/bootstrap/context/webserverContext.xml");
 
-        JettyManager jettyManager = SpringComponentContext.getBean("jettyManager");
-        shutdownManager.addStoppable(jettyManager);
+        JettyServerManager jettyServerManager = SpringComponentContext.getBean("jettyServerManager");
+        shutdownManager.addStoppable(jettyServerManager);
     }
 
     public boolean haltOnFailure()

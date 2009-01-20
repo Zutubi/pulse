@@ -1,17 +1,32 @@
 package com.zutubi.pulse.master.bootstrap;
 
-import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.security.SecurityManager;
-import com.zutubi.pulse.servercore.jetty.JettyManager;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.jetty.JettyServerManager;
+import com.zutubi.pulse.servercore.jetty.PulseWebappConfigurationHandler;
+import com.zutubi.util.logging.Logger;
+import org.mortbay.jetty.Server;
 
 /**
+ * The web manager is responsible for handling processes related
+ * to the management and configuration of the web application(s)
+ * deployed within the embedded jetty instances.
  */
 public class WebManager
 {
-    private JettyManager jettyManager;
+    private static final Logger LOG = Logger.getLogger(WebManager.class);
 
+    public static final String WEBAPP_PULSE = "pulse";
+
+    private ConfigurationManager configurationManager;
+
+    private JettyServerManager jettyServerManager;
+
+    /**
+     * Load the setup process' xwork configuration.
+     */
     public void deploySetup()
     {
         ensureJettyStarted();
@@ -19,6 +34,9 @@ public class WebManager
         loadXworkConfiguration("xwork-setup.xml");
     }
 
+    /**
+     * Deploy the main pulse applications' xwork configuration.
+     */
     public void deployMain()
     {
         ensureJettyStarted();
@@ -32,21 +50,42 @@ public class WebManager
 
     private void loadXworkConfiguration(String name)
     {
-        ConfigurationManager.clearConfigurationProviders();
-        ConfigurationManager.addConfigurationProvider(new XmlConfigurationProvider(name));
-        ConfigurationManager.getConfiguration().reload();
+        com.opensymphony.xwork.config.ConfigurationManager.clearConfigurationProviders();
+        com.opensymphony.xwork.config.ConfigurationManager.addConfigurationProvider(new XmlConfigurationProvider(name));
+        com.opensymphony.xwork.config.ConfigurationManager.getConfiguration().reload();
     }
 
     private void ensureJettyStarted()
     {
-        if (!jettyManager.isStarted())
+        Server server = jettyServerManager.getServer(WEBAPP_PULSE);
+        if (server != null && server.isStarted())
         {
-            jettyManager.start();
+            return;
+        }
+
+        PulseWebappConfigurationHandler webapp = new PulseWebappConfigurationHandler();
+        webapp.setConfigurationManager(configurationManager);
+        webapp.setLogDir(configurationManager.getSystemPaths().getLogRoot());
+        webapp.setTmpDir(configurationManager.getSystemPaths().getTmpRoot());
+        
+        try
+        {
+            server = jettyServerManager.createNewServer(WEBAPP_PULSE, webapp);
+            server.start();
+        }
+        catch (Exception e)
+        {
+            LOG.severe("Failed to start jetty instance.", e);
         }
     }
 
-    public void setJettyManager(JettyManager jettyManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
-        this.jettyManager = jettyManager;
+        this.configurationManager = configurationManager;
+    }
+
+    public void setJettyServerManager(JettyServerManager jettyServerManager)
+    {
+        this.jettyServerManager = jettyServerManager;
     }
 }
