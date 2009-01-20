@@ -16,7 +16,7 @@ public class DefaultObjectFactory implements ObjectFactory
 
     // not sure if this method belongs in this interface... it is pretty broken when considering
     // plugins.
-    public <T> Class<? extends T> getClassInstance(String className, Class<? super T> token)
+    public <T> Class<? extends T> getClassInstance(String className, Class<? super T> supertype)
     {
         Class<?> clazz = classes.get(className);
         if (clazz == null)
@@ -30,9 +30,9 @@ public class DefaultObjectFactory implements ObjectFactory
                 throw new RuntimeException("Unable to find class '" + className + "': " + e.getMessage(), e);
             }
 
-            if(!token.isAssignableFrom(clazz))
+            if(!supertype.isAssignableFrom(clazz))
             {
-                throw new ClassCastException("Loaded class '" + clazz.getName() + "' is not a subtype of '" + token.getName() + "'");
+                throw new ClassCastException("Loaded class '" + clazz.getName() + "' is not a subtype of '" + supertype.getName() + "'");
             }
 
             classes.put(className, clazz);
@@ -60,11 +60,11 @@ public class DefaultObjectFactory implements ObjectFactory
         return newInstance(clazz);
     }
 
-    public <T> T buildBean(String className, Class<? super T> token)
+    public <T> T buildBean(String className, Class<? super T> supertype)
     {
         // javac cannot infer this type argument
         //noinspection RedundantTypeArguments
-        Class<? extends T> clazz = this.<T>getClassInstance(className, token);
+        Class<? extends T> clazz = this.<T>getClassInstance(className, supertype);
         return newInstance(clazz);
     }
 
@@ -81,11 +81,11 @@ public class DefaultObjectFactory implements ObjectFactory
         }
     }
 
-    public <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args)
+    public <T> T buildBean(String className, Class<? super T> supertype, Class[] argTypes, Object[] args)
     {
         // javac cannot infer this type argument
         //noinspection RedundantTypeArguments
-        Class<? extends T> clazz = this.<T>getClassInstance(className, token);
+        Class<? extends T> clazz = this.<T>getClassInstance(className, supertype);
         return buildBean(clazz, argTypes, args);
     }
 

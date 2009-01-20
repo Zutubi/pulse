@@ -20,12 +20,12 @@ public interface ObjectFactory
      * constructor and casts it to the given type.
      *
      * @param className name of the class to construct an instance of
-     * @param token     type to cast the instance to
+     * @param supertype type to cast the instance to
      * @param <T> the type of the returned insstance
      * @return the new instance
      * @throws RuntimeException on error
      */
-    public <T> T buildBean(String className, Class<? super T> token);
+    public <T> T buildBean(String className, Class<? super T> supertype);
 
     /**
      * Creates an instance of the given class using a constructor with the
@@ -35,7 +35,7 @@ public interface ObjectFactory
      * @param argTypes types of the constructor arguments
      * @param args     arguments to pass to the constructor (must match the
      *                 types)
-     * @param <T> the type of the returned insstance
+     * @param <T> the type of the returned instance
      * @return the new instance
      * @throws RuntimeException on error
      */
@@ -46,7 +46,7 @@ public interface ObjectFactory
      * the given argument types.  The result is cast to the given type.
      *
      * @param className name of the class to construct an instance of
-     * @param token     type to cast the instance to
+     * @param supertype type to cast the instance to
      * @param argTypes  types of the constructor arguments
      * @param args      arguments to pass to the constructor (must match the
      *                  types)
@@ -54,16 +54,16 @@ public interface ObjectFactory
      * @return the new instance
      * @throws RuntimeException on error
      */
-    <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args);
+    <T> T buildBean(String className, Class<? super T> supertype, Class[] argTypes, Object[] args);
 
     /**
      * Loads the class of the given name, ensuring it can be assigned to the
      * token type.
      *
      * @param className name of the class to load
-     * @param token     type that the class must be a subtype of
+     * @param supertype type that the class must be a subtype of
      * @param <T>       the type that the returned class represents
      * @return the loaded class
      */
-    <T> Class<? extends T> getClassInstance(String className, Class<? super T> token);
+    <T> Class<? extends T> getClassInstance(String className, Class<? super T> supertype);
 }
