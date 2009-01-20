@@ -220,6 +220,14 @@ public class PulseScope implements Scope
         add(reference);
     }
 
+    public void add(PulseScope other)
+    {
+        for (ReferenceInfo info: other.merge().values())
+        {
+            references.put(info.reference.getName(), info);
+        }
+    }
+
     public void add(Reference reference)
     {
         references.put(reference.getName(), new ReferenceInfo(reference));
