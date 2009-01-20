@@ -37,43 +37,43 @@ public class WiringObjectFactory implements ObjectFactory
         }
     }
 
-    public <T> T buildBean(Class<? extends T> clazz) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz)
     {
         T bean = delegate.buildBean(clazz);
         wire(bean);
         return bean;
     }
 
-    public <T> T buildBean(String className, Class<? super T> token) throws Exception
+    public <T> T buildBean(String className, Class<? super T> supertype)
     {
         // javac requires this type argument
         //noinspection RedundantTypeArguments
-        T bean = delegate.<T>buildBean(className, token);
+        T bean = delegate.<T>buildBean(className, supertype);
         wire(bean);
         return bean;
     }
 
-    public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args)
     {
         T bean = delegate.buildBean(clazz, argTypes, args);
         wire(bean);
         return bean;
     }
 
-    public <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(String className, Class<? super T> supertype, Class[] argTypes, Object[] args)
     {
         // javac requires this type argument
         //noinspection RedundantTypeArguments
-        T bean = delegate.<T>buildBean(className, token, argTypes, args);
+        T bean = delegate.<T>buildBean(className, supertype, argTypes, args);
         wire(bean);
         return bean;
     }
 
-    public <T> Class<? extends T> getClassInstance(String className, Class<? super T> token) throws ClassNotFoundException
+    public <T> Class<? extends T> getClassInstance(String className, Class<? super T> supertype)
     {
         // javac requires this type argument
         //noinspection RedundantTypeArguments
-        return delegate.<T>getClassInstance(className, token);
+        return delegate.<T>getClassInstance(className, supertype);
     }
 
     private void wire(Object bean)

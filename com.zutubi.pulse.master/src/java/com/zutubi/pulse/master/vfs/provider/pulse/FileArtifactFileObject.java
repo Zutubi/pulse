@@ -56,7 +56,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
         return canDecorate;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         File newBase = new File(base, fileName.getBaseName());
 

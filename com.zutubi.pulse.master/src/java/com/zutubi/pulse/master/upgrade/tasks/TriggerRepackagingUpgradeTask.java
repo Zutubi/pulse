@@ -14,16 +14,6 @@ import java.io.IOException;
  */
 public class TriggerRepackagingUpgradeTask extends DatabaseUpgradeTask
 {
-    public String getName()
-    {
-        return "Trigger repackaging";
-    }
-
-    public String getDescription()
-    {
-        return "Renames classes referenced by the trigger table.";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

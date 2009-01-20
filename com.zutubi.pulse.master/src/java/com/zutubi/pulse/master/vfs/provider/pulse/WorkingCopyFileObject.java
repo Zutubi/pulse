@@ -28,7 +28,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
         this.base = base;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         File newBase = new File(base, fileName.getBaseName());
         return objectFactory.buildBean(WorkingCopyFileObject.class,

@@ -14,16 +14,6 @@ public class FixNPEOnLDAPRememberMeUpgradeTask extends AbstractUpgradeTask
 {
     private RecordManager recordManager;
 
-    public String getName()
-    {
-        return "LDAP User remember me fix.";
-    }
-
-    public String getDescription()
-    {
-        return "Data fix to allow LDAP users to use the remember me login functionality. ";
-    }
-
     public boolean haltOnFailure()
     {
         return false;

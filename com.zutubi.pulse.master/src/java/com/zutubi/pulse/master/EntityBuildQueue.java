@@ -218,25 +218,18 @@ public class EntityBuildQueue
             return;
         }
 
-        try
-        {
-            BuildController controller = objectFactory.buildBean(BuildController.class,
-                                                                 new Class[] { AbstractBuildRequestEvent.class },
-                                                                 new Object[] { event });
-            DefaultRecipeResultCollector collector = new DefaultRecipeResultCollector(configurationManager);
-            collector.setProjectConfig(event.getProjectConfig());
-            controller.setCollector(collector);
-            controller.run();
-            activeBuilds.add(0, new ActiveBuild(event, controller));
+        BuildController controller = objectFactory.buildBean(BuildController.class,
+                                                             new Class[] { AbstractBuildRequestEvent.class },
+                                                             new Object[] { event });
+        DefaultRecipeResultCollector collector = new DefaultRecipeResultCollector(configurationManager);
+        collector.setProjectConfig(event.getProjectConfig());
+        controller.setCollector(collector);
+        controller.run();
+        activeBuilds.add(0, new ActiveBuild(event, controller));
 
-            // Defer this as it must come after a build completed event that
-            // we may be handling.
-            eventManager.publish(new BuildActivatedEvent(this, event), PublishFlag.DEFERRED);
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-        }
+        // Defer this as it must come after a build completed event that
+        // we may be handling.
+        eventManager.publish(new BuildActivatedEvent(this, event), PublishFlag.DEFERRED);
     }
 
     public Entity getOwner()

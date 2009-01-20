@@ -13,16 +13,6 @@ import java.sql.SQLException;
  */
 public class FeatureDiscriminatorUpgradeTask extends DatabaseUpgradeTask
 {
-    public String getName()
-    {
-        return "Feature Discriminator";
-    }
-
-    public String getDescription()
-    {
-        return "Updates the discriminator for base features.";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

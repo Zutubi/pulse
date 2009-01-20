@@ -4,14 +4,32 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * The AbstractUpgradeTask is an implementation of the PulseUpgradeTask
+ * interface that provides default implementations for the boiler plate
+ * methods.
  */
 public abstract class AbstractUpgradeTask implements PulseUpgradeTask
 {
+    protected final UpgradeTaskMessages I18N;
+
     private int buildNumber;
 
     private List<String> errors;
+
+    public AbstractUpgradeTask()
+    {
+        I18N = new UpgradeTaskMessages(getClass());
+    }
+
+    public String getName()
+    {
+        return I18N.getName();
+    }
+
+    public String getDescription()
+    {
+        return I18N.getDescription();
+    }
 
     public int getBuildNumber()
     {

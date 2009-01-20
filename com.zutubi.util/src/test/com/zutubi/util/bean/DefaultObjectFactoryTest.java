@@ -9,22 +9,22 @@ public class DefaultObjectFactoryTest extends ZutubiTestCase
 
     private ObjectFactory objectFactory = new DefaultObjectFactory();
 
-    public void testGetClassInstanceSimple() throws ClassNotFoundException
+    public void testGetClassInstanceSimple()
     {
         assertSame(Constructors.class, objectFactory.getClassInstance(Constructors.class.getName(), Constructors.class));
     }
 
-    public void testGetClassInstanceUnrelatedTokenType() throws ClassNotFoundException
+    public void testGetClassInstanceUnrelatedTokenType()
     {
         getClassInstanceFailureHelper(Constructors.class.getName(), String.class);
     }
 
-    public void testGetClassInstanceSubTokenType() throws ClassNotFoundException
+    public void testGetClassInstanceSubTokenType()
     {
         getClassInstanceFailureHelper(ParentType.class.getName(), ChildType.class);
     }
 
-    private void getClassInstanceFailureHelper(String className, Class<?> token) throws ClassNotFoundException
+    private void getClassInstanceFailureHelper(String className, Class<?> token)
     {
         try
         {
@@ -37,63 +37,63 @@ public class DefaultObjectFactoryTest extends ZutubiTestCase
         }
     }
 
-    public void testGetClassInstanceSuperTokenType() throws ClassNotFoundException
+    public void testGetClassInstanceSuperTokenType()
     {
         Class<? extends ParentType> clazz = objectFactory.getClassInstance(ChildType.class.getName(), ParentType.class);
         assertSame(ChildType.class, clazz);
     }
 
-    public void testGetClassInstanceIndirectSuperTokenType() throws ClassNotFoundException
+    public void testGetClassInstanceIndirectSuperTokenType()
     {
         Class<? extends GrandParentType> clazz = objectFactory.getClassInstance(ChildType.class.getName(), GrandParentType.class);
         assertSame(ChildType.class, clazz);
     }
 
-    public void testBuildByClass() throws Exception
+    public void testBuildByClass()
     {
         assertEquals(new Constructors(), objectFactory.buildBean(Constructors.class));    
     }
 
-    public void testBuildByClassNoDefaultConstructor() throws Exception
+    public void testBuildByClassNoDefaultConstructor()
     {
         try
         {
             objectFactory.buildBean(NoDefaultConstructor.class);
             fail();
         }
-        catch(InstantiationException e)
+        catch(Exception e)
         {
         }
     }
 
-    public void testBuildByClassName() throws Exception
+    public void testBuildByClassName()
     {
-        assertEquals(new Constructors(), objectFactory.buildBean(Constructors.class.getName(), Constructors.class));    
+        assertEquals(new Constructors(), objectFactory.<Constructors>buildBean(Constructors.class.getName(), Constructors.class));
     }
 
-    public void testBuildByClassNameNoDefaultConstructor() throws Exception
+    public void testBuildByClassNameNoDefaultConstructor()
     {
         try
         {
-            objectFactory.buildBean(NoDefaultConstructor.class.getName(), NoDefaultConstructor.class);
+            objectFactory.<NoDefaultConstructor>buildBean(NoDefaultConstructor.class.getName(), NoDefaultConstructor.class);
             fail();
         }
-        catch(InstantiationException e)
+        catch(Exception e)
         {
         }
     }
 
-    public void testBuildByClassNameSuperTokenType() throws Exception
+    public void testBuildByClassNameSuperTokenType()
     {
         ParentType bean = objectFactory.buildBean(ChildType.class.getName(), ParentType.class);
         assertTrue(bean instanceof ChildType);    
     }
 
-    public void testBuildByClassNameBadTokenType() throws Exception
+    public void testBuildByClassNameBadTokenType()
     {
         try
         {
-            objectFactory.buildBean(ChildType.class.getName(), String.class);
+            objectFactory.<String>buildBean(ChildType.class.getName(), String.class);
             fail();
         }
         catch (ClassCastException e)
@@ -102,46 +102,48 @@ public class DefaultObjectFactoryTest extends ZutubiTestCase
         }
     }
 
-    public void testBuildWithArgumentByClass() throws Exception
+    public void testBuildWithArgumentByClass()
     {
         assertEquals(new Constructors(TEST_STRING), objectFactory.buildBean(Constructors.class, new Class[]{String.class}, new Object[]{TEST_STRING}));
     }
 
-    public void testBuildWithArgumentByClassNoSuchConstructor() throws Exception
+    public void testBuildWithArgumentByClassNoSuchConstructor()
     {
         try
         {
             objectFactory.buildBean(Constructors.class, new Class[]{Float.class}, new Object[]{1.0f});
+            fail();
         }
-        catch(NoSuchMethodException e)
+        catch(Exception e)
         {
         }
     }
 
-    public void testBuildWithArgumentByClassName() throws Exception
+    public void testBuildWithArgumentByClassName()
     {
-        assertEquals(new Constructors(TEST_STRING), objectFactory.buildBean(Constructors.class.getName(), Constructors.class, new Class[]{String.class}, new Object[]{TEST_STRING}));
+        assertEquals(new Constructors(TEST_STRING), objectFactory.<Constructors>buildBean(Constructors.class.getName(), Constructors.class, new Class[]{String.class}, new Object[]{TEST_STRING}));
     }
 
-    public void testBuildWithArgumentByClassNameSuchConstructor() throws Exception
+    public void testBuildWithArgumentByClassNameSuchConstructor()
     {
         try
         {
-            objectFactory.buildBean(Constructors.class.getName(), Constructors.class, new Class[]{Float.class}, new Object[]{1.0f});
+            objectFactory.<Constructors>buildBean(Constructors.class.getName(), Constructors.class, new Class[]{Float.class}, new Object[]{1.0f});
+            fail();
         }
-        catch(NoSuchMethodException e)
+        catch(Exception e)
         {
         }
     }
 
-    public void testBuildWithMultipleArgumentsByClass() throws Exception
+    public void testBuildWithMultipleArgumentsByClass()
     {
         assertEquals(new Constructors(TEST_STRING, TEST_INT), objectFactory.buildBean(Constructors.class, new Class[]{String.class, Integer.TYPE}, new Object[]{TEST_STRING, TEST_INT}));
     }
 
-    public void testBuildWithMultipleArgumentsByClassName() throws Exception
+    public void testBuildWithMultipleArgumentsByClassName()
     {
-        assertEquals(new Constructors(TEST_STRING, TEST_INT), objectFactory.buildBean(Constructors.class.getName(), Constructors.class, new Class[]{String.class, Integer.TYPE}, new Object[]{TEST_STRING, TEST_INT}));
+        assertEquals(new Constructors(TEST_STRING, TEST_INT), objectFactory.<Constructors>buildBean(Constructors.class.getName(), Constructors.class, new Class[]{String.class, Integer.TYPE}, new Object[]{TEST_STRING, TEST_INT}));
     }
 
     public static class GrandParentType

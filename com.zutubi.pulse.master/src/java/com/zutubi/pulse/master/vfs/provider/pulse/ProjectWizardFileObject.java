@@ -1,8 +1,12 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
+import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
+import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.SimpleInstantiator;
@@ -10,10 +14,6 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
-import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
-import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -41,7 +41,7 @@ public class ProjectWizardFileObject extends AbstractPulseFileObject implements 
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
         if (nodesDefinitions.containsKey(name))

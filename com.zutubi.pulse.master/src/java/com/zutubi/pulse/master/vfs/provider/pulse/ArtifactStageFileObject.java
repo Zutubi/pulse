@@ -28,7 +28,7 @@ public class ArtifactStageFileObject extends AbstractPulseFileObject implements 
         this.recipeId = recipeId;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String childName = fileName.getBaseName();
         if (childName.equals(IN_PROGRESS))

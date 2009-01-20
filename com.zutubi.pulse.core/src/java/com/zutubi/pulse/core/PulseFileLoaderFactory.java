@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
@@ -8,6 +7,7 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.TypeException;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,19 +42,12 @@ public class PulseFileLoaderFactory
 
     public PulseFileLoader createLoader()
     {
-        try
+        PulseFileLoader loader = objectFactory.buildBean(PulseFileLoader.class);
+        for(Map.Entry<String, CompositeType> entry: types.entrySet())
         {
-            PulseFileLoader loader = objectFactory.buildBean(PulseFileLoader.class);
-            for(Map.Entry<String, CompositeType> entry: types.entrySet())
-            {
-                loader.register(entry.getKey(), entry.getValue());
-            }
-            return loader;
+            loader.register(entry.getKey(), entry.getValue());
         }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Failed to create file loader instance. Cause: " + e.getMessage(), e);
-        }
+        return loader;
     }
 
     public void register(String name, Class clazz)

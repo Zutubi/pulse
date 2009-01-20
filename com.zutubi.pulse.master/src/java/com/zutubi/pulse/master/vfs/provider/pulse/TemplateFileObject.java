@@ -42,7 +42,7 @@ public class TemplateFileObject extends AbstractPulseFileObject implements Compa
         }
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         return objectFactory.buildBean(TemplateFileObject.class,
                 new Class[]{FileName.class, AbstractFileSystem.class},

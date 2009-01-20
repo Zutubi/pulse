@@ -14,7 +14,7 @@ public class ProjectConfigsFileObject extends AbstractPulseFileObject implements
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(FileName fileName)
     {
         return objectFactory.buildBean(ProjectConfigFileObject.class,
                 new Class[]{FileName.class, AbstractFileSystem.class},

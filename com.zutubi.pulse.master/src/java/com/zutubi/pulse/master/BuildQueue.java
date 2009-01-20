@@ -59,15 +59,7 @@ public class BuildQueue
         EntityBuildQueue queue = entityQueues.get(owner);
         if (queue == null)
         {
-            try
-            {
-                queue = objectFactory.buildBean(EntityBuildQueue.class, new Class[] { Entity.class, Integer.TYPE }, new Object[] { owner, 1 });
-            }
-            catch (Exception e)
-            {
-                LOG.severe(e);
-            }
-
+            queue = objectFactory.buildBean(EntityBuildQueue.class, new Class[] { Entity.class, Integer.TYPE }, new Object[] { owner, 1 });
             entityQueues.put(owner, queue);
         }
 

@@ -25,7 +25,7 @@ public class TemplateScopesFileObject extends AbstractPulseFileObject
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(FileName fileName)
     {
         return objectFactory.buildBean(TemplateScopeFileObject.class,
                                        new Class[]{FileName.class, AbstractFileSystem.class},

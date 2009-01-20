@@ -13,16 +13,6 @@ public class AddResourcePropertyDescriptionUpgradeTask extends AbstractRecordPro
 {
     private static final String PROPERTY_DESCRIPTION = "description";
 
-    public String getName()
-    {
-        return "Add resource property description.";
-    }
-
-    public String getDescription()
-    {
-        return "Initialises the new resource property description field.";
-    }
-
     public boolean haltOnFailure()
     {
         return false;

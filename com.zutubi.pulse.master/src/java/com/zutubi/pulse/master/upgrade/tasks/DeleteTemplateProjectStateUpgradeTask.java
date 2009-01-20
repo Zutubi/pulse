@@ -31,16 +31,6 @@ public class DeleteTemplateProjectStateUpgradeTask extends DatabaseUpgradeTask
     
     private RecordManager recordManager;
 
-    public String getName()
-    {
-        return I18N.getName();
-    }
-
-    public String getDescription()
-    {
-        return I18N.getDescription();
-    }
-
     public boolean haltOnFailure()
     {
         // Do not halt.  Pulse will still work although not for everyone.

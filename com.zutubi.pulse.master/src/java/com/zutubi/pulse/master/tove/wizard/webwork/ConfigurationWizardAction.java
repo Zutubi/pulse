@@ -319,26 +319,12 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
         Class wizardClass = ConventionSupport.getWizard(type);
         if (wizardClass != null)
         {
-            try
-            {
-                wizardInstance = (AbstractTypeWizard) objectFactory.buildBean(wizardClass);
-            }
-            catch (Exception e)
-            {
-                LOG.warning(e);
-            }
+            wizardInstance = (AbstractTypeWizard) objectFactory.buildBean(wizardClass);
         }
 
         if (wizardInstance == null)
         {
-            try
-            {
-                wizardInstance = objectFactory.buildBean(SingleTypeWizard.class);
-            }
-            catch (Exception e)
-            {
-                LOG.severe(e);
-            }
+            wizardInstance = objectFactory.buildBean(SingleTypeWizard.class);
         }
 
         wizardInstance.setParameters(parentPath, insertPath, templateParentPath, templateParentRecord, template);

@@ -16,16 +16,6 @@ public class UpdateDefaultActionUpgradeTask extends AbstractUpgradeTask
 {
     private RecordManager recordManager;
 
-    public String getName()
-    {
-        return "Update Default Action";
-    }
-
-    public String getDescription()
-    {
-        return "Renames the default action 'projects' to 'browse'.";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

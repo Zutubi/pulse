@@ -21,7 +21,7 @@ public class WorkingCopyContextFileObject extends AbstractPulseFileObject implem
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         long recipeId = Long.parseLong(fileName.getBaseName());
 

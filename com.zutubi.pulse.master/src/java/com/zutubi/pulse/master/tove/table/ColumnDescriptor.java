@@ -53,7 +53,7 @@ public class ColumnDescriptor
         }
     }
 
-    private FormattingWrapper newWrapper(Object instance) throws Exception
+    private FormattingWrapper newWrapper(Object instance)
     {
         return objectFactory.buildBean(FormattingWrapper.class, new Class[]{Object.class, CompositeType.class}, new Object[]{instance, type});
     }

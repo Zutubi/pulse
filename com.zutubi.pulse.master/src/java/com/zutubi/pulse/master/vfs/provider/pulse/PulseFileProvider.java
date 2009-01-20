@@ -32,17 +32,10 @@ public class PulseFileProvider extends AbstractOriginatingFileProvider
 
     protected FileSystem doCreateFileSystem(final FileName rootName, final FileSystemOptions fileSystemOptions) throws FileSystemException
     {
-        try
-        {
-            return objectFactory.buildBean(PulseFileSystem.class,
-                    new Class[]{FileName.class, FileObject.class, FileSystemOptions.class, Class.class}, 
-                    new Object[]{rootName, null, fileSystemOptions, rootFileType}
-            );
-        }
-        catch (Exception e)
-        {
-            throw new FileSystemException(e);
-        }
+        return objectFactory.buildBean(PulseFileSystem.class,
+                new Class[]{FileName.class, FileObject.class, FileSystemOptions.class, Class.class},
+                new Object[]{rootName, null, fileSystemOptions, rootFileType}
+        );
     }
 
     public Collection getCapabilities()

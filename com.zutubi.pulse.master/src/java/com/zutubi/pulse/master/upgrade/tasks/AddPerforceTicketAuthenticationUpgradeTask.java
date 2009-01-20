@@ -16,16 +16,6 @@ public class AddPerforceTicketAuthenticationUpgradeTask extends AbstractRecordPr
     private static final String PROPERTY_SCM = "scm";
     private static final String PROPERTY_TICKET_AUTH = "useTicketAuth";
 
-    public String getName()
-    {
-        return "Add Perforce Ticket Authentication";
-    }
-
-    public String getDescription()
-    {
-        return "Adds a new option to Perforce projects to allow use of ticket authentication";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

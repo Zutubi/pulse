@@ -30,10 +30,11 @@ public class ToveFileLoaderTest extends PulseTestCase
         rootType = registry.register(SimpleRoot.class);
 
         loader = new ToveFileLoader();
-        loader.register("reference", registry.getType(SimpleReference.class));
-        loader.register("referrer", registry.getType(Referrer.class));
+        loader.setTypeRegistry(registry);
         loader.setObjectFactory(new DefaultObjectFactory());
         loader.setValidationManager(new PulseValidationManager());
+        loader.register("reference", registry.getType(SimpleReference.class));
+        loader.register("referrer", registry.getType(Referrer.class));
     }
 
     public void testSimpleReference() throws Exception
