@@ -27,7 +27,7 @@ public class ControllingSelectFieldDescriptor extends OptionFieldDescriptor
         addParameter(PARAM_DEPENDENT_FIELDS, deps);
     }
 
-    protected boolean displayMultiple()
+    protected boolean transformType()
     {
         return false;
     }
