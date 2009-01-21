@@ -14,6 +14,8 @@ public interface ServerConfigurationHandler
      * Configure the server instance.
      *
      * @param server instance to be configured.
+     *
+     * @throws IOException on error
      */
     void configure(Server server) throws IOException;
 }
