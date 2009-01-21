@@ -30,7 +30,10 @@ public class AcegiSecurityManager implements SecurityManager
     public void secure()
     {
         WebApplicationHandler handler = getHandler();
-        
+        if (handler == null)
+        {
+            throw new RuntimeException("Can not enable web security before the web app is fully deployed.");
+        }
         deploySecurityFilter(handler);
         enableWebUISecurity(handler);
     }

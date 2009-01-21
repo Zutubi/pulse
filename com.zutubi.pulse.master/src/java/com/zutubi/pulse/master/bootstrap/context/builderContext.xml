@@ -151,8 +151,7 @@
                 <ref bean="agentPingService"/>
                 <ref bean="agentManager"/>
                 <ref bean="jabberManager"/>
-                <!-- this is already registered via a startup task. -->
-                <!-- <ref bean="jettyServerManager"/> -->
+                 <ref bean="jettyServerManager"/> 
                 <ref bean="projectInitialisationService"/>
                 <ref bean="projectLoggerManager"/>
                 <ref bean="databaseConsole"/>

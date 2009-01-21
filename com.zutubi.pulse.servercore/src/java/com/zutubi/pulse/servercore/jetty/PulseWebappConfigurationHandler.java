@@ -24,6 +24,8 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
 {
     private static final Logger LOG = Logger.getLogger(PulseWebappConfigurationHandler.class);
 
+    private static final String[] LOGGING_IGNORE_PATHS = new String[]{"/images/*.*", "*.css", "*.js", "*.ico", "*.gif"};
+
     private ConfigurationManager configurationManager;
 
     /**
@@ -112,7 +114,7 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
 
     private String[] getRequestLoggingIgnorePaths()
     {
-        return new String[]{"/images/*.*", "*.css", "*.js", "*.ico", "*.gif"};
+        return LOGGING_IGNORE_PATHS;
     }
 
     private Integer getDaysLogsRetained()

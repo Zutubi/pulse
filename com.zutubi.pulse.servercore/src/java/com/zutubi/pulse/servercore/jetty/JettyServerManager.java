@@ -24,8 +24,8 @@ public class JettyServerManager implements Stoppable
     /**
      * Create a new jetty server using the provided handler to configure the instance.
      *
-     * @param name      a key that can be used with JettyServerManager#getServer to retrieve
-     * the server instanec
+     * @param name      a key that can be used with {@link JettyServerManager#getServer} to retrieve
+     * the server instance
      * @param handler   a configuration handler responsible for configuring the server instance
      * @return the newly configured server instance
      *
@@ -34,11 +34,8 @@ public class JettyServerManager implements Stoppable
     public synchronized Server createNewServer(String name, ServerConfigurationHandler handler) throws IOException
     {
         Server server = new Server();
-
         handler.configure(server);
-
         servers.put(name, server);
-
         return server;
     }
 
