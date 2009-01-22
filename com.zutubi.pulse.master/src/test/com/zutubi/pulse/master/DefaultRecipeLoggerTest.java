@@ -6,10 +6,8 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.regex.Pattern;
 
 public class DefaultRecipeLoggerTest extends PulseTestCase
 {
@@ -45,6 +43,12 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
 
         logger.log(SHORT_STRING.getBytes());
         assertTrue(IOUtils.fileToString(logFile).length() > SHORT_STRING.length());
+    }
+
+    public void testOffsetAndLength() throws IOException
+    {
+        logger.log("0123456789".getBytes("US-ASCII"), 2, 4);
+        assertLineContent(IOUtils.fileToString(logFile), "2345");
     }
 
     public void testNewlineOnBoundaryUnix() throws IOException
@@ -218,7 +222,12 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     {
         for (int i = 1; i <= count; i++)
         {
-            assertThat(reader.readLine(), matchesRegex("[0-9][0-9]/[0-9][0-9]/[0-9][0-9] [0-9][0-9]?:[0-9][0-9]:[0-9][0-9]: line " +i));
+            assertLineContent(reader.readLine(), "line " + i);
         }
+    }
+
+    private void assertLineContent(String line, String content)
+    {
+        assertThat(line, matchesRegex("[0-9][0-9]/[0-9][0-9]/[0-9][0-9] [0-9][0-9]?:[0-9][0-9]:[0-9][0-9]: " + Pattern.quote(content)));
     }
 }
