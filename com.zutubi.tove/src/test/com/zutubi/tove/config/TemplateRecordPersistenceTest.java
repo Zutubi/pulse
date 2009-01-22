@@ -23,15 +23,18 @@ import java.util.*;
  */
 public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTestCase
 {
-    private CompositeType projectType;
-    private CompositeType propertyType;
-    private CompositeType stageType;
     private static final String GLOBAL_PROJECT = "global";
     private static final String GLOBAL_DESCRIPTION = "this is the daddy of them all";
     private static final String CHILD_PROJECT = "child";
     private static final String CHILD_DESCRIPTION = "my own way baby!";
     private static final String GRANDCHILD_PROJECT = "grandchild";
     private static final String GRANDCHILD_DESCRIPTION = "nkotb";
+
+    private static final String PROPERTY_VALUE = "wow!";
+
+    private CompositeType projectType;
+    private CompositeType propertyType;
+    private CompositeType stageType;
 
     protected void setUp() throws Exception
     {
@@ -822,6 +825,45 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         listener.assertEvents(new DeleteEventSpec(stagePath, false), new PostDeleteEventSpec(stagePath, false));
     }
 
+    public void testAddItemToHidden()
+    {
+        String parentPath = insertGlobal();
+        String childPath = insertChild();
+
+        String stagePath = "/stages/default";
+        hideStage(childPath + stagePath);
+
+        Listener listener = registerListener();
+        insertProperty(parentPath + stagePath + "/properties", "newproperty");
+        assertEquals(0, listener.getEvents().size());
+        
+        // On restore the new property should be in the child
+        configurationTemplateManager.restore(childPath + stagePath);
+        Property property = configurationTemplateManager.getInstance(childPath + stagePath + "/properties/newproperty", Property.class);
+        assertNotNull(property);
+        assertEquals(PROPERTY_VALUE, property.getValue());
+    }
+
+    public void testDeleteItemFromHidden()
+    {
+        String parentPath = insertGlobal();
+        String childPath = insertChild();
+
+        String stagePath = "/stages/default";
+        String childPropertyPath = childPath + stagePath + "/properties/p1";
+        assertTrue(configurationTemplateManager.pathExists(childPropertyPath));
+
+        hideStage(childPath + stagePath);
+
+        Listener listener = registerListener();
+        configurationTemplateManager.delete(parentPath + stagePath + "/properties/p1");
+        assertEquals(0, listener.getEvents().size());
+
+        // On restore the new property should not be in the child
+        configurationTemplateManager.restore(childPath + stagePath);
+        assertFalse(configurationTemplateManager.pathExists(childPropertyPath));
+    }
+
     public void testHideIndirectlyInherited()
     {
         insertToGrandchild();
@@ -1468,10 +1510,10 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         return listener;
     }
 
-    private void insertGlobal()
+    private String insertGlobal()
     {
         MutableRecord global = createGlobal();
-        configurationTemplateManager.insertRecord("project", global);
+        return configurationTemplateManager.insertRecord("project", global);
     }
 
     private MutableRecord createGlobal()
@@ -1481,10 +1523,10 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         return record;
     }
 
-    private void insertChild()
+    private String insertChild()
     {
         MutableRecord child = createChild();
-        configurationTemplateManager.insertRecord("project", child);
+        return configurationTemplateManager.insertRecord("project", child);
     }
 
     private void insertTemplateChild()
@@ -1549,7 +1591,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         MutableRecord property = propertyType.createNewRecord(false);
         property.put("name", name);
-        property.put("value", "wow!");
+        property.put("value", PROPERTY_VALUE);
         configurationTemplateManager.insertRecord(path, property);
     }
 
