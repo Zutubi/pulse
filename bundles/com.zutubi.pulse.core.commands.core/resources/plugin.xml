@@ -2,7 +2,6 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.commands">
-        <command name="command" class="com.zutubi.pulse.core.commands.core.CommandGroupConfiguration"/>
         <command name="executable" class="com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration"/>
         <command name="print" class="com.zutubi.pulse.core.commands.core.PrintCommand"/>
         <command name="sleep" class="com.zutubi.pulse.core.commands.core.SleepCommand"/>

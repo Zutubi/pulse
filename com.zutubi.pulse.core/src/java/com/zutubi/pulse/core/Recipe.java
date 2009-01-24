@@ -1,22 +1,20 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.engine.api.*;
+import com.zutubi.pulse.core.commands.api.*;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.SelfReference;
 import com.zutubi.pulse.core.events.CommandCommencedEvent;
 import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,16 +26,8 @@ public class Recipe extends SelfReference
 
     private static final String LABEL_EXECUTE = "execute";
 
-    /**
-     * The ordered list of commands that are executed by this recipe.
-     */
-    private LinkedList<Pair<Command, Scope>> commands = new LinkedList<Pair<Command, Scope>>();
+    private RecipeConfiguration config;
 
-    /**
-     * The list of resource dependencies that need to be resolved prior to
-     * being able to execute this recipe.
-     */
-    private List<Dependency> dependencies = new LinkedList<Dependency>();
     private Version version = null;
 
     /**
@@ -55,78 +45,16 @@ public class Recipe extends SelfReference
     /**
      * Flag indicating whether or not this recipe is terminating.
      */
-    private boolean terminating = false;
+    private volatile boolean terminating = false;
 
     /**
      * A lock used to control access to the running state of the recipe.
      */
     private Lock runningLock = new ReentrantLock();
 
-    /**
-     * Default no-arg constructor.
-     */
-    public Recipe()
+    public Recipe(RecipeConfiguration config)
     {
-    }
-
-    /**
-     * Add a new command instance to this recipe.
-     *
-     * @param command instance
-     * @param scope   scope at the point where the command is loaded
-     */
-    public void add(Command command, Scope scope)
-    {
-        if (scope != null)
-        {
-            scope = scope.copyTo(scope.getAncestor(BuildProperties.SCOPE_RECIPE));
-        }
-
-        commands.add(new Pair<Command, Scope>(command, scope));
-    }
-
-    /**
-     * Get the named command instance.
-     *
-     * @param name of the command being retrieved.
-     * @return the named command instance, or null if no matching command was found.
-     */
-    public Command getCommand(String name)
-    {
-        for (Pair<Command, Scope> c : commands)
-        {
-            if (c.first.getName().equals(name))
-            {
-                return c.first;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get the list of commands associated with this recipe. This list is in the commands execution order.
-     *
-     * @return list of commands.
-     */
-    public List<Command> getCommands()
-    {
-        return CollectionUtils.map(commands, new Mapping<Pair<Command, Scope>, Command>()
-        {
-            public Command map(Pair<Command, Scope> pair)
-            {
-                return pair.first;
-            }
-        });
-    }
-
-    public List<Dependency> getDependencies()
-    {
-        return Collections.unmodifiableList(dependencies);
-    }
-
-    public void addDependency(Dependency dependency)
-    {
-        dependencies.add(dependency);
+        this.config = config;
     }
 
     public Version getVersion()
@@ -137,17 +65,6 @@ public class Recipe extends SelfReference
     public void addVersion(Version version)
     {
         this.version = version;
-    }
-
-    /**
-     * Add a command to the front of the command execution list. This command will be executed first
-     * unless another command is added via this method.
-     *
-     * @param command to be scheduled before all existing commands.
-     */
-    public void addFirstCommand(Command command)
-    {
-        commands.addFirst(new Pair<Command, Scope>(command, null));
     }
 
     /**
@@ -178,15 +95,12 @@ public class Recipe extends SelfReference
         {
             boolean success = true;
             File outputDir = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
-            for (int i = 0; i < commands.size(); i++)
+            int i = 0;
+            for (CommandConfiguration commandConfig: config.getCommands().values())
             {
-                Pair<Command, Scope> pair = commands.get(i);
-                Command command = pair.first;
-//                Scope scope = pair.second;
-
-                if (success || command.isForce())
+                if (success || commandConfig.isForce())
                 {
-                    CommandResult result = new CommandResult(command.getName());
+                    CommandResult result = new CommandResult(commandConfig.getName());
 
                     File commandOutput = new File(outputDir, getCommandDirName(i, result));
                     if (!commandOutput.mkdirs())
@@ -194,9 +108,8 @@ public class Recipe extends SelfReference
                         throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
                     }
 
-                    // FIXME loader cheating with null scope
-                    pushCommandContext(context, null, commandOutput);
-                    boolean recipeTerminated = !executeCommand(context, commandOutput, result, command);
+                    pushCommandContext(context, commandOutput);
+                    boolean recipeTerminated = !executeCommand(context, commandOutput, result, commandConfig);
                     context.popTo(LABEL_EXECUTE);
 
                     if(recipeTerminated)
@@ -211,6 +124,8 @@ public class Recipe extends SelfReference
                             success = false;
                     }
                 }
+
+                i++;
             }
         }
         finally
@@ -231,21 +146,13 @@ public class Recipe extends SelfReference
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    private void pushCommandContext(PulseExecutionContext context, Scope scope, File commandOutput)
+    private void pushCommandContext(PulseExecutionContext context, File commandOutput)
     {
         context.push();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
-
-        if (scope != null)
-        {
-            for (Reference reference : scope.getReferences())
-            {
-                context.add(reference);
-            }
-        }
     }
 
-    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, Command command)
+    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, CommandConfiguration commandConfig)
     {
         runningLock.lock();
         if (terminating)
@@ -254,6 +161,7 @@ public class Recipe extends SelfReference
             return false;
         }
 
+        Command command = commandConfig.createCommand();
         runningCommand = command;
         runningLock.unlock();
 
@@ -262,9 +170,10 @@ public class Recipe extends SelfReference
         long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
         eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
 
+        DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult);
         try
         {
-            executeAndProcess(context, commandResult, command);
+            executeAndProcess(commandContext, command, commandConfig);
         }
         catch (BuildException e)
         {
@@ -277,6 +186,8 @@ public class Recipe extends SelfReference
         }
         finally
         {
+            commandContext.addArtifacts();
+
             runningLock.lock();
             runningCommand = null;
             runningLock.unlock();
@@ -289,16 +200,16 @@ public class Recipe extends SelfReference
         return true;
     }
 
-    private void executeAndProcess(ExecutionContext context, CommandResult commandResult, Command command)
+    private void executeAndProcess(CommandContext commandContext, Command command, CommandConfiguration commandConfig)
     {
         try
         {
-            command.execute(context, commandResult);
+            command.execute(commandContext);
         }
         finally
         {
             // still need to process any available artifacts, even in the event of an error.
-            processArtifacts(command, context, commandResult);
+            processOutputs(commandConfig, commandContext);
         }
     }
 
@@ -318,11 +229,12 @@ public class Recipe extends SelfReference
         }
     }
 
-    private void processArtifacts(Command command, ExecutionContext context, CommandResult result)
+    private void processOutputs(CommandConfiguration commandConfig, CommandContext context)
     {
-        for (Artifact artifact : command.getArtifacts())
+        for (OutputConfiguration outputConfiguration: commandConfig.getOutputs())
         {
-            artifact.capture(result, context);
+            Output output = outputConfiguration.createOutput();
+            output.capture(context);
         }
     }
 

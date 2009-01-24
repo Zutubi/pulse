@@ -1,5 +1,8 @@
 package com.zutubi.util;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -305,6 +308,47 @@ public class ReflectionUtils
             {
                 field.setAccessible(false);
             }
+        }
+    }
+
+    /**
+     * Gets all bean properties from a class, traversing all of its
+     * superinterfaces to find properties defined therein.  This is in contrast
+     * to the normal behaviour of of {@link java.beans.Introspector} which does
+     * not search superinterfaces of interfaces.
+     * <p/>
+     * The stop class is always Object for classes, and null for interfaces.
+     *
+     * @see java.beans.Introspector#getBeanInfo(Class, Class)
+     *  
+     * @param clazz the class to retrieve bean properties from
+     * @return all bean properties defined in the class and its supertypes
+     * @throws IntrospectionException on error
+     */
+    public static PropertyDescriptor[] getBeanProperties(Class<?> clazz) throws IntrospectionException
+    {
+        Class<Object> stopClass = null;
+        if (!clazz.isInterface())
+        {
+            stopClass = Object.class;
+        }
+
+        Map<String, PropertyDescriptor> descriptors = new HashMap<String, PropertyDescriptor>();
+        addBeanPropertiesFromClass(clazz, stopClass, descriptors);
+        for(Class iface: getImplementedInterfaces(clazz, null, true))
+        {
+            addBeanPropertiesFromClass(iface, null, descriptors);
+        }
+        
+        return descriptors.values().toArray(new PropertyDescriptor[descriptors.size()]);
+    }
+
+    private static void addBeanPropertiesFromClass(Class<?> clazz, Class<Object> stopClass, Map<String, PropertyDescriptor> descriptors)throws IntrospectionException
+    {
+        PropertyDescriptor[] properties = Introspector.getBeanInfo(clazz, stopClass).getPropertyDescriptors();
+        for (PropertyDescriptor p: properties)
+        {
+            descriptors.put(p.getName(), p);
         }
     }
 }

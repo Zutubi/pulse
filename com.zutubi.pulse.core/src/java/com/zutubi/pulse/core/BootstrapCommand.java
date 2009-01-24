@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -25,9 +24,9 @@ public class BootstrapCommand implements Command
         this.bootstrapper = bootstrapper;
     }
 
-    public void execute(ExecutionContext context, CommandResult result)
+    public void execute(CommandContext commandContext)
     {
-        bootstrapper.bootstrap((PulseExecutionContext) context);
+        bootstrapper.bootstrap((PulseExecutionContext) commandContext.getExecutionContext());
     }
 
     public List<Artifact> getArtifacts()

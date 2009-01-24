@@ -2,11 +2,12 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
-import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeStatusEvent;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -72,9 +74,6 @@ public class RecipeProcessor
         pushRecipeContext(context, request, testResults, recipeStartTime);
         try
         {
-            // Wrap bootstrapper in a command and run it.
-            BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
-
             // Now we can load the recipe from the pulse file
             ProjectRecipesConfiguration recipesConfiguration= loadPulseFile(request, context);
 
@@ -94,9 +93,13 @@ public class RecipeProcessor
                 throw new BuildException("Undefined recipe '" + recipeName + "'");
             }
 
-            Recipe recipe = recipeConfiguration.createRecipe();
-            recipe.addFirstCommand(bootstrapCommand);
+            LinkedHashMap<String, CommandConfiguration> commandConfigs = new LinkedHashMap<String, CommandConfiguration>();
+            BootstrapCommandConfiguration bootstrapConfig = new BootstrapCommandConfiguration(request.getBootstrapper());
+            commandConfigs.put(bootstrapConfig.getName(), bootstrapConfig);
+            commandConfigs.putAll(recipeConfiguration.getCommands());
+            recipeConfiguration.setCommands(commandConfigs);
 
+            Recipe recipe = recipeConfiguration.createRecipe();
             runningRecipeInstance = recipe;
 
             recipe.execute(context);

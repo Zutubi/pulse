@@ -6,10 +6,9 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.HandleAllocator;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.ReflectionUtils;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
@@ -24,7 +23,7 @@ public class TypeRegistry
 
     private Map<String, CompositeType> symbolicNameMapping = new HashMap<String, CompositeType>();
 
-    private Map<Class, CompositeType> classMapping = new HashMap<Class, CompositeType>();
+    private Map<Class<? extends Configuration>, CompositeType> classMapping = new HashMap<Class<? extends Configuration>, CompositeType>();
     private Map<Class, SimpleType> primitiveMapping = new HashMap<Class, SimpleType>();
 
     private ConfigurationReferenceManager configurationReferenceManager;
@@ -59,12 +58,12 @@ public class TypeRegistry
         }
     }
 
-    public <T extends Configuration> CompositeType register(Class<T> clazz) throws TypeException
+    public CompositeType register(Class<? extends Configuration> clazz) throws TypeException
     {
         return register(clazz, null);
     }
 
-    public <T extends Configuration> CompositeType register(Class<T> clazz, TypeHandler handler) throws TypeException
+    public CompositeType register(Class<? extends Configuration> clazz, TypeHandler handler) throws TypeException
     {
         SymbolicName symbolicName = clazz.getAnnotation(SymbolicName.class);
         if (symbolicName != null)
@@ -75,7 +74,7 @@ public class TypeRegistry
         return register(null, clazz, handler);
     }
 
-    private CompositeType register(String symbolicName, Class clazz, TypeHandler handler) throws TypeException
+    private CompositeType register(String symbolicName, Class<? extends Configuration> clazz, TypeHandler handler) throws TypeException
     {
         try
         {
@@ -131,6 +130,17 @@ public class TypeRegistry
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private Class<? extends Configuration> asConfigurationClass(Class<?> clazz) throws TypeException
+    {
+        if (!Configuration.class.isAssignableFrom(clazz))
+        {
+            throw new TypeException("Class " + clazz.getName() + " does not implement Configuration");
+        }
+
+        return (Class<? extends Configuration>) clazz;
+    }
+
     private void checkForExtensionParent(CompositeType type) throws TypeException
     {
         Class superClass = type.getClazz().getSuperclass();
@@ -178,17 +188,8 @@ public class TypeRegistry
             Class typeClass = prototype.getClazz();
             prototype.setAnnotations(Arrays.asList(typeClass.getAnnotations()));
 
-            BeanInfo beanInfo;
-            if (typeClass.isInterface() || typeClass == Object.class)
-            {
-                beanInfo = Introspector.getBeanInfo(typeClass, Introspector.USE_ALL_BEANINFO);
-            }
-            else
-            {
-                beanInfo = Introspector.getBeanInfo(typeClass, Object.class);
-            }
-
-            for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
+            PropertyDescriptor[] propertyDescriptors = ReflectionUtils.getBeanProperties(typeClass);
+            for (PropertyDescriptor descriptor : propertyDescriptors)
             {
                 DefinedTypeProperty property = new DefinedTypeProperty();
                 property.setName(descriptor.getName());
@@ -226,7 +227,7 @@ public class TypeRegistry
                         CompositeType compositeType = classMapping.get(clazz);
                         if (compositeType == null) // type has not yet been registered, do so now.
                         {
-                            compositeType = register(clazz, handler);
+                            compositeType = register(asConfigurationClass(clazz), handler);
                         }
 
                         property.setType(checkReferenceType(property, compositeType));
@@ -269,7 +270,7 @@ public class TypeRegistry
                             }
                             else
                             {
-                                CompositeType compositeType = register(valueClass, handler);
+                                CompositeType compositeType = register(asConfigurationClass(clazz), handler);
                                 collectionType = checkReferenceType(property, compositeType);
                             }
                         }

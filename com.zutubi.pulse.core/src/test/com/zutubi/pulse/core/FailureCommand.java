@@ -1,25 +1,20 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.commands.api.CommandSupport;
 
 /**
  * Simple testing command that always fails.
  */
-public class FailureCommand extends CommandSupport
+public class FailureCommand extends CommandSupport<FailureCommandConfiguration>
 {
-    public FailureCommand()
+    public FailureCommand(FailureCommandConfiguration config)
     {
-
+        super(config);
     }
 
-    public FailureCommand(String name)
+    public void execute(CommandContext commandContext)
     {
-        super(name);
-    }
-
-    public void execute(ExecutionContext context, CommandResult result)
-    {
-        result.failure("failure command");
+        commandContext.failure("failure command");
     }
 }

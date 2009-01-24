@@ -1,36 +1,67 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.PrecapturedArtifact;
-import com.zutubi.pulse.core.ProcessArtifact;
-import com.zutubi.pulse.core.Command;
-import com.zutubi.pulse.core.engine.AbstractCommandConfiguration;
+import com.zutubi.pulse.core.commands.api.OutputProducingCommandConfigurationSupport;
+import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Transient;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.TextUtils;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Arrays;
 import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
 @SymbolicName("zutubi.executableCommandConfig")
-public class ExecutableCommandConfiguration extends AbstractCommandConfiguration
+public class ExecutableCommandConfiguration extends OutputProducingCommandConfigurationSupport implements Validateable
 {
-    private String exe;
+    @Transient
     private String exeProperty;
+    @Transient
     private String defaultExe;
-    private String arguments;
+
+    private String exe;
+    private String args;
+    @Addable("arg")
+    private List<String> extraArguments = new LinkedList<String>();
     private File workingDir;
     private String inputFile;
-    private String outputFile;
     private List<EnvironmentConfiguration> environments = new LinkedList<EnvironmentConfiguration>();
 
-    private PrecapturedArtifact outputArtifact;
-    private PrecapturedArtifact envArtifact;
-
-    private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
     private List<String> suppressedEnvironment = new LinkedList<String>(Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD PULSE_TEST_SUPPRESSED").split(" +")));
     private List<StatusMapping> statusMappings = new LinkedList<StatusMapping>();
+
+    public ExecutableCommandConfiguration()
+    {
+        super(ExecutableCommand.class);
+    }
+
+    protected ExecutableCommandConfiguration(Class<? extends ExecutableCommand> clazz)
+    {
+        super(clazz);
+    }
+
+    protected ExecutableCommandConfiguration(Class<? extends ExecutableCommand> clazz, String exeProperty, String defaultExe)
+    {
+        super(clazz);
+        this.exeProperty = exeProperty;
+        this.defaultExe = defaultExe;
+    }
+
+    public String getExeProperty()
+    {
+        return exeProperty;
+    }
+
+    public String getDefaultExe()
+    {
+        return defaultExe;
+    }
 
     public String getExe()
     {
@@ -42,44 +73,53 @@ public class ExecutableCommandConfiguration extends AbstractCommandConfiguration
         this.exe = exe;
     }
 
-    public String getExeProperty()
+    public String getArgs()
     {
-        return exeProperty;
+        return args;
     }
 
-    public void setExeProperty(String exeProperty)
+    public void setArgs(String args)
     {
-        this.exeProperty = exeProperty;
+        this.args = args;
     }
 
-    public String getDefaultExe()
+    public List<String> getExtraArguments()
     {
-        return defaultExe;
+        return extraArguments;
     }
 
-    public void setDefaultExe(String defaultExe)
+    public void setExtraArguments(List<String> extraArguments)
     {
-        this.defaultExe = defaultExe;
+        this.extraArguments = extraArguments;
     }
 
-    public String getArguments()
+    @Transient
+    public List<String> getCombinedArguments()
     {
-        return arguments;
+        List<String> combined = new LinkedList<String>();
+        if (TextUtils.stringSet(args))
+        {
+            combined.addAll(Arrays.asList(args.split("\\s+")));
+        }
+        
+        combined.addAll(extraArguments);
+        return CollectionUtils.filter(combined, new Predicate<String>()
+        {
+            public boolean satisfied(String s)
+            {
+                return TextUtils.stringSet(s);
+            }
+        });
     }
 
-    public void setArguments(String arguments)
+    public File getWorkingDir()
     {
-        this.arguments = arguments;
+        return workingDir;
     }
 
-    public String getWorkingDir()
+    public void setWorkingDir(File workingDir)
     {
-        return workingDir.getPath();
-    }
-
-    public void setWorkingDir(String workingDir)
-    {
-        this.workingDir = new File(workingDir);
+        this.workingDir = workingDir;
     }
 
     public String getInputFile()
@@ -90,16 +130,6 @@ public class ExecutableCommandConfiguration extends AbstractCommandConfiguration
     public void setInputFile(String inputFile)
     {
         this.inputFile = inputFile;
-    }
-
-    public String getOutputFile()
-    {
-        return outputFile;
-    }
-
-    public void setOutputFile(String outputFile)
-    {
-        this.outputFile = outputFile;
     }
 
     public List<EnvironmentConfiguration> getEnvironments()
@@ -122,12 +152,12 @@ public class ExecutableCommandConfiguration extends AbstractCommandConfiguration
         this.suppressedEnvironment = suppressedEnvironment;
     }
 
-    public Command createCommand()
+    public void validate(ValidationContext context)
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe(exe);
-        command.setWorkingDir(workingDir);
-        return command;
+        if (!TextUtils.stringSet(exe) && !TextUtils.stringSet(getDefaultExe()))
+        {
+            context.addFieldError("exe", "exe is required");
+        }
     }
 
     @SymbolicName("zutubi.executableCommandConfig.environmentConfig")
@@ -135,6 +165,16 @@ public class ExecutableCommandConfiguration extends AbstractCommandConfiguration
     {
         private String name;
         private String value;
+
+        public EnvironmentConfiguration()
+        {
+        }
+
+        public EnvironmentConfiguration(String name, String value)
+        {
+            this.name = name;
+            this.value = value;
+        }
 
         public String getName()
         {

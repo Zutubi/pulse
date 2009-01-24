@@ -1,60 +1,21 @@
 package com.zutubi.pulse.core.commands.ant;
 
-import com.zutubi.pulse.core.ProcessArtifact;
-import com.zutubi.pulse.core.commands.core.ExecutableCommand;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.util.SystemUtils;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommandSupport;
 
 /**
  */
-public class AntCommand extends ExecutableCommand
+public class AntCommand extends NamedArgumentCommandSupport<AntCommandConfiguration>
 {
-    private String buildFile;
-    private String targets;
-
-    public AntCommand()
+    public AntCommand(AntCommandConfiguration config)
     {
-        super("ant.bin", SystemUtils.IS_WINDOWS ? "ant.bat" : "ant");
+        super(config);
     }
 
-    public void execute(ExecutionContext context, CommandResult cmdResult)
+    public void execute(CommandContext commandContext)
     {
-        if (buildFile != null)
-        {
-            addArguments("-f", buildFile);
-            cmdResult.getProperties().put("build file", buildFile);
-        }
-
-        if (targets != null)
-        {
-            addArguments(targets.split(" +"));
-            cmdResult.getProperties().put("targets", targets);
-        }
-
-        ProcessArtifact pa = createProcess();
-        pa.setProcessor(new AntPostProcessor("ant.pp"));
-
-        super.execute(context, cmdResult);
-    }
-
-    public String getBuildFile()
-    {
-        return buildFile;
-    }
-
-    public void setBuildFile(String buildFile)
-    {
-        this.buildFile = buildFile;
-    }
-
-    public String getTargets()
-    {
-        return targets;
-    }
-
-    public void setTargets(String targets)
-    {
-        this.targets = targets;
+        super.execute(commandContext);
+        // FIXME loader
+//        commandContext.processOutput(OUTPUT_NAME, new AntPostProcessor());
     }
 }

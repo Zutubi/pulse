@@ -17,7 +17,6 @@
 //        // initialise the loader some test objects.
 //        loader.register("dependency", Dependency.class);
 //
-//        loader.register("command", CommandGroup.class);
 //        loader.register("executable", ExecutableCommand.class);
 //        loader.register("property", Property.class);
 //        loader.register("post-processor", PostProcessorGroup.class);

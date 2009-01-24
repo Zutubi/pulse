@@ -1,23 +1,19 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.commands.api.CommandSupport;
 
 /**
  * Simple testing command that always throws a generic RuntimeException.
  */
-public class UnexpectedExceptionCommand extends CommandSupport
+public class UnexpectedExceptionCommand extends CommandSupport<UnexpectedExceptionCommandConfiguration>
 {
-    public UnexpectedExceptionCommand()
+    protected UnexpectedExceptionCommand(UnexpectedExceptionCommandConfiguration config)
     {
+        super(config);
     }
 
-    public UnexpectedExceptionCommand(String name)
-    {
-        super(name);
-    }
-
-    public void execute(ExecutionContext context, CommandResult result)
+    public void execute(CommandContext commandContext)
     {
         throw new RuntimeException("unexpected exception command");
     }

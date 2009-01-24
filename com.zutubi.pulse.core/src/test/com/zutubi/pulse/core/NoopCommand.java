@@ -1,24 +1,28 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.commands.api.CommandSupport;
 
 /**
- * <class comment/>
  */
-public class NoopCommand extends CommandSupport
+public class NoopCommand extends CommandSupport<NoopCommandConfiguration>
 {
     private boolean executed;
 
     private boolean terminated;
 
-    public void execute(ExecutionContext context, CommandResult result)
+    protected NoopCommand(NoopCommandConfiguration config)
+    {
+        super(config);
+    }
+
+    public void execute(CommandContext commandContext)
     {
         executed = true;
 
         if (terminated)
         {
-            result.error("Command terminated");
+            commandContext.error("Command terminated");
         }
     }
 
