@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.Command;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.SimpleRecipePaths;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
@@ -31,29 +32,44 @@ public abstract class CommandTestCase extends PulseTestCase
         super.setUp();
         tempDir = FileSystemUtils.createTempDir(getClass().getName() + "." + getName(), ".tmp");
         baseDir = new File(tempDir, "base");
+        assertTrue(baseDir.mkdir());
         outputDir = new File(tempDir, "output");
+        assertTrue(outputDir.mkdir());
     }
 
+    @Override
     public void tearDown() throws Exception
     {
         removeDirectory(tempDir);
         super.tearDown();
     }
 
-    protected TestCommandContext runCommand(Command command) throws Exception
+    protected ExecutionContext createExecutionContext()
     {
-        return runCommand(command, new PulseExecutionContext());
-    }
-
-    protected TestCommandContext runCommand(Command command, PulseExecutionContext context)
-    {
+        PulseExecutionContext context = new PulseExecutionContext();
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, outputDir);
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, outputDir));
         context.setWorkingDir(baseDir);
+        return context;
+    }
 
+    protected TestCommandContext runCommand(Command command) throws Exception
+    {
+        return runCommand(command, createExecutionContext());
+    }
+
+    protected TestCommandContext runCommand(Command command, ExecutionContext context)
+    {
         TestCommandContext commandContext = new TestCommandContext(context);
-        command.execute(commandContext);
-        return commandContext;
+        try
+        {
+            command.execute(commandContext);
+            return commandContext;
+        }
+        finally
+        {
+            commandContext.complete();
+        }
     }
 
     private File getFile(String name, String path)

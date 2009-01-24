@@ -9,11 +9,14 @@ import static com.zutubi.pulse.core.commands.core.ExecutableCommand.ENV_FILENAME
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_BUILD_NUMBER;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +48,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
     {
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
         config.setExe("netstat");
+        config.setArgs("-n");
 
         successRun(new ExecutableCommand(config));
     }
@@ -56,15 +60,16 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         config.setArgs("command");
 
         ExecutableCommand command = new ExecutableCommand(config);
-        TestCommandContext context = null;
+        TestCommandContext context = new TestCommandContext(createExecutionContext());
         try
         {
-            context = runCommand(command);
+            command.execute(context);
             assertEquals(ResultState.ERROR, context.getResultState());
+            fail("No such executable");
         }
         catch (BuildException e)
         {
-            fail(e.getMessage());      
+            assertThat(e.getMessage(), containsString("No such executable"));
         }
 
         // verify that the env output is captured even with the command failing.
@@ -179,7 +184,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
 
     public void testResourcePathsAddedToEnvironment() throws IOException
     {
-        PulseExecutionContext context = new PulseExecutionContext();
+        ExecutionContext context = createExecutionContext();
         context.add(new ResourceProperty("java.bin.dir", "somedir", false, true, false));
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
         config.setExe("echo");
@@ -359,7 +364,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
 
     private TestCommandContext runCommand(ExecutableCommand command, long buildNumber)
     {
-        PulseExecutionContext context = new PulseExecutionContext();
+        ExecutionContext context = createExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildNumber));
         return super.runCommand(command, context);
     }
@@ -368,6 +373,6 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
     {
         assertOutputRegistered(new TestCommandContext.Output(ENV_ARTIFACT_NAME), context);
         assertFile(ENV_ARTIFACT_NAME, ENV_FILENAME);
-        assertFileContains(ENV_ARTIFACT_NAME, ENV_FILENAME, contents);
+        assertFileContains(ENV_ARTIFACT_NAME, ENV_FILENAME, false, contents);
     }
 }

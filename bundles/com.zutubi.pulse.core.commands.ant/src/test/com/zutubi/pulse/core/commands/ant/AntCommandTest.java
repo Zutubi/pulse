@@ -4,14 +4,15 @@ import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
 
 import java.io.File;
+import java.io.IOException;
 
-/**
- */
 public class AntCommandTest extends ExecutableCommandTestCase
 {
+    private static final String EXTENSION_XML = "xml";
+
     public void testBasicDefault() throws Exception
     {
-        copyInputToDirectory("basic", baseDir);
+        copyBuildFile("basic");
 
         AntCommand command = new AntCommand(new AntCommandConfiguration());
         successRun(command, "build target");
@@ -19,7 +20,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
 
     public void testBasicTargets() throws Exception
     {
-        copyInputToDirectory("basic", baseDir);
+        copyBuildFile("basic");
 
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setTargets("build test");
@@ -30,7 +31,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
 
     public void testDoubleSpaceTargets() throws Exception
     {
-        copyInputToDirectory("basic", baseDir);
+        copyBuildFile("basic");
 
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setTargets("build  test");
@@ -41,7 +42,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
 
     public void testEnvironment() throws Exception
     {
-        copyInputToDirectory("basic", baseDir);
+        copyBuildFile("basic");
 
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setTargets("environment");
@@ -53,8 +54,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
 
     public void testExplicitBuildfile() throws Exception
     {
-        File buildFile = copyInputToDirectory("basic", baseDir);
-        assertTrue(buildFile.renameTo(new File(baseDir, "custom.xml")));
+        copyBuildFile("basic",  "custom.xml");
 
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setBuildFile("custom.xml");
@@ -65,8 +65,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
 
     public void testExplicitArguments() throws Exception
     {
-        File buildFile = copyInputToDirectory("basic", baseDir);
-        assertTrue(buildFile.renameTo(new File(baseDir, "custom.xml")));
+        copyBuildFile("basic",  "custom.xml");
 
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setBuildFile("custom.xml");
@@ -92,6 +91,18 @@ public class AntCommandTest extends ExecutableCommandTestCase
         failedRun(command, "Buildfile: nope.xml does not exist!");
     }
 
+    private File copyBuildFile(String name) throws IOException
+    {
+        return copyBuildFile(name, "build.xml");
+    }
+
+    private File copyBuildFile(String name, String toName) throws IOException
+    {
+        File buildFile = copyInputToDirectory(name, EXTENSION_XML, baseDir);
+        assertTrue(buildFile.renameTo(new File(baseDir, toName)));
+        return buildFile;
+    }
+
     protected String getBuildFileName()
     {
         return "build.xml";
@@ -99,6 +110,6 @@ public class AntCommandTest extends ExecutableCommandTestCase
 
     protected String getBuildFileExt()
     {
-        return "xml";
+        return EXTENSION_XML;
     }
 }

@@ -131,6 +131,14 @@ public class TestCommandContext implements CommandContext
         }
     }
 
+    public void complete()
+    {
+        if (resultState == ResultState.IN_PROGRESS)
+        {
+            resultState = ResultState.SUCCESS;
+        }
+    }
+
     public static class Output
     {
         private String name;

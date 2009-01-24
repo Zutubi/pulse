@@ -85,7 +85,7 @@ public class ExecutableCommand<T extends ExecutableCommandConfiguration> extends
         {
             // CIB-149: try and make friendlier error messages for common problems.
             String message = e.getMessage();
-            if (message.contains("nosuchexe") || message.endsWith("error=2"))
+            if (message.contains("nosuchexe") || message.endsWith("error=2") || message.contains("error=2,"))
             {
                 message = "No such executable '" + builder.command().get(0) + "'";
             }
