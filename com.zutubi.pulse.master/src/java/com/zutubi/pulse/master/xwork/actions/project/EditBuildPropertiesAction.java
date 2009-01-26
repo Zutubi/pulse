@@ -249,7 +249,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         try
         {
-            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason((String)getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
+            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason(getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
         }
         catch (Exception e)
         {
