@@ -76,7 +76,7 @@ public class OptionFieldDescriptor extends FieldDescriptor
 
     public Field instantiate(String path, Record instance)
     {
-        if (!displayMultiple())
+        if (transformType())
         {
             if (isEditable())
             {
@@ -91,8 +91,8 @@ public class OptionFieldDescriptor extends FieldDescriptor
         return super.instantiate(path, instance);
     }
 
-    protected boolean displayMultiple()
+    protected boolean transformType()
     {
-        return getMultiple() || (hasParameter(PARAMETER_SIZE) && getSize() > 1);
+        return !getMultiple() && (!hasParameter(PARAMETER_SIZE) || getSize() == 1);
     }
 }
