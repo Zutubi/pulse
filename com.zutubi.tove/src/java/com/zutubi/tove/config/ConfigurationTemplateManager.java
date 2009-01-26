@@ -448,15 +448,15 @@ public class ConfigurationTemplateManager
             public boolean handle(TemplateNode templateNode)
             {
                 String descendentPath = PathUtils.getPath(scope, templateNode.getId(), remainderPath);
-                if (recordManager.select(descendentPath) == null)
+                if (recordManager.select(descendentPath) == null && recordManager.select(PathUtils.getParentPath(descendentPath)) != null)
                 {
                     recordManager.insert(descendentPath, skeleton);
                     return true;
                 }
                 else
                 {
-                    // We hit an existing record, bail out of this
-                    // subtree.
+                    // We either hit an existing record OR are within a hidden
+                    // item, so bail out of this subtree.
                     return false;
                 }
             }
