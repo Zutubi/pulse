@@ -58,7 +58,6 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
 
     private List<ProjectAclConfiguration> permissions = new LinkedList<ProjectAclConfiguration>();
 
-    @Transient
     private Map<String, Object> extensions = new HashMap<String, Object>();
 
     @Ordered

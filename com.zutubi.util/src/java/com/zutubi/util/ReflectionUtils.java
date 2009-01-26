@@ -333,22 +333,36 @@ public class ReflectionUtils
             stopClass = Object.class;
         }
 
-        Map<String, PropertyDescriptor> descriptors = new HashMap<String, PropertyDescriptor>();
+        // Maps from property name to a (found class, descriptor) pair.  We use
+        // the found class to resolve conflicts: if the same property is found
+        // again we accept the one from the most specific class (closest to the
+        // leaf of the type hierarchy).
+        Map<String, Pair<Class, PropertyDescriptor>> descriptors = new HashMap<String, Pair<Class, PropertyDescriptor>>();
         addBeanPropertiesFromClass(clazz, stopClass, descriptors);
         for(Class iface: getImplementedInterfaces(clazz, null, true))
         {
             addBeanPropertiesFromClass(iface, null, descriptors);
         }
-        
-        return descriptors.values().toArray(new PropertyDescriptor[descriptors.size()]);
+
+        return CollectionUtils.mapToArray(descriptors.values(), new Mapping<Pair<Class, PropertyDescriptor>, PropertyDescriptor>()
+        {
+            public PropertyDescriptor map(Pair<Class, PropertyDescriptor> pair)
+            {
+                return pair.second;
+            }
+        }, new PropertyDescriptor[descriptors.size()]);
     }
 
-    private static void addBeanPropertiesFromClass(Class<?> clazz, Class<Object> stopClass, Map<String, PropertyDescriptor> descriptors)throws IntrospectionException
+    private static void addBeanPropertiesFromClass(Class<?> clazz, Class<Object> stopClass, Map<String, Pair<Class, PropertyDescriptor>> descriptors) throws IntrospectionException
     {
         PropertyDescriptor[] properties = Introspector.getBeanInfo(clazz, stopClass).getPropertyDescriptors();
         for (PropertyDescriptor p: properties)
         {
-            descriptors.put(p.getName(), p);
+            Pair<Class, PropertyDescriptor> existing = descriptors.get(p.getName());
+            if (existing == null || existing.first.isAssignableFrom(clazz))
+            {
+                descriptors.put(p.getName(), new Pair<Class, PropertyDescriptor>(clazz, p));
+            }
         }
     }
 }

@@ -712,7 +712,22 @@ public class ReflectionUtilsTest extends ZutubiTestCase
     {
         beanPropertiesHelper(BeanExtendsAndImplements.class, "extendsAndImplementsProperty", "interfaceProperty", "simpleProperty");
     }
-    
+
+    public void testGetBeanPropertiesDeclaringClassOverrides() throws IntrospectionException
+    {
+        PropertyDescriptor[] properties = ReflectionUtils.getBeanProperties(BeanOverridesGetter.class);
+        assertEquals(1, properties.length);
+        assertEquals(BeanOverridesGetter.class, properties[0].getReadMethod().getDeclaringClass());
+    }
+
+    public void testGetBeanPropertiesDeclaringClassImplements() throws IntrospectionException
+    {
+        PropertyDescriptor[] properties = ReflectionUtils.getBeanProperties(BeanImplementsGetterAndSetter.class);
+        assertEquals(1, properties.length);
+        assertEquals(BeanImplementsGetterAndSetter.class, properties[0].getReadMethod().getDeclaringClass());
+        assertEquals(BeanImplementsGetterAndSetter.class, properties[0].getWriteMethod().getDeclaringClass());
+    }
+
     private void beanPropertiesHelper(final Class<?> clazz, String... expectedNames) throws IntrospectionException
     {
         PropertyDescriptor[] properties = ReflectionUtils.getBeanProperties(clazz);
@@ -772,10 +787,34 @@ public class ReflectionUtilsTest extends ZutubiTestCase
         }
     }
 
+    public static class BeanOverridesGetter extends BeanSimple
+    {
+        @Override
+        public int getSimpleProperty()
+        {
+            return super.getSimpleProperty();
+        }
+    }
+
     public static interface BeanInterface
     {
         int getInterfaceProperty();
         void setInterfaceProperty(int i);
+    }
+
+    public static class BeanImplementsGetterAndSetter implements BeanInterface
+    {
+        private int interfaceProperty;
+
+        public int getInterfaceProperty()
+        {
+            return interfaceProperty;
+        }
+
+        public void setInterfaceProperty(int interfaceProperty)
+        {
+            this.interfaceProperty = interfaceProperty;
+        }
     }
 
     public abstract static class BeanImplements implements BeanInterface

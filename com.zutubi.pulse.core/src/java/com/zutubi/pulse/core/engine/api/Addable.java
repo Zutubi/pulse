@@ -1,5 +1,10 @@
 package com.zutubi.pulse.core.engine.api;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Used to mark a collection field as addable when binding text to
  * configuration objects.  For example, if your configuration type has a
@@ -7,14 +12,29 @@ package com.zutubi.pulse.core.engine.api;
  * that property as @Addable("widget").  Then when binding from an XML
  * form, a nested &lt;widget&gt; tag is understood to define a widget
  * instance which should be added to the widgets collection.
+ * <p/>
+ * If the collection field contains references, then {@link #reference()}
+ * gives the name of the attribute that will contain the referencing text.
+ * For example, with reference() set to "ref" (the default), a widget tag
+ * would refer to a widget like &lt;widget ref="${widget.property}"/&gt;.
  */
+@Target({ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Addable
 {
     /**
-     * Defines the names used to represent instances that can be added
-     * to this collection property  (e.g. XML tag names).
+     * Defines the name used to represent instances that can be added
+     * to this collection property  (e.g. the XML tag name).
      * 
-     * @return acceptable names for defining instances to be added
+     * @return the name for defining an instance to be added
      */
-    String[] value();
+    String value();
+
+    /**
+     * Defines the attribute used to refer to a widget when the target
+     * collection holds references rather than values.
+     *
+     * @return the name of the referencing attribute
+     */
+    String reference() default "ref";
 }

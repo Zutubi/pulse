@@ -12,7 +12,6 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.ValidationContext;
@@ -139,70 +138,54 @@ public class ToveFileLoader
                 return;
             }
 
-            CompositeType type;
 
             String propertyName = convertLocalNameToPropertyName(name);
-            TypeProperty addableProperty = getAddablePropertyByName(parentType, propertyName);
-            if (addableProperty != null)
+            Binder binder = getBinder(parentType, propertyName);
+            CompositeType type = binder.getType();
+            instance = binder.getInstance(e, scope);
+            if (binder.initInstance())
             {
-                type = (CompositeType) addableProperty.getType().getTargetType();
-                instance = create(propertyName, type);
+                // initialise attributes
+                mapAttributesToProperties(e, instance, type, predicate, scope);
+
+                // interface based initialisation.
+                if (Reference.class.isAssignableFrom(instance.getClass()))
+                {
+                    String referenceName = ((Reference) instance).getName();
+                    if (referenceName != null && referenceName.length() > 0)
+                    {
+                        scope.addUnique((Reference) instance);
+                    }
+                }
+
+                boolean loadType = predicate.loadType(instance, e);
+                if (loadType)
+                {
+                    scope = scope.createChild();
+
+                    // initialise sub-elements.
+                    loadSubElements(e, instance, type, scope, depth, predicate);
+                }
+
+                binder.set(parent, instance);
+
+                if (loadType)
+                {
+                    if (InitComponent.class.isAssignableFrom(instance.getClass()))
+                    {
+                        ((InitComponent) instance).initAfterChildren();
+                    }
+                }
+
+                // Apply declarative validation
+                if (predicate.validate(instance, e))
+                {
+                    validate(instance);
+                }
             }
             else
             {
-                type = typeDefinitions.get(name);
-                instance = create(name, type);
-                addableProperty = getAdddablePropertyByType(parentType, type);
-            }
-
-            // initialise attributes
-            mapAttributesToProperties(e, instance, type, predicate, scope);
-
-            // interface based initialisation.
-            if (Reference.class.isAssignableFrom(instance.getClass()))
-            {
-                String referenceName = ((Reference) instance).getName();
-                if (referenceName != null && referenceName.length() > 0)
-                {
-                    scope.addUnique((Reference) instance);
-                }
-            }
-
-            boolean loadType = predicate.loadType(instance, e);
-            if (loadType)
-            {
-                scope = scope.createChild();
-
-                // initialise sub-elements.
-                loadSubElements(e, instance, type, scope, depth, predicate);
-            }
-
-            // add to container.
-            if (addableProperty != null)
-            {
-                addProperty(parent, instance, addableProperty);
-            }
-            else
-            {
-                TypeProperty settableProperty = getSettableProperty(parentType, type);
-                if (settableProperty != null)
-                {
-                    settableProperty.setValue(parent, instance);
-                }
-            }
-
-            if (loadType)
-            {
-                if (InitComponent.class.isAssignableFrom(instance.getClass()))
-                {
-                    ((InitComponent) instance).initAfterChildren();
-                }
-            }
-
-            // Apply declarative validation
-            if (predicate.validate(instance, e))
-            {
-                validate(instance);
+                binder.set(parent, instance);
             }
         }
         catch (InvocationTargetException ex)
@@ -230,58 +213,52 @@ public class ToveFileLoader
         }
     }
 
-    private TypeProperty getSettableProperty(CompositeType parentType, CompositeType type)
+    private Binder getBinder(CompositeType parentType, String propertyName) throws FileLoadException
     {
-        for (TypeProperty property: parentType.getProperties(CompositeType.class))
+        Binder binder = getAdderByName(parentType, propertyName);
+        if (binder == null)
         {
-            if (property.getType().getClazz().isAssignableFrom(type.getClazz()))
+            CompositeType type = typeDefinitions.get(propertyName);
+            if (type == null)
             {
-                return property;
+                throw new FileLoadException("Unknown child element '" + propertyName + "'");
+            }
+
+            binder = getAdderByType(parentType, type);
+            if (binder == null)
+            {
+                binder = getSetter(parentType, type);
+
+                if (binder == null)
+                {
+                    binder = new Loader(type);
+                }
             }
         }
 
-        return null;
+        return binder;
     }
 
-    private void addProperty(Configuration parent, Configuration instance, TypeProperty addableProperty) throws FileLoadException
-    {
-        try
-        {
-            CollectionType type = (CollectionType) addableProperty.getType();
-            if (type instanceof ListType)
-            {
-                @SuppressWarnings("unchecked")
-                List<? super Configuration> list = (List) addableProperty.getValue(parent);
-                list.add(instance);
-            }
-            else
-            {
-                MapType mapType = (MapType) type;
-                CompositeType elementType = mapType.getTargetType();
-
-                @SuppressWarnings("unchecked")
-                Map<String, ? super Configuration> map = (Map) addableProperty.getValue(parent);
-                String key = (String) elementType.getProperty(mapType.getKeyProperty()).getValue(instance);
-                map.put(key, instance);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new FileLoadException("Unable to add value to property '" + addableProperty.getName() + "': " + e.getMessage(), e);
-        }
-    }
-
-    private TypeProperty getAddablePropertyByName(CompositeType parentType, String propertyName)
+    private Binder getAdderByName(CompositeType parentType, String propertyName) throws FileLoadException
     {
         for (TypeProperty property: parentType.getProperties(CollectionType.class))
         {
             Addable annotation = property.getAnnotation(Addable.class);
-            if (annotation != null && CollectionUtils.contains(annotation.value(), propertyName))
+            if (annotation != null && propertyName.equals(annotation.value()))
             {
                 Type propertyType = property.getType();
-                if (propertyType.getTargetType() instanceof CompositeType)
+                Type targetType = propertyType.getTargetType();
+                if (targetType instanceof CompositeType)
                 {
-                    return property;
+                    return new NestedAdder(property, (CompositeType) targetType);
+                }
+                else if (targetType instanceof ReferenceType)
+                {
+                    return new ReferenceAdder(property, (ReferenceType) targetType, annotation.reference());
+                }
+                else
+                {
+                    throw new FileLoadException("@Addable property for unsupported type '" + targetType.toString() + "'");
                 }
             }
         }
@@ -289,17 +266,213 @@ public class ToveFileLoader
         return null;
     }
 
-    private TypeProperty getAdddablePropertyByType(CompositeType parentType, CompositeType type)
+    private Binder getAdderByType(CompositeType parentType, CompositeType type)
     {
         for (TypeProperty property: parentType.getProperties(CollectionType.class))
         {
-            if (property.getType().getTargetType().getClazz().isAssignableFrom(type.getClazz()))
+            Type targetType = property.getType().getTargetType();
+            if (targetType instanceof CompositeType && targetType.getClazz().isAssignableFrom(type.getClazz()))
             {
-                return property;
+                return new NestedAdder(property, type);
             }
         }
 
         return null;
+    }
+
+    private Binder getSetter(CompositeType parentType, CompositeType type)
+    {
+        for (TypeProperty property: parentType.getProperties(CompositeType.class))
+        {
+            if (property.getType().getClazz().isAssignableFrom(type.getClazz()))
+            {
+                return new Setter(property);
+            }
+        }
+
+        return null;
+    }
+
+    private interface Binder
+    {
+        CompositeType getType();
+
+        Configuration getInstance(Element element, Scope scope) throws Exception;
+
+        boolean initInstance();
+
+        void set(Configuration parent, Configuration instance) throws Exception;
+    }
+
+    private abstract class CreatingBinder implements Binder
+    {
+        public boolean initInstance()
+        {
+            return true;
+        }
+
+        public Configuration getInstance(Element element, Scope scope) throws Exception
+        {
+            return create(getType());
+        }
+    }
+
+    private class Loader extends CreatingBinder
+    {
+        private CompositeType type;
+
+        public Loader(CompositeType type)
+        {
+            this.type = type;
+        }
+
+        public CompositeType getType()
+        {
+            return type;
+        }
+
+        public void set(Configuration parent, Configuration instance) throws Exception
+        {
+            // Noop.
+        }
+    }
+
+    private class Setter extends CreatingBinder
+    {
+        private TypeProperty property;
+
+        public Setter(TypeProperty property)
+        {
+            this.property = property;
+        }
+
+        public CompositeType getType()
+        {
+            return (CompositeType) property.getType();
+        }
+
+        public void set(Configuration parent, Configuration instance) throws Exception
+        {
+            property.setValue(parent, instance);
+        }
+    }
+
+    private abstract class Adder implements Binder
+    {
+        private TypeProperty property;
+
+        protected Adder(TypeProperty property)
+        {
+            this.property = property;
+        }
+
+        public void set(Configuration parent, Configuration instance) throws Exception
+        {
+            try
+            {
+                CollectionType type = (CollectionType) property.getType();
+                if (type instanceof ListType)
+                {
+                    @SuppressWarnings("unchecked")
+                    List<? super Configuration> list = (List) property.getValue(parent);
+                    list.add(instance);
+                }
+                else
+                {
+                    MapType mapType = (MapType) type;
+                    CompositeType elementType = mapType.getTargetType();
+
+                    @SuppressWarnings("unchecked")
+                    Map<String, ? super Configuration> map = (Map) property.getValue(parent);
+                    String key = (String) elementType.getProperty(mapType.getKeyProperty()).getValue(instance);
+                    map.put(key, instance);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new FileLoadException("Unable to add value to property '" + property.getName() + "': " + e.getMessage(), e);
+            }
+        }
+    }
+
+    private class NestedAdder extends Adder
+    {
+        private CompositeType type;
+
+        public CompositeType getType()
+        {
+            return type;
+        }
+
+        protected NestedAdder(TypeProperty property, CompositeType type)
+        {
+            super(property);
+            this.type = type;
+        }
+
+        public Configuration getInstance(Element element, Scope scope) throws Exception
+        {
+            return create(type);
+        }
+
+        public boolean initInstance()
+        {
+            return true;
+        }
+    }
+
+    private class ReferenceAdder extends Adder
+    {
+        private ReferenceType referenceType;
+        private String attribute;
+
+        private ReferenceAdder(TypeProperty property, ReferenceType referenceType, String attribute)
+        {
+            super(property);
+            this.referenceType = referenceType;
+            this.attribute = attribute;
+        }
+
+        public CompositeType getType()
+        {
+            return referenceType.getReferencedType();
+        }
+
+        public Configuration getInstance(Element element, Scope scope) throws Exception
+        {
+            String value = element.getAttributeValue(attribute);
+            if (value == null)
+            {
+                throw new FileLoadException("Required attribute '" + attribute + "' not specified");
+            }
+
+            Object resolved = ReferenceResolver.resolveReference(value, scope);
+            Class<? extends Configuration> clazz = referenceType.getReferencedType().getClazz();
+            if (!clazz.isInstance(resolved))
+            {
+                throw new FileLoadException("Referenced value '" + value + "' has unexpected type (expected '" + clazz.getName() + "', got '" + resolved.getClass().getName() + "')");
+            }
+
+            return clazz.cast(resolved);
+        }
+
+        public boolean initInstance()
+        {
+            return false;
+        }
+    }
+
+    private Configuration create(CompositeType type) throws FileLoadException
+    {
+        try
+        {
+            // FIXME loader should this always wire??
+            return factory.buildBean(type.getClazz());
+        }
+        catch (Exception e)
+        {
+            throw new FileLoadException("Could not instantiate type '" + type.getClazz().getName() + "'. Reason: " + e.getMessage());
+        }
     }
 
     private void validate(Object obj) throws CommandValidationException, ValidationException
@@ -479,23 +652,6 @@ public class ToveFileLoader
         return parseException;
     }
 
-    private Configuration create(String name, CompositeType type) throws FileLoadException
-    {
-        if (type != null)
-        {
-            try
-            {
-                // FIXME leader should this always wire??
-                return factory.buildBean(type.getClazz());
-            }
-            catch (Exception e)
-            {
-                throw new FileLoadException("Could not instantiate type '" + name + "'. Reason: " + e.getMessage());
-            }
-        }
-        throw new FileLoadException("Undefined type '" + name + "'");
-    }
-
     /**
      * Simple helper that converts some-name to someName. ie: remove the '-' and
      * upper case the following letter.
@@ -541,7 +697,14 @@ public class ToveFileLoader
     {
         if (type instanceof SimpleType)
         {
-            return Squeezers.findSqueezer(type.getClazz()).unsqueeze(ReferenceResolver.resolveReferences(value, scope, resolutionStrategy));
+            if (type instanceof ReferenceType)
+            {
+                return resolveReference(value, ((ReferenceType) type).getReferencedType().getClazz(), scope);
+            }
+            else
+            {
+                return Squeezers.findSqueezer(type.getClazz()).unsqueeze(ReferenceResolver.resolveReferences(value, scope, resolutionStrategy));
+            }
         }
         else if (type instanceof CompositeType)
         {
@@ -550,13 +713,7 @@ public class ToveFileLoader
 
             if (Reference.class.isAssignableFrom(clazz))
             {
-                Object obj = ReferenceResolver.resolveReference(value, scope);
-                if (!clazz.isInstance(obj))
-                {
-                    throw new ResolutionException("Referenced property '" + value + "' has unexpected type.  Expected '" + compositeType.getClazz().getName() + "', got '" + obj.getClass().getName() + "'");
-                }
-
-                return obj;
+                return resolveReference(value, clazz, scope);
             }
             else
             {
@@ -581,6 +738,17 @@ public class ToveFileLoader
         }
 
         throw new FileLoadException("Unable to convert value '" + value + "' to property type '" + type.toString() + "'");
+    }
+
+    private Object resolveReference(String rawReference, Class<? extends Configuration> expectedType, Scope scope) throws ResolutionException
+    {
+        Object obj = ReferenceResolver.resolveReference(rawReference, scope);
+        if (!expectedType.isInstance(obj))
+        {
+            throw new ResolutionException("Referenced property '" + rawReference + "' has unexpected type.  Expected '" + expectedType.getName() + "', got '" + obj.getClass().getName() + "'");
+        }
+
+        return obj;
     }
 
     public void register(String name, CompositeType type)

@@ -8,6 +8,7 @@ import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ public abstract class CommandConfigurationSupport extends AbstractNamedConfigura
 {
     @Wizard.Ignore
     private boolean force = false;
-    private List<OutputConfiguration> outputs;
+    private List<OutputConfiguration> outputs = new LinkedList<OutputConfiguration>();
 
     @Transient
     private ObjectFactory objectFactory;

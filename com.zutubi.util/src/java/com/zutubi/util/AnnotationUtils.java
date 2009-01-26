@@ -273,8 +273,7 @@ public class AnnotationUtils
      */
     public static <T extends Annotation> String getPropertyAnnotatedWith(Class clazz, Class<T> annotationType) throws IntrospectionException
     {
-        BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
-        for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
+        for (PropertyDescriptor descriptor : ReflectionUtils.getBeanProperties(clazz))
         {
             List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(descriptor, false);
             for (Annotation a : annotations)

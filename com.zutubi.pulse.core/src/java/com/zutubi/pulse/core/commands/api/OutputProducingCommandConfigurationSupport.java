@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.Command;
+import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -14,7 +15,7 @@ import java.util.List;
 public class OutputProducingCommandConfigurationSupport extends BuildingCommandConfigurationSupport
 {
     private String outputFile;
-    @Reference
+    @Reference @Addable(value = "process", reference = "processor")
     private List<PostProcessorConfiguration> postProcessors = new LinkedList<PostProcessorConfiguration>();
 
     public OutputProducingCommandConfigurationSupport(Class<? extends Command> commandType)

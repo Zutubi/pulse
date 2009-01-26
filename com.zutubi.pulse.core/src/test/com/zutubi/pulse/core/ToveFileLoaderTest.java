@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
@@ -11,6 +12,8 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class ToveFileLoaderTest extends PulseTestCase
@@ -35,6 +38,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         loader.setValidationManager(new PulseValidationManager());
         loader.register("reference", registry.getType(SimpleReference.class));
         loader.register("referrer", registry.getType(Referrer.class));
+        loader.register("collectionReferrer", registry.getType(CollectionReferrer.class));
     }
 
     public void testSimpleReference() throws Exception
@@ -42,11 +46,8 @@ public class ToveFileLoaderTest extends PulseTestCase
         SimpleRoot root = new SimpleRoot();
         loader.load(getInput(EXTENSION), root);
 
-        Object o = root.getReferences().get("a");
-        assertNotNull(o);
-        assertTrue(o instanceof SimpleReference);
-
-        SimpleReference t = (SimpleReference) o;
+        SimpleReference t = root.getReferences().get("a");
+        assertNotNull(t);
         assertEquals("a", t.getName());
     }
 
@@ -55,13 +56,24 @@ public class ToveFileLoaderTest extends PulseTestCase
         SimpleRoot root = new SimpleRoot();
         loader.load(getInput(EXTENSION), root);
 
-        Object o = root.getReferrers().get("er");
-        assertNotNull(o);
-        assertTrue(o instanceof Referrer);
+        Referrer er = root.getReferrers().get("er");
+        assertNotNull(er);
 
-        Referrer er = (Referrer) o;
         SimpleReference ee = er.getRef();
         assertNotNull(ee);
+        assertEquals("ee", ee.getName());
+    }
+
+    public void testCollectionReference() throws Exception
+    {
+        SimpleRoot root = new SimpleRoot();
+        loader.load(getInput(EXTENSION), root);
+
+        CollectionReferrer er = root.getCollectionReferrers().get("er");
+        assertNotNull(er);
+
+        assertEquals(1, er.getRefs().size());
+        SimpleReference ee = er.getRefs().get(0);
         assertEquals("ee", ee.getName());
     }
 
@@ -70,6 +82,7 @@ public class ToveFileLoaderTest extends PulseTestCase
     {
         private Map<String, SimpleReference> references = new HashMap<String, SimpleReference>();
         private Map<String, Referrer> referrers = new HashMap<String, Referrer>();
+        private Map<String, CollectionReferrer> collectionReferrers = new HashMap<String, CollectionReferrer>();
 
         public Map<String, SimpleReference> getReferences()
         {
@@ -89,6 +102,16 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void setReferrers(Map<String, Referrer> referrers)
         {
             this.referrers = referrers;
+        }
+
+        public Map<String, CollectionReferrer> getCollectionReferrers()
+        {
+            return collectionReferrers;
+        }
+
+        public void setCollectionReferrers(Map<String, CollectionReferrer> collectionReferrers)
+        {
+            this.collectionReferrers = collectionReferrers;
         }
     }
 
@@ -114,6 +137,23 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void setRef(SimpleReference ref)
         {
             this.ref = ref;
+        }
+    }
+
+    @SymbolicName("collectionReferrer")
+    public static class CollectionReferrer extends AbstractNamedConfiguration
+    {
+        @com.zutubi.tove.annotations.Reference @Addable(value = "el", reference = "at")
+        private List<SimpleReference> refs = new LinkedList<SimpleReference>();
+
+        public List<SimpleReference> getRefs()
+        {
+            return refs;
+        }
+
+        public void setRefs(List<SimpleReference> refs)
+        {
+            this.refs = refs;
         }
     }
 }

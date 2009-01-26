@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.commands.api.OutputProducingCommandConfigurationSup
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TextUtils;
@@ -161,7 +162,7 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
     }
 
     @SymbolicName("zutubi.executableCommandConfig.environmentConfig")
-    public static class EnvironmentConfiguration
+    public static class EnvironmentConfiguration extends AbstractConfiguration
     {
         private String name;
         private String value;

@@ -12,7 +12,7 @@ public class FileValidator extends StringFieldValidatorSupport
     private boolean verifyReadable;
     private boolean verifyWriteable;
 
-    protected FileValidator()
+    public FileValidator()
     {
         super("not.found");
     }

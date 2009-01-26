@@ -10,6 +10,7 @@ import com.zutubi.util.ReflectionUtils;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.io.File;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
@@ -49,6 +50,7 @@ public class TypeRegistry
         builtInTypes.add(new PrimitiveType(Long.TYPE, "long"));
         builtInTypes.add(new PrimitiveType(Short.class, "Short"));
         builtInTypes.add(new PrimitiveType(Short.TYPE, "short"));
+        builtInTypes.add(new PrimitiveType(File.class, "File"));
         builtInTypes.add(new PrimitiveType(String.class, "String"));
 
         for (PrimitiveType type : builtInTypes)
@@ -270,7 +272,7 @@ public class TypeRegistry
                             }
                             else
                             {
-                                CompositeType compositeType = register(asConfigurationClass(clazz), handler);
+                                CompositeType compositeType = register(asConfigurationClass(valueClass), handler);
                                 collectionType = checkReferenceType(property, compositeType);
                             }
                         }

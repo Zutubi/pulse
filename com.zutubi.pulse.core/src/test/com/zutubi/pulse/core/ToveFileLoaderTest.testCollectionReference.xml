@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project>
+    <reference name="ee"/>
+    <collection-referrer name="er">
+        <el at="${ee}"/>
+    </collection-referrer>
+</project>
