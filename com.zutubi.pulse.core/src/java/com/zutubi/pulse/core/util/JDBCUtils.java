@@ -649,7 +649,7 @@ public class JDBCUtils
 
         public String sqlDropTable(String tableName)
         {
-            return "DROP TABLE IF EXISTS " + tableName.toUpperCase() + " CASCADE";
+            return "DROP TABLE IF EXISTS " + tableName + " CASCADE";
         }
 
         public void postDrop(Connection con) throws SQLException

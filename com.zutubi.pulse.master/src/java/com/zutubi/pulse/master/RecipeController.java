@@ -55,6 +55,13 @@ public class RecipeController
     private RecipeResultCollector collector;
     private BuildManager buildManager;
     private ServiceTokenManager serviceTokenManager;
+    /**
+     * An explicit flag set on receipt of the recipe commenced event.  We don't
+     * user {@link com.zutubi.pulse.core.model.RecipeResult#commenced()} as it
+     * my be true without us ever having received the event (e.g. for a recipe
+     * that errored out before commencing).
+     */
+    private boolean commencedEventReceived = false;
     private boolean finished = false;
 
     private RecipeQueue recipeQueue;
@@ -222,6 +229,7 @@ public class RecipeController
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
+        commencedEventReceived = true;
         recipeResult.commence(event.getName(), System.currentTimeMillis());
         if(previousSuccessful != null)
         {
@@ -417,26 +425,24 @@ public class RecipeController
 
     public void terminateRecipe(String message)
     {
-        if (recipeResult.commenced())
+        recipeResult.terminate(message);
+        if (commencedEventReceived)
         {
-            // Tell the build service that it can stop trying to execute this
+            // Tell the agent service that it can stop trying to execute this
             // recipe.  We *must* have received the commenced event before we
             // can do this.
-            recipeResult.terminate(message);
             agentService.terminateRecipe(recipeResult.getId());
         }
         else
         {
-            // Not yet commanced, try and catch it at the recipe queue. If
+            // Not yet commenced, try and catch it at the recipe queue. If
             // we don't catch it, then we wait for the RecipeCommencedEvent.
-            recipeResult.terminate(message);
-            if(recipeQueue.cancelRequest(recipeResult.getId()))
+            if (recipeQueue.cancelRequest(recipeResult.getId()))
             {
                 // We caught it now, so we are complete.
                 complete();
             }
         }
-
     }
 
     public RecipeAssignmentRequest getAssignmentRequest()

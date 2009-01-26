@@ -12,7 +12,7 @@ public class UpgradeTaskMessages
     private static final String KEY_NAME = "name";
     private static final String KEY_DESCRIPTION = "description";
 
-    private static Messages I18N;
+    private final Messages I18N;
 
     public UpgradeTaskMessages(Class cls)
     {

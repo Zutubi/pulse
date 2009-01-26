@@ -68,7 +68,7 @@ public abstract class AbstractFileLogger implements OutputLogger
                 writer.print(marker);
             }
 
-            String s = new String(output);
+            String s = new String(output, offset, length);
             String markerReplacement = "$1" + marker + "$2";
             String stamped = s.replaceAll("(\\r\\n?|\\n)(.)", markerReplacement);
             writer.print(stamped);

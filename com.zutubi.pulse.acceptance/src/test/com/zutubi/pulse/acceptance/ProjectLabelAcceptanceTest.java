@@ -54,6 +54,36 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         assertFalse(browsePage.isProjectPresent(null, p2));
     }
 
+    public void testDisableGroupByLabel() throws Exception
+    {
+        String projectName = random + "-project";
+        String labelName = random + "-label";
+        String userLogin = random + "-user";
+
+        xmlRpcHelper.insertSimpleProject(projectName,  false);
+        Hashtable<String, Object> label = createLabel(labelName);
+        insertLabel(projectName, label);
+
+        String userPath = xmlRpcHelper.insertTrivialUser(userLogin);
+        login(userLogin, "");
+
+        // Default is group by label
+        BrowsePage browsePage = new BrowsePage(selenium, urls);
+        browsePage.goTo();
+        assertGroupPresent(browsePage, labelName, projectName);
+        assertFalse(browsePage.isProjectPresent(null, projectName));
+
+        // Uncheck option and ensure grouping disappears
+        String prefsPath = PathUtils.getPath(userPath, "preferences", "browseView");
+        Hashtable<String, Object> browsePreferences = xmlRpcHelper.getConfig(prefsPath);
+        browsePreferences.put("groupsShown", false);
+        xmlRpcHelper.saveConfig(prefsPath, browsePreferences, false);
+
+        browsePage.goTo();
+        assertFalse(browsePage.isGroupPresent(labelName));
+        assertTrue(browsePage.isProjectPresent(null, projectName));
+    }
+
     public void testAddProjectToGroup() throws Exception
     {
         String p1 = random + "-1";
