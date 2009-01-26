@@ -237,10 +237,7 @@ public class Recipe extends SelfReference
 
         if (scope != null)
         {
-            for (Reference reference : scope.getReferences())
-            {
-                context.add(reference);
-            }
+            context.getScope().add((PulseScope) scope);
         }
     }
 

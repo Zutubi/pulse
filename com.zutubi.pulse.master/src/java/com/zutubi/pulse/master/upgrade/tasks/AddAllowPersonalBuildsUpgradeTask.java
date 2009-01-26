@@ -13,16 +13,6 @@ public class AddAllowPersonalBuildsUpgradeTask extends AbstractRecordPropertiesU
     private static final String SCOPE_AGENTS = "agents";
     private static final String PROPERTY_NAME = "allowPersonalBuilds";
 
-    public String getName()
-    {
-        return "Add Allow Personal Builds";
-    }
-
-    public String getDescription()
-    {
-        return "Adds a new flag for allowing personal builds to each agent configuration.";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

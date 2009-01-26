@@ -25,14 +25,14 @@ public class MigrateSchemaUpgradeTask extends AbstractUpgradeTask implements Dat
 
     private DatabaseConfig databaseConfig;
 
-    public String getDescription()
-    {
-        return "The schema upgrade associated with build " + getBuildNumber();
-    }
-
     public String getName()
     {
-        return "Schema upgrade (" + getBuildNumber() + ")";
+        return super.getName() + " (" + getBuildNumber() + ")";
+    }
+
+    public String getDescription()
+    {
+        return super.getDescription() + " " + getBuildNumber();
     }
 
     public boolean haltOnFailure()
