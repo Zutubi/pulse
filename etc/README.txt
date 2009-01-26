@@ -1,4 +1,3 @@
-
 Zutubi Pulse(TM) @VERSION@ release
 ---------------------------------------
 
@@ -8,23 +7,6 @@ Pulse is an automated build or continuous integration server.
 Pulse regularly checks out your project's source code from your 
 SCM, builds the project and reports on the results. 
 
-Contents
---------
-
-    Included in this release are the following:
-
-    README.txt 		This file
-    bin/            Startup and admin scripts for launching Pulse.
-    lib/            Pulse bootstrap library files
-    logs/           Log files
-    versions/
-
-        pulse-build-number/
-
-            config/         Default configuration files.
-            packages/       Agent and Local packages.
-            templates/      Various templates used by Pulse
-            www/            Pulse web UI
 
 Requirements
 ------------
@@ -36,6 +18,7 @@ Requirements
        http://java.sun.com/j2se/1.5.0/download.jsp.  
 
     2. (Perforce users only) The Perforce command-line client p4.
+    3. (Git users only) The git command line client.
 
 Installation
 ------------
@@ -54,7 +37,7 @@ Installation
    
    
 For an extended description of the installation process, please see the Getting
-Started Guide http://confluence.zutubi.com/display/pulse0102/Getting+Started+Guide
+Started Guide http://confluence.zutubi.com/display/pulse0200/Getting+Started+Guide
    
 Problems?
 ---------
@@ -64,7 +47,7 @@ following places:
 
 The Pulse Documentation:
     
-    http://confluence.zutubi.com/display/pulse0102/Getting+Started+Guide
+    http://confluence.zutubi.com/display/pulse0200/Getting+Started+Guide
 
 The Pulse Support Forums:
     
@@ -72,9 +55,10 @@ The Pulse Support Forums:
 
 Send us an email:
     
-    mailto:pulse-support@zutubi.com
+    mailto:support@zutubi.com
     
 
 Thank you for using Pulse!
 
 The Zutubi Team
+
