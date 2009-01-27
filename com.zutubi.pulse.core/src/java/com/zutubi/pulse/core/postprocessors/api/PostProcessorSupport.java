@@ -22,16 +22,16 @@ import java.io.File;
  * @see TextFilePostProcessorSupport
  * @see LineBasedPostProcessorSupport
  */
-public abstract class PostProcessorSupport<T extends PostProcessorConfigurationSupport> implements PostProcessor
+public abstract class PostProcessorSupport implements PostProcessor
 {
-    private T config;
+    private PostProcessorConfigurationSupport config;
 
-    protected PostProcessorSupport(T config)
+    protected PostProcessorSupport(PostProcessorConfigurationSupport config)
     {
         this.config = config;
     }
 
-    public T getConfig()
+    public PostProcessorConfigurationSupport getConfig()
     {
         return config;
     }

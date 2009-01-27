@@ -79,6 +79,6 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         pp.setFailureStatus("FAIL");
 
         pp.setAutoFail(autoFail);
-        return new RegexTestPostProcessor<RegexTestPostProcessorConfiguration>(pp);
+        return new RegexTestPostProcessor(pp);
     }
 }

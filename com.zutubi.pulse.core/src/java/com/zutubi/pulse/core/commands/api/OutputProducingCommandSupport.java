@@ -16,14 +16,20 @@ import java.util.List;
 
 /**
  */
-public abstract class OutputProducingCommandSupport<T extends OutputProducingCommandConfigurationSupport> extends CommandSupport<T>
+public abstract class OutputProducingCommandSupport extends CommandSupport
 {
     public static final String OUTPUT_NAME = "command output";
     public static final String OUTPUT_FILE = "output.txt";
 
-    protected OutputProducingCommandSupport(T config)
+    protected OutputProducingCommandSupport(OutputProducingCommandConfigurationSupport config)
     {
         super(config);
+    }
+
+    @Override
+    public OutputProducingCommandConfigurationSupport getConfig()
+    {
+        return (OutputProducingCommandConfigurationSupport) super.getConfig();
     }
 
     public void execute(CommandContext commandContext)

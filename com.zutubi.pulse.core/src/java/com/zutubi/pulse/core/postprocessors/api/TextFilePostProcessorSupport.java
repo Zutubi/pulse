@@ -20,9 +20,9 @@ import java.io.IOException;
  *
  * @see LineBasedPostProcessorSupport
  */
-public abstract class TextFilePostProcessorSupport<T extends TextFilePostProcessorConfigurationSupport> extends PostProcessorSupport<T>
+public abstract class TextFilePostProcessorSupport extends PostProcessorSupport
 {
-    protected TextFilePostProcessorSupport(T config)
+    protected TextFilePostProcessorSupport(TextFilePostProcessorConfigurationSupport config)
     {
         super(config);
     }

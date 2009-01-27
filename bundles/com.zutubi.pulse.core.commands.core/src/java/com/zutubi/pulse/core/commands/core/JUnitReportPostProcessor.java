@@ -5,11 +5,17 @@ import nu.xom.*;
 
 /**
  */
-public class JUnitReportPostProcessor<T extends JUnitReportPostProcessorConfiguration> extends XMLTestReportPostProcessorSupport<T>
+public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
-    public JUnitReportPostProcessor(T config)
+    public JUnitReportPostProcessor(JUnitReportPostProcessorConfiguration config)
     {
         super(config);
+    }
+
+    @Override
+    public JUnitReportPostProcessorConfiguration getConfig()
+    {
+        return (JUnitReportPostProcessorConfiguration) super.getConfig();
     }
 
     protected void processDocument(Document doc, TestSuiteResult tests)
@@ -34,7 +40,7 @@ public class JUnitReportPostProcessor<T extends JUnitReportPostProcessorConfigur
 
     private void processSuite(Element element, TestSuiteResult tests)
     {
-        T config = getConfig();
+        JUnitReportPostProcessorConfiguration config = getConfig();
         String name = "";
 
         String attr = element.getAttributeValue(config.getPackageAttribute());
@@ -75,7 +81,7 @@ public class JUnitReportPostProcessor<T extends JUnitReportPostProcessorConfigur
 
     private void processCase(Element element, TestSuiteResult suite)
     {
-        T config = getConfig();
+        JUnitReportPostProcessorConfiguration config = getConfig();
         String name = element.getAttributeValue(config.getNameAttribute());
         if(name == null)
         {

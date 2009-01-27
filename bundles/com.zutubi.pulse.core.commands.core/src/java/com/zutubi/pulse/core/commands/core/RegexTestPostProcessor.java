@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * A post-processor that extracts test case results by parsing text lines with
  * regular expressions.
  */
-public class RegexTestPostProcessor<T extends RegexTestPostProcessorConfiguration> extends TestReportPostProcessorSupport<T>
+public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 {
     private static final Logger LOG = Logger.getLogger(RegexTestPostProcessor.class);
 
@@ -24,16 +24,21 @@ public class RegexTestPostProcessor<T extends RegexTestPostProcessorConfiguratio
 
     private String currentLine;
 
-    public RegexTestPostProcessor(T config)
+    public RegexTestPostProcessor(RegexTestPostProcessorConfiguration config)
     {
         super(config);
     }
 
+    @Override
+    public RegexTestPostProcessorConfiguration getConfig()
+    {
+        return (RegexTestPostProcessorConfiguration) super.getConfig();
+    }
 
     public void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
     {
         // clean up any whitespace from the regex which may have been added via the setText()
-        T config = getConfig();
+        RegexTestPostProcessorConfiguration config = getConfig();
         String regex = config.getRegex();
         if (config.isTrim())
         {
@@ -68,7 +73,7 @@ public class RegexTestPostProcessor<T extends RegexTestPostProcessorConfiguratio
 
     private void processFile(TestSuiteResult tests, String regex) throws IOException
     {
-        T config = getConfig();
+        RegexTestPostProcessorConfiguration  config = getConfig();
         Map<String, TestStatus> statusMap = config.getStatusMap();
 
         Pattern pattern = Pattern.compile(regex);

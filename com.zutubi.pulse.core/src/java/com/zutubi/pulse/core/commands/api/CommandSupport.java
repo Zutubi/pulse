@@ -6,16 +6,16 @@ import com.zutubi.pulse.core.Command;
  * Support class to make implementing the Command interface simpler for the
  * simple cases.
  */
-public abstract class CommandSupport<T extends CommandConfiguration> implements Command
+public abstract class CommandSupport implements Command
 {
-    private T config;
+    private CommandConfigurationSupport config;
 
-    protected CommandSupport(T config)
+    protected CommandSupport(CommandConfigurationSupport config)
     {
         this.config = config;
     }
 
-    public T getConfig()
+    public CommandConfigurationSupport getConfig()
     {
         return config;
     }

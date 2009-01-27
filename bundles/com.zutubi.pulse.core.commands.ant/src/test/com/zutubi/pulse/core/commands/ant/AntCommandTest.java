@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.commands.ant;
 
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +15,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
     {
         copyBuildFile("basic");
 
-        AntCommand command = new AntCommand(new AntCommandConfiguration());
+        NamedArgumentCommand command = new NamedArgumentCommand(new AntCommandConfiguration());
         successRun(command, "build target");
     }
 
@@ -25,7 +26,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setTargets("build test");
 
-        AntCommand command = new AntCommand(config);
+        NamedArgumentCommand command = new NamedArgumentCommand(config);
         successRun(command, "build target", "test target");
     }
 
@@ -36,7 +37,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setTargets("build  test");
 
-        AntCommand command = new AntCommand(config);
+        NamedArgumentCommand command = new NamedArgumentCommand(config);
         successRun(command, "build target", "test target");
     }
 
@@ -48,7 +49,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
         config.setTargets("environment");
         config.getEnvironments().add(new ExecutableCommandConfiguration.EnvironmentConfiguration("TEST_ENV_VAR", "test variable value"));
 
-        AntCommand command = new AntCommand(config);
+        NamedArgumentCommand command = new NamedArgumentCommand(config);
         successRun(command, "test variable value");
     }
 
@@ -59,7 +60,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setBuildFile("custom.xml");
 
-        AntCommand command = new AntCommand(config);
+        NamedArgumentCommand command = new NamedArgumentCommand(config);
         successRun(command, "build target");
     }
 
@@ -72,13 +73,13 @@ public class AntCommandTest extends ExecutableCommandTestCase
         config.setTargets("build");
         config.setArgs("test");
 
-        AntCommand command = new AntCommand(config);
+        NamedArgumentCommand command = new NamedArgumentCommand(config);
         successRun(command, "build target", "test target");
     }
 
     public void testRunNoBuildFile() throws Exception
     {
-        AntCommand command = new AntCommand(new AntCommandConfiguration());
+        NamedArgumentCommand command = new NamedArgumentCommand(new AntCommandConfiguration());
         failedRun(command, "Buildfile: build.xml does not exist!");
     }
 
@@ -87,7 +88,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setBuildFile("nope.xml");
 
-        AntCommand command = new AntCommand(config);
+        NamedArgumentCommand command = new NamedArgumentCommand(config);
         failedRun(command, "Buildfile: nope.xml does not exist!");
     }
 

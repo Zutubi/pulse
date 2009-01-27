@@ -10,18 +10,18 @@ import java.util.List;
 /**
  */
 @SymbolicName("zutubi.namedArgumentCommandConfig")
-public abstract class NamedArgumentCommandConfigurationSupport extends ExecutableCommandConfiguration
+public abstract class NamedArgumentCommandConfiguration extends ExecutableCommandConfiguration
 {
-    public NamedArgumentCommandConfigurationSupport()
+    public NamedArgumentCommandConfiguration()
     {
     }
 
-    protected NamedArgumentCommandConfigurationSupport(Class<? extends ExecutableCommand> clazz)
+    protected NamedArgumentCommandConfiguration(Class<? extends ExecutableCommand> clazz)
     {
         super(clazz);
     }
 
-    protected NamedArgumentCommandConfigurationSupport(Class<? extends ExecutableCommand> clazz, String exeProperty, String defaultExe)
+    protected NamedArgumentCommandConfiguration(Class<? extends ExecutableCommand> clazz, String exeProperty, String defaultExe)
     {
         super(clazz, exeProperty, defaultExe);
     }

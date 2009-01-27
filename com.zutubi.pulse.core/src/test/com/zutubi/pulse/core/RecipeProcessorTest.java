@@ -4,16 +4,20 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
+import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.bean.DefaultObjectFactory;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
 
@@ -36,6 +40,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private boolean waitMode = false;
     private Semaphore semaphore = new Semaphore(0);
     private ResourceRepository resourceRepository = new FileResourceRepository();
+    private TypeRegistry typeRegistry;
 
     public void setUp() throws Exception
     {
@@ -50,15 +55,28 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         events = new LinkedBlockingQueue<Event>(10);
         eventManager.register(this);
 
+        typeRegistry = new TypeRegistry();
+        typeRegistry.register(ProjectRecipesConfiguration.class);
+        typeRegistry.register(RecipeConfiguration.class);
+        typeRegistry.register(Property.class);
+        typeRegistry.register(DirectoryOutputConfiguration.class);
+        typeRegistry.register(FileOutputConfiguration.class);
+        typeRegistry.register(NoopCommandConfiguration.class);
+        typeRegistry.register(FailureCommandConfiguration.class);
+        typeRegistry.register(ExceptionCommandConfiguration.class);
+        typeRegistry.register(UnexpectedExceptionCommandConfiguration.class);
+
         objectFactory = new WiringObjectFactory();
         objectFactory.initProperties(this);
         
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
+        fileLoaderFactory.setTypeRegistry(typeRegistry);
         fileLoaderFactory.setObjectFactory(objectFactory);
-        fileLoaderFactory.register("noop", NoopCommand.class);
-        fileLoaderFactory.register("failure", FailureCommand.class);
-        fileLoaderFactory.register("exception", ExceptionCommand.class);
-        fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommand.class);
+        fileLoaderFactory.init();
+        fileLoaderFactory.register("noop", NoopCommandConfiguration.class);
+        fileLoaderFactory.register("failure", FailureCommandConfiguration.class);
+        fileLoaderFactory.register("exception", ExceptionCommandConfiguration.class);
+        fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommandConfiguration.class);
 
         recipeProcessor.setFileLoaderFactory(fileLoaderFactory);
     }

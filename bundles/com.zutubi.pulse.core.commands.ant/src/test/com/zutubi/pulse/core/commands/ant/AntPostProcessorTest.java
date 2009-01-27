@@ -11,11 +11,11 @@ import java.io.IOException;
  */
 public class AntPostProcessorTest extends PostProcessorTestBase
 {
-    private RegexPostProcessor<AntPostProcessorConfiguration> pp;
+    private RegexPostProcessor pp;
 
     public void setUp() throws IOException
     {
-        pp = new RegexPostProcessor<AntPostProcessorConfiguration>(new AntPostProcessorConfiguration());
+        pp = new RegexPostProcessor(new AntPostProcessorConfiguration());
         super.setUp();
     }
 

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.ant;
 
-import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfigurationSupport;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 
@@ -11,14 +12,15 @@ import java.util.List;
 /**
  */
 @SymbolicName("zutubi.antCommandConfig")
-public class AntCommandConfiguration extends NamedArgumentCommandConfigurationSupport
+public class AntCommandConfiguration extends NamedArgumentCommandConfiguration
 {
     private String buildFile;
     private String targets;
 
     public AntCommandConfiguration()
     {
-        super(AntCommand.class, "ant.bin", SystemUtils.IS_WINDOWS ? "ant.bat" : "ant");
+        super(NamedArgumentCommand.class, "ant.bin", SystemUtils.IS_WINDOWS ? "ant.bat" : "ant");
+        getPostProcessors().add(new AntPostProcessorConfiguration("ant.pp"));
     }
 
     public String getBuildFile()

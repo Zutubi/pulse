@@ -17,11 +17,17 @@ import java.io.IOException;
  *
  * @see com.zutubi.pulse.core.util.XMLUtils
  */
-public abstract class XMLTestReportPostProcessorSupport<T extends XMLTestReportPostProcessorConfigurationSupport> extends TestReportPostProcessorSupport<T>
+public abstract class XMLTestReportPostProcessorSupport extends TestReportPostProcessorSupport
 {
-    protected XMLTestReportPostProcessorSupport(T config)
+    protected XMLTestReportPostProcessorSupport(XMLTestReportPostProcessorConfigurationSupport config)
     {
         super(config);
+    }
+
+    @Override
+    public XMLTestReportPostProcessorConfigurationSupport getConfig()
+    {
+        return (XMLTestReportPostProcessorConfigurationSupport) super.getConfig();
     }
 
     protected final void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)

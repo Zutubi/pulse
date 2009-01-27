@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A command that sleeps for a certain number of milliseconds.
  */
-public class SleepCommand extends CommandSupport<SleepCommandConfiguration>
+public class SleepCommand extends CommandSupport
 {
     /**
      * Number of milliseconds to sleep.
@@ -19,6 +19,12 @@ public class SleepCommand extends CommandSupport<SleepCommandConfiguration>
     protected SleepCommand(SleepCommandConfiguration config)
     {
         super(config);
+    }
+
+    @Override
+    public SleepCommandConfiguration getConfig()
+    {
+        return (SleepCommandConfiguration) super.getConfig();
     }
 
     public void execute(CommandContext commandContext)

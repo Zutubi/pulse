@@ -10,13 +10,19 @@ import java.io.PrintWriter;
 /**
  * A command that prints a message to stdout.
  */
-public class PrintCommand extends OutputProducingCommandSupport<PrintCommandConfiguration>
+public class PrintCommand extends OutputProducingCommandSupport
 {
     private boolean terminated = false;
 
     protected PrintCommand(PrintCommandConfiguration config)
     {
         super(config);
+    }
+
+    @Override
+    public PrintCommandConfiguration getConfig()
+    {
+        return (PrintCommandConfiguration) super.getConfig();
     }
 
     public void execute(CommandContext commandContext, OutputStream outputStream)

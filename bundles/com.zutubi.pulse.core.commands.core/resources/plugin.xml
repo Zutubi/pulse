@@ -3,9 +3,8 @@
 <plugin>
     <extension point="com.zutubi.pulse.core.commands">
         <command name="executable" class="com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration"/>
-        <command name="print" class="com.zutubi.pulse.core.commands.core.PrintCommand"/>
-        <command name="sleep" class="com.zutubi.pulse.core.commands.core.SleepCommand"/>
-        <command name="resource" class="com.zutubi.pulse.core.ResourceReference"/>
+        <command name="print" class="com.zutubi.pulse.core.commands.core.PrintCommandConfiguration"/>
+        <command name="sleep" class="com.zutubi.pulse.core.commands.core.SleepCommandConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="post-processor" class="com.zutubi.pulse.core.commands.core.PostProcessorGroupConfiguration"/>

@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.commands.api.CommandSupport;
 /**
  * Simple testing command that always fails.
  */
-public class FailureCommand extends CommandSupport<FailureCommandConfiguration>
+public class FailureCommand extends CommandSupport
 {
     public FailureCommand(FailureCommandConfiguration config)
     {

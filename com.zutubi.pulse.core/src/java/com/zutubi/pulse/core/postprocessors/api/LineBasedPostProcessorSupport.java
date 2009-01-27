@@ -13,11 +13,16 @@ import java.util.List;
  * line-by-line.  Supports capturing of leading and trailing context lines
  * and optional joining of overlapping features.
  */
-public abstract class LineBasedPostProcessorSupport<T extends LineBasedPostProcessorConfigurationSupport> extends TextFilePostProcessorSupport<T>
+public abstract class LineBasedPostProcessorSupport extends TextFilePostProcessorSupport
 {
-    protected LineBasedPostProcessorSupport(T config)
+    protected LineBasedPostProcessorSupport(LineBasedPostProcessorConfigurationSupport config)
     {
         super(config);
+    }
+
+    public LineBasedPostProcessorConfigurationSupport getConfig()
+    {
+        return (LineBasedPostProcessorConfigurationSupport) super.getConfig();
     }
 
     protected final void process(BufferedReader reader, PostProcessorContext ppContext) throws IOException

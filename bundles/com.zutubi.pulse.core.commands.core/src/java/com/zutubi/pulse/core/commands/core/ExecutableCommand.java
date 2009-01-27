@@ -23,7 +23,7 @@ import java.util.*;
  * It exposes two built in artifacts. The command's output and its execution
  * environment.
  */
-public class ExecutableCommand<T extends ExecutableCommandConfiguration> extends OutputProducingCommandSupport<T>
+public class ExecutableCommand extends OutputProducingCommandSupport
 {
     private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
 
@@ -44,9 +44,15 @@ public class ExecutableCommand<T extends ExecutableCommandConfiguration> extends
     private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD PULSE_TEST_SUPPRESSED").split(" +"));
     private List<StatusMapping> statusMappings = new LinkedList<StatusMapping>();
 
-    public ExecutableCommand(T configuration)
+    public ExecutableCommand(ExecutableCommandConfiguration configuration)
     {
         super(configuration);
+    }
+
+    @Override
+    public ExecutableCommandConfiguration getConfig()
+    {
+        return (ExecutableCommandConfiguration) super.getConfig();
     }
 
     public void execute(CommandContext commandContext, OutputStream outputStream)

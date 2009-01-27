@@ -9,7 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class GccPostProcessorTest extends PostProcessorTestCase
 {
-    private RegexPostProcessor<GccPostProcessorConfiguration> pp;
+    private RegexPostProcessor pp;
 
     public void setUp() throws Exception
     {
@@ -17,7 +17,7 @@ public class GccPostProcessorTest extends PostProcessorTestCase
         GccPostProcessorConfiguration config = new GccPostProcessorConfiguration();
         config.setLeadingContext(0);
         config.setTrailingContext(0);
-        pp = new RegexPostProcessor<GccPostProcessorConfiguration>(config);
+        pp = new RegexPostProcessor(config);
     }
 
     public void testErrors() throws Exception

@@ -18,18 +18,24 @@ import java.io.File;
  *
  * @see XMLTestReportPostProcessorSupport
  */
-public abstract class TestReportPostProcessorSupport<T extends TestReportPostProcessorConfigurationSupport> extends PostProcessorSupport<T>
+public abstract class TestReportPostProcessorSupport extends PostProcessorSupport
 {
-    protected TestReportPostProcessorSupport(T config)
+    protected TestReportPostProcessorSupport(TestReportPostProcessorConfigurationSupport config)
     {
         super(config);
+    }
+
+    @Override
+    public TestReportPostProcessorConfigurationSupport getConfig()
+    {
+        return (TestReportPostProcessorConfigurationSupport) super.getConfig();
     }
 
     public void processFile(File artifactFile, PostProcessorContext ppContext)
     {
         if(artifactFile.isFile())
         {
-            T config = getConfig();
+            TestReportPostProcessorConfigurationSupport config = getConfig();
             TestSuiteResult suiteResult = new TestSuiteResult(null);
             TestSuiteResult accumulateSuite = suiteResult;
             String suite = config.getSuite();

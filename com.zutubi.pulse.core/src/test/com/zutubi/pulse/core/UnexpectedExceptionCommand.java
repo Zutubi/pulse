@@ -6,9 +6,9 @@ import com.zutubi.pulse.core.commands.api.CommandSupport;
 /**
  * Simple testing command that always throws a generic RuntimeException.
  */
-public class UnexpectedExceptionCommand extends CommandSupport<UnexpectedExceptionCommandConfiguration>
+public class UnexpectedExceptionCommand extends CommandSupport
 {
-    protected UnexpectedExceptionCommand(UnexpectedExceptionCommandConfiguration config)
+    public UnexpectedExceptionCommand(UnexpectedExceptionCommandConfiguration config)
     {
         super(config);
     }

@@ -5,13 +5,13 @@ import com.zutubi.pulse.core.commands.api.CommandSupport;
 
 /**
  */
-public class NoopCommand extends CommandSupport<NoopCommandConfiguration>
+public class NoopCommand extends CommandSupport
 {
     private boolean executed;
 
     private boolean terminated;
 
-    protected NoopCommand(NoopCommandConfiguration config)
+    public NoopCommand(NoopCommandConfiguration config)
     {
         super(config);
     }

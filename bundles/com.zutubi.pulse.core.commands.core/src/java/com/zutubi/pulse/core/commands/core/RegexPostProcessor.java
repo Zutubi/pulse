@@ -16,11 +16,16 @@ import java.util.regex.Pattern;
  * A post processor that does line-by-line searching with regular expressions
  * to detect features.
  */
-public class RegexPostProcessor<T extends RegexPostProcessorConfiguration> extends LineBasedPostProcessorSupport<T>
+public class RegexPostProcessor extends LineBasedPostProcessorSupport
 {
-    public RegexPostProcessor(T config)
+    public RegexPostProcessor(RegexPostProcessorConfiguration config)
     {
         super(config);
+    }
+
+    public RegexPostProcessorConfiguration getConfig()
+    {
+        return (RegexPostProcessorConfiguration) super.getConfig();
     }
 
     protected List<Feature> findFeatures(String line)

@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 /**
  * Simple testing command that always throws a BuildException.
  */
-public class ExceptionCommand extends CommandSupport<ExceptionCommandConfiguration>
+public class ExceptionCommand extends CommandSupport
 {
     public ExceptionCommand(ExceptionCommandConfiguration config)
     {
