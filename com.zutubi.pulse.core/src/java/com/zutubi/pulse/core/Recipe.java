@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.engine.api.SelfReference;
 import com.zutubi.pulse.core.events.CommandCommencedEvent;
 import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -34,6 +35,8 @@ public class Recipe extends SelfReference
      * The systems event manager.
      */
     private EventManager eventManager;
+    private CommandFactory commandFactory;
+    private PostProcessorFactory postProcessorFactory;
 
     //---( support for the termination of the recipe )---
 
@@ -161,7 +164,7 @@ public class Recipe extends SelfReference
             return false;
         }
 
-        Command command = commandConfig.createCommand();
+        Command command = commandFactory.createCommand(commandConfig);
         runningCommand = command;
         runningLock.unlock();
 
@@ -170,7 +173,7 @@ public class Recipe extends SelfReference
         long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
         eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
 
-        DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult);
+        DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult, postProcessorFactory);
         try
         {
             executeAndProcess(commandContext, command, commandConfig);
@@ -241,5 +244,15 @@ public class Recipe extends SelfReference
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setCommandFactory(CommandFactory commandFactory)
+    {
+        this.commandFactory = commandFactory;
+    }
+
+    public void setPostProcessorFactory(PostProcessorFactory postProcessorFactory)
+    {
+        this.postProcessorFactory = postProcessorFactory;
     }
 }

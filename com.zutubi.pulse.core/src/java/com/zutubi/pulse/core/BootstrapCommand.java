@@ -16,17 +16,16 @@ public class BootstrapCommand implements Command
 {
     public static final String OUTPUT_NAME = "bootstrap output";
     public static final String FILES_FILE = "files.txt";
+    private BootstrapCommandConfiguration config;
 
-    private Bootstrapper bootstrapper;
-
-    public BootstrapCommand(Bootstrapper bootstrapper)
+    public BootstrapCommand(BootstrapCommandConfiguration config)
     {
-        this.bootstrapper = bootstrapper;
+        this.config = config;
     }
 
     public void execute(CommandContext commandContext)
     {
-        bootstrapper.bootstrap((PulseExecutionContext) commandContext.getExecutionContext());
+        config.getBootstrapper().bootstrap((PulseExecutionContext) commandContext.getExecutionContext());
     }
 
     public List<Artifact> getArtifacts()
@@ -61,6 +60,6 @@ public class BootstrapCommand implements Command
 
     public void terminate()
     {
-        bootstrapper.terminate();
+        config.getBootstrapper().terminate();
     }
 }

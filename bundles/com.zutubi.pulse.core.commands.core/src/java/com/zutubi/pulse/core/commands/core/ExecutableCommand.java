@@ -42,7 +42,6 @@ public class ExecutableCommand extends OutputProducingCommandSupport
     private volatile boolean terminated = false;
 
     private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD PULSE_TEST_SUPPRESSED").split(" +"));
-    private List<StatusMapping> statusMappings = new LinkedList<StatusMapping>();
 
     public ExecutableCommand(ExecutableCommandConfiguration configuration)
     {
@@ -205,7 +204,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
 
     private ResultState mapExitCode(int code)
     {
-        for(StatusMapping mapping: statusMappings)
+        for(StatusMappingConfiguration mapping: getConfig().getStatusMappings())
         {
             if(mapping.getCode() == code)
             {
@@ -478,18 +477,6 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         name = name.replaceAll("\\.", "_");
 
         return "PULSE_" + name;
-    }
-
-    public List<StatusMapping> getStatusMappings()
-    {
-        return statusMappings;
-    }
-
-    public StatusMapping createStatusMapping()
-    {
-        StatusMapping mapping = new StatusMapping();
-        statusMappings.add(mapping);
-        return mapping;
     }
 
     private String extractCommandLine(ProcessBuilder builder)

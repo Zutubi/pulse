@@ -34,8 +34,7 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
     private String inputFile;
     private List<EnvironmentConfiguration> environments = new LinkedList<EnvironmentConfiguration>();
 
-    private List<String> suppressedEnvironment = new LinkedList<String>(Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD PULSE_TEST_SUPPRESSED").split(" +")));
-    private List<StatusMapping> statusMappings = new LinkedList<StatusMapping>();
+    private List<StatusMappingConfiguration> statusMappings = new LinkedList<StatusMappingConfiguration>();
 
     public ExecutableCommandConfiguration()
     {
@@ -143,14 +142,14 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
         this.environments = environments;
     }
 
-    public List<String> getSuppressedEnvironment()
+    public List<StatusMappingConfiguration> getStatusMappings()
     {
-        return suppressedEnvironment;
+        return statusMappings;
     }
 
-    public void setSuppressedEnvironment(List<String> suppressedEnvironment)
+    public void setStatusMappings(List<StatusMappingConfiguration> statusMappings)
     {
-        this.suppressedEnvironment = suppressedEnvironment;
+        this.statusMappings = statusMappings;
     }
 
     public void validate(ValidationContext context)

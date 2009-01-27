@@ -8,5 +8,5 @@ import com.zutubi.tove.config.api.NamedConfiguration;
 @SymbolicName("zutubi.postProcessorConfig")
 public interface PostProcessorConfiguration extends NamedConfiguration
 {
-    PostProcessor createProcessor();
+    Class<? extends PostProcessor> processorType();
 }

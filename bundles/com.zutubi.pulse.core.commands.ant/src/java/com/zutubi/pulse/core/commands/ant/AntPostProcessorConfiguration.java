@@ -2,10 +2,8 @@ package com.zutubi.pulse.core.commands.ant;
 
 import com.zutubi.pulse.core.ExpressionElementConfiguration;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
-import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 
@@ -73,11 +71,5 @@ public class AntPostProcessorConfiguration extends RegexPostProcessorConfigurati
     {
         this();
         setName(name);
-    }
-
-    @Override
-    public PostProcessor createProcessor()
-    {
-        return buildPostProcessor(RegexPostProcessor.class, RegexPostProcessorConfiguration.class, this);
     }
 }

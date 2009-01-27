@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfigurationSupport;
 import com.zutubi.tove.annotations.Reference;
@@ -38,16 +37,5 @@ public class PostProcessorGroupConfiguration extends PostProcessorConfigurationS
     public int size()
     {
         return processors.size();
-    }
-
-    public PostProcessor createProcessor()
-    {
-        PostProcessorGroup result = new PostProcessorGroup();
-        for (PostProcessorConfiguration childConfig: processors)
-        {
-            result.add(childConfig.createProcessor());
-        }
-
-        return result;
     }
 }

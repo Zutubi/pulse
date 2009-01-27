@@ -2,6 +2,9 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;
@@ -9,12 +12,14 @@ import com.zutubi.validation.annotations.Required;
 /**
  * A way to map command exit codes to specified result states.
  */
-public class StatusMapping implements Validateable
+@SymbolicName("zutubi.statusMappingConfig")
+public class StatusMappingConfiguration extends AbstractConfiguration implements Validateable
 {
+    @Required
     private int code;
+    @Required
     private String status;
 
-    @Required
     public int getCode()
     {
         return code;
@@ -35,6 +40,7 @@ public class StatusMapping implements Validateable
         this.status = status;
     }
 
+    @Transient
     public ResultState getResultState()
     {
         for(ResultState state: ResultState.getCompletedStates())

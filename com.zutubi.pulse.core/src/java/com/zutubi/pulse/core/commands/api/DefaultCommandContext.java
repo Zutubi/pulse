@@ -6,10 +6,7 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import org.apache.tools.ant.DirectoryScanner;
@@ -26,11 +23,13 @@ public class DefaultCommandContext implements CommandContext
     private ExecutionContext executionContext;
     private CommandResult result;
     private Map<String, OutputSpec> registeredOutputs = new LinkedHashMap<String, OutputSpec>();
+    private PostProcessorFactory postProcessorFactory;
 
-    public DefaultCommandContext(ExecutionContext executionContext, CommandResult result)
+    public DefaultCommandContext(ExecutionContext executionContext, CommandResult result, PostProcessorFactory postProcessorFactory)
     {
         this.executionContext = executionContext;
         this.result = result;
+        this.postProcessorFactory = postProcessorFactory;
     }
 
     public void addArtifacts()
@@ -123,7 +122,7 @@ public class DefaultCommandContext implements CommandContext
         {
             public PostProcessor map(PostProcessorConfiguration postProcessorConfiguration)
             {
-                return postProcessorConfiguration.createProcessor();
+                return postProcessorFactory.createProcessor(postProcessorConfiguration);
             }
         });
 

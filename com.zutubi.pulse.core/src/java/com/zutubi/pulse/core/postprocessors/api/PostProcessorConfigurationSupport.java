@@ -1,11 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.SelfReference;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Transient;
-import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.logging.Logger;
 
 /**
  * <p>
@@ -27,16 +23,11 @@ import com.zutubi.util.logging.Logger;
 @SymbolicName("zutubi.postProcessorConfigSupport")
 public abstract class PostProcessorConfigurationSupport extends SelfReference implements PostProcessorConfiguration
 {
-    private static final Logger LOG = Logger.getLogger(PostProcessorConfigurationSupport.class);
-
     private Class<? extends PostProcessor> postProcessorType;
     /** @see #setFailOnError(boolean) */
     private boolean failOnError = true;
     /** @see #setFailOnWarning(boolean) */
     private boolean failOnWarning = false;
-
-    @Transient
-    private ObjectFactory objectFactory;
 
     protected PostProcessorConfigurationSupport(Class<? extends PostProcessor> postProcessorType)
     {
@@ -83,26 +74,8 @@ public abstract class PostProcessorConfigurationSupport extends SelfReference im
         this.failOnWarning = failOnWarning;
     }
 
-    protected <T extends PostProcessor> T buildPostProcessor(Class<T> postProcessorType, Class<? extends PostProcessorConfiguration> configType, PostProcessorConfiguration config)
+    public Class<? extends PostProcessor> processorType()
     {
-        try
-        {
-            return objectFactory.buildBean(postProcessorType, new Class[]{configType}, new Object[]{config});
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-            throw new BuildException("Unable to instantiate post-processor '" + getName() + "': " + e.getMessage(), e);
-        }
-    }
-
-    public PostProcessor createProcessor()
-    {
-        return buildPostProcessor(postProcessorType, getClass(), this);
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
+        return postProcessorType;
     }
 }

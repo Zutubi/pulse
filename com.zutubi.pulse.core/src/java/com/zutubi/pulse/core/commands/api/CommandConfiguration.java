@@ -30,16 +30,9 @@ public interface CommandConfiguration extends NamedConfiguration
      */
     void setForce(boolean force);
 
-    /**
-     * Factory method that creates a command to execute based on this
-     * configuration.  This method is called during recipe initialisation, as
-     * all commands are assembled for execution.
-     *
-     * @return a new command instance as described by this conf
-     */
-    Command createCommand();
-
     List<OutputConfiguration> getOutputs();
 
     void setOutputs(List<OutputConfiguration> outputs);
+
+    Class<? extends Command> commandType();
 }

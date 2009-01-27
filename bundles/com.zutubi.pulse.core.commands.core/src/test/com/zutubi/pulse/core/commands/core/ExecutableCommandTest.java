@@ -354,12 +354,12 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
         config.setExe("java");
         config.setExtraArguments(Arrays.asList("-jar", jarFile.getAbsolutePath(), Integer.toString(exitCode)));
-
-        ExecutableCommand command = new ExecutableCommand(config);
-        StatusMapping mapping = command.createStatusMapping();
+        StatusMappingConfiguration mapping = new StatusMappingConfiguration();
+        config.getStatusMappings().add(mapping);
         mapping.setCode(mappedCode);
         mapping.setStatus(mappedStatus.getPrettyString());
-        return runCommand(command);
+
+        return runCommand(new ExecutableCommand(config));
     }
 
     private TestCommandContext runCommand(ExecutableCommand command, long buildNumber)

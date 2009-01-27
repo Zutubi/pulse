@@ -11,7 +11,6 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -288,24 +287,25 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     public void testOverlappingDifferentLevels() throws FileLoadException
     {
-        RegexPostProcessorConfiguration pp = new RegexPostProcessorConfiguration("test");
+        RegexPostProcessorConfiguration ppConfig = new RegexPostProcessorConfiguration("test");
         RegexPatternConfiguration pattern = new RegexPatternConfiguration();
         pattern.setCategory(Feature.Level.WARNING);
         pattern.setExpression("^xxx abc$");
-        pp.setTrailingContext(1);
-        pp.getPatterns().add(pattern);
+        ppConfig.setTrailingContext(1);
+        ppConfig.getPatterns().add(pattern);
 
         pattern = new RegexPatternConfiguration();
         pattern.setCategory(Feature.Level.ERROR);
         pattern.setExpression("^abc xxx$");
-        pp.setLeadingContext(1);
-        pp.getPatterns().add(pattern);
+        ppConfig.setLeadingContext(1);
+        ppConfig.getPatterns().add(pattern);
 
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
-        pp.setObjectFactory(new DefaultObjectFactory());
-        pp.createProcessor().process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
+
+        RegexPostProcessor pp = new RegexPostProcessor(ppConfig);
+        pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
         List<PersistentFeature> features = artifact.getFeatures();
         assertEquals(2, features.size());
         assertEquals(Feature.Level.WARNING, features.get(0).getLevel());
@@ -401,8 +401,8 @@ public class RegexPostProcessorTest extends PulseTestCase
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
-        config.setObjectFactory(new DefaultObjectFactory());
-        config.createProcessor().process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
+        RegexPostProcessor pp = new RegexPostProcessor(config);
+        pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
         List<PersistentFeature> features = artifact.getFeatures();
 
         assertEquals(lines.length, features.size());

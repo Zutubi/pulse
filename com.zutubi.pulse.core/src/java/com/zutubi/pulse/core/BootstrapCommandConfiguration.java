@@ -10,12 +10,13 @@ public class BootstrapCommandConfiguration extends CommandConfigurationSupport
 
     public BootstrapCommandConfiguration(Bootstrapper bootstrapper)
     {
+        super(BootstrapCommand.class);
         this.bootstrapper = bootstrapper;
         setName("bootstrap");
     }
 
-    public Command createCommand()
+    public Bootstrapper getBootstrapper()
     {
-        return new BootstrapCommand(bootstrapper);
+        return bootstrapper;
     }
 }

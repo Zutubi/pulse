@@ -166,22 +166,41 @@ public class ReflectionUtils
      * @return true if the method could be called with instances of the given
      *         types
      */
-    public static boolean acceptsParameters(Method method, Class... parameterTypes)
+    public static boolean acceptsParameters(Method method, Class<?>... parameterTypes)
     {
-        Class<?>[] actualTypes = method.getParameterTypes();
-        if(actualTypes.length != parameterTypes.length)
+        return parameterTypesMatch(method.getParameterTypes(), parameterTypes);
+    }
+
+    /**
+     * Returns true if the given constructor will accept parameters of the
+     * given types.  Unlike {@link Class#getConstructor(Class[])}, the
+     * parameter types need not be exact matches: subtypes are also accepted.
+     *
+     * @param constructor    the constructor to test
+     * @param parameterTypes candidate parameter types
+     * @return true if the method could be called with instances of the given
+     *         types
+     */
+    public static boolean acceptsParameters(Constructor constructor, Class<?>... parameterTypes)
+    {
+        return parameterTypesMatch(constructor.getParameterTypes(), parameterTypes);
+    }
+
+    private static boolean parameterTypesMatch(Class<?>[] formalTypes, Class<?>... parameterTypes)
+    {
+        if(formalTypes.length != parameterTypes.length)
         {
             return false;
         }
 
-        for(int i = 0; i < actualTypes.length; i++)
+        for(int i = 0; i < formalTypes.length; i++)
         {
-            if(!actualTypes[i].isAssignableFrom(parameterTypes[i]))
+            if(!formalTypes[i].isAssignableFrom(parameterTypes[i]))
             {
                 return false;
             }
         }
-        
+
         return true;
     }
 

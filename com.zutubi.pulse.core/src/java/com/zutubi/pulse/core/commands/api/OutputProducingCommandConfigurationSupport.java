@@ -12,7 +12,7 @@ import java.util.List;
 /**
  */
 @SymbolicName("zutubi.outputProducingCommandConfigSupport")
-public class OutputProducingCommandConfigurationSupport extends BuildingCommandConfigurationSupport
+public class OutputProducingCommandConfigurationSupport extends CommandConfigurationSupport
 {
     private String outputFile;
     @Reference @Addable(value = "process", reference = "processor")

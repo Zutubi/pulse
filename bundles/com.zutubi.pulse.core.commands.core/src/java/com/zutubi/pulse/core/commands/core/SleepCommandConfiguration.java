@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.commands.api.BuildingCommandConfigurationSupport;
+import com.zutubi.pulse.core.commands.api.CommandConfigurationSupport;
 import com.zutubi.tove.annotations.SymbolicName;
 
 /**
  */
 @SymbolicName("zutubi.sleepCommandConfig")
-public class SleepCommandConfiguration extends BuildingCommandConfigurationSupport
+public class SleepCommandConfiguration extends CommandConfigurationSupport
 {
     private long interval;
 

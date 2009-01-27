@@ -40,7 +40,6 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
             return;
         }
 
-        // FIXME loader combine these to one check for new ppconfig class
         if (!PostProcessorConfiguration.class.isAssignableFrom(clazz))
         {
             LOG.severe(String.format("Ignoring post-processor '%s': class '%s' does not implement PostProcessorConfiguration", name, cls));
