@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.TextUtils;
 
@@ -19,73 +18,21 @@ import java.io.File;
  *
  * @see XMLTestReportPostProcessorSupport
  */
-public abstract class TestReportPostProcessorSupport extends PostProcessorSupport
+public abstract class TestReportPostProcessorSupport<T extends TestReportPostProcessorConfigurationSupport> extends PostProcessorSupport<T>
 {
-    /** @see #setSuite(String)  */
-    private String suite;
-    /** @see #setFailOnFailure(boolean) */
-    private boolean failOnFailure = true;
-    /** @see #setResolveConflicts(String) */
-    private NameConflictResolution resolveConflicts = NameConflictResolution.OFF;
-
-    /**
-     * Sets the name of a nested suite to add all found test results to.
-     * This is especially useful when the same tests are processed twice in a
-     * build.  By using two processors with different nested suites
-     * collisions may be avoided.
-     *
-     * @param suite name of a nested suite to create and add all tests to
-     */
-    public void setSuite(String suite)
+    protected TestReportPostProcessorSupport(T config)
     {
-        this.suite = suite;
-    }
-
-    /**
-     * @see #setFailOnFailure(boolean)
-     * @return the current value of the failOnFailure flag
-     */
-    public boolean getFailOnFailure()
-    {
-        return failOnFailure;
-    }
-
-    /**
-     * If set to true, the command (and thus build) will be failed if any
-     * failed test case is discovered by this processor.  This flag is true
-     * by default.
-     *
-     * @param failOnFailure true to fail build on a failed test case
-     */
-    public void setFailOnFailure(boolean failOnFailure)
-    {
-        this.failOnFailure = failOnFailure;
-    }
-
-    public NameConflictResolution getResolveConflicts()
-    {
-        return resolveConflicts;
-    }
-
-    public void setResolveConflicts(String resolveConflicts) throws FileLoadException
-    {
-        try
-        {
-            this.resolveConflicts = NameConflictResolution.valueOf(resolveConflicts.toUpperCase());
-        }
-        catch(IllegalArgumentException e)
-        {
-            throw new FileLoadException("Unrecognised conflict resolution '" + resolveConflicts + "'");
-        }
+        super(config);
     }
 
     public void processFile(File artifactFile, PostProcessorContext ppContext)
     {
         if(artifactFile.isFile())
         {
-
+            T config = getConfig();
             TestSuiteResult suiteResult = new TestSuiteResult(null);
             TestSuiteResult accumulateSuite = suiteResult;
+            String suite = config.getSuite();
             if (TextUtils.stringSet(suite))
             {
                 accumulateSuite = new TestSuiteResult(suite);
@@ -93,10 +40,10 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
             }
 
             extractTestResults(artifactFile, ppContext, accumulateSuite);
-            ppContext.addTests(suiteResult, resolveConflicts);
+            ppContext.addTests(suiteResult, config.getResolveConflicts());
 
             ResultState state = ppContext.getResultState();
-            if (failOnFailure && state != ResultState.ERROR && state != ResultState.FAILURE)
+            if (config.getFailOnFailure() && state != ResultState.ERROR && state != ResultState.FAILURE)
             {
                 if (containsBrokenCase(suiteResult))
                 {

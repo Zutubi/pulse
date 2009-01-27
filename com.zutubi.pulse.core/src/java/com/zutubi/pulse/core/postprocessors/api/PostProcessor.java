@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.engine.api.Reference;
-
 import java.io.File;
 
 
@@ -32,7 +30,7 @@ import java.io.File;
  * @see TextFilePostProcessorSupport
  * @see LineBasedPostProcessorSupport
  */
-public interface PostProcessor extends Reference
+public interface PostProcessor
 {
     /**
      * Called once for each artifact file to process.  Details discovered by

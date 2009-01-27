@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.postprocessors.gcc;
 
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import static com.zutubi.pulse.core.postprocessors.api.FeatureMatchers.hasOrderedErrors;
 import static com.zutubi.pulse.core.postprocessors.api.FeatureMatchers.hasOrderedWarnings;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorTestCase;
@@ -8,14 +9,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class GccPostProcessorTest extends PostProcessorTestCase
 {
-    private GccPostProcessor pp;
+    private RegexPostProcessor<GccPostProcessorConfiguration> pp;
 
     public void setUp() throws Exception
     {
         super.setUp();
-        pp = new GccPostProcessor();
-        pp.setLeadingContext(0);
-        pp.setTrailingContext(0);
+        GccPostProcessorConfiguration config = new GccPostProcessorConfiguration();
+        config.setLeadingContext(0);
+        config.setTrailingContext(0);
+        pp = new RegexPostProcessor<GccPostProcessorConfiguration>(config);
     }
 
     public void testErrors() throws Exception

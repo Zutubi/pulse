@@ -70,7 +70,7 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
 
     private RegexTestPostProcessor createProcessor(boolean autoFail, int detailsGroup)
     {
-        RegexTestPostProcessor pp = new RegexTestPostProcessor();
+        RegexTestPostProcessorConfiguration pp = new RegexTestPostProcessorConfiguration();
         pp.setRegex("\\[(.*)\\] .*EDT:([^:]*)(?:\\: (.*))?");
         pp.setStatusGroup(1);
         pp.setNameGroup(2);
@@ -79,6 +79,6 @@ public class RegexTestPostProcessorTest extends TestPostProcessorTestCase
         pp.setFailureStatus("FAIL");
 
         pp.setAutoFail(autoFail);
-        return pp;
+        return new RegexTestPostProcessor<RegexTestPostProcessorConfiguration>(pp);
     }
 }

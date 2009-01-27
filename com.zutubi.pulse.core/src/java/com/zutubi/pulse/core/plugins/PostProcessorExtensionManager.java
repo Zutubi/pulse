@@ -1,9 +1,8 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.tove.config.ConfigurationRegistry;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -42,15 +41,9 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         }
 
         // FIXME loader combine these to one check for new ppconfig class
-        if(!PostProcessor.class.isAssignableFrom(clazz))
+        if (!PostProcessorConfiguration.class.isAssignableFrom(clazz))
         {
-            LOG.severe(String.format("Ignoring post-processor '%s': class '%s' does not implement PostProcessor", name, cls));
-            return;
-        }
-
-        if (!Configuration.class.isAssignableFrom(clazz))
-        {
-            LOG.severe(String.format("Ignoring post-processor '%s': class '%s' does not implement Configuration", name, cls));
+            LOG.severe(String.format("Ignoring post-processor '%s': class '%s' does not implement PostProcessorConfiguration", name, cls));
             return;
         }
 

@@ -138,9 +138,7 @@ public class ToveFileLoader
                 return;
             }
 
-
-            String propertyName = convertLocalNameToPropertyName(name);
-            Binder binder = getBinder(parentType, propertyName);
+            Binder binder = getBinder(parentType, name);
             CompositeType type = binder.getType();
             instance = binder.getInstance(e, scope);
             if (binder.initInstance())
@@ -213,15 +211,16 @@ public class ToveFileLoader
         }
     }
 
-    private Binder getBinder(CompositeType parentType, String propertyName) throws FileLoadException
+    private Binder getBinder(CompositeType parentType, String elementName) throws FileLoadException
     {
+        String propertyName = convertLocalNameToPropertyName(elementName);
         Binder binder = getAdderByName(parentType, propertyName);
         if (binder == null)
         {
-            CompositeType type = typeDefinitions.get(propertyName);
+            CompositeType type = typeDefinitions.get(elementName);
             if (type == null)
             {
-                throw new FileLoadException("Unknown child element '" + propertyName + "'");
+                throw new FileLoadException("Unknown child element '" + elementName + "'");
             }
 
             binder = getAdderByType(parentType, type);

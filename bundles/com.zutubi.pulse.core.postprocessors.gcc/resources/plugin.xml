@@ -3,6 +3,6 @@
 <plugin>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="gcc.pp" display-name="gcc output processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.postprocessors.gcc.GccPostProcessor"/>
+                        default-fragment="true" class="com.zutubi.pulse.core.postprocessors.gcc.GccPostProcessorConfiguration"/>
     </extension>
 </plugin>

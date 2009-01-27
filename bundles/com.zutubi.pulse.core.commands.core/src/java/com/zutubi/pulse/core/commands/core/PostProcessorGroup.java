@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.engine.api.SelfReference;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 
@@ -13,7 +12,7 @@ import java.util.List;
  * A group of post-processors.  Simply applies all processors in the group in
  * order.
  */
-public class PostProcessorGroup extends SelfReference implements PostProcessor
+public class PostProcessorGroup implements PostProcessor
 {
     private List<PostProcessor> processors = new LinkedList<PostProcessor>();
 
@@ -33,15 +32,5 @@ public class PostProcessorGroup extends SelfReference implements PostProcessor
     public int size()
     {
         return processors.size();
-    }
-
-    public List<PostProcessor> getProcessors()
-    {
-        return processors;
-    }
-
-    public PostProcessor get(int index)
-    {
-        return processors.get(index);
     }
 }

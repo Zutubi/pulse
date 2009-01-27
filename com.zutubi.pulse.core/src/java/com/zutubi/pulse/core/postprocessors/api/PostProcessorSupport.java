@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.engine.api.SelfReference;
 
 import java.io.File;
 
@@ -23,51 +22,18 @@ import java.io.File;
  * @see TextFilePostProcessorSupport
  * @see LineBasedPostProcessorSupport
  */
-public abstract class PostProcessorSupport extends SelfReference implements PostProcessor
+public abstract class PostProcessorSupport<T extends PostProcessorConfigurationSupport> implements PostProcessor
 {
-    /** @see #setFailOnError(boolean) */
-    private boolean failOnError = true;
-    /** @see #setFailOnWarning(boolean) */
-    private boolean failOnWarning = false;
+    private T config;
 
-    /**
-     * @see #setFailOnError(boolean)
-     * @return current value of the fail on error flag
-     */
-    public boolean isFailOnError()
+    protected PostProcessorSupport(T config)
     {
-        return failOnError;
+        this.config = config;
     }
 
-    /**
-     * If set to true, the command (and thus build) will be failed when this
-     * processor detects an error feature.  This flag is true by default.
-     *
-     * @param failOnError true to fail the build on error
-     */
-    public void setFailOnError(boolean failOnError)
+    public T getConfig()
     {
-        this.failOnError = failOnError;
-    }
-
-    /**
-     * @see #setFailOnWarning(boolean)
-     * @return current value of the fail on warning flag
-     */
-    public boolean isFailOnWarning()
-    {
-        return failOnWarning;
-    }
-
-    /**
-     * If set to true, the command (and thus build) will be failed when this
-     * processor detects a warning feature.  This flag is false by default.
-     *
-     * @param failOnWarning true to fail the build on error
-     */
-    public void setFailOnWarning(boolean failOnWarning)
-    {
-        this.failOnWarning = failOnWarning;
+        return config;
     }
 
     public final void process(File artifactFile, final PostProcessorContext ppContext)
@@ -94,13 +60,13 @@ public abstract class PostProcessorSupport extends SelfReference implements Post
                 switch(feature.getLevel())
                 {
                     case ERROR:
-                        if (failOnError)
+                        if (config.isFailOnError())
                         {
                             failCommand("Error features detected");
                         }
                         break;
                     case WARNING:
-                        if (failOnWarning)
+                        if (config.isFailOnWarning())
                         {
                             failCommand("Warning features detected");
                         }

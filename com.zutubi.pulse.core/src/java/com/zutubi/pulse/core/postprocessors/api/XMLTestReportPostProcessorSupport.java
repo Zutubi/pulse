@@ -17,20 +17,11 @@ import java.io.IOException;
  *
  * @see com.zutubi.pulse.core.util.XMLUtils
  */
-public abstract class XMLTestReportPostProcessorSupport extends TestReportPostProcessorSupport
+public abstract class XMLTestReportPostProcessorSupport<T extends XMLTestReportPostProcessorConfigurationSupport> extends TestReportPostProcessorSupport<T>
 {
-    /** @see #XMLTestReportPostProcessorSupport(String) */
-    private String reportType;
-
-    /**
-     * Creates a new XML report processor for the given report type.
-     *
-     * @param reportType human-readable name of the type of report being
-     *                   processed (e.g. JUnit)
-     */
-    protected XMLTestReportPostProcessorSupport(String reportType)
+    protected XMLTestReportPostProcessorSupport(T config)
     {
-        this.reportType = reportType;
+        super(config);
     }
 
     protected final void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
@@ -47,7 +38,7 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
         }
         catch (ParsingException pex)
         {
-            String message = "Unable to parse " + reportType + " report '" + file.getAbsolutePath() + "'";
+            String message = "Unable to parse " + getConfig().getReportType() + " report '" + file.getAbsolutePath() + "'";
             if(pex.getMessage() != null)
             {
                 message += ": " + pex.getMessage();
@@ -57,7 +48,7 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
         }
         catch (IOException e)
         {
-            String message = "I/O error processing " + reportType + " report '" + file.getAbsolutePath() + "'";
+            String message = "I/O error processing " + getConfig().getReportType() + " report '" + file.getAbsolutePath() + "'";
             if(e.getMessage() != null)
             {
                 message += ": " + e.getMessage();

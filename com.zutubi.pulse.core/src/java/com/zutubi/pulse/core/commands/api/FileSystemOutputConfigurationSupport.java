@@ -1,9 +1,11 @@
 package com.zutubi.pulse.core.commands.api;
 
+import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,8 +16,8 @@ public abstract class FileSystemOutputConfigurationSupport extends OutputConfigu
     private boolean failIfNotPresent = true;
     private boolean ignoreStale = false;
     private String type;
-    @Reference
-    private List<PostProcessorConfiguration> postProcessors;
+    @Reference @Addable(value = "process", reference = "processor")
+    private List<PostProcessorConfiguration> postProcessors = new LinkedList<PostProcessorConfiguration>();
 
     public boolean isFailIfNotPresent()
     {

@@ -1,13 +1,14 @@
 package com.zutubi.pulse.core.engine.api;
 
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+
 /**
  * A base class to simplify references that are named objects where the
  * reference value is the object itself.
+ * FIXME loader
  */
-public class SelfReference implements Reference
+public class SelfReference extends AbstractNamedConfiguration implements Reference
 {
-    private String name;
-
     /**
      * Creates a self-reference without a name (it must later be set).
      */
@@ -22,25 +23,7 @@ public class SelfReference implements Reference
      */
     public SelfReference(String name)
     {
-        this.name = name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    /**
-     * Updates the name of this reference.
-     *
-     * @param name the new name of this reference
-     */
-    public void setName(String name)
-    {
-        this.name = name;
+        setName(name);
     }
 
     /**

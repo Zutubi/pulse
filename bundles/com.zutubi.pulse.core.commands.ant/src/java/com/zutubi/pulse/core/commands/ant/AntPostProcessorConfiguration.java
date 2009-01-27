@@ -1,20 +1,25 @@
 package com.zutubi.pulse.core.commands.ant;
 
-import com.zutubi.pulse.core.ExpressionElement;
-import com.zutubi.pulse.core.RegexPattern;
+import com.zutubi.pulse.core.ExpressionElementConfiguration;
+import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
+import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
-
-import java.util.regex.Pattern;
 
 /**
  * A post-processor for ant output.  Attempts to capture features from Ant
  * itself (e.g. "BUILD FAILED") and from commonly-used tasks (e.g. javac).
  */
-public class AntPostProcessor extends RegexPostProcessor
+@SymbolicName("zutubi.antPostProcessorConfig")
+public class AntPostProcessorConfiguration extends RegexPostProcessorConfiguration
 {
-    public AntPostProcessor()
+    private static final String ERROR_PATTERN = "\\[javac\\] .*:[0-9]+:";
+    private static final String WARNING_PATTERN = "\\[javac\\] .*:[0-9]+: warning";
+
+    public AntPostProcessorConfiguration()
     {
         // Add our built-in patterns.
 
@@ -35,22 +40,22 @@ public class AntPostProcessor extends RegexPostProcessor
         // Target `nosuchtarget' does not exist in this project.
         //
         // Total time: 0 seconds
-        RegexPattern pattern = createPattern();
-        pattern.setPattern(Pattern.compile("^Build failed|^BUILD FAILED"));
-        pattern.setCategory(Feature.Level.ERROR);
+        addErrorRegexs("^Build failed|^BUILD FAILED");
 
         // javac task compiler messages
-        pattern = createPattern();
-        pattern.setPattern(Pattern.compile("\\[javac\\] .*:[0-9]+:"));
-        ExpressionElement exclude = pattern.createExclude();
-        Pattern warningPattern = Pattern.compile("\\[javac\\] .*:[0-9]+: warning");
-        exclude.setPattern(warningPattern);
+        RegexPatternConfiguration pattern = new RegexPatternConfiguration();
         pattern.setCategory(Feature.Level.ERROR);
+        pattern.setExpression(ERROR_PATTERN);
+        ExpressionElementConfiguration exclude = new ExpressionElementConfiguration();
+        exclude.setExpression(WARNING_PATTERN);
+        pattern.getExclusions().add(exclude);
+        getPatterns().add(pattern);
 
-        pattern = createPattern();
-        pattern.setPattern(warningPattern);
+        pattern = new RegexPatternConfiguration();
         pattern.setCategory(Feature.Level.WARNING);
-        
+        pattern.setExpression(WARNING_PATTERN);
+        getPatterns().add(pattern);
+
         // Unfortunately the ant.bat file on windows does not exit with
         // a non-zero code on failure.  Thus, we need to rely on the output
         // to see if ant is reporting failure.
@@ -64,9 +69,15 @@ public class AntPostProcessor extends RegexPostProcessor
         setTrailingContext(5);
     }
 
-    public AntPostProcessor(String name)
+    public AntPostProcessorConfiguration(String name)
     {
         this();
         setName(name);
+    }
+
+    @Override
+    public PostProcessor createProcessor()
+    {
+        return buildPostProcessor(RegexPostProcessor.class, RegexPostProcessorConfiguration.class, this);
     }
 }
