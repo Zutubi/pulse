@@ -1,13 +1,13 @@
 package com.zutubi.pulse.core.commands.bjam;
 
-import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
+import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 
 /**
  * A post processor that looks for error messages from Boost Jam (bjam).
  */
-public class BJamPostProcessor extends RegexPostProcessor
+public class BJamPostProcessorConfiguration extends RegexPostProcessorConfiguration
 {
-    public BJamPostProcessor()
+    public BJamPostProcessorConfiguration()
     {
         addErrorRegexs("^error:",
                        "^rule [a-zA-Z0-9_-]+ unknown",
@@ -23,4 +23,9 @@ public class BJamPostProcessor extends RegexPostProcessor
         setTrailingContext(3);
     }
 
+    public BJamPostProcessorConfiguration(String name)
+    {
+        this();
+        setName(name);
+    }
 }
