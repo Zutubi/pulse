@@ -29,8 +29,6 @@ public class Recipe extends SelfReference
 
     private RecipeConfiguration config;
 
-    private Version version = null;
-
     /**
      * The systems event manager.
      */
@@ -58,16 +56,6 @@ public class Recipe extends SelfReference
     public Recipe(RecipeConfiguration config)
     {
         this.config = config;
-    }
-
-    public Version getVersion()
-    {
-        return version;
-    }
-
-    public void addVersion(Version version)
-    {
-        this.version = version;
     }
 
     /**
@@ -134,6 +122,7 @@ public class Recipe extends SelfReference
         finally
         {
             context.pop();
+            RecipeVersionConfiguration version = config.getVersion();
             if (version != null)
             {
                 context.setVersion(version.getValue());

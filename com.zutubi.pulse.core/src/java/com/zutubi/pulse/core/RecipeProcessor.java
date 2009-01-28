@@ -17,6 +17,7 @@ import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -33,7 +34,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The recipe processor, as the name suggests, is responsible for running recipies.
- *
  */
 public class RecipeProcessor
 {
@@ -45,15 +45,7 @@ public class RecipeProcessor
     private Recipe runningRecipeInstance = null;
     private boolean terminating = false;
     private PulseFileLoaderFactory fileLoaderFactory;
-
-    public RecipeProcessor()
-    {
-    }
-
-    public void init()
-    {
-        
-    }
+    private ObjectFactory objectFactory;
 
     public void build(RecipeRequest request)
     {
@@ -99,7 +91,7 @@ public class RecipeProcessor
             commandConfigs.putAll(recipeConfiguration.getCommands());
             recipeConfiguration.setCommands(commandConfigs);
 
-            Recipe recipe = recipeConfiguration.createRecipe();
+            Recipe recipe = objectFactory.buildBean(Recipe.class, new Class[] { RecipeConfiguration.class }, new Object[] { recipeConfiguration });
             runningRecipeInstance = recipe;
 
             recipe.execute(context);
@@ -296,5 +288,10 @@ public class RecipeProcessor
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
         this.fileLoaderFactory = fileLoaderFactory;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

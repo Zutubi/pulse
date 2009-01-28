@@ -1,12 +1,10 @@
 package com.zutubi.pulse.core.engine;
 
-import com.zutubi.pulse.core.Recipe;
+import com.zutubi.pulse.core.RecipeVersionConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
-import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,7 +16,7 @@ public class RecipeConfiguration extends AbstractNamedConfiguration
 {
     @Ordered
     private Map<String, CommandConfiguration> commands = new LinkedHashMap<String, CommandConfiguration>();
-    private ObjectFactory objectFactory;
+    private RecipeVersionConfiguration version;
 
     public Map<String, CommandConfiguration> getCommands()
     {
@@ -30,20 +28,13 @@ public class RecipeConfiguration extends AbstractNamedConfiguration
         this.commands = commands;
     }
 
-    public Recipe createRecipe()
+    public RecipeVersionConfiguration getVersion()
     {
-        try
-        {
-            return objectFactory.buildBean(Recipe.class, new Class[]{ RecipeConfiguration.class }, new Object[]{this});
-        }
-        catch (Exception e)
-        {
-            throw new BuildException(e);
-        }
+        return version;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
+    public void setVersion(RecipeVersionConfiguration version)
     {
-        this.objectFactory = objectFactory;
+        this.version = version;
     }
 }

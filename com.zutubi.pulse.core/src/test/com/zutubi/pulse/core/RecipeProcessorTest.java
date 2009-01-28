@@ -4,6 +4,7 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.commands.DefaultCommandFactory;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
@@ -14,6 +15,7 @@ import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.PersistentFeature;
+import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.TypeRegistry;
@@ -36,6 +38,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private RecipeProcessor recipeProcessor;
     private EventManager eventManager;
     private WiringObjectFactory objectFactory;
+    private DefaultCommandFactory commandFactory;
+    private DefaultPostProcessorFactory postProcessorFactory;
     private BlockingQueue<Event> events;
     private boolean waitMode = false;
     private Semaphore semaphore = new Semaphore(0);
@@ -67,6 +71,10 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         typeRegistry.register(UnexpectedExceptionCommandConfiguration.class);
 
         objectFactory = new WiringObjectFactory();
+        commandFactory = new DefaultCommandFactory();
+        commandFactory.setObjectFactory(objectFactory);
+        postProcessorFactory = new DefaultPostProcessorFactory();
+        postProcessorFactory.setObjectFactory(objectFactory);
         objectFactory.initProperties(this);
         
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
@@ -79,6 +87,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommandConfiguration.class);
 
         recipeProcessor.setFileLoaderFactory(fileLoaderFactory);
+        recipeProcessor.setObjectFactory(objectFactory);
     }
 
     protected void tearDown() throws Exception
