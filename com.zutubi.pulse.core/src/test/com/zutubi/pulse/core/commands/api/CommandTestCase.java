@@ -46,11 +46,7 @@ public abstract class CommandTestCase extends PulseTestCase
 
     protected ExecutionContext createExecutionContext()
     {
-        PulseExecutionContext context = new PulseExecutionContext();
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, outputDir);
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, outputDir));
-        context.setWorkingDir(baseDir);
-        return context;
+        return new PulseExecutionContext();
     }
 
     protected TestCommandContext runCommand(Command command) throws Exception
@@ -60,6 +56,10 @@ public abstract class CommandTestCase extends PulseTestCase
 
     protected TestCommandContext runCommand(Command command, ExecutionContext context)
     {
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, outputDir);
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, outputDir));
+        ((PulseExecutionContext) context).setWorkingDir(baseDir);
+
         TestCommandContext commandContext = new TestCommandContext(context);
         try
         {

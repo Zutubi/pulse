@@ -24,6 +24,11 @@ public class PostProcessorGroupConfiguration extends PostProcessorConfigurationS
         super(PostProcessorGroup.class);
     }
 
+    public PostProcessorGroupConfiguration(Class<? extends PostProcessorGroup> postProcessorType)
+    {
+        super(postProcessorType);
+    }
+
     public List<PostProcessorConfiguration> getProcessors()
     {
         return processors;

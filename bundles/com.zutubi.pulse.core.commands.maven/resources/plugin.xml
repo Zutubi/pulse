@@ -2,10 +2,10 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.commands">
-        <command name="maven" class="com.zutubi.pulse.core.commands.maven.MavenCommand"/>
+        <command name="maven" class="com.zutubi.pulse.core.commands.maven.MavenCommandConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="maven.pp" display-name="maven 1 output processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.commands.maven.MavenPostProcessor"/>
+                        default-fragment="true" class="com.zutubi.pulse.core.commands.maven.MavenPostProcessorConfiguration"/>
     </extension>
 </plugin>

@@ -5,6 +5,9 @@ import com.zutubi.pulse.core.commands.api.OutputProducingCommandTestCase;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 
+import java.io.File;
+import java.io.IOException;
+
 public abstract class ExecutableCommandTestCase extends OutputProducingCommandTestCase
 {
     protected TestCommandContext failedRun(Command command, String ...contents) throws Exception
@@ -23,5 +26,12 @@ public abstract class ExecutableCommandTestCase extends OutputProducingCommandTe
         assertEquals(expectedState, context.getResultState());
         assertOutputContains(contents);
         return context;
+    }
+
+    protected File copyBuildFile(String name, String extension, String toName) throws IOException
+    {
+        File buildFile = copyInputToDirectory(name, extension, baseDir);
+        assertTrue(buildFile.renameTo(new File(baseDir, toName)));
+        return buildFile;
     }
 }

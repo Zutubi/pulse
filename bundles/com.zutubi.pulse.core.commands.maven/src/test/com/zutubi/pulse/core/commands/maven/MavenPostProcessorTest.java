@@ -1,27 +1,26 @@
 package com.zutubi.pulse.core.commands.maven;
 
+import com.zutubi.pulse.core.commands.core.PostProcessorGroup;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory;
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
+import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.IOException;
 
-/**
- * Tests for RegexPostProcessor.
- */
 public class MavenPostProcessorTest extends PostProcessorTestBase
 {
-    private MavenPostProcessor pp;
+    private PostProcessorGroup pp;
 
     public void setUp() throws IOException
     {
         super.setUp();
-        pp = new MavenPostProcessor();
-    }
 
-    public void tearDown()
-    {
-        super.tearDown();
-        pp = null;
+        DefaultPostProcessorFactory postProcessorFactory = new DefaultPostProcessorFactory();
+        postProcessorFactory.setObjectFactory(new DefaultObjectFactory());
+
+        pp = new PostProcessorGroup(new MavenPostProcessorConfiguration());
+        pp.setPostProcessorFactory(postProcessorFactory);
     }
 
     public void testSuccess() throws Exception

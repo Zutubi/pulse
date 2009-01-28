@@ -20,6 +20,7 @@ public class MakeCommandConfiguration extends NamedArgumentCommandConfiguration
     public MakeCommandConfiguration()
     {
         super(NamedArgumentCommand.class, "make.bin", "make");
+        getPostProcessors().add(new MakePostProcessorConfiguration());
     }
 
     public String getMakefile()

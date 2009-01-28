@@ -99,18 +99,6 @@ public class AntCommandTest extends ExecutableCommandTestCase
 
     private File copyBuildFile(String name, String toName) throws IOException
     {
-        File buildFile = copyInputToDirectory(name, EXTENSION_XML, baseDir);
-        assertTrue(buildFile.renameTo(new File(baseDir, toName)));
-        return buildFile;
-    }
-
-    protected String getBuildFileName()
-    {
-        return "build.xml";
-    }
-
-    protected String getBuildFileExt()
-    {
-        return EXTENSION_XML;
+        return copyBuildFile(name, EXTENSION_XML, toName);
     }
 }

@@ -79,9 +79,7 @@ public class MakeCommandTest extends ExecutableCommandTestCase
 
     private File copyMakefile(String name, String toName) throws IOException
     {
-        File buildFile = copyInputToDirectory(name, "txt", baseDir);
-        assertTrue(buildFile.renameTo(new File(baseDir, toName)));
-        return buildFile;
+        return copyBuildFile(name, "txt", toName);
     }
 
     private void successRun(MakeCommandConfiguration configuration, String... contents) throws Exception
