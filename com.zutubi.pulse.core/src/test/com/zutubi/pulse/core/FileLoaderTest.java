@@ -3,7 +3,6 @@
 //import com.zutubi.pulse.core.api.PulseException;
 //import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 //import com.zutubi.pulse.core.engine.api.Reference;
-//import com.zutubi.pulse.core.engine.api.SelfReference;
 //import com.zutubi.pulse.core.engine.api.Property;
 //import com.zutubi.validation.Validateable;
 //import com.zutubi.validation.ValidationContext;
@@ -289,7 +288,8 @@
 //        }
 //    }
 //
-//    public static class SimpleNestedType extends SelfReference
+//    @Referenceable
+//    public static class SimpleNestedType
 //    {
 //        private List<SimpleNestedType> nestedTypes = new LinkedList<SimpleNestedType>();
 //

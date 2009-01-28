@@ -3,7 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.FileLoadException;
 import com.zutubi.pulse.core.engine.api.HashReferenceMap;
-import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.util.junit.ZutubiTestCase;
 
@@ -17,10 +16,10 @@ public class ReferenceResolverTest extends ZutubiTestCase
     public void setUp() throws FileLoadException
     {
         scope = new HashReferenceMap();
-        scope.add(new Property("foo", "foo"));
-        scope.add(new Property("bar", "baz"));
-        scope.add(new Property("a\\b", "slashed"));
-        scope.add(new Property("empty", ""));
+        scope.add(new GenericReference<String>("foo", "foo"));
+        scope.add(new GenericReference<String>("bar", "baz"));
+        scope.add(new GenericReference<String>("a\\b", "slashed"));
+        scope.add(new GenericReference<String>("empty", ""));
     }
 
     private void errorTest(String input, String expectedError)
@@ -151,7 +150,7 @@ public class ReferenceResolverTest extends ZutubiTestCase
 
     public void testNestedReference() throws Exception
     {
-        scope.add(new Property("a", "${foo}"));
+        scope.add(new GenericReference<String>("a", "${foo}"));
         successTest("${a}", "${foo}");
     }
 
@@ -247,13 +246,13 @@ public class ReferenceResolverTest extends ZutubiTestCase
 
     public void testSplitQuotesInReference() throws Exception
     {
-        scope.add(new Property("a\"b", "val"));
+        scope.add(new GenericReference<String>("a\"b", "val"));
         successSplitTest("odd ${a\"b} ref", "odd", "val", "ref");
     }
 
     public void testSplitSpaceInReference() throws Exception
     {
-        scope.add(new Property("space invader", "val"));
+        scope.add(new GenericReference<String>("space invader", "val"));
         successSplitTest("odd ${space invader} ref", "odd", "val", "ref");
     }
 

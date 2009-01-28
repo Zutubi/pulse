@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.util.HashSet;
@@ -24,22 +23,22 @@ public class MultiScopeStackTest extends PulseTestCase
         super.setUp();
 
         scope1 = stack.getScope(NS1);
-        scope1.add(new Property("1", "v1 1"));
-        scope1.add(new Property("1 2", "v1 1 2"));
-        scope1.add(new Property("1 3", "v1 1 3"));
-        scope1.add(new Property("1 2 3", "v1 1 2 3"));
+        scope1.add(new GenericReference<String>("1", "v1 1"));
+        scope1.add(new GenericReference<String>("1 2", "v1 1 2"));
+        scope1.add(new GenericReference<String>("1 3", "v1 1 3"));
+        scope1.add(new GenericReference<String>("1 2 3", "v1 1 2 3"));
 
         scope2 = stack.getScope(NS2);
-        scope2.add(new Property("2", "v2 2"));
-        scope2.add(new Property("1 2", "v2 1 2"));
-        scope2.add(new Property("2 3", "v2 2 3"));
-        scope2.add(new Property("1 2 3", "v2 1 2 3"));
+        scope2.add(new GenericReference<String>("2", "v2 2"));
+        scope2.add(new GenericReference<String>("1 2", "v2 1 2"));
+        scope2.add(new GenericReference<String>("2 3", "v2 2 3"));
+        scope2.add(new GenericReference<String>("1 2 3", "v2 1 2 3"));
 
         scope3 = stack.getScope(NS3);
-        scope3.add(new Property("3", "v3 3"));
-        scope3.add(new Property("1 3", "v3 1 3"));
-        scope3.add(new Property("2 3", "v3 2 3"));
-        scope3.add(new Property("1 2 3", "v3 1 2 3"));
+        scope3.add(new GenericReference<String>("3", "v3 3"));
+        scope3.add(new GenericReference<String>("1 3", "v3 1 3"));
+        scope3.add(new GenericReference<String>("2 3", "v3 2 3"));
+        scope3.add(new GenericReference<String>("1 2 3", "v3 1 2 3"));
     }
 
     public void testScopeChain()
@@ -110,13 +109,13 @@ public class MultiScopeStackTest extends PulseTestCase
         }
     }
 
-    public void testPopTo(String label)
+    public void testPopTo()
     {
         stack.setLabel("foo");
         stack.push();
-        stack.add(new Property("a", "av"));
+        stack.add(new GenericReference<String>("a", "av"));
         stack.push();
-        stack.add(new Property("b", "bv"));
+        stack.add(new GenericReference<String>("b", "bv"));
         stack.popTo("foo");
 
         assertFalse(stack.containsReference("a"));
@@ -124,10 +123,10 @@ public class MultiScopeStackTest extends PulseTestCase
         assertOriginalProperties(stack);
     }
 
-    public void testPopToSame(String label)
+    public void testPopToSame()
     {
         stack.push();
-        stack.add(new Property("a", "av"));
+        stack.add(new GenericReference<String>("a", "av"));
         stack.setLabel("foo");
         stack.popTo("foo");
 
@@ -135,13 +134,13 @@ public class MultiScopeStackTest extends PulseTestCase
         assertOriginalProperties(stack);
     }
 
-    public void testPopToNonExistantLabel(String label)
+    public void testPopToNonExistantLabel()
     {
         stack.setLabel("foo");
         stack.push();
-        stack.add(new Property("a", "av"));
+        stack.add(new GenericReference<String>("a", "av"));
         stack.push();
-        stack.add(new Property("b", "bv"));
+        stack.add(new GenericReference<String>("b", "bv"));
         stack.popTo("non");
 
         assertTrue(stack.containsReference("a"));
@@ -182,16 +181,16 @@ public class MultiScopeStackTest extends PulseTestCase
     private void pushAndAddProperties()
     {
         stack.push();
-        stack.getScope(NS1).add(new Property("1", "v1p 1"));
-        stack.getScope(NS1).add(new Property("p 1", "v1p p 1"));
-        stack.getScope(NS1).add(new Property("p 1 2", "v1p p 1 2"));
-        stack.getScope(NS1).add(new Property("p 1 3", "v1p p 1 3"));
-        stack.getScope(NS2).add(new Property("2", "v2p 2"));
-        stack.getScope(NS2).add(new Property("p 2", "v2p p 2"));
-        stack.getScope(NS2).add(new Property("p 1 2", "v2p p 1 2"));
-        stack.getScope(NS3).add(new Property("3", "v3p 3"));
-        stack.getScope(NS3).add(new Property("p 3", "v3p p 3"));
-        stack.getScope(NS3).add(new Property("p 1 3", "v3p p 1 3"));
+        stack.getScope(NS1).add(new GenericReference<String>("1", "v1p 1"));
+        stack.getScope(NS1).add(new GenericReference<String>("p 1", "v1p p 1"));
+        stack.getScope(NS1).add(new GenericReference<String>("p 1 2", "v1p p 1 2"));
+        stack.getScope(NS1).add(new GenericReference<String>("p 1 3", "v1p p 1 3"));
+        stack.getScope(NS2).add(new GenericReference<String>("2", "v2p 2"));
+        stack.getScope(NS2).add(new GenericReference<String>("p 2", "v2p p 2"));
+        stack.getScope(NS2).add(new GenericReference<String>("p 1 2", "v2p p 1 2"));
+        stack.getScope(NS3).add(new GenericReference<String>("3", "v3p 3"));
+        stack.getScope(NS3).add(new GenericReference<String>("p 3", "v3p p 3"));
+        stack.getScope(NS3).add(new GenericReference<String>("p 1 3", "v3p p 1 3"));
     }
 
     private void assertPushedProperties(MultiScopeStack stack)
@@ -231,14 +230,14 @@ public class MultiScopeStackTest extends PulseTestCase
 
     private void assertCopyIndependent(MultiScopeStack copy)
     {
-        stack.getScope(NS1).add(new Property("after copy", "foo"));
-        stack.getScope(NS2).add(new Property("after copy", "foo"));
-        stack.getScope(NS3).add(new Property("after copy", "foo"));
+        stack.getScope(NS1).add(new GenericReference<String>("after copy", "foo"));
+        stack.getScope(NS2).add(new GenericReference<String>("after copy", "foo"));
+        stack.getScope(NS3).add(new GenericReference<String>("after copy", "foo"));
         assertNull(copy.getReference("after copy"));
 
-        copy.getScope(NS1).add(new Property("in copy", "foo"));
-        copy.getScope(NS2).add(new Property("in copy", "foo"));
-        copy.getScope(NS3).add(new Property("in copy", "foo"));
+        copy.getScope(NS1).add(new GenericReference<String>("in copy", "foo"));
+        copy.getScope(NS2).add(new GenericReference<String>("in copy", "foo"));
+        copy.getScope(NS3).add(new GenericReference<String>("in copy", "foo"));
         assertNull(stack.getReference("in copy"));
     }
 

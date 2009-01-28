@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.SelfReference;
 import com.zutubi.pulse.core.events.CommandCommencedEvent;
 import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -21,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  */
-public class Recipe extends SelfReference
+public class Recipe
 {
     private static final Logger LOG = Logger.getLogger(Recipe.class);
 
@@ -58,6 +57,11 @@ public class Recipe extends SelfReference
         this.config = config;
     }
 
+    public String getName()
+    {
+        return config.getName();
+    }
+    
     /**
      * Terminate this
      */

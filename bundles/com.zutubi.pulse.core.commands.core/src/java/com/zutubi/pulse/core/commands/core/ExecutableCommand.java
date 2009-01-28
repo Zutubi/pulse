@@ -428,7 +428,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         {
             if(acceptableName(reference.getName()))
             {
-                childEnvironment.put(convertName(reference.getName()), (String) reference.referenceValue());
+                childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());
             }
         }
 

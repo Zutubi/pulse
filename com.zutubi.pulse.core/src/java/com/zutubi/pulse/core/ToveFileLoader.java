@@ -11,6 +11,7 @@ import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.ValidationContext;
@@ -145,13 +146,22 @@ public class ToveFileLoader
                 // initialise attributes
                 mapAttributesToProperties(e, instance, type, predicate, scope);
 
-                // interface based initialisation.
-                if (Reference.class.isAssignableFrom(instance.getClass()))
+                Referenceable referenceable = type.getAnnotation(Referenceable.class, true);
+                if (referenceable != null)
                 {
-                    String referenceName = ((Reference) instance).getName();
-                    if (referenceName != null && referenceName.length() > 0)
+                    String referenceName = (String) type.getProperty(referenceable.nameProperty()).getValue(instance);
+                    if (TextUtils.stringSet(referenceName))
                     {
-                        scope.addUnique((Reference) instance);
+                        Object value;
+                        if (referenceable.valueProperty().length() == 0)
+                        {
+                            value = instance;
+                        }
+                        else
+                        {
+                            value = type.getProperty(referenceable.valueProperty()).getValue(instance);
+                        }
+                        scope.addUnique(new GenericReference<Object>(referenceName, value));
                     }
                 }
 
@@ -464,7 +474,6 @@ public class ToveFileLoader
     {
         try
         {
-            // FIXME loader should this always wire??
             return factory.buildBean(type.getClazz());
         }
         catch (Exception e)
@@ -721,14 +730,21 @@ public class ToveFileLoader
             CompositeType compositeType = (CompositeType) type;
             Class<? extends Configuration> clazz = compositeType.getClazz();
 
-            if (Reference.class.isAssignableFrom(clazz))
+            if (compositeType.hasAnnotation(Referenceable.class, true))
             {
                 return resolveReference(value, clazz, scope);
             }
             else
             {
-                Constructor c = clazz.getConstructor(new Class[]{String.class});
-                return c.newInstance(ReferenceResolver.resolveReferences(value, scope, resolutionStrategy));
+                try
+                {
+                    Constructor c = clazz.getConstructor(new Class[]{String.class});
+                    return c.newInstance(ReferenceResolver.resolveReferences(value, scope, resolutionStrategy));
+                }
+                catch (Exception e)
+                {
+                    // Expected if there is no such constructor.  Fall through.
+                }
             }
         }
         else if (type instanceof ListType)

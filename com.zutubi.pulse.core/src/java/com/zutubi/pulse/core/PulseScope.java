@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
@@ -148,7 +147,7 @@ public class PulseScope implements Scope
         {
             public boolean satisfied(ReferenceInfo referenceInfo)
             {
-                return type.isInstance(referenceInfo.reference.referenceValue());
+                return type.isInstance(referenceInfo.reference.getValue());
             }
         });
     }
@@ -174,7 +173,7 @@ public class PulseScope implements Scope
                 String value = environment.get(envName);
                 if(value != null)
                 {
-                    result = new Property(name, value);
+                    result = new GenericReference<String>(name, value);
                 }
             }
 
@@ -186,11 +185,11 @@ public class PulseScope implements Scope
                 {
                     if(result == null)
                     {
-                        result = new Property(name, pathPrefix.substring(0, pathPrefix.length() - 1));
+                        result = new GenericReference<String>(name, pathPrefix.substring(0, pathPrefix.length() - 1));
                     }
-                    else if((result.referenceValue() instanceof String))
+                    else if((result.getValue() instanceof String))
                     {
-                        result = new Property(name, pathPrefix + result.referenceValue());
+                        result = new GenericReference<String>(name, pathPrefix + result.getValue());
                     }
                 }
             }
@@ -202,12 +201,12 @@ public class PulseScope implements Scope
     public <T> T getReferenceValue(String name, Class<T> type)
     {
         Reference r = getReference(name);
-        if (r == null || !type.isInstance(r.referenceValue()))
+        if (r == null || !type.isInstance(r.getValue()))
         {
             return null;
         }
 
-        return type.cast(r.referenceValue());
+        return type.cast(r.getValue());
     }
 
     public void addUnique(Reference reference) throws IllegalArgumentException
@@ -257,14 +256,14 @@ public class PulseScope implements Scope
         {
             public boolean satisfied(ReferenceInfo referenceInfo)
             {
-                return referenceInfo.addToEnvironment && (referenceInfo.reference.referenceValue() instanceof String);
+                return referenceInfo.addToEnvironment && (referenceInfo.reference.getValue() instanceof String);
             }
         });
 
         Map<String, String> result = new HashMap<String, String>(references.size());
         for(Reference r: references)
         {
-            result.put(r.getName(), (String) r.referenceValue());
+            result.put(r.getName(), (String) r.getValue());
         }
 
         return result;
@@ -311,7 +310,7 @@ public class PulseScope implements Scope
         {
             public boolean satisfied(ReferenceInfo referenceInfo)
             {
-                return referenceInfo.addToPath && referenceInfo.reference.referenceValue() instanceof String;
+                return referenceInfo.addToPath && referenceInfo.reference.getValue() instanceof String;
             }
         });
         
@@ -319,7 +318,7 @@ public class PulseScope implements Scope
         {
             public String map(Reference reference)
             {
-                return (String) reference.referenceValue();
+                return (String) reference.getValue();
             }
         });
 
@@ -366,7 +365,7 @@ public class PulseScope implements Scope
         }
 
         String name = resourceProperty.getName();
-        references.put(name, new ReferenceInfo(new Property(name, value), resourceProperty.getAddToEnvironment(), resourceProperty.getAddToPath()));
+        references.put(name, new ReferenceInfo(new GenericReference<String>(name, value), resourceProperty.getAddToEnvironment(), resourceProperty.getAddToPath()));
     }
 
     /**
@@ -384,7 +383,7 @@ public class PulseScope implements Scope
             name = name.toUpperCase();
         }
 
-        add(new Property("env." + name, value));
+        add(new GenericReference<String>("env." + name, value));
     }
 
     public PulseScope copyTo(Scope scope)

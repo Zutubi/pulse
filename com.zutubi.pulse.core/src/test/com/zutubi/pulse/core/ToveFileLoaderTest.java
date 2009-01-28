@@ -3,7 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.engine.api.Property;
-import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.Referenceable;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -141,12 +141,9 @@ public class ToveFileLoaderTest extends PulseTestCase
     }
 
     @SymbolicName("simpleReference")
-    public static class SimpleReference extends AbstractNamedConfiguration implements Reference
+    @Referenceable
+    public static class SimpleReference extends AbstractNamedConfiguration
     {
-        public Object referenceValue()
-        {
-            return this;
-        }
     }
 
     @SymbolicName("referrer")

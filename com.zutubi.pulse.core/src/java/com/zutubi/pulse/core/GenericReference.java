@@ -26,7 +26,7 @@ public class GenericReference<T> implements Reference
         this.name = name;
     }
 
-    public T referenceValue()
+    public T getValue()
     {
         return value;
     }

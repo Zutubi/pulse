@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.engine.api;
 
-import com.zutubi.tove.annotations.Transient;
-
 /**
  * Types that define the reference interface can be referenced anywhere within the
  * pulse file using the syntax ${name}, where name is the value returned by the getName
@@ -26,7 +24,5 @@ import com.zutubi.tove.annotations.Transient;
 public interface Reference
 {
     String getName();
-
-    @Transient
-    Object referenceValue();
+    Object getValue();
 }

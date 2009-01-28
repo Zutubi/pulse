@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.engine.api.SelfReference;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
 /**
  * <p>
@@ -21,7 +21,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  * @see com.zutubi.pulse.core.postprocessors.api.LineBasedPostProcessorSupport
  */
 @SymbolicName("zutubi.postProcessorConfigSupport")
-public abstract class PostProcessorConfigurationSupport extends SelfReference implements PostProcessorConfiguration
+public abstract class PostProcessorConfigurationSupport extends AbstractNamedConfiguration implements PostProcessorConfiguration
 {
     private Class<? extends PostProcessor> postProcessorType;
     /** @see #setFailOnError(boolean) */
