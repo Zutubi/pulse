@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.make;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
@@ -17,8 +18,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-/**
- */
 public class MakePostProcessorTest extends PulseTestCase
 {
     public void testCommandError() throws URISyntaxException
@@ -74,7 +73,7 @@ public class MakePostProcessorTest extends PulseTestCase
 
     private List<PersistentFeature> getFeatures(String name) throws URISyntaxException
     {
-        MakePostProcessor pp = new MakePostProcessor();
+        RegexPostProcessor pp = new RegexPostProcessor(new MakePostProcessorConfiguration());
         URL url = getInputURL(name, "txt");
         File file = new File(url.toURI());
         StoredFileArtifact artifact = new StoredFileArtifact(file.getName());
