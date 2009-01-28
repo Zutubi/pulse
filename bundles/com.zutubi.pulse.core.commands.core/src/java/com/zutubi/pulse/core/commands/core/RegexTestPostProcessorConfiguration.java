@@ -1,9 +1,11 @@
 package com.zutubi.pulse.core.commands.core;
 
+import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.postprocessors.api.TestReportPostProcessorConfigurationSupport;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
+import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.ValidRegex;
 
 import java.util.HashMap;
@@ -16,9 +18,11 @@ import java.util.Map;
 @SymbolicName("zutubi.regexTestPostProcessorConfig")
 public class RegexTestPostProcessorConfiguration extends TestReportPostProcessorConfigurationSupport
 {
-    @ValidRegex
+    @ValidRegex @Content
     private String regex;
+    @Required
     private int statusGroup;
+    @Required
     private int nameGroup;
     private int detailsGroup = -1;
 
@@ -147,16 +151,6 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
 
         return null;
     }
-
-    // FIXME loader
-//    public void setText(String txt)
-//    {
-//         first lets check to see if there is a valid regex here.
-//        if (TextUtils.stringSet(txt) && TextUtils.stringSet(txt.trim()))
-//        {
-//            regex = txt;
-//        }
-//    }
 
     public boolean isAutoFail()
     {

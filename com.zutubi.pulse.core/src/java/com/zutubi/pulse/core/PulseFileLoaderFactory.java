@@ -29,9 +29,6 @@ public class PulseFileLoaderFactory
         register("dir-artifact", DirectoryOutputConfiguration.class);
         register("artifact", FileOutputConfiguration.class);
         register("version", RecipeVersionConfiguration.class);
-
-        // FIXME loader scrap this? actually in use...
-//        register("version", Version.class);
     }
 
     public PulseFileLoader createLoader()

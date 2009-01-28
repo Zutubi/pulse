@@ -1,10 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.api.Addable;
-import com.zutubi.pulse.core.engine.api.FileLoadException;
-import com.zutubi.pulse.core.engine.api.Reference;
-import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.core.validation.PulseValidationContext;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
@@ -12,6 +9,8 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.ValidationContext;
@@ -512,14 +511,26 @@ public class ToveFileLoader
             }
         }
 
-        // FIXME loader better handling of text
-        if (text != null && type.hasProperty("text"))
+        if (text != null)
         {
-            ReferenceResolver.ResolutionStrategy resolutionStrategy = getResolutionStrategy(predicate, type, e);
-
-            text = ReferenceResolver.resolveReferences(text, scope, resolutionStrategy);
-            type.getProperty("text").setValue(instance, text);
+            TypeProperty contentProperty = findContentProperty(type);
+            if (contentProperty != null)
+            {
+                text = ReferenceResolver.resolveReferences(text, scope, getResolutionStrategy(predicate, type, e));
+                contentProperty.setValue(instance, text);
+            }
         }
+    }
+
+    private TypeProperty findContentProperty(CompositeType type)
+    {
+        return CollectionUtils.find(type.getProperties(), new Predicate<TypeProperty>()
+        {
+            public boolean satisfied(TypeProperty property)
+            {
+                return property.getAnnotation(Content.class) != null;
+            }
+        });
     }
 
     private ReferenceResolver.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Object type, Element e)

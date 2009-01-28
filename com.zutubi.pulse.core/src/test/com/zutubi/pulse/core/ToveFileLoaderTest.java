@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.engine.api.Addable;
+import com.zutubi.pulse.core.engine.api.Content;
+import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
@@ -39,6 +41,8 @@ public class ToveFileLoaderTest extends PulseTestCase
         loader.register("reference", registry.getType(SimpleReference.class));
         loader.register("referrer", registry.getType(Referrer.class));
         loader.register("collection-referrer", registry.getType(CollectionReferrer.class));
+        loader.register("textual", registry.getType(Textual.class));
+        loader.register("property", registry.register(Property.class));
     }
 
     public void testSimpleReference() throws Exception
@@ -77,12 +81,23 @@ public class ToveFileLoaderTest extends PulseTestCase
         assertEquals("ee", ee.getName());
     }
 
+    public void testContentProperty() throws Exception
+    {
+        SimpleRoot root = new SimpleRoot();
+        loader.load(getInput(EXTENSION), root);
+
+        Textual textual = root.getTextual();
+        assertNotNull(textual);
+        assertEquals("text content v", textual.getX());
+    }
+
     @SymbolicName("simpleRoot")
     public static class SimpleRoot extends AbstractConfiguration
     {
         private Map<String, SimpleReference> references = new HashMap<String, SimpleReference>();
         private Map<String, Referrer> referrers = new HashMap<String, Referrer>();
         private Map<String, CollectionReferrer> collectionReferrers = new HashMap<String, CollectionReferrer>();
+        private Textual textual;
 
         public Map<String, SimpleReference> getReferences()
         {
@@ -112,6 +127,16 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void setCollectionReferrers(Map<String, CollectionReferrer> collectionReferrers)
         {
             this.collectionReferrers = collectionReferrers;
+        }
+
+        public Textual getTextual()
+        {
+            return textual;
+        }
+
+        public void setTextual(Textual textual)
+        {
+            this.textual = textual;
         }
     }
 
@@ -154,6 +179,23 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void setRefs(List<SimpleReference> refs)
         {
             this.refs = refs;
+        }
+    }
+
+    @SymbolicName("textual")
+    public static class Textual extends AbstractConfiguration
+    {
+        @Content
+        private String x;
+
+        public String getX()
+        {
+            return x;
+        }
+
+        public void setX(String x)
+        {
+            this.x = x;
         }
     }
 }
