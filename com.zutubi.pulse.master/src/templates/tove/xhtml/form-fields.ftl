@@ -17,7 +17,8 @@ function updateButtons()
     <#assign parameters=field.parameters>
     fc = {
     <#if form.readOnly || parameters.readOnly?default(false)>
-        disabled: true,
+        readOnly: true,
+        cls:'x-item-disabled',
     </#if>
         width: 360,
         validateOnBlur: false
