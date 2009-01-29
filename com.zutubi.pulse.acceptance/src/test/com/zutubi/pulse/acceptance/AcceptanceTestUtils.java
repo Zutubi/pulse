@@ -2,8 +2,11 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.util.Condition;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 
 public class AcceptanceTestUtils
 {
@@ -16,6 +19,26 @@ public class AcceptanceTestUtils
             workingDir = new File(System.getProperty("work.dir"));
         }
         return workingDir;
+    }
+
+    public static File getDataDirectory() throws IOException
+    {
+        File userHome = new File(System.getProperty("user.home"));
+        File configFile = new File(userHome, ".pulse2/config.properties");
+        if (configFile.isFile())
+        {
+            Properties configProperties = IOUtils.read(configFile);
+            return new File(configProperties.getProperty("pulse.data"));
+        }
+
+        configFile = new File(getWorkingDirectory(), "user.home/.pulse2/config.properties");
+        if (configFile.isFile())
+        {
+            Properties configProperties = IOUtils.read(configFile);
+            return new File(configProperties.getProperty("pulse.data"));
+        }
+
+        return new File("./data");
     }
 
     public static void waitForCondition(Condition condition, long timeout, String description)

@@ -17,13 +17,13 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ProjectXmlRpcAcceptanceTest.class);
         suite.addTestSuite(ReportingXmlRpcAcceptanceTest.class);
         suite.addTestSuite(ResourceXmlRpcAcceptanceTest.class);
+        suite.addTestSuite(ArtifactRepositoryAcceptanceTest.class);
 
         // this test uses the remote api exclusively, but does not test the xmlrpc interface.
         suite.addTestSuite(NotificationAcceptanceTest.class);
         suite.addTestSuite(CustomProjectAcceptanceTest.class);
 
         //---( web ui acceptance tests )---
-        suite.addTestSuite(ArtifactRepositoryAcceptanceTest.class);
         suite.addTestSuite(ConfigUIAcceptanceTest.class);
         suite.addTestSuite(DeleteAcceptanceTest.class);
         suite.addTestSuite(CloneAcceptanceTest.class);

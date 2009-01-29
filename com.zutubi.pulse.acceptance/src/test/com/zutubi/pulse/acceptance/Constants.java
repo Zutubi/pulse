@@ -14,6 +14,10 @@ public class Constants
      */
     public static final String TRIVIAL_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "triviant";
     /**
+     * Subversion URL for an ant-ivy project that publishes to the internal pulse artifact repository. 
+     */
+    public static final String IVY_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "ivyant";
+    /**
      * Subversion URL for a small sample ant project that contains a build file as well as src and
      * test directories.
      */
