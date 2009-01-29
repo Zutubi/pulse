@@ -1,0 +1,55 @@
+package com.zutubi.pulse.servercore.jetty;
+
+import static com.zutubi.util.CollectionUtils.contains;
+import com.zutubi.util.Predicate;
+
+import java.util.List;
+import java.util.Arrays;
+
+/**
+ * A simple holder for the path, role, methods tuple.  The represented data is defined as follows:
+ * <ul>
+ * <li>Path</li> is the http request path for which this privilege is being applied.
+ * <li>Role</li> is the role required to qualify for this privilege.
+ * <li>Methods</li> are the methods that are 'allowed' by this privilege. 
+ * </ul>
+ */
+public class Privilege
+{
+    private String path;
+    private String role;
+    private List<String> methods;
+
+    protected Privilege(String path, String role, String... methods)
+    {
+        this.path = path;
+        this.role = role;
+        this.methods = Arrays.asList(methods);
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public String getRole()
+    {
+        return role;
+    }
+
+    public List<String> getMethods()
+    {
+        return methods;
+    }
+
+    public boolean containsMethod(final String method)
+    {
+        return contains(methods, new Predicate<String>()
+        {
+            public boolean satisfied(String s)
+            {
+                return  method.compareTo(s) == 0;
+            }
+        });
+    }
+}

@@ -3,7 +3,8 @@ package com.zutubi.pulse.servercore.jetty;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-//import org.apache.ivy.plugins.repository.url.URLRepository;
+import org.acegisecurity.Authentication;
+import org.apache.ivy.plugins.repository.url.URLRepository;
 import org.mortbay.jetty.Server;
 
 import java.io.ByteArrayInputStream;
@@ -15,7 +16,7 @@ import java.util.List;
 // because it does more than just deal with the ArtifactRepositoryConfigurationHandler, but
 // it is less than an acceptance test because it does not use the repository that is running
 // within the deployed pulse installation.  So where does this test fit?.
-public class ArtifactRepositoryTest extends PulseTestCase
+public class ArtifactRepositoryUnitTest extends PulseTestCase
 {
     private File tmp;
     private File repositoryBase;
@@ -37,6 +38,17 @@ public class ArtifactRepositoryTest extends PulseTestCase
         repository.setPort(8888);
         repository.setBase(repositoryBase);
 
+        // disable security until we can sort out how to properly set the credentials.
+        SecurityHandler security = new SecurityHandler();
+        security.setPrivilegeEvaluator(new PrivilegeEvaluator()
+        {
+            public boolean isAllowed(HttpInvocation invocation, Authentication auth)
+            {
+                return true;
+            }
+        });
+        repository.setSecurityHandler(security);
+
         baseRepoUrl = "http://localhost:8888/";
 
         startServer(serverManager.createNewServer("repository", repository));
@@ -55,7 +67,7 @@ public class ArtifactRepositoryTest extends PulseTestCase
         assertCanRetrieve("sample/a.txt", "sample content");
         assertCanRetrieve("a.txt", "a quick brown fox");
 
-        assertCanPublish("sample/b.txt", "sample content");
+        assertCanPublish("zutubi/com.zutubi.sample/txts/b.txt", "sample content");
         assertCanPublish("b.txt", "jumped over the log");
     }
 
@@ -82,10 +94,8 @@ public class ArtifactRepositoryTest extends PulseTestCase
         createFile(repositoryBase, "a/b/1.txt", "sample");
         createFile(repositoryBase, "a/b/2.txt", "sample");
 
-/*
         URLRepository repositoryClient = new URLRepository();
         List listing = repositoryClient.list(baseRepoUrl);
-*/
 
         // bug in the html returned by the Resource.getListHtml from jetty prevents the correct interpretation of the response.
 //        assertEquals(2, listing.size());
@@ -106,7 +116,6 @@ public class ArtifactRepositoryTest extends PulseTestCase
 
     private void assertCanPublish(String path, String content) throws IOException
     {
-/*
         File toPublish = createFile(tmp, "localfile.txt", content);
 
         // use ivy to handle the interaction with the repository.
@@ -116,12 +125,10 @@ public class ArtifactRepositoryTest extends PulseTestCase
         File uploadedRepositoryFile = new File(repositoryBase, path);
         assertTrue(uploadedRepositoryFile.isFile());
         assertEquals(content, IOUtils.fileToString(uploadedRepositoryFile));
-*/
     }
 
     private void assertCanRetrieve(String path, String content) throws IOException
     {
-/*
         createFile(repositoryBase, path, content);
 
         File dest = new File(tmp, "localfile.txt");
@@ -131,7 +138,6 @@ public class ArtifactRepositoryTest extends PulseTestCase
         repositoryClient.get(baseRepoUrl + path, dest);
 
         assertEquals(content, IOUtils.fileToString(dest));
-*/
     }
 
     private void startServer(final Server server) throws InterruptedException
