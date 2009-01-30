@@ -4,15 +4,15 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.util.List;
 
-public class StaticRolePrivilegeEvaluatorEditorTest extends PulseTestCase
+public class AuthorityDefinitionsEditorTest extends PulseTestCase
 {
-    private StaticRolePrivilegeEvaluatorEditor editor;
+    private AuthorityDefinitionsEditor editor;
 
     public void setUp() throws Exception
     {
         super.setUp();
 
-        editor = new StaticRolePrivilegeEvaluatorEditor();
+        editor = new AuthorityDefinitionsEditor();
     }
 
     public void testSinglePrivilege()
@@ -42,8 +42,8 @@ public class StaticRolePrivilegeEvaluatorEditorTest extends PulseTestCase
     {
         editor.setAsText(inputText);
 
-        StaticRolePrivilegeEvaluator evaluator = (StaticRolePrivilegeEvaluator)editor.getValue();
-        List<Privilege> configuredPrivileges = evaluator.getPrivileges();
+        AuthorityDefinitions definitions = (AuthorityDefinitions)editor.getValue();
+        List<Privilege> configuredPrivileges = definitions.getPrivileges();
         assertEquals(privileges.length, configuredPrivileges.size());
 
         for (int i = 0; i < privileges.length; i++)
@@ -63,3 +63,4 @@ public class StaticRolePrivilegeEvaluatorEditorTest extends PulseTestCase
         }
     }
 }
+

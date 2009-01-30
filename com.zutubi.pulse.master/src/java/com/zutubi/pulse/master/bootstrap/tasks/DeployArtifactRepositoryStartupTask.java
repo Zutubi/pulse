@@ -6,9 +6,14 @@ import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.jetty.*;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.mortbay.jetty.Server;
-import org.acegisecurity.Authentication;
+import org.mortbay.http.handler.AbstractHttpHandler;
+import org.mortbay.http.HttpRequest;
+import org.mortbay.http.HttpResponse;
+import org.mortbay.http.HttpException;
+import org.mortbay.http.HttpHandler;
 
 /**
  * Startup task responsible for starting the artifact repository.
@@ -17,7 +22,7 @@ public class DeployArtifactRepositoryStartupTask implements StartupTask
 {
     private JettyServerManager jettyServerManager;
     private ConfigurationManager configurationManager;
-    private SecurityHandler artifactRepositorySecurityHandler;
+    private HttpHandler securityHandler;
 
     public void execute() throws Exception
     {
@@ -27,16 +32,7 @@ public class DeployArtifactRepositoryStartupTask implements StartupTask
         repository.setHost(sysConfig.getBindAddress());
         repository.setPort(8888); // need to make this configurable.
 
-        // ignore the configured security handler for now.
-        SecurityHandler accessAllowed = new SecurityHandler();
-        accessAllowed.setPrivilegeEvaluator(new PrivilegeEvaluator()
-        {
-            public boolean isAllowed(HttpInvocation invocation, Authentication auth)
-            {
-                return true;
-            }
-        });
-        repository.setSecurityHandler(accessAllowed);
+        repository.setSecurityHandler(securityHandler);
 
         File repositoryBase = new File(configurationManager.getUserPaths().getData(), "repository");
         ensureIsDirectory(repositoryBase);
@@ -74,8 +70,8 @@ public class DeployArtifactRepositoryStartupTask implements StartupTask
         this.configurationManager = configurationManager;
     }
 
-    public void setArtifactRepositorySecurityHandler(SecurityHandler artifactRepositorySecurityHandler)
+    public void setArtifactRepositorySecurityHandler(HttpHandler securityHandler)
     {
-        this.artifactRepositorySecurityHandler = artifactRepositorySecurityHandler;
+        this.securityHandler = securityHandler;
     }
 }

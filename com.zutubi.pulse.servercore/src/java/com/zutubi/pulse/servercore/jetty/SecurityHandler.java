@@ -9,6 +9,8 @@ import org.mortbay.http.handler.AbstractHttpHandler;
 
 import java.io.IOException;
 
+import com.zutubi.tove.security.AccessManager;
+
 /**
  * An implementation of the {@link org.mortbay.http.HttpHandler} interface
  * that delegates a security check to a {@link PrivilegeEvaluator}.  If the request
@@ -17,24 +19,21 @@ import java.io.IOException;
  */
 public class SecurityHandler extends AbstractHttpHandler
 {
-    private PrivilegeEvaluator privilegeEvaluator;
+    private AccessManager accessManager;
 
     public void handle(final String pathInContext, final String pathParams, final HttpRequest httpRequest, final HttpResponse httpResponse) throws IOException
     {
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
+        HttpInvocation invocation = new HttpInvocation(httpRequest, httpResponse, pathInContext);
 
-        HttpInvocation invocation = new HttpInvocation(httpRequest, httpResponse);
-
-        if (!privilegeEvaluator.isAllowed(invocation, authentication))
+        if (!accessManager.hasPermission(invocation.getMethod(), invocation))
         {
             httpResponse.sendError(HttpResponse.__403_Forbidden);
             httpRequest.setHandled(true);
         }
     }
 
-    public void setPrivilegeEvaluator(PrivilegeEvaluator privilegeEvaluator)
+    public void setAccessManager(AccessManager accessManager)
     {
-        this.privilegeEvaluator = privilegeEvaluator;
+        this.accessManager = accessManager;
     }
 }

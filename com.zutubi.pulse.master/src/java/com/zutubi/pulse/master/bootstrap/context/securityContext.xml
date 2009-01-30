@@ -64,12 +64,12 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <!-- register the property editor so that we can define the privilege evaluator as a string. -->
+    <!-- is this still necessary? -->
     <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
         <property name="customEditors">
             <map>
-                <entry key="com.zutubi.pulse.servercore.jetty.PrivilegeEvaluator">
-                    <bean class="com.zutubi.pulse.servercore.jetty.StaticRolePrivilegeEvaluatorEditor"/>
+                <entry key="com.zutubi.pulse.servercore.jetty.AuthorityDefinitions">
+                    <bean class="com.zutubi.pulse.servercore.jetty.AuthorityDefinitionsEditor"/>
                 </entry>
             </map>
         </property>
@@ -78,16 +78,29 @@ The beans defined within the security subsystem need not be accessed by other co
     <!--
     The security handler for access to the artifact repository.
     -->
-    <bean id="artifactRepositorySecurityHandler" class="com.zutubi.pulse.servercore.jetty.SecurityHandler">
-        <property name="privilegeEvaluator">
+    <bean name="artifactRepositorySecurityHandler" class="com.zutubi.pulse.servercore.jetty.FilteringHandler">
+        <property name="filters">
+            <list>
+                <ref local="basicProcessingFilter"/>
+                <ref local="rememberMeProcessingFilter"/>
+                <ref local="anonymousProcessingFilter"/>
+            </list>
+        </property>
+        <property name="delegate" ref="securityDelegateHandler"/>
+    </bean>
+
+    <bean name="securityDelegateHandler" class="com.zutubi.pulse.servercore.jetty.SecurityHandler">
+        <property name="accessManager" ref="accessManager"/>
+    </bean>
+
+    <bean name="artifactRepositoryAuthorityProvider" class="com.zutubi.pulse.servercore.jetty.ArtifactRepositoryAuthorityProvider">
+        <property name="accessManager" ref="accessManager"/>
+        <property name="definitions">
             <value>
-                /,ADMINISTER,GET,PUT
-                /,ROLE_USER,GET
-                /,ROLE_ANONYMOUS,
+                /,ROLE_ANONYMOUS,GET,PUT
             </value>
         </property>
     </bean>
-
 
     <!--
     The AuthenticationProcessingFilter is responsible for handling the login request. It monitors for requests

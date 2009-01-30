@@ -12,10 +12,13 @@ public class HttpInvocation
     
     private final HttpResponse httpResponse;
 
-    public HttpInvocation(HttpRequest httpRequest, HttpResponse httpResponse)
+    private String pathInContext;
+
+    public HttpInvocation(HttpRequest httpRequest, HttpResponse httpResponse, String pathInContext)
     {
         this.httpRequest = httpRequest;
         this.httpResponse = httpResponse;
+        this.pathInContext = pathInContext;
     }
 
     public String getMethod()
@@ -36,5 +39,10 @@ public class HttpInvocation
     public HttpResponse getHttpResponse()
     {
         return httpResponse;
+    }
+
+    public String getPathInContext()
+    {
+        return pathInContext;
     }
 }

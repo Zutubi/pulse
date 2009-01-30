@@ -1,10 +1,11 @@
 package com.zutubi.pulse.servercore.jetty;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import org.acegisecurity.Authentication;
 import org.apache.ivy.plugins.repository.url.URLRepository;
+import static org.mockito.Mockito.*;
 import org.mortbay.jetty.Server;
 
 import java.io.ByteArrayInputStream;
@@ -39,19 +40,15 @@ public class ArtifactRepositoryUnitTest extends PulseTestCase
         repository.setBase(repositoryBase);
 
         // disable security until we can sort out how to properly set the credentials.
+        AccessManager accessManager = mock(AccessManager.class);
+        stub(accessManager.hasPermission(anyString(), anyObject())).toReturn(true);
         SecurityHandler security = new SecurityHandler();
-        security.setPrivilegeEvaluator(new PrivilegeEvaluator()
-        {
-            public boolean isAllowed(HttpInvocation invocation, Authentication auth)
-            {
-                return true;
-            }
-        });
+        security.setAccessManager(accessManager);
         repository.setSecurityHandler(security);
 
         baseRepoUrl = "http://localhost:8888/";
 
-        startServer(serverManager.createNewServer("repository", repository));
+//        startServer(serverManager.createNewServer("repository", repository));
     }
 
     protected void tearDown() throws Exception

@@ -18,7 +18,7 @@ import java.util.LinkedList;
  * handler.  This handler also allows for {@link javax.servlet.Filter}s to be
  * configured around the handler.
  */
-public class DelegatingHandler extends AbstractHttpHandler
+public class FilteringHandler extends AbstractHttpHandler
 {
     private List<Filter> filters = new LinkedList<Filter>();
 

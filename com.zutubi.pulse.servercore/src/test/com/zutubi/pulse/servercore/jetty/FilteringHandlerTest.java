@@ -14,7 +14,7 @@ import static org.mockito.Matchers.same;
 import javax.servlet.*;
 import java.io.IOException;
 
-public class DelegatingHandlerTest extends PulseTestCase
+public class FilteringHandlerTest extends PulseTestCase
 {
     private HttpResponse response;
     private HttpRequest request;
@@ -82,7 +82,7 @@ public class DelegatingHandlerTest extends PulseTestCase
 
     private void handle(HttpHandler delegate, MockFilter... filters) throws IOException
     {
-        DelegatingHandler handler = new DelegatingHandler();
+        FilteringHandler handler = new FilteringHandler();
         handler.setDelegate(delegate);
         for (Filter filter : filters)
         {

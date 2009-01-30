@@ -1,10 +1,10 @@
 package com.zutubi.pulse.servercore.jetty;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import org.acegisecurity.Authentication;
+import com.zutubi.tove.security.AccessManager;
 import static org.mockito.Mockito.*;
-import org.mortbay.http.HttpResponse;
 import org.mortbay.http.HttpRequest;
+import org.mortbay.http.HttpResponse;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ public class SecurityHandlerTest extends PulseTestCase
 
     private HttpRequest request;
     private HttpResponse response;
-    private PrivilegeEvaluator evaluator;
+    private AccessManager accessManager;
 
     protected void setUp() throws Exception
     {
@@ -23,24 +23,15 @@ public class SecurityHandlerTest extends PulseTestCase
         request = mock(HttpRequest.class);
         response = mock(HttpResponse.class);
 
-        evaluator = mock(PrivilegeEvaluator.class);
+        accessManager = mock(AccessManager.class);
 
         handler = new SecurityHandler();
-        handler.setPrivilegeEvaluator(evaluator);
-    }
-
-    public void testNullAuthentication() throws IOException
-    {
-        stub(evaluator.isAllowed((HttpInvocation)anyObject(), (Authentication) isNull())).toReturn(false);
-
-        handler.handle("path", "params", request, response);
-
-        verifyForbidden();
+        handler.setAccessManager(accessManager);
     }
 
     public void testAuthorised() throws IOException
     {
-        stub(evaluator.isAllowed((HttpInvocation)anyObject(), (Authentication) anyObject())).toReturn(true);
+        stub(accessManager.hasPermission(anyString(), anyObject())).toReturn(true);
 
         handler.handle("path", "params", request, response);
 
@@ -49,7 +40,7 @@ public class SecurityHandlerTest extends PulseTestCase
 
     public void testForbidden() throws IOException
     {
-        stub(evaluator.isAllowed((HttpInvocation)anyObject(), (Authentication) anyObject())).toReturn(false);
+        stub(accessManager.hasPermission(anyString(), anyObject())).toReturn(false);
 
         handler.handle("path", "params", request, response);
 
