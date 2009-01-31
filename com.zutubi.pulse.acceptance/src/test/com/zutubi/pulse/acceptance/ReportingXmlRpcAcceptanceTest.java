@@ -3,8 +3,10 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
+import com.zutubi.util.io.IOUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +20,7 @@ import java.util.Vector;
 public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private static final int BUILD_TIMEOUT = 90000;
-
+    
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -194,6 +196,27 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(1, build.get("id"));
         assertEquals(projectName, build.get("project"));
         assertEquals("success", build.get("status"));
+    }
+
+    public void testErrorAndWarningCounts() throws Exception
+    {
+        String projectName = randomName();
+        Hashtable<String, Object> customType = xmlRpcHelper.createDefaultConfig(CustomTypeConfiguration.class);
+        customType.put("pulseFileString", IOUtils.inputStreamToString(getInput("xml")));
+
+        xmlRpcHelper.insertProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), customType);
+        int number = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, number);
+        assertNotNull(build);
+        assertEquals(4, build.get("errorCount"));
+        assertEquals(1, build.get("warningCount"));
+
+        @SuppressWarnings("unchecked")
+        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
+        Hashtable<String, Object> stage = stages.get(0);
+        assertEquals(3, stage.get("errorCount"));
+        assertEquals(1, stage.get("warningCount"));
     }
 
     public void testGetBuildUnknownProject()

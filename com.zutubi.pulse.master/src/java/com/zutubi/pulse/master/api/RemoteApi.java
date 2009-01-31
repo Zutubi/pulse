@@ -1898,6 +1898,8 @@ public class RemoteApi
         buildDetails.put("status", result.getState().getPrettyString());
         buildDetails.put("completed", result.completed());
         buildDetails.put("succeeded", result.succeeded());
+        buildDetails.put("errorCount", result.getErrorFeatureCount());
+        buildDetails.put("warningCount", result.getWarningFeatureCount());
 
         TimeStamps timeStamps = result.getStamps();
         buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
