@@ -5,8 +5,16 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.IOUtils;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -267,6 +275,54 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String projectName = randomName();
         insertSimpleProject(projectName);
         assertFalse(xmlRpcHelper.deleteBuild(projectName, 1));
+    }
+
+    public void testTriggerBuildWithProperties() throws Exception
+    {
+        final String projectName = randomName();
+        insertSimpleProject(projectName);
+        xmlRpcHelper.insertProjectProperty(projectName, "existing.property", "existing value");
+
+        Hashtable<String, String> properties = new Hashtable<String, String>();
+        properties.put("existing.property", "overriding value");
+        properties.put("new.property", "new value");
+
+        int number = xmlRpcHelper.getNextBuildNumber(projectName);
+        xmlRpcHelper.triggerBuild(projectName, "", properties);
+        xmlRpcHelper.waitForBuildToComplete(projectName, number, BUILD_TIMEOUT);
+
+        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(projectName, number);
+        Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
+        {
+            public boolean satisfied(Hashtable<String, Object> artifact)
+            {
+                return artifact.get("name").equals("environment");
+            }
+        });
+
+        assertNotNull(artifact);
+        String permalink = (String) artifact.get("permalink");
+
+        HttpClient client = new HttpClient();
+
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
+        client.getState().setCredentials(new AuthScope(null, -1), credentials);
+        client.getParams().setAuthenticationPreemptive(true);
+
+        GetMethod get = new GetMethod(baseUrl + permalink.substring(1) + "env.txt");
+        get.setDoAuthentication(true);
+        try
+        {
+            client.executeMethod(get);
+
+            String text = get.getResponseBodyAsString();
+            assertThat(text, containsString("PULSE_EXISTING_PROPERTY=overriding value"));
+            assertThat(text, containsString("PULSE_NEW_PROPERTY=new value"));
+        }
+        finally
+        {
+            get.releaseConnection();
+        }
     }
 
     private void getAllHelper(GetAllHelper helper) throws Exception
