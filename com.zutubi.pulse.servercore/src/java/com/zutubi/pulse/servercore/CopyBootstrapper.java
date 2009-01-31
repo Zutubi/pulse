@@ -3,6 +3,7 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -28,7 +29,7 @@ public class CopyBootstrapper extends BootstrapperSupport
         this.previousRecipeId = previousRecipeId;
     }
 
-    public void bootstrap(PulseExecutionContext context) throws BuildException
+    public void bootstrap(PulseExecutionContext context, CommandResult result) throws BuildException
     {
         try
         {

@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import static com.zutubi.util.FileSystemUtils.*;
 
@@ -34,7 +35,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         this.revision = revision;
     }
 
-    public void bootstrap(final PulseExecutionContext context) throws BuildException
+    public void bootstrap(final PulseExecutionContext context, CommandResult result) throws BuildException
     {
         final RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
         if (paths.getPersistentWorkDir() == null)
@@ -69,7 +70,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         {
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, mungedPaths);
             context.setWorkingDir(mungedPaths.getBaseDir());
-            childBootstrapper.bootstrap(context);
+            childBootstrapper.bootstrap(context, result);
         }
         finally
         {

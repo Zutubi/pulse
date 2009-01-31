@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
+import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.io.IOException;
  */
 public class LocalBootstrapper extends BootstrapperSupport
 {
-    public void bootstrap(PulseExecutionContext context) throws BuildException
+    public void bootstrap(PulseExecutionContext context, CommandResult result) throws BuildException
     {
         try
         {
