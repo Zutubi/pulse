@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 
@@ -72,11 +73,14 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         Plugin plugin = pluginSystem.install(samplePostProcessorPlugin);
         assertEquals(Plugin.State.ENABLED, plugin.getState());
 
-        // need to yield since the extension manager is notified of the new plugin asynchronously.
-        Thread.yield();
-
         // ensure that we are picking up the expected post processors from the installed plugin.
-        assertNotNull(extensionManager.getPostProcessor("sample.pp"));
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return extensionManager.getPostProcessor("sample.pp") != null;
+            }
+        }, 30000, "sample processor to be ready");
 
         PulseFile pf = new PulseFile();
 
