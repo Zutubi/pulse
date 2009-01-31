@@ -6,7 +6,10 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class DefaultRecipeLoggerTest extends PulseTestCase
@@ -228,6 +231,6 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
 
     private void assertLineContent(String line, String content)
     {
-        assertThat(line, matchesRegex("[0-9][0-9]/[0-9][0-9]/[0-9][0-9] [0-9][0-9]?:[0-9][0-9]:[0-9][0-9]: " + Pattern.quote(content)));
+        assertThat(line, matchesRegex("[0-9][0-9]?/[0-9][0-9]/[0-9][0-9] [0-9][0-9]?:[0-9][0-9]:[0-9][0-9]: " + Pattern.quote(content)));
     }
 }
