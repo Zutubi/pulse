@@ -347,22 +347,10 @@ ZUTUBI.ConfigTreeLoader = function(base)
 };
 
 Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
-    getNodePath : function(node)
+    getNodeURL : function(node)
     {
         var tree = node.getOwnerTree();
-        var configPath = tree.getNodeConfigPath(node);
-        var pieces = configPath.split('/');
-        var encodedPath = '';
-        for (var i = 0; i < pieces.length; i++)
-        {
-            if (encodedPath.length > 0)
-            {
-                encodedPath += '/';
-            }
-
-            encodedPath += encodeURIComponent(pieces[i]);
-        }
-        return this.dataUrl + '/' + encodedPath;
+        return this.dataUrl + '/' + encodeURIPath(tree.getNodeConfigPath(node));
     },
 
     requestData : function(node, callback)
@@ -377,7 +365,7 @@ Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
                 argument: {callback: callback, node: node}
             };
 
-            this.transId = Ext.lib.Ajax.request(this.requestMethod, this.getNodePath(node) + '?ls', cb, params);
+            this.transId = Ext.lib.Ajax.request(this.requestMethod, this.getNodeURL(node) + '?ls', cb, params);
         }
         else
         {
