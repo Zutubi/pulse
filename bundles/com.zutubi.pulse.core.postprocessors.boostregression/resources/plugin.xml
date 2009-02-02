@@ -3,6 +3,6 @@
 <plugin>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="boost-regression.pp" display-name="boost regression XML report processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.postprocessors.boostregression.BoostRegressionPostProcessor"/>
+                        default-fragment="true" class="com.zutubi.pulse.core.postprocessors.boostregression.BoostRegressionPostProcessorConfiguration"/>
     </extension>
 </plugin>

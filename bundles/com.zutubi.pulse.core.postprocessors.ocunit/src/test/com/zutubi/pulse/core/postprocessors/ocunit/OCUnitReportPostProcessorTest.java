@@ -21,29 +21,17 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
     private StoredFileArtifact artifact = null;
     private CommandResult result = null;
 
-    public OCUnitReportPostProcessorTest()
-    {
-    }
-
-    public OCUnitReportPostProcessorTest(String name)
-    {
-        super(name);
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();
 
         tmpDir = FileSystemUtils.createTempDir("OCUnitReportPostProcessorTest", getName());
-
         artifact = prepareArtifact(this.getName());
-
         result = new CommandResult("output");
     }
 
     protected void tearDown() throws Exception
     {
-        artifact = null;
         removeDirectory(tmpDir);
 
         super.tearDown();
@@ -184,7 +172,7 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
 
     private PersistentTestSuiteResult process()
     {
-        OCUnitReportPostProcessor pp = new OCUnitReportPostProcessor();
+        OCUnitReportPostProcessor pp = new OCUnitReportPostProcessor(new OCUnitReportPostProcessorConfiguration());
         PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
 
         ExecutionContext context = new PulseExecutionContext();
