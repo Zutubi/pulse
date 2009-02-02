@@ -1,17 +1,18 @@
 package com.zutubi.pulse.core.commands.xcode;
 
-import com.zutubi.pulse.core.ProcessArtifact;
-import com.zutubi.pulse.core.commands.core.ExecutableCommand;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
  */
-public class XCodeCommand extends ExecutableCommand
+@SymbolicName("zutubi.xcodeCommandConfig")
+public class XCodeCommandConfiguration extends NamedArgumentCommandConfiguration
 {
     private String target;
     private String config;
@@ -20,47 +21,41 @@ public class XCodeCommand extends ExecutableCommand
     private String buildaction;
     private List<String> settings;
 
-    public XCodeCommand()
+    public XCodeCommandConfiguration()
     {
-        super("xcode.bin", "xcodebuild");
+        super(NamedArgumentCommand.class, "xcode.bin", "xcodebuild");
+        getPostProcessors().add(new XCodePostProcessorConfiguration("xcode.pp"));
     }
 
-    public void execute(ExecutionContext context, CommandResult cmdResult)
+    protected List<NamedArgument> getNamedArguments()
     {
+        List<NamedArgument> result = new LinkedList<NamedArgument>();
         if (TextUtils.stringSet(project))
         {
-            addArguments("-project", project);
-            cmdResult.getProperties().put("project", project);
+            result.add(new NamedArgument("project", project, "-project"));
         }
 
         if (TextUtils.stringSet(config))
         {
-            addArguments("-configuration", config);
-            cmdResult.getProperties().put("configuration", config);
+            result.add(new NamedArgument("configuration", config, "-configuration"));
         }
 
         if (TextUtils.stringSet(target))
         {
-            addArguments("-target", target);
-            cmdResult.getProperties().put("target", target);
+            result.add(new NamedArgument("target", target, "-target"));
         }
 
         if (TextUtils.stringSet(buildaction))
         {
-            addArguments(buildaction);
-            cmdResult.getProperties().put("build action", buildaction);
+            result.add(new NamedArgument("build action", buildaction));
         }
 
         if (settings != null && settings.size() > 0)
         {
-            addArguments(settings.toArray(new String[settings.size()]));
-            cmdResult.getProperties().put("settings", StringUtils.unsplit(settings));
+            result.add(new NamedArgument("settings", StringUtils.unsplit(settings), settings));
         }
 
-        ProcessArtifact pa = createProcess();
-        pa.setProcessor(new XCodePostProcessor("xcode.pp"));
-        
-        super.execute(context, cmdResult);
+        return result;
     }
 
     public String getTarget()
