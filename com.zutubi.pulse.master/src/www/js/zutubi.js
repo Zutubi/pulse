@@ -350,7 +350,19 @@ Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
     getNodePath : function(node)
     {
         var tree = node.getOwnerTree();
-        return this.dataUrl + '/' + tree.getNodeConfigPath(node);
+        var configPath = tree.getNodeConfigPath(node);
+        var pieces = configPath.split('/');
+        var encodedPath = '';
+        for (var i = 0; i < pieces.length; i++)
+        {
+            if (encodedPath.length > 0)
+            {
+                encodedPath += '/';
+            }
+
+            encodedPath += encodeURIComponent(pieces[i]);
+        }
+        return this.dataUrl + '/' + encodedPath;
     },
 
     requestData : function(node, callback)
@@ -413,7 +425,6 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
             treePath = treePath.substring(1);
         }
 
-        //console.log('cpttp(' + configPath + ') -> ' + treePath);
         return treePath;
     },
 
@@ -436,7 +447,6 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
             configPath = this.pathPrefix + this.pathSeparator + configPath;
         }
 
-        //console.log('tptcp(' + treePath + ') -> ' + configPath);
         return configPath;
     },
 
