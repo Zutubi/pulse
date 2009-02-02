@@ -3,6 +3,8 @@ package com.zutubi.pulse.core.personal;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -12,6 +14,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -176,18 +182,31 @@ public class PatchArchive
         return metadata;
     }
 
-    public void apply(File base, EOLStyle localEOL) throws PulseException
+    public void apply(File base, EOLStyle localEOL, CommandResult result) throws PulseException
     {
         try
         {
-            for(FileStatus fs: metadata.getFileStatuses())
+            List<FileStatus> statuses = new LinkedList<FileStatus>(metadata.getFileStatuses());
+
+            // Sort the statuses so that we handle nested files before their parents.  So, for
+            // example, if all files in a tree are marked for delete we can verify they all exist
+            // as we delete them from leaf to root.
+            Collections.sort(statuses, new Comparator<FileStatus>()
             {
-                preApply(fs, base);
+                public int compare(FileStatus o1, FileStatus o2)
+                {
+                    return o2.getTargetPath().length() - o1.getTargetPath().length();
+                }
+            });
+
+            for(FileStatus fs: statuses)
+            {
+                preApply(fs, base, result);
             }
 
             unzip(base);
 
-            for(FileStatus fs: metadata.getFileStatuses())
+            for(FileStatus fs: statuses)
             {
                 postApply(fs, base, localEOL);
             }
@@ -198,20 +217,46 @@ public class PatchArchive
         }
     }
 
-    private void preApply(FileStatus fileStatus, File base) throws IOException
+    private void preApply(FileStatus fileStatus, File base, CommandResult result) throws IOException
     {
-        if (fileStatus.getState() == FileStatus.State.DELETED || fileStatus.getState() == FileStatus.State.REPLACED)
+        switch (fileStatus.getState())
         {
-            File f = new File(base, fileStatus.getTargetPath());
-            if (fileStatus.isDirectory())
-            {
-                FileSystemUtils.rmdir(f);
-            }
-            else
-            {
-                f.delete();
-            }
+            case MODIFIED:
+            case MERGED:
+            case METADATA_MODIFIED:
+                checkTargetFile(fileStatus, base, result);
+                break;
+
+            case DELETED:
+            case REPLACED:
+                File f = checkTargetFile(fileStatus, base, result);
+                if (fileStatus.isDirectory())
+                {
+                    if (!FileSystemUtils.rmdir(f))
+                    {
+                        result.addFeature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target directory '" + fileStatus.getTargetPath() + "'");
+                    }
+                }
+                else
+                {
+                    if (!f.delete())
+                    {
+                        result.addFeature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target file '" + fileStatus.getTargetPath() + "'");
+                    }
+                }
+                break;
         }
+    }
+
+    private File checkTargetFile(FileStatus fileStatus, File base, CommandResult result)
+    {
+        File f = new File(base, fileStatus.getTargetPath());
+        if (!f.exists())
+        {
+            result.addFeature(Feature.Level.WARNING, "Problem applying patch: Target file '" + fileStatus.getTargetPath() + "' with status " + fileStatus.getState() + " in patch does not exist");
+        }
+        
+        return f;
     }
 
     private void postApply(FileStatus fileStatus, File base, EOLStyle localEOL) throws IOException

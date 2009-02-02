@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.util.io.ForkOutputStream;
@@ -37,7 +38,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
         this.revision = revision;
     }
 
-    public void bootstrap(PulseExecutionContext context)
+    public void bootstrap(PulseExecutionContext context, CommandResult result)
     {
         File outDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
         if (!outDir.mkdirs())

@@ -8,12 +8,11 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
+import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.bean.DefaultObjectFactory;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
 
@@ -389,7 +388,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public class SimpleBootstrapper extends BootstrapperSupport
     {
-        public void bootstrap(PulseExecutionContext context) throws BuildException
+        public void bootstrap(PulseExecutionContext context, CommandResult result) throws BuildException
         {
             // Do nothing.
         }
@@ -404,7 +403,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
             this.exception = exception;
         }
 
-        public void bootstrap(PulseExecutionContext context) throws BuildException
+        public void bootstrap(PulseExecutionContext context, CommandResult result) throws BuildException
         {
             throw exception;
         }
