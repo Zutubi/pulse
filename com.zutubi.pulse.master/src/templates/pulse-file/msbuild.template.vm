@@ -4,34 +4,28 @@
     #parse("pulse-file/prologue.vm")
 
     <recipe name="msbuild build">
-        <command name="build">
-            <!-- pull in the msbuild resource if configured. -->
-            <resource name="msbuild" required="false"/>
-            <msbuild
+        <msbuild name="build"
 #if($buildFile)
-                    build-file="$buildFile"
+                 build-file="$buildFile"
 #end
 #if($targets)
-                    targets="$targets"
+                 targets="$targets"
 #end
 #if($configuration)
-                    configuration="$configuration"
+                 configuration="$configuration"
 #end
 #if($arguments)
-                    args="$arguments"
+                 args="$arguments"
 #end
 #if($workingDirectory)
-                    working-dir="${base.dir}/$workingDirectory"
+                 working-dir="${base.dir}/$workingDirectory"
 #end
-                    >
+        >
 #foreach($buildProperty in $buildProperties)
-                <build-property name="$buildProperty.name" value="$buildProperty.value"/>
+            <build-property name="$buildProperty.name" value="$buildProperty.value"/>
 #end
-                #parse("pulse-file/output.processors.vm")
-            </msbuild>
-
+            #parse("pulse-file/output.processors.vm")
             #parse("pulse-file/artifacts.vm")
-
-        </command>
+        </msbuild>
     </recipe>
 </project>

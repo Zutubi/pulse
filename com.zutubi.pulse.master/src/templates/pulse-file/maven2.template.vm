@@ -4,10 +4,7 @@
     #parse("pulse-file/prologue.vm")
 
     <recipe name="default">
-        <command name="build">
-            <!-- pull in the maven2 resource if configured. -->
-            <resource name="maven2" required="false"/>
-            <maven2
+        <maven2 name="build"
 #if($workingDir)
                 working-dir="${base.dir}/$workingDir"
 #end
@@ -17,18 +14,15 @@
 #if($arguments)
                 args="$arguments"
 #end
-            >
+        >
 #if($suppressWarning)
-                <suppress-warning expression="$suppressWarning"/>
+            <suppress-warning expression="$suppressWarning"/>
 #end
 #if($suppressError)
-                <suppress-error expression="$suppressError"/>
+            <suppress-error expression="$suppressError"/>
 #end
             #parse("pulse-file/output.processors.vm")
-            </maven2>
-
             #parse("pulse-file/artifacts.vm")
-
-        </command>
+        </maven2>
     </recipe>
 </project>

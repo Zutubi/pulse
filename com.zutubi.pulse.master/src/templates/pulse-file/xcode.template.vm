@@ -4,33 +4,28 @@
     #parse("pulse-file/prologue.vm")
 
     <recipe name="xcode build">
-        <command name="build">
-            <!-- the build command. -->
-            <xcodebuild
+        <xcodebuild name="build"
 #if($workingDir)
-                working-dir="${base.dir}/$workingDir"
+                    working-dir="${base.dir}/$workingDir"
 #end
 #if($config)
-                config="$config"
+                    config="$config"
 #end
 #if($target)
-                target="$target"
+                    target="$target"
 #end
 #if($project)
-                project="$project"
+                    project="$project"
 #end
 #if ($action)
-                buildaction="$action"
+                    buildaction="$action"
 #end
 #if($settings)
-                settings="$settings"
+                    settings="$settings"
 #end
-            >
-                #parse("pulse-file/output.processors.vm")
-            </xcodebuild>
-
+        >
+            #parse("pulse-file/output.processors.vm")
             #parse("pulse-file/artifacts.vm")
-
-        </command>
+        </xcodebuild>
     </recipe>
 </project>
