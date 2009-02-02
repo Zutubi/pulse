@@ -200,6 +200,7 @@ public class ResultNotifier implements EventListener
         dataMap.put("model", result);
         dataMap.put("changelists", buildManager.getChangesForBuild(result));
         dataMap.put("errorLevel", Feature.Level.ERROR);
+        dataMap.put("infoLevel", Feature.Level.INFO);
         dataMap.put("warningLevel", Feature.Level.WARNING);
 
         if (!result.succeeded())
