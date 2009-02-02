@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.util.RandomUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.RandomUtils;
 
 import java.net.URL;
 import java.util.Vector;
@@ -15,7 +15,8 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
 {
     public static final String SYMBOLIC_NAME_KEY = XmlRpcHelper.SYMBOLIC_NAME_KEY;
 
-    XmlRpcHelper xmlRpcHelper;
+    protected XmlRpcHelper xmlRpcHelper;
+    protected String baseUrl;
 
     public BaseXmlRpcAcceptanceTest()
     {
@@ -38,7 +39,8 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
             port = Integer.parseInt(portProperty);
         }
 
-        xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", port, "/xmlrpc"));
+        baseUrl = "http://localhost:" + port + "/";
+        xmlRpcHelper = new XmlRpcHelper(new URL(baseUrl + "xmlrpc"));
     }
 
     protected String randomName()
