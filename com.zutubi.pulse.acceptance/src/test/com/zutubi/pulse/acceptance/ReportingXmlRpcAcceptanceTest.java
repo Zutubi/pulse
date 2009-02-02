@@ -9,10 +9,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.IOUtils;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -302,27 +298,10 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         assertNotNull(artifact);
         String permalink = (String) artifact.get("permalink");
+        String text = downloadAsAdmin(baseUrl + permalink.substring(1) + "env.txt");
 
-        HttpClient client = new HttpClient();
-
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
-        client.getState().setCredentials(new AuthScope(null, -1), credentials);
-        client.getParams().setAuthenticationPreemptive(true);
-
-        GetMethod get = new GetMethod(baseUrl + permalink.substring(1) + "env.txt");
-        get.setDoAuthentication(true);
-        try
-        {
-            client.executeMethod(get);
-
-            String text = get.getResponseBodyAsString();
-            assertThat(text, containsString("PULSE_EXISTING_PROPERTY=overriding value"));
-            assertThat(text, containsString("PULSE_NEW_PROPERTY=new value"));
-        }
-        finally
-        {
-            get.releaseConnection();
-        }
+        assertThat(text, containsString("PULSE_EXISTING_PROPERTY=overriding value"));
+        assertThat(text, containsString("PULSE_NEW_PROPERTY=new value"));
     }
 
     private void getAllHelper(GetAllHelper helper) throws Exception
