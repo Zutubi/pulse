@@ -25,9 +25,9 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProces
 
     private Map<String, TestSuiteResult> suites;
 
-    public UnitTestPlusPlusReportPostProcessor()
+    public UnitTestPlusPlusReportPostProcessor(UnitTestPlusPlusReportPostProcessorConfiguration config)
     {
-        super("UnitTest++");
+        super(config);
     }
 
     protected void processDocument(Document doc, TestSuiteResult tests)

@@ -24,7 +24,6 @@ public class UnitTestPlusPlusReportPostProcessorTest extends XMLTestPostProcesso
                 )
         );
 
-        assertEquals(expected, runProcessorAndGetTests(new UnitTestPlusPlusReportPostProcessor()));
+        assertEquals(expected, runProcessorAndGetTests(new UnitTestPlusPlusReportPostProcessor(new UnitTestPlusPlusReportPostProcessorConfiguration())));
     }
-
 }
