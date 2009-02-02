@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<project default-recipe="ant build">
+    <regex.pp name="all">
+        <pattern category="error" expression="BUILD SUCCESSFUL"/>
+        <pattern category="warning" expression="BUILD SUCCESSFUL"/>
+    </regex.pp>
+
+    <recipe name="ant build">
+            <ant name="build">
+                <process processor="${all}"/>
+            </ant>
+    </recipe>
+</project>
