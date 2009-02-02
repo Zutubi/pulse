@@ -2,7 +2,12 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.RandomUtils;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Vector;
 
@@ -103,6 +108,26 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
         catch (Exception e)
         {
             assertTrue("Message '" + e.getMessage() + "' does not contain '" + error + "'", e.getMessage().contains(error));
+        }
+    }
+
+    protected String downloadAsAdmin(String url) throws IOException
+    {
+        HttpClient client = new HttpClient();
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
+        client.getState().setCredentials(new AuthScope(null, -1), credentials);
+        client.getParams().setAuthenticationPreemptive(true);
+
+        GetMethod get = new GetMethod(url);
+        get.setDoAuthentication(true);
+        try
+        {
+            client.executeMethod(get);
+            return get.getResponseBodyAsString();
+        }
+        finally
+        {
+            get.releaseConnection();
         }
     }
 }
