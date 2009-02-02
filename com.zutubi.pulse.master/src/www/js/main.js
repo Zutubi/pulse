@@ -37,6 +37,26 @@ function getElement(id)
     return element;
 }
 
+// Function to encode the components of a path using encodeURIComponent.  This
+// effectively works like enodeURIComponent on the whole path but without
+// encoding the slashes.
+function encodeURIPath(path)
+{
+    var pieces = path.split('/');
+    var encodedPath = '';
+    for (var i = 0; i < pieces.length; i++)
+    {
+        if (encodedPath.length > 0)
+        {
+            encodedPath += '/';
+        }
+
+        encodedPath += encodeURIComponent(pieces[i]);
+    }
+
+    return encodedPath;
+}
+
 // Function to toggle the enable state of a control based on the state of a
 // checkbox.
 function setEnableState(id, checkboxId, inverse)
@@ -508,7 +528,7 @@ function onConfigSelect(sm, node)
     if(treesInitialised && node)
     {
         detailPanel.load({
-            url: configTree.loader.getNodePath(node),
+            url: configTree.loader.getNodeURL(node),
             scripts: true,
             callback: function(element, success, response) {
                 if(!success)
@@ -574,17 +594,17 @@ function selectPath(path)
 
 function editPath(path)
 {
-    detailPanel.load({url: window.baseUrl + '/aconfig/' + path, scripts:true});
+    detailPanel.load({url: window.baseUrl + '/aconfig/' + encodeURIPath(path), scripts:true});
 }
 
 function addToPath(path, template)
 {
-    runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?wizard' + (template ? '=template' : ''));
+    runAjaxRequest(window.baseUrl + '/aconfig/' + encodeURIPath(path) + '?wizard' + (template ? '=template' : ''));
 }
 
-function actionPath(path, fromParent)
+function actionPath(path, action, fromParent)
 {
-    var url = window.baseUrl + '/aconfig/' + path + '=input';
+    var url = window.baseUrl + '/aconfig/' + encodeURIPath(path) + '?' + action + '=input';
     if(fromParent)
     {
         url += '&newPath=' + getParentPath(path);
@@ -594,7 +614,7 @@ function actionPath(path, fromParent)
 
 function deletePath(path)
 {
-    runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?delete=confirm');
+    runAjaxRequest(window.baseUrl + '/aconfig/' + encodeURIPath(path) + '?delete=confirm');
 }
 
 function showHelp(path, type)
