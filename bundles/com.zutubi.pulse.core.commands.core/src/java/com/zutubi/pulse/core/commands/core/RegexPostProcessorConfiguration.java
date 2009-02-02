@@ -52,12 +52,12 @@ public class RegexPostProcessorConfiguration extends LineBasedPostProcessorConfi
         this.patterns = patterns;
     }
 
-    public void addErrorRegexs(String... errorRegexs)
+    public void addErrorRegexes(String... errorRegexs)
     {
         addRegexes(Feature.Level.ERROR, errorRegexs);
     }
 
-    public void addWarningRegexs(String... warningRegexs)
+    public void addWarningRegexes(String... warningRegexs)
     {
         addRegexes(Feature.Level.WARNING, warningRegexs);
     }

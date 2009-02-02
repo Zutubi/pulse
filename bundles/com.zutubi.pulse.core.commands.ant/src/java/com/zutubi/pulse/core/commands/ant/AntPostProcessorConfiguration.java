@@ -38,7 +38,7 @@ public class AntPostProcessorConfiguration extends RegexPostProcessorConfigurati
         // Target `nosuchtarget' does not exist in this project.
         //
         // Total time: 0 seconds
-        addErrorRegexs("^Build failed|^BUILD FAILED");
+        addErrorRegexes("^Build failed|^BUILD FAILED");
 
         // javac task compiler messages
         RegexPatternConfiguration pattern = new RegexPatternConfiguration();

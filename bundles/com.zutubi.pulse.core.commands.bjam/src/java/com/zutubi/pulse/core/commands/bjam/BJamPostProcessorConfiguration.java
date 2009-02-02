@@ -9,14 +9,14 @@ public class BJamPostProcessorConfiguration extends RegexPostProcessorConfigurat
 {
     public BJamPostProcessorConfiguration()
     {
-        addErrorRegexs("^error:",
+        addErrorRegexes("^error:",
                        "^rule [a-zA-Z0-9_-]+ unknown",
                        "^\\.\\.\\.failed",
                        "^\\*\\*\\* argument error",
                        "^don't know how to make",
                        "^syntax error");
 
-        addWarningRegexs("^warning:");
+        addWarningRegexes("^warning:");
 
         setFailOnError(false);
         setLeadingContext(1);

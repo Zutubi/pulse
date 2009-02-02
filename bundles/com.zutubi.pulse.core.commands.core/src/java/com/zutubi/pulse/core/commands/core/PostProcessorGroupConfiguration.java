@@ -2,11 +2,11 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfigurationSupport;
-import com.zutubi.tove.annotations.Reference;
+import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /**
@@ -16,8 +16,8 @@ import java.util.List;
 @SymbolicName("zutubi.postProcessorGroupConfig")
 public class PostProcessorGroupConfiguration extends PostProcessorConfigurationSupport
 {
-    @Reference
-    private List<PostProcessorConfiguration> processors = new LinkedList<PostProcessorConfiguration>();
+    @Ordered
+    private Map<String, PostProcessorConfiguration> processors = new LinkedHashMap<String, PostProcessorConfiguration>();
 
     public PostProcessorGroupConfiguration()
     {
@@ -29,18 +29,13 @@ public class PostProcessorGroupConfiguration extends PostProcessorConfigurationS
         super(postProcessorType);
     }
 
-    public List<PostProcessorConfiguration> getProcessors()
+    public Map<String, PostProcessorConfiguration> getProcessors()
     {
         return processors;
     }
 
-    public void setProcessors(List<PostProcessorConfiguration> processors)
+    public void setProcessors(Map<String, PostProcessorConfiguration> processors)
     {
         this.processors = processors;
-    }
-
-    public int size()
-    {
-        return processors.size();
     }
 }

@@ -11,8 +11,7 @@ public class JUnitSummaryPostProcessorConfiguration extends RegexPostProcessorCo
 {
     public JUnitSummaryPostProcessorConfiguration()
     {
-        // Regex for patterns from maven itself
-        addErrorRegexs("Tests run: .*(Errors|Failures): [1-9]+");
+        addErrorRegexes("Tests run: .*(Errors|Failures): [1-9]+");
 
         setFailOnError(false);
         setLeadingContext(1);

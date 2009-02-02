@@ -1,43 +1,58 @@
 package com.zutubi.pulse.core.commands.maven2;
 
+import com.zutubi.pulse.core.ExpressionElementConfiguration;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory;
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 public class Maven2PostProcessorTest extends PostProcessorTestBase
 {
-    private Maven2PostProcessor pp;
+    private Maven2PostProcessorConfiguration config;
 
     public void setUp() throws IOException
     {
-        pp = new Maven2PostProcessor();
         super.setUp();
+        config = new Maven2PostProcessorConfiguration("maven2.pp");
+    }
+
+    private Maven2PostProcessor createProcessor()
+    {
+        DefaultPostProcessorFactory postProcessorFactory = new DefaultPostProcessorFactory();
+        postProcessorFactory.setObjectFactory(new DefaultObjectFactory());
+
+        Maven2PostProcessor pp = new Maven2PostProcessor(config);
+        pp.setPostProcessorFactory(postProcessorFactory);
+        return pp;
     }
 
     public void testSuccess() throws Exception
     {
-        CommandResult result = createAndProcessArtifact("success", pp);
+        CommandResult result = createAndProcessArtifact("success", createProcessor());
         assertTrue(result.succeeded());
         assertEquals(0, artifact.getFeatures().size());
     }
 
     public void testWarnings() throws Exception
     {
-        CommandResult result = createAndProcessArtifact("warnings", pp);
+        CommandResult result = createAndProcessArtifact("warnings", createProcessor());
         assertTrue(result.succeeded());
         assertWarnings("Compiling 1 source file to base.dir/target/classes\n" +
-                       "[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.\n" +
-                       "[WARNING] Another warning\n" +
-                       "[INFO] ----------------------------------------------------------------------------");
+                "[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.\n" +
+                "[WARNING] Another warning\n" +
+                "[INFO] ----------------------------------------------------------------------------\n" +
+                "[INFO] BUILD SUCCESSFUL\n" +
+                "[INFO] ----------------------------------------------------------------------------\n" +
+                "[INFO] ----------------------------------------------------------------------------");
     }
 
     public void testSuppressAllWarnings() throws Exception
     {
-        pp.createSuppressWarning().setPattern(Pattern.compile(".*"));
-        CommandResult result = createAndProcessArtifact("warnings", pp);
+        config.getSuppressedWarnings().add(new ExpressionElementConfiguration(".*"));
+        CommandResult result = createAndProcessArtifact("warnings", createProcessor());
         assertTrue(result.succeeded());
         assertEquals(0, artifact.getFeatures().size());
     }
@@ -46,18 +61,18 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
     {
         // Turn off context because it makes it difficult to see the right
         // warning is suppressed.
-        pp.setLeadingContext(0);
-        pp.setTrailingContext(0);
+        config.setLeadingContext(0);
+        config.setTrailingContext(0);
         
-        pp.createSuppressWarning().setPattern(Pattern.compile("jar from forked lifecycle"));
-        CommandResult result = createAndProcessArtifact("warnings", pp);
+        config.getSuppressedWarnings().add(new ExpressionElementConfiguration("jar from forked lifecycle"));
+        CommandResult result = createAndProcessArtifact("warnings", createProcessor());
         assertTrue(result.succeeded());
         assertWarnings("[WARNING] Another warning");
     }
 
     public void testNoPOM() throws Exception
     {
-        createAndProcessArtifact("nopom", pp);
+        createAndProcessArtifact("nopom", createProcessor());
         assertErrors("[INFO] ----------------------------------------------------------------------------\n" +
                 "[ERROR] BUILD ERROR\n" +
                 "[INFO] ----------------------------------------------------------------------------\n" +
@@ -70,7 +85,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testNoGoal() throws Exception
     {
-        createAndProcessArtifact("nogoal", pp);
+        createAndProcessArtifact("nogoal", createProcessor());
         assertErrors("[INFO] ----------------------------------------------------------------------------\n" +
                 "[ERROR] BUILD FAILURE\n" +
                 "[INFO] ----------------------------------------------------------------------------\n" +
@@ -83,7 +98,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testCompilerError() throws Exception
     {
-        CommandResult result = createAndProcessArtifact("compilererror", pp);
+        CommandResult result = createAndProcessArtifact("compilererror", createProcessor());
         assertErrors("[INFO] ----------------------------------------------------------------------------\n" +
                 "[ERROR] BUILD FAILURE\n" +
                 "[INFO] ----------------------------------------------------------------------------\n" +
@@ -104,7 +119,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testFatalError() throws Exception
     {
-        CommandResult result = createAndProcessArtifact("fatalerror", pp);
+        CommandResult result = createAndProcessArtifact("fatalerror", createProcessor());
         assertErrors("[INFO] ------------------------------------------------------------------------\n" +
                 "[ERROR] FATAL ERROR\n" +
                 "[INFO] ------------------------------------------------------------------------\n" +
@@ -125,7 +140,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testTestFailure() throws Exception
     {
-        CommandResult result = createAndProcessArtifact("testfailure", pp);
+        CommandResult result = createAndProcessArtifact("testfailure", createProcessor());
         assertErrors("[surefire] Running com.zutubi.maven2.test.AppTest\n" +
                 "[surefire] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: x sec <<<<<<<< FAILURE !! ",
 
@@ -150,18 +165,23 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testSuccessfulError() throws Exception
     {
-        CommandResult result = createAndProcessArtifact("successfulerror", pp);
+        CommandResult result = createAndProcessArtifact("successfulerror", createProcessor());
         assertErrors("[INFO] Generate \"Continuous Integration\" report.\n" +
                 "[ERROR] VM #displayTree: error : too few arguments to macro. Wanted 2 got 0\n" +
                 "[ERROR] VM #menuItem: error : too few arguments to macro. Wanted 1 got 0\n" +
-                "[INFO] Generate \"Dependencies\" report.");
+                "[INFO] Generate \"Dependencies\" report.\n" +
+                "[INFO] Generate \"Issue Tracking\" report.\n" +
+                "[INFO] Generate \"Project License\" report.\n" +
+                "[INFO] Generate \"Mailing Lists\" report.\n" +
+                "[INFO] Generate \"About\" report.\n" +
+                "[INFO] Generate \"Project Summary\" report.");
         assertTrue(result.succeeded());
     }
 
     public void testSuppressError() throws Exception
     {
-        pp.createSuppressError().setPattern(Pattern.compile("too few arguments"));
-        CommandResult result = createAndProcessArtifact("successfulerror", pp);
+        config.getSuppressedErrors().add(new ExpressionElementConfiguration("too few arguments"));
+        CommandResult result = createAndProcessArtifact("successfulerror", createProcessor());
         assertEquals(0, artifact.getFeatures().size());
         assertTrue(result.succeeded());
     }

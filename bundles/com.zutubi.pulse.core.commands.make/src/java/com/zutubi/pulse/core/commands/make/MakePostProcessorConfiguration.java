@@ -12,7 +12,7 @@ public class MakePostProcessorConfiguration extends RegexPostProcessorConfigurat
 {
     public MakePostProcessorConfiguration()
     {
-        addErrorRegexs("^make(\\[[0-9]+\\])?: \\*\\*\\*");
+        addErrorRegexes("^make(\\[[0-9]+\\])?: \\*\\*\\*");
         setFailOnError(false);
         setLeadingContext(3);
         setTrailingContext(3);

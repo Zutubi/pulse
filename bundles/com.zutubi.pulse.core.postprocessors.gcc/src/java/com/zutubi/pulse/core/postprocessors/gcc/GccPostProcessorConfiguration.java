@@ -12,8 +12,8 @@ public class GccPostProcessorConfiguration extends RegexPostProcessorConfigurati
 {
     public GccPostProcessorConfiguration()
     {
-        addErrorRegexs("^.+:[0-9]+: error:");
-        addWarningRegexs("^.+:[0-9]+: warning:");
+        addErrorRegexes("^.+:[0-9]+: error:");
+        addWarningRegexes("^.+:[0-9]+: warning:");
 
         setFailOnError(false);
         setLeadingContext(2);

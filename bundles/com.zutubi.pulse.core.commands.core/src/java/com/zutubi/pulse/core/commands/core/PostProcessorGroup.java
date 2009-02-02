@@ -1,6 +1,9 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.postprocessors.api.*;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
@@ -12,23 +15,33 @@ import java.util.List;
  * A group of post-processors.  Simply applies all processors in the group in
  * order.
  */
-public class PostProcessorGroup extends PostProcessorSupport
+public class PostProcessorGroup implements PostProcessor
 {
     private PostProcessorFactory postProcessorFactory;
+    private PostProcessorGroupConfiguration config;
 
     public PostProcessorGroup(PostProcessorGroupConfiguration config)
     {
-        super(config);
+        this.config = config;
     }
 
-    public void processFile(File artifactFile, PostProcessorContext ppContext)
+    public PostProcessorGroupConfiguration getConfig()
     {
-        PostProcessorGroupConfiguration config = (PostProcessorGroupConfiguration) getConfig();
-        List<PostProcessor> processors = CollectionUtils.map(config.getProcessors(), new Mapping<PostProcessorConfiguration, PostProcessor>()
+        return config;
+    }
+
+    protected PostProcessor createChildProcessor(PostProcessorConfiguration childConfig)
+    {
+        return postProcessorFactory.createProcessor(childConfig);
+    }
+
+    public void process(File artifactFile, PostProcessorContext ppContext)
+    {
+        List<PostProcessor> processors = CollectionUtils.map(config.getProcessors().values(), new Mapping<PostProcessorConfiguration, PostProcessor>()
         {
             public PostProcessor map(PostProcessorConfiguration childConfig)
             {
-                return postProcessorFactory.createProcessor(childConfig);
+                return createChildProcessor(childConfig);
             }
         });
 
