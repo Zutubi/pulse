@@ -1,16 +1,19 @@
 package com.zutubi.pulse.core.commands.msbuild;
 
-import com.zutubi.pulse.core.commands.core.ExecutableCommandTestBase;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.commands.api.TestCommandContext;
+import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 
-public class MsBuildCommandTest extends ExecutableCommandTestBase
+public class MsBuildCommandTest extends ExecutableCommandTestCase
 {
+    private static final String BUILD_FILE_NAME = "build.proj.xml";
+    private static final String EXTENSION_XML = "xml";
+
     public boolean isMsBuildPresent()
     {
         return SystemUtils.IS_WINDOWS && SystemUtils.findInPath("msbuild") != null;
@@ -26,8 +29,8 @@ public class MsBuildCommandTest extends ExecutableCommandTestBase
 
     public void testTrivialDefaultBuildFile() throws Exception
     {
-        copyBuildFileToBaseDir("trivial");
-        MsBuildCommand command = new MsBuildCommand();
+        copyBuildFile("trivial");
+        MsBuildCommandConfiguration command = new MsBuildCommandConfiguration();
         successRun(command, "Build succeeded");
     }
 
@@ -35,24 +38,24 @@ public class MsBuildCommandTest extends ExecutableCommandTestBase
     {
         final String NON_STANDARD_BUILD_FILE_NAME = "random.name";
 
-        copyBuildFileToBaseDir("trivial");
-        File buildFile = new File(baseDir, getBuildFileName());
+        copyBuildFile("trivial");
+        File buildFile = new File(baseDir, BUILD_FILE_NAME);
         assertTrue(buildFile.renameTo(new File(baseDir, NON_STANDARD_BUILD_FILE_NAME)));
 
-        MsBuildCommand command = new MsBuildCommand();
+        MsBuildCommandConfiguration command = new MsBuildCommandConfiguration();
         command.setBuildFile(NON_STANDARD_BUILD_FILE_NAME);
         successRun(command, "Build succeeded");
     }
 
     public void testNoBuildFile() throws Exception
     {
-        MsBuildCommand command = new MsBuildCommand();
+        MsBuildCommandConfiguration command = new MsBuildCommandConfiguration();
         failedRun(command, "Specify a project or solution file");
     }
 
     public void testBadBuildFile() throws Exception
     {
-        MsBuildCommand command = new MsBuildCommand();
+        MsBuildCommandConfiguration command = new MsBuildCommandConfiguration();
         command.setBuildFile("nosuchfile");
         failedRun(command, "Project file does not exist");
     }
@@ -61,59 +64,36 @@ public class MsBuildCommandTest extends ExecutableCommandTestBase
     {
         createSourceFile();
 
-        copyBuildFileToBaseDir("csharp");
-        MsBuildCommand command = new MsBuildCommand();
+        copyBuildFile("csharp");
+        MsBuildCommandConfiguration command = new MsBuildCommandConfiguration();
         successRun(command, "Build succeeded");
-    }
-
-    public void testCSharpSuccessCompileError() throws Exception
-    {
-        createSourceFileWithError();
-
-        copyBuildFileToBaseDir("csharp");
-        MsBuildCommand command = new MsBuildCommand();
-        CommandResult commandResult = failedRun(command, "The name 'i' does not exist in the current context");
-        StoredFileArtifact outputArtifact = getOutputArtifact(commandResult);
-        assertErrorsMatch(outputArtifact, ".*'i' does not exist.*", "Build FAILED\\.");
     }
 
     public void testTargets() throws Exception
     {
-        copyBuildFileToBaseDir("properties");
-        MsBuildCommand command = new MsBuildCommand();
+        copyBuildFile("properties");
+        MsBuildCommandConfiguration command = new MsBuildCommandConfiguration();
         command.setTargets("T1 T2");
         successRun(command, "Ran T1", "Ran T2");
     }
 
     public void testConfiguration() throws Exception
     {
-        copyBuildFileToBaseDir("properties");
-        MsBuildCommand command = new MsBuildCommand();
+        copyBuildFile("properties");
+        MsBuildCommandConfiguration command = new MsBuildCommandConfiguration();
         command.setConfiguration("Release");
         successRun(command, "Configuration = Release");
     }
 
     public void testBuildProperties() throws Exception
     {
-        copyBuildFileToBaseDir("properties");
-        MsBuildCommand command = new MsBuildCommand();
-        MsBuildCommand.BuildProperty buildProperty = command.createBuildProperty();
+        copyBuildFile("properties");
+        MsBuildCommandConfiguration command = new MsBuildCommandConfiguration();
+        MsBuildCommandConfiguration.BuildPropertyConfiguration buildProperty = new MsBuildCommandConfiguration.BuildPropertyConfiguration();
         buildProperty.setName("foo");
         buildProperty.setValue("bar");
+        command.getBuildProperties().put(buildProperty.getName(), buildProperty);
         successRun(command, "foo = bar");
-    }
-
-    public void testDisablePostProcessing() throws Exception
-    {
-        createSourceFileWithError();
-        copyBuildFileToBaseDir("csharp");
-        MsBuildCommand command = new MsBuildCommand();
-        command.setPostProcess(false);
-        CommandResult commandResult = failedRun(command);
-
-        // No post processing, so no error features.
-        StoredFileArtifact outputArtifact = getOutputArtifact(commandResult);
-        assertErrorsMatch(outputArtifact);
     }
 
     private void createSourceFile() throws IOException
@@ -140,13 +120,23 @@ public class MsBuildCommandTest extends ExecutableCommandTestBase
                 "}");
     }
 
-    protected String getBuildFileName()
+    private TestCommandContext successRun(MsBuildCommandConfiguration commandConfiguration, String... contents) throws Exception
     {
-        return "build.proj";
+        return successRun(new NamedArgumentCommand(commandConfiguration), contents);
     }
 
-    protected String getBuildFileExt()
+    private TestCommandContext failedRun(MsBuildCommandConfiguration commandConfiguration, String... contents) throws Exception
     {
-        return "xml";
+        return failedRun(new NamedArgumentCommand(commandConfiguration), contents);
+    }
+
+    private File copyBuildFile(String name) throws IOException
+    {
+        return copyBuildFile(name, BUILD_FILE_NAME);
+    }
+
+    private File copyBuildFile(String name, String toName) throws IOException
+    {
+        return copyBuildFile(name, EXTENSION_XML, toName);
     }
 }

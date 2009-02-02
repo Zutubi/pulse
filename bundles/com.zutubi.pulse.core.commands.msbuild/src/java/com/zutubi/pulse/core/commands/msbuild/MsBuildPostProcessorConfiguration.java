@@ -1,19 +1,17 @@
 package com.zutubi.pulse.core.commands.msbuild;
 
-import com.zutubi.pulse.core.RegexPattern;
-import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
-
-import java.util.regex.Pattern;
+import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
+import com.zutubi.tove.annotations.SymbolicName;
 
 /**
  * A post-processor for msbuild output.  Attempts to capture features from
  * MsBuild itself (e.g. "Build failed") and from tools it commonly invokes
  * (such as the C# compiler).
  */
-public class MsBuildPostProcessor extends RegexPostProcessor
+@SymbolicName("zutubi.msbuildPostProcessorConfig")
+public class MsBuildPostProcessorConfiguration extends RegexPostProcessorConfiguration
 {
-    public MsBuildPostProcessor()
+    public MsBuildPostProcessorConfiguration()
     {
         // MsBuild's own build failed messages:
 
@@ -54,9 +52,7 @@ public class MsBuildPostProcessor extends RegexPostProcessor
         //
         // Time Elapsed 00:00:00.01
 
-        RegexPattern pattern = createPattern();
-        pattern.setPattern(Pattern.compile("^Build FAILED"));
-        pattern.setCategory(Feature.Level.ERROR);
+        addErrorRegexes("^Build FAILED");
 
         // Tool error messages follow a similar format, examples include:
         //
@@ -70,21 +66,17 @@ public class MsBuildPostProcessor extends RegexPostProcessor
         // <tool/file> : [fatal] error <code>: <message>
         // The file name and location are given if the message can be pinned to
         // a file, otherwise the tool name is used as a prefix.
-        pattern = createPattern();
-        pattern.setPattern(Pattern.compile("^\\w.*:( fatal)? error [A-Z]*[0-9]*:"));
-        pattern.setCategory(Feature.Level.ERROR);
+        addErrorRegexes("^\\w.*:( fatal)? error [A-Z]*[0-9]*:");
 
         // Tool warning messages have a similar format, with "warning" in place
         // of "error".
-        pattern = createPattern();
-        pattern.setPattern(Pattern.compile("^\\w.*: warning [A-Z]*[0-9]*:"));
-        pattern.setCategory(Feature.Level.WARNING);
+        addWarningRegexes("^\\w.*: warning [A-Z]*[0-9]*:");
 
         // Use the exit code to determine the command result.
         setFailOnError(false);
     }
 
-    public MsBuildPostProcessor(String name)
+    public MsBuildPostProcessorConfiguration(String name)
     {
         this();
         setName(name);

@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<project>
-    <recipe name="default">
-        <msbuild name="properties">
-            <build-property/>
-        </msbuild>
-    </recipe>
-</project>
