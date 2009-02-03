@@ -489,6 +489,11 @@ public class XmlRpcHelper
         call("triggerBuild", projectName);
     }
 
+    public void triggerBuild(String projectName, String revision, Hashtable<String, String> properties) throws Exception
+    {
+        call("triggerBuild", projectName, revision, properties);
+    }
+
     /**
      * Requests the given build be terminated.
      *
@@ -606,5 +611,4 @@ public class XmlRpcHelper
             helper.logout();
         }
     }
-
 }

@@ -97,7 +97,7 @@
             if(treesInitialised && node)
             {
                 detailPanel.load({
-                    url: '$base/atemplate/$scope/' + node.attributes.baseName,
+                    url: '$base/atemplate/$scope/' + encodeURIComponent(node.attributes.baseName),
                     scripts: true,
                     callback: function(element, success, response) {
                         if(!success)

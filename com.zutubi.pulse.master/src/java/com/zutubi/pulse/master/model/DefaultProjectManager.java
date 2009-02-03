@@ -531,6 +531,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         Project project = getProject(projectConfig.getProjectId(), false);
 
+        // Rewire the project instance with the passed-in configuration, which may not be identical
+        // to the persistent version (e.g. it could have additional properties).
+        project.setConfig(projectConfig);
+
         if(revision == null)
         {
             if(projectConfig.getOptions().getIsolateChangelists())

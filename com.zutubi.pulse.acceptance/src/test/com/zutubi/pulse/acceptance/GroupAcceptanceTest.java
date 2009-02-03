@@ -17,6 +17,8 @@ import com.zutubi.tove.type.record.PathUtils;
  */
 public class GroupAcceptanceTest extends SeleniumTestBase
 {
+    private static final String ANONYMOUS_USERS_GROUP_ID = "anonymous.users";
+
     public void testDefaultGroupsTable()
     {
         loginAsAdmin();
@@ -130,6 +132,20 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         logout();
     }
 
+    public void testEditBuiltInGroup()
+    {
+        loginAsAdmin();
+
+        GroupsPage groupsPage = new GroupsPage(selenium, urls);
+        groupsPage.goTo();
+
+        BuiltinGroupForm form = groupsPage.clickViewBuiltinGroupAndWait(ANONYMOUS_USERS_GROUP_ID);
+
+        form.applyFormElements(null, ServerPermission.PERSONAL_BUILD.toString());
+        form.waitFor();
+        assertTextNotPresent("name requires a value");
+    }
+
     public void testAllUsersGroupNameIsReadOnly()
     {
         assertBuiltinGroupNameIsReadOnly(ALL_USERS_GROUP_NAME, "all.users");
@@ -137,7 +153,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
     public void testAnonymousUserGroupNameIsReadOnly()
     {
-        assertBuiltinGroupNameIsReadOnly(ANONYMOUS_USERS_GROUP_NAME, "anonymous.users");
+        assertBuiltinGroupNameIsReadOnly(ANONYMOUS_USERS_GROUP_NAME, ANONYMOUS_USERS_GROUP_ID);
     }
 
     private void assertBuiltinGroupNameIsReadOnly(String groupName, String groupId)

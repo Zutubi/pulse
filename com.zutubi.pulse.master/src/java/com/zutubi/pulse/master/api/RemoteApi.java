@@ -21,6 +21,7 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
@@ -1898,6 +1899,8 @@ public class RemoteApi
         buildDetails.put("status", result.getState().getPrettyString());
         buildDetails.put("completed", result.completed());
         buildDetails.put("succeeded", result.succeeded());
+        buildDetails.put("errorCount", result.getErrorFeatureCount());
+        buildDetails.put("warningCount", result.getWarningFeatureCount());
 
         TimeStamps timeStamps = result.getStamps();
         buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
@@ -2276,6 +2279,7 @@ public class RemoteApi
      * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String, String) 
+     * @see #triggerBuild(String, String, String, Hashtable)
      */
     public boolean triggerBuild(String token, String projectName)
     {
@@ -2288,12 +2292,35 @@ public class RemoteApi
      * 
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project to trigger
-     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number)
+     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
+     *                    may be empty to indicate the latest revision should be used
      * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String) 
+     * @see #triggerBuild(String, String, String, Hashtable)
      */
-    public boolean triggerBuild(String token, String projectName, final String revision)
+    public boolean triggerBuild(String token, String projectName, String revision)
+    {
+        return triggerBuild(token, projectName, revision, null);
+    }
+
+    /**
+     * Triggers a build of the given project at the given revision with the given project property
+     * values.  The revision will be verified before requesting the build.  The properties are added
+     * to the project configuration (for properties that already exist, the values are overridden)
+     * for this build only.  This function returns as soon as the request has been made.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project to trigger
+     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
+     *                    may be empty to indicate the latest revision should be used
+     * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
+     * @return true
+     * @access requires trigger permission for the given project
+     * @see #triggerBuild(String, String)
+     * @see #triggerBuild(String, String, String)
+     */
+    public boolean triggerBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
     {
         User user = tokenManager.loginAndReturnUser(token);
         try
@@ -2326,7 +2353,25 @@ public class RemoteApi
                 }
             }
 
-            projectManager.triggerBuild(project.getConfig(), new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
+            ProjectConfiguration projectConfig = project.getConfig();
+            if (properties != null)
+            {
+                projectConfig = configurationProvider.deepClone(projectConfig);
+                for (Map.Entry<String, String> property: properties.entrySet())
+                {
+                    ResourcePropertyConfiguration existingProperty = projectConfig.getProperty(property.getKey());
+                    if (existingProperty == null)
+                    {
+                        projectConfig.getProperties().put(property.getKey(), new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
+                    }
+                    else
+                    {
+                        existingProperty.setValue(property.getValue());
+                    }
+                }
+            }
+
+            projectManager.triggerBuild(projectConfig, new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
             return true;
         }
         finally
@@ -2334,7 +2379,7 @@ public class RemoteApi
             tokenManager.logoutUser();
         }
     }
-
+    
     /**
      * Request that the given active build is cancelled.  This function returns when the request is
      * made, which is likely to be before the build is cancelled (if indeed it is cancelled).

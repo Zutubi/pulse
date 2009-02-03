@@ -12,6 +12,49 @@ import java.util.logging.Logger;
 /**
  * The LogManager provides a wrapper around the default java.util.logging.LogManager that
  * allows for the use of a custom logging configuration file format.
+ *
+ * The following is a brief overview of the custom logging format, which is heavily based on
+ * the default, with a few additions.
+ *
+ * config:  used to define one of more configuration classes that can be used to programmatically
+ * configure the logging system.  The class names must be fully qualified and any configuration
+ * handled in the no argument constructor.
+ *
+ * handlers:  list of the logging handlers that are defined later in the log configuration file.
+ *
+ * For example:
+ *
+ * handlers=eventHandler
+ *
+ * handler.type: this is a required property for all of the configured handlers, and is used to
+ * define the handlers type. Available types include ConsoleHandler, FileHandler and MemoryHandler.
+ * The handlers type can also be a fully qualifies class name if you wish to use a custom handler.
+ * If you use one of the existing types, you can configure it by handler.xxx properties, where xxx
+ * are the properties supported by that specific handler implementation.
+ *
+ * For example:
+ *
+ * eventHandler.type=FileHandler
+ * eventHandler.pattern=%l/event%u.%g.log
+ * eventHandler.limit=200000
+ * eventHandler.count=5
+ * eventHandler.append=false
+ * eventHandler.formatter=com.zutubi.pulse.servercore.util.logging.EventLogFormatter
+ * eventHandler.level=ALL
+ *
+ * xxx.level: this defines the logging level for a specific level in the logging hierarchy.
+ *
+ * For example:
+ *
+ * org.springframework.level=WARNING
+ * org.hibernate.level=WARNING
+ *
+ * xxx.handler: this binds the previously defines handlers to a specific level in the logging hierarchy
+ *
+ * For example:
+ *
+ * com.zutubi.pulse.master.events.handler=eventHandler
+ *
  */
 public class LogManager
 {
@@ -40,7 +83,12 @@ public class LogManager
         {
             String loggerName = loggerNames.nextElement();
             Logger l = java.util.logging.LogManager.getLogManager().getLogger(loggerName);
-            l.setLevel(null);
+            // Note that on OpenJDK platforms, there is no guarentee that a logger will exist.  The logger instance
+            // may have been garbage collected.  Hence we need this != null check.
+            if (l != null)
+            {
+                l.setLevel(null);
+            }
         }
     }
 

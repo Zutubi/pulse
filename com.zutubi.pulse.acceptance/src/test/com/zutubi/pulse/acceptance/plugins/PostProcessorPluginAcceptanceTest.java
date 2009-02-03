@@ -6,9 +6,11 @@ import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 
@@ -66,27 +68,24 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testPostProcessorPlugins() throws PulseException, InterruptedException
+    public void testPostProcessorPlugin() throws PulseException, InterruptedException
     {
-        // FIXME loader
-//        // install test plugin.
-//        Plugin plugin = pluginSystem.install(samplePostProcessorPlugin);
-//        assertEquals(Plugin.State.ENABLED, plugin.getState());
-//
-//        // need to yield since the extension manager is notified of the new plugin asynchronously.
-//        Thread.yield();
-//
-//        // ensure that we are picking up the expected post processors from the installed plugin.
-//        assertNotNull(extensionManager.getPostProcessor("sample.pp"));
-//
-//        PulseFile pf = new PulseFile();
-//
-//        PulseFileLoader loader = loaderFactory.createLoader();
-//        loader.load(getInput("testPostProcessorPlugin", "xml"), pf);
-//
-//        Reference ref = pf.getReference("sample.pp");
-//
-//        // verify that the reference is to the expected instance.
-//        assertNotNull(ref.referenceValue());
+        // install test plugin.
+        Plugin plugin = pluginSystem.install(samplePostProcessorPlugin);
+        assertEquals(Plugin.State.ENABLED, plugin.getState());
+
+        // ensure that we are picking up the expected post processors from the installed plugin.
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return extensionManager.getPostProcessor("sample.pp") != null;
+            }
+        }, 30000, "sample processor to be ready");
+
+        ProjectRecipesConfiguration prc = new ProjectRecipesConfiguration();
+
+        PulseFileLoader loader = loaderFactory.createLoader();
+        loader.load(getInput("xml"), prc);
     }
 }

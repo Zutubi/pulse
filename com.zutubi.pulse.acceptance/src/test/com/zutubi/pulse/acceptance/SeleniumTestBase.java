@@ -266,15 +266,15 @@ public class SeleniumTestBase extends PulseTestCase
      */
     public AddProjectWizard.TypeState runAddProjectWizard(ProjectWizardDriver driver)
     {
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, driver.getParentName(), true);
-        globalPage.goTo();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, driver.getParentName(), true);
+        hierarchyPage.goTo();
         if (driver.isTemplate())
         {
-            globalPage.clickAddTemplate();
+            hierarchyPage.clickAddTemplate();
         }
         else
         {
-            globalPage.clickAdd();
+            hierarchyPage.clickAdd();
         }
 
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);

@@ -83,7 +83,7 @@
             #if($action.action == "delete")
                             onclick="deletePath('#jss(${path})'); return false;"
             #else
-                            onclick="actionPath('#jss(${path})?${action.action}', false); return false;"
+                            onclick="actionPath('#jss(${path})', '${action.action}', false); return false;"
             #end
                         >
                             <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}

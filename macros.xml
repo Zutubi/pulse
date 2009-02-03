@@ -21,7 +21,7 @@
                     <typefound uri="antlib:org.apache.ivy.ant" name="info"/>
                 </not>
                 <then>
-                    <echo>Loading ivy from project.root/etc</echo>
+                    <echo>Loading ivy from ${project.root.dir}/etc</echo>
                     <path id="ivy.task.path">
                         <fileset dir="${project.root.dir}/etc">
                             <include name="ivy*.jar"/>

@@ -795,6 +795,22 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         checkListedRecipes("");
     }
 
+    public void testPunctuatedProjectName()
+    {
+        loginAsAdmin();
+
+        String punctuatedName = ".;.,." + random;
+        addProject(punctuatedName, false);
+
+        // Check the hierarchy, config and such.
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, punctuatedName, false);
+        hierarchyPage.goTo();
+        assertTextNotPresent("invalid");
+        ProjectConfigPage configPage = hierarchyPage.clickConfigure();
+        configPage.waitFor();
+        configPage.clickBuildOptionsAndWait();
+    }
+
     private void checkListedRecipes(String... expectedRecipes)
     {
         loginAsAdmin();

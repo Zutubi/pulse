@@ -208,9 +208,6 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         ProjectConfiguration projectConfig = configurationProvider.deepClone(project.getConfig());
         mapProperties(projectConfig);
 
-        // Rewire the now cloned instance of the projectConfiguration to the project state.
-        project.setConfig(projectConfig);
-
         Revision r = null;
         if(TextUtils.stringSet(revision))
         {

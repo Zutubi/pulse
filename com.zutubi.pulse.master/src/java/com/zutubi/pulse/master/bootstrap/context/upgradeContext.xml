@@ -45,6 +45,7 @@
                 <ref local="addPerforceTicketAuthentication"/>
                 <ref local="deleteTempateProjectStates"/>
                 <ref local="skippedTestCases"/>
+                <ref local="ensureGlobalConfigPermanent"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -140,5 +141,9 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.19-patch-01.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="ensureGlobalConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureGlobalConfigPermanentUpgradeTask">
+        <property name="buildNumber" value="200021001"/>
     </bean>
 </beans>
