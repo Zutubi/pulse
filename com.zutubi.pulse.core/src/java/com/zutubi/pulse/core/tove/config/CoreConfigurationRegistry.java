@@ -1,7 +1,9 @@
 package com.zutubi.pulse.core.tove.config;
 
+import com.zutubi.pulse.core.commands.api.CommandConfigurationSupport;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.OutputProducingCommandConfigurationSupport;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.tove.config.api.Configuration;
@@ -30,6 +32,9 @@ public class CoreConfigurationRegistry implements ConfigurationRegistry
             registerConfigurationType(Property.class);
             registerConfigurationType(DirectoryOutputConfiguration.class);
             registerConfigurationType(FileOutputConfiguration.class);
+
+            registerConfigurationType(CommandConfigurationSupport.class);
+            registerConfigurationType(OutputProducingCommandConfigurationSupport.class);
         }
         catch (TypeException e)
         {

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.api;
 
+import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.api.AbstractConfiguration;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -14,8 +14,10 @@ public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationS
 {
     private File base;
     private String index;
-    private List<PatternConfiguration> inclusions = new LinkedList<PatternConfiguration>();
-    private List<PatternConfiguration> exclusions = new LinkedList<PatternConfiguration>();
+    @Addable("include")
+    private List<String> exclusions = new LinkedList<String>();
+    @Addable("exclude")
+    private List<String> inclusions = new LinkedList<String>();
     private boolean followSymlinks;
 
     public File getBase()
@@ -38,22 +40,22 @@ public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationS
         this.index = index;
     }
 
-    public List<PatternConfiguration> getInclusions()
+    public List<String> getInclusions()
     {
         return inclusions;
     }
 
-    public void setInclusions(List<PatternConfiguration> inclusions)
+    public void setInclusions(List<String> inclusions)
     {
         this.inclusions = inclusions;
     }
 
-    public List<PatternConfiguration> getExclusions()
+    public List<String> getExclusions()
     {
         return exclusions;
     }
 
-    public void setExclusions(List<PatternConfiguration> exclusions)
+    public void setExclusions(List<String> exclusions)
     {
         this.exclusions = exclusions;
     }
@@ -71,21 +73,5 @@ public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationS
     public Output createOutput()
     {
         return buildOutput(DirectoryOutput.class);
-    }
-
-    @SymbolicName("zutubi.directoryOutputConfig.patternConfig")
-    public static class PatternConfiguration extends AbstractConfiguration
-    {
-        private String pattern;
-
-        public String getPattern()
-        {
-            return pattern;
-        }
-
-        public void setPattern(String pattern)
-        {
-            this.pattern = pattern;
-        }
     }
 }

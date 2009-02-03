@@ -43,11 +43,6 @@ public class ToveFileLoader
     private TypeRegistry typeRegistry;
     private ValidationManager validationManager = new PulseValidationManager();
 
-    public ToveFileLoader()
-    {
-        // For the Spring
-    }
-
     public CompositeType lookupType(Class clazz) throws FileLoadException
     {
         CompositeType type = typeRegistry.getType(clazz);

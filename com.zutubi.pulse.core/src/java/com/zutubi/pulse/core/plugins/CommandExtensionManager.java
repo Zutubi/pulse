@@ -9,6 +9,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
+import java.lang.reflect.Modifier;
+
 /**
  * Extension manager for managing build commands (e.g. the Ant command).
  */
@@ -54,11 +56,15 @@ public class CommandExtensionManager extends AbstractExtensionManager
             return;
         }
 
-        if (PluginManager.VERBOSE_EXTENSIONS)
+        if (!clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers()))
         {
-            System.out.println(String.format("Adding Command: %s -> %s", name, cls));
+            if (PluginManager.VERBOSE_EXTENSIONS)
+            {
+                System.out.println(String.format("Adding Command: %s -> %s", name, cls));
+            }
+
+            fileLoaderFactory.register(name, clazz);
         }
-        fileLoaderFactory.register(name, clazz);
         tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
     }
 

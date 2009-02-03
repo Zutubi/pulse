@@ -3,6 +3,7 @@
 <plugin>
     <extension point="com.zutubi.pulse.core.commands">
         <command name="executable" class="com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration"/>
+        <command name="named-argument" class="com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration"/>
         <command name="print" class="com.zutubi.pulse.core.commands.core.PrintCommandConfiguration"/>
         <command name="sleep" class="com.zutubi.pulse.core.commands.core.SleepCommandConfiguration"/>
     </extension>

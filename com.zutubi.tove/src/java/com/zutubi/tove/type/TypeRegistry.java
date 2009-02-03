@@ -160,7 +160,7 @@ public class TypeRegistry
     private void checkSuperType(CompositeType type, Class superType) throws TypeException
     {
         CompositeType candidateSuper = getType(superType);
-        if(candidateSuper != null && candidateSuper.isExtendable())
+        if (candidateSuper != null)
         {
             if(type.hasAnnotation(Internal.class, false))
             {

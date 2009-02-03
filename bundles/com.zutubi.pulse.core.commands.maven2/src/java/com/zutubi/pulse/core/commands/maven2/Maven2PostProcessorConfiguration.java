@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.SystemUtils;
 
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
  * A post-processor for maven 2 output.  Attempts to capture features from Maven
  * itself (e.g. "[ERROR] BUILD ERROR") and from commonly-used plugins.
  */
+@SymbolicName("zutubi.maven2PostProcessorConfig")
 public class Maven2PostProcessorConfiguration extends AbstractNamedConfiguration implements PostProcessorConfiguration
 {
     private static final String JUNIT_PROCESSOR_NAME = "junit.summary";
@@ -33,8 +35,13 @@ public class Maven2PostProcessorConfiguration extends AbstractNamedConfiguration
     @Addable("suppress-warning")
     private List<ExpressionElementConfiguration> suppressedErrors = new LinkedList<ExpressionElementConfiguration>();
 
+    public Maven2PostProcessorConfiguration()
+    {
+    }
+
     public Maven2PostProcessorConfiguration(String name)
     {
+        this();
         setName(name);
     }
 

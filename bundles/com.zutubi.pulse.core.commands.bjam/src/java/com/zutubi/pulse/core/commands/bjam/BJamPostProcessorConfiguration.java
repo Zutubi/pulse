@@ -1,10 +1,12 @@
 package com.zutubi.pulse.core.commands.bjam;
 
 import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
+import com.zutubi.tove.annotations.SymbolicName;
 
 /**
  * A post processor that looks for error messages from Boost Jam (bjam).
  */
+@SymbolicName("zutubi.bjamPostProcessorConfig")
 public class BJamPostProcessorConfiguration extends RegexPostProcessorConfiguration
 {
     public BJamPostProcessorConfiguration()

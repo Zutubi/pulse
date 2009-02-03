@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
-import java.util.List;
 
 /**
  */
@@ -50,12 +49,12 @@ public class DirectoryOutput extends FileSystemOutputSupport<DirectoryOutputConf
         scanner.setBasedir(base);
         if (!config.getInclusions().isEmpty())
         {
-            scanner.setIncludes(flattenPatterns(config.getInclusions()));
+            scanner.setIncludes(config.getInclusions().toArray(new String[config.getInclusions().size()]));
         }
 
         if (!config.getExclusions().isEmpty())
         {
-            scanner.setExcludes(flattenPatterns(config.getExclusions()));
+            scanner.setExcludes(config.getExclusions().toArray(new String[config.getExclusions().size()]));
         }
 
         scanner.setFollowSymlinks(config.isFollowSymlinks());
@@ -66,18 +65,5 @@ public class DirectoryOutput extends FileSystemOutputSupport<DirectoryOutputConf
         {
             captureFile(new File(toDir, file), new File(base, file), context);
         }
-    }
-
-    private String[] flattenPatterns(List<DirectoryOutputConfiguration.PatternConfiguration> patterns)
-    {
-        String[] result = new String[patterns.size()];
-        int i = 0;
-
-        for (DirectoryOutputConfiguration.PatternConfiguration p : patterns)
-        {
-            result[i++] = p.getPattern();
-        }
-
-        return result;
     }
 }

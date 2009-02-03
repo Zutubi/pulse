@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.maven2;
 
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.TextUtils;
 
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * The Maven2 command is used to run a maven 2 build.
  */
+@SymbolicName("zutubi.maven2CommandConfig")
 public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguration
 {
     /**

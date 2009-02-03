@@ -335,21 +335,16 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private void registerSubtype(CompositeType type, boolean internal, boolean direct) throws TypeException
     {
-        if (!isExtendable())
-        {
-            throw new TypeException("Class '" + getClass().getName() + "' is not extendable");
-        }
-
         if (!this.getClazz().isAssignableFrom(type.getClazz()))
         {
             throw new TypeException("Extension class '" + type.getClazz().getName() + "' is not a subtype of '" + getClazz().getName() + "'");
         }
 
         // All of our concrete descendents get registered on the extensions
-        // list.
-        if (!type.isExtendable())
+        // list, but only if we are not concrete.
+        if (isExtendable() && !type.isExtendable())
         {
-            if(internal)
+            if (internal)
             {
                 internalExtensions.add(type);
             }

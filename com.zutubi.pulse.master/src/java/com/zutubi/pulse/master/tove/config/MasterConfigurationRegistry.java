@@ -115,6 +115,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(MsBuildTypeConfiguration.class);
             registerConfigurationType(VersionedTypeConfiguration.class);
             registerConfigurationType(XCodeTypeConfiguration.class);
+            registerConfigurationType(MultiStepTypeConfiguration.class);
 
             // change viewer configuration
             registerConfigurationType(ChangeViewerConfiguration.class);
