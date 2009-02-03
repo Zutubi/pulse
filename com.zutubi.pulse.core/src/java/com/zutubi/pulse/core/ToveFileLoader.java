@@ -698,7 +698,7 @@ public class ToveFileLoader
             TypeProperty property = type.getProperty(propertyName);
             if (property == null)
             {
-                throw new FileLoadException("Unrecognised attribute '" + propertyName + "'");
+                throw new FileLoadException("Unrecognised attribute '" + a.getLocalName() + "'");
             }
 
             try

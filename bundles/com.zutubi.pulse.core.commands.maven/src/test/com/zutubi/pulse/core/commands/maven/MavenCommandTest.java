@@ -26,7 +26,7 @@ public class MavenCommandTest extends ExecutableCommandTestCase
     {
         copyMavenFile("basic");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
-        PulseExecutionContext context = new PulseExecutionContext();
+        PulseExecutionContext context = (PulseExecutionContext) createExecutionContext();
         runCommand(new MavenCommand(command), context);
         assertEquals("1.0-SNAPSHOT", context.getVersion());
     }

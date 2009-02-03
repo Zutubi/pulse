@@ -112,7 +112,7 @@ public class MultiScopeStack implements ReferenceMap
 
     public void popTo(String label)
     {
-        while(!label.equals(getLabel()) & leaf.getParent() != null)
+        while(!label.equals(getLabel()) & leaves[0].getParent() != null)
         {
             pop();
         }

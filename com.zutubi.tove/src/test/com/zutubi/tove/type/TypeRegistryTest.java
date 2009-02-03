@@ -6,33 +6,16 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- *
- */
 public class TypeRegistryTest extends ZutubiTestCase
 {
-    private TypeRegistry typeRegistry;
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        typeRegistry = new TypeRegistry();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        typeRegistry = null;
-
-        super.tearDown();
-    }
+    private TypeRegistry typeRegistry = new TypeRegistry();
 
     public void testSimpleObject() throws TypeException
     {
@@ -317,7 +300,7 @@ public class TypeRegistryTest extends ZutubiTestCase
     }
 
     @SymbolicName("simpleInterface")
-    public static interface SimpleInterface
+    public static interface SimpleInterface extends Configuration
     {
         String getA();
         void setA(String str);

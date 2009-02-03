@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.engine;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -12,7 +12,7 @@ import java.util.Map;
 public class ProjectRecipesConfiguration extends AbstractConfiguration
 {
     private String defaultRecipe;
-    private Map<String, RecipeConfiguration> recipes = new HashMap<String, RecipeConfiguration>();
+    private Map<String, RecipeConfiguration> recipes = new LinkedHashMap<String, RecipeConfiguration>();
 
     public String getDefaultRecipe()
     {

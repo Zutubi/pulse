@@ -26,7 +26,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
 
         Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
-        PulseExecutionContext context = new PulseExecutionContext();
+        PulseExecutionContext context = (PulseExecutionContext) createExecutionContext();
         runCommand(new Maven2Command(command), context);
         assertEquals("1.0-SNAPSHOT", context.getVersion());
     }

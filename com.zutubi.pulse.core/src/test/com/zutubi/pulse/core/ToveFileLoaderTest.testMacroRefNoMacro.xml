@@ -2,7 +2,7 @@
 <project>
 
     <macro name="m1">
-        <executable name="m1-e1" exe="m1-e1-exe"/>
+        <command name="m1-e1"/>
     </macro>
 
     <recipe name="r1">

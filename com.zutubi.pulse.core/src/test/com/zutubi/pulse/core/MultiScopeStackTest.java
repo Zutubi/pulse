@@ -5,8 +5,6 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- */
 public class MultiScopeStackTest extends PulseTestCase
 {
     private static final String NS1 = "ns1";
@@ -143,8 +141,8 @@ public class MultiScopeStackTest extends PulseTestCase
         stack.add(new GenericReference<String>("b", "bv"));
         stack.popTo("non");
 
-        assertTrue(stack.containsReference("a"));
-        assertTrue(stack.containsReference("b"));
+        assertFalse(stack.containsReference("a"));
+        assertFalse(stack.containsReference("b"));
         assertOriginalProperties(stack);
     }
 

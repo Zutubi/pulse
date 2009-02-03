@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<project>
-    
-    <recipe name="default">
-        <register name="cool" class="com.zutubi.pulse.core.engine.api.Property"/>
-        <cool name="a" value="b"/>
-    </recipe>
-
-</project>
