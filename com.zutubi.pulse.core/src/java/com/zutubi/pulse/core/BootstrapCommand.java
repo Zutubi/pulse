@@ -23,7 +23,7 @@ public class BootstrapCommand implements Command
     public void execute(CommandContext commandContext)
     {
         commandContext.registerOutput(OUTPUT_NAME, null);
-        config.getBootstrapper().bootstrap((PulseExecutionContext) commandContext.getExecutionContext());
+        config.getBootstrapper().bootstrap(commandContext);
     }
 
     public void terminate()

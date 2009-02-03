@@ -5,6 +5,7 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.commands.DefaultCommandFactory;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
@@ -416,7 +417,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public class SimpleBootstrapper extends BootstrapperSupport
     {
-        public void bootstrap(PulseExecutionContext context) throws BuildException
+        public void bootstrap(CommandContext context) throws BuildException
         {
             // Do nothing.
         }
@@ -431,7 +432,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
             this.exception = exception;
         }
 
-        public void bootstrap(PulseExecutionContext context) throws BuildException
+        public void bootstrap(CommandContext context) throws BuildException
         {
             throw exception;
         }
