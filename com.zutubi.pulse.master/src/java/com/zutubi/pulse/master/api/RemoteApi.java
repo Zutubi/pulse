@@ -2293,7 +2293,7 @@ public class RemoteApi
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project to trigger
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
-     *                    may be empty to indicate the latest revision should be used
+     *                    may be the empty string to indicate the latest revision should be used
      * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String) 
