@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.engine.api.Addable;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.util.List;
 /**
  */
 @SymbolicName("zutubi.directoryOutputConfig")
+@Form(fieldOrder = {"name", "base", "inclusions", "exclusions", "index", "type", "postProcessors", "failIfNotPresent", "ignoreStale", "followSymlinks"})
 public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationSupport
 {
     private File base;

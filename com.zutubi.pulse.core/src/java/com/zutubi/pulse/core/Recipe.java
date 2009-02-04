@@ -227,7 +227,7 @@ public class Recipe
 
     private void processOutputs(CommandConfiguration commandConfig, CommandContext context)
     {
-        for (OutputConfiguration outputConfiguration: commandConfig.getOutputs())
+        for (OutputConfiguration outputConfiguration: commandConfig.getOutputs().values())
         {
             Output output = outputConfiguration.createOutput();
             output.capture(context);

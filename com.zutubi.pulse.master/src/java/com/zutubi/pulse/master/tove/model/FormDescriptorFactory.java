@@ -20,6 +20,7 @@ import com.zutubi.validation.Validator;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.validators.RequiredValidator;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -43,6 +44,7 @@ public class FormDescriptorFactory
     static
     {
         defaultFieldTypeMapping.put(String.class, "text");
+        defaultFieldTypeMapping.put(File.class, "text");
         defaultFieldTypeMapping.put(Boolean.class, "checkbox");
         defaultFieldTypeMapping.put(Boolean.TYPE, "checkbox");
         defaultFieldTypeMapping.put(Integer.class, "text");

@@ -1,10 +1,12 @@
 package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.Command;
+import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.NamedConfiguration;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Base interface for all command configuration types.  Defines common
@@ -20,6 +22,7 @@ public interface CommandConfiguration extends NamedConfiguration
      *
      * @return true if the command is forced to execute
      */
+    @Wizard.Ignore
     boolean isForce();
 
     /**
@@ -30,9 +33,10 @@ public interface CommandConfiguration extends NamedConfiguration
      */
     void setForce(boolean force);
 
-    List<OutputConfiguration> getOutputs();
+    @Ordered
+    Map<String, OutputConfiguration> getOutputs();
 
-    void setOutputs(List<OutputConfiguration> outputs);
+    void setOutputs(Map<String, OutputConfiguration> outputs);
 
     Class<? extends Command> commandType();
 }

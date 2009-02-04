@@ -2,11 +2,10 @@ package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.Command;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Abstract base class to support implementation of the {@link com.zutubi.pulse.core.commands.api.CommandConfiguration}
@@ -16,9 +15,8 @@ import java.util.List;
 public abstract class CommandConfigurationSupport extends AbstractNamedConfiguration implements CommandConfiguration
 {
     private Class<? extends Command> commandType;
-    @Wizard.Ignore
     private boolean force = false;
-    private List<OutputConfiguration> outputs = new LinkedList<OutputConfiguration>();
+    private Map<String, OutputConfiguration> outputs = new LinkedHashMap<String, OutputConfiguration>();
 
     protected CommandConfigurationSupport(Class<? extends Command> commandType)
     {
@@ -35,12 +33,12 @@ public abstract class CommandConfigurationSupport extends AbstractNamedConfigura
         this.force = force;
     }
 
-    public List<OutputConfiguration> getOutputs()
+    public Map<String, OutputConfiguration> getOutputs()
     {
         return outputs;
     }
 
-    public void setOutputs(List<OutputConfiguration> outputs)
+    public void setOutputs(Map<String, OutputConfiguration> outputs)
     {
         this.outputs = outputs;
     }

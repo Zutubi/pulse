@@ -16,7 +16,7 @@ public class SleepCommand extends CommandSupport
      */
     private Semaphore terminatedSemaphore = new Semaphore(0);
 
-    protected SleepCommand(SleepCommandConfiguration config)
+    public SleepCommand(SleepCommandConfiguration config)
     {
         super(config);
     }

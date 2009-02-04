@@ -41,6 +41,16 @@ public class PulseFileLoaderFactory
         return loader;
     }
 
+    public ToveFileStorer createStorer()
+    {
+        ToveFileStorer storer = objectFactory.buildBean(ToveFileStorer.class);
+        for(Map.Entry<String, CompositeType> entry: types.entrySet())
+        {
+            storer.register(entry.getValue(), entry.getKey());
+        }
+        return storer;
+    }
+
     public void register(String name, Class clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);

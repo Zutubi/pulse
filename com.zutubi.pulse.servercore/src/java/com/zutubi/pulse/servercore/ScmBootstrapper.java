@@ -41,7 +41,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
     {
         ExecutionContext context = commandContext.getExecutionContext();
         File outDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
-        if (!outDir.mkdirs())
+        if (!outDir.isDirectory() && !outDir.mkdirs())
         {
             throw new BuildException("Failed to create output directory: " + outDir);
         }

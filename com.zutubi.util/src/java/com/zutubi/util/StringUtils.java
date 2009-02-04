@@ -494,11 +494,11 @@ public class StringUtils
                 char c = piece.charAt(i);
                 switch (c)
                 {
-                    case'\\':
-                    case'\"':
+                    case '\\':
+                    case '\"':
                         current.append('\\');
                         break;
-                    case' ':
+                    case ' ':
                         quote = true;
                         break;
                 }

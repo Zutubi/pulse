@@ -748,13 +748,16 @@ public class ToveFileLoader
             if (listType.getCollectionType() instanceof SimpleType)
             {
                 TypeSqueezer squeezer = Squeezers.findSqueezer(listType.getCollectionType().getClazz());
-                List<Object> values = new LinkedList<Object>();
-                for (String v: ReferenceResolver.splitAndResolveReferences(value, scope, resolutionStrategy))
+                if (squeezer != null)
                 {
-                    values.add(squeezer.unsqueeze(v));
-                }
+                    List<Object> values = new LinkedList<Object>();
+                    for (String v: ReferenceResolver.splitAndResolveReferences(value, scope, resolutionStrategy))
+                    {
+                        values.add(squeezer.unsqueeze(v));
+                    }
 
-                return values;
+                    return values;
+                }
             }
         }
 

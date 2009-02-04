@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.commands.ant;
 
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  */
 @SymbolicName("zutubi.antCommandConfig")
+@Form(fieldOrder = {"name", "workingDir", "buildFile", "targets", "args", "inputFile"})
 public class AntCommandConfiguration extends NamedArgumentCommandConfiguration
 {
     private String buildFile;

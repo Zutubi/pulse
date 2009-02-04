@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandConfigurationSupport;
 import com.zutubi.pulse.core.engine.api.Addable;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -19,6 +20,7 @@ import java.util.List;
 /**
  */
 @SymbolicName("zutubi.executableCommandConfig")
+@Form(fieldOrder = {"name", "workingDir", "exe", "args", "inputFile"})
 public class ExecutableCommandConfiguration extends OutputProducingCommandConfigurationSupport implements Validateable
 {
     @Transient
