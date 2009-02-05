@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.ForkOutputStream;
 import com.zutubi.util.io.IOUtils;
@@ -12,6 +13,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -32,6 +35,27 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
         return (OutputProducingCommandConfigurationSupport) super.getConfig();
     }
 
+    protected List<String> getDefaultPostProcessorNames()
+    {
+        return Collections.emptyList();
+    }
+
+    protected List<PostProcessorConfiguration> getDefaultPostProcessors(CommandContext commandContext)
+    {
+        List<PostProcessorConfiguration> result = new LinkedList<PostProcessorConfiguration>();
+        ExecutionContext executionContext = commandContext.getExecutionContext();
+        for (String name: getDefaultPostProcessorNames())
+        {
+            PostProcessorConfiguration processor = executionContext.getValue(name, PostProcessorConfiguration.class);
+            if (processor != null)
+            {
+                result.add(processor);
+            }
+        }
+
+        return result;
+    }
+    
     public void execute(CommandContext commandContext)
     {
         File outputDir = commandContext.registerOutput(OUTPUT_NAME, null);
@@ -52,6 +76,7 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
             IOUtils.close(stream);
 
             // Even on error, process whatever we have captured.
+            commandContext.processOutput(OUTPUT_NAME, getDefaultPostProcessors(commandContext));
             commandContext.processOutput(OUTPUT_NAME, getConfig().getPostProcessors());
         }
     }
