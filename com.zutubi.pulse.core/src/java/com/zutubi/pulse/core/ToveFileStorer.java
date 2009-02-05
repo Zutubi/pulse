@@ -21,7 +21,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -35,12 +38,12 @@ public class ToveFileStorer
         typeDefinitions.put(type, name);
     }
 
-    public void store(File file, Configuration root) throws IOException
+    public void store(File file, Configuration configuration, Element root) throws IOException
     {
         FileOutputStream stream = new FileOutputStream(file);
         try
         {
-            store(stream, root);
+            store(stream, configuration, root);
         }
         finally
         {
@@ -48,81 +51,93 @@ public class ToveFileStorer
         }
     }
 
-    public void store(OutputStream output, Configuration root) throws IOException
+    public void store(OutputStream output, Configuration configuration, Element root) throws IOException
     {
         Serializer serializer = new Serializer(output);
         serializer.setIndent(4);
-        serializer.write(buildDoc(root));
-    }
 
-    private Document buildDoc(Configuration root)
-    {
-        return new Document(buildElement("project", root));
+        Document document = new Document(root);
+        fillElement(configuration, root);
+        serializer.write(document);
     }
 
     private Element buildElement(String localName, Configuration configuration)
     {
-        Element element = new Element(localName);
+        return fillElement(configuration, new Element(localName));
+    }
+
+    private Element fillElement(Configuration configuration, Element element)
+    {
+        CompositeType type = getType(configuration);
+        for (TypeProperty property: type.getProperties())
+        {
+            storeProperty(configuration, property, element);
+        }
+
+        return element;
+    }
+
+    private CompositeType getType(Configuration configuration)
+    {
         CompositeType type = typeRegistry.getType(configuration.getClass());
         if (type == null)
         {
             throw new PulseRuntimeException("Attempt to store instance of unregistered configuration class '" + configuration.getClass().getName() + "'");
         }
+        return type;
+    }
 
-        for (TypeProperty property: type.getProperties())
+    private void storeProperty(Configuration configuration, TypeProperty property, Element element)
+    {
+        Type propertyType = property.getType();
+        if (convertsToAttribute(propertyType))
         {
-            Type propertyType = property.getType();
-            if (convertsToAttribute(propertyType))
+            String attributeValue;
+            if (propertyType instanceof PrimitiveType)
             {
-                String attributeValue;
-                if (propertyType instanceof PrimitiveType)
-                {
-                    attributeValue = convertPrimitiveProperty(configuration, property);
-                }
-                else if (propertyType instanceof EnumType)
-                {
-                    attributeValue = convertEnumProperty(configuration, property);
-                }
-                else if (propertyType instanceof ReferenceType)
-                {
-                    attributeValue = convertReferenceProperty(configuration, property);
-                }
-                else
-                {
-                    attributeValue = convertPrimitiveListProperty(configuration, property);
-                }
-
-                if (attributeValue != null)
-                {
-                    element.addAttribute(new Attribute(property.getName(), attributeValue));
-                }
+                attributeValue = convertPrimitiveProperty(configuration, property);
             }
-            else if (propertyType instanceof CompositeType)
+            else if (propertyType instanceof EnumType)
             {
-                Configuration childConfiguration = (Configuration) getPropertyValue(configuration, property);
-                if (childConfiguration != null)
-                {
-                    CompositeType compositeType = (CompositeType) propertyType;
-                    String childName = typeDefinitions.get(compositeType);
-                    if (childName == null)
-                    {
-                        childName = property.getName();
-                    }
-
-                    element.appendChild(buildElement(childName, childConfiguration));
-                }
+                attributeValue = convertEnumProperty(configuration, property);
             }
-            else if (propertyType instanceof CollectionType)
+            else if (propertyType instanceof ReferenceType)
             {
-                storeCollection(element, configuration, property);
+                attributeValue = convertReferenceProperty(configuration, property);
             }
             else
             {
-                throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': unsupported property type '" + propertyType.getClazz().getName() + "'");
+                attributeValue = convertPrimitiveListProperty(configuration, property);
+            }
+
+            if (attributeValue != null)
+            {
+                element.addAttribute(new Attribute(property.getName(), attributeValue));
             }
         }
+        else if (propertyType instanceof CompositeType)
+        {
+            Configuration childConfiguration = (Configuration) getPropertyValue(configuration, property);
+            if (childConfiguration != null)
+            {
+                CompositeType compositeType = (CompositeType) propertyType;
+                String childName = typeDefinitions.get(compositeType);
+                if (childName == null)
+                {
+                    childName = property.getName();
+                }
 
-        return element;
+                element.appendChild(buildElement(childName, childConfiguration));
+            }
+        }
+        else if (propertyType instanceof CollectionType)
+        {
+            storeCollection(element, configuration, property);
+        }
+        else
+        {
+            throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': unsupported property type '" + propertyType.getClazz().getName() + "'");
+        }
     }
 
     private boolean convertsToAttribute(Type propertyType)
@@ -157,16 +172,9 @@ public class ToveFileStorer
     {
         ReferenceType propertyType = (ReferenceType) property.getType();
         CompositeType referencedType = propertyType.getReferencedType();
+        TypeProperty nameProperty = getReferenceNameProperty(configuration, property, referencedType);
 
-        Referenceable annotation = referencedType.getAnnotation(Referenceable.class, true);
-        if (annotation == null)
-        {
-            throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': the property is marked @Reference, but its type is not @Referenceable");
-        }
-
-        // FIXME we need to make sure the referenced thing is stored, and before us.
-
-        return "${" + annotation.nameProperty() + "}";
+        return toReference((String) getPropertyValue(configuration, nameProperty));
     }
 
     private String convertPrimitiveListProperty(final Configuration configuration, final TypeProperty property)
@@ -208,18 +216,7 @@ public class ToveFileStorer
         {
             ReferenceType referenceType = (ReferenceType) itemType;
             CompositeType referencedType = referenceType.getReferencedType();
-
-            Referenceable referenceable = referencedType.getAnnotation(Referenceable.class, true);
-            if (referenceable == null)
-            {
-                throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': the collection property is marked @Reference, but the collection item type '" + referencedType.getClazz().getName() + "' is not @Referenceable");
-            }
-
-            TypeProperty nameProperty = referencedType.getProperty(referenceable.nameProperty());
-            if (nameProperty == null)
-            {
-                throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': the collection item type '" + referencedType.getClazz().getName() + "' has an invalid nameProperty '" + referenceable.nameProperty() + "' specified in its @Referenceable annotation");
-            }
+            TypeProperty nameProperty = getReferenceNameProperty(configuration, property, referencedType);
 
             Addable addable = property.getAnnotation(Addable.class);
             if (addable == null)
@@ -230,7 +227,8 @@ public class ToveFileStorer
             for (Configuration item: getCollectionItems(configuration, property))
             {
                 Element itemElement = new Element(addable.value());
-                itemElement.addAttribute(new Attribute(addable.reference(), (String) getPropertyValue(item, nameProperty)));
+                String referenceName = (String) getPropertyValue(item, nameProperty);
+                itemElement.addAttribute(new Attribute(addable.reference(), toReference(referenceName)));
                 element.appendChild(itemElement);
             }
         }
@@ -258,6 +256,28 @@ public class ToveFileStorer
         {
             throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': unsupported collection item type '" + itemType.getClazz().getName() + "'");
         }
+    }
+
+    private TypeProperty getReferenceNameProperty(Configuration configuration, TypeProperty property, CompositeType referencedType)
+    {
+        Referenceable referenceable = referencedType.getAnnotation(Referenceable.class, true);
+        if (referenceable == null)
+        {
+            throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': the collection property is marked @Reference, but the collection item type '" + referencedType.getClazz().getName() + "' is not @Referenceable");
+        }
+
+        TypeProperty nameProperty = referencedType.getProperty(referenceable.nameProperty());
+        if (nameProperty == null)
+        {
+            throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': the collection item type '" + referencedType.getClazz().getName() + "' has an invalid nameProperty '" + referenceable.nameProperty() + "' specified in its @Referenceable annotation");
+        }
+
+        return nameProperty;
+    }
+
+    private String toReference(String referenceName)
+    {
+        return "${" + referenceName + "}";
     }
 
     @SuppressWarnings("unchecked")
@@ -291,41 +311,5 @@ public class ToveFileStorer
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
-    }
-
-    private static final class ReferenceGraph
-    {
-        private Map<String, ReferencableElement> elements = new HashMap<String, ReferencableElement>();
-
-        public void add(ReferencableElement element)
-        {
-            elements.put(element.name, element);
-        }
-
-        public ReferencableElement get(String name)
-        {
-            return elements.get(name);
-        }
-    }
-
-    private static final class ReferencableElement
-    {
-        public enum SearchState
-        {
-            INITIAL,
-            DISCOVERED,
-            FINISHED
-        }
-
-        private String name;
-        private Element element;
-        private List<ReferencableElement> requiredBy = new LinkedList<ReferencableElement>();
-        private List<ReferencableElement> dependsOn = new LinkedList<ReferencableElement>();
-        private SearchState searchState = SearchState.INITIAL;
-
-        private ReferencableElement(String name)
-        {
-            this.name = name;
-        }
     }
 }

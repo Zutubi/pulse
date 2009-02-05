@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.tove.config;
 import com.zutubi.pulse.core.commands.api.*;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.postprocessors.api.*;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
@@ -33,6 +34,13 @@ public class CoreConfigurationRegistry implements ConfigurationRegistry
             registerConfigurationType(DirectoryOutputConfiguration.class);
             registerConfigurationType(FileOutputConfiguration.class);
             registerConfigurationType(LinkOutputConfiguration.class);
+
+            registerConfigurationType(PostProcessorConfiguration.class);
+            registerConfigurationType(PostProcessorConfigurationSupport.class);
+            registerConfigurationType(TextFilePostProcessorConfigurationSupport.class);
+            registerConfigurationType(LineBasedPostProcessorConfigurationSupport.class);
+            registerConfigurationType(TestReportPostProcessorConfigurationSupport.class);
+            registerConfigurationType(XMLTestReportPostProcessorConfigurationSupport.class);
 
             registerConfigurationType(CommandConfigurationSupport.class);
             registerConfigurationType(OutputProducingCommandConfigurationSupport.class);
