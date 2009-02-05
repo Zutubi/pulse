@@ -49,7 +49,7 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         IFilter filter = ExtensionTracker.createExtensionPointFilter(extensionPoint);
         tracker.registerHandler(this, filter);
         IExtension[] extensions = extensionPoint.getExtensions();
-        for (IExtension extension : extensions)
+        for (IExtension extension : pluginManager.sortExtensions(extensions))
         {
             try
             {

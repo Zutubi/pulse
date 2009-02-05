@@ -2093,7 +2093,7 @@ public class ConfigurationTemplateManager
     }
 
     @SuppressWarnings({"unchecked"})
-    <T extends Configuration> T deepClone(T instance)
+    public <T extends Configuration> T deepClone(T instance)
     {
         final String path = instance.getConfigurationPath();
         Record record = getRecord(path);
@@ -2139,7 +2139,7 @@ public class ConfigurationTemplateManager
      * @param path path of the instance to retrieve
      * @return object defined by the path.
      */
-    Configuration getInstance(String path)
+    public Configuration getInstance(String path)
     {
         State state = getState();
         if (state == null)

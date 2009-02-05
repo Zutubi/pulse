@@ -58,7 +58,7 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         
         String displayName = ConfigUtils.getString(config, "display-name", name);
         boolean defaultTemplate = ConfigUtils.getBoolean(config, "default-fragment", false);
-        PostProcessorDescriptor descriptor = new PostProcessorDescriptor(name, displayName, defaultTemplate);
+        PostProcessorDescriptor descriptor = new PostProcessorDescriptor(name, displayName, defaultTemplate, clazz);
 
         if (PluginManager.VERBOSE_EXTENSIONS)
         {

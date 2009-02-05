@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.commands.ant;
 
-import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -21,8 +21,7 @@ public class AntCommandConfiguration extends NamedArgumentCommandConfiguration
 
     public AntCommandConfiguration()
     {
-        super(NamedArgumentCommand.class, "ant.bin", SystemUtils.IS_WINDOWS ? "ant.bat" : "ant");
-        getPostProcessors().add(new AntPostProcessorConfiguration("ant.pp"));
+        super(AntCommand.class, "ant.bin", SystemUtils.IS_WINDOWS ? "ant.bat" : "ant");
     }
 
     public String getBuildFile()
@@ -48,12 +47,12 @@ public class AntCommandConfiguration extends NamedArgumentCommandConfiguration
     protected List<NamedArgument> getNamedArguments()
     {
         List<NamedArgument> args = new LinkedList<NamedArgument>();
-        if (buildFile != null)
+        if (TextUtils.stringSet(buildFile))
         {
             args.add(new NamedArgument("build file", buildFile, "-f"));
         }
 
-        if (targets != null)
+        if (TextUtils.stringSet(targets))
         {
             args.add(new NamedArgument("targets", targets, Arrays.asList(targets.split("\\s+"))));
         }

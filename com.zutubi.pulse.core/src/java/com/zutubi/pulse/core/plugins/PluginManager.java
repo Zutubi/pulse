@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
@@ -18,8 +19,10 @@ import org.osgi.framework.BundleException;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The PluginManager is responsible for handling everything needed to support plugins.
@@ -1074,7 +1077,62 @@ public class PluginManager
     }
 
     /**
-     * Sort the list of plugins according to there defined dependencies.  This sorting does not occur inplace.
+     * Sorts the given extensions based on the dependencies between their contributing plugins.
+     * An extension from a dependent plugin is guaranteed to come after an extension from its
+     * required plugin in the returned list.
+     *
+     * @param extensions the extensions to sort
+     * @return the given extensions sorted by plugin dependencies
+     */
+    public List<IExtension> sortExtensions(IExtension[] extensions)
+    {
+        Map<Plugin, List<IExtension>> extensionsByPlugin = new HashMap<Plugin, List<IExtension>>();
+        for (IExtension extension: extensions)
+        {
+            Plugin contributingPlugin = getPlugin(extension.getContributor().getName());
+            List<IExtension> byPlugin = extensionsByPlugin.get(contributingPlugin);
+            if (byPlugin == null)
+            {
+                byPlugin = new LinkedList<IExtension>();
+                extensionsByPlugin.put(contributingPlugin, byPlugin);
+            }
+
+            byPlugin.add(extension);
+        }
+
+        List<IExtension> sorted = new LinkedList<IExtension>();
+        for (IExtension extension: extensions)
+        {
+            LocalPlugin contributingPlugin = (LocalPlugin) getPlugin(extension.getContributor().getName());
+            List<Plugin> dependentPlugins = getDependentPlugins(contributingPlugin);
+            List<IExtension> dependentExtensions = new LinkedList<IExtension>();
+            for (Plugin dependentPlugin: dependentPlugins)
+            {
+                List<IExtension> byPlugin = extensionsByPlugin.get(dependentPlugin);
+                if (byPlugin != null)
+                {
+                    dependentExtensions.addAll(byPlugin);
+                }
+            }
+
+            int i = 0;
+            for (IExtension e: sorted)
+            {
+                if (dependentExtensions.contains(e))
+                {
+                    break;
+                }
+                i++;
+            }
+
+            sorted.add(i, extension);
+        }
+        
+        return sorted;
+    }
+
+    /**
+     * Sort the list of plugins according to their defined dependencies.  This sorting does not occur inplace.
      * <p/>
      * This only works for installed plugins as only these have the bundle descriptions available.
      *
@@ -1083,14 +1141,15 @@ public class PluginManager
      */
     private List<LocalPlugin> sortPlugins(final List<LocalPlugin> plugins)
     {
-        List<LocalPlugin> unsortable = CollectionUtils.filter(plugins, new Predicate<LocalPlugin>()
+        boolean unsortablePlugin = CollectionUtils.contains(plugins, new Predicate<LocalPlugin>()
         {
             public boolean satisfied(LocalPlugin plugin)
             {
                 return plugin.getBundleDescription() == null;
             }
         });
-        if (unsortable.size() > 0)
+
+        if (unsortablePlugin)
         {
             // we have plugins with no bundle descriptions.  These may be sorted as though they have no
             // dependencies, but is that correct?.  The problem here is really that all plugins should
