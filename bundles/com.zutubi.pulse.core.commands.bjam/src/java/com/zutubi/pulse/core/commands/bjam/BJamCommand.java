@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.commands.ant;
+package com.zutubi.pulse.core.commands.bjam;
 
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
@@ -8,9 +8,9 @@ import java.util.List;
 
 /**
  */
-public class AntCommand extends NamedArgumentCommand
+public class BJamCommand extends NamedArgumentCommand
 {
-    public AntCommand(AntCommandConfiguration configuration)
+    public BJamCommand(BJamCommandConfiguration configuration)
     {
         super(configuration);
     }
@@ -18,6 +18,6 @@ public class AntCommand extends NamedArgumentCommand
     @Override
     protected List<Class<? extends PostProcessorConfiguration>> getDefaultPostProcessorTypes()
     {
-        return Arrays.<Class<? extends PostProcessorConfiguration>>asList(AntPostProcessorConfiguration.class);
+        return Arrays.<Class<? extends PostProcessorConfiguration>>asList(BJamPostProcessorConfiguration.class);
     }
 }

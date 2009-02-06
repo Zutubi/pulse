@@ -24,7 +24,6 @@ public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguratio
     public Maven2CommandConfiguration()
     {
         super(Maven2Command.class, "maven2.bin", SystemUtils.IS_WINDOWS ? "mvn.bat" : "mvn");
-        getPostProcessors().add(new Maven2PostProcessorConfiguration("maven2.pp"));
     }
 
     protected List<NamedArgument> getNamedArguments()

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.xcode;
 
-import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
@@ -23,8 +22,7 @@ public class XCodeCommandConfiguration extends NamedArgumentCommandConfiguration
 
     public XCodeCommandConfiguration()
     {
-        super(NamedArgumentCommand.class, "xcode.bin", "xcodebuild");
-        getPostProcessors().add(new XCodePostProcessorConfiguration("xcode.pp"));
+        super(XCodeCommand.class, "xcode.bin", "xcodebuild");
     }
 
     protected List<NamedArgument> getNamedArguments()

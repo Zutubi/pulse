@@ -6,6 +6,6 @@
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="maven2.pp" display-name="maven 2 output processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration"/>
+                        default-processor="true" class="com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration"/>
     </extension>
 </plugin>

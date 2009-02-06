@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.bjam;
 
-import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.TextUtils;
@@ -19,8 +18,7 @@ public class BJamCommandConfiguration extends NamedArgumentCommandConfiguration
 
     public BJamCommandConfiguration()
     {
-        super(NamedArgumentCommand.class, "bjam.bin", "bjam");
-        getPostProcessors().add(new BJamPostProcessorConfiguration("bjam.pp"));
+        super(BJamCommand.class, "bjam.bin", "bjam");
     }
 
     public String getJamfile()

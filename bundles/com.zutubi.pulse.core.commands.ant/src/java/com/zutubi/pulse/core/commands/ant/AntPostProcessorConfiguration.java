@@ -14,8 +14,6 @@ import com.zutubi.util.SystemUtils;
 @SymbolicName("zutubi.antPostProcessorConfig")
 public class AntPostProcessorConfiguration extends RegexPostProcessorConfiguration
 {
-    public static final String DEFAULT_PROCESSOR_NAME = "ant output processor";
-    
     private static final String ERROR_PATTERN = "\\[javac\\] .*:[0-9]+:";
     private static final String WARNING_PATTERN = "\\[javac\\] .*:[0-9]+: warning";
 

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.msbuild;
 
-import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -33,8 +32,7 @@ public class MsBuildCommandConfiguration extends NamedArgumentCommandConfigurati
 
     public MsBuildCommandConfiguration()
     {
-        super(NamedArgumentCommand.class, EXECUTABLE_PROPERTY, DEFAULT_EXECUTABLE);
-        getPostProcessors().add(new MsBuildPostProcessorConfiguration("msbuild.pp"));
+        super(MsBuildCommand.class, EXECUTABLE_PROPERTY, DEFAULT_EXECUTABLE);
     }
 
     protected List<NamedArgument> getNamedArguments()

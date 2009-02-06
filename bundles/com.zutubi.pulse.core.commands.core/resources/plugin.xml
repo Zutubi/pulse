@@ -9,15 +9,15 @@
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="post-processor" class="com.zutubi.pulse.core.commands.core.PostProcessorGroupConfiguration"/>
-        <post-processor name="regex-test.pp" display-name="Regular expression test processor"
-                        default-fragment="false" class="com.zutubi.pulse.core.commands.core.RegexTestPostProcessorConfiguration"/>
-        <post-processor name="regex.pp" display-name="Regular expression processor"
-                        default-fragment="false" class="com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration"/>
-        <post-processor name="junit.pp" display-name="JUnit XML report processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration"/>
-        <post-processor name="junitee.pp" display-name="JUnitEE XML report processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.commands.core.JUnitEEReportPostProcessorConfiguration"/>
-        <post-processor name="junit-summary.pp" display-name="JUnit summary output processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessorConfiguration"/>
+        <post-processor name="regex-test.pp" display-name="regular expression test processor"
+                        default-processor="false" class="com.zutubi.pulse.core.commands.core.RegexTestPostProcessorConfiguration"/>
+        <post-processor name="regex.pp" display-name="regular expression processor"
+                        default-processor="false" class="com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration"/>
+        <post-processor name="junit.pp" display-name="junit xml report processor"
+                        default-processor="true" class="com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration"/>
+        <post-processor name="junitee.pp" display-name="junitee xml report processor"
+                        default-processor="true" class="com.zutubi.pulse.core.commands.core.JUnitEEReportPostProcessorConfiguration"/>
+        <post-processor name="junit-summary.pp" display-name="junit summary output processor"
+                        default-processor="true" class="com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessorConfiguration"/>
     </extension>
 </plugin>

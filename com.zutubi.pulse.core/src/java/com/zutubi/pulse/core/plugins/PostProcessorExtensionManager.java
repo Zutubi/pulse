@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.TypeException;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -57,7 +59,7 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         }
         
         String displayName = ConfigUtils.getString(config, "display-name", name);
-        boolean defaultTemplate = ConfigUtils.getBoolean(config, "default-fragment", false);
+        boolean defaultTemplate = ConfigUtils.getBoolean(config, "default-processor", false);
         PostProcessorDescriptor descriptor = new PostProcessorDescriptor(name, displayName, defaultTemplate, clazz);
 
         if (PluginManager.VERBOSE_EXTENSIONS)
@@ -76,6 +78,24 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         {
             fileLoaderFactory.unregister((String) o);
         }
+    }
+
+    public String getDefaultProcessorName(final Class<? extends PostProcessorConfiguration> type)
+    {
+        PostProcessorDescriptor descriptor = CollectionUtils.find(info.values(), new Predicate<PostProcessorDescriptor>()
+        {
+            public boolean satisfied(PostProcessorDescriptor postProcessorDescriptor)
+            {
+                return postProcessorDescriptor.getClazz() == type;
+            }
+        });
+
+        if (descriptor == null)
+        {
+            return null;
+        }
+
+        return descriptor.getDisplayName();
     }
 
     public PostProcessorDescriptor getPostProcessor(String name)

@@ -6,8 +6,11 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Support for running Maven 2 - adds automatic version capturing.
@@ -17,6 +20,12 @@ public class Maven2Command extends NamedArgumentCommand
     public Maven2Command(Maven2CommandConfiguration configuration)
     {
         super(configuration);
+    }
+
+    @Override
+    protected List<Class<? extends PostProcessorConfiguration>> getDefaultPostProcessorTypes()
+    {
+        return Arrays.<Class<? extends PostProcessorConfiguration>>asList(Maven2PostProcessorConfiguration.class);
     }
 
     @Override

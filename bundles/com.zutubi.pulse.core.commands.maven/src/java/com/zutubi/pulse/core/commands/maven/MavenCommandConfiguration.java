@@ -21,7 +21,6 @@ public class MavenCommandConfiguration extends NamedArgumentCommandConfiguration
     public MavenCommandConfiguration()
     {
         super(MavenCommand.class, "maven.bin", SystemUtils.IS_WINDOWS ? "maven.bat" : "maven");
-        getPostProcessors().add(new MavenPostProcessorConfiguration());
     }
 
     protected List<NamedArgument> getNamedArguments()

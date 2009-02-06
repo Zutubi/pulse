@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.ForkOutputStream;
@@ -24,6 +25,8 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
     public static final String OUTPUT_NAME = "command output";
     public static final String OUTPUT_FILE = "output.txt";
 
+    private PostProcessorExtensionManager postProcessorExtensionManager;
+
     protected OutputProducingCommandSupport(OutputProducingCommandConfigurationSupport config)
     {
         super(config);
@@ -35,7 +38,7 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
         return (OutputProducingCommandConfigurationSupport) super.getConfig();
     }
 
-    protected List<String> getDefaultPostProcessorNames()
+    protected List<Class<? extends PostProcessorConfiguration>> getDefaultPostProcessorTypes()
     {
         return Collections.emptyList();
     }
@@ -44,12 +47,16 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
     {
         List<PostProcessorConfiguration> result = new LinkedList<PostProcessorConfiguration>();
         ExecutionContext executionContext = commandContext.getExecutionContext();
-        for (String name: getDefaultPostProcessorNames())
+        for (Class<? extends PostProcessorConfiguration> type: getDefaultPostProcessorTypes())
         {
-            PostProcessorConfiguration processor = executionContext.getValue(name, PostProcessorConfiguration.class);
-            if (processor != null)
+            String name = postProcessorExtensionManager.getDefaultProcessorName(type);
+            if (name != null)
             {
-                result.add(processor);
+                PostProcessorConfiguration processor = executionContext.getValue(name, PostProcessorConfiguration.class);
+                if (processor != null)
+                {
+                    result.add(processor);
+                }
             }
         }
 
@@ -124,4 +131,9 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
     }
 
     protected abstract void execute(CommandContext commandContext, OutputStream outputStream);
+
+    public void setPostProcessorExtensionManager(PostProcessorExtensionManager postProcessorExtensionManager)
+    {
+        this.postProcessorExtensionManager = postProcessorExtensionManager;
+    }
 }

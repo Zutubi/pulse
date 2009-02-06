@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.make;
 
-import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.TextUtils;
@@ -19,8 +18,7 @@ public class MakeCommandConfiguration extends NamedArgumentCommandConfiguration
 
     public MakeCommandConfiguration()
     {
-        super(NamedArgumentCommand.class, "make.bin", "make");
-        getPostProcessors().add(new MakePostProcessorConfiguration());
+        super(MakeCommand.class, "make.bin", "make");
     }
 
     public String getMakefile()
