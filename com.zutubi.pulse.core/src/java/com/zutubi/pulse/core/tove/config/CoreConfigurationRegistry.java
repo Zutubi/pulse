@@ -20,7 +20,7 @@ public class CoreConfigurationRegistry implements ConfigurationRegistry
 {
     private static final Logger LOG = Logger.getLogger(CoreConfigurationRegistry.class);
 
-    private TypeRegistry typeRegistry;
+    protected TypeRegistry typeRegistry;
 
     public void init()
     {

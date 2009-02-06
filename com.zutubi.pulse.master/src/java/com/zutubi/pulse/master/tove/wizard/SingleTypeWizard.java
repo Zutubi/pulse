@@ -1,14 +1,13 @@
-package com.zutubi.pulse.master.tove.wizard.webwork;
+package com.zutubi.pulse.master.tove.wizard;
 
-import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
+import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.SimpleInstantiator;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 
 /**
  * A wizard that configures a single record. perhaps including two states if

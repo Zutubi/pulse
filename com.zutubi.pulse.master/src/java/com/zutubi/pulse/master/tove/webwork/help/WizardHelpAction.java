@@ -1,9 +1,11 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
-import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizardState;
+import com.zutubi.pulse.master.tove.wizard.TwoStepStateBuilder;
 import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
+import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -42,12 +44,12 @@ public class WizardHelpAction extends ActionSupport
             return "none";
         }
 
-        if(state instanceof AbstractTypeWizard.AbstractTypeWizardState)
+        if(state instanceof AbstractTypeWizardState)
         {
             // We are configuring a type: chain to the wizard type help action.
             return "type";
         }
-        else if(state instanceof AbstractTypeWizard.TwoStepStateBuilder.SelectWizardState)
+        else if(state instanceof TwoStepStateBuilder.SelectWizardState)
         {
             // A type selection state: chain to the wizard select help action.
             return "select";

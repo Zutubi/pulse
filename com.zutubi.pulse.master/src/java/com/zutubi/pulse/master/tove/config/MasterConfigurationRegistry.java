@@ -13,6 +13,7 @@ import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
 import com.zutubi.pulse.master.tove.config.misc.TransientConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.*;
 import com.zutubi.pulse.master.tove.config.project.commit.CustomTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
@@ -51,7 +52,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
 {
     private static final Logger LOG = Logger.getLogger(MasterConfigurationRegistry.class);
 
-    private static final String TRANSIENT_SCOPE = "transient";
+    public static final String TRANSIENT_SCOPE = "transient";
 
     public static final String AGENTS_SCOPE = "agents";
     public static final String PROJECTS_SCOPE = "projects";
@@ -62,7 +63,6 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
     private CompositeType transientConfig;
     private Map<CompositeType, CompositeType> checkTypeMapping = new HashMap<CompositeType, CompositeType>();
 
-    private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ActionManager actionManager;
     private ConfigurationSecurityManager configurationSecurityManager;
@@ -102,6 +102,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
 
             registerTransientConfiguration("login", LoginConfiguration.class);
             registerTransientConfiguration("signup", SignupUserConfiguration.class);
+            registerTransientConfiguration("projectTypeSelection", ProjectTypeSelectionConfiguration.class);
 
             registerConfigurationType(TypeConfiguration.class);
             registerConfigurationType(TemplateTypeConfiguration.class);
@@ -308,11 +309,6 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
     public CompositeType getConfigurationCheckType(CompositeType type)
     {
         return checkTypeMapping.get(type);
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
     }
 
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
