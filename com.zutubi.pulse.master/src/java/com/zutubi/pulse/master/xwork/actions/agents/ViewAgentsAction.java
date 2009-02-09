@@ -3,14 +3,14 @@ package com.zutubi.pulse.master.xwork.actions.agents;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
@@ -76,13 +76,17 @@ public class ViewAgentsAction extends ActionSupport
             public AgentModel map(Agent agent)
             {
                 String status;
-                if(agent.isDisabling())
+                if (agent.isDisabling())
                 {
                     status = "disabling on idle";
                 }
-                else if(agent.isUpgrading())
+                else if (agent.isUpgrading())
                 {
                     status = "upgrading [" + agent.getUpgradeState().toString().toLowerCase() + "]";
+                }
+                else if (agent.isFailedUpgrade())
+                {
+                    status = "failed upgrade";
                 }
                 else
                 {
