@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.commands.make;
 
-import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
+import com.zutubi.pulse.core.commands.core.EnvironmentConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 
@@ -37,7 +37,7 @@ public class MakeCommandTest extends ExecutableCommandTestCase
         copyMakefile("basic");
         MakeCommandConfiguration command = new MakeCommandConfiguration();
         command.setTargets("environment");
-        command.getEnvironments().add(new ExecutableCommandConfiguration.EnvironmentConfiguration("TEST_ENV_VAR", "test variable value"));
+        command.getEnvironments().add(new EnvironmentConfiguration("TEST_ENV_VAR", "test variable value"));
         successRun(command, "test variable value");
     }
 

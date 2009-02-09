@@ -4,17 +4,25 @@ import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Helper base for configuring captures that capture files from the local file
+ * system.
+ *
+ * @see com.zutubi.pulse.core.commands.api.FileSystemOutputSupport
  */
 @SymbolicName("zutubi.fileSystemOutputConfigSupport")
 public abstract class FileSystemOutputConfigurationSupport extends OutputConfigurationSupport
 {
+    @Wizard.Ignore
     private boolean failIfNotPresent = true;
+    @Wizard.Ignore
     private boolean ignoreStale = false;
+    @Wizard.Ignore
     private String type;
     @Reference @Addable(value = "process", reference = "processor")
     private List<PostProcessorConfiguration> postProcessors = new LinkedList<PostProcessorConfiguration>();

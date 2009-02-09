@@ -208,7 +208,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         {
             if(mapping.getCode() == code)
             {
-                return mapping.getResultState();
+                return mapping.getStatus();
             }
         }
 
@@ -301,10 +301,10 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         buffer.append(separator);
         buffer.append("Resources: (via environment tag)").append(separator);
         buffer.append("--------------------------------").append(separator);
-        List<ExecutableCommandConfiguration.EnvironmentConfiguration> configuredEnv = getConfig().getEnvironments();
+        List<EnvironmentConfiguration> configuredEnv = getConfig().getEnvironments();
         if (configuredEnv.size() > 0)
         {
-            for (ExecutableCommandConfiguration.EnvironmentConfiguration setting : configuredEnv)
+            for (EnvironmentConfiguration setting : configuredEnv)
             {
                 appendProperty(setting.getName(), setting.getValue(), buffer, separator);
             }
@@ -436,7 +436,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         scope.applyEnvironment(childEnvironment);
 
         // Finally things defined on the command
-        for (ExecutableCommandConfiguration.EnvironmentConfiguration setting : getConfig().getEnvironments())
+        for (EnvironmentConfiguration setting : getConfig().getEnvironments())
         {
             childEnvironment.put(setting.getName(), setting.getValue());
         }

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.commands.ant;
 
-import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
+import com.zutubi.pulse.core.commands.core.EnvironmentConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 
@@ -47,7 +47,7 @@ public class AntCommandTest extends ExecutableCommandTestCase
 
         AntCommandConfiguration config = new AntCommandConfiguration();
         config.setTargets("environment");
-        config.getEnvironments().add(new ExecutableCommandConfiguration.EnvironmentConfiguration("TEST_ENV_VAR", "test variable value"));
+        config.getEnvironments().add(new EnvironmentConfiguration("TEST_ENV_VAR", "test variable value"));
 
         NamedArgumentCommand command = new NamedArgumentCommand(config);
         successRun(command, "test variable value");

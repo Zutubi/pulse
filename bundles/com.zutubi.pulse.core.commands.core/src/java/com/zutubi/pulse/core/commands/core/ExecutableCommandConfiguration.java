@@ -2,10 +2,8 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandConfigurationSupport;
 import com.zutubi.pulse.core.engine.api.Addable;
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.pulse.core.tove.config.annotations.BrowseScmDirAction;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TextUtils;
@@ -18,9 +16,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Configuration for the base command used for running an external process.
+ * 
+ * @see ExecutableCommand
  */
 @SymbolicName("zutubi.executableCommandConfig")
-@Form(fieldOrder = {"name", "workingDir", "exe", "args", "inputFile"})
+@Form(fieldOrder = {"name", "workingDir", "exe", "args", "extraArguments", "postProcessors", "inputFile", "outputFile", "force"})
 public class ExecutableCommandConfiguration extends OutputProducingCommandConfigurationSupport implements Validateable
 {
     @Transient
@@ -28,14 +29,17 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
     @Transient
     private String defaultExe;
 
+    @BrowseScmDirAction
+    private File workingDir;
     private String exe;
     private String args;
-    @Addable("arg")
+    @Addable("arg") @Wizard.Ignore @StringList
     private List<String> extraArguments = new LinkedList<String>();
-    private File workingDir;
+    @Wizard.Ignore
     private String inputFile;
+    @Addable("environment")
     private List<EnvironmentConfiguration> environments = new LinkedList<EnvironmentConfiguration>();
-
+    @Addable("statusMapping")
     private List<StatusMappingConfiguration> statusMappings = new LinkedList<StatusMappingConfiguration>();
 
     public ExecutableCommandConfiguration()
@@ -162,40 +166,4 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
         }
     }
 
-    @SymbolicName("zutubi.executableCommandConfig.environmentConfig")
-    public static class EnvironmentConfiguration extends AbstractConfiguration
-    {
-        private String name;
-        private String value;
-
-        public EnvironmentConfiguration()
-        {
-        }
-
-        public EnvironmentConfiguration(String name, String value)
-        {
-            this.name = name;
-            this.value = value;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public void setName(String name)
-        {
-            this.name = name;
-        }
-
-        public String getValue()
-        {
-            return value;
-        }
-
-        public void setValue(String value)
-        {
-            this.value = value;
-        }
-    }
 }

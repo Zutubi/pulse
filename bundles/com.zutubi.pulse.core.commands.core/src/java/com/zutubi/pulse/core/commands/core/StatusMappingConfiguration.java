@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
@@ -13,12 +14,14 @@ import com.zutubi.validation.annotations.Required;
  * A way to map command exit codes to specified result states.
  */
 @SymbolicName("zutubi.statusMappingConfig")
+@Form(fieldOrder = {"code", "status"})
+@Table(columns = {"code", "status"})
 public class StatusMappingConfiguration extends AbstractConfiguration implements Validateable
 {
     @Required
     private int code;
-    @Required
-    private String status;
+    @Required @Select(optionProvider = "com.zutubi.pulse.master.tove.CompletedResultStateOptionProvider")
+    private ResultState status;
 
     public int getCode()
     {
@@ -30,35 +33,21 @@ public class StatusMappingConfiguration extends AbstractConfiguration implements
         this.code = code;
     }
 
-    public String getStatus()
+    public ResultState getStatus()
     {
         return status;
     }
 
-    public void setStatus(String status)
+    public void setStatus(ResultState status)
     {
         this.status = status;
     }
 
-    @Transient
-    public ResultState getResultState()
-    {
-        for(ResultState state: ResultState.getCompletedStates())
-        {
-            if(state.getPrettyString().equalsIgnoreCase(status))
-            {
-                return state;
-            }
-        }
-
-        return null;
-    }
-
     public void validate(ValidationContext context)
     {
-        if(TextUtils.stringSet(status) && getResultState() == null)
+        if (!status.isCompleted())
         {
-            context.addFieldError("status", "unknown or incomplete build state '" + status + "'");
+            context.addFieldError("status", "incomplete build state '" + status + "'");
         }
     }
 }

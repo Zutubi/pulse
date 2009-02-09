@@ -1,10 +1,23 @@
 ${form.name}.items.last().on('browse', function(field)
 {
-    var projectPath = '${field.parameters.parentPath}';
+    function findProjectPath(path)
+    {
 <#if field.parameters.baseName?exists>
-    projectPath = 'c' + projectPath;
+        var start = 'c';
 <#else>
-    projectPath = 'wizards/' + projectPath;
+        var start = 'wizards/';
 </#if>
+        var parentPath = getParentPath(path);
+        while(parentPath != null && parentPath != 'projects')
+        {
+            path = parentPath;
+            parentPath = getParentPath(path);
+            start = '';
+        }
+
+        return start + path;
+    }
+
+    var projectPath = findProjectPath('${field.parameters.parentPath}');
     openSCMSelectDialog('${base}', false, '${form.name}', field.name, projectPath, '', 'scm');
 });

@@ -5,15 +5,21 @@ import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Helper base for configuration for commands that produce output that may be
+ * captured and/or processed.
+ *
+ * @see com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport
  */
 @SymbolicName("zutubi.outputProducingCommandConfigSupport")
 public abstract class OutputProducingCommandConfigurationSupport extends CommandConfigurationSupport
 {
+    @Wizard.Ignore
     private String outputFile;
     @Reference @Addable(value = "process", reference = "processor")
     private List<PostProcessorConfiguration> postProcessors = new LinkedList<PostProcessorConfiguration>();

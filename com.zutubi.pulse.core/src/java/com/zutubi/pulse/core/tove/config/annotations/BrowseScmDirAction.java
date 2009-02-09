@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.tove.config.project;
+package com.zutubi.pulse.core.tove.config.annotations;
 
 import com.zutubi.tove.annotations.FieldAction;
 

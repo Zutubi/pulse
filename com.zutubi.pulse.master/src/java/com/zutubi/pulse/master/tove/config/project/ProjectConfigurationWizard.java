@@ -40,12 +40,9 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 
     public class ProjectTypeSelectState extends SingleStepWizardState
     {
-        private int ord;
-
-        public ProjectTypeSelectState(AbstractTypeWizard wizard, int ord, String parentPath, CompositeType baseType, CompositeType type, TemplateRecord templateRecord)
+        public ProjectTypeSelectState(AbstractTypeWizard wizard, String parentPath, CompositeType baseType, CompositeType type, TemplateRecord templateRecord)
         {
-            super(wizard, ord, parentPath, baseType, type, templateRecord);
-            this.ord = ord;
+            super(wizard, wizard.getNextUniqueId(), parentPath, baseType, type, templateRecord);
         }
 
         @Override
@@ -63,17 +60,17 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
                     if (TextUtils.stringSet(commandSymbolicName))
                     {
                         CompositeType selectedCommandType = typeRegistry.getType(commandSymbolicName);
-                        return new SingleStepWizardState(ProjectConfigurationWizard.this, ord, null, commandType, selectedCommandType, null);
+                        return new SingleStepWizardState(ProjectConfigurationWizard.this, wizard.getNextUniqueId(), null, commandType, selectedCommandType, null);
                     }
                     else
                     {
-                        return new UnknownTypeState(ord, typeType);
+                        return new UnknownTypeState(wizard.getNextUniqueId(), typeType);
                     }
                 }
                 else
                 {
                     CompositeType selectedTypeType = typeRegistry.getType(ProjectTypeSelectionConfiguration.TYPE_MAPPING.get(primaryType));
-                    return new SingleStepWizardState(ProjectConfigurationWizard.this, ord, null, typeType, selectedTypeType, null);
+                    return new SingleStepWizardState(ProjectConfigurationWizard.this, wizard.getNextUniqueId(), null, typeType, selectedTypeType, null);
                 }
             }
             catch (TypeException e)
@@ -111,7 +108,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         }
         else
         {
-            ProjectTypeSelectState typeSelectState = new ProjectTypeSelectState(this, getNextUniqueId(), MasterConfigurationRegistry.TRANSIENT_SCOPE, typeSelectType, typeSelectType, null);
+            ProjectTypeSelectState typeSelectState = new ProjectTypeSelectState(this, MasterConfigurationRegistry.TRANSIENT_SCOPE, typeSelectType, typeSelectType, null);
             SpringComponentContext.autowire(typeSelectState);
             addWizardState(states, typeSelectState);
         }

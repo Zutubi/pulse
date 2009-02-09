@@ -1,9 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
+import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.pulse.master.tove.config.project.BrowseScmDirAction;
-import com.zutubi.pulse.master.tove.config.project.BrowseScmFileAction;
 import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
@@ -15,7 +14,6 @@ import org.apache.velocity.VelocityContext;
 @Form(fieldOrder = {"work", "file", "target", "args", "postProcessors"})
 public class AntTypeConfiguration extends TemplateTypeConfiguration
 {
-    @BrowseScmDirAction
     private String work;
     @BrowseScmFileAction
     private String file;

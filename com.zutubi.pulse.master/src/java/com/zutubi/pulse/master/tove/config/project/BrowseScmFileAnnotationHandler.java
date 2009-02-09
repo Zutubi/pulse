@@ -1,14 +1,15 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
+import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
-import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.tove.type.CompositeType;
 
 import java.lang.annotation.Annotation;
 
 /**
- * Handler for the {@link com.zutubi.pulse.master.tove.config.project.BrowseScmFileAction} annotation.
+ * Handler for the {@link com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction} annotation.
  */
 public class BrowseScmFileAnnotationHandler implements AnnotationHandler
 {

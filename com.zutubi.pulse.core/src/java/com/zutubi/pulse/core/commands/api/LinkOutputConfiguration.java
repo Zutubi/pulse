@@ -5,6 +5,9 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.validation.annotations.Required;
 
 /**
+ * Configures a capture of a link to an external system.
+ *
+ * @see LinkOutput
  */
 @SymbolicName("zutubi.linkOutputConfig")
 @Form(fieldOrder = {"name", "url"})

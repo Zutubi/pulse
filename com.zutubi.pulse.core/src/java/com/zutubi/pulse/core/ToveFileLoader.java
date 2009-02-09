@@ -698,12 +698,22 @@ public class ToveFileLoader
 
             try
             {
-                property.setValue(target, coerce(a.getValue(), property.getType(), getResolutionStrategy(predicate, target, source), scope));
+                Object value = coerce(a.getValue(), property.getType(), getResolutionStrategy(predicate, target, source), scope);
+
+                try
+                {
+                    property.setValue(target, value);
+                }
+                catch (Exception e)
+                {
+                    throw new FileLoadException(e.getMessage(), e);
+                }
             }
             catch (Exception e)
             {
-                throw new FileLoadException(e.getMessage(), e);
+                throw new FileLoadException("Unable to convert value of attribute '" + a.getLocalName() + "' to expected type: " + e.getMessage(), e);
             }
+
         }
     }
 
@@ -714,6 +724,10 @@ public class ToveFileLoader
             if (type instanceof ReferenceType)
             {
                 return resolveReference(value, ((ReferenceType) type).getReferencedType().getClazz(), scope);
+            }
+            else if (type instanceof EnumType)
+            {
+                return coerceEnum((EnumType)type, ReferenceResolver.resolveReferences(value, scope, resolutionStrategy));
             }
             else
             {
@@ -761,7 +775,21 @@ public class ToveFileLoader
             }
         }
 
-        throw new FileLoadException("Unable to convert value '" + value + "' to property type '" + type.toString() + "'");
+        throw new FileLoadException("No conversion available to property type '" + type.toString() + "'");
+    }
+
+    private Object coerceEnum(EnumType enumType, String s) throws FileLoadException
+    {
+        Class<? extends Enum> clazz = enumType.getClazz();
+        String converted = s.toUpperCase().replace(' ', '_');
+        try
+        {
+            return Enum.valueOf(clazz, converted);
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new FileLoadException("Invalid value '" + s + "'");
+        }
     }
 
     private Object resolveReference(String rawReference, Class<? extends Configuration> expectedType, Scope scope) throws ResolutionException

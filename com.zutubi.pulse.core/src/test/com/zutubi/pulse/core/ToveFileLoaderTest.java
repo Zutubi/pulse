@@ -46,6 +46,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         loader.register("textual", registry.getType(Textual.class));
         loader.register("property", registry.register(Property.class));
         loader.register("validateable", registry.register(SimpleValidateable.class));
+        loader.register("enumerator", registry.register(Enumerator.class));
     }
 
     public void testSimpleReference() throws Exception
@@ -180,6 +181,29 @@ public class ToveFileLoaderTest extends PulseTestCase
         errorHelper("bad-attribute");
     }
 
+    public void testEnumProperty() throws PulseException
+    {
+        enumPropertyHelper(Enumerator.Hotness.HANSEL);
+    }
+
+    public void testEnumPropertyNameConversion() throws PulseException
+    {
+        enumPropertyHelper(Enumerator.Hotness.JUST_BOILING);
+    }
+
+    public void testEnumPropertyInvalid() throws PulseException
+    {
+        errorHelper("Invalid value 'no such enum value'");
+    }
+
+    private void enumPropertyHelper(Enumerator.Hotness expectedHeat) throws PulseException
+    {
+        SimpleRoot simpleRoot = load();
+        List<Enumerator> enumerators = simpleRoot.getEnumerators();
+        assertEquals(1, enumerators.size());
+        assertEquals(expectedHeat, enumerators.get(0).getHeat());
+    }
+
     private SimpleRoot load() throws PulseException
     {
         SimpleRoot root = new SimpleRoot();
@@ -212,6 +236,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         @Addable("recipe")
         private Map<String, Recipe> recipes = new LinkedHashMap<String, Recipe>();
         private Textual textual;
+        private List<Enumerator> enumerators = new LinkedList<Enumerator>();
 
         public Map<String, SimpleReference> getReferences()
         {
@@ -261,6 +286,16 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void setRecipes(Map<String, Recipe> recipes)
         {
             this.recipes = recipes;
+        }
+
+        public List<Enumerator> getEnumerators()
+        {
+            return enumerators;
+        }
+
+        public void setEnumerators(List<Enumerator> enumerators)
+        {
+            this.enumerators = enumerators;
         }
     }
 
@@ -348,6 +383,32 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void validate(ValidationContext context)
         {
             context.addFieldError("field", "error");
+        }
+    }
+
+    @SymbolicName("enumerator")
+    public static class Enumerator extends AbstractConfiguration
+    {
+        public enum Hotness
+        {
+            VERY_COLD,
+            MILDLY_TEPID,
+            SLIGHTLY_WARM,
+            QUITE_HOT,
+            JUST_BOILING,
+            HANSEL
+        }
+
+        private Hotness heat;
+
+        public Hotness getHeat()
+        {
+            return heat;
+        }
+
+        public void setHeat(Hotness heat)
+        {
+            this.heat = heat;
         }
     }
 }

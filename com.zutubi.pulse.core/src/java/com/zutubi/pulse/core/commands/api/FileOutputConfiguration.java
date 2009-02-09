@@ -5,9 +5,12 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.validation.annotations.Required;
 
 /**
+ * Configures a capture of a single file from the local file sysytem.
+ *
+ * @see FileOutput
  */
 @SymbolicName("zutubi.fileOutputConfig")
-@Form(fieldOrder = {"name", "file", "type", "postProcessors", "failIfNotPresent", "ignoreStale"})
+@Form(fieldOrder = {"name", "file", "postProcessors", "type", "failIfNotPresent", "ignoreStale"})
 public class FileOutputConfiguration extends FileSystemOutputConfigurationSupport
 {
     @Required

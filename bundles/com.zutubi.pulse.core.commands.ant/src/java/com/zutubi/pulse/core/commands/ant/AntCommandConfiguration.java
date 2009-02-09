@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.ant;
 
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
+import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
@@ -16,6 +17,7 @@ import java.util.List;
 @Form(fieldOrder = {"name", "workingDir", "buildFile", "targets", "args", "inputFile"})
 public class AntCommandConfiguration extends NamedArgumentCommandConfiguration
 {
+    @BrowseScmFileAction(baseDirField = "workingDir")
     private String buildFile;
     private String targets;
 

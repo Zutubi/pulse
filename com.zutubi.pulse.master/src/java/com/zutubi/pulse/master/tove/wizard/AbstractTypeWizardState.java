@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public abstract class AbstractTypeWizardState extends AbstractChainableState
 {
-    private AbstractTypeWizard wizard;
+    protected AbstractTypeWizard wizard;
     private String id;
     private String parentPath;
     private CompositeType baseType;

@@ -357,7 +357,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         StatusMappingConfiguration mapping = new StatusMappingConfiguration();
         config.getStatusMappings().add(mapping);
         mapping.setCode(mappedCode);
-        mapping.setStatus(mappedStatus.getPrettyString());
+        mapping.setStatus(mappedStatus);
 
         return runCommand(new ExecutableCommand(config));
     }
