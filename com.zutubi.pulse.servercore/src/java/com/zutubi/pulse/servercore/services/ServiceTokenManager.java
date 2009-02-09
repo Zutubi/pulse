@@ -1,14 +1,15 @@
 package com.zutubi.pulse.servercore.services;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 /**
  */
@@ -16,6 +17,7 @@ public class ServiceTokenManager implements TokenManager
 {
     private static final Logger LOG = Logger.getLogger(ServiceTokenManager.class);
 
+    private static final int TOKEN_LENGTH = 64;
     private static final String TOKEN_FILE = "service.token";
 
     /**
@@ -44,7 +46,15 @@ public class ServiceTokenManager implements TokenManager
         }
         else if(generate)
         {
-            this.token = RandomUtils.randomString(64);
+            try
+            {
+                token = RandomUtils.secureRandomString(TOKEN_LENGTH);
+            }
+            catch (GeneralSecurityException e)
+            {
+                token = RandomUtils.randomString(TOKEN_LENGTH);
+            }
+
             writeToken();
         }
     }

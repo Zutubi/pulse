@@ -3,8 +3,8 @@ package com.zutubi.pulse.servercore.services;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.servercore.SystemInfo;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 
 import java.util.List;
 
@@ -63,10 +63,6 @@ public interface SlaveService
 
     List<Resource> discoverResources(String token);
 
-    /*
-    String[] list(String path);
-    */
-    
     FileInfo getFileInfo(String token, String path);
 
     String[] listRoots(String token);
