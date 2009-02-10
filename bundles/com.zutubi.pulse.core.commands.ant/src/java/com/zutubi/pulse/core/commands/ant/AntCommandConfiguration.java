@@ -12,9 +12,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Configuration for instances of {@link AntCommand}.
  */
 @SymbolicName("zutubi.antCommandConfig")
-@Form(fieldOrder = {"name", "workingDir", "buildFile", "targets", "args", "inputFile"})
+@Form(fieldOrder = {"name", "workingDir", "buildFile", "targets", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
 public class AntCommandConfiguration extends NamedArgumentCommandConfiguration
 {
     @BrowseScmFileAction(baseDirField = "workingDir")

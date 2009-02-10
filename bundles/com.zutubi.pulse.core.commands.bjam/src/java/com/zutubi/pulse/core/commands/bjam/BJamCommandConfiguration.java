@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core.commands.bjam;
 
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
+import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.TextUtils;
 
@@ -9,10 +11,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Configuration for instances of {@link BJamCommand}.
  */
 @SymbolicName("zutubi.bjamCommandConfig")
+@Form(fieldOrder = {"name", "workingDir", "jamfile", "targets", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
 public class BJamCommandConfiguration extends NamedArgumentCommandConfiguration
 {
+    @BrowseScmFileAction(baseDirField = "workingDir")
     private String jamfile;
     private String targets;
 

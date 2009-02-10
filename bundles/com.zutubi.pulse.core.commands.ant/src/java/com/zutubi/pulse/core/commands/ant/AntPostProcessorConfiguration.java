@@ -7,8 +7,9 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 
 /**
- * A post-processor for ant output.  Attempts to capture features from Ant
- * itself (e.g. "BUILD FAILED") and from commonly-used tasks (e.g. javac).
+ * A pre-canned regular expression post-processor configuration for ant output.
+ * Attempts to capture features from Ant itself (e.g. "BUILD FAILED") and from
+ * commonly-used tasks (e.g. javac).
  */
 @SymbolicName("zutubi.antPostProcessorConfig")
 public class AntPostProcessorConfiguration extends RegexPostProcessorConfiguration

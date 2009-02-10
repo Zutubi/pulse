@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.annotations.Wizard;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -38,6 +39,12 @@ public abstract class NamedArgumentCommandConfiguration extends ExecutableComman
 
         combined.addAll(super.getCombinedArguments());
         return combined;
+    }
+
+    @Override @Wizard.Ignore
+    public String getExe()
+    {
+        return super.getExe();
     }
 
     @Transient

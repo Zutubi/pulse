@@ -4,7 +4,8 @@ import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 
 /**
- * A post processor that looks for error messages from Boost Jam (bjam).
+ * A pre-cannoed regex post-processor configuration that looks for error
+ * messages from Boost Jam (bjam).
  */
 @SymbolicName("zutubi.bjamPostProcessorConfig")
 public class BJamPostProcessorConfiguration extends RegexPostProcessorConfiguration
