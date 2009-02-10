@@ -231,6 +231,6 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
 
     private void assertLineContent(String line, String content)
     {
-        assertThat(line, matchesRegex("[0-9][0-9]?/[0-9][0-9]/[0-9][0-9] [0-9][0-9]?:[0-9][0-9]:[0-9][0-9]: " + Pattern.quote(content)));
+        assertThat(line, matchesRegex("[0-9][0-9]?/[0-9][0-9]/[0-9][0-9] [0-9][0-9]?:[0-9][0-9]:[0-9][0-9]( [AP]M [A-Z][A-Z][A-Z])?: " + Pattern.quote(content)));
     }
 }
