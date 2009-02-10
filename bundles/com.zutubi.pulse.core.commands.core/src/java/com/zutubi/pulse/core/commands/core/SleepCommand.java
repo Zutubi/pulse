@@ -11,9 +11,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class SleepCommand extends CommandSupport
 {
-    /**
-     * Number of milliseconds to sleep.
-     */
     private Semaphore terminatedSemaphore = new Semaphore(0);
 
     public SleepCommand(SleepCommandConfiguration config)

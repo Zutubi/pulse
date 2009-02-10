@@ -10,8 +10,7 @@ import java.util.Map;
 
 
 /**
- * A group of post-processors.  Simply applies all processors in the group in
- * order.
+ * Configuration for instances of {@link com.zutubi.pulse.core.commands.core.PostProcessorGroup}.
  */
 @SymbolicName("zutubi.postProcessorGroupConfig")
 public class PostProcessorGroupConfiguration extends PostProcessorConfigurationSupport

@@ -1,6 +1,9 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * <p>
@@ -16,13 +19,14 @@ import com.zutubi.tove.annotations.SymbolicName;
  * @see com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorSupport
  */
 @SymbolicName("zutubi.testPostProcessorConfigSupport")
+@Form(fieldOrder = {"failOnFailure", "suite", "resolveConflicts"})
 public abstract class TestReportPostProcessorConfigurationSupport extends PostProcessorConfigurationSupport
 {
-    /** @see #setSuite(String)  */
+    @Wizard.Ignore
     private String suite;
-    /** @see #setFailOnFailure(boolean) */
+    @Wizard.Ignore
     private boolean failOnFailure = true;
-    /** @see #setResolveConflicts(NameConflictResolution)  */
+    @Wizard.Ignore @Required
     private NameConflictResolution resolveConflicts = NameConflictResolution.OFF;
 
     protected TestReportPostProcessorConfigurationSupport(Class<? extends TestReportPostProcessorSupport> postProcessorType)

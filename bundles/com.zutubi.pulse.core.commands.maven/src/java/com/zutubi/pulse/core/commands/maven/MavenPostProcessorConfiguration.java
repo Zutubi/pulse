@@ -3,7 +3,8 @@ package com.zutubi.pulse.core.commands.maven;
 import com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.core.PostProcessorGroupConfiguration;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfigurationSupport;
+import com.zutubi.pulse.core.postprocessors.api.OutputPostProcessorConfigurationSupport;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 
@@ -11,7 +12,7 @@ import com.zutubi.util.SystemUtils;
  * Post-processor to extract comon maven build messages.
  */
 @SymbolicName("zutubi.mavenPostProcessorConfig")
-public class MavenPostProcessorConfiguration extends PostProcessorConfigurationSupport
+public class MavenPostProcessorConfiguration extends OutputPostProcessorConfigurationSupport
 {
     private static final String JUNIT_PROCESSOR_NAME = "junit.summary";
     private static final String MAVEN_ERRORS_PROCESSOR_NAME = "maven.errors";
@@ -36,8 +37,6 @@ public class MavenPostProcessorConfiguration extends PostProcessorConfigurationS
     public PostProcessorGroupConfiguration asGroup()
     {
         PostProcessorGroupConfiguration group = new PostProcessorGroupConfiguration();
-        group.setFailOnError(isFailOnError());
-        group.setFailOnWarning(isFailOnWarning());
         
         // Add a JUnit summary post processor.  It comes first as the output
         // appears as the tests are run.
@@ -56,6 +55,12 @@ public class MavenPostProcessorConfiguration extends PostProcessorConfigurationS
         maven.setTrailingContext(6);
         group.getProcessors().put(MAVEN_ERRORS_PROCESSOR_NAME, maven);
 
+        for (PostProcessorConfiguration child: group.getProcessors().values())
+        {
+            OutputPostProcessorConfigurationSupport outputChild = (OutputPostProcessorConfigurationSupport) child;
+            outputChild.setFailOnError(isFailOnError());
+            outputChild.setFailOnWarning(isFailOnWarning());
+        }
         return group;
     }
 }

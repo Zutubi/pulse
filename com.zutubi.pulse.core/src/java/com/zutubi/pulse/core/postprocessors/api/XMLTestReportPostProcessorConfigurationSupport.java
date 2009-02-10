@@ -13,13 +13,12 @@ import com.zutubi.tove.annotations.SymbolicName;
 @SymbolicName("zutubi.xmlTestReportPostProcessorConfigSupport")
 public abstract class XMLTestReportPostProcessorConfigurationSupport extends TestReportPostProcessorConfigurationSupport
 {
-    /** @see #XMLTestReportPostProcessorConfigurationSupport(Class, String) ) */
-    
     private String reportType;
 
     /**
      * Creates a new XML report processor for the given report type.
      *
+     * @param postProcessorType type of processor created for this config
      * @param reportType human-readable name of the type of report being
      *                   processed (e.g. JUnit)
      */
@@ -29,7 +28,7 @@ public abstract class XMLTestReportPostProcessorConfigurationSupport extends Tes
         this.reportType = reportType;
     }
 
-    public String getReportType()
+    public String reportType()
     {
         return reportType;
     }

@@ -1,11 +1,15 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorConfigurationSupport;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 
 /**
+ * Configuration for instances of {@link com.zutubi.pulse.core.commands.core.JUnitReportPostProcessor}.
  */
 @SymbolicName("zutubi.junitReportPostProcessorConfig")
+@Form(fieldOrder = {"name", "failOnFailure", "suite", "resolveConflicts", "suiteElement", "caseElement", "errorElement", "failureElement", "skippedElement", "classAttribute", "messageAttribute", "nameAttribute", "packageAttribute", "timeAttribute"})
 public class JUnitReportPostProcessorConfiguration extends XMLTestReportPostProcessorConfigurationSupport
 {
     private static final String ELEMENT_SUITE   = "testsuite";
@@ -20,15 +24,25 @@ public class JUnitReportPostProcessorConfiguration extends XMLTestReportPostProc
     private static final String ATTRIBUTE_PACKAGE = "package";
     private static final String ATTRIBUTE_TIME    = "time";
 
+    @Wizard.Ignore
     private String suiteElement     = ELEMENT_SUITE;
+    @Wizard.Ignore
     private String caseElement      = ELEMENT_CASE;
+    @Wizard.Ignore
     private String errorElement     = ELEMENT_ERROR;
+    @Wizard.Ignore
     private String failureElement   = ELEMENT_FAILURE;
+    @Wizard.Ignore
     private String skippedElement   = ELEMENT_SKIPPED;
+    @Wizard.Ignore
     private String classAttribute   = ATTRIBUTE_CLASS;
+    @Wizard.Ignore
     private String messageAttribute = ATTRIBUTE_MESSAGE;
+    @Wizard.Ignore
     private String nameAttribute    = ATTRIBUTE_NAME;
+    @Wizard.Ignore
     private String packageAttribute = ATTRIBUTE_PACKAGE;
+    @Wizard.Ignore
     private String timeAttribute    = ATTRIBUTE_TIME;
 
     public JUnitReportPostProcessorConfiguration()

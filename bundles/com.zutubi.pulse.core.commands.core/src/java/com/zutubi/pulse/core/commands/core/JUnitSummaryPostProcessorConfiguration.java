@@ -3,8 +3,8 @@ package com.zutubi.pulse.core.commands.core;
 import com.zutubi.tove.annotations.SymbolicName;
 
 /**
- * A post-processor for JUnit summaries.  These are simple status lines
- * printed as JUnit is run.
+ * A pre-canned regex post-processor configuration for JUnit summaries.  These
+ * are simple status lines printed as JUnit is run.
  */
 @SymbolicName("zutubi.junitSummaryPostProcessorConfig")
 public class JUnitSummaryPostProcessorConfiguration extends RegexPostProcessorConfiguration

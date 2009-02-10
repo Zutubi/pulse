@@ -44,7 +44,7 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
         }
         catch (ParsingException pex)
         {
-            String message = "Unable to parse " + getConfig().getReportType() + " report '" + file.getAbsolutePath() + "'";
+            String message = "Unable to parse " + getConfig().reportType() + " report '" + file.getAbsolutePath() + "'";
             if(pex.getMessage() != null)
             {
                 message += ": " + pex.getMessage();
@@ -54,7 +54,7 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
         }
         catch (IOException e)
         {
-            String message = "I/O error processing " + getConfig().getReportType() + " report '" + file.getAbsolutePath() + "'";
+            String message = "I/O error processing " + getConfig().reportType() + " report '" + file.getAbsolutePath() + "'";
             if(e.getMessage() != null)
             {
                 message += ": " + e.getMessage();

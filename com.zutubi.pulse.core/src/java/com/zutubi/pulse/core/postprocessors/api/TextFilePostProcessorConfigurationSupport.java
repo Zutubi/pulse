@@ -7,7 +7,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  * instances.
  */
 @SymbolicName("zutubi.textFilePostProcessorConfigSupport")
-public abstract class TextFilePostProcessorConfigurationSupport extends PostProcessorConfigurationSupport
+public abstract class TextFilePostProcessorConfigurationSupport extends OutputPostProcessorConfigurationSupport
 {
     protected TextFilePostProcessorConfigurationSupport(Class<? extends TextFilePostProcessorSupport> postProcessorType)
     {

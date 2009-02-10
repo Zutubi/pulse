@@ -24,7 +24,7 @@ import java.io.File;
  * common cases and reduce coupling to implementation details.
  * </p>
  *
- * @see PostProcessorSupport
+ * @see OutputPostProcessorSupport
  * @see TestReportPostProcessorSupport
  * @see XMLTestReportPostProcessorSupport
  * @see TextFilePostProcessorSupport

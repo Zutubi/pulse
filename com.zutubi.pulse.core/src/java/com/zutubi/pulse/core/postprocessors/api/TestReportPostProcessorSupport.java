@@ -31,7 +31,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
         return (TestReportPostProcessorConfigurationSupport) super.getConfig();
     }
 
-    public void processFile(File artifactFile, PostProcessorContext ppContext)
+    public void process(File artifactFile, PostProcessorContext ppContext)
     {
         if(artifactFile.isFile())
         {
