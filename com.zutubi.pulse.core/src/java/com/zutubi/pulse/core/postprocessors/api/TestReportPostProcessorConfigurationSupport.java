@@ -19,7 +19,7 @@ import com.zutubi.validation.annotations.Required;
  * @see com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorSupport
  */
 @SymbolicName("zutubi.testPostProcessorConfigSupport")
-@Form(fieldOrder = {"failOnFailure", "suite", "resolveConflicts"})
+@Form(fieldOrder = {"name", "failOnFailure", "suite", "resolveConflicts"})
 public abstract class TestReportPostProcessorConfigurationSupport extends PostProcessorConfigurationSupport
 {
     @Wizard.Ignore
