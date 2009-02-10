@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.commands.core;
 import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.postprocessors.api.TestReportPostProcessorConfigurationSupport;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.validation.annotations.Required;
@@ -12,13 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A post-processor that extracts test case results by parsing text lines with
- * regular expressions.
+ * Configuration for instances of {@link RegexTestPostProcessor}.
  */
 @SymbolicName("zutubi.regexTestPostProcessorConfig")
+@Form(fieldOrder = {"name", "regex", "nameGroup", "statusGroup", "detailsGroup", "passStatus", "failureStatus", "errorStatus", "skippedStatus", "autoFail", "trim", "suite", "failOnFailure", "resolveConflicts"})
 public class RegexTestPostProcessorConfiguration extends TestReportPostProcessorConfigurationSupport
 {
-    @ValidRegex @Content
+    @Required @ValidRegex @Content
     private String regex;
     @Required
     private int statusGroup;
@@ -99,6 +100,7 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
         this.detailsGroup = detailsGroup;
     }
 
+    @Required
     public String getPassStatus()
     {
         return findStatus(TestStatus.PASS);
@@ -109,6 +111,7 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
         this.statusMap.put(status, TestStatus.PASS);
     }
 
+    @Required
     public String getFailureStatus()
     {
         return findStatus(TestStatus.FAILURE);
@@ -119,6 +122,7 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
         this.statusMap.put(status, TestStatus.FAILURE);
     }
 
+    @Required
     public String getErrorStatus()
     {
         return findStatus(TestStatus.ERROR);
@@ -129,6 +133,7 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
         this.statusMap.put(status, TestStatus.ERROR);
     }
 
+    @Required
     public String getSkippedStatus()
     {
         return findStatus(TestStatus.SKIPPED);
