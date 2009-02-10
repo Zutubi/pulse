@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 
 /**
- * A post processor that looks for error messages from GNU-compatible make
- * programs.
+ * A pre-canned conffiguration for a regex post-processor that looks for error
+ * messages from GNU-compatible make programs.
  */
 @SymbolicName("zutubi.makePostProcessorConfig")
 public class MakePostProcessorConfiguration extends RegexPostProcessorConfiguration
