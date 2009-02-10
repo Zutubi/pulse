@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.commands.DefaultCommandFactory;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
@@ -65,6 +66,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         typeRegistry.register(RecipeConfiguration.class);
         typeRegistry.register(Property.class);
         typeRegistry.register(DirectoryOutputConfiguration.class);
+        typeRegistry.register(LinkOutputConfiguration.class);
         typeRegistry.register(FileOutputConfiguration.class);
         typeRegistry.register(NoopCommandConfiguration.class);
         typeRegistry.register(FailureCommandConfiguration.class);

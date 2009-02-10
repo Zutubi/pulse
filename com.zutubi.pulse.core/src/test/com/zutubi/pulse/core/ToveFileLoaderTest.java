@@ -47,6 +47,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         loader.register("property", registry.register(Property.class));
         loader.register("validateable", registry.register(SimpleValidateable.class));
         loader.register("enumerator", registry.register(Enumerator.class));
+        loader.register("string-list", registry.register(StringList.class));
     }
 
     public void testSimpleReference() throws Exception
@@ -204,6 +205,25 @@ public class ToveFileLoaderTest extends PulseTestCase
         assertEquals(expectedHeat, enumerators.get(0).getHeat());
     }
 
+    public void testStringListViaAdder() throws PulseException
+    {
+        SimpleRoot simpleRoot = load();
+        assertNotNull(simpleRoot.getStringList());
+        List<String> list = simpleRoot.getStringList().getAddableList();
+        assertEquals(1, list.size());
+        assertEquals("test value", list.get(0));
+    }
+
+    public void testStringListViaAttribute() throws PulseException
+    {
+        SimpleRoot simpleRoot = load();
+        assertNotNull(simpleRoot.getStringList());
+        List<String> list = simpleRoot.getStringList().getNotAddableList();
+        assertEquals(2, list.size());
+        assertEquals("val1", list.get(0));
+        assertEquals("val2", list.get(1));
+    }
+
     private SimpleRoot load() throws PulseException
     {
         SimpleRoot root = new SimpleRoot();
@@ -237,6 +257,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         private Map<String, Recipe> recipes = new LinkedHashMap<String, Recipe>();
         private Textual textual;
         private List<Enumerator> enumerators = new LinkedList<Enumerator>();
+        private StringList stringList;
 
         public Map<String, SimpleReference> getReferences()
         {
@@ -297,6 +318,16 @@ public class ToveFileLoaderTest extends PulseTestCase
         {
             this.enumerators = enumerators;
         }
+
+        public StringList getStringList()
+        {
+            return stringList;
+        }
+
+        public void setStringList(StringList stringList)
+        {
+            this.stringList = stringList;
+        }
     }
 
     @SymbolicName("simpleReference")
@@ -324,7 +355,7 @@ public class ToveFileLoaderTest extends PulseTestCase
     @SymbolicName("collectionReferrer")
     public static class CollectionReferrer extends AbstractNamedConfiguration
     {
-        @com.zutubi.tove.annotations.Reference @Addable(value = "el", reference = "at")
+        @com.zutubi.tove.annotations.Reference @Addable(value = "el", attribute = "at")
         private List<SimpleReference> refs = new LinkedList<SimpleReference>();
 
         public List<SimpleReference> getRefs()
@@ -409,6 +440,34 @@ public class ToveFileLoaderTest extends PulseTestCase
         public void setHeat(Hotness heat)
         {
             this.heat = heat;
+        }
+    }
+
+    @SymbolicName("stringlist")
+    public static class StringList extends AbstractConfiguration
+    {
+        @Addable(value = "add", attribute = "val")
+        private List<String> addableList = new LinkedList<String>();
+        private List<String> notAddableList = new LinkedList<String>();
+
+        public List<String> getAddableList()
+        {
+            return addableList;
+        }
+
+        public void setAddableList(List<String> addableList)
+        {
+            this.addableList = addableList;
+        }
+
+        public List<String> getNotAddableList()
+        {
+            return notAddableList;
+        }
+
+        public void setNotAddableList(List<String> notAddableList)
+        {
+            this.notAddableList = notAddableList;
         }
     }
 }

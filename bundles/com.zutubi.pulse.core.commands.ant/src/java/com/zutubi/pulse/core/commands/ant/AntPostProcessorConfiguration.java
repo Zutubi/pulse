@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.ant;
 
-import com.zutubi.pulse.core.ExpressionElementConfiguration;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
@@ -44,9 +43,7 @@ public class AntPostProcessorConfiguration extends RegexPostProcessorConfigurati
         RegexPatternConfiguration pattern = new RegexPatternConfiguration();
         pattern.setCategory(Feature.Level.ERROR);
         pattern.setExpression(ERROR_PATTERN);
-        ExpressionElementConfiguration exclude = new ExpressionElementConfiguration();
-        exclude.setExpression(WARNING_PATTERN);
-        pattern.getExclusions().add(exclude);
+        pattern.getExclusions().add(WARNING_PATTERN);
         getPatterns().add(pattern);
 
         pattern = new RegexPatternConfiguration();

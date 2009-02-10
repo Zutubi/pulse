@@ -119,7 +119,7 @@ public class ToveFileLoader
     private void loadType(Element e, Configuration parent, CompositeType parentType, Scope scope, int depth, TypeLoadPredicate predicate) throws PulseException
     {
         String name = e.getLocalName();
-        Configuration instance;
+        Object instance;
 
         try
         {
@@ -134,55 +134,56 @@ public class ToveFileLoader
             }
 
             Binder binder = getBinder(parentType, name);
-            CompositeType type = binder.getType();
-            instance = binder.getInstance(e, scope);
+            instance = binder.getInstance(e, scope, getResolutionStrategy(predicate, parent, e));
             if (binder.initInstance())
             {
+                CompositeType type = binder.getType();
+                Configuration configuration = (Configuration) instance;
                 // initialise attributes
-                mapAttributesToProperties(e, instance, type, predicate, scope);
+                mapAttributesToProperties(e, configuration, type, predicate, scope);
 
                 Referenceable referenceable = type.getAnnotation(Referenceable.class, true);
                 if (referenceable != null)
                 {
-                    String referenceName = (String) type.getProperty(referenceable.nameProperty()).getValue(instance);
+                    String referenceName = (String) type.getProperty(referenceable.nameProperty()).getValue(configuration);
                     if (TextUtils.stringSet(referenceName))
                     {
                         Object value;
                         if (referenceable.valueProperty().length() == 0)
                         {
-                            value = instance;
+                            value = configuration;
                         }
                         else
                         {
-                            value = type.getProperty(referenceable.valueProperty()).getValue(instance);
+                            value = type.getProperty(referenceable.valueProperty()).getValue(configuration);
                         }
                         scope.addUnique(new GenericReference<Object>(referenceName, value));
                     }
                 }
 
-                boolean loadType = predicate.loadType(instance, e);
+                boolean loadType = predicate.loadType(configuration, e);
                 if (loadType)
                 {
                     scope = scope.createChild();
 
                     // initialise sub-elements.
-                    loadSubElements(e, instance, type, scope, depth, predicate);
+                    loadSubElements(e, configuration, type, scope, depth, predicate);
                 }
 
-                binder.set(parent, instance);
+                binder.set(parent, configuration);
 
                 if (loadType)
                 {
-                    if (InitComponent.class.isAssignableFrom(instance.getClass()))
+                    if (InitComponent.class.isAssignableFrom(configuration.getClass()))
                     {
-                        ((InitComponent) instance).initAfterChildren();
+                        ((InitComponent) configuration).initAfterChildren();
                     }
                 }
 
                 // Apply declarative validation
-                if (predicate.validate(instance, e))
+                if (predicate.validate(configuration, e))
                 {
-                    validate(instance);
+                    validate(configuration);
                 }
             }
             else
@@ -257,7 +258,11 @@ public class ToveFileLoader
                 }
                 else if (targetType instanceof ReferenceType)
                 {
-                    return new ReferenceAdder(property, (ReferenceType) targetType, annotation.reference());
+                    return new ReferenceAdder(property, (ReferenceType) targetType, annotation.attribute());
+                }
+                else if (targetType instanceof SimpleType)
+                {
+                    return new SimpleAdder(property, (SimpleType) targetType, annotation.attribute());
                 }
                 else
                 {
@@ -300,11 +305,11 @@ public class ToveFileLoader
     {
         CompositeType getType();
 
-        Configuration getInstance(Element element, Scope scope) throws Exception;
+        Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception;
 
         boolean initInstance();
 
-        void set(Configuration parent, Configuration instance) throws Exception;
+        void set(Configuration parent, Object instance) throws Exception;
     }
 
     private abstract class CreatingBinder implements Binder
@@ -314,7 +319,7 @@ public class ToveFileLoader
             return true;
         }
 
-        public Configuration getInstance(Element element, Scope scope) throws Exception
+        public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
             return create(getType());
         }
@@ -334,7 +339,7 @@ public class ToveFileLoader
             return type;
         }
 
-        public void set(Configuration parent, Configuration instance) throws Exception
+        public void set(Configuration parent, Object instance) throws Exception
         {
             // Noop.
         }
@@ -354,7 +359,7 @@ public class ToveFileLoader
             return (CompositeType) property.getType();
         }
 
-        public void set(Configuration parent, Configuration instance) throws Exception
+        public void set(Configuration parent, Object instance) throws Exception
         {
             property.setValue(parent, instance);
         }
@@ -369,7 +374,7 @@ public class ToveFileLoader
             this.property = property;
         }
 
-        public void set(Configuration parent, Configuration instance) throws Exception
+        public void set(Configuration parent, Object instance) throws Exception
         {
             try
             {
@@ -377,7 +382,7 @@ public class ToveFileLoader
                 if (type instanceof ListType)
                 {
                     @SuppressWarnings("unchecked")
-                    List<? super Configuration> list = (List) property.getValue(parent);
+                    List<Object> list = (List) property.getValue(parent);
                     list.add(instance);
                 }
                 else
@@ -386,7 +391,7 @@ public class ToveFileLoader
                     CompositeType elementType = mapType.getTargetType();
 
                     @SuppressWarnings("unchecked")
-                    Map<String, ? super Configuration> map = (Map) property.getValue(parent);
+                    Map<String, Object> map = (Map) property.getValue(parent);
                     String key = (String) elementType.getProperty(mapType.getKeyProperty()).getValue(instance);
                     map.put(key, instance);
                 }
@@ -413,7 +418,7 @@ public class ToveFileLoader
             this.type = type;
         }
 
-        public Configuration getInstance(Element element, Scope scope) throws Exception
+        public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
             return create(type);
         }
@@ -441,7 +446,7 @@ public class ToveFileLoader
             return referenceType.getReferencedType();
         }
 
-        public Configuration getInstance(Element element, Scope scope) throws Exception
+        public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
             String value = element.getAttributeValue(attribute);
             if (value == null)
@@ -457,6 +462,40 @@ public class ToveFileLoader
             }
 
             return clazz.cast(resolved);
+        }
+
+        public boolean initInstance()
+        {
+            return false;
+        }
+    }
+
+    private class SimpleAdder extends Adder
+    {
+        private SimpleType type;
+        private String attribute;
+
+        protected SimpleAdder(TypeProperty property, SimpleType type, String attribute)
+        {
+            super(property);
+            this.type = type;
+            this.attribute = attribute;
+        }
+
+        public CompositeType getType()
+        {
+            return null;
+        }
+
+        public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
+        {
+            String value = element.getAttributeValue(attribute);
+            if (value == null)
+            {
+                throw new FileLoadException("Required attribute '" + attribute + "' not specified");
+            }
+
+            return coerce(value, type, resolutionStrategy, scope);
         }
 
         public boolean initInstance()

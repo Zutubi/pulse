@@ -5,6 +5,9 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.NamedConfiguration;
 
 /**
+ * Base interface for post-processor configuration.
+ *
+ * @see PostProcessor
  */
 @SymbolicName("zutubi.postProcessorConfig")
 @Referenceable

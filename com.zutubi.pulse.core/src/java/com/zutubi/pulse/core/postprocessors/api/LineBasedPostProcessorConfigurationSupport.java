@@ -1,22 +1,21 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.validation.Validateable;
-import com.zutubi.validation.ValidationContext;
+import com.zutubi.tove.annotations.Wizard;
+import com.zutubi.validation.annotations.Min;
 
 /**
- * A support base class for post processors that process text files
- * line-by-line.  Supports capturing of leading and trailing context lines
- * and optional joining of overlapping features.
+ * A support base class for configuration of {@link LineBasedPostProcessorSupport}
+ * instances.
  */
 @SymbolicName("zutubi.lineBasedPostProcessorConfigSupport")
-public abstract class LineBasedPostProcessorConfigurationSupport extends TextFilePostProcessorConfigurationSupport implements Validateable
+public abstract class LineBasedPostProcessorConfigurationSupport extends TextFilePostProcessorConfigurationSupport
 {
-    /** @see #setLeadingContext(int) */
+    @Min(0)
     private int leadingContext = 0;
-    /** @see #setTrailingContext(int) */
+    @Min(0)
     private int trailingContext = 0;
-    /** @see #setJoinOverlapping(boolean) */
+    @Wizard.Ignore
     private boolean joinOverlapping = true;
 
     protected LineBasedPostProcessorConfigurationSupport(Class<? extends LineBasedPostProcessorSupport> postProcessorType)
@@ -83,18 +82,5 @@ public abstract class LineBasedPostProcessorConfigurationSupport extends TextFil
     public void setJoinOverlapping(boolean joinOverlapping)
     {
         this.joinOverlapping = joinOverlapping;
-    }
-
-    public void validate(ValidationContext context)
-    {
-        if (leadingContext < 0)
-        {
-            context.addFieldError("leadingContext", "Leading context count must be non-negative (got " + leadingContext + ")");
-        }
-
-        if (trailingContext < 0)
-        {
-            context.addFieldError("trailingContext", "Trailing context count must be non-negative (got " + trailingContext + ")");
-        }
     }
 }

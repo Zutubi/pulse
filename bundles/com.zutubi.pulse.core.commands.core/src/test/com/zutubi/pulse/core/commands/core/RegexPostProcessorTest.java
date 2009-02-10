@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.ExpressionElementConfiguration;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
@@ -468,7 +467,7 @@ public class RegexPostProcessorTest extends PulseTestCase
         RegexPatternConfiguration pattern = new RegexPatternConfiguration(Feature.Level.ERROR, Pattern.compile(expression));
         for (String e : exclusions)
         {
-            pattern.getExclusions().add(new ExpressionElementConfiguration(e));
+            pattern.getExclusions().add(e);
         }
         pp.getPatterns().add(pattern);
 

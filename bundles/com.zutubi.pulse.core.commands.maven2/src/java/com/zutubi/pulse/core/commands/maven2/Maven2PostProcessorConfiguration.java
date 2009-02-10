@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.maven2;
 
-import com.zutubi.pulse.core.ExpressionElementConfiguration;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.core.PostProcessorGroupConfiguration;
@@ -30,10 +29,10 @@ public class Maven2PostProcessorConfiguration extends AbstractNamedConfiguration
 
     private int leadingContext = 1;
     private int trailingContext = 6;
-    @Addable("suppress-error")
-    private List<ExpressionElementConfiguration> suppressedWarnings = new LinkedList<ExpressionElementConfiguration>();
-    @Addable("suppress-warning")
-    private List<ExpressionElementConfiguration> suppressedErrors = new LinkedList<ExpressionElementConfiguration>();
+    @Addable(value = "suppress-error", attribute = "expression")
+    private List<String> suppressedWarnings = new LinkedList<String>();
+    @Addable(value = "suppress-warning", attribute = "expression")
+    private List<String> suppressedErrors = new LinkedList<String>();
 
     public Maven2PostProcessorConfiguration()
     {
@@ -72,7 +71,7 @@ public class Maven2PostProcessorConfiguration extends AbstractNamedConfiguration
         Pattern failurePattern = Pattern.compile("^\\[ERROR\\] (BUILD|FATAL) (ERROR|FAILURE)");
 
         RegexPatternConfiguration errorPattern = new RegexPatternConfiguration(Feature.Level.ERROR, Pattern.compile("^\\[ERROR\\]"));
-        errorPattern.getExclusions().add(new ExpressionElementConfiguration(failurePattern.pattern()));
+        errorPattern.getExclusions().add(failurePattern.pattern());
         errorPattern.getExclusions().addAll(suppressedErrors);
 
         RegexPostProcessorConfiguration mavenErrorsPP = new RegexPostProcessorConfiguration(MAVEN_ERRORS_PROCESSOR_NAME);
@@ -124,22 +123,22 @@ public class Maven2PostProcessorConfiguration extends AbstractNamedConfiguration
         this.trailingContext = trailingContext;
     }
 
-    public List<ExpressionElementConfiguration> getSuppressedWarnings()
+    public List<String> getSuppressedWarnings()
     {
         return suppressedWarnings;
     }
 
-    public void setSuppressedWarnings(List<ExpressionElementConfiguration> suppressedWarnings)
+    public void setSuppressedWarnings(List<String> suppressedWarnings)
     {
         this.suppressedWarnings = suppressedWarnings;
     }
 
-    public List<ExpressionElementConfiguration> getSuppressedErrors()
+    public List<String> getSuppressedErrors()
     {
         return suppressedErrors;
     }
 
-    public void setSuppressedErrors(List<ExpressionElementConfiguration> suppressedErrors)
+    public void setSuppressedErrors(List<String> suppressedErrors)
     {
         this.suppressedErrors = suppressedErrors;
     }

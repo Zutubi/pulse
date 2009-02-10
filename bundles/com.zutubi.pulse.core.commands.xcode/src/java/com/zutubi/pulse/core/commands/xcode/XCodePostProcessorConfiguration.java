@@ -8,7 +8,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 @SymbolicName("zutubi.xcodePostProcessorConfig")
 public class XCodePostProcessorConfiguration extends RegexPostProcessorConfiguration
 {
-    private String[] errorRegexs = new String[]
+    private static final String[] ERROR_REGEXES = new String[]
     {
             "[\\d]+: error:",
             "Assertion failure",
@@ -17,15 +17,15 @@ public class XCodePostProcessorConfiguration extends RegexPostProcessorConfigura
             "Uncaught exception:"
     };
 
-    private String[] warningRegexs = new String[]
+    private static final String[] WARNING_REGEXES = new String[]
     {
             "warning:"
     };
 
     public XCodePostProcessorConfiguration()
     {
-        addErrorRegexes(errorRegexs);
-        addWarningRegexes(warningRegexs);
+        addErrorRegexes(ERROR_REGEXES);
+        addWarningRegexes(WARNING_REGEXES);
 
         setLeadingContext(1);
         setTrailingContext(3);

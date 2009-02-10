@@ -21,7 +21,7 @@ public abstract class OutputProducingCommandConfigurationSupport extends Command
 {
     @Wizard.Ignore
     private String outputFile;
-    @Reference @Addable(value = "process", reference = "processor")
+    @Reference @Addable(value = "process", attribute = "processor")
     private List<PostProcessorConfiguration> postProcessors = new LinkedList<PostProcessorConfiguration>();
 
     public OutputProducingCommandConfigurationSupport(Class<? extends Command> commandType)

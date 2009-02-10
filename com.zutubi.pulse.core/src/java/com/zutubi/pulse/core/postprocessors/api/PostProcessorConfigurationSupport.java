@@ -1,32 +1,19 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
 /**
- * <p>
- * A default implementation of {@link com.zutubi.pulse.core.postprocessors.api.PostProcessor} which hides some
- * implementation details and provides utility methods for common cases.
- * This is still quite a low-level implementation, consider also more
- * targeted base classes.
- * </p>
- * <p>
- * This implementation handles standard fail on error and warning
- * capabilities.
- * </p>
- *
- * @see com.zutubi.pulse.core.postprocessors.api.TestReportPostProcessorSupport
- * @see com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorSupport
- * @see com.zutubi.pulse.core.postprocessors.api.TextFilePostProcessorSupport
- * @see com.zutubi.pulse.core.postprocessors.api.LineBasedPostProcessorSupport
+ * Support base class to configure an instance of {@link PostProcessorSupport}.
  */
 @SymbolicName("zutubi.postProcessorConfigSupport")
 public abstract class PostProcessorConfigurationSupport extends AbstractNamedConfiguration implements PostProcessorConfiguration
 {
     private Class<? extends PostProcessor> postProcessorType;
-    /** @see #setFailOnError(boolean) */
+    @Wizard.Ignore
     private boolean failOnError = true;
-    /** @see #setFailOnWarning(boolean) */
+    @Wizard.Ignore
     private boolean failOnWarning = false;
 
     protected PostProcessorConfigurationSupport(Class<? extends PostProcessor> postProcessorType)

@@ -228,7 +228,7 @@ public class ToveFileStorer
             {
                 Element itemElement = new Element(addable.value());
                 String referenceName = (String) getPropertyValue(item, nameProperty);
-                itemElement.addAttribute(new Attribute(addable.reference(), toReference(referenceName)));
+                itemElement.addAttribute(new Attribute(addable.attribute(), toReference(referenceName)));
                 element.appendChild(itemElement);
             }
         }

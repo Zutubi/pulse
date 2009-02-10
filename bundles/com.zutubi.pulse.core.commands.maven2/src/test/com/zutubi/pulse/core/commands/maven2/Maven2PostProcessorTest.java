@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.maven2;
 
-import com.zutubi.pulse.core.ExpressionElementConfiguration;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory;
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
@@ -51,7 +50,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testSuppressAllWarnings() throws Exception
     {
-        config.getSuppressedWarnings().add(new ExpressionElementConfiguration(".*"));
+        config.getSuppressedWarnings().add(".*");
         CommandResult result = createAndProcessArtifact("warnings", createProcessor());
         assertTrue(result.succeeded());
         assertEquals(0, artifact.getFeatures().size());
@@ -64,7 +63,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
         config.setLeadingContext(0);
         config.setTrailingContext(0);
         
-        config.getSuppressedWarnings().add(new ExpressionElementConfiguration("jar from forked lifecycle"));
+        config.getSuppressedWarnings().add("jar from forked lifecycle");
         CommandResult result = createAndProcessArtifact("warnings", createProcessor());
         assertTrue(result.succeeded());
         assertWarnings("[WARNING] Another warning");
@@ -180,7 +179,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testSuppressError() throws Exception
     {
-        config.getSuppressedErrors().add(new ExpressionElementConfiguration("too few arguments"));
+        config.getSuppressedErrors().add("too few arguments");
         CommandResult result = createAndProcessArtifact("successfulerror", createProcessor());
         assertEquals(0, artifact.getFeatures().size());
         assertTrue(result.succeeded());

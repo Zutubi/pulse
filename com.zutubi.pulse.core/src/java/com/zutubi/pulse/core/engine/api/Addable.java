@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * form, a nested &lt;widget&gt; tag is understood to define a widget
  * instance which should be added to the widgets collection.
  * <p/>
- * If the collection field contains references, then {@link #reference()}
+ * If the collection field contains references, then {@link #attribute()}
  * gives the name of the attribute that will contain the referencing text.
  * For example, with reference() set to "ref" (the default), a widget tag
  * would refer to a widget like &lt;widget ref="${widget.property}"/&gt;.
@@ -36,5 +36,5 @@ public @interface Addable
      *
      * @return the name of the referencing attribute
      */
-    String reference() default "ref";
+    String attribute() default "ref";
 }

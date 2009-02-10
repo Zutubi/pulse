@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.LineBasedPostProcessorConfigurationSupport;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 
 import java.util.LinkedList;
@@ -12,10 +13,10 @@ import java.util.regex.Pattern;
 
 
 /**
- * A post processor that does line-by-line searching with regular expressions
- * to detect features.
+ * Configuration for instances of {@link com.zutubi.pulse.core.commands.core.RegexPostProcessor}.
  */
 @SymbolicName("zutubi.regexPostProcessorConfig")
+@Form(fieldOrder = {"name", "failOnError", "failOnWarning", "leadingContext", "trailingContext", "joinOverlapping"})
 public class RegexPostProcessorConfiguration extends LineBasedPostProcessorConfigurationSupport
 {
     @Addable("pattern")

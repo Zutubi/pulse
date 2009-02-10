@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.ExpressionElementConfiguration;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.LineBasedPostProcessorSupport;
@@ -51,9 +50,9 @@ public class RegexPostProcessor extends LineBasedPostProcessorSupport
         Matcher matcher = pattern.matcher(line);
         if (matcher.find())
         {
-            for (ExpressionElementConfiguration e : patternConfiguration.getExclusions())
+            for (String e : patternConfiguration.getExclusions())
             {
-                if (Pattern.compile(e.getExpression()).matcher(line).find())
+                if (Pattern.compile(e).matcher(line).find())
                 {
                     return null;
                 }

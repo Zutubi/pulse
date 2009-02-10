@@ -24,7 +24,7 @@ public abstract class FileSystemOutputConfigurationSupport extends OutputConfigu
     private boolean ignoreStale = false;
     @Wizard.Ignore
     private String type;
-    @Reference @Addable(value = "process", reference = "processor")
+    @Reference @Addable(value = "process", attribute = "processor")
     private List<PostProcessorConfiguration> postProcessors = new LinkedList<PostProcessorConfiguration>();
 
     public boolean isFailIfNotPresent()
