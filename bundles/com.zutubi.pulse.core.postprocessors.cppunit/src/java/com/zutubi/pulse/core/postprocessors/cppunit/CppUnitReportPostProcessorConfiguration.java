@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.postprocessors.api.XMLTestReportPostProcessorConfig
 import com.zutubi.tove.annotations.SymbolicName;
 
 /**
+ * Configuration for instances of {@link CppUnitReportPostProcessor}.
  */
 @SymbolicName("zutubi.cppUnitReportPostProcessorConfig")
 public class CppUnitReportPostProcessorConfiguration extends XMLTestReportPostProcessorConfigurationSupport
