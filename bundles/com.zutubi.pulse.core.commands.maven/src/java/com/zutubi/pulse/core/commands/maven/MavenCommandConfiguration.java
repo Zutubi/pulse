@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.maven;
 
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.TextUtils;
@@ -10,10 +11,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Support for executing Maven 1.  Applies {@link com.zutubi.pulse.core.commands.maven.MavenPostProcessorConfiguration}
- * by default.
+ * Configuration for instances of {@link MavenCommand}.
  */
 @SymbolicName("zutubi.mavenCommandConfig")
+@Form(fieldOrder = {"name", "workingDir", "targets", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
 public class MavenCommandConfiguration extends NamedArgumentCommandConfiguration
 {
     private String targets;

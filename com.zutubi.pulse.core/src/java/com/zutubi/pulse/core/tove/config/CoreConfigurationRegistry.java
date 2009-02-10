@@ -37,6 +37,7 @@ public class CoreConfigurationRegistry implements ConfigurationRegistry
 
             registerConfigurationType(PostProcessorConfiguration.class);
             registerConfigurationType(PostProcessorConfigurationSupport.class);
+            registerConfigurationType(OutputPostProcessorConfigurationSupport.class);
             registerConfigurationType(TextFilePostProcessorConfigurationSupport.class);
             registerConfigurationType(LineBasedPostProcessorConfigurationSupport.class);
             registerConfigurationType(TestReportPostProcessorConfigurationSupport.class);

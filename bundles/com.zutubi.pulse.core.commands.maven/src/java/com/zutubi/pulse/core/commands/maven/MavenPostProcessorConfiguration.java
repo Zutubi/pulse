@@ -5,13 +5,15 @@ import com.zutubi.pulse.core.commands.core.PostProcessorGroupConfiguration;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.OutputPostProcessorConfigurationSupport;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 
 /**
- * Post-processor to extract comon maven build messages.
+ * Configuration for instances if {@link MavenPostProcessor}.
  */
 @SymbolicName("zutubi.mavenPostProcessorConfig")
+@Form(fieldOrder = {"name", "failOnError", "failOnWarning"})
 public class MavenPostProcessorConfiguration extends OutputPostProcessorConfigurationSupport
 {
     private static final String JUNIT_PROCESSOR_NAME = "junit.summary";
