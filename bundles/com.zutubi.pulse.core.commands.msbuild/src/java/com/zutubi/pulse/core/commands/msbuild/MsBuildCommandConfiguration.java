@@ -2,17 +2,18 @@ package com.zutubi.pulse.core.commands.msbuild;
 
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.Addable;
+import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.TextUtils;
-import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
 
 /**
- * A command which runs the MsBuild build tool.
+ * Configuration for instances of {@link MsBuildCommand}.
  */
 @SymbolicName("zutubi.msbuildCommandConfig")
+@Form(fieldOrder = {"name", "workingDir", "buildFile", "targets", "configuration", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
 public class MsBuildCommandConfiguration extends NamedArgumentCommandConfiguration
 {
     private static final String EXECUTABLE_PROPERTY = "msbuild.bin";
@@ -24,6 +25,7 @@ public class MsBuildCommandConfiguration extends NamedArgumentCommandConfigurati
     private static final String PROPERTY_SEPARATOR     = "=";
     private static final String PROPERTY_CONFIGURATION = "Configuration";
 
+    @BrowseScmFileAction(baseDirField = "workingDir")
     private String buildFile;
     private String targets;
     private String configuration;
@@ -119,24 +121,4 @@ public class MsBuildCommandConfiguration extends NamedArgumentCommandConfigurati
         this.buildProperties = buildProperties;
     }
 
-    @SymbolicName("zutubi.msbuildCommandConfig.buildPropertyConfig")
-    public static class BuildPropertyConfiguration extends AbstractNamedConfiguration
-    {
-        @Required
-        private String value;
-
-        public BuildPropertyConfiguration()
-        {
-        }
-
-        public String getValue()
-        {
-            return value;
-        }
-
-        public void setValue(String value)
-        {
-            this.value = value;
-        }
-    }
 }

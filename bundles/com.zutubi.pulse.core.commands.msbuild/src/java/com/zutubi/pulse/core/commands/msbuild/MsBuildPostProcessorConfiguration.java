@@ -4,9 +4,9 @@ import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 
 /**
- * A post-processor for msbuild output.  Attempts to capture features from
- * MsBuild itself (e.g. "Build failed") and from tools it commonly invokes
- * (such as the C# compiler).
+ * A pre-canned configuration for a regex post-processor for msbuild output.
+ * Attempts to capture features from MsBuild itself (e.g. "Build failed") \
+ * and from tools it commonly invokes (such as the C# compiler).
  */
 @SymbolicName("zutubi.msbuildPostProcessorConfig")
 public class MsBuildPostProcessorConfiguration extends RegexPostProcessorConfiguration

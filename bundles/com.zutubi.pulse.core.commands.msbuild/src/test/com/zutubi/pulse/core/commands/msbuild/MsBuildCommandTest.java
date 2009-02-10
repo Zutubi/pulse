@@ -89,7 +89,7 @@ public class MsBuildCommandTest extends ExecutableCommandTestCase
     {
         copyBuildFile("properties");
         MsBuildCommandConfiguration command = new MsBuildCommandConfiguration();
-        MsBuildCommandConfiguration.BuildPropertyConfiguration buildProperty = new MsBuildCommandConfiguration.BuildPropertyConfiguration();
+        BuildPropertyConfiguration buildProperty = new BuildPropertyConfiguration();
         buildProperty.setName("foo");
         buildProperty.setValue("bar");
         command.getBuildProperties().put(buildProperty.getName(), buildProperty);
