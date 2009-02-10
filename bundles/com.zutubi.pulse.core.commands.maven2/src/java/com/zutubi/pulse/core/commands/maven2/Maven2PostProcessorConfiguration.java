@@ -8,30 +8,39 @@ import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.StringList;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.annotations.Min;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
- * A post-processor for maven 2 output.  Attempts to capture features from Maven
- * itself (e.g. "[ERROR] BUILD ERROR") and from commonly-used plugins.
+ * Configuration for instances of {@link Maven2PostProcessor}.
  */
 @SymbolicName("zutubi.maven2PostProcessorConfig")
-public class Maven2PostProcessorConfiguration extends AbstractNamedConfiguration implements PostProcessorConfiguration
+@Form(fieldOrder = {"name", "leadingContext", "trailingContext", "suppressedWarnings", "suppressedErrors"})
+public class Maven2PostProcessorConfiguration extends AbstractNamedConfiguration implements PostProcessorConfiguration, Validateable
 {
     private static final String JUNIT_PROCESSOR_NAME = "junit.summary";
     private static final String MAVEN_ERRORS_PROCESSOR_NAME = "maven.errors";
     private static final String BUILD_FAILURE_PROCESSOR_NAME = "build.failure";
 
+    @Min(0) @Wizard.Ignore
     private int leadingContext = 1;
+    @Min(0) @Wizard.Ignore
     private int trailingContext = 6;
-    @Addable(value = "suppress-error", attribute = "expression")
+    @Addable(value = "suppress-error", attribute = "expression") @StringList @Wizard.Ignore
     private List<String> suppressedWarnings = new LinkedList<String>();
-    @Addable(value = "suppress-warning", attribute = "expression")
+    @Addable(value = "suppress-warning", attribute = "expression") @StringList @Wizard.Ignore
     private List<String> suppressedErrors = new LinkedList<String>();
 
     public Maven2PostProcessorConfiguration()
@@ -141,5 +150,26 @@ public class Maven2PostProcessorConfiguration extends AbstractNamedConfiguration
     public void setSuppressedErrors(List<String> suppressedErrors)
     {
         this.suppressedErrors = suppressedErrors;
+    }
+
+    public void validate(ValidationContext context)
+    {
+        validateSuppressions(context, suppressedErrors, "suppressedErrors");
+        validateSuppressions(context, suppressedWarnings, "suppressedWarnings");
+    }
+
+    private void validateSuppressions(ValidationContext context, List<String> suppressions, String field)
+    {
+        for (String expression: suppressions)
+        {
+            try
+            {
+                Pattern.compile(expression);
+            }
+            catch (PatternSyntaxException e)
+            {
+                context.addFieldError(field, "Invalid expression '" + expression + "': " + e.getMessage());
+            }
+        }
     }
 }

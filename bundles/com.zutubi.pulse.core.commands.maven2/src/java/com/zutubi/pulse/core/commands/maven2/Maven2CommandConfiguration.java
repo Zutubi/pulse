@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.maven2;
 
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.TextUtils;
@@ -10,15 +11,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * The Maven2 command is used to run a maven 2 build.
+ * Configuration for instances of {@link Maven2Command}.
  */
 @SymbolicName("zutubi.maven2CommandConfig")
+@Form(fieldOrder = {"name", "workingDir", "goals", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
 public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguration
 {
-    /**
-     * The goals to be passed to the maven2 command line.  The format is a space
-     * separated list of goals.
-     */
     private String goals;
 
     public Maven2CommandConfiguration()
