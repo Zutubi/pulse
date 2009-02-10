@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core.commands.xcode;
 
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.StringList;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
@@ -9,15 +11,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Configuration for instances of {@link XCodeCommand}.
  */
 @SymbolicName("zutubi.xcodeCommandConfig")
+@Form(fieldOrder = {"name", "workingDir", "project", "config", "target", "buildaction", "settings", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
 public class XCodeCommandConfiguration extends NamedArgumentCommandConfiguration
 {
     private String target;
     private String config;
     private String project;
-
     private String buildaction;
+    @StringList
     private List<String> settings;
 
     public XCodeCommandConfiguration()

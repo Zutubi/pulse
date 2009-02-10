@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 
 /**
+ * A pre-canned configuration for a regex post-processor for extracting common
+ * errors and warnings from xcode build output.
  */
 @SymbolicName("zutubi.xcodePostProcessorConfig")
 public class XCodePostProcessorConfiguration extends RegexPostProcessorConfiguration
