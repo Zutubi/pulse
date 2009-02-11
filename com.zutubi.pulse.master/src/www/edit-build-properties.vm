@@ -4,6 +4,25 @@
 <html>
 <head>
     <title>#wwtext("name=build.properties.specify")</title>
+	<script type="text/javascript">
+        var detailPanel = new ZUTUBI.DetailPanel();
+        detailPanel.setHelp('#jss(${project.config.configurationPath})', 'manualTrigger');
+
+        var Layout = function()
+        {
+            return {
+                init : function()
+                {
+                    var center = Ext.getCmp('nested-center');
+                    center.add(detailPanel);
+                    Ext.getCmp('nested-east').show()
+                    viewport.doLayout();
+                }
+            }
+        }();
+
+        Ext.onReady(Layout.init, Layout, true);
+	</script>
 </head>
 <body>
     #projectTabs("home")
