@@ -10,9 +10,9 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.DefaultPostProcessorFragment;
 import com.zutubi.pulse.master.tove.config.project.types.PostProcessorFragment;
+import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
-import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -108,7 +108,7 @@ public class DefaultPostProcessorManager implements PostProcessorManager, EventL
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ ConfigurationSystemStartedEvent.class };
+        return new Class[]{ SystemStartedEvent.class };
     }
 
     public void setEventManager(EventManager eventManager)

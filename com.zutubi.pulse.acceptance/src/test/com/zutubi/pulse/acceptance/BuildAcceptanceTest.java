@@ -138,6 +138,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         String changelistLink = FISHEYE_BASE + "/changelog/" + FISHEYE_PROJECT + "/?cs=" + revisionString;
 
+        loginAsAdmin();
         BuildChangesPage changesPage = new BuildChangesPage(selenium, urls, random, buildNumber);
         changesPage.goTo();
         SeleniumUtils.assertLinkToPresent(selenium, changelistLink);

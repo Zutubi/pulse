@@ -14,7 +14,7 @@ public class PrintCommand extends OutputProducingCommandSupport
 {
     private boolean terminated = false;
 
-    protected PrintCommand(PrintCommandConfiguration config)
+    public PrintCommand(PrintCommandConfiguration config)
     {
         super(config);
     }

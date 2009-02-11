@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.annotations.Wire;
@@ -23,6 +24,7 @@ import java.util.Map;
  */
 @SymbolicName("zutubi.multiRecipeTypeConfig")
 @Wire
+@Form(fieldOrder = {"defaultRecipe"})
 public class MultiRecipeTypeConfiguration extends TypeConfiguration
 {
     private String defaultRecipe;

@@ -89,14 +89,14 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseLinkAvailableForSubversionAntProjectConfiguration() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
         assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
     }
 
     public void testBrowseLinkAvailableForGitAntProjectConfiguration() throws Exception
     {
-        AntCommandForm antForm = insertTestGitProjectAndNavigateToTypeConfig();
+        AntCommandForm antForm = insertTestGitProjectAndNavigateToCommandConfig();
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
         assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
     }
@@ -105,7 +105,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseSelectionOfScmFile() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
@@ -121,7 +121,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseSelectionOfScmDirectory() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
         assertTrue(antForm.isBrowseWorkingDirectoryLinkPresent());
 
         BrowseScmWindow browse = antForm.clickBrowseWorkingDirectory();
@@ -136,7 +136,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseAndCancelSelectionOfScmFile() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
         assertEquals("build.xml", antForm.getBuildFileFieldValue());
         assertTrue(antForm.isBrowseBuildFileLinkPresent());
 
@@ -152,8 +152,8 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseFileUsesWorkingDirectory() throws Exception
     {
-        AntCommandForm antForm = insertTestSvnProjectAndNavigateToTypeConfig();
-        antForm.setFieldValue("work", "src");
+        AntCommandForm antForm = insertTestSvnProjectAndNavigateToCommandConfig();
+        antForm.setFieldValue("workingDir", "src");
 
         BrowseScmWindow browse = antForm.clickBrowseBuildFile();
         browse.waitForNode("java");
@@ -168,16 +168,16 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         assertEquals("java/com/zutubi/testant/Unit.java", antForm.getBuildFileFieldValue());
     }
 
-    private AntCommandForm insertTestSvnProjectAndNavigateToTypeConfig() throws Exception
+    private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig() throws Exception
     {
         Hashtable<String, Object> svnConfig = xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY);
         xmlRpcHelper.loginAsAdmin();
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, xmlRpcHelper.getAntConfig());
         xmlRpcHelper.logout();
-        return navigateToTypeConfig();
+        return navigateToCommandConfig();
     }
 
-    private AntCommandForm insertTestGitProjectAndNavigateToTypeConfig() throws Exception
+    private AntCommandForm insertTestGitProjectAndNavigateToCommandConfig() throws Exception
     {
         // the git repository is located on the local file system in the work.dir/git-repo directory
         File workingDir = AcceptanceTestUtils.getWorkingDirectory();
@@ -190,12 +190,12 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, gitConfig, xmlRpcHelper.getAntConfig());
         xmlRpcHelper.logout();
-        return navigateToTypeConfig();
+        return navigateToCommandConfig();
     }
 
-    private AntCommandForm navigateToTypeConfig()
+    private AntCommandForm navigateToCommandConfig()
     {
-        goTo(urls.adminProject(random) + "/" + Constants.Project.TYPE);
+        goTo(urls.adminProject(random) + "/" + Constants.Project.TYPE + "/recipes/default/commands/build");
         AntCommandForm antForm = new AntCommandForm(selenium);
         antForm.waitFor();
         return antForm;
