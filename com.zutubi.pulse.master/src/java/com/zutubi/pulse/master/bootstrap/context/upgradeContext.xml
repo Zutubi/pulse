@@ -46,6 +46,7 @@
                 <ref local="deleteTempateProjectStates"/>
                 <ref local="skippedTestCases"/>
                 <ref local="ensureGlobalConfigPermanent"/>
+                <ref local="dashboardShowUngrouped"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -145,5 +146,9 @@
 
     <bean id="ensureGlobalConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureGlobalConfigPermanentUpgradeTask">
         <property name="buildNumber" value="200021001"/>
+    </bean>
+
+    <bean id="dashboardShowUngrouped" class="com.zutubi.pulse.master.upgrade.tasks.DashboardShowUngroupedUpgradeTask">
+        <property name="buildNumber" value="200022001"/>
     </bean>
 </beans>

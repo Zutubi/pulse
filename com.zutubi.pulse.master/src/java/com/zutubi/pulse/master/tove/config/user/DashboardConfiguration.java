@@ -10,7 +10,7 @@ import java.util.List;
  * User preferences controlling what they see on their dashboard.
  */
 @SymbolicName("zutubi.dashboardConfig")
-@Form(labelWidth = 300, fieldOrder = {"showAllProjects", "shownProjects", "groupsShown", "showAllGroups", "shownGroups", "hierarchyShown", "hiddenHierarchyLevels", "buildsPerProject", "columns", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
+@Form(labelWidth = 300, fieldOrder = {"showAllProjects", "shownProjects", "groupsShown", "showUngrouped", "showAllGroups", "shownGroups", "hierarchyShown", "hiddenHierarchyLevels", "buildsPerProject", "columns", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
 @Classification(single = "dashboard")
 public class DashboardConfiguration extends ProjectsSummaryConfiguration
 {
@@ -21,7 +21,7 @@ public class DashboardConfiguration extends ProjectsSummaryConfiguration
      */
     @Reference
     private List<ProjectConfiguration> shownProjects = new LinkedList<ProjectConfiguration>();
-    @ControllingCheckbox(dependentFields = {"showAllGroups"})
+    @ControllingCheckbox(dependentFields = {"showAllGroups", "showUngrouped"})
     private boolean groupsShown = true;
     @ControllingCheckbox(invert = true, dependentFields = {"shownGroups"})
     private boolean showAllGroups = true;
@@ -30,7 +30,7 @@ public class DashboardConfiguration extends ProjectsSummaryConfiguration
      */
     @ItemPicker(optionProvider = "com.zutubi.pulse.master.tove.config.project.ProjectLabelOptionProvider")
     private List<String> shownGroups = new LinkedList<String>();
-
+    private boolean showUngrouped = true;
     @ControllingCheckbox(dependentFields = {"myChangeCount"})
     private boolean showMyChanges = true;
     /**
@@ -98,6 +98,16 @@ public class DashboardConfiguration extends ProjectsSummaryConfiguration
     public void setShownGroups(List<String> shownGroups)
     {
         this.shownGroups = shownGroups;
+    }
+
+    public boolean isShowUngrouped()
+    {
+        return showUngrouped;
+    }
+
+    public void setShowUngrouped(boolean showUngrouped)
+    {
+        this.showUngrouped = showUngrouped;
     }
 
     public boolean isShowMyChanges()
