@@ -1,12 +1,13 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.MultiStepTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.master.tove.wizard.*;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -29,6 +30,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
     private static final Logger LOG = Logger.getLogger(ProjectConfigurationWizard.class);
 
     public static final String DEFAULT_STAGE = "default";
+    private static final String DEFAULT_RECIPE = "default";
 
     private CompositeType projectType;
     private CompositeType scmType;
@@ -117,13 +119,17 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 
     private TemplateRecord getSingleCommandTemplate(TypeConfiguration configuredType)
     {
-        if (configuredType instanceof MultiStepTypeConfiguration)
+        if (configuredType instanceof MultiRecipeTypeConfiguration)
         {
-            MultiStepTypeConfiguration multiStep = (MultiStepTypeConfiguration) configuredType;
-            if (multiStep.getCommands().size() == 1)
+            MultiRecipeTypeConfiguration multiRecipe = (MultiRecipeTypeConfiguration) configuredType;
+            if (multiRecipe.getRecipes().size() == 1)
             {
-                CommandConfiguration command = multiStep.getCommands().values().iterator().next();
-                return (TemplateRecord) configurationTemplateManager.getRecord(command.getConfigurationPath());
+                RecipeConfiguration recipe = multiRecipe.getRecipes().values().iterator().next();
+                if (recipe.getCommands().size() == 1)
+                {
+                    CommandConfiguration command = recipe.getCommands().values().iterator().next();
+                    return (TemplateRecord) configurationTemplateManager.getRecord(command.getConfigurationPath());
+                }
             }
         }
 
@@ -143,11 +149,18 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         if (typeState == null)
         {
             TypeWizardState commandState = getCompletedStateForType(commandType);
-            typeRecord = typeRegistry.getType(MultiStepTypeConfiguration.class).createNewRecord(true);
-            MutableRecord commandsRecord = (MutableRecord) typeRecord.get("commands");
+            typeRecord = typeRegistry.getType(MultiRecipeTypeConfiguration.class).createNewRecord(true);
+            typeRecord.put("defaultRecipe", DEFAULT_RECIPE);
+
+            MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
+            recipeRecord.put("name", DEFAULT_RECIPE);
+            MutableRecord commandsRecord = (MutableRecord) recipeRecord.get("commands");
             Record commandRenderRecord = commandState.getRenderRecord();
             MutableRecord commandRecord = commandState.getDataRecord();
             commandsRecord.put((String) commandRenderRecord.get("name"), commandRecord);
+
+            MutableRecord recipesRecord = (MutableRecord) typeRecord.get("recipes");
+            recipesRecord.put(DEFAULT_RECIPE, recipeRecord);
         }
         else
         {

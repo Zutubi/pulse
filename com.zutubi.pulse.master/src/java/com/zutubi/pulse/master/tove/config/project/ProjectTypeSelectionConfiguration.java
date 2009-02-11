@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.MultiStepTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.annotations.ControllingSelect;
 import com.zutubi.tove.annotations.Form;
@@ -29,7 +29,7 @@ public class ProjectTypeSelectionConfiguration extends AbstractConfiguration
     static
     {
         TYPE_MAPPING.put(TYPE_CUSTOM, CustomTypeConfiguration.class);
-        TYPE_MAPPING.put(TYPE_MULTI_STEP, MultiStepTypeConfiguration.class);
+        TYPE_MAPPING.put(TYPE_MULTI_STEP, MultiRecipeTypeConfiguration.class);
         TYPE_MAPPING.put(TYPE_VERSIONED, VersionedTypeConfiguration.class);
     }
 

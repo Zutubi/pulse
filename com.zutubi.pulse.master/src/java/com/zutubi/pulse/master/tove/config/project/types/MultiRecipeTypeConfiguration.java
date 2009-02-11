@@ -2,14 +2,13 @@ package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.ToveFileStorer;
-import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.Element;
@@ -19,30 +18,29 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * A project type that allows multiple recipes to be fully configured in the
+ * UI.
  */
-@SymbolicName("zutubi.multiStepTypeConfig")
+@SymbolicName("zutubi.multiRecipeTypeConfig")
 @Wire
-public class MultiStepTypeConfiguration extends TypeConfiguration
+public class MultiRecipeTypeConfiguration extends TypeConfiguration
 {
-    @Ordered
-    private Map<String, CommandConfiguration> commands = new LinkedHashMap<String, CommandConfiguration>();
+    private String defaultRecipe;
+    private Map<String, RecipeConfiguration> recipes = new LinkedHashMap<String, RecipeConfiguration>();
+    @Transient
     private PulseFileLoaderFactory fileLoaderFactory;
 
     public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
     {
-        RecipeConfiguration recipe = new RecipeConfiguration();
-        recipe.setName("default");
-        recipe.getCommands().putAll(commands);
-
-        ProjectRecipesConfiguration recipes = new ProjectRecipesConfiguration();
-        recipes.getRecipes().put(recipe.getName(), recipe);
-        recipes.setDefaultRecipe(recipe.getName());
+        ProjectRecipesConfiguration prc = new ProjectRecipesConfiguration();
+        prc.setDefaultRecipe(defaultRecipe);
+        prc.getRecipes().putAll(recipes);
 
         ToveFileStorer fileStorer = fileLoaderFactory.createStorer();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try
         {
-            fileStorer.store(baos, recipes, new Element("project"));
+            fileStorer.store(baos, prc, new Element("project"));
             return new String(baos.toByteArray());
         }
         finally
@@ -51,14 +49,24 @@ public class MultiStepTypeConfiguration extends TypeConfiguration
         }
     }
 
-    public Map<String, CommandConfiguration> getCommands()
+    public String getDefaultRecipe()
     {
-        return commands;
+        return defaultRecipe;
     }
 
-    public void setCommands(Map<String, CommandConfiguration> commands)
+    public void setDefaultRecipe(String defaultRecipe)
     {
-        this.commands = commands;
+        this.defaultRecipe = defaultRecipe;
+    }
+
+    public Map<String, RecipeConfiguration> getRecipes()
+    {
+        return recipes;
+    }
+
+    public void setRecipes(Map<String, RecipeConfiguration> recipes)
+    {
+        this.recipes = recipes;
     }
 
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
