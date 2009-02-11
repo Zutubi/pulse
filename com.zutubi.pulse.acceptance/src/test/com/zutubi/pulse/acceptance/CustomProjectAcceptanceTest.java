@@ -39,7 +39,7 @@ public class CustomProjectAcceptanceTest extends BaseXmlRpcAcceptanceTest
                         xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY),
                         xmlRpcHelper.getCustomTypeConfig(pulseFileString));
             }
-        }, 2, TimeUnit.SECONDS, null);
+        }, 4, TimeUnit.SECONDS, null);
         
         assertNotNull(insertionPath);
     }

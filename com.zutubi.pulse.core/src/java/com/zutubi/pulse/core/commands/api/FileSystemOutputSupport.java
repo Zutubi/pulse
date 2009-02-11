@@ -22,7 +22,7 @@ public abstract class FileSystemOutputSupport<T extends FileSystemOutputConfigur
         FileSystemOutputConfigurationSupport config = getConfig();
         File file = context.registerOutput(config.getName(), config.getType());
         captureFiles(file, context);
-        context.processOutput(config.getName(), config.getPostProcessors());
+        context.registerProcessors(config.getName(), config.getPostProcessors());
     }
 
     protected boolean captureFile(File toFile, File fromFile, CommandContext context)

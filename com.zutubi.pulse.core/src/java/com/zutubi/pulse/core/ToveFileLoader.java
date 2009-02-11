@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.*;
+import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.core.validation.PulseValidationContext;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
@@ -448,12 +449,7 @@ public class ToveFileLoader
 
         public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
-            String value = element.getAttributeValue(attribute);
-            if (value == null)
-            {
-                throw new FileLoadException("Required attribute '" + attribute + "' not specified");
-            }
-
+            String value = getAddableValue(element, attribute);
             Object resolved = ReferenceResolver.resolveReference(value, scope);
             Class<? extends Configuration> clazz = referenceType.getReferencedType().getClazz();
             if (!clazz.isInstance(resolved))
@@ -489,13 +485,7 @@ public class ToveFileLoader
 
         public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
         {
-            String value = element.getAttributeValue(attribute);
-            if (value == null)
-            {
-                throw new FileLoadException("Required attribute '" + attribute + "' not specified");
-            }
-
-            return coerce(value, type, resolutionStrategy, scope);
+            return coerce(getAddableValue(element, attribute), type, resolutionStrategy, scope);
         }
 
         public boolean initInstance()
@@ -514,6 +504,25 @@ public class ToveFileLoader
         {
             throw new FileLoadException("Could not instantiate type '" + type.getClazz().getName() + "'. Reason: " + e.getMessage());
         }
+    }
+
+    private String getAddableValue(Element element, String attribute) throws FileLoadException
+    {
+        String value;
+        if (TextUtils.stringSet(attribute))
+        {
+            value = element.getAttributeValue(attribute);
+            if (value == null)
+            {
+                throw new FileLoadException("Required attribute '" + attribute + "' not specified");
+            }
+        }
+        else
+        {
+            value = XMLUtils.getText(element, "");
+        }
+
+        return value;
     }
 
     private void validate(Object obj) throws CommandValidationException, ValidationException

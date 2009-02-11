@@ -33,7 +33,7 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
     private File workingDir;
     private String exe;
     private String args;
-    @Addable("arg") @Wizard.Ignore @StringList
+    @Addable(value = "arg", attribute = "") @Wizard.Ignore @StringList
     private List<String> extraArguments = new LinkedList<String>();
     @Wizard.Ignore
     private String inputFile;

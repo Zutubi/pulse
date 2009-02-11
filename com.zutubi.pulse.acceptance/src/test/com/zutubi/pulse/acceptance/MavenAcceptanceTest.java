@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.BuildArtifactsPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
+import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
 
 import java.util.Hashtable;
@@ -67,24 +68,25 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     private void createMavenProject() throws Exception
     {
-        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.mavenTypeConfig");
-        type.put("targets", "install");
+        // FIXME loader
+        Hashtable<String, Object> command = xmlRpcHelper.createEmptyConfig("zutubi.mavenTypeConfig");
+        command.put("targets", "install");
 
-        createMavenProject(type);
+        createMavenProject(command);
     }
 
     private void createMaven2Project() throws Exception
     {
-        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.maven2TypeConfig");
-        type.put("goals", "install");
+        Hashtable<String, Object> command = xmlRpcHelper.createEmptyConfig(Maven2CommandConfiguration.class);
+        command.put("goals", "install");
 
-        createMavenProject(type);
+        createMavenProject(command);
     }
 
-    private void createMavenProject(Hashtable<String, Object> type) throws Exception
+    private void createMavenProject(Hashtable<String, Object> command) throws Exception
     {
         xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TEST_MAVEN_REPOSITORY), type);
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TEST_MAVEN_REPOSITORY), command);
         xmlRpcHelper.logout();
     }
 

@@ -31,144 +31,108 @@
 
  <!-- MAKE MACRO -->
  <macro name="make">
- <command name="configure">
  <executable name="configure.sh" exe="${project.home}/configure.sh" args="${params}"/>
- </command>
 
- <command name="make">
  <executable name="make" exe="/usr/bin/make" args="-j 4" working-dir="${project.home}/build/${mode}">
  <process processor="${compile.pp}"/>
  </executable>
- </command>
  </macro>
 
  <!-- DIST MACRO -->
  <macro name="dist">
- <command name="configure">
  <executable name="configure.sh" exe="${project.home}/configure.sh" args="${params}"/>
- </command>
 
- <command name="make">
  <executable name="make" exe="/usr/bin/make" args="-j 4" working-dir="${project.home}/build/${mode}">
  <process processor="${compile.pp}"/>
  </executable>
- </command>
 
- <command name="dist">
  <executable name="dist" exe="/usr/bin/make" args="dist" working-dir="${project.home}/build/${mode}">
  <process processor="${compile.pp}"/>
  </executable>
- </command>
 
  <macro-ref macro="${reports}"/>
 
- <command name="copy">
  <executable name="copy" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>cp -r ${project.home}/build/${mode}/dist/app-* ${project.dist}</arg>
  </executable>
- </command>
-
- <command name="build-info">
+ 
  <executable name="build-info" exe="${project.home}/src/build_support/BuildInfo.sh">
  <environment name="BUILD_INFO_PLATFORM" value="${device}"/>
  <environment name="BUILD_INFO_PROJECT" value="${BUILD_INFO_PROJECT}"/>
  <environment name="BUILD_INFO_TYPE" value="${type}"/>
  <environment name="BUILD_INFO_DIST" value="${project.home}/build/${mode}/dist"/>
  </executable>
- </command>
  </macro>
 
  <!-- COVERITY MACRO -->
  <macro name="coverity">
- <command name="configure">
  <executable name="configure.sh" exe="${project.home}/configure.sh" args="${params}"/>
- </command>
 
- <command name="make">
  <executable name="cov-build"
  exe="/home/autobuild/coverity/${coverity.version}/bin/cov-build"
  working-dir="${project.home}/build/${mode}"
  args="--dir /tmp/coverity-${recipe}-${build.number} /usr/bin/make -j 4">
  <process processor="${compile.pp}"/>
  </executable>
- </command>
 
- <command name="coverity-prevent-analysis">
  <executable working-dir="/home/autobuild/coverity" name="pulse-stage.pl" exe="/home/autobuild/coverity/pulse-stage.pl">
  <environment name="COVERITY_VERSION" value="${coverity.version}"/>
  </executable>
- </command>
  </macro>
 
  <!-- UNIT TEST MACRO -->
  <macro name="unit-test">
- <command name="map.link">
  <executable name="map.link" exe="${project.home}/src/build_support/BuildMapSwitch.sh">
  <environment name="MAP_VERSION" value="${MAP_VERSION}"/>
  </executable>
- </command>
 
- <command name="test">
  <executable name="runtests.sh"
  exe="${project.home}/runtests.sh"
  working-dir="${project.home}" args="-x -r ${project.home}/build/${mode} -o ${project.home}/build/${mode}/test-results">
+     <dir-artifact name="test-results" base="${project.home}/build/${mode}/test-results" fail-if-not-present="false">
+     <include pattern="**/*.xml"/>
+     <process processor="${unittest.pp}"/>
+     </dir-artifact>
  </executable>
- <dir-artifact name="test-results" base="${project.home}/build/${mode}/test-results" fail-if-not-present="false">
- <include pattern="**/*.xml"/>
- <process processor="${unittest.pp}"/>
- </dir-artifact>
- </command>
 
- <command name="cleanup">
  <executable name="copy" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>rm -rf /tmp/dniPlatformprofile /tmp/gps_test_log.trace /tmp/MyRouteDbTest.db /tmp/qloc* /tmp/hsperfdata_autobuild /tmp/share /tmp/TestSettings_save.xml /tmp/TestSettings.xml /tmp/test.tst /tmp/unzipOverwrite /tmp/workspace </arg>
  </executable>
- </command>
  </macro>
 
  <!-- QE COPY MACRO -->
  <macro name="qe.copy">
- <command name="mkdir">
  <executable name="mkdir" exe="/bin/mkdir" args="-p ${project.qe.dist}">
  </executable>
- </command>
 
- <command name="copy">
  <executable name="copy" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>cp -r ${project.home}/build/${mode}/dist/app-* ${project.qe.dist}</arg>
  </executable>
- </command>
  </macro>
 
  <!-- START OF MAKE REPORT MACRO -->
 
  <macro name="reports">
- <command name="make">
  <executable name="make" exe="/usr/bin/make" args="reports" working-dir="${project.home}/build/${mode}">
  <process processor="${compile.pp}"/>
  </executable>
- </command>
 
- <command name="copy">
  <executable name="copy" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
  <arg>cp -r ${project.home}/build/${mode}/reports ${project.home}/build/${mode}/dist/app-*</arg>
  </executable>
- </command>
  </macro>
 
  <!-- DOXYGEN MACRO -->
  <macro name="gendoc">
- <command name="gendoc">
  <executable name="gendoc.sh" exe="${project.home}/gendoc.sh" args="-d /mnt/raid/builds/doxygen/device -q"/>
- </command>
  </macro>
 
  <!-- END OF MACRO SECTION -->

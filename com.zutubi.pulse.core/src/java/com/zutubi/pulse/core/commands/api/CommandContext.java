@@ -28,8 +28,8 @@ public interface CommandContext
     
     File registerOutput(String name, String type);
 
+    void registerProcessors(String name, List<PostProcessorConfiguration> postProcessors);
+
     void setOutputIndex(String name, String index);
-    
-    void processOutput(String name, List<PostProcessorConfiguration> postProcessors);
 
 }

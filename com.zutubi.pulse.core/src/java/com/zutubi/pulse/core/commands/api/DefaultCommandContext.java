@@ -13,6 +13,7 @@ import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -109,37 +110,43 @@ public class DefaultCommandContext implements CommandContext
         spec.artifact.setIndex(index);
     }
 
-    public void processOutput(String name, List<PostProcessorConfiguration> postProcessors)
+    public void registerProcessors(String name, List<PostProcessorConfiguration> postProcessors)
     {
         final OutputSpec spec = registeredOutputs.get(name);
-        if (spec == null)
+        if (spec != null)
         {
-            // Nothing to process.
-            return;
+            spec.processors.addAll(postProcessors);
         }
+    }
 
-        final List<PostProcessor> processors = CollectionUtils.map(postProcessors, new Mapping<PostProcessorConfiguration, PostProcessor>()
+    public void processOutputs()
+    {
+        for (OutputSpec spec: registeredOutputs.values())
         {
-            public PostProcessor map(PostProcessorConfiguration postProcessorConfiguration)
+            final List<PostProcessor> processors = CollectionUtils.map(spec.processors, new Mapping<PostProcessorConfiguration, PostProcessor>()
             {
-                return postProcessorFactory.createProcessor(postProcessorConfiguration);
-            }
-        });
+                public PostProcessor map(PostProcessorConfiguration postProcessorConfiguration)
+                {
+                    return postProcessorFactory.createProcessor(postProcessorConfiguration);
+                }
+            });
 
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir(spec.toDir);
-        scanner.setExcludes(null);
-        scanner.scan();
+            DirectoryScanner scanner = new DirectoryScanner();
+            scanner.setBasedir(spec.toDir);
+            scanner.setExcludes(null);
+            scanner.scan();
 
-        for (String path : scanner.getIncludedFiles())
-        {
-            StoredFileArtifact fileArtifact = new StoredFileArtifact(path, spec.type);
-            spec.artifact.add(fileArtifact);
-            PostProcessorContext ppContext = new DefaultPostProcessorContext(fileArtifact, result, executionContext);
-            for (PostProcessor pp: processors)
+            String prefix = spec.artifact.getName() + "/";
+            for (String path : scanner.getIncludedFiles())
             {
-                pp.process(new File(spec.toDir, path), ppContext);
-            }
+                StoredFileArtifact fileArtifact = new StoredFileArtifact(prefix + path, spec.type);
+                spec.artifact.add(fileArtifact);
+                PostProcessorContext ppContext = new DefaultPostProcessorContext(fileArtifact, result, executionContext);
+                for (PostProcessor pp: processors)
+                {
+                    pp.process(new File(spec.toDir, path), ppContext);
+                }
+            }            
         }
     }
 
@@ -148,6 +155,7 @@ public class DefaultCommandContext implements CommandContext
         private StoredArtifact artifact;
         private String type;
         private File toDir;
+        private List<PostProcessorConfiguration> processors = new LinkedList<PostProcessorConfiguration>();
 
         private OutputSpec(StoredArtifact artifact, String type, File toDir)
         {

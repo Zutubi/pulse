@@ -122,7 +122,7 @@ public class TestCommandContext implements CommandContext
         output.setIndex(index);
     }
 
-    public void processOutput(String name, List<PostProcessorConfiguration> postProcessors)
+    public void registerProcessors(String name, List<PostProcessorConfiguration> postProcessors)
     {
         Output output = outputs.get(name);
         if (output != null)

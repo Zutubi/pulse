@@ -50,7 +50,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testSimpleBuild() throws Exception
     {
         String project = randomName();
-        xmlRpcHelper.insertProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
+        xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
         int buildId = xmlRpcHelper.runBuild(project, BUILD_TIMEOUT);
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(project, buildId);
         assertEquals("success", build.get("status"));
@@ -61,7 +61,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(getAllPulseWorkspaces().isEmpty());
 
         String project = randomName();
-        String projectPath = xmlRpcHelper.insertProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
         xmlRpcHelper.runBuild(project, BUILD_TIMEOUT);
 
         assertFalse(getAllPulseWorkspaces().isEmpty());

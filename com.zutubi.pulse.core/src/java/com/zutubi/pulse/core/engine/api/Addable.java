@@ -13,10 +13,12 @@ import java.lang.annotation.Target;
  * form, a nested &lt;widget&gt; tag is understood to define a widget
  * instance which should be added to the widgets collection.
  * <p/>
- * If the collection field contains references, then {@link #attribute()}
- * gives the name of the attribute that will contain the referencing text.
- * For example, with reference() set to "ref" (the default), a widget tag
- * would refer to a widget like &lt;widget ref="${widget.property}"/&gt;.
+ * If the collection field contains simple values (including references),
+ * then {@link #attribute()} gives the name of the attribute that will
+ * contain the value or referencing text.  For example, with reference()
+ * set to "ref" (the default), a widget tag would refer to a widget like
+ * &lt;widget ref="${widget.property}"/&gt;.  If attribute() is empty, then
+ * the nested text between the tags is used.
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -32,7 +34,8 @@ public @interface Addable
 
     /**
      * Defines the attribute used to refer to a widget when the target
-     * collection holds references rather than values.
+     * collection holds references rather than values.  May be empty to
+     * indicate that nested text content should be used.
      *
      * @return the name of the referencing attribute
      */

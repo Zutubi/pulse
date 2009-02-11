@@ -105,18 +105,9 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerTransientConfiguration("projectTypeSelection", ProjectTypeSelectionConfiguration.class);
 
             registerConfigurationType(TypeConfiguration.class);
-            registerConfigurationType(TemplateTypeConfiguration.class);
-            registerConfigurationType(AntTypeConfiguration.class);
-            registerConfigurationType(BJamTypeConfiguration.class);
             registerConfigurationType(CustomTypeConfiguration.class);
-            registerConfigurationType(ExecutableTypeConfiguration.class);
-            registerConfigurationType(MavenTypeConfiguration.class);
-            registerConfigurationType(Maven2TypeConfiguration.class);
-            registerConfigurationType(MakeTypeConfiguration.class);
-            registerConfigurationType(MsBuildTypeConfiguration.class);
-            registerConfigurationType(VersionedTypeConfiguration.class);
-            registerConfigurationType(XCodeTypeConfiguration.class);
             registerConfigurationType(MultiRecipeTypeConfiguration.class);
+            registerConfigurationType(VersionedTypeConfiguration.class);
 
             // change viewer configuration
             registerConfigurationType(ChangeViewerConfiguration.class);

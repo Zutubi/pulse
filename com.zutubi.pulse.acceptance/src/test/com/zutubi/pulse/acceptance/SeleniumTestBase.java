@@ -4,6 +4,7 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
+import com.zutubi.pulse.acceptance.forms.admin.ProjectTypeSelectState;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -12,6 +13,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ExceptionWrappingRunnable;
@@ -263,8 +265,9 @@ public class SeleniumTestBase extends PulseTestCase
      * driver instance to guide the process.
      *
      * @param driver the driver instance
+     * @return the final state of the wizard
      */
-    public AddProjectWizard.TypeState runAddProjectWizard(ProjectWizardDriver driver)
+    public AddProjectWizard.CommandState runAddProjectWizard(ProjectWizardDriver driver)
     {
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, driver.getParentName(), true);
         hierarchyPage.goTo();
@@ -291,31 +294,31 @@ public class SeleniumTestBase extends PulseTestCase
 
         driver.scmState(scmState);
 
-        SelectTypeState projectTypeState = new SelectTypeState(selenium);
+        ProjectTypeSelectState projectTypeState = new ProjectTypeSelectState(selenium);
         projectTypeState.waitFor();
-        scmTypeState.nextFormElements(driver.selectType());
+        projectTypeState.nextFormElements(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP, driver.selectCommand());
 
-        AddProjectWizard.TypeState typeState = createTypeForm(driver.selectType());
-        typeState.waitFor();
+        AddProjectWizard.CommandState commandState = createCommandForm(driver.selectCommand());
+        commandState.waitFor();
 
-        driver.typeState(typeState);
+        driver.commandState(commandState);
 
-        return typeState;
+        return commandState;
     }
 
-    private AddProjectWizard.TypeState createTypeForm(String s)
+    private AddProjectWizard.CommandState createCommandForm(String s)
     {
-        if (s.equals("zutubi.antTypeConfig"))
+        if (s.equals("zutubi.antCommandConfig"))
         {
             return new AddProjectWizard.AntState(selenium);
         }
-        else if (s.equals("zutubi.maven2TypeConfig"))
+        else if (s.equals("zutubi.maven2CommandConfig"))
         {
             return new AddProjectWizard.Maven2State(selenium);
         }
         else
         {
-            throw new IllegalArgumentException("Unknown type config: " + s);
+            throw new IllegalArgumentException("Unknown command config: " + s);
         }
     }
 
@@ -369,7 +372,7 @@ public class SeleniumTestBase extends PulseTestCase
         /**
          * @return the symbolic name of the project type to be selected.
          */
-        String selectType();
+        String selectCommand();
 
         /**
          * Callback that allows interaction with the project type
@@ -377,7 +380,7 @@ public class SeleniumTestBase extends PulseTestCase
          *
          * @param form the form instance.
          */
-        void typeState(AddProjectWizard.TypeState form);
+        void commandState(AddProjectWizard.CommandState form);
 
         String getParentName();
 
@@ -426,14 +429,14 @@ public class SeleniumTestBase extends PulseTestCase
             form.nextFormElements(Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, "CLEAN_CHECKOUT");
         }
 
-        public String selectType()
+        public String selectCommand()
         {
-            return "zutubi.antTypeConfig";
+            return "zutubi.antCommandConfig";
         }
 
-        public void typeState(AddProjectWizard.TypeState form)
+        public void commandState(AddProjectWizard.CommandState form)
         {
-            form.finishFormElements(null, "build.xml", null, null);
+            form.finishFormElements("build", null, "build.xml", null, null, null);
         }
     }
 

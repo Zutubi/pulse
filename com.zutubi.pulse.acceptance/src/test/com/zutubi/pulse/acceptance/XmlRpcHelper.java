@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -8,6 +10,8 @@ import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -292,7 +296,33 @@ public class XmlRpcHelper
 
     public String insertSimpleProject(String name, String parent, boolean template) throws Exception
     {
-        return insertProject(name, parent, template, getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), getAntConfig());
+        return insertSingleCommandProject(name, parent, template, getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), getAntConfig());
+    }
+
+    public String insertSingleCommandProject(String name, String parent, boolean template, Hashtable<String, Object> scm, Hashtable<String, Object> command) throws Exception
+    {
+        Hashtable<String, Object> commands = new Hashtable<String, Object>();
+        String commandName = (String) command.get("name");
+        if (commandName == null)
+        {
+            commandName = "build";
+            command.put("name", commandName);
+        }
+
+        commands.put(commandName, command);
+
+        Hashtable<String, Object> recipe = createEmptyConfig(RecipeConfiguration.class);
+        recipe.put("name", "default");
+        recipe.put("commands", commands);
+
+        Hashtable<String, Object> recipes = new Hashtable<String, Object>();
+        recipes.put("default", recipe);
+
+        Hashtable<String, Object> type = createEmptyConfig(MultiRecipeTypeConfiguration.class);
+        type.put("defaultRecipe", "default");
+        type.put("recipes", recipes);
+
+        return insertProject(name, parent, template, scm, type);
     }
 
     public String insertProject(String name, String parent, boolean template, Hashtable<String, Object> scm, Hashtable<String, Object> type) throws Exception
@@ -334,14 +364,14 @@ public class XmlRpcHelper
 
     public Hashtable<String, Object> getAntConfig()
     {
-        Hashtable<String, Object> type = createEmptyConfig("zutubi.antTypeConfig");
-        type.put("file", "build.xml");
+        Hashtable<String, Object> type = createEmptyConfig(AntCommandConfiguration.class);
+        type.put("buildFile", "build.xml");
         return type;
     }
 
     public Hashtable<String, Object> getCustomTypeConfig(String pulseFileString)
     {
-        Hashtable<String, Object> type = createEmptyConfig("zutubi.customTypeConfig");
+        Hashtable<String, Object> type = createEmptyConfig(CustomTypeConfiguration.class);
         type.put("pulseFileString", pulseFileString);
         return type;
     }

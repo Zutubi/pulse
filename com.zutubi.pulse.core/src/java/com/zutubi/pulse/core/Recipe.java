@@ -196,7 +196,7 @@ public class Recipe
         return true;
     }
 
-    private void executeAndProcess(CommandContext commandContext, Command command, CommandConfiguration commandConfig)
+    private void executeAndProcess(DefaultCommandContext commandContext, Command command, CommandConfiguration commandConfig)
     {
         try
         {
@@ -205,7 +205,8 @@ public class Recipe
         finally
         {
             // still need to process any available artifacts, even in the event of an error.
-            processOutputs(commandConfig, commandContext);
+            captureOutputs(commandConfig, commandContext);
+            commandContext.processOutputs();
         }
     }
 
@@ -225,7 +226,7 @@ public class Recipe
         }
     }
 
-    private void processOutputs(CommandConfiguration commandConfig, CommandContext context)
+    private void captureOutputs(CommandConfiguration commandConfig, CommandContext context)
     {
         for (OutputConfiguration outputConfiguration: commandConfig.getOutputs().values())
         {

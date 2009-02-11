@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.admin.AntTypeForm;
+import com.zutubi.pulse.acceptance.forms.admin.AntCommandForm;
 import com.zutubi.pulse.acceptance.forms.admin.CustomTypeForm;
 import com.zutubi.pulse.acceptance.forms.admin.SetPasswordForm;
 import com.zutubi.pulse.acceptance.forms.admin.UserForm;
@@ -136,7 +136,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertTrue(projectPage.isTreeLinkPresent("ant command and artifacts"));
 
         projectPage.clickComposite("type", "ant command and artifacts");
-        AntTypeForm antForm = new AntTypeForm(selenium);
+        AntCommandForm antForm = new AntCommandForm(selenium);
         antForm.waitFor();
     }
 

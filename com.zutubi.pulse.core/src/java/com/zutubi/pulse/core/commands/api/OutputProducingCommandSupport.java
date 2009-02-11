@@ -83,8 +83,8 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
             IOUtils.close(stream);
 
             // Even on error, process whatever we have captured.
-            commandContext.processOutput(OUTPUT_NAME, getDefaultPostProcessors(commandContext));
-            commandContext.processOutput(OUTPUT_NAME, getConfig().getPostProcessors());
+            commandContext.registerProcessors(OUTPUT_NAME, getDefaultPostProcessors(commandContext));
+            commandContext.registerProcessors(OUTPUT_NAME, getConfig().getPostProcessors());
         }
     }
 

@@ -11,11 +11,9 @@ import com.zutubi.tove.type.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
-import nu.xom.Attribute;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Serializer;
+import nu.xom.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -228,7 +226,7 @@ public class ToveFileStorer
             {
                 Element itemElement = new Element(addable.value());
                 String referenceName = (String) getPropertyValue(item, nameProperty);
-                itemElement.addAttribute(new Attribute(addable.attribute(), toReference(referenceName)));
+                applyAddable(itemElement, addable, toReference(referenceName));
                 element.appendChild(itemElement);
             }
         }
@@ -255,6 +253,19 @@ public class ToveFileStorer
         else
         {
             throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': unsupported collection item type '" + itemType.getClazz().getName() + "'");
+        }
+    }
+
+    private void applyAddable(Element element, Addable addable, String value)
+    {
+        String attribute = addable.attribute();
+        if (TextUtils.stringSet(attribute))
+        {
+            element.addAttribute(new Attribute(attribute, value));
+        }
+        else
+        {
+            element.appendChild(new Text(value));
         }
     }
 
