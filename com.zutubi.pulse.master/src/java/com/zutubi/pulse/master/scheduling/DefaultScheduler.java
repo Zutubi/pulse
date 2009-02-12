@@ -123,14 +123,22 @@ public class DefaultScheduler implements Scheduler
             throw new SchedulingException("Trigger is already scheduled.");
         }
 
-        if (started)
-        {
-            SchedulerStrategy impl = getStrategy(trigger);
-            impl.schedule(trigger);
-        }
-
         trigger.setState(TriggerState.SCHEDULED);
         triggerDao.save(trigger);
+
+        try
+        {
+            if (started)
+            {
+                SchedulerStrategy impl = getStrategy(trigger);
+                impl.schedule(trigger);
+            }
+        }
+        catch (SchedulingException e)
+        {
+            triggerDao.delete(trigger);
+            throw new SchedulingException(e);
+        }
     }
 
     public void trigger(Trigger trigger) throws SchedulingException
