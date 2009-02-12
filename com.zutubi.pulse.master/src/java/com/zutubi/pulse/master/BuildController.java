@@ -427,7 +427,8 @@ public class BuildController implements EventListener
             {
                 public Revision process(ScmClient client, ScmContext context) throws ScmException
                 {
-                    boolean supportsRevisions = client.getCapabilities(project.isInitialised()).contains(ScmCapability.REVISIONS);
+                    ScmContext c = (project.isInitialised()) ? context : null;
+                    boolean supportsRevisions = client.getCapabilities(c).contains(ScmCapability.REVISIONS);
                     return supportsRevisions ? client.getLatestRevision(context) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
                 }
             });
@@ -712,7 +713,7 @@ public class BuildController implements EventListener
                 ScmClient client = null;
                 try
                 {
-                    Set<ScmCapability> capabilities = getCapabilities(scm, scmManager, project.isInitialised());
+                    Set<ScmCapability> capabilities = getCapabilities(project, projectConfig, scmManager);
                     if(capabilities.contains(ScmCapability.CHANGESETS))
                     {
                         ScmContext context = scmManager.createContext(projectConfig);

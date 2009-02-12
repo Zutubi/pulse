@@ -49,7 +49,8 @@ public class GetLatestRevisionAction extends ProjectActionSupport
                 {
                     public String process(ScmClient client, ScmContext context) throws ScmException
                     {
-                        if(client.getCapabilities(project.isInitialised()).contains(ScmCapability.REVISIONS))
+                        ScmContext c = (project.isInitialised()) ? context : null;
+                        if(client.getCapabilities(c).contains(ScmCapability.REVISIONS))
                         {
                             return client.getLatestRevision(context).getRevisionString();
                         }

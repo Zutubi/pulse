@@ -1,25 +1,19 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
-import org.netbeans.lib.cvsclient.util.Logger;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
-import java.io.File;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
-public class CvsClientTest extends PulseTestCase
+public class CvsClientTest extends AbstractCvsClient_x_xx_xx_TestCase
 {
     private String cvsRoot = null;
-    private File workdir = null;
 
-    private static final SimpleDateFormat SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    private String password;
 
     public CvsClientTest(String testName)
     {
@@ -30,24 +24,9 @@ public class CvsClientTest extends PulseTestCase
     {
         super.setUp();
 
-        Logger.setLogging("system");
-
         // test repository root.
-        cvsRoot = ":ext:daniel:xxxxx@zutubi.com:/cvsroots/default";
-        //":local:" + repoDir.getCanonicalPath()
-
-        // cleanup the working directory.
-        workdir = FileSystemUtils.createTempDir("CvsServer", "Test");
-    }
-
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-        removeDirectory(workdir);
-
-        cvsRoot = null;
-
-        super.tearDown();
+        cvsRoot = ":ext:cvs-1.12.9@zutubi.com:/cvsroots/default";
+        password = getPassword("cvs-1.12.9");
     }
 
     /*
@@ -55,23 +34,21 @@ public class CvsClientTest extends PulseTestCase
      */
     public void testGetChangesBetween() throws ParseException, ScmException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenSingleRevision", null, null);
-        CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:07:00 GMT"));
-        CvsRevision to = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:08:00 GMT"));
-        List<Changelist> changes = cvsClient.getChanges(null, CvsClient.convertRevision(from), CvsClient.convertRevision(to));
-        assertNotNull(changes);
-        assertEquals(1, changes.size());
+        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsClientTest/testGetChangesBetween", password, null);
+        Revision from = new Revision(localTime("2006-05-08 11:07:00 GMT"));
+        Revision to = new Revision(localTime("2006-05-08 11:08:00 GMT"));
+        assertEquals(1, cvsClient.getChanges(scmContext, from, to).size());
     }
 
     /*
      * When requesting the changes between a revision and itself, nothing
      * should be returned.
      */
-    public void testGetChangesBetweenSingleRevision() throws ParseException, ScmException
+    public void testGetChangesBetweenRevisionAndItself() throws ParseException, ScmException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenSingleRevision", null, null);
-        CvsRevision from = new CvsRevision("daniel", "", "", SERVER_DATE.parse("2006-05-08 11:07:15 GMT"));
-        List<Changelist> changes = cvsClient.getChanges(null, CvsClient.convertRevision(from), CvsClient.convertRevision(from));
+        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsClientTest/testGetChangesBetween", password, null);
+        Revision from = new Revision("daniel::" + localTime("2006-05-08 11:07:15 GMT"));
+        List<Changelist> changes = cvsClient.getChanges(scmContext, from, from);
         assertNotNull(changes);
         assertEquals(0, changes.size());
     }
@@ -81,48 +58,71 @@ public class CvsClientTest extends PulseTestCase
      */
     public void testGetChangesBetweenTwoRevisions() throws ParseException, ScmException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenTwoRevisions", null, null);
-        CvsRevision from = new CvsRevision("daniel", "", "", SERVER_DATE.parse("2006-05-08 11:12:24 GMT"));
-        CvsRevision to = new CvsRevision("daniel", "", "", SERVER_DATE.parse("2006-05-08 11:16:16 GMT"));
-        List<Changelist> changes = cvsClient.getChanges(null, CvsClient.convertRevision(from), CvsClient.convertRevision(to));
-        assertNotNull(changes);
+        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsClientTest/testGetChangesBetweenTwoRevisions", password, null);
+        Revision from = new Revision("daniel::" + localTime("2006-05-08 11:12:24 GMT"));
+        Revision to = new Revision("daniel::" + localTime("2006-05-08 11:16:16 GMT"));
+        List<Changelist> changes = cvsClient.getChanges(scmContext, from, to);
         assertEquals(1, changes.size());
     }
 
     public void testGetChangesCorrectlyFiltersResults() throws ParseException, ScmException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsServerTest/testGetChangesCorrectlyFiltersResults", null, null);
-        CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2006-06-19 00:00:00 GMT"));
-        CvsRevision to = new CvsRevision("", "", "", SERVER_DATE.parse("2006-06-21 00:00:00 GMT"));
+        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsClientTest/testGetChangesCorrectlyFiltersResults", password, null);
+        Revision from = new Revision(localTime("2006-06-19 00:00:00 GMT"));
+        Revision to = new Revision(localTime("2006-06-21 00:00:00 GMT"));
 
         // filter nothing.
-        List<Changelist> changes = cvsClient.getChanges(null, CvsClient.convertRevision(from), CvsClient.convertRevision(to));
+        List<Changelist> changes = cvsClient.getChanges(scmContext, from, to);
+        assertEquals(1, changes.size());
         assertEquals(6, changes.get(0).getChanges().size());
 
         // filter all .txt files
         cvsClient.setExcludedPaths(Arrays.asList("**/*.txt"));
-        changes = cvsClient.getChanges(null, CvsClient.convertRevision(from), CvsClient.convertRevision(to));
+        changes = cvsClient.getChanges(scmContext, from, to);
+        assertEquals(1, changes.size());
         assertEquals(4, changes.get(0).getChanges().size());
 
         // filter the file.txt files in the subdirectory.
         cvsClient.setExcludedPaths(Arrays.asList("**/directory/file.txt"));
-        changes = cvsClient.getChanges(null, CvsClient.convertRevision(from), CvsClient.convertRevision(to));
+        changes = cvsClient.getChanges(scmContext, from, to);
+        assertEquals(1, changes.size());
         assertEquals(5, changes.get(0).getChanges().size());
 
         // filter .txt and everything from the directory subdirectory.
         cvsClient.setExcludedPaths(Arrays.asList("**/*.txt", "**/directory/*"));
-        changes = cvsClient.getChanges(null, CvsClient.convertRevision(from), CvsClient.convertRevision(to));
+        changes = cvsClient.getChanges(null, from, to);
+        assertEquals(1, changes.size());
         assertEquals(2, changes.get(0).getChanges().size());
 
         // filter everything.
         cvsClient.setExcludedPaths(Arrays.asList("**/*"));
-        changes = cvsClient.getChanges(null, CvsClient.convertRevision(from), CvsClient.convertRevision(to));
+        changes = cvsClient.getChanges(null, from, to);
         assertEquals(0, changes.size());
     }
 
     public void testTestConnection()
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
+        assertTestConnectionSucceeds(cvsRoot, "unit-test/moduleA", password, null);
+    }
+
+    public void testTestConnectionMultipleValidModules()
+    {
+        assertTestConnectionSucceeds(cvsRoot, "unit-test/moduleA, unit-test/moduleB", password, null);
+    }
+
+    public void testTestConnectionInvalidModule()
+    {
+        assertTestConnectionFails(cvsRoot, "invalid-moduleA", password, null);
+    }
+
+    public void testTestConnectionMultipleInvalidModules()
+    {
+        assertTestConnectionFails(cvsRoot, "invalid-moduleA, invalid-moduleB", password, null);
+    }
+
+    private void assertTestConnectionSucceeds(String cvsRoot, String modules, String password, String branch)
+    {
+        CvsClient cvsClient = new CvsClient(cvsRoot, modules, password, branch);
         try
         {
             cvsClient.testConnection();
@@ -133,9 +133,9 @@ public class CvsClientTest extends PulseTestCase
         }
     }
 
-    public void testTestConnectionInvalidModule()
+    private void assertTestConnectionFails(String cvsRoot, String modules, String password, String branch)
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "some invalid module here", null, null);
+        CvsClient cvsClient = new CvsClient(cvsRoot, modules, password, branch);
         try
         {
             cvsClient.testConnection();
@@ -143,58 +143,71 @@ public class CvsClientTest extends PulseTestCase
         }
         catch (ScmException e)
         {
-            assertTrue(e.getMessage().contains("module"));
+            // expected.
         }
     }
 
-    public void testTestConnectionMultipleModules()
+    public void testCheckoutMultipleModules() throws ScmException
     {
-        String modules = "unit-test, integration-test";
-        CvsClient cvsClient = new CvsClient(cvsRoot, modules, null, null);
-        try
-        {
-            cvsClient.testConnection();
-        }
-        catch (ScmException e)
-        {
-            fail();
-        }
+        String module = "unit-test/moduleA, unit-test/moduleB";
+        CvsClient client = new CvsClient(cvsRoot, module, password, null);
+        assertEquals(module, client.getModule());
+
+        client.checkout(exeContext, Revision.HEAD, null);
+
+        assertFileExists("unit-test/moduleA");
+        assertFileExists("unit-test/moduleB");
     }
 
     public void testGetRevisionsSince() throws ParseException, ScmException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenSingleRevision", null, null);
-        CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:07:00 GMT"));
-        List<Revision> revisions = cvsClient.getRevisions(null, CvsClient.convertRevision(from), null);
+        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsClientTest/testGetChangesBetween", password, null);
+        Revision from = new Revision(localTime("2006-05-08 11:07:00 GMT"));
+        List<Revision> revisions = cvsClient.getRevisions(null, from, null);
         assertNotNull(revisions);
         assertEquals(1, revisions.size());
     }
 
-    public void testGetRevision() throws ScmException, ParseException
+    public void testContextProperties() throws ScmException
     {
-        CvsRevision revision = new CvsRevision("author:BRANCH:20070201-01:02:33");
-        assertEquals("author", revision.getAuthor());
-        assertEquals("BRANCH", revision.getBranch());
-        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
-        assertEquals("author:BRANCH:20070201-01:02:33", revision.getRevisionString());
+        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/moduleA", password, null);
+        List<ResourceProperty> properties = cvsClient.getProperties(exeContext);
+        assertEquals(2, properties.size());
+        assertProperty(properties.get(0), CvsClient.PROPERTY_CVS_ROOT, cvsRoot);
+        assertProperty(properties.get(1), CvsClient.PROPERTY_CVS_MODULE, "unit-test/moduleA");
     }
 
-    public void testMultipleModules() throws ScmException
+    public void testContextPropertiesWithMultipleModules() throws ScmException
     {
-        String modules = "unit-test, integration-test";
-        CvsClient client = new CvsClient(cvsRoot, modules, null, null);
+        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/moduleA, unit-test/moduleB", password, "branch");
+        List<ResourceProperty> properties = cvsClient.getProperties(exeContext);
+        assertEquals(6, properties.size());
+        assertProperty(properties.get(0), CvsClient.PROPERTY_CVS_ROOT, cvsRoot);
+        assertProperty(properties.get(1), CvsClient.PROPERTY_CVS_BRANCH, "branch");
+        assertProperty(properties.get(2), CvsClient.PROPERTY_CVS_MODULE, "unit-test/moduleA, unit-test/moduleB");
+        assertProperty(properties.get(3), CvsClient.PROPERTY_CVS_MODULE_COUNT, "2");
+        assertProperty(properties.get(4), CvsClient.PREFIX_CVS_MODULE + "1", "unit-test/moduleA");
+        assertProperty(properties.get(5), CvsClient.PREFIX_CVS_MODULE + "2", "unit-test/moduleB");
+    }
 
-        PulseExecutionContext context = new PulseExecutionContext();
-        context.setWorkingDir(workdir);
-        client.checkout(context, Revision.HEAD, null);
-
-        assertTrue(new File(workdir, "unit-test").isDirectory());
-        assertTrue(new File(workdir, "integration-test").isDirectory());
+    private void assertProperty(ResourceProperty property, String name, Object value)
+    {
+        assertEquals(name, property.getName());
+        assertEquals(value, property.getValue());
     }
 
     public void testGetPreviousFileRevision() throws ScmException
     {
-        CvsClient client = new CvsClient(cvsRoot, "unit-test", "", "");
-        assertEquals("1.3", client.getPreviousRevision(null, new Revision("1.4"), true).getRevisionString());
+        assertPreviousRevision(null, "1.1");
+        assertPreviousRevision("1.3", "1.4");
+        assertPreviousRevision("1.8.4.1", "1.8.4.2");
+        assertPreviousRevision("1.8", "1.8.4.1");
+    }
+
+    private void assertPreviousRevision(String expected, String current) throws ScmException
+    {
+        CvsClient client = new CvsClient(cvsRoot, "moduleA", password, "");
+        Revision revision = client.getPreviousRevision(null, new Revision(current), true);
+        assertEquals(expected, (revision != null) ? revision.getRevisionString() : null);
     }
 }

@@ -2,17 +2,14 @@ package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.scm.DataCacheAware;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.IOUtils;
+import static com.zutubi.util.io.IOUtils.writeToFile;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -23,26 +20,33 @@ import java.util.*;
 /**
  * The CvsClient provides all interactions with a cvs repository.
  */
-public class CvsClient implements ScmClient, DataCacheAware
+public class CvsClient implements ScmClient
 {
-    public static final String TYPE = "cvs";
+    private static final Logger LOG = Logger.getLogger(CvsClient.class);
+
+    protected static final String PROPERTY_CVS_ROOT = "cvs.root";
+    protected static final String PROPERTY_CVS_BRANCH = "cvs.branch";
+    protected static final String PROPERTY_CVS_MODULE = "cvs.module";
+    protected static final String PROPERTY_CVS_MODULE_COUNT = "cvs.module.count";
+    protected static final String PREFIX_CVS_MODULE = "cvs.module.";
 
     private File tmpSpace;
 
-    private static final Logger LOG = Logger.getLogger(CvsClient.class);
-
     private CvsCore core;
 
+    /**
+     * A record of the original configuration module string, formatted as a comma separated
+     * list of modules.
+     */
     private String module;
+
+    /**
+     * The parsed version of the module string.
+     */
     private String[] modules;
     private String branch;
     private String root;
     private String password;
-
-    /**
-     * Data cache.
-     */
-    private Map<Object, Object> cache;
 
     /**
      * A list of ant style path expressions that define what should be excluded from being considered as a change.
@@ -56,24 +60,22 @@ public class CvsClient implements ScmClient, DataCacheAware
         core.setPassword(password);
 
         this.module = module;
-        
-        // CIB-911: ensure that we trim any whitespace from the module, else the cvs command will return false.
-        if (module != null)
-        {
-            this.module = this.module.trim();
-        }
 
-        // parse the comma separated list of modules.
-        StringTokenizer tokens = new StringTokenizer(module, ", ", false);
-        modules = new String[tokens.countTokens()];
-        for(int i = 0; tokens.hasMoreTokens(); i++)
-        {
-            modules[i] = tokens.nextToken();
-        }
-
+        this.modules = parseModuleString(module);
         this.branch = branch;
         this.root = root;
         this.password = password;
+    }
+
+    private String[] parseModuleString(String module)
+    {
+        StringTokenizer tokens = new StringTokenizer(module, ", ", false);
+        String[] modules = new String[tokens.countTokens()];
+        for (int i = 0; tokens.hasMoreTokens(); i++)
+        {
+            modules[i] = tokens.nextToken();
+        }
+        return modules;
     }
 
     public CvsClient(String root, String module, String password, String branch, List<String> filteredPaths, File tempDir)
@@ -88,9 +90,8 @@ public class CvsClient implements ScmClient, DataCacheAware
         this.excludedPaths = excluded;
     }
 
-    public void init(ScmContext context, ScmFeedbackHandler handler)
+    public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
-        // noop - could checkout to provide browse functionality?.
     }
 
     public void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException
@@ -102,10 +103,52 @@ public class CvsClient implements ScmClient, DataCacheAware
     {
     }
 
-    public Set<ScmCapability> getCapabilities(boolean contextAvailable)
+    public Set<ScmCapability> getCapabilities(ScmContext context)
     {
-        // should disable browsing on repos that do not support the remote ls operation.
-        return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
+        Set<ScmCapability> capabilities = EnumSet.allOf(ScmCapability.class);
+        try
+        {
+            String version = (context != null) ? getContextVersion(context) : core.version();
+
+            if (!CvsServerCapabilities.supportsRemoteListing(version))
+            {
+                capabilities.remove(ScmCapability.BROWSE);
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.warning(e);
+        }
+        return capabilities;
+    }
+
+    private String getContextVersion(ScmContext context) throws ScmException
+    {
+        File versionFile = new File(context.getPersistentWorkingDir(), ".version");
+        if (!versionFile.isFile())
+        {
+            try
+            {
+                String version = core.version();
+                writeToFile(version, versionFile);
+                return version;
+            }
+            catch (IOException e)
+            {
+                throw new ScmException(e);
+            }
+        }
+        else
+        {
+            try
+            {
+                return IOUtils.fileToString(versionFile);
+            }
+            catch (IOException e)
+            {
+                throw new ScmException(e);
+            }
+        }
     }
 
     /**
@@ -120,27 +163,25 @@ public class CvsClient implements ScmClient, DataCacheAware
 
     public String getLocation()
     {
-        StringBuilder builder = new StringBuilder();
-        builder.append(getRoot()).append("[").append(getModule()).append("]");
-        return builder.toString();
+        return String.format("%s[%s]", getRoot(), getModule());
     }
 
     public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException
     {
         List<ResourceProperty> result = new LinkedList<ResourceProperty>();
-        result.add(new ResourceProperty("cvs.root", root));
+        result.add(new ResourceProperty(PROPERTY_CVS_ROOT, root));
 
         if (branch != null)
         {
-            result.add(new ResourceProperty("cvs.branch", branch));
+            result.add(new ResourceProperty(PROPERTY_CVS_BRANCH, branch));
         }
-        result.add(new ResourceProperty("cvs.module", module));
+        result.add(new ResourceProperty(PROPERTY_CVS_MODULE, module));
         if (modules.length > 1)
         {
-            result.add(new ResourceProperty("cvs.module.count", String.valueOf(modules.length)));
+            result.add(new ResourceProperty(PROPERTY_CVS_MODULE_COUNT, String.valueOf(modules.length)));
             for (int i = 0; i < modules.length; i++)
             {
-                result.add(new ResourceProperty("cvs.module." + (i + 1), modules[i]));
+                result.add(new ResourceProperty(PREFIX_CVS_MODULE + (i + 1), modules[i]));
             }
         }
 
@@ -191,7 +232,7 @@ public class CvsClient implements ScmClient, DataCacheAware
      * Run some diagnostics on the cvs configuration.
      *
      * @throws ScmException is thrown if there is a problem with the server connection or configuration that
-     * prevents us from querying the cvs repository.
+     *                      prevents us from querying the cvs repository.
      */
     public void testConnection() throws ScmException
     {
@@ -216,7 +257,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         assertRevisionArgValid(revision);
-        for (String module: modules)
+        for (String module : modules)
         {
             core.tag(module, convertRevision(revision), name, moveExisting);
         }
@@ -226,7 +267,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     {
         Properties props = new Properties();
         props.put("root", root);
-        if(branch != null)
+        if (branch != null)
         {
             props.put("branch", branch);
         }
@@ -252,59 +293,66 @@ public class CvsClient implements ScmClient, DataCacheAware
     public Revision parseRevision(ScmContext context, String revision) throws ScmException
     {
         CvsRevision cvsRevision = new CvsRevision(revision);
-        if(cvsRevision.getBranch() == null)
+        if (cvsRevision.getBranch() == null)
         {
             // As this is a user-specified value, we set the right branch for
             // them when it is left unspecified.
             cvsRevision.setBranch(branch);
         }
-        
+
         return convertRevision(cvsRevision);
     }
 
     public Revision getPreviousRevision(ScmContext context, Revision revision, boolean isFile) throws ScmException
     {
+        // cvs revisions are file based.  If we receive a request for a revision other than for
+        // a file, it is likely to be a tag or 'simulated' changelist revision.  These types of
+        // revisions we can do nothing about.
         if (!isFile)
         {
-            // No way to easily get the previous simulated changelist revision.
             return null;
         }
 
-        String revisionString = revision.getRevisionString();
-        int index = revisionString.lastIndexOf(".");
-        if(index != -1)
+        try
         {
-            String end = revisionString.substring(index + 1);
-            try
+            String revisionString = revision.getRevisionString();
+            String[] parts = revisionString.split("\\.");
+
+            // we expect the left of the parts array to be even.
+            // ie:  1.1, 1.2.3.1, etc etc.
+
+            long lastPart = Long.parseLong(parts[parts.length - 1]);
+            if (lastPart > 1)
             {
-                long last = Long.parseLong(end);
-                if(last > 1)
-                {
-                    String start = revisionString.substring(0, index + 1);
-                    return new Revision(start + Long.toString(last - 1));
-                }
+                parts[parts.length - 1] = String.valueOf(lastPart - 1);
+                return new Revision(StringUtils.join(".", parts));
             }
-            catch(NumberFormatException e)
+            else
             {
-                // Fall through.
+                if (parts.length == 2)
+                {
+                    return null;
+                }
+                String[] target = new String[parts.length - 2];
+                System.arraycopy(parts, 0, target, 0, target.length);
+                return new Revision(StringUtils.join(".", target));
             }
         }
-
-        return null;
+        catch (NumberFormatException e)
+        {
+            // just in case.
+            return null;
+        }
     }
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         if (revision == Revision.HEAD)
         {
-            // FIXME: it would be good to be able to avoid this call to get the latest revision and
-            // simply use the information from the checkout / update
-            // It would be nice to have the revision that we checkout/update to be returned by the cvscore
-            // and then return that revision from this method.
             revision = getLatestRevision(null);
         }
 
-        for (String module: modules)
+        for (String module : modules)
         {
             core.checkout(context.getWorkingDir(), module, convertRevision(revision), handler);
         }
@@ -315,6 +363,12 @@ public class CvsClient implements ScmClient, DataCacheAware
     public Revision update(ExecutionContext context, Revision rev, ScmFeedbackHandler handler) throws ScmException
     {
         assertRevisionArgValid(rev);
+        CvsRevision cvsRev = convertRevision(rev);
+
+        if (!isUpdateSupported(cvsRev))
+        {
+            throw new ScmException("The cvs server does not support updating to a specified date on a branch.");
+        }
 
         // we can not run an update from the base directory, even though this is where the checkout occured.
         // Checkout will checkout into the current directory, but not generate a ./CVS directory.  For that, we need to
@@ -326,10 +380,21 @@ public class CvsClient implements ScmClient, DataCacheAware
         {
             for (File workingDir : workingDirs)
             {
-                core.update(workingDir, convertRevision(rev), handler);
+                core.update(workingDir, cvsRev, handler);
             }
         }
         return rev;
+    }
+
+    private boolean isUpdateSupported(CvsRevision rev) throws ScmException
+    {
+        if (TextUtils.stringSet(rev.getBranch()) && rev.getDate() != null)
+        {
+            // can only update to a specified date on a branch on some cvs servers.
+            String version = core.version();
+            return CvsServerCapabilities.supportsDateRevisionOnBranch(version);
+        }
+        return true;
     }
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
@@ -386,11 +451,11 @@ public class CvsClient implements ScmClient, DataCacheAware
 
         List<LogInformation> info = new LinkedList<LogInformation>();
 
-        for (String module: modules)
+        for (String module : modules)
         {
             info.addAll(core.rlog(module, convertRevision(from), convertRevision(to)));
         }
-        
+
         LogInformationAnalyser analyser = new LogInformationAnalyser(CVSRoot.parse(root));
 
         CvsRevision cvsFrom = convertRevision(from);
@@ -463,24 +528,12 @@ public class CvsClient implements ScmClient, DataCacheAware
         Collections.sort(changes);
 
         List<Revision> result = new LinkedList<Revision>();
-        for(Changelist c: changes)
+        for (Changelist c : changes)
         {
             result.add(c.getRevision());
         }
 
         return result;
-    }
-
-    public boolean hasChangedSince(Revision since) throws ScmException
-    {
-        CvsRevision cvsSince = convertRevision(since);
-        if (cvsSince.getDate() == null)
-        {
-            throw new IllegalArgumentException("since revision date can not be null.");
-        }
-
-        List<Changelist> changelists = getChanges(null, since, null);
-        return changelists.size() > 0;
     }
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
@@ -525,35 +578,17 @@ public class CvsClient implements ScmClient, DataCacheAware
 
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
-        //TODO: listing is based on the availability of the remote list command, available on 1.12.x cvs servers.
         List<ScmFile> listing = new LinkedList<ScmFile>();
 
-        String version = core.version();
-        if (version.contains("1.11"))
+        if (getCapabilities(context).contains(ScmCapability.BROWSE))
         {
-            // do not browse for 1.11 repositories, the remote list functionality is not available.
-            // this needs to be passed through via the capabilities as well.
-            return listing;
+            for (RlsInfo info : core.list(path))
+            {
+                listing.add(new ScmFile(info.getModule(), info.getName(), info.isDirectory()));
+            }
         }
         
-        for (RlsInfo info : core.list(path))
-        {
-            listing.add(new ScmFile(info.getModule(), info.getName(), info.isDirectory()));
-        }
-
         return listing;
-    }
-
-    //---( data cache aware implementation )---
-
-    public String getCacheId()
-    {
-        return getUid(); // unique to each external repository since we use the cache to store per server details.
-    }
-
-    public void setCache(Map<Object, Object> cache)
-    {
-        this.cache = cache;
     }
 
     /**
@@ -582,7 +617,7 @@ public class CvsClient implements ScmClient, DataCacheAware
             try
             {
                 // non - recursive.
-                for (String module: modules)
+                for (String module : modules)
                 {
                     currentModule = module;
                     core.checkout(tmpDir, currentModule, null, false, null);

@@ -186,13 +186,6 @@ public class DefaultScmManager implements ScmManager
             // when was the last time that we checked? if never, get the latest revision.
             ScmContext context = scmContextFactory.createContext(projectConfig);
             client = scmClientFactory.createClient(projectConfig.getScm());
-            if (!latestRevisions.containsKey(projectId))
-            {
-                Revision revision = client.getLatestRevision(context);
-                latestRevisions.put(projectId, revision);
-                eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Retrieved initial revision: " + revision.getRevisionString() + " (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
-                return;
-            }
 
             Revision previous = latestRevisions.get(projectId);
 
@@ -200,8 +193,13 @@ public class DefaultScmManager implements ScmManager
             if (previous == null)
             {
                 Revision revision = client.getLatestRevision(context);
+                if (revision == null)
+                {
+                    eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Scm failed to return latest revision.  We can not poll the scm unless a revision is returned.  Will try again later."));
+                    return;
+                }
                 latestRevisions.put(projectId, revision);
-                eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Forced initial revision: " + revision.getRevisionString() + " (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
+                eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Retrieved initial revision: " + revision.getRevisionString() + " (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
                 return;
             }
 
