@@ -57,6 +57,7 @@
     <bean id="buildRequestEventAuthorityProvider" class="com.zutubi.pulse.master.security.BuildRequestEventAuthorityProvider" autowire="byName"/>
     <bean id="agentConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.AgentConfigurationAuthorityProvider" autowire="byName"/>
     <bean id="agentAuthorityProvider" class="com.zutubi.pulse.master.security.AgentAuthorityProvider" autowire="byName"/>
+    <bean id="groupConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.GroupConfigurationAuthorityProvider" autowire="byName"/>
     <bean id="userConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.UserConfigurationAuthorityProvider" autowire="byName"/>
     <bean id="userAuthorityProvider" class="com.zutubi.pulse.master.security.UserAuthorityProvider" autowire="byName"/>
 
