@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.scm;
 
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.UnaryFunctionE;
 import com.zutubi.util.io.IOUtils;
 
@@ -74,7 +74,7 @@ public class ScmClientUtils
         {
             public Set<ScmCapability> process(ScmClient client, ScmContext context) throws ScmException
             {
-                ScmContext c = (project.isInitialised()) ? context : null;
+                ScmContext c = (project != null && project.isInitialised()) ? context : null;
                 return client.getCapabilities(c);
             }
         });
