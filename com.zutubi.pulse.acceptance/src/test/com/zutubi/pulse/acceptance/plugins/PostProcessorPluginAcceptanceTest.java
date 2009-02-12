@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.core.PulseFile;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
+import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
@@ -13,12 +14,13 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
+import com.zutubi.tove.type.TypeRegistry;
 
 import java.io.File;
 
 public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 {
-    private static final String JAR_NAME = "com.zutubi.bundles.postprocessor.sample_1.0.0";
+    private static final String JAR_NAME = "com.zutubi.pulse.core.postprocessors.test";
 
     private PostProcessorExtensionManager extensionManager;
 
@@ -27,6 +29,8 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
     private File tmpDir;
     private PluginSystem pluginSystem;
     private File samplePostProcessorPlugin;
+    private CoreConfigurationRegistry configurationRegistry;
+    private TypeRegistry typeRegistry;
 
     protected void setUp() throws Exception
     {
@@ -48,12 +52,21 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 
         objectFactory = new WiringObjectFactory();
 
+        typeRegistry = new TypeRegistry();
+
+        configurationRegistry = new CoreConfigurationRegistry();
+        configurationRegistry.setTypeRegistry(typeRegistry);
+        configurationRegistry.init();
+
         loaderFactory = new PulseFileLoaderFactory();
+        loaderFactory.setTypeRegistry(typeRegistry);
         loaderFactory.setObjectFactory(objectFactory);
+        loaderFactory.init();
 
         extensionManager = new PostProcessorExtensionManager();
         extensionManager.setPluginManager(pluginSystem.getPluginManager());
         extensionManager.setFileLoaderFactory(loaderFactory);
+        extensionManager.setConfigurationRegistry(configurationRegistry);
         extensionManager.init();
         extensionManager.initialiseExtensions();
 
@@ -79,9 +92,9 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         {
             public boolean satisfied()
             {
-                return extensionManager.getPostProcessor("sample.pp") != null;
+                return extensionManager.getPostProcessor("test.pp") != null;
             }
-        }, 30000, "sample processor to be ready");
+        }, 30000, "test processor to be ready");
 
         ProjectRecipesConfiguration prc = new ProjectRecipesConfiguration();
 

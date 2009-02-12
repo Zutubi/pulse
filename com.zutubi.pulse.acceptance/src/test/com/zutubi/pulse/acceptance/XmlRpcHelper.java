@@ -261,12 +261,16 @@ public class XmlRpcHelper
     }
 
     @SuppressWarnings({"unchecked"})
-    public Hashtable<String, Object> getProjectArtifact(String projectName, String artifactName) throws Exception
+    public Hashtable<String, Object> getProjectCapture(String projectName, String captureName) throws Exception
     {
         Hashtable<String, Object> projectConfig = getConfig(MasterConfigurationRegistry.PROJECTS_SCOPE + "/" + projectName);
         Hashtable<String, Object> projectType = (Hashtable<String, Object>) projectConfig.get(Constants.Project.TYPE);
-        Hashtable<String, Object> typeArtifacts = (Hashtable<String, Object>) projectType.get(Constants.Project.Type.ARTIFACTS);
-        return (Hashtable<String, Object>) typeArtifacts.get(artifactName);
+        Hashtable<String, Object> recipes = (Hashtable<String, Object>) projectType.get("recipes");
+        Hashtable<String, Object> recipe = (Hashtable<String, Object>) recipes.get("default");
+        Hashtable<String, Object> commands = (Hashtable<String, Object>) recipe.get("commands");
+        Hashtable<String, Object> command = (Hashtable<String, Object>) commands.get("build");
+        Hashtable<String, Object> captures = (Hashtable<String, Object>) command.get(Constants.Project.Command.CAPTURES);
+        return (Hashtable<String, Object>) captures.get(captureName);
     }
 
     public int getAgentCount() throws Exception
