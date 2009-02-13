@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.scm.cvs;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.util.FileSystemUtils;
 
 import java.util.Set;
 import java.text.ParseException;
@@ -11,7 +10,7 @@ import java.text.ParseException;
 /**
  * This test case is to test version specific cvs features.
  */
-public class CvsClient_1_12_12_Test extends AbstractCvsClient_x_xx_xx_TestCase
+public class CvsClient_1_12_12_Test extends AbstractCvsClientTestCase
 {
     private CvsClient client;
 

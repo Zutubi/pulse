@@ -265,30 +265,4 @@ public class IOUtils
     {
         joinStreams(inputStream, new FileOutputStream(file), true);
     }
-
-    /**
-     * Write the contents of the string to the specified file.  If the file does not
-     * exist, it will be created.  Any existing contents of the file will be overwritten.
-     *
-     * @param str   the string to the written to the file
-     * @param file  the file to which the string will be written to.
-     *
-     * @throws IOException  on error
-     */
-    public static void writeToFile(String str, File file) throws IOException
-    {
-        if (!file.isFile())
-        {
-            File parent = file.getParentFile();
-            if (!parent.isDirectory() && !file.getParentFile().mkdirs())
-            {
-                throw new IOException("Failed to create parent directory " + parent.getCanonicalPath());
-            }
-            if (!file.createNewFile())
-            {
-                throw new IOException("Failed to create new file " + file.getCanonicalPath());
-            }
-        }
-        writeToFile(file, new ByteArrayInputStream(str.getBytes()));
-    }
 }

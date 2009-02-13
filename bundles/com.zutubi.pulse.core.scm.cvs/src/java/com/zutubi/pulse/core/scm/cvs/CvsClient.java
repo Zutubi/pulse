@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.util.*;
 import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.IOUtils;
-import static com.zutubi.util.io.IOUtils.writeToFile;
+import static com.zutubi.util.FileSystemUtils.createFile;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -130,7 +130,16 @@ public class CvsClient implements ScmClient
             try
             {
                 String version = core.version();
-                writeToFile(version, versionFile);
+                File parent = versionFile.getParentFile();
+                if (!parent.exists() && !parent.mkdirs())
+                {
+                    throw new IOException("Failed to create directory: " + parent.getCanonicalPath());
+                }
+                if (!versionFile.createNewFile())
+                {
+                    throw new IOException("Failed to create new file: " + versionFile.getCanonicalPath());
+                }
+                createFile(versionFile, version);
                 return version;
             }
             catch (IOException e)
@@ -580,14 +589,11 @@ public class CvsClient implements ScmClient
     {
         List<ScmFile> listing = new LinkedList<ScmFile>();
 
-        if (getCapabilities(context).contains(ScmCapability.BROWSE))
+        for (RlsInfo info : core.list(path))
         {
-            for (RlsInfo info : core.list(path))
-            {
-                listing.add(new ScmFile(info.getModule(), info.getName(), info.isDirectory()));
-            }
+            listing.add(new ScmFile(info.getModule(), info.getName(), info.isDirectory()));
         }
-        
+
         return listing;
     }
 

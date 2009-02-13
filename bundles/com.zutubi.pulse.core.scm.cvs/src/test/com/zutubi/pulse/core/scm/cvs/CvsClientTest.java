@@ -9,7 +9,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
-public class CvsClientTest extends AbstractCvsClient_x_xx_xx_TestCase
+public class CvsClientTest extends AbstractCvsClientTestCase
 {
     private String cvsRoot = null;
 

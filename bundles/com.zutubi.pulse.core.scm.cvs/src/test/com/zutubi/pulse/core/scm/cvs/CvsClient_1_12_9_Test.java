@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * This test case is to test version specific cvs features.
  */
-public class CvsClient_1_12_9_Test extends AbstractCvsClient_x_xx_xx_TestCase
+public class CvsClient_1_12_9_Test extends AbstractCvsClientTestCase
 {
     private CvsClient client;
 

@@ -17,7 +17,7 @@ public class CvsCore_1_11_17_Test extends PulseTestCase
         assertNotNull(password);
 
         cvs = new CvsCore();
-        cvs.setRoot(CVSRoot.parse(":ext:cvs-1.11.17:"+password+"@zutubi.com:/cvsroots/cvs-1.11.17"));
+        cvs.setRoot(CVSRoot.parse(":ext:cvs-1.11.17:" + password + "@zutubi.com:/cvsroots/cvs-1.11.17"));
     }
 
     public void testVersion() throws ScmException

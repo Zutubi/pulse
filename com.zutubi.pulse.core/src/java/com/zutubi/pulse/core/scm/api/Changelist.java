@@ -5,6 +5,7 @@ import com.zutubi.util.StringUtils;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
 
 
 /**
@@ -97,11 +98,11 @@ public class Changelist implements Comparable<Changelist>
     }
 
     /**
-     * @return the list of file changes that make up this changelist
+     * @return the list of file changes that make up this changelist (immutable).
      */
     public List<FileChange> getChanges()
     {
-        return changes;
+        return Collections.unmodifiableList(changes);
     }
 
     /**

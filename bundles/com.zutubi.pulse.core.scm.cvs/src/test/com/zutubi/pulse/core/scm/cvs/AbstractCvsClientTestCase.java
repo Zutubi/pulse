@@ -12,7 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class AbstractCvsClient_x_xx_xx_TestCase extends PulseTestCase
+public class AbstractCvsClientTestCase extends PulseTestCase
 {
     private static final SimpleDateFormat SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
     
@@ -22,11 +22,11 @@ public class AbstractCvsClient_x_xx_xx_TestCase extends PulseTestCase
     protected File exeBaseDir;
     protected File scmBaseDir;
 
-    public AbstractCvsClient_x_xx_xx_TestCase()
+    public AbstractCvsClientTestCase()
     {
     }
 
-    public AbstractCvsClient_x_xx_xx_TestCase(String name)
+    public AbstractCvsClientTestCase(String name)
     {
         super(name);
     }

@@ -195,7 +195,7 @@ public class DefaultScmManager implements ScmManager
                 Revision revision = client.getLatestRevision(context);
                 if (revision == null)
                 {
-                    eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Scm failed to return latest revision.  We can not poll the scm unless a revision is returned.  Will try again later."));
+                    eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Scm failed to return latest revision."));
                     return;
                 }
                 latestRevisions.put(projectId, revision);
