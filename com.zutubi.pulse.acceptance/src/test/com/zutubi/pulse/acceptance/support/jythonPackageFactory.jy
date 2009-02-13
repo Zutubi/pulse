@@ -237,7 +237,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         return 0
 
 
-    def waitFor(self, timeout=60):
+    def waitFor(self, timeout=300):
         """Waits for this server to start listening.  If a connection
         can be made to the port before the specified timeout (in seconds) elapses,
         this function returns True.  Otherwise, False is returned."""
