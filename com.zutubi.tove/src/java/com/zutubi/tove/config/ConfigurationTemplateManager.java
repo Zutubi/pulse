@@ -2280,6 +2280,16 @@ public class ConfigurationTemplateManager
         return getState().templateHierarchies.get(scope);
     }
 
+    /**
+     * Retrieves the template path of the template collection item at the
+     * given configuration path.  The template path is composed of an element
+     * for each item in the ancestry of the element (including the item's
+     * id itself as the last element).
+     *
+     * @param path the configuration path of the templated collection item
+     * @return the item's template path, or null if the path does not refer to
+     *         an item of a templated collection
+     */
     public String getTemplatePath(String path)
     {
         TemplateNode templateNode = getTemplateNode(path);
@@ -2293,11 +2303,11 @@ public class ConfigurationTemplateManager
 
     /**
      * Retrieves the template node for the given path, which should be an
-     * element of a templated collection.
+     * item of a templated collection.
      *
      * @param path the path to retrieve the node for
      * @return the template node, or null if this path does not refer to an
-     *         element of a templated collection
+     *         item of a templated collection
      */
     public TemplateNode getTemplateNode(String path)
     {

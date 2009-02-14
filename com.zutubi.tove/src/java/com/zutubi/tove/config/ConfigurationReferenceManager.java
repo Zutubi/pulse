@@ -1,11 +1,11 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.tove.annotations.Reference;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.DefaultReferenceCleanupTaskProvider;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 import com.zutubi.tove.config.cleanup.RecordCleanupTaskSupport;
 import com.zutubi.tove.config.cleanup.ReferenceCleanupTaskProvider;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
@@ -49,13 +49,14 @@ public class ConfigurationReferenceManager implements ReferenceResolver
     }
 
     /**
-     * Returns the handle for the record at the given path.
+     * Returns the handle that should be used to reference the record at the
+     * given path.
      *
      * @param path the path of the record
      * @return the handle for the record at path, or 0 if there is no such
      *         record
      */
-    public long getHandleForPath(String path)
+    public long getReferenceHandleForPath(String path)
     {
         Record record = recordManager.select(path);
         if(record == null)

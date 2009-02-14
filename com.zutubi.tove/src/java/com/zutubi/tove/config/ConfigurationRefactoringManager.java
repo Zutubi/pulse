@@ -447,7 +447,7 @@ public class ConfigurationRefactoringManager
                                 // Then we need to update the reference to point to
                                 // the new clone.
                                 String newPath = convertPath(referencedPath, parentPath, oldKeyToNewKey);
-                                long newHandle = configurationReferenceManager.getHandleForPath(newPath);
+                                long newHandle = configurationReferenceManager.getReferenceHandleForPath(newPath);
                                 if (mutableRecord == null)
                                 {
                                     mutableRecord = record.copy(false);
@@ -598,7 +598,7 @@ public class ConfigurationRefactoringManager
             MutableRecord common = extractCommon(records, parentPath, parentType.getTargetType());
             common.put(mapType.getKeyProperty(), parentTemplateName);
             configurationTemplateManager.markAsTemplate(common);
-            configurationTemplateManager.setParentTemplate(common, configurationReferenceManager.getHandleForPath(templateParentNode.getPath()));
+            configurationTemplateManager.setParentTemplate(common, recordManager.select(templateParentNode.getPath()).getHandle());
             String newParentTemplatePath = configurationTemplateManager.insertRecord(parentPath, common);
             TemplateRecord newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
             long newParentTemplateHandle = newParentTemplateRecord.getHandle();

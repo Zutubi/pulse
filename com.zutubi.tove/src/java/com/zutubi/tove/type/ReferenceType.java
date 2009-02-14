@@ -1,8 +1,8 @@
 package com.zutubi.tove.type;
 
 import com.zutubi.tove.annotations.ID;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
@@ -132,7 +132,7 @@ public class ReferenceType extends SimpleType implements Type
         {
             typeCheck(data, String.class);
             String path = (String) data;
-            long handle = configurationReferenceManager.getHandleForPath(path);
+            long handle = configurationReferenceManager.getReferenceHandleForPath(path);
             if(handle == 0)
             {
                 throw new TypeException("Reference to unknown path '" + path + "'");
