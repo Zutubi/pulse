@@ -73,6 +73,6 @@ public class CvsConfiguration extends PollableScmConfiguration
 
     public String getType()
     {
-        return CvsClient.TYPE;
+        return "cvs";
     }
 }

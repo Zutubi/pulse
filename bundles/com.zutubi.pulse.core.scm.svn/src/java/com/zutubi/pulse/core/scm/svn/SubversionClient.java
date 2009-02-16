@@ -252,7 +252,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public Set<ScmCapability> getCapabilities(boolean contextAvailable)
+    public Set<ScmCapability> getCapabilities(ScmContext context)
     {
         return EnumSet.allOf(ScmCapability.class);
     }

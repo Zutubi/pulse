@@ -3,39 +3,19 @@ package com.zutubi.pulse.core.scm.cvs;
 import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
 import com.zutubi.pulse.core.scm.ExpectedTestResults;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.util.io.IOUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.io.IOException;
+import java.io.File;
 
 public abstract class AbstractCvsClientIntegrationTestCase extends AbstractScmIntegrationTestCase
 {
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss z");
-
-    public static Revision FIRST_REVISION = null;
-    public static Revision SECOND_REVISION = null;
-    public static Revision THIRD_REVISION = null;
-    public static Revision FOURTH_REVISION = null;
-    public static Revision FIFTH_REVISION = null;
-
-    static
-    {
-        try
-        {
-            // revisions are defined when the cvs test data is set up.
-            FIRST_REVISION = CvsClient.convertRevision(new CvsRevision("cvstester", null, DATE_FORMAT.parse("20070729-12:29:10 gmt")));
-            SECOND_REVISION = CvsClient.convertRevision(new CvsRevision("cvstester", null, DATE_FORMAT.parse("20070729-12:35:08 gmt")));
-            THIRD_REVISION = CvsClient.convertRevision(new CvsRevision("cvstester", null, DATE_FORMAT.parse("20070729-12:36:25 gmt")));
-            FOURTH_REVISION = CvsClient.convertRevision(new CvsRevision("cvstester", null, DATE_FORMAT.parse("20070729-12:38:18 gmt")));
-            FIFTH_REVISION = CvsClient.convertRevision(new CvsRevision("cvstester", null, DATE_FORMAT.parse("20070729-12:39:02 gmt")));
-        }
-        catch (ParseException e)
-        {
-            // noop.
-        }
-    }
+    public static final DateFormat SERVER_DATE = new SimpleDateFormat("yyyyMMdd-HH:mm:ss z");
 
     protected void setUp() throws Exception
     {
@@ -43,20 +23,28 @@ public abstract class AbstractCvsClientIntegrationTestCase extends AbstractScmIn
 
         client = getClient();
 
-        List<Revision> revisions = Arrays.asList(FIRST_REVISION, SECOND_REVISION, THIRD_REVISION, FOURTH_REVISION, FIFTH_REVISION);
+        List<Revision> revisions = Arrays.asList(
+                new Revision("cvstester::" + localTime("20090129-12:29:10 GMT")),
+                new Revision("cvstester::" + localTime("20090129-12:35:08 GMT")),
+                new Revision("cvstester::" + localTime("20090129-12:36:25 GMT")),
+                new Revision("cvstester::" + localTime("20090129-12:38:18 GMT")),
+                new Revision("cvstester::" + localTime("20090129-12:39:02 GMT"))
+        );
         
         // installation directory is integration-test, this is independent of the module being worked with.
         prefix = "integration-test/";
         testData = new ExpectedTestResults(revisions, prefix);
     }
 
-    protected void tearDown() throws Exception
-    {
-        testData = null;
-        client = null;
+    protected abstract CvsClient getClient() throws IOException;
 
-        super.tearDown();
+    protected String getPassword(String name) throws IOException
+    {
+        return CvsTestUtils.getPassword(name);
     }
 
-    protected abstract CvsClient getClient();
+    protected static String localTime(String time) throws ParseException
+    {
+        return CvsRevision.DATE_FORMAT.format(SERVER_DATE.parse(time));
+    }
 }

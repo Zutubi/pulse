@@ -54,7 +54,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
                 ScmConfiguration config = projectConfig.getScm();
                 if (config != null && configurationTemplateManager.isDeeplyCompleteAndValid(config))
                 {
-                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(config, scmManager, project != null && project.isInitialised());
+                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(project, projectConfig, scmManager);
                     return capabilities.contains(ScmCapability.BROWSE);
                 }
             }

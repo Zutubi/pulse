@@ -5,7 +5,6 @@ import com.zutubi.validation.validators.FieldValidatorTestCase;
 import junit.framework.Assert;
 
 /**
- * <class-comment/>
  */
 public class CvsRootValidatorTest extends FieldValidatorTestCase
 {

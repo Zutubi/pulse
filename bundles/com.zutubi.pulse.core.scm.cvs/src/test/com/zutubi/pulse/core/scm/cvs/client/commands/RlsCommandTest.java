@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.cvs.client.commands;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
+import com.zutubi.pulse.core.scm.cvs.CvsTestUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
@@ -22,9 +23,10 @@ public class RlsCommandTest extends ZutubiTestCase
 
         Logger.setLogging("system");
 
+        String password = CvsTestUtils.getPassword("cvs-1.12.12");
         core = new CvsCore();
-        core.setRoot(CVSRoot.parse(":ext:cvs-1.12.12@cinnamonbob.com:/cvsroots/cvs-1.12.12"));
-        core.setPassword("cvs-1.12.12");
+        core.setRoot(CVSRoot.parse(":ext:cvs-1.12.12@zutubi.com:/cvsroots/cvs-1.12.12"));
+        core.setPassword(password);
     }
 
     protected void tearDown() throws Exception

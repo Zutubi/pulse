@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.scm;
 
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.UnaryFunctionE;
 import com.zutubi.util.io.IOUtils;
@@ -67,13 +68,25 @@ public class ScmClientUtils
         }
     }
 
-    public static Set<ScmCapability> getCapabilities(ScmConfiguration config, ScmClientFactory<ScmConfiguration> clientFactory, final boolean contextAvailable) throws ScmException
+    public static Set<ScmCapability> getCapabilities(final Project project, ProjectConfiguration config, ScmManager manager) throws ScmException
+    {
+        return withScmClient(config, manager, new ScmContextualAction<Set<ScmCapability>>()
+        {
+            public Set<ScmCapability> process(ScmClient client, ScmContext context) throws ScmException
+            {
+                ScmContext c = (project != null && project.isInitialised()) ? context : null;
+                return client.getCapabilities(c);
+            }
+        });
+    }
+    
+    public static Set<ScmCapability> getCapabilities(ScmConfiguration config, ScmClientFactory<ScmConfiguration> clientFactory, final ScmContext context) throws ScmException
     {
         return withScmClient(config, clientFactory, new ScmAction<Set<ScmCapability>>()
         {
             public Set<ScmCapability> process(ScmClient scmClient) throws ScmException
             {
-                return scmClient.getCapabilities(contextAvailable);
+                return scmClient.getCapabilities(context);
             }
         });
     }

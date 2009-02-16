@@ -2336,7 +2336,8 @@ public class RemoteApi
                     {
                         public Revision process(ScmClient client, ScmContext context) throws ScmException
                         {
-                            if(client.getCapabilities(project.isInitialised()).contains(ScmCapability.REVISIONS))
+                            ScmContext c = (project.isInitialised()) ? context : null;
+                            if(client.getCapabilities(c).contains(ScmCapability.REVISIONS))
                             {
                                 return client.parseRevision(context, revision);
                             }

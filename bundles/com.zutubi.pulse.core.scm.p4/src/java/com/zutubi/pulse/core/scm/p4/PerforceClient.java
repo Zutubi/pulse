@@ -332,7 +332,7 @@ public class PerforceClient extends CachingScmClient
     {
     }
 
-    public Set<ScmCapability> getCapabilities(boolean contextAvailable)
+    public Set<ScmCapability> getCapabilities(ScmContext context)
     {
         return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
     }

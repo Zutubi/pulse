@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
@@ -72,10 +73,12 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         try
         {
             String tagName = context.resolveReferences(tag);
+            ScmContext scmContext = scmManager.createContext(project.getConfig());
+            ScmContext c = (project.isInitialised()) ? scmContext : null;
             client = scmManager.createClient(scm);
-            if(client.getCapabilities(project.isInitialised()).contains(ScmCapability.TAG))
+            if(client.getCapabilities(c).contains(ScmCapability.TAG))
             {
-                client.tag(scmManager.createContext(project.getConfig()), context, revision, tagName, moveExisting);
+                client.tag(scmContext, context, revision, tagName, moveExisting);
             }
             else
             {
