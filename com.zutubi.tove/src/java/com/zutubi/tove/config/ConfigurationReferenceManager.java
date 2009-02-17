@@ -64,10 +64,13 @@ public class ConfigurationReferenceManager implements ReferenceResolver
             // If we have a more local inherited version of toPath, push the
             // path down to the local template's level.
             String toTemplateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(toPath);
-            if (isTemplateAncestor(toTemplateOwnerPath, templateOwnerPath))
+            if (toTemplateOwnerPath != null)
             {
-                String suffix = PathUtils.getPath(2, PathUtils.getPathElements(toPath));
-                toPath = PathUtils.getPath(templateOwnerPath, suffix);
+                if (isTemplateAncestor(toTemplateOwnerPath, templateOwnerPath))
+                {
+                    String suffix = PathUtils.getPath(2, PathUtils.getPathElements(toPath));
+                    toPath = PathUtils.getPath(templateOwnerPath, suffix);
+                }
             }
         }
 

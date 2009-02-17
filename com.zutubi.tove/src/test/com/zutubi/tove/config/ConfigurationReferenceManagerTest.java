@@ -185,6 +185,11 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         assertEquals(PATH_CONCRETE_CHILD, configurationReferenceManager.getReferencedPathForHandle(PATH_TEMPLATE_CHILD, getHandle(PATH_CONCRETE_CHILD)));
     }
 
+    public void testGetReferencedPathReferenceToConcreteScopeFromTemplatedScope()
+    {
+        assertEquals(PATH_PROJECT1, configurationReferenceManager.getReferencedPathForHandle(PATH_TEMPLATE_CHILD, getHandle(PATH_PROJECT1)));
+    }
+
     public void testGetReferencedPathReferenceToStageNonTemplated()
     {
         final String PATH = PATH_PROJECT1 + "/stages/p1s1";
