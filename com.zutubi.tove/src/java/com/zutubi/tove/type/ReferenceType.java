@@ -1,8 +1,8 @@
 package com.zutubi.tove.type;
 
 import com.zutubi.tove.annotations.ID;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
@@ -102,12 +102,12 @@ public class ReferenceType extends SimpleType implements Type
         }
     }
 
-    public String getReferencedPath(Object data) throws TypeException
+    public String getReferencedPath(String templateOwnerPath, Object data) throws TypeException
     {
         long handle = getHandle(data);
         if(handle > 0)
         {
-            return configurationReferenceManager.getPathForHandle(handle);
+            return configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, handle);
         }
         else
         {
@@ -115,11 +115,11 @@ public class ReferenceType extends SimpleType implements Type
         }
     }
 
-    public Object toXmlRpc(Object data) throws TypeException
+    public Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         // We return references via the remote api as paths so that the
         // caller can use the value in subsequent calls.
-        return getReferencedPath(data);
+        return getReferencedPath(templateOwnerPath, data);
     }
 
     public String fromXmlRpc(Object data) throws TypeException
@@ -132,7 +132,7 @@ public class ReferenceType extends SimpleType implements Type
         {
             typeCheck(data, String.class);
             String path = (String) data;
-            long handle = configurationReferenceManager.getHandleForPath(path);
+            long handle = configurationReferenceManager.getReferenceHandleForPath(path);
             if(handle == 0)
             {
                 throw new TypeException("Reference to unknown path '" + path + "'");

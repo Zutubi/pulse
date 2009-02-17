@@ -45,8 +45,8 @@ public class MapTypeTest extends TypeTestCase
         instance.put("keyA", new MockA("valueA"));
         instance.put("keyB", new MockA("valueB"));
 
-        Record record = (Record) mapType.unstantiate(instance);
-        SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationTemplateManager);
+        Record record = mapType.unstantiate(instance);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         Map newInstance = (Map) instantiator.instantiate(mapType, record);
 
         assertEquals(2, newInstance.size());
@@ -68,13 +68,13 @@ public class MapTypeTest extends TypeTestCase
 
     public void testToXmlRpcNull() throws TypeException
     {
-        assertNull(mapType.toXmlRpc(null));
+        assertNull(mapType.toXmlRpc(null, null));
     }
 
     public void testToXmlRpcEmptyRecord() throws TypeException
     {
         Record record = mapType.createNewRecord(true);
-        Object o = mapType.toXmlRpc(record);
+        Object o = mapType.toXmlRpc(null, record);
         assertTrue(o instanceof Hashtable);
         assertEquals(0, ((Hashtable)o).size());
     }
@@ -84,10 +84,11 @@ public class MapTypeTest extends TypeTestCase
         Map<String, MockA> m = new HashMap<String, MockA>();
         m.put("key1", new MockA("1"));
         m.put("key2", new MockA("2"));
-        Record record = (Record) mapType.unstantiate(m);
-        Object o = mapType.toXmlRpc(record);
+        Record record = mapType.unstantiate(m);
+        Object o = mapType.toXmlRpc(null, record);
         assertTrue(o instanceof Hashtable);
-        Hashtable<String, Hashtable> rpcForm = ((Hashtable) o);
+        @SuppressWarnings("unchecked")
+        Hashtable<String, Hashtable> rpcForm = (Hashtable<String, Hashtable>) o;
         assertEquals(2, rpcForm.size());
         assertEquals("1", rpcForm.get("key1").get("a"));
         assertEquals("2", rpcForm.get("key2").get("a"));
@@ -95,11 +96,11 @@ public class MapTypeTest extends TypeTestCase
 
     public void testFromXmlRpc() throws TypeException
     {
-        Hashtable element = new Hashtable();
+        Hashtable<String, Object> element = new Hashtable<String, Object>();
         element.put("meta.symbolicName", "mockA");
         element.put("a", "avalue");
 
-        Hashtable rpcForm = new Hashtable();
+        Hashtable<String, Object> rpcForm = new Hashtable<String, Object>();
         rpcForm.put("avalue", element);
 
         Object o = mapType.fromXmlRpc(rpcForm);
