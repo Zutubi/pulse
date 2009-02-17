@@ -233,6 +233,16 @@ public class TemplateRecord extends AbstractRecord
         return moi;
     }
 
+    /**
+     * Returns the name of the templated instance that owns the given property.
+     * The owner is the instance where the property is first defined with its
+     * local value.  So, if getOwner(key).equals(getOwner()), then we override
+     * the property locally, otherwise we inherit it from an ancestor.
+     * 
+     * @param key name of the property to get the owner for
+     * @return name of the instance that owns the property (i.e. defines its
+     *         local value).
+     */
     public String getOwner(String key)
     {
         if (isSignificant(key, moi.get(key)))

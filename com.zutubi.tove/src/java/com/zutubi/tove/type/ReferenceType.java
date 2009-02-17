@@ -102,12 +102,12 @@ public class ReferenceType extends SimpleType implements Type
         }
     }
 
-    public String getReferencedPath(Object data) throws TypeException
+    public String getReferencedPath(String templateOwnerPath, Object data) throws TypeException
     {
         long handle = getHandle(data);
         if(handle > 0)
         {
-            return configurationReferenceManager.getPathForHandle(handle);
+            return configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, handle);
         }
         else
         {
@@ -115,11 +115,11 @@ public class ReferenceType extends SimpleType implements Type
         }
     }
 
-    public Object toXmlRpc(Object data) throws TypeException
+    public Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         // We return references via the remote api as paths so that the
         // caller can use the value in subsequent calls.
-        return getReferencedPath(data);
+        return getReferencedPath(templateOwnerPath, data);
     }
 
     public String fromXmlRpc(Object data) throws TypeException

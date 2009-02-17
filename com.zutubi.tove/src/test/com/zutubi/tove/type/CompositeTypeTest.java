@@ -74,7 +74,7 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setString("howdy");
 
         Record record = basicType.unstantiate(instance);
-        SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationTemplateManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         Object newInstance = instantiator.instantiate(basicType, record);
         assertTrue(newInstance instanceof BasicTypes);
         assertEquals(newInstance, instance);
@@ -91,7 +91,7 @@ public class CompositeTypeTest extends TypeTestCase
             }
         }
 
-        SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationTemplateManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         BasicTypes instance = (BasicTypes) basicType.instantiate(record, instantiator);
         basicType.initialise(instance, record, instantiator);
         assertEquals(false, instance.isBooleanP());
@@ -112,7 +112,7 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setA(objectTypeB);
 
         Record record = typeA.unstantiate(instance);
-        SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationTemplateManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         ObjectTypeA newInstance = (ObjectTypeA) instantiator.instantiate(typeA, record);
 
         assertNotNull(newInstance.getA());
@@ -137,7 +137,7 @@ public class CompositeTypeTest extends TypeTestCase
 
     public void testToXmlRpcNull() throws TypeException
     {
-        assertNull(typeA.toXmlRpc(null));
+        assertNull(typeA.toXmlRpc(null, null));
     }
 
     public void testToXmlRpc() throws TypeException
@@ -148,7 +148,7 @@ public class CompositeTypeTest extends TypeTestCase
         a.setB(b);
 
         Record record = typeA.unstantiate(a);
-        Object rpcForm = typeA.toXmlRpc(record);
+        Object rpcForm = typeA.toXmlRpc(null, record);
         assertTrue(rpcForm instanceof Hashtable);
 
         Hashtable ht = (Hashtable) rpcForm;
@@ -164,7 +164,7 @@ public class CompositeTypeTest extends TypeTestCase
     {
         ObjectTypeA a = new ObjectTypeA();
         Record record = typeA.unstantiate(a);
-        Object rpcForm = typeA.toXmlRpc(record);
+        Object rpcForm = typeA.toXmlRpc(null, record);
         assertTrue(rpcForm instanceof Hashtable);
 
         Hashtable ht = (Hashtable) rpcForm;

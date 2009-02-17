@@ -48,7 +48,7 @@ public class ListTypeTest extends TypeTestCase
 
         Record record = (Record) listType.unstantiate(list);
 
-        SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationTemplateManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
         List newList = (List) instantiator.instantiate(listType, record);
         assertEquals(2, newList.size());
         assertTrue(newList.get(0) instanceof MockA);
@@ -69,13 +69,13 @@ public class ListTypeTest extends TypeTestCase
 
     public void testToXmlRpcNull() throws TypeException
     {
-        assertNull(listType.toXmlRpc(null));
+        assertNull(listType.toXmlRpc(null, null));
     }
 
     public void testToXmlRpcEmptyRecord() throws TypeException
     {
         MutableRecord record = listType.createNewRecord(true);
-        Object o = listType.toXmlRpc(record);
+        Object o = listType.toXmlRpc(null, record);
         assertTrue(o instanceof Vector);
         Vector v = (Vector) o;
         assertEquals(0, v.size());
@@ -88,7 +88,7 @@ public class ListTypeTest extends TypeTestCase
         l.add(new MockA("two"));
         Record r = (Record) listType.unstantiate(l);
 
-        Object rpcForm = listType.toXmlRpc(r);
+        Object rpcForm = listType.toXmlRpc(null, r);
         assertTrue(rpcForm instanceof Vector);
         Vector rpcVector = (Vector) rpcForm;
         assertEquals(2, rpcVector.size());
@@ -102,7 +102,7 @@ public class ListTypeTest extends TypeTestCase
 
     public void testToXmlRpcEmptyArray() throws TypeException
     {
-        Object o = simpleListType.toXmlRpc(new String[0]);
+        Object o = simpleListType.toXmlRpc(null, new String[0]);
         assertTrue(o instanceof Vector);
         Vector v = (Vector) o;
         assertEquals(0, v.size());
@@ -110,7 +110,7 @@ public class ListTypeTest extends TypeTestCase
 
     public void testToXmlRpcArray() throws TypeException
     {
-        Object o = simpleListType.toXmlRpc(new String[] {"one", "two"});
+        Object o = simpleListType.toXmlRpc(null, new String[] {"one", "two"});
         assertTrue(o instanceof Vector);
         Vector v = (Vector) o;
         assertEquals(2, v.size());

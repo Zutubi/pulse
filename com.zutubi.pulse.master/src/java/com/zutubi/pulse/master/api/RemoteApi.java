@@ -309,7 +309,7 @@ public class RemoteApi
         }
 
         MutableRecord record = type.createNewRecord(true);
-        return type.toXmlRpc(record);
+        return type.toXmlRpc(null, record);
     }
 
     /**
@@ -353,7 +353,7 @@ public class RemoteApi
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
 
             Type t = configurationTemplateManager.getType(path);
-            return t.toXmlRpc(t.unstantiate(instance));
+            return t.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), t.unstantiate(instance));
         }
         finally
         {
@@ -422,7 +422,7 @@ public class RemoteApi
 
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
             Type t = configurationTemplateManager.getType(path);
-            return t.toXmlRpc(record);
+            return t.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), record);
         }
         finally
         {
@@ -1056,7 +1056,7 @@ public class RemoteApi
             String symbolicName = CompositeType.getTypeFromXmlRpc(argument);
             CompositeType type = typeRegistry.getType(symbolicName);
             MutableRecord record = type.fromXmlRpc(argument);
-            Configuration arg = configurationTemplateManager.validate(null, null, record, true, true);
+            Configuration arg = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, true, true);
             if(!type.isValid(arg))
             {
                 throw new ValidationException(type, arg);

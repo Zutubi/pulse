@@ -222,6 +222,30 @@ public class ConfigurationTemplateManager
         return parentTemplateRecord;
     }
 
+    /**
+     * Calculates the template owner path for a given path if that path points
+     * within a templated instance.  The template owner path is the path to the
+     * item in the templated collection that contains the given path.  For
+     * example, for path "projects/foo/stages/default" in templated scope
+     * "projects", the result will be "projects/foo".
+     *
+     * @param path the path to retrieve the template owner of
+     * @return the template owner path, or null if the given path is not within
+     *         a templated collection item
+     */
+    public String getTemplateOwnerPath(String path)
+    {
+        String[] pathElements = PathUtils.getPathElements(path);
+        if (pathElements.length >= 2 && isTemplatedCollection(pathElements[0]))
+        {
+            return PathUtils.getPath(pathElements[0], pathElements[1]);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     private Record templatiseRecord(String path, Record record)
     {
         // We need to understand the root level can be templated.
@@ -599,7 +623,7 @@ public class ConfigurationTemplateManager
                     boolean concrete = isConcreteOwner(record);
                     try
                     {
-                        PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager, this);
+                        PersistentInstantiator instantiator = new PersistentInstantiator(itemPath, path, instances, configurationReferenceManager, this);
                         Configuration instance = (Configuration) instantiator.instantiate(id, true, templatedType, record);
 
                         // Concrete instances go into the collection
@@ -618,7 +642,7 @@ public class ConfigurationTemplateManager
             {
                 try
                 {
-                    PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager, this);
+                    PersistentInstantiator instantiator = new PersistentInstantiator(null, path, instances, configurationReferenceManager, this);
                     instantiator.instantiate(path, false, type, topRecord);
                 }
                 catch (TypeException e)
@@ -994,7 +1018,7 @@ public class ConfigurationTemplateManager
      * @param parentPath    parent of the path where the record is to be
      *                      stored
      * @param baseName      base name of the path where the record is to be
-     *                      stored
+     *                      stored, may be null for a new instance
      * @param subject       record to validate
      * @param concrete      if true, the record should be validated as a
      *                      concrete (i.e. complete) instance
@@ -1016,9 +1040,30 @@ public class ConfigurationTemplateManager
             throw new TypeException("Attempt to validate record with unrecognised symbolic name '" + subject.getSymbolicName() + "'");
         }
 
+        // The template owner path is tricky to calculate when inserting a new
+        // item into a templated scope.  We need to use the path of the parent
+        // template item.
+        String templateOwnerPath;
+        if (baseName == null && parentPath != null && isTemplatedCollection(parentPath))
+        {
+            long templateParentHandle = getTemplateParentHandle(null, subject);
+            if (templateParentHandle == 0)
+            {
+                templateOwnerPath = null;
+            }
+            else
+            {
+                templateOwnerPath = recordManager.getPathForHandle(templateParentHandle);
+            }
+        }
+        else
+        {
+            templateOwnerPath = getTemplateOwnerPath(parentPath);
+        }
+
         // Create an instance of the object represented by the record.  It is
         // during the instantiation that type conversion errors are detected.
-        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager, this);
+        SimpleInstantiator instantiator = new SimpleInstantiator(templateOwnerPath, configurationReferenceManager, this);
         @SuppressWarnings({"unchecked"})
         T instance = (T) instantiator.instantiate(type, subject);
 
@@ -2099,12 +2144,12 @@ public class ConfigurationTemplateManager
         Record record = getRecord(path);
         ComplexType type = getType(path);
         final DefaultInstanceCache cache = new DefaultInstanceCache();
-        PersistentInstantiator instantiator = new PersistentInstantiator(path, cache, new ReferenceResolver()
+        PersistentInstantiator instantiator = new PersistentInstantiator(getTemplateOwnerPath(path), path, cache, new ReferenceResolver()
         {
-            public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
+            public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, String indexPath) throws TypeException
             {
                 InstanceSource source = getState().instances;
-                String targetPath = configurationReferenceManager.getPathForHandle(toHandle);
+                String targetPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, toHandle);
                 if(targetPath.startsWith(path))
                 {
                     // This reference points within the object tree we are cloning.
@@ -2118,7 +2163,7 @@ public class ConfigurationTemplateManager
                     };
                 }
 
-                return configurationReferenceManager.resolveReference(path, toHandle, instantiator, source);
+                return configurationReferenceManager.resolveReference(templateOwnerPath, toHandle, instantiator, source, path);
             }
         }, this);
 

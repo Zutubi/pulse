@@ -60,11 +60,14 @@ public interface Type
      * XML-RPC call.  Records are converted to hashtables, strings to
      * XML-RPC types (where sensible) and so on.
      *
-     * @param data the data to be converted (record form)
+     * @param templateOwnerPath path of the templated collection item that
+     *                          contains the data, may be null if not within a
+     *                          templated scope
+     * @param data              the data to be converted (record form)
      * @return the XML-RPC formatted data
      * @throws TypeException in the event of an error
      */
-    Object toXmlRpc(Object data) throws TypeException;
+    Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException;
 
     /**
      * Converts the given XML-RPC form data into record form.  This is the

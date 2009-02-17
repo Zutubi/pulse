@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.tove.wizard.webwork;
 
-import com.zutubi.tove.config.api.ConfigurationCreator;
+import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
+import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.SimpleInstantiator;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 
 /**
  * A wizard that configures a single record. perhaps including two states if
@@ -45,7 +45,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
         MutableRecord record = recordState.getDataRecord();
         if(creatorType != null)
         {
-            SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager, configurationTemplateManager);
+            SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationReferenceManager, configurationTemplateManager);
             try
             {
                 ConfigurationCreator creator = (ConfigurationCreator) instantiator.instantiate(creatorType, record);

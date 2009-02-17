@@ -47,5 +47,4 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(PersonalBuildAcceptanceTest.class);
         return suite;
     }
-
 }

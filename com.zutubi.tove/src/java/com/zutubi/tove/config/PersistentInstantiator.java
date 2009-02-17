@@ -1,12 +1,12 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.Instantiator;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.tove.config.api.Configuration;
 
 /**
  * Instantiator that is used when refreshing persistent instance caches in
@@ -15,13 +15,15 @@ import com.zutubi.tove.config.api.Configuration;
  */
 public class PersistentInstantiator implements Instantiator
 {
+    private String templateOwnerPath;
     private String path;
     private InstanceCache cache;
     private ReferenceResolver referenceResolver;
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public PersistentInstantiator(String path, InstanceCache cache, ReferenceResolver referenceResolver, ConfigurationTemplateManager configurationTemplateManager)
+    public PersistentInstantiator(String templateOwnerPath, String path, InstanceCache cache, ReferenceResolver referenceResolver, ConfigurationTemplateManager configurationTemplateManager)
     {
+        this.templateOwnerPath = templateOwnerPath;
         this.path = path;
         this.cache = cache;
         this.referenceResolver = referenceResolver;
@@ -38,7 +40,7 @@ public class PersistentInstantiator implements Instantiator
         Object instance = cache.get(propertyPath, true);
         if (instance == null)
         {
-            PersistentInstantiator childInstantiator = new PersistentInstantiator(propertyPath, cache, referenceResolver, configurationTemplateManager);
+            PersistentInstantiator childInstantiator = new PersistentInstantiator(templateOwnerPath, propertyPath, cache, referenceResolver, configurationTemplateManager);
             instance = type.instantiate(data, childInstantiator);
 
             if (instance != null)
@@ -72,6 +74,6 @@ public class PersistentInstantiator implements Instantiator
 
     public Configuration resolveReference(long toHandle) throws TypeException
     {
-        return referenceResolver.resolveReference(path, toHandle, this);
+        return referenceResolver.resolveReference(templateOwnerPath, toHandle, this, path);
     }
 }

@@ -43,14 +43,54 @@ public class ConfigurationReferenceManager implements ReferenceResolver
         references.clear();
     }
 
-    public String getPathForHandle(long handle)
+    /**
+     * Returns the path that is referenced by the given handle, which may not
+     * be the path for that handle directly in a templated scope.  In templated
+     * scopes references always use the handle where an instance is first
+     * defined in the hierarchy.
+     *
+     * @param templateOwnerPath if in a templated scope, the item of the
+     *                          templated collection that this reference is
+     *                          coming from, otherwise null
+     * @param toHandle          the handle being referenced
+     * @return the path referenced by the given handle, taking into account any
+     *         template owner
+     */
+    public String getReferencedPathForHandle(String templateOwnerPath, long toHandle)
     {
-        return recordManager.getPathForHandle(handle);
+        String toPath = recordManager.getPathForHandle(toHandle);
+        if (templateOwnerPath != null)
+        {
+            // If we have a more local inherited version of toPath, push the
+            // path down to the local template's level.
+            String toTemplateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(toPath);
+            if (isTemplateAncestor(toTemplateOwnerPath, templateOwnerPath))
+            {
+                String suffix = PathUtils.getPath(2, PathUtils.getPathElements(toPath));
+                toPath = PathUtils.getPath(templateOwnerPath, suffix);
+            }
+        }
+
+        return toPath;
+    }
+
+    private boolean isTemplateAncestor(String toTemplateOwnerPath, String templateOwnerPath)
+    {
+        TemplateNode toNode = configurationTemplateManager.getTemplateNode(toTemplateOwnerPath);
+        TemplateNode localNode = configurationTemplateManager.getTemplateNode(templateOwnerPath);
+        while (localNode != null && localNode != toNode)
+        {
+            localNode = localNode.getParent();
+        }
+
+        // Did we exit before we hit the root?
+        return localNode != null;
     }
 
     /**
      * Returns the handle that should be used to reference the record at the
-     * given path.
+     * given path.  This may not be the handle of the record at that path in a
+     * templated scope.
      *
      * @param path the path of the record
      * @return the handle for the record at path, or 0 if there is no such
@@ -58,35 +98,48 @@ public class ConfigurationReferenceManager implements ReferenceResolver
      */
     public long getReferenceHandleForPath(String path)
     {
-        Record record = recordManager.select(path);
-        if(record == null)
+        Record record = configurationTemplateManager.getRecord(path);
+        if (record == null)
         {
             return 0;
         }
         else
         {
+            if (record instanceof TemplateRecord && PathUtils.getPathElements(path).length > 2)
+            {
+                // Inside a templated collection item, pull up to the level
+                // where it is first defined.
+                TemplateRecord templateRecord = (TemplateRecord) record;
+                while (templateRecord.getParent() != null)
+                {
+                    templateRecord = templateRecord.getParent();
+                }
+
+                record = templateRecord;
+            }
+
             return record.getHandle();
         }
     }
 
-    public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
+    public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, String indexPath) throws TypeException
     {
-        return resolveReference(fromPath, toHandle, instantiator, configurationTemplateManager.getState().instances);
+        return resolveReference(templateOwnerPath, toHandle, instantiator, configurationTemplateManager.getState().instances, indexPath);
     }
 
-    public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator, InstanceSource cache) throws TypeException
+    public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, InstanceSource cache, String indexPath) throws TypeException
     {
-        String toPath = recordManager.getPathForHandle(toHandle);
-        if(toPath == null)
+        String toPath = getReferencedPathForHandle(templateOwnerPath, toHandle);
+        if (toPath == null)
         {
             throw new TypeException("Broken reference to unknown handle '" + toHandle + "'");
         }
 
-        if (fromPath != null)
+        if (indexPath != null)
         {
-            indexReference(fromPath, toPath);
+            indexReference(indexPath, toPath);
         }
-        
+
         Configuration instance = cache.get(toPath, true);
         if (instance == null)
         {

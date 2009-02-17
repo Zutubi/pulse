@@ -1,8 +1,8 @@
 package com.zutubi.tove.type;
 
 import com.zutubi.tove.annotations.ID;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationMap;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.AnnotationUtils;
@@ -156,7 +156,7 @@ public class MapType extends CollectionType
         return convertToRecord((Map) instance, new UnstantiateToRecord());
     }
 
-    public Object toXmlRpc(Object data) throws TypeException
+    public Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         if(data == null)
         {
@@ -166,7 +166,7 @@ public class MapType extends CollectionType
         {
             Record record = (Record) data;
             Hashtable<String, Object> result = new Hashtable<String, Object>(record.size());
-            covertFromRecord(record, result, new XmlRpcFromRecord());
+            covertFromRecord(record, result, new XmlRpcFromRecord(templateOwnerPath));
             return result;
         }
     }
@@ -260,7 +260,7 @@ public class MapType extends CollectionType
     public String getItemKey(String path, Record record)
     {
         String key = (String) record.get(keyProperty);
-        if( key == null)
+        if (key == null)
         {
             throw new IllegalArgumentException("Record has no " + keyProperty);
         }
@@ -342,6 +342,13 @@ public class MapType extends CollectionType
 
     private static class XmlRpcFromRecord implements FromRecord
     {
+        private String templateOwnerPath;
+
+        public XmlRpcFromRecord(String templateOwnerPath)
+        {
+            this.templateOwnerPath = templateOwnerPath;
+        }
+
         public void handleFieldError(String key, String message)
         {
             // Do nothing.
@@ -349,7 +356,7 @@ public class MapType extends CollectionType
 
         public Object convert(String key, Type type, Object child) throws TypeException
         {
-            return type.toXmlRpc(child);
+            return type.toXmlRpc(templateOwnerPath, child);
         }
     }
 

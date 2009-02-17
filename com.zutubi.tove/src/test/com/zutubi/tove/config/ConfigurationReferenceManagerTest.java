@@ -16,10 +16,17 @@ import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
 
-/**
- */
 public class ConfigurationReferenceManagerTest extends AbstractConfigurationSystemTestCase
 {
+    private static final String SCOPE_SUBSCRIPTION = "subscription";
+
+    private static final String PATH_PROJECT1 = "project/p1";
+    private static final String PATH_PROJECT2 = "project/p2";
+
+    private static final String PATH_GLOBAL_TEMPLATE = "template/global";
+    private static final String PATH_TEMPLATE_CHILD = "template/child";
+    private static final String PATH_CONCRETE_CHILD = "template/concreteChild";
+
     private CompositeType projectType;
     private CompositeType stageType;
 
@@ -29,7 +36,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         
         projectType = typeRegistry.register(Project.class);
         stageType = typeRegistry.register(Stage.class);
-        typeRegistry.register(Action.class);
+        typeRegistry.register(Hook.class);
         CompositeType subscriptionType = typeRegistry.register(Subscription.class);
 
         TemplatedMapType templated = new TemplatedMapType(projectType, typeRegistry);
@@ -39,7 +46,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         configurationPersistenceManager.register("project", project);
 
         MapType subscription = new MapType(subscriptionType, typeRegistry);
-        configurationPersistenceManager.register("subscription", subscription);
+        configurationPersistenceManager.register(SCOPE_SUBSCRIPTION, subscription);
 
         Project p1 = new Project("p1");
         p1.addStage(new Stage("p1s1"));
@@ -74,7 +81,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         stage.put("name", "childStage");
         configurationTemplateManager.insertRecord("template/child/stages", stage);
 
-        long childHandle = configurationTemplateManager.getRecord("template/child").getHandle();
+        long childHandle = configurationTemplateManager.getRecord(PATH_TEMPLATE_CHILD).getHandle();
 
         MutableRecord concreteChild = projectType.createNewRecord(false);
         concreteChild.put("name", "concreteChild");
@@ -148,6 +155,146 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         assertNamedConfigurations(ref, "default", "childStage", "concreteGrandchildStage");
     }
 
+    public void testGetReferencedPathReferenceToNonTemplatedProject()
+    {
+        assertEquals(PATH_PROJECT1, configurationReferenceManager.getReferencedPathForHandle(null, getHandle(PATH_PROJECT1)));
+    }
+
+    public void testGetReferencedPathReferenceToRootTemplateProject()
+    {
+        assertEquals(PATH_GLOBAL_TEMPLATE, configurationReferenceManager.getReferencedPathForHandle(PATH_GLOBAL_TEMPLATE, getHandle(PATH_GLOBAL_TEMPLATE)));
+    }
+
+    public void testGetReferencedPathReferenceToChildProject()
+    {
+        assertEquals(PATH_TEMPLATE_CHILD, configurationReferenceManager.getReferencedPathForHandle(PATH_TEMPLATE_CHILD, getHandle(PATH_TEMPLATE_CHILD)));
+    }
+
+    public void testGetReferencedPathReferenceToOtherProjectNonTemplated()
+    {
+        assertEquals(PATH_PROJECT2, configurationReferenceManager.getReferencedPathForHandle(null, getHandle(PATH_PROJECT2)));
+    }
+
+    public void testGetReferencedPathReferenceToOtherProjectFromRootTemplate()
+    {
+        assertEquals(PATH_CONCRETE_CHILD, configurationReferenceManager.getReferencedPathForHandle(PATH_GLOBAL_TEMPLATE, getHandle(PATH_CONCRETE_CHILD)));
+    }
+
+    public void testGetReferencedPathReferenceToOtherProjectFromChildProject()
+    {
+        assertEquals(PATH_CONCRETE_CHILD, configurationReferenceManager.getReferencedPathForHandle(PATH_TEMPLATE_CHILD, getHandle(PATH_CONCRETE_CHILD)));
+    }
+
+    public void testGetReferencedPathReferenceToStageNonTemplated()
+    {
+        final String PATH = PATH_PROJECT1 + "/stages/p1s1";
+        assertEquals(PATH, configurationReferenceManager.getReferencedPathForHandle(null, getHandle(PATH)));
+    }
+
+    public void testGetReferencedPathReferenceToStageInRootTemplate()
+    {
+        final String PATH_STAGE = PATH_GLOBAL_TEMPLATE + "/stages/default";
+        assertEquals(PATH_STAGE, configurationReferenceManager.getReferencedPathForHandle(PATH_GLOBAL_TEMPLATE, getHandle(PATH_STAGE)));
+    }
+
+    public void testGetReferencedPathReferenceToStageInChildProject()
+    {
+        final String PATH_STAGE = PATH_TEMPLATE_CHILD + "/stages/childStage";
+        assertEquals(PATH_STAGE, configurationReferenceManager.getReferencedPathForHandle(PATH_TEMPLATE_CHILD, getHandle(PATH_STAGE)));
+    }
+
+    public void testGetReferencedPathReferenceToStageInheritedByChildProject()
+    {
+        assertEquals(PATH_TEMPLATE_CHILD + "/stages/default", configurationReferenceManager.getReferencedPathForHandle(PATH_TEMPLATE_CHILD, getHandle(PATH_GLOBAL_TEMPLATE + "/stages/default")));
+    }
+
+    public void testReferenceResolutionSubscriptionReferencesNonTemplated()
+    {
+        subscriptionReferencesProjectHelper(PATH_PROJECT1);
+    }
+
+    public void testReferenceResolutionSubscriptionReferencesTemplated()
+    {
+        subscriptionReferencesProjectHelper(PATH_CONCRETE_CHILD);
+    }
+
+    private void subscriptionReferencesProjectHelper(String projectPath)
+    {
+        Subscription subscription = new Subscription(getName());
+        subscription.getProjectRefs().add(configurationTemplateManager.getInstance(projectPath, Project.class));
+
+        String path = configurationTemplateManager.insert(SCOPE_SUBSCRIPTION, subscription);
+        subscription = configurationTemplateManager.getInstance(path, Subscription.class);
+        assertSame(configurationTemplateManager.getInstance(projectPath), subscription.getProjectRefs().get(0));
+    }
+
+    public void testReferenceResolutionSubscriptionReferencesNonTemplatedStage()
+    {
+        subscriptionReferencesStageHelper(PATH_PROJECT1 + "/stages/p1s1");
+    }
+
+    public void testReferenceResolutionSubscriptionReferencesGlobalTemplateStage()
+    {
+        subscriptionReferencesStageHelper(PATH_GLOBAL_TEMPLATE + "/stages/default");
+    }
+
+    public void testReferenceResolutionSubscriptionReferencesChildTemplateStage()
+    {
+        subscriptionReferencesStageHelper(PATH_TEMPLATE_CHILD + "/stages/childStage");
+    }
+
+    public void testReferenceResolutionSubscriptionReferencesInheritedStage()
+    {
+        subscriptionReferencesStageHelper(PATH_TEMPLATE_CHILD + "/stages/default");
+    }
+
+    private void subscriptionReferencesStageHelper(String stagePath)
+    {
+        Subscription subscription = new Subscription(getName());
+        subscription.setStageRef(configurationTemplateManager.getInstance(stagePath, Stage.class));
+
+        String path = configurationTemplateManager.insert(SCOPE_SUBSCRIPTION, subscription);
+        subscription = configurationTemplateManager.getInstance(path, Subscription.class);
+        assertSame(configurationTemplateManager.getInstance(stagePath), subscription.getStageRef());
+    }
+
+    public void testHookReferencesStageNonTemplated()
+    {
+        hookReferencesStageHelper(PATH_PROJECT1, "p1s1");
+    }
+
+    public void testHookReferencesStageGlobalTemplate()
+    {
+        hookReferencesStageHelper(PATH_GLOBAL_TEMPLATE, "default");
+    }
+
+    public void testHookReferencesStageChildTemplate()
+    {
+        hookReferencesStageHelper(PATH_TEMPLATE_CHILD, "childStage");
+    }
+
+    public void testHookReferencesStageInheritedStage()
+    {
+        hookReferencesStageHelper(PATH_TEMPLATE_CHILD, "default");
+    }
+
+    private void hookReferencesStageHelper(String projectPath, String stageName)
+    {
+        Project p1 = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(projectPath, Project.class));
+        Hook hook = new Hook(getName());
+        hook.setStage(p1.getStages().get(stageName));
+        p1.addHook(hook);
+        configurationTemplateManager.save(p1);
+
+        p1 = configurationTemplateManager.getInstance(projectPath, Project.class);
+        assertSame(p1.getStages().get(stageName), p1.getHooks().get(getName()).getStage());
+    }
+
+    private long getHandle(String path)
+    {
+        return recordManager.select(path).getHandle();
+    }
+
     private void assertConcreteProjects(Collection<Configuration> referenceable)
     {
         assertNamedConfigurations(referenceable, "p1", "p2", "p3", "concreteChild", "concreteGrandchild");
@@ -170,17 +317,17 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         assertTrue(CollectionUtils.equals(expected, got));
     }
 
-    @SymbolicName("action")
-    public static class Action extends AbstractNamedConfiguration
+    @SymbolicName("hook")
+    public static class Hook extends AbstractNamedConfiguration
     {
         @Reference
         private Stage stage;
 
-        public Action()
+        public Hook()
         {
         }
 
-        public Action(String name)
+        public Hook(String name)
         {
             super(name);
         }
@@ -215,7 +362,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         @Reference
         private Stage stageRef;
         private Map<String, Stage> stages = new HashMap<String, Stage>();
-        private Map<String, Action> actions = new HashMap<String, Action>();
+        private Map<String, Hook> hooks = new HashMap<String, Hook>();
 
         public Project()
         {
@@ -251,19 +398,19 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
             stages.put(stage.getName(), stage);
         }
 
-        public Map<String, Action> getActions()
+        public Map<String, Hook> getHooks()
         {
-            return actions;
+            return hooks;
         }
 
-        public void setActions(Map<String, Action> actions)
+        public void setHooks(Map<String, Hook> hooks)
         {
-            this.actions = actions;
+            this.hooks = hooks;
         }
 
-        public void addAction(Action action)
+        public void addHook(Hook hook)
         {
-            actions.put(action.getName(), action);
+            hooks.put(hook.getName(), hook);
         }
     }
 
@@ -273,7 +420,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         @Required @Reference
         private Stage stageRef;
         @Reference
-        private List<Project> projectRefs;
+        private List<Project> projectRefs = new LinkedList<Project>();
 
         public Subscription()
         {
