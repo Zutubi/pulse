@@ -31,6 +31,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private static final String DEFAULT_HOST = "localhost";
     private static final String EMAIL_DOMAIN = "@zutubi.com";
+    private static final int DEFAULT_PORT = 2525;
     private static final String DEFAULT_FROM = "testing" + EMAIL_DOMAIN;
     private static final int BUILD_TIMEOUT = 90000;
     private static final int EMAIL_TIMEOUT = 30000;
@@ -58,7 +59,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.loginAsAdmin();
         random = getName() + "-" + RandomUtils.randomString(10);
 
-        server = SimpleSmtpServer.start();
+        server = SimpleSmtpServer.start(DEFAULT_PORT);
         ensureDefaultEmailSettings();
     }
 
@@ -78,6 +79,8 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> emailSettings = xmlRpcHelper.createDefaultConfig(EmailConfiguration.class);
         emailSettings.put("host", DEFAULT_HOST);
         emailSettings.put("from", DEFAULT_FROM);
+        emailSettings.put("customPort", true);
+        emailSettings.put("port", DEFAULT_PORT);
         xmlRpcHelper.saveConfig("settings/email", emailSettings, false);
     }
 
@@ -93,7 +96,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void clearSmtpServer()
     {
         server.stop();
-        server = SimpleSmtpServer.start();
+        server = SimpleSmtpServer.start(DEFAULT_PORT);
     }
 
     private void triggerAndCheckSuccessfulBuild() throws Exception
