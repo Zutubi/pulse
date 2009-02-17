@@ -416,16 +416,22 @@ public class ConfigurationRefactoringManager
             {
                 String path = getPath(parentPath, entry.getValue());
                 Record record = configurationTemplateManager.getRecord(path);
+                String templateOwnerPath;
                 if (record instanceof TemplateRecord)
                 {
                     record = ((TemplateRecord) record).getMoi();
+                    templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(PathUtils.getPath(parentPath, entry.getKey()));
+                }
+                else
+                {
+                    templateOwnerPath = null;
                 }
 
-                rewriteRecordReferences(path, record, parentPath, oldKeyToNewKey);
+                rewriteRecordReferences(path, record, parentPath, templateOwnerPath, oldKeyToNewKey);
             }
         }
 
-        private void rewriteRecordReferences(String path, Record record, String parentPath, Map<String, String> oldKeyToNewKey)
+        private void rewriteRecordReferences(String path, Record record, String parentPath, String templateOwnerPath, Map<String, String> oldKeyToNewKey)
         {
             String symbolicName = record.getSymbolicName();
             if (symbolicName != null)
@@ -441,13 +447,13 @@ public class ConfigurationRefactoringManager
                         {
                             // Does the referenced path fall into the clone set?
                             final ReferenceType referenceType = (ReferenceType) property.getType();
-                            String referencedPath = referenceType.getReferencedPath(data);
+                            String referencedPath = referenceType.getReferencedPath(templateOwnerPath, data);
                             if (inCloneSet(referencedPath, parentPath, oldKeyToNewKey.keySet()))
                             {
                                 // Then we need to update the reference to point to
                                 // the new clone.
                                 String newPath = convertPath(referencedPath, parentPath, oldKeyToNewKey);
-                                long newHandle = configurationReferenceManager.getHandleForPath(newPath);
+                                long newHandle = configurationReferenceManager.getReferenceHandleForPath(newPath);
                                 if (mutableRecord == null)
                                 {
                                     mutableRecord = record.copy(false);
@@ -471,7 +477,7 @@ public class ConfigurationRefactoringManager
 
             for (String key : record.nestedKeySet())
             {
-                rewriteRecordReferences(getPath(path, key), (Record) record.get(key), parentPath, oldKeyToNewKey);
+                rewriteRecordReferences(getPath(path, key), (Record) record.get(key), parentPath, templateOwnerPath, oldKeyToNewKey);
             }
         }
 
@@ -598,20 +604,33 @@ public class ConfigurationRefactoringManager
             MutableRecord common = extractCommon(records, parentPath, parentType.getTargetType());
             common.put(mapType.getKeyProperty(), parentTemplateName);
             configurationTemplateManager.markAsTemplate(common);
-            configurationTemplateManager.setParentTemplate(common, configurationReferenceManager.getHandleForPath(templateParentNode.getPath()));
+            configurationTemplateManager.setParentTemplate(common, recordManager.select(templateParentNode.getPath()).getHandle());
             String newParentTemplatePath = configurationTemplateManager.insertRecord(parentPath, common);
             TemplateRecord newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
             long newParentTemplateHandle = newParentTemplateRecord.getHandle();
 
+            // Fix internal references which were pulled up (note we need to
+            // refresh the record after saving).
+            MutableRecord newParentTemplateCopy = newParentTemplateRecord.getMoi().copy(true);
+            newParentTemplateCopy.forEach(new PullUpReferencesFunction(mapType.getTargetType(), newParentTemplateCopy, newParentTemplatePath, PathUtils.getPath(parentPath, keys.get(0))));
+            newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
+            
             // Reparent all the children.  Note we need to scrub all the
             // values we just pulled up and then do a deep update.  No events
             // need to be sent as no concrete instance is changed.
-            for(String key: keys)
+            for (String key: keys)
             {
                 String path = getPath(parentPath, key);
-                TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(path);
-                MutableRecord copy = record.getMoi().copy(true);
+                MutableRecord copy = ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi().copy(false);
+
+                // Update the parent reference.
                 configurationTemplateManager.setParentTemplate(copy, newParentTemplateHandle);
+                recordManager.update(path, copy);
+                configurationTemplateManager.refreshCaches();
+
+                // Fix references, scrub and apply updates.
+                copy = ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi().copy(true);
+                copy.forEach(new CanonicaliseReferencesFunction(mapType.getTargetType(), copy, path));
                 configurationTemplateManager.scrubInheritedValues(newParentTemplateRecord, copy, true);
                 copy.forEach(new DeepUpdateFunction(path));
             }
@@ -625,6 +644,7 @@ public class ConfigurationRefactoringManager
             Map<String, Object> commonSimple = new HashMap<String, Object>();
             Set<String> commonNestedKeySet = new HashSet<String>();
             boolean first = true;
+            String firstTemplateOwnerPath = null;
             String symbolicName = null;
             for(Pair<String, Record> pair: pathRecordPairs)
             {
@@ -641,14 +661,23 @@ public class ConfigurationRefactoringManager
                         commonMeta.remove(key);
                     }
 
+                    firstTemplateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(pair.first);
                     commonSimple.putAll(getSimple(r));
                     commonNestedKeySet.addAll(r.nestedKeySet());
                 }
                 else
                 {
                     CollectionUtils.retainAll(commonMeta, getMeta(r));
-                    CollectionUtils.retainAll(commonSimple, getSimple(r));
                     commonNestedKeySet.retainAll(r.nestedKeySet());
+
+                    if (type instanceof CollectionType)
+                    {
+                        CollectionUtils.retainAll(commonSimple, getSimple(r));
+                    }
+                    else
+                    {
+                        mergeSimple(firstTemplateOwnerPath, configurationTemplateManager.getTemplateOwnerPath(pair.first), commonSimple, r, (CompositeType) type);
+                    }
                 }
             }
 
@@ -701,6 +730,107 @@ public class ConfigurationRefactoringManager
             }
 
             return result;
+        }
+
+        private void mergeSimple(String firstTemplateOwnerPath, String templateOwnerPath, Map<String, Object> commonSimple, Record record, CompositeType compositeType)
+        {
+            Set<String> commonKeys = commonSimple.keySet();
+            commonKeys.retainAll(record.simpleKeySet());
+
+            Iterator<String> it = commonKeys.iterator();
+            while (it.hasNext())
+            {
+                String key = it.next();
+                TypeProperty property = compositeType.getProperty(key);
+                if (property == null)
+                {
+                    throw new IllegalStateException("Record of type '" + compositeType.getClazz().getName() + "' has unrecognised property '" + key + "'");
+                }
+
+                Type propertyType = property.getType();
+                boolean equal;
+                if (propertyType instanceof ListType)
+                {
+                    // List of references.
+                    String[] commonValue = (String[]) commonSimple.get(key);
+                    String[] recordValue = (String[]) record.get(key);
+
+                    if (commonValue.length == recordValue.length)
+                    {
+                        equal = true;
+                        for (int i = 0; i < commonValue.length; i++)
+                        {
+                            if (!equivalentHandles(firstTemplateOwnerPath, commonValue[i], templateOwnerPath, recordValue[i]))
+                            {
+                                equal = false;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        equal = false;
+                    }
+                }
+                else if (propertyType instanceof ReferenceType)
+                {
+                    equal = equivalentHandles(firstTemplateOwnerPath, commonSimple.get(key), templateOwnerPath, record.get(key));
+                }
+                else
+                {
+                    equal = RecordUtils.valuesEqual(record.get(key), commonSimple.get(key));
+                }
+
+                if (!equal)
+                {
+                    it.remove();
+                }
+            }
+        }
+
+        private boolean equivalentHandles(String templateOwnerPath1, Object h1, String templateOwnerPath2, Object h2)
+        {
+            if (h1 == null)
+            {
+                return h2 == null;
+            }
+
+            if (!(h1 instanceof String) || !(h2 instanceof String))
+            {
+                return false;
+            }
+
+            String s1 = (String) h1;
+            String s2 = (String) h2;
+
+            if (s1.equals(s2))
+            {
+                return true;
+            }
+
+            long l1 = Long.parseLong(s1);
+            long l2 = Long.parseLong(s2);
+
+            String path1 = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath1, l1);
+            String path2 = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath2, l2);
+
+            if (path1.startsWith(templateOwnerPath1) && path2.startsWith(templateOwnerPath2))
+            {
+                // Both are references within the owner - they are equal if
+                // they point to the same relative path within the owner, and
+                // the referenced paths are of the same type.
+                String type1 = recordManager.select(path1).getSymbolicName();
+                String type2 = recordManager.select(path2).getSymbolicName();
+                if (!type1.equals(type2))
+                {
+                    return false;
+                }
+
+                path1 = path1.substring(templateOwnerPath1.length());
+                path2 = path2.substring(templateOwnerPath2.length());
+            }
+
+            return path1.equals(path2);
         }
 
         private void extractCommonValues(CollectionType type, List<Pair<String, Record>> pathRecordPairs, MutableRecord result)
@@ -828,6 +958,184 @@ public class ConfigurationRefactoringManager
         }
     }
 
+    /**
+     * Base class for record walking functions that need to be aware of the
+     * types of the records.
+     */
+    private static abstract class TypeAwareFunction implements GraphFunction<Record>
+    {
+        protected Stack<ComplexType> typeStack = new Stack<ComplexType>();
+        protected Stack<MutableRecord> recordStack = new Stack<MutableRecord>();
+        protected String path;
+
+        public TypeAwareFunction(ComplexType type, MutableRecord record, String path)
+        {
+            typeStack.push(type);
+            recordStack.push(record);
+            this.path = path;
+        }
+
+        public void push(String edge)
+        {
+            path = PathUtils.getPath(path, edge);
+            MutableRecord record = (MutableRecord) recordStack.peek().get(edge);
+            typeStack.push((ComplexType) typeStack.peek().getActualPropertyType(edge, record));
+            recordStack.push(record);
+        }
+
+        public void process(com.zutubi.tove.type.record.Record record)
+        {
+            process(record, typeStack.peek());
+        }
+
+        public void pop()
+        {
+            path = PathUtils.getParentPath(path);
+            recordStack.pop();
+            typeStack.pop();
+        }
+
+        protected abstract void process(com.zutubi.tove.type.record.Record record, Type type);
+    }
+
+    /**
+     * Base for record walking functions that process references in those
+     * records in some way.
+     */
+    private abstract class ReferenceWalkingFunction extends TypeAwareFunction
+    {
+        protected String templateOwnerPath;
+
+        public ReferenceWalkingFunction(ComplexType type, MutableRecord record, String path)
+        {
+            super(type, record, path);
+            templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
+        }
+
+        protected  void process(Record record, Type type)
+        {
+            if (type instanceof CompositeType)
+            {
+                CompositeType compositeType = (CompositeType) type;
+                for (TypeProperty property: compositeType.getProperties(ReferenceType.class))
+                {
+                    String value = (String) record.get(property.getName());
+                    if (value != null)
+                    {
+                        handleReference(record, property, value);
+                    }
+                }
+
+                for (TypeProperty property: compositeType.getProperties(ListType.class))
+                {
+                    Type targetType = property.getType().getTargetType();
+                    if (targetType instanceof ReferenceType)
+                    {
+                        String[] value = (String[]) record.get(property.getName());
+                        if (value != null)
+                        {
+                            handleReferenceList(record, property, value);
+                        }
+                    }
+                }
+            }
+        }
+
+        protected abstract void handleReferenceList(Record record, TypeProperty property, String[] value);
+        protected abstract void handleReference(Record record, TypeProperty property, String value);
+    }
+
+    /**
+     * A record walking function that pulls up references from an original
+     * owner path into the new parent owner path.  This relies on the fact that
+     * all pulled-up references use the handle from the first sibling in the
+     * smart clone operation -- the from owner is this sibling.
+     */
+    private class PullUpReferencesFunction extends ReferenceWalkingFunction
+    {
+        private String fromOwnerPath;
+
+        public PullUpReferencesFunction(ComplexType type, MutableRecord record, String path, String fromOwnerPath)
+        {
+            super(type, record, path);
+            this.fromOwnerPath = fromOwnerPath;
+        }
+
+        @Override
+        protected void process(Record record, Type type)
+        {
+            super.process(record, type);
+            if (!record.shallowEquals(recordManager.select(path)))
+            {
+                recordManager.update(path, record);
+                configurationTemplateManager.refreshCaches();
+            }
+        }
+
+        protected void handleReference(Record record, TypeProperty property, String value)
+        {
+            ((MutableRecord) record).put(property.getName(), pullUp(value));
+        }
+
+        protected void handleReferenceList(Record record, TypeProperty property, String[] value)
+        {
+            for (int i = 0; i < value.length; i++)
+            {
+                value[i] = pullUp(value[i]);
+            }
+        }
+
+        private String pullUp(String value)
+        {
+            String path = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, Long.parseLong(value));
+            if (path.startsWith(fromOwnerPath))
+            {
+                path = templateOwnerPath + path.substring(fromOwnerPath.length());
+            }
+
+            long handle = configurationReferenceManager.getReferenceHandleForPath(path);
+            return Long.toString(handle);
+        }
+    }
+
+    /**
+     * Record walking function that ensures all references are pointing to the
+     * first point of definition in the hierarchy.  After an extraction, any
+     * internal references may be pointing to items that have now been pulled
+     * up into the parent -- these reference handles need fixing.
+     */
+    private class CanonicaliseReferencesFunction extends ReferenceWalkingFunction
+    {
+        public CanonicaliseReferencesFunction(ComplexType type, MutableRecord record, String path)
+        {
+            super(type, record, path);
+        }
+
+        protected void handleReference(Record record, TypeProperty property, String value)
+        {
+            ((MutableRecord) record).put(property.getName(), canonicaliseReference(value));
+        }
+
+        protected void handleReferenceList(Record record, TypeProperty property, String[] value)
+        {
+            for (int i = 0; i < value.length; i++)
+            {
+                value[i] = canonicaliseReference(value[i]);
+            }
+        }
+
+        private String canonicaliseReference(String value)
+        {
+            String path = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, Long.parseLong(value));
+            long handle = configurationReferenceManager.getReferenceHandleForPath(path);
+            return Long.toString(handle);
+        }
+    }
+
+    /**
+     * Record walking function that checks if any unsaved changes have been
+     * made to a record, and if so saves them.
+     */
     private class DeepUpdateFunction implements GraphFunction<Record>
     {
         private String path;
@@ -844,7 +1152,7 @@ public class ConfigurationRefactoringManager
 
         public void process(Record record)
         {
-            if(!record.shallowEquals(recordManager.select(path)))
+            if (!record.shallowEquals(recordManager.select(path)))
             {
                 recordManager.update(path, record);
                 configurationTemplateManager.refreshCaches();
@@ -857,6 +1165,10 @@ public class ConfigurationRefactoringManager
         }
     }
 
+    /**
+     * Record walking function that applies the skeletal record tree to the
+     * existing persistent records, keeping handles intact.
+     */
     private class DeepSkeletoniseFunction implements GraphFunction<Record>
     {
         private String path;
@@ -874,7 +1186,7 @@ public class ConfigurationRefactoringManager
         public void process(Record record)
         {
             Record existing = recordManager.select(path);
-            if(!record.shallowEquals(existing))
+            if (!record.shallowEquals(existing))
             {
                 MutableRecord r = record.copy(false);
                 r.setHandle(existing.getHandle());

@@ -810,7 +810,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         String path = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
         record = typeA.unstantiate(new MockA("child"));
-        configurationTemplateManager.setParentTemplate(record, configurationReferenceManager.getHandleForPath(path));
+        configurationTemplateManager.setParentTemplate(record, recordManager.select(path).getHandle());
         path = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
         return path;
     }
@@ -1487,7 +1487,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MutableRecord record = typeA.unstantiate(parent);
         configurationTemplateManager.markAsTemplate(record);
         String parentPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
-        long parentHandle = configurationReferenceManager.getHandleForPath(parentPath);
+        long parentHandle = recordManager.select(parentPath).getHandle();
 
         record = typeA.unstantiate(child);
         configurationTemplateManager.setParentTemplate(record, parentHandle);
@@ -1499,13 +1499,13 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MutableRecord record = typeA.unstantiate(parent);
         configurationTemplateManager.markAsTemplate(record);
         String parentPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
-        long parentHandle = configurationReferenceManager.getHandleForPath(parentPath);
+        long parentHandle = recordManager.select(parentPath).getHandle();
 
         record = typeA.unstantiate(child);
         configurationTemplateManager.markAsTemplate(record);
         configurationTemplateManager.setParentTemplate(record, parentHandle);
         String childPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
-        long childHandle = configurationReferenceManager.getHandleForPath(childPath);
+        long childHandle = recordManager.select(childPath).getHandle();
 
         record = typeA.unstantiate(grandchild);
         configurationTemplateManager.setParentTemplate(record, childHandle);

@@ -27,12 +27,12 @@ public class ReferenceTypeTest extends AbstractConfigurationSystemTestCase
 
     public void testToXmlRpcZero() throws TypeException
     {
-        assertNull(referenceType.toXmlRpc("0"));
+        assertNull(referenceType.toXmlRpc(null, "0"));
     }
 
     public void testToXmlRpcInvalidHandle() throws TypeException
     {
-        assertNull(referenceType.toXmlRpc("9"));
+        assertNull(referenceType.toXmlRpc(null, "9"));
     }
 
     public void testToXmlRpc() throws TypeException
@@ -43,7 +43,7 @@ public class ReferenceTypeTest extends AbstractConfigurationSystemTestCase
         String eePath = PathUtils.getPath(erPath, "r");
 
         Record eeRecord = configurationTemplateManager.getRecord(eePath);
-        Object o = referenceType.toXmlRpc(Long.toString(eeRecord.getHandle()));
+        Object o = referenceType.toXmlRpc(null, Long.toString(eeRecord.getHandle()));
         assertTrue(o instanceof String);
         assertEquals(eePath, o);
     }
@@ -60,9 +60,9 @@ public class ReferenceTypeTest extends AbstractConfigurationSystemTestCase
             referenceType.fromXmlRpc("nosuchpath");
             fail();
         }
-        catch (TypeException e)
+        catch (IllegalArgumentException e)
         {
-            assertEquals("Reference to unknown path 'nosuchpath'", e.getMessage());
+            assertEquals("Invalid path 'nosuchpath': references non-existant root scope 'nosuchpath'", e.getMessage());
         }
     }
 

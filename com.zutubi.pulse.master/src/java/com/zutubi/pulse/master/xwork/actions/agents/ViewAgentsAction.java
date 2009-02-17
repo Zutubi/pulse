@@ -76,13 +76,17 @@ public class ViewAgentsAction extends ActionSupport
             public AgentModel map(Agent agent)
             {
                 String status;
-                if(agent.isDisabling())
+                if (agent.isDisabling())
                 {
                     status = "disabling on idle";
                 }
-                else if(agent.isUpgrading())
+                else if (agent.isUpgrading())
                 {
                     status = "upgrading [" + agent.getUpgradeState().toString().toLowerCase() + "]";
+                }
+                else if (agent.isFailedUpgrade())
+                {
+                    status = "failed upgrade";
                 }
                 else
                 {

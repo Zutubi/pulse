@@ -232,12 +232,12 @@ public class GitClientTest extends PulseTestCase
 
     public void testBrowseNotAvailableWhenContextNotAvailable()
     {
-        assertFalse(client.getCapabilities(false).contains(ScmCapability.BROWSE));
+        assertFalse(client.getCapabilities(null).contains(ScmCapability.BROWSE));
     }
 
     public void testBrowseAvailableWhenContextAvailable()
     {
-        assertTrue(client.getCapabilities(true).contains(ScmCapability.BROWSE));
+        assertTrue(client.getCapabilities(scmContext).contains(ScmCapability.BROWSE));
     }
 
     private void assertFiles(File base, String... filenames)

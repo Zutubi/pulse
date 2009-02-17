@@ -67,7 +67,7 @@ public class BrowseAction extends ProjectActionSupport
             {
                 return browseConfig.isGroupsShown();
             }
-        });
+        }, true);
         
         return SUCCESS;
     }

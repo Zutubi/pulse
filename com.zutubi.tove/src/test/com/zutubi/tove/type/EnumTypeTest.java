@@ -14,12 +14,12 @@ public class EnumTypeTest extends TypeTestCase
 
     public void testToXmlRpcNull() throws TypeException
     {
-        assertNull(type.toXmlRpc(null));
+        assertNull(type.toXmlRpc(null, null));
     }
     
     public void testToXmlRpc() throws TypeException
     {
-        Object o = type.toXmlRpc("M2");
+        Object o = type.toXmlRpc(null, "M2");
         assertTrue(o instanceof String);
         assertEquals("M2", o);
     }

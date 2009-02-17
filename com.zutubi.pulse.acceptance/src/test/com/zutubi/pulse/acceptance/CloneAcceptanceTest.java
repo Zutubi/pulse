@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
 import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
 import com.zutubi.pulse.acceptance.forms.admin.ResourcePropertyForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -8,6 +9,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getParentPath;
@@ -268,18 +270,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialProject(random, false);
 
-        loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
-        hierarchyPage.goTo();
-        hierarchyPage.clickSmartClone();
-
-        CloneForm cloneForm = new CloneForm(selenium, true);
-        cloneForm.waitFor();
-        cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random + PARENT_PROPERTY_NAME);
-
-        ProjectHierarchyPage cloneHierarchyPage = new ProjectHierarchyPage(selenium, urls, random + CLONE_PROPERTY_NAME, false);
-        cloneHierarchyPage.waitFor();
-
+        ProjectHierarchyPage cloneHierarchyPage = doSmartClone();
         assertTrue(cloneHierarchyPage.isTreeItemPresent(random + PARENT_PROPERTY_NAME));
         assertTrue(cloneHierarchyPage.isTreeItemPresent(random + CLONE_PROPERTY_NAME));
     }
@@ -337,6 +328,36 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         assertFalse(hierarchyPage.isTreeItemPresent(childCloneName));
         hierarchyPage.expandTreeItem(parentCloneName);
         SeleniumUtils.waitForLocator(selenium, hierarchyPage.getTreeItemLocator(childCloneName));
+    }
+
+    public void testSmartCloneWithInternalReference() throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(random, false);
+        xmlRpcHelper.insertPostStageHook(random, "stagey", "default");
+
+        doSmartClone();
+
+        goTo(urls.adminProject(random) + Constants.Project.HOOKS + "/stagey");
+        ConfigurationForm hookForm = new ConfigurationForm(selenium, PostStageHookConfiguration.class);
+        hookForm.waitFor();
+
+        assertTrue("Stages field should have been pulled up to extracted template", hookForm.isInherited("stages"));
+    }
+
+    private ProjectHierarchyPage doSmartClone()
+    {
+        loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
+        hierarchyPage.goTo();
+        hierarchyPage.clickSmartClone();
+
+        CloneForm cloneForm = new CloneForm(selenium, true);
+        cloneForm.waitFor();
+        cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random + PARENT_PROPERTY_NAME);
+
+        ProjectHierarchyPage cloneHierarchyPage = new ProjectHierarchyPage(selenium, urls, random + CLONE_PROPERTY_NAME, false);
+        cloneHierarchyPage.waitFor();
+        return cloneHierarchyPage;
     }
 
     private ProjectHierarchyPage setupHierarchy(String parentName, String childName) throws Exception

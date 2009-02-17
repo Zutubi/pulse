@@ -25,6 +25,8 @@ import java.util.Map;
  */
 public class ConfigurationForm extends SeleniumForm
 {
+    public static final String ANNOTATION_INHERITED = "inherited";
+
     private static final Logger LOG = Logger.getLogger(ConfigurationForm.class);
     private Class<? extends Configuration> configurationClass;
 
@@ -137,5 +139,16 @@ public class ConfigurationForm extends SeleniumForm
         }
 
         return TEXTFIELD;
+    }
+
+    /**
+     * Indicates if a field is marked as inherited.
+     *
+     * @param fieldName name of the field to check
+     * @return true iff the given field is marked inherited
+     */
+    public boolean isInherited(String fieldName)
+    {
+        return isAnnotationPresent(fieldName, ANNOTATION_INHERITED);
     }
 }

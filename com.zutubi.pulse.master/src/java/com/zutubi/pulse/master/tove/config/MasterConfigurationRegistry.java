@@ -93,6 +93,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             configurationSecurityManager.registerGlobalPermission(PathUtils.getPath(PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), AccessManager.ACTION_DELETE, ServerPermission.DELETE_PROJECT.toString());
 
             configurationSecurityManager.registerOwnedScope(AGENTS_SCOPE);
+            configurationSecurityManager.registerOwnedScope(GROUPS_SCOPE);
             configurationSecurityManager.registerOwnedScope(PROJECTS_SCOPE);
             configurationSecurityManager.registerOwnedScope(USERS_SCOPE);
             

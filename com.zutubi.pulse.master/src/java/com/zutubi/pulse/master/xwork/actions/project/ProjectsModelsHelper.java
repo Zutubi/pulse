@@ -25,12 +25,12 @@ public class ProjectsModelsHelper
     private BuildManager buildManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration)
+    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, boolean showUngrouped)
     {
-        return createProjectsModels(configuration, new TruePredicate<Project>(), new TruePredicate<ProjectGroup>());
+        return createProjectsModels(configuration, new TruePredicate<Project>(), new TruePredicate<ProjectGroup>(), showUngrouped);
     }
     
-    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, Predicate<Project> projectPredicate, Predicate<ProjectGroup> groupPredicate)
+    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, Predicate<Project> projectPredicate, Predicate<ProjectGroup> groupPredicate, boolean showUngrouped)
     {
         List<Project> projects = CollectionUtils.filter(projectManager.getProjects(false), projectPredicate);
         List<ProjectGroup> groups = CollectionUtils.filter(projectManager.getAllProjectGroups(), groupPredicate);
@@ -57,7 +57,7 @@ public class ProjectsModelsHelper
             }
         }
 
-        if (projects.size() > 0)
+        if (showUngrouped && projects.size() > 0)
         {
             Collections.sort(projects, new NamedEntityComparator());
 

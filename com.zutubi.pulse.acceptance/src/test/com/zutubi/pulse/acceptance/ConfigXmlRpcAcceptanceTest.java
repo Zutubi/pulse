@@ -709,6 +709,23 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         callAndExpectError("Unrecognised property 'projectId'", "saveConfig", projectPath, project, false);
     }
 
+    public void testInheritanceOfInternalReference() throws Exception
+    {
+        String random = randomName();
+        String parentProject = random + "-parent";
+        String childProject = random + "-child";
+
+        xmlRpcHelper.insertSimpleProject(parentProject, true);
+        String hookPath = xmlRpcHelper.insertPostStageHook(parentProject, "hokey", "default");
+        String childPath = xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+        
+        String childHookPath = hookPath.replace(parentProject, childProject);
+        Hashtable<String, Object> childHook = xmlRpcHelper.getConfig(childHookPath);
+        @SuppressWarnings({"unchecked"})
+        Vector<String> stages = (Vector<String>) childHook.get("stages");
+        assertEquals(PathUtils.getPath(childPath, Constants.Project.STAGES, "default"), stages.get(0));
+    }
+
     private void assertSortedEquals(Collection<String> got, String... expected)
     {
         assertEquals(expected.length, got.size());

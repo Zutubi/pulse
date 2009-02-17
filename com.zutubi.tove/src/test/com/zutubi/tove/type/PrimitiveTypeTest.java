@@ -57,7 +57,7 @@ public class PrimitiveTypeTest extends TypeTestCase
     public void testToXmlRpcFloat() throws TypeException
     {
         PrimitiveType type = new PrimitiveType(Float.class);
-        Object o = type.toXmlRpc(Float.toString(1.2e-4f));
+        Object o = type.toXmlRpc(null, Float.toString(1.2e-4f));
         assertTrue(o instanceof Double);
         assertTrue(Math.abs(1.2e-4 - (Double)o) < 1e-10);
     }
@@ -65,7 +65,7 @@ public class PrimitiveTypeTest extends TypeTestCase
     public void testToXmlRpcFloatPrimitive() throws TypeException
     {
         PrimitiveType type = new PrimitiveType(float.class);
-        Object o = type.toXmlRpc(Float.toString(1.2e-4f));
+        Object o = type.toXmlRpc(null, Float.toString(1.2e-4f));
         assertTrue(o instanceof Double);
         assertTrue(Math.abs(1.2e-4 - (Double)o) < 1e-10);
     }
@@ -98,7 +98,7 @@ public class PrimitiveTypeTest extends TypeTestCase
     private void toXmlRpcHelper(Class fromClazz, String from, Class toClazz, Object to) throws TypeException
     {
         PrimitiveType type = new PrimitiveType(fromClazz);
-        Object o = type.toXmlRpc(from);
+        Object o = type.toXmlRpc(null, from);
         assertTrue(toClazz.isInstance(o));
         assertEquals(to, o);
     }
@@ -106,7 +106,7 @@ public class PrimitiveTypeTest extends TypeTestCase
     public void testToXmlRpcNull() throws TypeException
     {
         PrimitiveType type = new PrimitiveType(String.class);
-        assertNull(type.toXmlRpc(null));
+        assertNull(type.toXmlRpc(null, null));
     }
 
     public void testFromXmlRpcBoolean() throws TypeException
@@ -205,7 +205,7 @@ public class PrimitiveTypeTest extends TypeTestCase
     public void testFromXmlRpcNull() throws TypeException
     {
         PrimitiveType type = new PrimitiveType(String.class);
-        assertNull(type.toXmlRpc(null));
+        assertNull(type.toXmlRpc(null, null));
     }
     
 }

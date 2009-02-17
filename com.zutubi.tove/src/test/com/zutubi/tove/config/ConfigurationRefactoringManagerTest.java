@@ -8,6 +8,7 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getBaseName;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.TemplateRecord;
@@ -20,8 +21,6 @@ import com.zutubi.validation.ValidationException;
 import java.util.*;
 import static java.util.Arrays.asList;
 
-/**
- */
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
     private static final String SAMPLE_SCOPE = "sample";
@@ -507,19 +506,137 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testExtractParentTemplateReferenceToExtracted() throws TypeException
     {
+        externalReferenceHelper("referee");
+    }
+
+    public void testExtractParentTemplateReferenceFromExtracted() throws TypeException
+    {
+        externalReferenceHelper("referer");
+    }
+
+    private void externalReferenceHelper(String extractKey) throws TypeException
+    {
         String refereePath = insertTemplateAInstance(rootPath, createAInstance("referee"), false);
         MockA referee = configurationTemplateManager.getInstance(refereePath, MockA.class);
         MockA referer = new MockA("referer");
         referer.setRefToRef(referee.getRef());
+        referer.getListOfRefs().add(referee.getRef());
         String refererPath = insertTemplateAInstance(rootPath, referer, false);
 
-        configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("referee"), "extracted");
+        configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList(extractKey), "extracted");
 
         referee = configurationTemplateManager.getInstance(refereePath, MockA.class);
         referer = configurationTemplateManager.getInstance(refererPath, MockA.class);
         assertSame(referee.getRef(), referer.getRefToRef());
+        assertSame(referee.getRef(), referer.getListOfRefs().get(0));
     }
 
+    public void testExtractParentTemplateInternalReference() throws TypeException
+    {
+        final String EXTRACTED_NAME = "extracted";
+
+        String aPath = insertAInstanceWithInternalReference("a");
+        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), EXTRACTED_NAME);
+
+        assertExtractedInternalReference(aPath, extractedPath);
+        assertExtractedInternalReference(extractedPath, extractedPath);
+    }
+
+    public void testExtractParentTemplateInternalReferenceList() throws TypeException
+    {
+        String aPath = insertAInstanceWithInternalReferenceList("a");
+        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), "extracted");
+
+        assertExtractedInternalReferenceList(aPath, extractedPath);
+        assertExtractedInternalReferenceList(extractedPath, extractedPath);
+    }
+
+    public void testExtractParentTemplateCommonExternalReferences() throws TypeException
+    {
+        String refereePath = insertTemplateAInstance(rootPath, createAInstance("referee"), false);
+        String path1 = insertTemplateAInstance(rootPath, createAInstance("one"), false);
+        String path2 = insertTemplateAInstance(rootPath, createAInstance("two"), false);
+
+        MockA referee = configurationTemplateManager.getInstance(refereePath, MockA.class);
+        MockA a1 = configurationTemplateManager.getInstance(path1, MockA.class);
+        a1.setRefToRef(referee.getRef());
+        configurationTemplateManager.save(a1);
+
+        MockA a2 = configurationTemplateManager.getInstance(path2, MockA.class);
+        a2.setRefToRef(referee.getRef());
+        configurationTemplateManager.save(a2);
+
+        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("one", "two"), "extracted");
+
+        referee = configurationTemplateManager.getInstance(refereePath, MockA.class);
+        a1 = configurationTemplateManager.getInstance(path1, MockA.class);
+        a2 = configurationTemplateManager.getInstance(path2, MockA.class);
+        MockA extracted = configurationTemplateManager.getInstance(extractedPath, MockA.class);
+        
+        assertSame(referee.getRef(), a1.getRefToRef());
+        assertSame(referee.getRef(), a2.getRefToRef());
+        assertSame(referee.getRef(), extracted.getRefToRef());
+    }
+
+    public void testExtractParentTemplateCommonInternalReferences() throws TypeException
+    {
+        String path1 = insertAInstanceWithInternalReference("one");
+        String path2 = insertAInstanceWithInternalReference("two");
+        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("one", "two"), "extracted");
+
+        assertExtractedInternalReference(path1, extractedPath);
+        assertExtractedInternalReference(path2, extractedPath);
+        assertExtractedInternalReference(extractedPath, extractedPath);
+    }
+
+    public void testExtractParentTemplateCommonInternalReferenceLists() throws TypeException
+    {
+        String path1 = insertAInstanceWithInternalReferenceList("one");
+        String path2 = insertAInstanceWithInternalReferenceList("two");
+        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("one", "two"), "extracted");
+
+        assertExtractedInternalReferenceList(path1, extractedPath);
+        assertExtractedInternalReferenceList(path2, extractedPath);
+        assertExtractedInternalReferenceList(extractedPath, extractedPath);
+    }
+
+    private String insertAInstanceWithInternalReference(String name) throws TypeException
+    {
+        MockA mockA = createAInstance(name);
+        String aPath = insertTemplateAInstance(rootPath, mockA, false);
+
+        mockA = configurationTemplateManager.getInstance(aPath, MockA.class);
+        mockA.setRefToRef(mockA.getRef());
+        return configurationTemplateManager.save(mockA);
+    }
+
+    private void assertExtractedInternalReference(String originalPath, String extractedPath)
+    {
+        MockA mockA = configurationTemplateManager.getInstance(originalPath, MockA.class);
+        assertSame(mockA.getRef(), mockA.getRefToRef());
+        // Check that the value is owned at the right level (scrubbing was
+        // applied correctly).
+        assertEquals(PathUtils.getBaseName(extractedPath), ((TemplateRecord) configurationTemplateManager.getRecord(extractedPath)).getOwner("refToRef"));
+    }
+
+    private String insertAInstanceWithInternalReferenceList(String name) throws TypeException
+    {
+        MockA mockA = createAInstance(name);
+        String aPath = insertTemplateAInstance(rootPath, mockA, false);
+
+        mockA = configurationTemplateManager.getInstance(aPath, MockA.class);
+        mockA.getListOfRefs().add(mockA.getRef());
+        configurationTemplateManager.save(mockA);
+        return aPath;
+    }
+
+    private void assertExtractedInternalReferenceList(String originalPath, String extractedPath)
+    {
+        MockA mockA;
+        mockA = configurationTemplateManager.getInstance(originalPath, MockA.class);
+        assertSame(mockA.getRef(), mockA.getListOfRefs().get(0));
+        assertEquals(PathUtils.getBaseName(extractedPath), ((TemplateRecord) configurationTemplateManager.getRecord(extractedPath)).getOwner("listOfRefs"));
+    }
 
     private void assertAllValuesExtracted(String key)
     {
@@ -631,6 +748,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         private Referee ref;
         @Reference
         private Referee refToRef;
+        @Reference
+        private List<Referee> listOfRefs = new LinkedList<Referee>();
 
         public MockA()
         {
@@ -699,6 +818,16 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         public void setRefToRef(Referee refToRef)
         {
             this.refToRef = refToRef;
+        }
+
+        public List<Referee> getListOfRefs()
+        {
+            return listOfRefs;
+        }
+
+        public void setListOfRefs(List<Referee> listOfRefs)
+        {
+            this.listOfRefs = listOfRefs;
         }
     }
 

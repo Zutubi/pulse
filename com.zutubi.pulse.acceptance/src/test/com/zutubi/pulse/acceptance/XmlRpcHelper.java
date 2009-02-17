@@ -12,10 +12,12 @@ import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import org.apache.xmlrpc.XmlRpcClient;
@@ -458,6 +460,31 @@ public class XmlRpcHelper
         permission.put("group", groupPath);
         permission.put("allowedActions", new Vector<String>(Arrays.asList(actions)));
         return insertConfig(getPath(projectPath, "permissions"), permission);
+    }
+
+    public String insertPostStageHook(String project, String name, String... stageNames) throws Exception
+    {
+        Hashtable<String, Object> hook = createPostStageHook(project, name, stageNames);
+        return insertConfig(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.HOOKS), hook);
+    }
+
+    public Hashtable<String, Object> createPostStageHook(String project, String name, String... stageNames) throws Exception
+    {
+        Hashtable<String, Object> hook = createDefaultConfig(PostStageHookConfiguration.class);
+        hook.put("name", name);
+        hook.put("applyToAllStages", stageNames.length == 0);
+        if (stageNames.length > 0)
+        {
+            String stagesPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.STAGES);
+            Vector<String> stages = new Vector<String>();
+            for (String stageName: stageNames)
+            {
+                stages.add(PathUtils.getPath(stagesPath, stageName));
+            }
+            hook.put("stages", stages);
+        }
+
+        return hook;
     }
 
     public String insertSimpleAgent(String name) throws Exception

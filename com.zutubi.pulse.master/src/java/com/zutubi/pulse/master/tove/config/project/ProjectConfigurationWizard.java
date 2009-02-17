@@ -53,7 +53,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             MutableRecord record = getDataRecord();
             try
             {
-                SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationTemplateManager);
+                SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
                 ProjectTypeSelectionConfiguration config = (ProjectTypeSelectionConfiguration) instantiator.instantiate(typeSelectType, record);
                 String primaryType = config.getPrimaryType();
                 if (primaryType.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))

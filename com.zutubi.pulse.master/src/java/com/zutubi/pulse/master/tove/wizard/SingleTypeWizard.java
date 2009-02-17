@@ -44,7 +44,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
         MutableRecord record = recordState.getDataRecord();
         if(creatorType != null)
         {
-            SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager, configurationTemplateManager);
+            SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationReferenceManager, configurationTemplateManager);
             try
             {
                 ConfigurationCreator creator = (ConfigurationCreator) instantiator.instantiate(creatorType, record);

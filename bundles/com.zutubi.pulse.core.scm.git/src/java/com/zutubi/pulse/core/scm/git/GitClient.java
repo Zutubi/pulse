@@ -126,14 +126,15 @@ public class GitClient implements ScmClient
         // remains for the duration of the scm configuration.
     }
 
-    public Set<ScmCapability> getCapabilities(boolean contextAvailable)
+    public Set<ScmCapability> getCapabilities(ScmContext context)
     {
-        if (contextAvailable)
+        if (context != null)
         {
             return CAPABILITIES;
         }
         // browse requires that the scm context be available.
-        HashSet<ScmCapability> capabilities = new HashSet<ScmCapability>(CAPABILITIES);
+        HashSet<ScmCapability> capabilities = new HashSet<ScmCapability>();
+        capabilities.addAll(CAPABILITIES);
         capabilities.remove(ScmCapability.BROWSE);
         return capabilities;
     }

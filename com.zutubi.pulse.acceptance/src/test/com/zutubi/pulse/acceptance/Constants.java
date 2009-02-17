@@ -39,6 +39,7 @@ public class Constants
      */
     public static class Project
     {
+        public static final String HOOKS = "buildHooks";
         public static final String STAGES = "stages";
         public static final String SCM = "scm";
         public static final String TYPE = "type";

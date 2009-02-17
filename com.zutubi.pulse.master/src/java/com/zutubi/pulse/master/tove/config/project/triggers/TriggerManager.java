@@ -5,11 +5,11 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.tove.config.*;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -56,7 +56,10 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
         try
         {
             Trigger trigger = scheduler.getTrigger(id);
-            scheduler.unschedule(trigger);
+            if (trigger != null && trigger.isScheduled())
+            {
+                scheduler.unschedule(trigger);
+            }
         }
         catch (SchedulingException e)
         {

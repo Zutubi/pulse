@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config;
 
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.ReferenceType;
 import com.zutubi.tove.type.TypeProperty;
@@ -45,7 +45,8 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
             {
                 try
                 {
-                    options.put(Long.toString(r.getHandle()), (String) BeanUtils.getProperty(referenceType.getIdProperty(), r));
+                    long handle = configurationReferenceManager.getReferenceHandleForPath(r.getConfigurationPath());
+                    options.put(Long.toString(handle), (String) BeanUtils.getProperty(referenceType.getIdProperty(), r));
                 }
                 catch (BeanException e)
                 {

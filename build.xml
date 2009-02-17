@@ -542,7 +542,13 @@
         </javadoc>
     </target>
 
-    <target name="idea" depends="build.all"
+    <target name="idea" description="Runs build.idea.modules with -Dskip.tests=true">
+        <antcall target="build.idea.modules">
+            <param name="skip.tests" value="true"/>
+        </antcall>
+    </target>
+
+    <target name="build.idea.modules" depends="build.all"
             description="Adds modules to an IDEA project file (pulse.ipr) for all Pulse modules and plugins.">
 
         <!-- copy the template idea project files into the project directory if they dont already exist. -->

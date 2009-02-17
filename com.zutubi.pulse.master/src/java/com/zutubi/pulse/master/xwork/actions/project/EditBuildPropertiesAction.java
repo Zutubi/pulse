@@ -124,7 +124,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         field = new Field(FieldType.TEXT, "revision");
         field.setLabel("revision");
         field.setValue(revision);
-        addLatestAction(field, project.getConfig().getScm(), project);
+        addLatestAction(field, project, project.getConfig());
 
         form.add(field);
 
@@ -149,11 +149,11 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         newPanel = new ConfigurationPanel("aaction/edit-build-properties.vm");
     }
 
-    private void addLatestAction(Field field, ScmConfiguration scm, Project project)
+    private void addLatestAction(Field field, Project project, ProjectConfiguration projectConfig)
     {
         try
         {
-            Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(scm, scmManager, project.isInitialised());
+            Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(project, projectConfig, scmManager);
             if(capabilities.contains(ScmCapability.REVISIONS))
             {
                 field.addParameter(ACTIONS, Arrays.asList("getlatest"));

@@ -252,7 +252,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public Set<ScmCapability> getCapabilities(boolean contextAvailable)
+    public Set<ScmCapability> getCapabilities(ScmContext context)
     {
         return EnumSet.allOf(ScmCapability.class);
     }
@@ -331,7 +331,7 @@ public class SubversionClient implements ScmClient
 
         try
         {
-            updateClient.doCheckout(repository.getLocation(), context.getWorkingDir(), svnRevision, svnRevision, SVNDepth.INFINITY, false);
+            updateClient.doCheckout(repository.getLocation(), context.getWorkingDir(), SVNRevision.UNDEFINED, svnRevision, SVNDepth.INFINITY, false);
             updateExternals(context.getWorkingDir(), revision, updateClient, handler);
         }
         catch (SVNException e)
@@ -457,7 +457,7 @@ public class SubversionClient implements ScmClient
                 for (String externalsPath : externalsPaths)
                 {
                     SVNURL url = repository.getLocation().appendPath(externalsPath, false);
-                    SVNPropertyData data = wcClient.doGetProperty(url, SVNProperty.EXTERNALS, SVNRevision.HEAD, convertRevision(revision));
+                    SVNPropertyData data = wcClient.doGetProperty(url, SVNProperty.EXTERNALS, SVNRevision.UNDEFINED, convertRevision(revision));
                     if (data == null)
                     {
                         LOG.warning("Configured externals path '" + externalsPath + "' for URL '" + repository.getLocation().toString() + "' does not exist or does not have svn:externals property set: ignoring.");

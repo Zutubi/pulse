@@ -543,7 +543,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 // outstanding revisions and if so create requests for each one.
                 try
                 {
-                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(projectConfig.getScm(), scmManager, project.isInitialised());
+                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(project, projectConfig, scmManager);
                     if(capabilities.contains(ScmCapability.REVISIONS))
                     {
                             List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);

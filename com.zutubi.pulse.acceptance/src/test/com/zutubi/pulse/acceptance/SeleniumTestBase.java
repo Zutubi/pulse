@@ -32,6 +32,8 @@ import java.util.Vector;
  */
 public class SeleniumTestBase extends PulseTestCase
 {
+    private static final long STATUS_TIMEOUT = 30000;
+
     /**
      * Shared agent used for simple single-agent builds.  Makes it easier to
      * run these tests in development environments (just manually run one
@@ -152,7 +154,7 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void waitForStatus(String message)
     {
-        SeleniumUtils.waitForVisible(selenium, IDs.STATUS_MESSAGE);
+        SeleniumUtils.refreshUntilElement(selenium, IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
         String text = selenium.getText(IDs.STATUS_MESSAGE);
         assertTrue(text.contains(message));        
     }

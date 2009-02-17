@@ -52,7 +52,7 @@ public class EnumType extends SimpleType
         }
     }
 
-    public Object toXmlRpc(Object data) throws TypeException
+    public Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         // Leave it as is (a string).
         return data;

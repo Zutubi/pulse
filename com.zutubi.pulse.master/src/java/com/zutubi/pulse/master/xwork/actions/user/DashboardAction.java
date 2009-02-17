@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModel;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelsHelper;
+import com.zutubi.util.FalsePredicate;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TruePredicate;
 import com.zutubi.util.bean.ObjectFactory;
@@ -143,24 +144,34 @@ public class DashboardAction extends ActionSupport
             };
         }
 
+        boolean showUngrouped;
         Predicate<ProjectGroup> groupPredicate;
-        if (dashboardConfig.isShowAllGroups())
+        if (dashboardConfig.isGroupsShown())
         {
-            groupPredicate = new TruePredicate<ProjectGroup>();
+            showUngrouped = dashboardConfig.isShowUngrouped();
+            if (dashboardConfig.isShowAllGroups())
+            {
+                groupPredicate = new TruePredicate<ProjectGroup>();
+            }
+            else
+            {
+                groupPredicate = new Predicate<ProjectGroup>()
+                {
+                    public boolean satisfied(ProjectGroup projectGroup)
+                    {
+                        return dashboardConfig.getShownGroups().contains(projectGroup.getName());
+                    }
+                };
+            }
         }
         else
         {
-            groupPredicate = new Predicate<ProjectGroup>()
-            {
-                public boolean satisfied(ProjectGroup projectGroup)
-                {
-                    return dashboardConfig.getShownGroups().contains(projectGroup.getName());
-                }
-            };
+            showUngrouped = true;
+            groupPredicate = new FalsePredicate<ProjectGroup>();
         }
 
         ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
-        models = helper.createProjectsModels(dashboardConfig, projectPredicate, groupPredicate);
+        models = helper.createProjectsModels(dashboardConfig, projectPredicate, groupPredicate, showUngrouped);
 
         changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
         Collections.sort(changelists, new ChangelistComparator());
