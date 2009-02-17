@@ -1,9 +1,5 @@
 package com.zutubi.pulse.master.tove.config;
 
-import com.zutubi.tove.annotations.ConfigurationCheck;
-import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.config.api.ConfigurationCheckHandler;
-import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.security.GlobalAuthorityProvider;
@@ -30,10 +26,15 @@ import com.zutubi.pulse.master.tove.config.user.*;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.JabberContactConfiguration;
 import com.zutubi.tove.ConventionSupport;
-import com.zutubi.tove.config.*;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.actions.ConfigurationAction;
 import com.zutubi.tove.actions.ConfigurationActions;
+import com.zutubi.tove.annotations.ConfigurationCheck;
+import com.zutubi.tove.config.ConfigurationPersistenceManager;
+import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.api.ConfigurationCheckHandler;
+import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
@@ -89,6 +90,7 @@ public class ConfigurationRegistry
             configurationSecurityManager.registerGlobalPermission(PathUtils.getPath(PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), AccessManager.ACTION_DELETE, ServerPermission.DELETE_PROJECT.toString());
 
             configurationSecurityManager.registerOwnedScope(AGENTS_SCOPE);
+            configurationSecurityManager.registerOwnedScope(GROUPS_SCOPE);
             configurationSecurityManager.registerOwnedScope(PROJECTS_SCOPE);
             configurationSecurityManager.registerOwnedScope(USERS_SCOPE);
             

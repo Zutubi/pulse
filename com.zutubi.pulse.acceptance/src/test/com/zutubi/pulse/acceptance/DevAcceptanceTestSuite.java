@@ -30,6 +30,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(PluginUIAcceptanceTest.class);
         suite.addTestSuite(GroupAcceptanceTest.class);
         suite.addTestSuite(ProjectLabelAcceptanceTest.class);
+        suite.addTestSuite(ProjectPermissionsAcceptanceTest.class);
         suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
         suite.addTestSuite(LicenseAcceptanceTest.class);
         suite.addTestSuite(DashboardAcceptanceTest.class);
