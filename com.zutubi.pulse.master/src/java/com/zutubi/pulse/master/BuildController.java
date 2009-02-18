@@ -449,6 +449,7 @@ public class BuildController implements EventListener
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
         }
         return pulseFile;

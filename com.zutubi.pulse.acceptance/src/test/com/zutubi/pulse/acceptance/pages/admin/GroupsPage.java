@@ -1,10 +1,10 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
-import com.zutubi.pulse.acceptance.forms.admin.GroupForm;
 import com.zutubi.pulse.acceptance.forms.admin.BuiltinGroupForm;
+import com.zutubi.pulse.acceptance.forms.admin.GroupForm;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.webwork.Urls;
 
 /**
  * Simple specialisation of a list page for the admin/groups tab.
@@ -13,7 +13,7 @@ public class GroupsPage extends ListPage
 {
     public GroupsPage(Selenium selenium, Urls urls)
     {
-        super(selenium, urls, ConfigurationRegistry.GROUPS_SCOPE);
+        super(selenium, urls, MasterConfigurationRegistry.GROUPS_SCOPE);
     }
 
     public GroupForm clickAddGroupAndWait()

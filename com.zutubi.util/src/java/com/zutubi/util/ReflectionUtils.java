@@ -1,5 +1,8 @@
 package com.zutubi.util;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -163,22 +166,41 @@ public class ReflectionUtils
      * @return true if the method could be called with instances of the given
      *         types
      */
-    public static boolean acceptsParameters(Method method, Class... parameterTypes)
+    public static boolean acceptsParameters(Method method, Class<?>... parameterTypes)
     {
-        Class<?>[] actualTypes = method.getParameterTypes();
-        if(actualTypes.length != parameterTypes.length)
+        return parameterTypesMatch(method.getParameterTypes(), parameterTypes);
+    }
+
+    /**
+     * Returns true if the given constructor will accept parameters of the
+     * given types.  Unlike {@link Class#getConstructor(Class[])}, the
+     * parameter types need not be exact matches: subtypes are also accepted.
+     *
+     * @param constructor    the constructor to test
+     * @param parameterTypes candidate parameter types
+     * @return true if the method could be called with instances of the given
+     *         types
+     */
+    public static boolean acceptsParameters(Constructor constructor, Class<?>... parameterTypes)
+    {
+        return parameterTypesMatch(constructor.getParameterTypes(), parameterTypes);
+    }
+
+    private static boolean parameterTypesMatch(Class<?>[] formalTypes, Class<?>... parameterTypes)
+    {
+        if(formalTypes.length != parameterTypes.length)
         {
             return false;
         }
 
-        for(int i = 0; i < actualTypes.length; i++)
+        for(int i = 0; i < formalTypes.length; i++)
         {
-            if(!actualTypes[i].isAssignableFrom(parameterTypes[i]))
+            if(!formalTypes[i].isAssignableFrom(parameterTypes[i]))
             {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -304,6 +326,61 @@ public class ReflectionUtils
             if (clearAccessible)
             {
                 field.setAccessible(false);
+            }
+        }
+    }
+
+    /**
+     * Gets all bean properties from a class, traversing all of its
+     * superinterfaces to find properties defined therein.  This is in contrast
+     * to the normal behaviour of of {@link java.beans.Introspector} which does
+     * not search superinterfaces of interfaces.
+     * <p/>
+     * The stop class is always Object for classes, and null for interfaces.
+     *
+     * @see java.beans.Introspector#getBeanInfo(Class, Class)
+     *  
+     * @param clazz the class to retrieve bean properties from
+     * @return all bean properties defined in the class and its supertypes
+     * @throws IntrospectionException on error
+     */
+    public static PropertyDescriptor[] getBeanProperties(Class<?> clazz) throws IntrospectionException
+    {
+        Class<Object> stopClass = null;
+        if (!clazz.isInterface())
+        {
+            stopClass = Object.class;
+        }
+
+        // Maps from property name to a (found class, descriptor) pair.  We use
+        // the found class to resolve conflicts: if the same property is found
+        // again we accept the one from the most specific class (closest to the
+        // leaf of the type hierarchy).
+        Map<String, Pair<Class, PropertyDescriptor>> descriptors = new HashMap<String, Pair<Class, PropertyDescriptor>>();
+        addBeanPropertiesFromClass(clazz, stopClass, descriptors);
+        for(Class iface: getImplementedInterfaces(clazz, null, true))
+        {
+            addBeanPropertiesFromClass(iface, null, descriptors);
+        }
+
+        return CollectionUtils.mapToArray(descriptors.values(), new Mapping<Pair<Class, PropertyDescriptor>, PropertyDescriptor>()
+        {
+            public PropertyDescriptor map(Pair<Class, PropertyDescriptor> pair)
+            {
+                return pair.second;
+            }
+        }, new PropertyDescriptor[descriptors.size()]);
+    }
+
+    private static void addBeanPropertiesFromClass(Class<?> clazz, Class<Object> stopClass, Map<String, Pair<Class, PropertyDescriptor>> descriptors) throws IntrospectionException
+    {
+        PropertyDescriptor[] properties = Introspector.getBeanInfo(clazz, stopClass).getPropertyDescriptors();
+        for (PropertyDescriptor p: properties)
+        {
+            Pair<Class, PropertyDescriptor> existing = descriptors.get(p.getName());
+            if (existing == null || existing.first.isAssignableFrom(clazz))
+            {
+                descriptors.put(p.getName(), new Pair<Class, PropertyDescriptor>(clazz, p));
             }
         }
     }

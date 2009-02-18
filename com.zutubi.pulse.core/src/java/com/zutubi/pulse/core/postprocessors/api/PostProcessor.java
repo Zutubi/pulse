@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.pulse.core.engine.api.Reference;
-
 import java.io.File;
 
 
@@ -26,13 +24,13 @@ import java.io.File;
  * common cases and reduce coupling to implementation details.
  * </p>
  *
- * @see PostProcessorSupport
+ * @see OutputPostProcessorSupport
  * @see TestReportPostProcessorSupport
  * @see XMLTestReportPostProcessorSupport
  * @see TextFilePostProcessorSupport
  * @see LineBasedPostProcessorSupport
  */
-public interface PostProcessor extends Reference
+public interface PostProcessor
 {
     /**
      * Called once for each artifact file to process.  Details discovered by

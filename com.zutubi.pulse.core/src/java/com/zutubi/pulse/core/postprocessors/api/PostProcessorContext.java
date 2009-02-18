@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
  * Context in which a post-processor executes.  Provides a high-level
  * interface for adding discovered information to the build.
  *
- * @see PostProcessorSupport
+ * @see OutputPostProcessorSupport
  */
 public interface PostProcessorContext
 {

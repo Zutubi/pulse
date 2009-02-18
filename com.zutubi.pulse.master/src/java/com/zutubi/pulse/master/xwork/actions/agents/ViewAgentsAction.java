@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.agents;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
@@ -47,7 +47,7 @@ public class ViewAgentsAction extends ActionSupport
         List<Agent> agents = agentManager.getAllAgents();
 
         // Find invalid agents (which the agent manager always ignores).
-        Collection<AgentConfiguration> allConfigs = configurationTemplateManager.getAllInstances(PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), AgentConfiguration.class, true);
+        Collection<AgentConfiguration> allConfigs = configurationTemplateManager.getAllInstances(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), AgentConfiguration.class, true);
         for (final AgentConfiguration config: allConfigs)
         {
             if (config.isConcrete() && !CollectionUtils.contains(agents, new Predicate<Agent>()

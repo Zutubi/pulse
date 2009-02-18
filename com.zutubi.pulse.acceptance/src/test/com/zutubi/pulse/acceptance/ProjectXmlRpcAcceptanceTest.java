@@ -8,15 +8,6 @@ import java.util.Vector;
  */
 public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
-    public ProjectXmlRpcAcceptanceTest()
-    {
-    }
-
-    public ProjectXmlRpcAcceptanceTest(String testName)
-    {
-        super(testName);
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -58,8 +49,23 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> createdType = (Hashtable<String, Object>) createdProject.get("type");
         assertNotNull(createdType);
-        assertEquals("zutubi.antTypeConfig", createdType.get(SYMBOLIC_NAME_KEY));
-        assertEquals("build.xml", createdType.get("file"));
+        assertEquals("zutubi.multiRecipeTypeConfig", createdType.get(SYMBOLIC_NAME_KEY));
+        assertEquals("default", createdType.get("defaultRecipe"));
+
+        Hashtable<String, Object> recipes = (Hashtable<String, Object>) createdType.get("recipes");
+        assertEquals(1, recipes.size());
+
+        Hashtable<String, Object> recipe = (Hashtable<String, Object>) recipes.get("default");
+        assertNotNull(recipe);
+        assertEquals("default", recipe.get("name"));
+
+        Hashtable<String, Object> commands = (Hashtable<String, Object>) recipe.get("commands");
+        assertEquals(1, commands.size());
+
+        Hashtable<String, Object> command = (Hashtable<String, Object>) commands.get("build");
+        assertNotNull(command);
+        assertEquals("zutubi.antCommandConfig", command.get(SYMBOLIC_NAME_KEY));
+        assertEquals("build.xml", command.get("buildFile"));
     }
 
     public void testDeleteProject() throws Exception

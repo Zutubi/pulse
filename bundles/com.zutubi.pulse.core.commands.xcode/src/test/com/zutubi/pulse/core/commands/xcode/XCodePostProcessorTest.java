@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.commands.xcode;
 
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
@@ -15,18 +16,12 @@ import java.util.List;
  */
 public class XCodePostProcessorTest extends PostProcessorTestBase
 {
-    private XCodePostProcessor pp;
+    private RegexPostProcessor pp;
 
     public void setUp() throws IOException
     {
         super.setUp();
-        pp = new XCodePostProcessor();
-    }
-
-    public void tearDown()
-    {
-        super.tearDown();
-        pp = null;
+        pp = new RegexPostProcessor(new XCodePostProcessorConfiguration());
     }
 
     public void testSimple() throws Exception
@@ -54,8 +49,8 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
 
     public void testSetContext() throws Exception
     {
-        pp.setLeadingContext(0);
-        pp.setTrailingContext(0);
+        pp.getConfig().setLeadingContext(0);
+        pp.getConfig().setTrailingContext(0);
 
         CommandResult result = createAndProcessArtifact("testSimple", pp);
         assertTrue(result.failed());

@@ -1,13 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -259,12 +263,16 @@ public class XmlRpcHelper
     }
 
     @SuppressWarnings({"unchecked"})
-    public Hashtable<String, Object> getProjectArtifact(String projectName, String artifactName) throws Exception
+    public Hashtable<String, Object> getProjectCapture(String projectName, String captureName) throws Exception
     {
-        Hashtable<String, Object> projectConfig = getConfig(ConfigurationRegistry.PROJECTS_SCOPE + "/" + projectName);
+        Hashtable<String, Object> projectConfig = getConfig(MasterConfigurationRegistry.PROJECTS_SCOPE + "/" + projectName);
         Hashtable<String, Object> projectType = (Hashtable<String, Object>) projectConfig.get(Constants.Project.TYPE);
-        Hashtable<String, Object> typeArtifacts = (Hashtable<String, Object>) projectType.get(Constants.Project.Type.ARTIFACTS);
-        return (Hashtable<String, Object>) typeArtifacts.get(artifactName);
+        Hashtable<String, Object> recipes = (Hashtable<String, Object>) projectType.get("recipes");
+        Hashtable<String, Object> recipe = (Hashtable<String, Object>) recipes.get("default");
+        Hashtable<String, Object> commands = (Hashtable<String, Object>) recipe.get("commands");
+        Hashtable<String, Object> command = (Hashtable<String, Object>) commands.get("build");
+        Hashtable<String, Object> captures = (Hashtable<String, Object>) command.get(Constants.Project.Command.CAPTURES);
+        return (Hashtable<String, Object>) captures.get(captureName);
     }
 
     public int getAgentCount() throws Exception
@@ -294,7 +302,33 @@ public class XmlRpcHelper
 
     public String insertSimpleProject(String name, String parent, boolean template) throws Exception
     {
-        return insertProject(name, parent, template, getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), getAntConfig());
+        return insertSingleCommandProject(name, parent, template, getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), getAntConfig());
+    }
+
+    public String insertSingleCommandProject(String name, String parent, boolean template, Hashtable<String, Object> scm, Hashtable<String, Object> command) throws Exception
+    {
+        Hashtable<String, Object> commands = new Hashtable<String, Object>();
+        String commandName = (String) command.get("name");
+        if (commandName == null)
+        {
+            commandName = "build";
+            command.put("name", commandName);
+        }
+
+        commands.put(commandName, command);
+
+        Hashtable<String, Object> recipe = createEmptyConfig(RecipeConfiguration.class);
+        recipe.put("name", "default");
+        recipe.put("commands", commands);
+
+        Hashtable<String, Object> recipes = new Hashtable<String, Object>();
+        recipes.put("default", recipe);
+
+        Hashtable<String, Object> type = createEmptyConfig(MultiRecipeTypeConfiguration.class);
+        type.put("defaultRecipe", "default");
+        type.put("recipes", recipes);
+
+        return insertProject(name, parent, template, scm, type);
     }
 
     public String insertProject(String name, String parent, boolean template, Hashtable<String, Object> scm, Hashtable<String, Object> type) throws Exception
@@ -336,14 +370,14 @@ public class XmlRpcHelper
 
     public Hashtable<String, Object> getAntConfig()
     {
-        Hashtable<String, Object> type = createEmptyConfig("zutubi.antTypeConfig");
-        type.put("file", "build.xml");
+        Hashtable<String, Object> type = createEmptyConfig(AntCommandConfiguration.class);
+        type.put("buildFile", "build.xml");
         return type;
     }
 
     public Hashtable<String, Object> getCustomTypeConfig(String pulseFileString)
     {
-        Hashtable<String, Object> type = createEmptyConfig("zutubi.customTypeConfig");
+        Hashtable<String, Object> type = createEmptyConfig(CustomTypeConfiguration.class);
         type.put("pulseFileString", pulseFileString);
         return type;
     }
@@ -399,7 +433,7 @@ public class XmlRpcHelper
 
     public String insertProjectProperty(String project, String name, String value, boolean resolveVariables, boolean addToEnvironment, boolean addToPath) throws Exception
     {
-        String propertiesPath = getPath(ConfigurationRegistry.PROJECTS_SCOPE, project, "properties");
+        String propertiesPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, "properties");
         Hashtable<String, Object> property = createProperty(name, value, resolveVariables, addToEnvironment, addToPath);
         return insertConfig(propertiesPath, property);
     }
@@ -431,7 +465,7 @@ public class XmlRpcHelper
     public String insertPostStageHook(String project, String name, String... stageNames) throws Exception
     {
         Hashtable<String, Object> hook = createPostStageHook(project, name, stageNames);
-        return insertConfig(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.HOOKS), hook);
+        return insertConfig(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.HOOKS), hook);
     }
 
     public Hashtable<String, Object> createPostStageHook(String project, String name, String... stageNames) throws Exception
@@ -441,7 +475,7 @@ public class XmlRpcHelper
         hook.put("applyToAllStages", stageNames.length == 0);
         if (stageNames.length > 0)
         {
-            String stagesPath = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.STAGES);
+            String stagesPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.STAGES);
             Vector<String> stages = new Vector<String>();
             for (String stageName: stageNames)
             {
@@ -479,7 +513,7 @@ public class XmlRpcHelper
         Hashtable<String, Object> user = createDefaultConfig(UserConfiguration.class);
         user.put("login", login);
         user.put("name", login);
-        String path = insertConfig(ConfigurationRegistry.USERS_SCOPE, user);
+        String path = insertConfig(MasterConfigurationRegistry.USERS_SCOPE, user);
         Hashtable <String, Object> password = createEmptyConfig(SetPasswordConfiguration.class);
         password.put("password", "");
         password.put("confirmPassword", "");
@@ -493,7 +527,7 @@ public class XmlRpcHelper
         group.put("name", name);
         group.put("members", new Vector<String>(memberPaths));
         group.put("serverPermissions", new Vector<String>(Arrays.asList(serverPermissions)));
-        return insertConfig(ConfigurationRegistry.GROUPS_SCOPE, group);
+        return insertConfig(MasterConfigurationRegistry.GROUPS_SCOPE, group);
     }
 
     public void logError(String message) throws Exception

@@ -88,9 +88,17 @@
 
     <bean id="slaveRecipeProcessor" class="com.zutubi.pulse.slave.SlaveRecipeProcessor" autowire="byName"/>
 
-    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
+    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName"/>
 
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
+    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" autowire="byName"/>
+
+    <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" autowire="byName" init-method="init"/>
+
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName" init-method="init"/>
+
+    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory" autowire="byName"/>
+
+    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory" autowire="byName"/>
 
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.servercore.hessian.CustomSerialiserFactory"/>
 

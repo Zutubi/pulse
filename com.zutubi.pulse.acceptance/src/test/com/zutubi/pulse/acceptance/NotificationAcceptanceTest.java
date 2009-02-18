@@ -229,7 +229,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
         else
         {
-            xmlRpcHelper.insertProject(name, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+            xmlRpcHelper.insertSingleCommandProject(name, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
         }
 
         // remove all existing permissions so that we are sure they will not get in the way.
@@ -244,7 +244,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
             acl.put("group", "groups/"+random + "group" + groupNameSuffix);
-            acl.put("allowedActions", new Vector(Arrays.asList(AccessManager.ACTION_VIEW)));
+            acl.put("allowedActions", new Vector<String>(Arrays.asList(AccessManager.ACTION_VIEW)));
             xmlRpcHelper.insertConfig("projects/" + name + "/permissions", acl);
         }
     }

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<project>
+
+    <macro name="m1">
+        <command name="m1-e1"/>
+    </macro>
+
+    <recipe name="r1">
+        <macro-ref/>
+    </recipe>
+
+</project>

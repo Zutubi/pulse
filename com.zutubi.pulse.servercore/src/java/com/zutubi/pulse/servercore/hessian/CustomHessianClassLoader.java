@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore.hessian;
 
 import com.zutubi.pulse.core.hessian.HessianConfigurationExtensionManager;
+import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginManager;
 
 import java.security.SecureClassLoader;
@@ -20,24 +21,39 @@ public class CustomHessianClassLoader extends SecureClassLoader
         super(parent);
     }
 
-    public Class<?> loadClass(String name) throws ClassNotFoundException
-    {
-        String contributor = registry.getContributor(name);
-        if (contributor != null)
-        {
-            return pluginManager.getPlugin(contributor).loadClass(name);
-        }
-        return super.loadClass(name);
-    }
-
     protected Class<?> findClass(String name) throws ClassNotFoundException
     {
-        String contributor = registry.getContributor(name);
-        if (contributor != null)
+        try
         {
-            return pluginManager.getPlugin(contributor).loadClass(name);
+            return super.findClass(name);
         }
-        return super.findClass(name);
+        catch (ClassNotFoundException e)
+        {
+            String contributor = registry.getContributor(name);
+            if (contributor != null)
+            {
+                return pluginManager.getPlugin(contributor).loadClass(name);
+            }
+            else
+            {
+                // Search all plugins.  This could be slow, and although there
+                // are ways to improve it for now we rely on caching of the
+                // loaded classes to reduce the impact.
+                for (Plugin plugin: pluginManager.getPlugins())
+                {
+                    try
+                    {
+                        return plugin.loadClass(name);
+                    }
+                    catch (ClassNotFoundException ex)
+                    {
+                        // Try next plugin
+                    }
+                }
+            }
+        }
+
+        throw new ClassNotFoundException(name);
     }
 
     public void setHessianExtensionManager(HessianConfigurationExtensionManager registry)

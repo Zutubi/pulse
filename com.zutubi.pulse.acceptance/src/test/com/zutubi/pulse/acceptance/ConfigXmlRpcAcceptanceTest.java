@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -433,7 +433,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testCanCloneUncloneablePath() throws Exception
     {
-        assertEquals(false, call("canCloneConfig", PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME)));
+        assertEquals(false, call("canCloneConfig", PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME)));
     }
 
     public void testCanCloneCloneablePath() throws Exception
@@ -446,7 +446,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         Hashtable<String, String> keyMap = new Hashtable<String, String>(1);
         keyMap.put("thisprojectdoesnotexist", "soicantcloneit");
-        callAndExpectError("Invalid path 'projects/thisprojectdoesnotexist': path does not exist", "cloneConfig", ConfigurationRegistry.PROJECTS_SCOPE, keyMap);
+        callAndExpectError("Invalid path 'projects/thisprojectdoesnotexist': path does not exist", "cloneConfig", MasterConfigurationRegistry.PROJECTS_SCOPE, keyMap);
     }
 
     public void testClone() throws Exception
@@ -456,8 +456,8 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.insertTrivialProject(name, false);
         Hashtable<String, String> keyMap = new Hashtable<String, String>(1);
         keyMap.put(name, cloneName);
-        assertEquals(true, call("cloneConfig", ConfigurationRegistry.PROJECTS_SCOPE, keyMap));
-        assertTrue(xmlRpcHelper.configPathExists(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, cloneName)));
+        assertEquals(true, call("cloneConfig", MasterConfigurationRegistry.PROJECTS_SCOPE, keyMap));
+        assertTrue(xmlRpcHelper.configPathExists(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, cloneName)));
     }
 
     public void testDeleteConfigNonExistantPath() throws Exception
@@ -676,7 +676,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> user = xmlRpcHelper.createEmptyConfig(UserConfiguration.class);
         user.put("login", random);
         user.put("name", random);
-        String path = xmlRpcHelper.insertConfig(ConfigurationRegistry.USERS_SCOPE, user);
+        String path = xmlRpcHelper.insertConfig(MasterConfigurationRegistry.USERS_SCOPE, user);
         assertTrue(xmlRpcHelper.isConfigPermanent(PathUtils.getPath(path, "preferences")));
     }
 

@@ -20,8 +20,13 @@ import java.io.IOException;
  *
  * @see LineBasedPostProcessorSupport
  */
-public abstract class TextFilePostProcessorSupport extends PostProcessorSupport
+public abstract class TextFilePostProcessorSupport extends OutputPostProcessorSupport
 {
+    protected TextFilePostProcessorSupport(TextFilePostProcessorConfigurationSupport config)
+    {
+        super(config);
+    }
+
     public final void processFile(File artifactFile, PostProcessorContext ppContext)
     {
         BufferedReader reader = null;

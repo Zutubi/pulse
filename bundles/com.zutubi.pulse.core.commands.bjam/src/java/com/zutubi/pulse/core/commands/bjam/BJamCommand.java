@@ -1,59 +1,23 @@
 package com.zutubi.pulse.core.commands.bjam;
 
-import com.zutubi.pulse.core.ProcessArtifact;
-import com.zutubi.pulse.core.commands.core.ExecutableCommand;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  */
-public class BJamCommand extends ExecutableCommand
+public class BJamCommand extends NamedArgumentCommand
 {
-    private String jamfile;
-    private String targets;
-
-    public BJamCommand()
+    public BJamCommand(BJamCommandConfiguration configuration)
     {
-        super("bjam.bin", "bjam");
+        super(configuration);
     }
 
-    public void execute(ExecutionContext context, CommandResult cmdResult)
+    @Override
+    protected List<Class<? extends PostProcessorConfiguration>> getDefaultPostProcessorTypes()
     {
-        if (jamfile != null)
-        {
-            addArguments("-f", jamfile);
-            cmdResult.getProperties().put("Jamfile", jamfile);
-        }
-
-        if (targets != null)
-        {
-            addArguments(targets.split(" +"));
-            cmdResult.getProperties().put("targets", targets);
-        }
-
-        ProcessArtifact pa = createProcess();
-        pa.setProcessor(new BJamPostProcessor());
-
-        super.execute(context, cmdResult);
-    }
-
-    public String getJamfile()
-    {
-        return jamfile;
-    }
-
-    public void setJamfile(String jamfile)
-    {
-        this.jamfile = jamfile;
-    }
-
-    public String getTargets()
-    {
-        return targets;
-    }
-
-    public void setTargets(String targets)
-    {
-        this.targets = targets;
+        return Arrays.<Class<? extends PostProcessorConfiguration>>asList(BJamPostProcessorConfiguration.class);
     }
 }

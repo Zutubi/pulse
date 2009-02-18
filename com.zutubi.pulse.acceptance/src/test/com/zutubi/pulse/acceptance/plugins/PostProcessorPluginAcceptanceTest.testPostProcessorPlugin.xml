@@ -1,8 +1,4 @@
 <?xml version="1.0"?>
 <project defaultRecipe="default">
-
-    <post-processor name="sample.pp">
-        <sample.pp/>
-    </post-processor>
-
+    <test.pp name="test.pp"/>
 </project>

@@ -4,26 +4,22 @@
     #parse("pulse-file/prologue.vm")
 
     <recipe name="bjam build">
-        <command name="build">
-            <bjam
+        <bjam name="build"
 #if($arguments)
-                    args="$arguments"
+              args="$arguments"
 #end
 #if($workingDir)
-                    working-dir="${base.dir}/$workingDir"
+              working-dir="${base.dir}/$workingDir"
 #end
 #if($jamfile)
-                    jamfile="$jamfile"
+              jamfile="$jamfile"
 #end
 #if($targets)
-                    targets="$targets"
+              targets="$targets"
 #end
-                    >
-                #parse("pulse-file/output.processors.vm")
-            </bjam>
-
+        >
+            #parse("pulse-file/output.processors.vm")
             #parse("pulse-file/artifacts.vm")
-
-        </command>
+        </bjam>
     </recipe>
 </project>

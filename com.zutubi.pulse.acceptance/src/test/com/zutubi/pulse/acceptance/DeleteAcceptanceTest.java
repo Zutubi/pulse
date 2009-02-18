@@ -4,8 +4,8 @@ import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
@@ -246,7 +246,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String path = xmlRpcHelper.insertTrivialUser(random);
         loginAsAdmin();
         
-        ListPage usersPage = new ListPage(selenium, urls, ConfigurationRegistry.USERS_SCOPE);
+        ListPage usersPage = new ListPage(selenium, urls, MasterConfigurationRegistry.USERS_SCOPE);
         usersPage.goTo();
         assertItemPresent(usersPage, random, null, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE, UserConfigurationActions.ACTION_SET_PASSWORD);
         DeleteConfirmPage confirmPage = usersPage.clickDelete(random);

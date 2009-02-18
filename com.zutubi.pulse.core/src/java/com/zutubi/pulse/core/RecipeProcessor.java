@@ -2,6 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
@@ -14,6 +17,7 @@ import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -23,13 +27,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The recipe processor, as the name suggests, is responsible for running recipies.
- *
  */
 public class RecipeProcessor
 {
@@ -41,15 +45,7 @@ public class RecipeProcessor
     private Recipe runningRecipeInstance = null;
     private boolean terminating = false;
     private PulseFileLoaderFactory fileLoaderFactory;
-
-    public RecipeProcessor()
-    {
-    }
-
-    public void init()
-    {
-        
-    }
+    private ObjectFactory objectFactory;
 
     public void build(RecipeRequest request)
     {
@@ -70,30 +66,32 @@ public class RecipeProcessor
         pushRecipeContext(context, request, testResults, recipeStartTime);
         try
         {
-            // Wrap bootstrapper in a command and run it.
-            BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
-
             // Now we can load the recipe from the pulse file
-            PulseFile pulseFile = loadPulseFile(request, context);
+            ProjectRecipesConfiguration recipesConfiguration= loadPulseFile(request, context);
 
             String recipeName = request.getRecipeName();
             if (!TextUtils.stringSet(recipeName))
             {
-                recipeName = pulseFile.getDefaultRecipe();
+                recipeName = recipesConfiguration.getDefaultRecipe();
                 if (!TextUtils.stringSet(recipeName))
                 {
                     throw new BuildException("Please specify a default recipe for your project.");
                 }
             }
 
-            Recipe recipe = pulseFile.getRecipe(recipeName);
-            if (recipe == null)
+            RecipeConfiguration recipeConfiguration = recipesConfiguration.getRecipes().get(recipeName);
+            if (recipeConfiguration == null)
             {
                 throw new BuildException("Undefined recipe '" + recipeName + "'");
             }
 
-            recipe.addFirstCommand(bootstrapCommand);
+            LinkedHashMap<String, CommandConfiguration> commandConfigs = new LinkedHashMap<String, CommandConfiguration>();
+            BootstrapCommandConfiguration bootstrapConfig = new BootstrapCommandConfiguration(request.getBootstrapper());
+            commandConfigs.put(bootstrapConfig.getName(), bootstrapConfig);
+            commandConfigs.putAll(recipeConfiguration.getCommands());
+            recipeConfiguration.setCommands(commandConfigs);
 
+            Recipe recipe = objectFactory.buildBean(Recipe.class, new Class[] { RecipeConfiguration.class }, new Object[] { recipeConfiguration });
             runningRecipeInstance = recipe;
 
             recipe.execute(context);
@@ -219,7 +217,7 @@ public class RecipeProcessor
         }
     }
 
-    private PulseFile loadPulseFile(RecipeRequest request, PulseExecutionContext context) throws BuildException
+    private ProjectRecipesConfiguration loadPulseFile(RecipeRequest request, PulseExecutionContext context) throws BuildException
     {
         context.setLabel(SCOPE_RECIPE);
         PulseScope globalScope = new PulseScope(context.getScope());
@@ -237,10 +235,9 @@ public class RecipeProcessor
         {
             stream = new ByteArrayInputStream(pulseFileSource.getBytes());
 
-            ResourceRepository resourceRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
-            PulseFile result = new PulseFile();
+            ProjectRecipesConfiguration result = new ProjectRecipesConfiguration();
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-            fileLoader.load(stream, result, globalScope, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
+            fileLoader.load(stream, result, globalScope, new RecipeLoadPredicate(result, request.getRecipeName()));
             return result;
         }
         catch (Exception e)
@@ -291,5 +288,10 @@ public class RecipeProcessor
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
         this.fileLoaderFactory = fileLoaderFactory;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

@@ -3,7 +3,6 @@ package com.zutubi.pulse.core;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_USER;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.util.StringUtils;
@@ -181,12 +180,12 @@ public class PulseExecutionContext implements ExecutionContext
 
     public void addString(String namespace, String name, String value)
     {
-        scopeStack.getScope(namespace).add(new Property(name, value));
+        scopeStack.getScope(namespace).add(new GenericReference<String>(name, value));
     }
 
     public void addString(String name, String value)
     {
-        scopeStack.getScope().add(new Property(name, value));
+        scopeStack.getScope().add(new GenericReference<String>(name, value));
     }
 
     public void addValue(String namespace, String name, Object value)

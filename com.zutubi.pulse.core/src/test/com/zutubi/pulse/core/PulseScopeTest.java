@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.test.EqualityAssertions;
@@ -26,8 +25,8 @@ public class PulseScopeTest extends PulseTestCase
         parent.setLabel("parent");
         scope = new PulseScope(parent);
         scope.setLabel("child");
-        parent.add(new Property("parent only", "parent"));
-        parent.add(new Property("parent and child", "parent"));
+        parent.add(new GenericReference<String>("parent only", "parent"));
+        parent.add(new GenericReference<String>("parent and child", "parent"));
         parent.add(new ResourceProperty("parent only resource", "parent resource", true, true, false));
         parent.add(new ResourceProperty("parent and child resource", "parent resource", true, true, false));
 
@@ -37,8 +36,8 @@ public class PulseScopeTest extends PulseTestCase
             parent.addEnvironmentProperty(var.getKey(), var.getValue());
         }
 
-        scope.add(new Property("child only", "child"));
-        scope.add(new Property("parent and child", "child"));
+        scope.add(new GenericReference<String>("child only", "child"));
+        scope.add(new GenericReference<String>("parent and child", "child"));
         scope.add(new ResourceProperty("child only resource", "child resource", true, true, false));
         scope.add(new ResourceProperty("parent and child resource", "child resource", true, true, false));
 
@@ -78,7 +77,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         try
         {
-            scope.addUnique(new Property("child only", ""));
+            scope.addUnique(new GenericReference<String>("child only", ""));
             fail();
         }
         catch(IllegalArgumentException e)
@@ -89,13 +88,13 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testAddUniqueOverride()
     {
-        scope.addUnique(new Property("parent only", "override"));
+        scope.addUnique(new GenericReference<String>("parent only", "override"));
         assertEquals("override", scope.getReferenceValue("parent only", String.class));
     }
 
     public void testAddAll()
     {
-        scope.addAll(Arrays.asList(new Property("p1", "v1"), new Property("p2", "v2")));
+        scope.addAll(Arrays.asList(new GenericReference<String>("p1", "v1"), new GenericReference<String>("p2", "v2")));
         assertEquals("v1", scope.getReferenceValue("p1", String.class));
         assertEquals("v2", scope.getReferenceValue("p2", String.class));
     }
@@ -104,7 +103,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         try
         {
-            scope.addAllUnique(Arrays.asList(new Property("child only", "")));
+            scope.addAllUnique(Arrays.asList(new GenericReference<String>("child only", "")));
             fail();
         }
         catch (IllegalArgumentException e)
@@ -116,11 +115,11 @@ public class PulseScopeTest extends PulseTestCase
     public void testGetReferences()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new Property("parent", "pv"));
-        parent.add(new Property("both", "bv"));
+        parent.add(new GenericReference<String>("parent", "pv"));
+        parent.add(new GenericReference<String>("both", "bv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new Property("child", "cv"));
-        child.add(new Property("both", "bv"));
+        child.add(new GenericReference<String>("child", "cv"));
+        child.add(new GenericReference<String>("both", "bv"));
 
         Collection<Reference> references = child.getReferences();
         assertEquals(3, references.size());
@@ -137,7 +136,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope scope = new PulseScope();
         scope.add(new GenericReference<Long>("long", 1L));
-        scope.add(new Property("string", "s"));
+        scope.add(new GenericReference<String>("string", "s"));
 
         Collection<Reference> references = scope.getReferences(String.class);
         assertEquals(1, references.size());
@@ -148,10 +147,10 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope parent = new PulseScope();
         parent.add(new GenericReference<Long>("long then string", 1L));
-        parent.add(new Property("string then long", "s"));
+        parent.add(new GenericReference<String>("string then long", "s"));
 
         PulseScope child = new PulseScope(parent);
-        parent.add(new Property("long then string", "s"));
+        parent.add(new GenericReference<String>("long then string", "s"));
         parent.add(new GenericReference<Long>("string then long", 1L));
         
         Collection<Reference> references = child.getReferences(String.class);
@@ -432,7 +431,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope s = new PulseScope();
         s.add(new ResourceProperty("myvar", "this ${ is invalid", false, true, true));
-        assertEquals("this ${ is invalid", s.getReference("myvar").getValue());        
+        assertEquals("this ${ is invalid", s.getReference("myvar").getValue());
     }
 
     public void testGetReferencesIncludesParents()
@@ -452,13 +451,13 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopy()
     {
         PulseScope original = new PulseScope();
-        original.add(new Property("foo", "bar"));
+        original.add(new GenericReference<String>("foo", "bar"));
 
         PulseScope copy = original.copy();
         assertEquals("bar", original.getReferenceValue("foo", String.class));
         assertEquals("bar", copy.getReferenceValue("foo", String.class));
         
-        original.add(new Property("foo", "baz"));
+        original.add(new GenericReference<String>("foo", "baz"));
         assertEquals("baz", original.getReferenceValue("foo", String.class));
         assertEquals("bar", copy.getReferenceValue("foo", String.class));
     }
@@ -466,7 +465,7 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyWithParent()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new Property("foo", "bar"));
+        parent.add(new GenericReference<String>("foo", "bar"));
         PulseScope original = new PulseScope(parent);
 
         PulseScope copy = original.copy();
@@ -474,7 +473,7 @@ public class PulseScopeTest extends PulseTestCase
         assertEquals("bar", original.getReferenceValue("foo", String.class));
         assertEquals("bar", copy.getReferenceValue("foo", String.class));
 
-        parent.add(new Property("foo", "baz"));
+        parent.add(new GenericReference<String>("foo", "baz"));
         assertEquals("baz", parent.getReferenceValue("foo", String.class));
         assertEquals("baz", original.getReferenceValue("foo", String.class));
         assertEquals("bar", copy.getReferenceValue("foo", String.class));
@@ -490,9 +489,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyTo()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new Property("pp", "pv"));
+        parent.add(new GenericReference<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new Property("cp", "cv"));
+        child.add(new GenericReference<String>("cp", "cv"));
 
         PulseScope copy = child.copyTo(parent);
         assertNull(copy.getParent());
@@ -504,9 +503,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyToNull()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new Property("pp", "pv"));
+        parent.add(new GenericReference<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new Property("cp", "cv"));
+        child.add(new GenericReference<String>("cp", "cv"));
 
         assertFullCopy(child.copyTo(null));
     }
@@ -514,9 +513,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyToScopeNotInChain()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new Property("pp", "pv"));
+        parent.add(new GenericReference<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new Property("cp", "cv"));
+        child.add(new GenericReference<String>("cp", "cv"));
 
         assertFullCopy(child.copyTo(new PulseScope()));
     }
@@ -524,9 +523,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyToSelf()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new Property("pp", "pv"));
+        parent.add(new GenericReference<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new Property("cp", "cv"));
+        child.add(new GenericReference<String>("cp", "cv"));
 
         assertFullCopy(child.copyTo(child));
     }

@@ -7,15 +7,16 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.security.AcegiUtils;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.wizard.AbstractChainableState;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.WizardTransition;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfigurationSupport;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.type.*;
@@ -50,8 +51,8 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         adminConfigType = typeRegistry.getType(AdminUserConfiguration.class);
         serverConfigType = typeRegistry.getType(ServerSettingsConfiguration.class);
 
-        List<AbstractChainableState> states = addWizardStates(null, ConfigurationRegistry.SETUP_SCOPE, adminConfigType, null);
-        states = addWizardStates(states, ConfigurationRegistry.SETUP_SCOPE, serverConfigType, null);
+        List<AbstractChainableState> states = addWizardStates(null, MasterConfigurationRegistry.SETUP_SCOPE, adminConfigType, null);
+        states = addWizardStates(states, MasterConfigurationRegistry.SETUP_SCOPE, serverConfigType, null);
 
         // a bit of custom initialisation
         SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
@@ -127,35 +128,35 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             adminUser.setName(adminConfig.getName());
             adminUser.setPassword(new Md5PasswordEncoder().encodePassword(adminConfig.getPassword(), null));
             adminUser.addDirectAuthority(ServerPermission.ADMINISTER.toString());
-            configurationTemplateManager.insert(ConfigurationRegistry.USERS_SCOPE, adminUser);
+            configurationTemplateManager.insert(MasterConfigurationRegistry.USERS_SCOPE, adminUser);
 
             // Special all-users group.
             BuiltinGroupConfiguration allUsersGroup = new BuiltinGroupConfiguration(UserManager.ALL_USERS_GROUP_NAME, GrantedAuthority.USER);
             allUsersGroup.setPermanent(true);
-            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, allUsersGroup);
+            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, allUsersGroup);
 
             // Special anonymous users group.
             BuiltinGroupConfiguration anonymousUsersGroup = new BuiltinGroupConfiguration(UserManager.ANONYMOUS_USERS_GROUP_NAME, GrantedAuthority.GUEST);
             anonymousUsersGroup.setPermanent(true);
-            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, anonymousUsersGroup);
+            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, anonymousUsersGroup);
             
             // create an administrators group (for convenience)
             GroupConfiguration adminGroup = new GroupConfiguration(UserManager.ADMINS_GROUP_NAME);
             adminGroup.addServerPermission(ServerPermission.ADMINISTER);
             adminGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
-            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, adminGroup);
+            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, adminGroup);
 
             // and a project admins group that has admin access to all projects
             GroupConfiguration projectAdmins = new GroupConfiguration(UserManager.PROJECT_ADMINS_GROUP_NAME);
             projectAdmins.addServerPermission(ServerPermission.PERSONAL_BUILD);
             projectAdmins.addServerPermission(ServerPermission.CREATE_PROJECT);
             projectAdmins.addServerPermission(ServerPermission.DELETE_PROJECT);
-            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, projectAdmins);
+            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, projectAdmins);
 
             // and a developers group that has personal build access (for convenience)
             GroupConfiguration developersGroup = new GroupConfiguration(UserManager.DEVELOPERS_GROUP_NAME);
             developersGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
-            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, developersGroup);
+            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, developersGroup);
 
             // apply the settings
             MutableRecord record = configurationTemplateManager.getRecord(GlobalConfiguration.SCOPE_NAME).copy(false);

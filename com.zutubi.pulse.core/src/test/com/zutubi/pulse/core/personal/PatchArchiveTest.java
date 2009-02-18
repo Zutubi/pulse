@@ -8,6 +8,8 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.commands.api.TestCommandContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -78,10 +80,10 @@ public class PatchArchiveTest extends PulseTestCase
         WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
         status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.MODIFIED, false));
 
-        CommandResult commandResult = createAndApplyPatch(status);
+        TestCommandContext context = createAndApplyPatch(status);
         
         assertEquals(EDITED_CONTENT, IOUtils.fileToString(targetTestFile));
-        assertEquals(0, commandResult.getFeatures().size());
+        assertEquals(0, context.getFeatures().size());
     }
 
     public void testApplyDelete() throws IOException, PulseException
@@ -91,10 +93,10 @@ public class PatchArchiveTest extends PulseTestCase
         WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
         status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.DELETED, false));
 
-        CommandResult commandResult = createAndApplyPatch(status);
+        TestCommandContext context = createAndApplyPatch(status);
 
         assertFalse(targetTestFile.exists());
-        assertEquals(0, commandResult.getFeatures().size());
+        assertEquals(0, context.getFeatures().size());
     }
 
     public void testApplyNestedDeletes() throws IOException, PulseException
@@ -108,11 +110,11 @@ public class PatchArchiveTest extends PulseTestCase
         status.addFileStatus(new FileStatus("nested", FileStatus.State.DELETED, false));
         status.addFileStatus(new FileStatus("nested/f", FileStatus.State.DELETED, false));
 
-        CommandResult commandResult = createAndApplyPatch(status);
+        TestCommandContext context = createAndApplyPatch(status);
 
         assertFalse(nestedTargetDir.exists());
         assertFalse(nestedTargetFile.exists());
-        assertEquals(0, commandResult.getFeatures().size());
+        assertEquals(0, context.getFeatures().size());
     }
 
     public void testModificationToNonExistantTarget() throws IOException, PulseException
@@ -125,18 +127,18 @@ public class PatchArchiveTest extends PulseTestCase
         WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
         status.addFileStatus(new FileStatus(MISSING_FILE_NAME, FileStatus.State.MODIFIED, false));
 
-        CommandResult commandResult = createAndApplyPatch(status);
+        TestCommandContext context = createAndApplyPatch(status);
 
-        assertEquals(1, commandResult.getFeatures().size());
-        assertThat(commandResult.getFeatures().get(0).getSummary(), containsString("Target file 'notintarget' with status MODIFIED in patch does not exist"));
+        assertEquals(1, context.getFeatures().size());
+        assertThat(context.getFeatures().get(0).getSummary(), containsString("Target file 'notintarget' with status MODIFIED in patch does not exist"));
     }
 
-    private CommandResult createAndApplyPatch(WorkingCopyStatus status) throws PulseException
+    private TestCommandContext createAndApplyPatch(WorkingCopyStatus status) throws PulseException
     {
         PatchArchive archive = new PatchArchive(new Revision("1"), status, archiveFile, null);
-        CommandResult commandResult = new CommandResult("test");
-        archive.apply(targetDir, EOLStyle.BINARY, commandResult);
-        return commandResult;
+        TestCommandContext context = new TestCommandContext(new PulseExecutionContext());
+        archive.apply(targetDir, EOLStyle.BINARY, context);
+        return context;
     }
 
 }

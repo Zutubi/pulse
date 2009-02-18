@@ -12,6 +12,8 @@ import com.zutubi.tove.config.ConfigurationValidatorProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.util.AnnotationUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -20,6 +22,7 @@ import com.zutubi.validation.Validator;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.validators.RequiredValidator;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -43,6 +46,7 @@ public class FormDescriptorFactory
     static
     {
         defaultFieldTypeMapping.put(String.class, "text");
+        defaultFieldTypeMapping.put(File.class, "text");
         defaultFieldTypeMapping.put(Boolean.class, "checkbox");
         defaultFieldTypeMapping.put(Boolean.TYPE, "checkbox");
         defaultFieldTypeMapping.put(Integer.class, "text");
@@ -85,7 +89,21 @@ public class FormDescriptorFactory
         descriptor.setId(type.getClazz().getName());
 
         // Process the annotations at apply to the type / form.
-        List<Annotation> annotations = type.getAnnotations(false);
+        List<Annotation> annotations = type.getAnnotations(true);
+
+        // We accept inherited annotations, but only process the most locally-
+        // declared of each type.
+        final Set<Class> seenTypes = new HashSet<Class>();
+        annotations = CollectionUtils.filter(annotations, new Predicate<Annotation>()
+        {
+            public boolean satisfied(Annotation annotation)
+            {
+                boolean satisfied = !seenTypes.contains(annotation.getClass());
+                seenTypes.add(annotation.getClass());
+                return satisfied;
+            }
+        });
+
         handleAnnotations(type, descriptor, annotations);
 
         descriptor.setFieldDescriptors(buildFieldDescriptors(parentPath, baseName, type, concrete, descriptor));

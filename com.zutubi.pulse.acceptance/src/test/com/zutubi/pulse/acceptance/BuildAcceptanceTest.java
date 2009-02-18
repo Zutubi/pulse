@@ -12,10 +12,11 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
@@ -60,12 +61,12 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
 
-        Vector<String> agents = xmlRpcHelper.getConfigListing(ConfigurationRegistry.AGENTS_SCOPE);
+        Vector<String> agents = xmlRpcHelper.getConfigListing(MasterConfigurationRegistry.AGENTS_SCOPE);
         for (String agent : agents)
         {
             if (!agent.equals(AgentManager.GLOBAL_AGENT_NAME) && !agent.equals(AgentManager.MASTER_AGENT_NAME))
             {
-                xmlRpcHelper.deleteConfig(PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, agent));
+                xmlRpcHelper.deleteConfig(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
             }
         }
     }
@@ -137,6 +138,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         String changelistLink = FISHEYE_BASE + "/changelog/" + FISHEYE_PROJECT + "/?cs=" + revisionString;
 
+        loginAsAdmin();
         BuildChangesPage changesPage = new BuildChangesPage(selenium, urls, random, buildNumber);
         changesPage.goTo();
         SeleniumUtils.assertLinkToPresent(selenium, changelistLink);
@@ -264,7 +266,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         String projectName = random + "-project";
         ensureProject(projectName);
-        xmlRpcHelper.insertConfig(getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
+        xmlRpcHelper.insertConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         loginAsAdmin();
         triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
@@ -278,7 +280,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(resourcePath, "properties"), xmlRpcHelper.createProperty("rp", "rv", false, false, false));
 
         String projectName = random + "-project";
-        String projectPath = getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName);
+        String projectPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName);
         ensureProject(projectName);
         xmlRpcHelper.insertConfig(getPath(projectPath, "requirements"), createRequiredResource(resourceName, null));
         xmlRpcHelper.insertConfig(getPath(projectPath, "properties"), xmlRpcHelper.createProperty("pp", "ref ${rp}", true, true, false));
@@ -298,7 +300,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         String projectName = random + "-project";
         ensureProject(projectName);
-        xmlRpcHelper.insertConfig(getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
+        xmlRpcHelper.insertConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         loginAsAdmin();
         triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
@@ -309,9 +311,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         String projectName = random + "-project";
         ensureProject(projectName);
-        String stagePath = getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "stages", "default");
+        String stagePath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "stages", "default");
         Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
-        defaultStage.put("agent", getPath(ConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
+        defaultStage.put("agent", getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
         xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
         xmlRpcHelper.insertProjectProperty(projectName, "pp", "ref ${agent}", true, true, false);
 
@@ -328,7 +330,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         String projectName = random + "-project";
         ensureProject(projectName);
-        xmlRpcHelper.insertConfig(getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
+        xmlRpcHelper.insertConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         loginAsAdmin();
         triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
@@ -339,9 +341,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         String projectName = random + "-project";
         ensureProject(projectName);
-        String stagePath = getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "stages", "default");
+        String stagePath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "stages", "default");
         Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
-        defaultStage.put("agent", getPath(ConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
+        defaultStage.put("agent", getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
         xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
         String suppressedName = "PULSE_TEST_SUPPRESSED";
         String suppressedValue = random + "-suppress";
@@ -356,7 +358,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testScmPropertiesAvailableInPulseFile() throws Exception
     {
-        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.customTypeConfig");
+        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig(CustomTypeConfiguration.class);
         type.put("pulseFileString", "<?xml version=\"1.0\"?>\n" +
                 "<project default-recipe=\"default\"><recipe name=\"default\"><print name=\"mess\" message=\"${svn.url}\"/></recipe></project>");
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), type);
@@ -492,12 +494,12 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private String getPropertiesPath(String projectName)
     {
-        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "properties");
+        return PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "properties");
     }
 
     private String getOptionsPath(String projectName)
     {
-        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "options");
+        return PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "options");
     }
 
     private void assertEnvironment(String projectName, int buildId, String... envs)
@@ -527,7 +529,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         Hashtable<String, Object> resource = xmlRpcHelper.createDefaultConfig(ResourceConfiguration.class);
         resource.put("name", name);
-        return xmlRpcHelper.insertConfig(getPath(ConfigurationRegistry.AGENTS_SCOPE, agent, "resources"), resource);
+        return xmlRpcHelper.insertConfig(getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent, "resources"), resource);
     }
 
     private Hashtable<String, Object> createRequiredResource(String resource, String version) throws Exception

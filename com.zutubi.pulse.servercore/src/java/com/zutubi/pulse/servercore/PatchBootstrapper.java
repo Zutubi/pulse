@@ -2,6 +2,7 @@ package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -36,15 +37,16 @@ public class PatchBootstrapper implements Bootstrapper
         this.localEOL = localEOL;
     }
 
-    public void bootstrap(PulseExecutionContext context, CommandResult result) throws BuildException
+    public void bootstrap(CommandContext commandContext) throws BuildException
     {
-        delegate.bootstrap(context, result);
+        delegate.bootstrap(commandContext);
         try
         {
+            ExecutionContext context = commandContext.getExecutionContext();
             FileRepository fileRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, FileRepository.class);
             PatchArchive patch = new PatchArchive(fileRepository.getPatchFile(userId, number));
             // apply a patch prefix to the if one is specified. Used to work around a cvs issue.
-            patch.apply(getBaseBuildDir(context), localEOL, result);
+            patch.apply(getBaseBuildDir(context), localEOL, commandContext);
         }
         catch(PulseException e)
         {

@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.ProjectAclForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Vector;
@@ -29,7 +29,7 @@ public class ProjectPermissionsAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialUser(random);
 
-        String permissionsPath = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME, "permissions");
+        String permissionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME, "permissions");
         Vector<String> permissions = xmlRpcHelper.getConfigListing(permissionsPath);
 
         login(random, "");

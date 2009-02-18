@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.BuildArtifactsPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
+import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
 
 import java.util.Hashtable;
@@ -14,13 +15,14 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 {
     private static final int BUILD_TIMEOUT = 90000;
 
-    public void testMavenDefaultTestArtifactConfiguration() throws Exception
+    public void testMavenDefaultTestCaptureConfiguration() throws Exception
     {
         createMavenProject();
 
         // We expect a artifact called surefire-reports to be configured.
-        Hashtable<String, Object> artifact = getArtifactConfiguration(random, "test reports");
-        assertArtifactConfiguration(artifact, "test reports", "target/test-reports", "TEXT-*.xml", "junit");
+        Hashtable<String, Object> capture = getCaptureConfiguration(random, "test reports");
+        assertNotNull(capture);
+        assertCaptureConfiguration(capture, "test reports", "target/test-reports", "TEXT-*.xml", "junit");
     }
 
     public void testMaven2DefaultTestArtifactConfiguration() throws Exception
@@ -28,8 +30,9 @@ public class MavenAcceptanceTest extends SeleniumTestBase
         createMaven2Project();
 
         // We expect a artifact called surefire-reports to be configured.
-        Hashtable<String, Object> artifact = getArtifactConfiguration(random, "test reports");
-        assertArtifactConfiguration(artifact, "test reports", "target/surefire-reports", "TEXT-*.xml", "junit");
+        Hashtable<String, Object> capture = getCaptureConfiguration(random, "test reports");
+        assertNotNull(capture);
+        assertCaptureConfiguration(capture, "test reports", "target/surefire-reports", "TEXT-*.xml", "junit");
     }
 
     public void testMaven2BuildPicksUpTests() throws Exception
@@ -52,39 +55,40 @@ public class MavenAcceptanceTest extends SeleniumTestBase
     }
 
     @SuppressWarnings({ "unchecked" })
-    private void assertArtifactConfiguration(Hashtable<String, Object> artifact, String expectedName, String expectedBase, String expectedIncludes, String... expectedPostProcessors)
+    private void assertCaptureConfiguration(Hashtable<String, Object> capture, String expectedName, String expectedBase, String expectedIncludes, String... expectedPostProcessors)
     {
-        Vector<String> postprocessors = (Vector<String>) artifact.get(Constants.DirectoryArtifact.POSTPROCESSORS);
+        Vector<String> postprocessors = (Vector<String>) capture.get(Constants.DirectoryOutput.POSTPROCESSORS);
         assertEquals(expectedPostProcessors.length, postprocessors.size());
         for (int i = 0; i < expectedPostProcessors.length; i++)
         {
             assertEquals(expectedPostProcessors[i], postprocessors.get(i));
         }
-        assertEquals(expectedName, artifact.get(Constants.DirectoryArtifact.NAME));
-        assertEquals(expectedBase, artifact.get(Constants.DirectoryArtifact.BASE));
-        assertEquals(expectedIncludes, artifact.get(Constants.DirectoryArtifact.INCLUDES));
+        assertEquals(expectedName, capture.get(Constants.DirectoryOutput.NAME));
+        assertEquals(expectedBase, capture.get(Constants.DirectoryOutput.BASE));
+        assertEquals(expectedIncludes, capture.get(Constants.DirectoryOutput.INCLUSIONS));
     }
 
     private void createMavenProject() throws Exception
     {
-        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.mavenTypeConfig");
-        type.put("targets", "install");
+        // FIXME loader
+        Hashtable<String, Object> command = xmlRpcHelper.createEmptyConfig("zutubi.mavenCommandConfig");
+        command.put("targets", "install");
 
-        createMavenProject(type);
+        createMavenProject(command);
     }
 
     private void createMaven2Project() throws Exception
     {
-        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig("zutubi.maven2TypeConfig");
-        type.put("goals", "install");
+        Hashtable<String, Object> command = xmlRpcHelper.createEmptyConfig(Maven2CommandConfiguration.class);
+        command.put("goals", "install");
 
-        createMavenProject(type);
+        createMavenProject(command);
     }
 
-    private void createMavenProject(Hashtable<String, Object> type) throws Exception
+    private void createMavenProject(Hashtable<String, Object> command) throws Exception
     {
         xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TEST_MAVEN_REPOSITORY), type);
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TEST_MAVEN_REPOSITORY), command);
         xmlRpcHelper.logout();
     }
 
@@ -101,12 +105,12 @@ public class MavenAcceptanceTest extends SeleniumTestBase
         }
     }
 
-    private Hashtable<String, Object> getArtifactConfiguration(String projectName, String artifactName) throws Exception
+    private Hashtable<String, Object> getCaptureConfiguration(String projectName, String artifactName) throws Exception
     {
         try
         {
             xmlRpcHelper.loginAsAdmin();
-            return xmlRpcHelper.getProjectArtifact(projectName, artifactName);
+            return xmlRpcHelper.getProjectCapture(projectName, artifactName);
         }
         finally
         {

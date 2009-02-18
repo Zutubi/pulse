@@ -4,29 +4,25 @@
     #parse("pulse-file/prologue.vm")
 
     <recipe name="make build">
-        <command name="build">
-            <make
+        <make name="build"
 #if($arguments)
-                    args="$arguments"
+              args="$arguments"
 #end
 #if($workingDir)
-                    working-dir="${base.dir}/$workingDir"
+              working-dir="${base.dir}/$workingDir"
 #end
 #if($makefile)
-                    makefile="$makefile"
+              makefile="$makefile"
 #end
 #if($targets)
-                    targets="$targets"
+              targets="$targets"
 #end
-                    >
+        >
 #foreach($key in $environment.keySet())
-                <environment name="$key" value="$environment.get($key)"/>
+            <environment name="$key" value="$environment.get($key)"/>
 #end
-                #parse("pulse-file/output.processors.vm")
-            </make>
-
+            #parse("pulse-file/output.processors.vm")
             #parse("pulse-file/artifacts.vm")
-
-        </command>
+        </make>
     </recipe>
 </project>

@@ -1,59 +1,47 @@
 package com.zutubi.pulse.core.commands.maven;
 
-import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.MavenUtils;
-import com.zutubi.pulse.core.ProcessArtifact;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.commands.core.ExecutableCommand;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.util.SystemUtils;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
+import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 /**
+ * Support for running Maven 1 - adds automatic version capturing.
  */
-public class MavenCommand extends ExecutableCommand
+public class MavenCommand extends NamedArgumentCommand
 {
-    private String targets;
-
-    public MavenCommand()
+    public MavenCommand(MavenCommandConfiguration configuration)
     {
-        super("maven.bin", SystemUtils.IS_WINDOWS ? "maven.bat" : "maven");
+        super(configuration);
     }
 
-    public void execute(ExecutionContext context, CommandResult cmdResult)
+    @Override
+    protected List<Class<? extends PostProcessorConfiguration>> getDefaultPostProcessorTypes()
     {
-        if (targets != null)
-        {
-            addArguments(targets.split(" +"));
-            cmdResult.getProperties().put("targets", targets);
-        }
+        return Arrays.<Class<? extends PostProcessorConfiguration>>asList(MavenPostProcessorConfiguration.class);
+    }
 
-        ProcessArtifact pa = createProcess();
-        pa.setProcessor(new MavenPostProcessor("maven.pp"));
-
-        super.execute(context, cmdResult);
+    @Override
+    public void execute(CommandContext commandContext)
+    {
+        super.execute(commandContext);
 
         try
         {
-            //TODO: use the context's variables to transfer this maven specific information around. 
-            PulseExecutionContext pec = (PulseExecutionContext) context;
-            pec.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(context.getWorkingDir()), "maven.xml"), "currentVersion"));
+            //TODO: use the context's variables to transfer this maven specific information around.
+            PulseExecutionContext pec = (PulseExecutionContext) commandContext.getExecutionContext();
+            pec.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(pec.getWorkingDir()), "maven.xml"), "currentVersion"));
         }
         catch (PulseException e)
         {
-            cmdResult.warning(e.getMessage());
+            commandContext.addFeature(new Feature(Feature.Level.WARNING, e.getMessage()));
         }
-    }
-
-    public String getTargets()
-    {
-        return targets;
-    }
-
-    public void setTargets(String targets)
-    {
-        this.targets = targets;
     }
 }

@@ -1,15 +1,22 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
+import com.zutubi.pulse.master.tove.wizard.*;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.type.CollectionType;
-import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.Type;
+import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.util.TextUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -20,24 +27,113 @@ import java.util.Map;
  */
 public class ProjectConfigurationWizard extends AbstractTypeWizard
 {
+    private static final Logger LOG = Logger.getLogger(ProjectConfigurationWizard.class);
+
     public static final String DEFAULT_STAGE = "default";
+    private static final String DEFAULT_RECIPE = "default";
 
     private CompositeType projectType;
     private CompositeType scmType;
     private CompositeType typeType;
+    private CompositeType typeSelectType;
+    private CompositeType commandType;
 
     private ConfigurationProvider configurationProvider;
+
+    public class ProjectTypeSelectState extends SingleStepWizardState
+    {
+        public ProjectTypeSelectState(AbstractTypeWizard wizard, String parentPath, CompositeType baseType, CompositeType type, TemplateRecord templateRecord)
+        {
+            super(wizard, wizard.getNextUniqueId(), parentPath, baseType, type, templateRecord);
+        }
+
+        @Override
+        public TypeWizardState getNextState()
+        {
+            MutableRecord record = getDataRecord();
+            try
+            {
+                SimpleInstantiator instantiator = new SimpleInstantiator(null, null, configurationTemplateManager);
+                ProjectTypeSelectionConfiguration config = (ProjectTypeSelectionConfiguration) instantiator.instantiate(typeSelectType, record);
+                String primaryType = config.getPrimaryType();
+                if (primaryType.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))
+                {
+                    String commandSymbolicName = config.getCommandType();
+                    if (TextUtils.stringSet(commandSymbolicName))
+                    {
+                        CompositeType selectedCommandType = typeRegistry.getType(commandSymbolicName);
+                        return new SingleStepWizardState(ProjectConfigurationWizard.this, wizard.getNextUniqueId(), null, commandType, selectedCommandType, null);
+                    }
+                    else
+                    {
+                        return new UnknownTypeState(wizard.getNextUniqueId(), typeType);
+                    }
+                }
+                else
+                {
+                    CompositeType selectedTypeType = typeRegistry.getType(ProjectTypeSelectionConfiguration.TYPE_MAPPING.get(primaryType));
+                    return new SingleStepWizardState(ProjectConfigurationWizard.this, wizard.getNextUniqueId(), null, typeType, selectedTypeType, null);
+                }
+            }
+            catch (TypeException e)
+            {
+                LOG.severe(e);
+                return null;
+            }
+        }
+    }
 
     public void initialise()
     {
         projectType = typeRegistry.getType(ProjectConfiguration.class);
-
-        scmType = (CompositeType) projectType.getProperty("scm").getType();
-        typeType = (CompositeType) projectType.getProperty("type").getType();
+        scmType = typeRegistry.getType(ScmConfiguration.class);
+        typeType = typeRegistry.getType(TypeConfiguration.class);
+        typeSelectType = typeRegistry.getType(ProjectTypeSelectionConfiguration.class);
+        commandType = typeRegistry.getType(CommandConfiguration.class);
 
         List<AbstractChainableState> states = addWizardStates(null, parentPath, projectType, templateParentRecord);
         states = addWizardStates(states, null, scmType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("scm")));
-        addWizardStates(states, null, typeType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("type")));
+
+        ProjectConfiguration templateParent = templateParentPath == null ? null : configurationProvider.get(templateParentPath, ProjectConfiguration.class);
+        if (templateParent != null && templateParent.getType() != null)
+        {
+            TypeConfiguration configuredType = templateParent.getType();
+            TemplateRecord commandTemplate = getSingleCommandTemplate(configuredType);
+            if (commandTemplate == null)
+            {
+                addWizardStates(states, null, typeType, (TemplateRecord) templateParentRecord.get("type"));
+            }
+            else
+            {
+                addWizardStates(states, null, commandType, commandTemplate);
+            }
+        }
+        else
+        {
+            ProjectTypeSelectState typeSelectState = new ProjectTypeSelectState(this, MasterConfigurationRegistry.TRANSIENT_SCOPE, typeSelectType, typeSelectType, null);
+            SpringComponentContext.autowire(typeSelectState);
+            addWizardState(states, typeSelectState);
+        }
+
+    }
+
+    private TemplateRecord getSingleCommandTemplate(TypeConfiguration configuredType)
+    {
+        if (configuredType instanceof MultiRecipeTypeConfiguration)
+        {
+            MultiRecipeTypeConfiguration multiRecipe = (MultiRecipeTypeConfiguration) configuredType;
+            if (multiRecipe.getRecipes().size() == 1)
+            {
+                RecipeConfiguration recipe = multiRecipe.getRecipes().values().iterator().next();
+                if (recipe.getCommands().size() == 1)
+                {
+                    CommandConfiguration command = recipe.getCommands().values().iterator().next();
+                    return (TemplateRecord) configurationTemplateManager.getRecord(command.getConfigurationPath());
+                }
+            }
+        }
+
+        return null;
     }
 
     public void doFinish()
@@ -47,7 +143,31 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         MutableRecord record = projectType.createNewRecord(false);
         record.update(getCompletedStateForType(projectType).getDataRecord());
         record.put("scm", getCompletedStateForType(scmType).getDataRecord());
-        record.put("type", getCompletedStateForType(typeType).getDataRecord());
+
+        TypeWizardState typeState = getCompletedStateForType(typeType);
+        MutableRecord typeRecord;
+        if (typeState == null)
+        {
+            TypeWizardState commandState = getCompletedStateForType(commandType);
+            typeRecord = typeRegistry.getType(MultiRecipeTypeConfiguration.class).createNewRecord(true);
+            typeRecord.put("defaultRecipe", DEFAULT_RECIPE);
+
+            MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
+            recipeRecord.put("name", DEFAULT_RECIPE);
+            MutableRecord commandsRecord = (MutableRecord) recipeRecord.get("commands");
+            Record commandRenderRecord = commandState.getRenderRecord();
+            MutableRecord commandRecord = commandState.getDataRecord();
+            commandsRecord.put((String) commandRenderRecord.get("name"), commandRecord);
+
+            MutableRecord recipesRecord = (MutableRecord) typeRecord.get("recipes");
+            recipesRecord.put(DEFAULT_RECIPE, recipeRecord);
+        }
+        else
+        {
+            typeRecord = typeState.getDataRecord();
+        }
+        
+        record.put("type", typeRecord);
 
         ProjectConfiguration templateParentProject = configurationProvider.get(templateParentPath, ProjectConfiguration.class);
         if(templateParentProject.getStages().size() == 0)
@@ -80,7 +200,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             configurationTemplateManager.markAsTemplate(record);
         }
         
-        successPath = configurationTemplateManager.insertRecord(ConfigurationRegistry.PROJECTS_SCOPE, record);
+        successPath = configurationTemplateManager.insertRecord(MasterConfigurationRegistry.PROJECTS_SCOPE, record);
     }
 
     private boolean hasScmTrigger(ProjectConfiguration templateParentProject)

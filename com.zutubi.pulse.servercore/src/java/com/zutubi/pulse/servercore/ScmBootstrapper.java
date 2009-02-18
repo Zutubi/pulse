@@ -3,13 +3,12 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.pulse.core.BootstrapCommand;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.util.io.ForkOutputStream;
@@ -38,10 +37,11 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
         this.revision = revision;
     }
 
-    public void bootstrap(PulseExecutionContext context, CommandResult result)
+    public void bootstrap(CommandContext commandContext)
     {
+        ExecutionContext context = commandContext.getExecutionContext();
         File outDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
-        if (!outDir.mkdirs())
+        if (!outDir.isDirectory() && !outDir.mkdirs())
         {
             throw new BuildException("Failed to create output directory: " + outDir);
         }

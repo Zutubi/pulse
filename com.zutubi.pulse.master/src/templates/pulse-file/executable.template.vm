@@ -4,26 +4,23 @@
     #parse("pulse-file/prologue.vm")
 
     <recipe name="executable build">
-        <command name="build">
-            <executable
+        <executable name="build"
 #if($executable)
-                    exe="$executable"
+                exe="$executable"
 #end
 #if($arguments)
-                    args="$arguments"
+                args="$arguments"
 #end
 #if($workingDir)
-                    working-dir="${base.dir}/$workingDir"
+                working-dir="${base.dir}/$workingDir"
 #end
-                    >
+                >
 #foreach($key in $environment.keySet())
-                <environment name="$key" value="$environment.get($key)"/>
+            <environment name="$key" value="$environment.get($key)"/>
 #end
-                #parse("pulse-file/output.processors.vm")
-            </executable>
+            #parse("pulse-file/output.processors.vm")
 
             #parse("pulse-file/artifacts.vm")
-
-        </command>
+        </executable>
     </recipe>
 </project>

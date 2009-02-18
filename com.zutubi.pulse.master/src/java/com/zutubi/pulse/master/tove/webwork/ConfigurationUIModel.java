@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
@@ -36,7 +36,7 @@ public class ConfigurationUIModel
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationProvider configurationProvider;
-    private ConfigurationRegistry configurationRegistry;
+    private MasterConfigurationRegistry configurationRegistry;
     private ActionManager actionManager;
     private StateDisplayManager stateDisplayManager;
     private SystemPaths systemPaths;
@@ -356,7 +356,7 @@ public class ConfigurationUIModel
         this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
-    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
+    public void setConfigurationRegistry(MasterConfigurationRegistry configurationRegistry)
     {
         this.configurationRegistry = configurationRegistry;
     }

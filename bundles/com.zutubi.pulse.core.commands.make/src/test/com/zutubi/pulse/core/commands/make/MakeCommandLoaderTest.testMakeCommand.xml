@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<project>
-    <recipe name="wow">
-        <make name="test"/>
-        <make name="test" exe="mymake"/>
-        <make name="test" targets="build test"/>
-        <make name="test" makefile="mymakefile"/>
-    </recipe>
-</project>

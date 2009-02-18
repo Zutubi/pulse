@@ -1,11 +1,13 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.RegexPattern;
+import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.LineBasedPostProcessorSupport;
+import com.zutubi.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -15,23 +17,22 @@ import java.util.regex.Pattern;
  */
 public class RegexPostProcessor extends LineBasedPostProcessorSupport
 {
-    private List<RegexPattern> patterns = new LinkedList<RegexPattern>();
-
-    public RegexPostProcessor()
+    public RegexPostProcessor(RegexPostProcessorConfiguration config)
     {
+        super(config);
     }
 
-    public RegexPostProcessor(String name)
+    public RegexPostProcessorConfiguration getConfig()
     {
-        setName(name);
+        return (RegexPostProcessorConfiguration) super.getConfig();
     }
 
     protected List<Feature> findFeatures(String line)
     {
         List<Feature> features = new LinkedList<Feature>();
-        for (RegexPattern p : patterns)
+        for (RegexPatternConfiguration p : getConfig().getPatterns())
         {
-            String summary = p.match(line);
+            String summary = match(p, line);
             if (summary != null)
             {
                 features.add(new Feature(p.getCategory(), summary));
@@ -41,41 +42,33 @@ public class RegexPostProcessor extends LineBasedPostProcessorSupport
         return features;
     }
 
-    public RegexPattern createPattern()
+    private String match(RegexPatternConfiguration patternConfiguration, String line)
     {
-        RegexPattern pattern = new RegexPattern();
-        addRegexPattern(pattern);
-        return pattern;
-    }
+        String result = null;
 
-    /* Hrm, if we call this addPattern it gets magically picked up by FileLoader */
-    public void addRegexPattern(RegexPattern pattern)
-    {
-        patterns.add(pattern);
-    }
-
-    public List<RegexPattern> getPatterns()
-    {
-        return patterns;
-    }
-
-    public void addErrorRegexs(String... errorRegexs)
-    {
-        for (String errorRegex : errorRegexs)
+        Pattern pattern = Pattern.compile(patternConfiguration.getExpression());
+        Matcher matcher = pattern.matcher(line);
+        if (matcher.find())
         {
-            RegexPattern pattern = createPattern();
-            pattern.setPattern(Pattern.compile(errorRegex));
-            pattern.setCategory(Feature.Level.ERROR);
-        }
-    }
+            for (String e : patternConfiguration.getExclusions())
+            {
+                if (Pattern.compile(e).matcher(line).find())
+                {
+                    return null;
+                }
+            }
 
-    public void addWarningRegexs(String... warningRegexs)
-    {
-        for (String warningRegex : warningRegexs)
-        {
-            RegexPattern pattern = createPattern();
-            pattern.setPattern(Pattern.compile(warningRegex));
-            pattern.setCategory(Feature.Level.WARNING);
+            String summary = patternConfiguration.getSummary();
+            if (TextUtils.stringSet(summary))
+            {
+                result = matcher.replaceAll(summary);
+            }
+            else
+            {
+                result = line;
+            }
         }
+
+        return result;
     }
 }

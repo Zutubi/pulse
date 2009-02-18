@@ -2,23 +2,23 @@ ${form.name}.items.last().on('browse', function(field)
 {
     function findProjectPath(path)
     {
+<#if field.parameters.baseName?exists>
+        var start = 'c';
+<#else>
+        var start = 'wizards/';
+</#if>
         var parentPath = getParentPath(path);
         while(parentPath != null && parentPath != 'projects')
         {
-            path = getParentPath(path);
+            path = parentPath;
             parentPath = getParentPath(path);
+            start = '';
         }
-        
-        return path;
+
+        return start + path;
     }
 
-    var projectPath;
-<#if field.parameters.baseName?exists>
-     projectPath = 'c' + findProjectPath('${field.parameters.parentPath}/${field.parameters.baseName}');
-<#else>
-     projectPath = 'wizards/${field.parameters.parentPath}';
-</#if>
-
+    var projectPath = findProjectPath('${field.parameters.parentPath}');
     var prefix = '';
 <#if field.parameters.baseDirField?exists>
     var dirField = Ext.getCmp('zfid.${field.parameters.baseDirField}')

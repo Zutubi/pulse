@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.RegexPattern;
+import com.zutubi.pulse.core.RegexPatternConfiguration;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
@@ -61,7 +61,7 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     public void tearDown()
     {
-        tempFile.delete();
+        assertTrue(tempFile.delete());
     }
 
     public void testMatchAll()
@@ -91,51 +91,51 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     public void testCustomSummary()
     {
-        RegexPostProcessor pp = new RegexPostProcessor("test-pp");
-        RegexPattern pattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile("^xxx$"));
+        RegexPostProcessorConfiguration pp = new RegexPostProcessorConfiguration("test-pp");
+        RegexPatternConfiguration pattern = new RegexPatternConfiguration(Feature.Level.ERROR, Pattern.compile("^xxx$"));
         pattern.setSummary("custom");
-        pp.addRegexPattern(pattern);
+        pp.getPatterns().add(pattern);
 
         simpleErrors(pp, "custom");
     }
 
     public void testCustomSummaryGroups()
     {
-        RegexPostProcessor pp = new RegexPostProcessor("test-pp");
-        RegexPattern pattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile("^x(x)x$"));
+        RegexPostProcessorConfiguration pp = new RegexPostProcessorConfiguration("test-pp");
+        RegexPatternConfiguration pattern = new RegexPatternConfiguration(Feature.Level.ERROR, Pattern.compile("^x(x)x$"));
         pattern.setSummary("$1");
-        pp.addRegexPattern(pattern);
+        pp.getPatterns().add(pattern);
 
         simpleErrors(pp, "x");
     }
 
     public void testExcludeAll()
     {
-        RegexPostProcessor pp = createExclusionProcessor("xxx", ".*");
+        RegexPostProcessorConfiguration pp = createExclusionProcessor("xxx", ".*");
         simpleErrors(pp);
     }
 
     public void testExcludeSame()
     {
-        RegexPostProcessor pp = createExclusionProcessor(".*xxx$", ".*xxx$");
+        RegexPostProcessorConfiguration pp = createExclusionProcessor(".*xxx$", ".*xxx$");
         simpleErrors(pp);
     }
 
     public void testExcludeSome()
     {
-        RegexPostProcessor pp = createExclusionProcessor(".*xxx$", "^xxx$");
+        RegexPostProcessorConfiguration pp = createExclusionProcessor(".*xxx$", "^xxx$");
         simpleErrors(pp, "abc xxx");
     }
 
     public void testMultipleExclusions()
     {
-        RegexPostProcessor pp = createExclusionProcessor(".*", "^xxx$", "abc");
+        RegexPostProcessorConfiguration pp = createExclusionProcessor(".*", "^xxx$", "abc");
         simpleErrors(pp, "first line", "second line");
     }
 
     public void testFailOnError()
     {
-        RegexPostProcessor pp = createPostProcessor(".*");
+        RegexPostProcessorConfiguration pp = createPostProcessor(".*");
         CommandResult result = simpleErrors(pp, LINES);
         assertTrue(result.failed());
         assertEquals("Error features detected", getFailureMessage(result));
@@ -143,7 +143,7 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     public void testNoFailOnError()
     {
-        RegexPostProcessor pp = createPostProcessor(".*");
+        RegexPostProcessorConfiguration pp = createPostProcessor(".*");
         pp.setFailOnError(false);
         CommandResult result = simpleErrors(pp, LINES);
         assertFalse(result.failed());
@@ -151,7 +151,7 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     public void testNoFailOnWarning()
     {
-        RegexPostProcessor pp = createPostProcessor(".*", Feature.Level.WARNING);
+        RegexPostProcessorConfiguration pp = createPostProcessor(".*", Feature.Level.WARNING);
         assertFalse(pp.isFailOnWarning());
         CommandResult result = simpleFeatures(pp, Feature.Level.WARNING, LINES);
         assertFalse(result.failed());
@@ -159,7 +159,7 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     public void testFailOnWarning()
     {
-        RegexPostProcessor pp = createPostProcessor(".*", Feature.Level.WARNING);
+        RegexPostProcessorConfiguration pp = createPostProcessor(".*", Feature.Level.WARNING);
         pp.setFailOnWarning(true);
         CommandResult result = simpleFeatures(pp, Feature.Level.WARNING, LINES);
         assertTrue(result.failed());
@@ -258,48 +258,52 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     public void testJoinOverlapping()
     {
-        RegexPostProcessor pp = createPostProcessor("xxx");
+        RegexPostProcessorConfiguration pp = createPostProcessor("xxx");
         pp.setTrailingContext(1);
         simpleErrors(pp, "xxx\nxxx abc\nabc xxx\nabc xxx abc");
     }
 
     public void testJoinDoubleOverlapping()
     {
-        RegexPostProcessor pp = createPostProcessor("xxx");
+        RegexPostProcessorConfiguration pp = createPostProcessor("xxx");
         pp.setTrailingContext(2);
         simpleErrors(pp, "xxx\nxxx abc\nabc xxx\nabc xxx abc");
     }
 
     public void testNotJoinAdjacent()
     {
-        RegexPostProcessor pp = createPostProcessor("xxx abc");
+        RegexPostProcessorConfiguration pp = createPostProcessor("xxx abc");
         pp.setTrailingContext(1);
         simpleErrors(pp, "xxx abc\nabc xxx", "abc xxx abc");
     }
 
     public void testJoinSeparated()
     {
-        RegexPostProcessor pp = createPostProcessor("xxx abc");
+        RegexPostProcessorConfiguration pp = createPostProcessor("xxx abc");
         pp.setTrailingContext(2);
         simpleErrors(pp, "xxx abc\nabc xxx\nabc xxx abc");
     }
 
     public void testOverlappingDifferentLevels() throws FileLoadException
     {
-        RegexPostProcessor pp = new RegexPostProcessor("test");
-        RegexPattern pattern = pp.createPattern();
+        RegexPostProcessorConfiguration ppConfig = new RegexPostProcessorConfiguration("test");
+        RegexPatternConfiguration pattern = new RegexPatternConfiguration();
         pattern.setCategory(Feature.Level.WARNING);
         pattern.setExpression("^xxx abc$");
-        pp.setTrailingContext(1);
+        ppConfig.setTrailingContext(1);
+        ppConfig.getPatterns().add(pattern);
 
-        pattern = pp.createPattern();
+        pattern = new RegexPatternConfiguration();
         pattern.setCategory(Feature.Level.ERROR);
         pattern.setExpression("^abc xxx$");
-        pp.setLeadingContext(1);
+        ppConfig.setLeadingContext(1);
+        ppConfig.getPatterns().add(pattern);
 
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
+
+        RegexPostProcessor pp = new RegexPostProcessor(ppConfig);
         pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
         List<PersistentFeature> features = artifact.getFeatures();
         assertEquals(2, features.size());
@@ -309,7 +313,7 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     public void testSmileFace() throws FileLoadException, FileNotFoundException
     {
-        RegexPostProcessor pp = createPostProcessor(":-\\)");
+        RegexPostProcessorConfiguration pp = createPostProcessor(":-\\)");
 
         writeToArtifact("first line", ":-) blah blah blah", "last line");
 
@@ -339,7 +343,7 @@ public class RegexPostProcessorTest extends PulseTestCase
 
     private void contextHelper(int leading, int trailing)
     {
-        RegexPostProcessor pp = createPostProcessor(".*");
+        RegexPostProcessorConfiguration pp = createPostProcessor(".*");
         pp.setLeadingContext(leading);
         pp.setTrailingContext(trailing);
         pp.setJoinOverlapping(false);
@@ -391,11 +395,12 @@ public class RegexPostProcessorTest extends PulseTestCase
         return result;
     }
 
-    private CommandResult simpleFeatures(RegexPostProcessor pp, Feature.Level level, String... lines)
+    private CommandResult simpleFeatures(RegexPostProcessorConfiguration config, Feature.Level level, String... lines)
     {
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
+        RegexPostProcessor pp = new RegexPostProcessor(config);
         pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
         List<PersistentFeature> features = artifact.getFeatures();
 
@@ -409,12 +414,12 @@ public class RegexPostProcessorTest extends PulseTestCase
 
         if (features.size() > 0)
         {
-            if (level == Feature.Level.ERROR && pp.isFailOnError())
+            if (level == Feature.Level.ERROR && config.isFailOnError())
             {
                 assertTrue(result.failed());
                 assertEquals("Error features detected", getFailureMessage(result));
             }
-            else if (level == Feature.Level.WARNING && pp.isFailOnWarning())
+            else if (level == Feature.Level.WARNING && config.isFailOnWarning())
             {
                 assertTrue(result.failed());
                 assertEquals("Warning features detected", getFailureMessage(result));
@@ -431,41 +436,40 @@ public class RegexPostProcessorTest extends PulseTestCase
         return feature.getSummary();
     }
 
-    private CommandResult simpleErrors(RegexPostProcessor pp, String... lines)
+    private CommandResult simpleErrors(RegexPostProcessorConfiguration pp, String... lines)
     {
         return simpleFeatures(pp, Feature.Level.ERROR, lines);
     }
 
     private void simpleErrors(String expression, String... lines)
     {
-        RegexPostProcessor pp = createPostProcessor(expression);
+        RegexPostProcessorConfiguration pp = createPostProcessor(expression);
         assertTrue(pp.isFailOnError());
         assertFalse(pp.isFailOnWarning());
         simpleErrors(pp, lines);
     }
 
-    private RegexPostProcessor createPostProcessor(String expression)
+    private RegexPostProcessorConfiguration createPostProcessor(String expression)
     {
         return createPostProcessor(expression, Feature.Level.ERROR);
     }
 
-    private RegexPostProcessor createPostProcessor(String expression, Feature.Level level)
+    private RegexPostProcessorConfiguration createPostProcessor(String expression, Feature.Level level)
     {
-        RegexPostProcessor pp = new RegexPostProcessor("test-pp");
-        RegexPattern pattern = new RegexPattern(level, Pattern.compile(expression));
-        pp.addRegexPattern(pattern);
+        RegexPostProcessorConfiguration pp = new RegexPostProcessorConfiguration("test-pp");
+        pp.addRegexes(level, expression);
         return pp;
     }
 
-    private RegexPostProcessor createExclusionProcessor(String expression, String... exclusions)
+    private RegexPostProcessorConfiguration createExclusionProcessor(String expression, String... exclusions)
     {
-        RegexPostProcessor pp = new RegexPostProcessor("test-pp");
-        RegexPattern pattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile(expression));
+        RegexPostProcessorConfiguration pp = new RegexPostProcessorConfiguration("test-pp");
+        RegexPatternConfiguration pattern = new RegexPatternConfiguration(Feature.Level.ERROR, Pattern.compile(expression));
         for (String e : exclusions)
         {
-            pattern.addExclusion(Pattern.compile(e));
+            pattern.getExclusions().add(e);
         }
-        pp.addRegexPattern(pattern);
+        pp.getPatterns().add(pattern);
 
         return pp;
     }

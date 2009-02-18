@@ -8,7 +8,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
 import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.tove.type.record.PathUtils;
 
@@ -178,6 +178,6 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
     private String getGroupPath(String group)
     {
-        return PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, group);
+        return PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, group);
     }
 }

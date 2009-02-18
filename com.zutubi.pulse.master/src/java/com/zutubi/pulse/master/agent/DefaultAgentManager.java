@@ -15,7 +15,7 @@ import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentStateManager;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
@@ -133,21 +133,21 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 globalAgent.setPermanent(true);
                 
                 // All users can view all agents by default.
-                AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalAgent.addPermission(new AgentAclConfiguration(group, AccessManager.ACTION_VIEW));
 
                 // Anonymous users can view all agents by default (but only
                 // when anonymous access is explicitly enabled).
-                group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalAgent.addPermission(new AgentAclConfiguration(group, AccessManager.ACTION_VIEW));
 
                 CompositeType agentType = typeRegistry.getType(AgentConfiguration.class);
                 MutableRecord globalTemplate = agentType.unstantiate(globalAgent);
                 configurationTemplateManager.markAsTemplate(globalTemplate);
-                configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, globalTemplate);
+                configurationTemplateManager.insertRecord(MasterConfigurationRegistry.AGENTS_SCOPE, globalTemplate);
 
                 // reload the template so that we have the handle.
-                Record persistedGlobalTemplate = configurationTemplateManager.getRecord(PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, GLOBAL_AGENT_NAME));
+                Record persistedGlobalTemplate = configurationTemplateManager.getRecord(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, GLOBAL_AGENT_NAME));
 
                 AgentConfiguration masterAgent = new AgentConfiguration();
                 masterAgent.setName(MASTER_AGENT_NAME);
@@ -155,7 +155,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
                 MutableRecord masterAgentRecord = agentType.unstantiate(masterAgent);
                 configurationTemplateManager.setParentTemplate(masterAgentRecord, persistedGlobalTemplate.getHandle());
-                configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, masterAgentRecord);
+                configurationTemplateManager.insertRecord(MasterConfigurationRegistry.AGENTS_SCOPE, masterAgentRecord);
             }
             catch (TypeException e)
             {

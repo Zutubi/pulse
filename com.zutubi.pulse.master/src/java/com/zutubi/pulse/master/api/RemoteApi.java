@@ -18,7 +18,7 @@ import com.zutubi.pulse.master.model.*;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
@@ -266,7 +266,7 @@ public class RemoteApi
                 }
             });
 
-            configurationSecurityManager.filterPaths(ConfigurationRegistry.PROJECTS_SCOPE, names, AccessManager.ACTION_VIEW);
+            configurationSecurityManager.filterPaths(MasterConfigurationRegistry.PROJECTS_SCOPE, names, AccessManager.ACTION_VIEW);
             return new Vector<String>(names);
         }
         finally

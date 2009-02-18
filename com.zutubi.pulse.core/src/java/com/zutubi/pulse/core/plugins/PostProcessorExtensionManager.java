@@ -1,7 +1,11 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.pulse.core.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.TypeException;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -19,6 +23,7 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
 
     private Map<String, PostProcessorDescriptor> info = new HashMap<String, PostProcessorDescriptor>();
     private PulseFileLoaderFactory fileLoaderFactory;
+    private ConfigurationRegistry configurationRegistry;
 
     protected String getExtensionPointId()
     {
@@ -37,21 +42,32 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
             return;
         }
 
-        if(!PostProcessor.class.isAssignableFrom(clazz))
+        if (!PostProcessorConfiguration.class.isAssignableFrom(clazz))
         {
-            LOG.severe(String.format("Ignoring post-processor '%s': class '%s' does not implement PostProcessor", name, cls));
+            LOG.severe(String.format("Ignoring post-processor '%s': class '%s' does not implement PostProcessorConfiguration", name, cls));
             return;
         }
 
+        try
+        {
+            configurationRegistry.registerConfigurationType(clazz);
+        }
+        catch (TypeException e)
+        {
+            LOG.severe("Registering post-processor '" + name + "': " + e.getMessage(), e);
+            return;
+        }
+        
         String displayName = ConfigUtils.getString(config, "display-name", name);
-        boolean defaultTemplate = ConfigUtils.getBoolean(config, "default-fragment", false);
-        PostProcessorDescriptor descriptor = new PostProcessorDescriptor(name, displayName, defaultTemplate);
+        boolean defaultTemplate = ConfigUtils.getBoolean(config, "default-processor", false);
+        PostProcessorDescriptor descriptor = new PostProcessorDescriptor(name, displayName, defaultTemplate, clazz);
 
         if (PluginManager.VERBOSE_EXTENSIONS)
         {
             System.out.printf("Adding Post-Processor: %s -> %s\n", name, cls);
         }
         info.put(name, descriptor);
+
         fileLoaderFactory.register(name, clazz);
         tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
     }
@@ -62,6 +78,24 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         {
             fileLoaderFactory.unregister((String) o);
         }
+    }
+
+    public String getDefaultProcessorName(final Class<? extends PostProcessorConfiguration> type)
+    {
+        PostProcessorDescriptor descriptor = CollectionUtils.find(info.values(), new Predicate<PostProcessorDescriptor>()
+        {
+            public boolean satisfied(PostProcessorDescriptor postProcessorDescriptor)
+            {
+                return postProcessorDescriptor.getClazz() == type;
+            }
+        });
+
+        if (descriptor == null)
+        {
+            return null;
+        }
+
+        return descriptor.getDisplayName();
     }
 
     public PostProcessorDescriptor getPostProcessor(String name)
@@ -85,5 +119,10 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
         this.fileLoaderFactory = fileLoaderFactory;
+    }
+
+    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
+    {
+        this.configurationRegistry = configurationRegistry;
     }
 }

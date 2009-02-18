@@ -11,13 +11,11 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-/**
- */
 public class BoostRegressionPostProcessorTest extends XMLTestReportPostProcessorTestBase
 {
     public BoostRegressionPostProcessorTest()
     {
-        super(new BoostRegressionPostProcessor());
+        super(new BoostRegressionPostProcessor(new BoostRegressionPostProcessorConfiguration()));
     }
 
     protected File getOutputDir() throws URISyntaxException

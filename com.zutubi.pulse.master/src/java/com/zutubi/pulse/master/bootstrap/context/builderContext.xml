@@ -101,9 +101,13 @@
 
     <bean id="recipeTerminationService" class="com.zutubi.pulse.master.agent.RecipeTerminationService" autowire="byName" init-method="init"/>
 
-    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
+    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName"/>
 
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName" init-method="init"/>
+
+    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory" autowire="byName"/>
+
+    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory" autowire="byName"/>
 
     <bean id="masterRecipeProcessor" class="com.zutubi.pulse.master.MasterRecipeProcessor" autowire="byName"/>
 

@@ -3,18 +3,18 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.GrantedAuthorityImpl;
@@ -39,7 +39,7 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
         newAttribute.addAuthority(new GrantedAuthorityImpl(GrantedAuthority.ANONYMOUS));
         if(configurationProvider.get(GlobalConfiguration.class).isAnonymousAccessEnabled())
         {
-            BuiltinGroupConfiguration group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), BuiltinGroupConfiguration.class);
+            BuiltinGroupConfiguration group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), BuiltinGroupConfiguration.class);
             if(group != null)
             {
                 for(String authority: group.getGrantedAuthorities())

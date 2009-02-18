@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<project>
-    <recipe name="wow">
-        <executable name="test" exe="foo" args="one">
-            <status-mapping code="2" status="error"/>
-        </executable>
-    </recipe>
-</project>

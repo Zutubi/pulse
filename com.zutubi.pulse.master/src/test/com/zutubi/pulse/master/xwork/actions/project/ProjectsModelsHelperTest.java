@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
@@ -77,8 +77,8 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         globalNode.addChild(createNode(p2.getName(), true));
         globalNode.addChild(createNode(p3.getName(), true));
 
-        TemplateHierarchy hierarchy = new TemplateHierarchy(ConfigurationRegistry.PROJECTS_SCOPE, globalNode);
-        stub(configurationTemplateManager.getTemplateHierarchy(ConfigurationRegistry.PROJECTS_SCOPE)).toReturn(hierarchy);
+        TemplateHierarchy hierarchy = new TemplateHierarchy(MasterConfigurationRegistry.PROJECTS_SCOPE, globalNode);
+        stub(configurationTemplateManager.getTemplateHierarchy(MasterConfigurationRegistry.PROJECTS_SCOPE)).toReturn(hierarchy);
         
         final List<Project> allProjects = Arrays.asList(p1, p2, p3, cp1, cp2, cp3);
         groups = groupProjects(allProjects);
@@ -130,7 +130,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
 
     private TemplateNode createNode(String name, boolean concrete)
     {
-        return new TemplateNode(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, name), name, concrete);
+        return new TemplateNode(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, name), name, concrete);
     }
 
     private Map<String, ProjectGroup> groupProjects(List<Project> allProjects)

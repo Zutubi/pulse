@@ -1,103 +1,80 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.ProcessArtifact;
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.RegexPattern;
+import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_FILE;
+import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_NAME;
+import com.zutubi.pulse.core.commands.api.TestCommandContext;
+import static com.zutubi.pulse.core.commands.core.ExecutableCommand.ENV_ARTIFACT_NAME;
+import static com.zutubi.pulse.core.commands.core.ExecutableCommand.ENV_FILENAME;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_BUILD_NUMBER;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.PersistentFeature;
-import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.io.IOUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
-public class ExecutableCommandTest extends ExecutableCommandTestBase
+public class ExecutableCommandTest extends ExecutableCommandTestCase
 {
     public void testExecuteSuccessExpected() throws Exception
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("echo");
-        command.setArgs("hello world");
-        CommandResult result = runCommand(command);
-        assertEquals(result.getState(), ResultState.SUCCESS);
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("echo");
+        config.setArgs("hello world");
+
+        successRun(new ExecutableCommand(config));
     }
 
     public void testExecuteFailureExpected() throws Exception
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe(SystemUtils.IS_WINDOWS ? "dir" : "ls");
-        command.setArgs("wtfisgoingon");
-        CommandResult result = runCommand(command);
-        assertEquals(ResultState.FAILURE, result.getState());
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe(SystemUtils.IS_WINDOWS ? "dir" : "ls");
+        config.setArgs("wtfisgoingon");
+
+        failedRun(new ExecutableCommand(config));
     }
 
     public void testExecuteSuccessExpectedNoArg() throws Exception
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("netstat");
-        CommandResult result = runCommand(command);
-        assertEquals(result.getState(), ResultState.SUCCESS);
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("netstat");
+        config.setArgs("-n");
+
+        successRun(new ExecutableCommand(config));
     }
 
     public void testExecuteExceptionExpected() throws Exception
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("unknown");
-        command.setArgs("command");
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("unknown");
+        config.setArgs("command");
 
-        CommandResult result = null;
+        ExecutableCommand command = new ExecutableCommand(config);
+        TestCommandContext context = new TestCommandContext(createExecutionContext());
         try
         {
-            result = runCommand(command);
-            assertTrue(result.errored());
+            command.execute(context);
+            assertEquals(ResultState.ERROR, context.getResultState());
+            fail("No such executable");
         }
         catch (BuildException e)
         {
-            fail(e.getMessage());      
+            assertThat(e.getMessage(), containsString("No such executable"));
         }
 
         // verify that the env output is captured even with the command failing.
-        assertEquals(1, result.getArtifacts().size());
-        StoredArtifact artifact = result.getArtifacts().get(0);
-        assertEquals(1, artifact.getChildren().size());
-        StoredFileArtifact fileArtifact = artifact.getChildren().get(0);
-        assertEquals(ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt", fileArtifact.getPath());
-    }
-
-    public void testPostProcess() throws Exception
-    {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("echo");
-        command.setArgs("error: badness");
-
-        ProcessArtifact processArtifact = command.createProcess();
-        RegexPostProcessor processor = new RegexPostProcessor();
-        RegexPattern regex = new RegexPattern();
-        regex.setCategory("error");
-        regex.setExpression("error:.*");
-        processor.addRegexPattern(regex);
-        processArtifact.setProcessor(processor);
-
-        CommandResult cmdResult = runCommand(command);
-        assertEquals(ResultState.FAILURE, cmdResult.getState());
-
-        StoredArtifact artifact = cmdResult.getArtifact(ExecutableCommand.OUTPUT_ARTIFACT_NAME);
-        List<PersistentFeature> features = artifact.getFeatures(Feature.Level.ERROR);
-        assertEquals(1, features.size());
-        PersistentFeature feature = features.get(0);
-        assertEquals(Feature.Level.ERROR, feature.getLevel());
-        assertEquals("error: badness", feature.getSummary());
+        assertOutputRegistered(new TestCommandContext.Output(ENV_ARTIFACT_NAME), context);
+        assertFile(ENV_ARTIFACT_NAME, ENV_FILENAME);
     }
 
     public void testWorkingDir() throws Exception
@@ -119,12 +96,11 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
             FileSystemUtils.setPermissions(file, FileSystemUtils.PERMISSION_ALL_FULL);
         }
 
-        ExecutableCommand command = new ExecutableCommand();
-        command.setWorkingDir(new File("nested"));
-        command.setExe(file.getPath());
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setWorkingDir(new File("nested"));
+        config.setExe(file.getPath());
 
-        CommandResult result = runCommand(command);
-        assertTrue(result.succeeded());
+        successRun(new ExecutableCommand(config));
     }
 
     public void testRelativeExe() throws Exception
@@ -149,48 +125,37 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
             FileSystemUtils.setPermissions(file, FileSystemUtils.PERMISSION_ALL_FULL);
         }
 
-        ExecutableCommand command = new ExecutableCommand();
-        command.setWorkingDir(new File("nested"));
-        command.setExe(exe);
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setWorkingDir(new File("nested"));
+        config.setExe(exe);
 
-        CommandResult result = runCommand(command);
-        assertTrue(result.succeeded());
+        successRun(new ExecutableCommand(config));
     }
 
     public void testEnvironmentDetailsAreCaptured() throws Exception
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("echo");
-        command.setArgs("hello world");
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("echo");
+        config.setArgs("hello world");
 
-        CommandResult result = runCommand(command);
+        ExecutableCommand command = new ExecutableCommand(config);
+        TestCommandContext context = runCommand(command);
 
-        List<StoredArtifact> artifacts = result.getArtifacts();
-        assertEquals(2, artifacts.size());
+        assertEquals(2, context.getOutputs().size());
 
-        StoredArtifact artifact = artifacts.get(0);
-        assertEquals(1, artifact.getChildren().size());
+        assertEnvironment(context, "Command Line:", "Process Environment:", "Resources:");
 
-        StoredFileArtifact envArtifact = artifact.getChildren().get(0);
-        assertEquals(ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt", envArtifact.getPath());
-        assertEquals("text/plain", envArtifact.getType());
-
-        checkEnv(result, "Command Line:", "Process Environment:", "Resources:");
-
-        artifact = artifacts.get(1);
-        StoredFileArtifact outputArtifact = artifact.getChildren().get(0);
-        assertEquals(ExecutableCommand.OUTPUT_ARTIFACT_NAME + "/output.txt", outputArtifact.getPath());
-        assertEquals("text/plain", outputArtifact.getType());
+        assertOutputRegistered(new TestCommandContext.Output(OUTPUT_NAME), context);
+        assertFile(OUTPUT_NAME, OUTPUT_FILE);
     }
 
     public void testBuildNumberAddedToEnvironment() throws IOException
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("echo");
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("echo");
 
-        CommandResult result = runCommand(command, 1234);
-
-        checkEnv(result, "PULSE_BUILD_NUMBER=1234");
+        ExecutableCommand command = new ExecutableCommand(config);
+        assertEnvironment(runCommand(command, 1234), "PULSE_BUILD_NUMBER=1234");
     }
 
     public void testBuildNumberNotAddedToEnvironmentWhenNotSpecified() throws Exception
@@ -199,12 +164,12 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         // be added to the environment.
         boolean runningInPulse = System.getenv().containsKey("PULSE_BUILD_NUMBER");
 
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("echo");
-        CommandResult result = runCommand(command);
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("echo");
 
-        String output = IOUtils.fileToString(getCommandEnv(result));
+        runCommand(new ExecutableCommand(config));
 
+        String output = getFileContent(ENV_ARTIFACT_NAME, ENV_FILENAME);
         if (runningInPulse)
         {
             // should only appear once.
@@ -219,14 +184,13 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
 
     public void testResourcePathsAddedToEnvironment() throws IOException
     {
-        PulseExecutionContext context = new PulseExecutionContext();
+        ExecutionContext context = createExecutionContext();
         context.add(new ResourceProperty("java.bin.dir", "somedir", false, true, false));
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("echo");
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("echo");
 
-        CommandResult result = runCommand(command, context);
-
-        checkEnv(result, "path=somedir" + File.pathSeparator);
+        ExecutableCommand command = new ExecutableCommand(config);
+        assertEnvironment(runCommand(command, context), "path=somedir" + File.pathSeparator);
     }
 
     public void testNoSuchExecutableOnWindows()
@@ -235,14 +199,15 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         {
             return;
         }
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("thisfiledoesnotexist");
 
-        CommandResult result;
-        result = runCommand(command, 1234);
-        assertTrue(result.errored());
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("thisfiledoesnotexist");
 
-        List<PersistentFeature> features = result.getFeatures(Feature.Level.ERROR);
+        ExecutableCommand command = new ExecutableCommand(config);
+        TestCommandContext context = runCommand(command, 1234);
+        assertEquals(ResultState.ERROR, context.getResultState());
+
+        List<Feature> features = context.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
         String message = features.get(0).getSummary();
         boolean java15 = message.contains("No such executable 'thisfiledoesnotexist'");
@@ -259,15 +224,15 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
             return;
         }
 
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("dir");
-        command.setWorkingDir(new File("nosuchworkdir"));
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("dir");
+        config.setWorkingDir(new File("nosuchworkdir"));
 
-        CommandResult result;
-        result = runCommand(command, 1234);
+        ExecutableCommand command = new ExecutableCommand(config);
+        TestCommandContext context = runCommand(command, 1234);
 
-        assertTrue(result.errored());
-        List<PersistentFeature> features = result.getFeatures(Feature.Level.ERROR);
+        assertEquals(ResultState.ERROR, context.getResultState());
+        List<Feature> features = context.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
         String message = features.get(0).getSummary();
         boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
@@ -298,7 +263,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
             return;
         }
 
-        ExecutableCommand cmd = new ExecutableCommand();
+        ExecutableCommand cmd = new ExecutableCommand(null);
         assertTrue(cmd.acceptableName("^"));
         assertTrue(cmd.acceptableName("<"));
         assertTrue(cmd.acceptableName(">"));
@@ -311,7 +276,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
 
     public void testAcceptableNames()
     {
-        ExecutableCommand cmd = new ExecutableCommand();
+        ExecutableCommand cmd = new ExecutableCommand(null);
         assertTrue(cmd.acceptableName("a"));
         assertTrue(cmd.acceptableName("Z"));
         assertTrue(cmd.acceptableName("2"));
@@ -321,7 +286,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
 
     public void testConvertNames()
     {
-        ExecutableCommand cmd = new ExecutableCommand();
+        ExecutableCommand cmd = new ExecutableCommand(null);
         assertEquals("PULSE_A", cmd.convertName("a"));
         assertEquals("PULSE_1", cmd.convertName("1"));
     }
@@ -332,92 +297,82 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         {
             PulseExecutionContext context = new PulseExecutionContext();
             context.add(new ResourceProperty("a<>", "b", true, false, false));
-            ExecutableCommand command = new ExecutableCommand();
-            command.setExe("dir");
+            ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+            config.setExe("dir");
 
+            ExecutableCommand command = new ExecutableCommand(config);
             runCommand(command, context);
         }
     }
 
     public void testStatusMapping() throws Exception
     {
-        CommandResult result = statusMappingHelper(1, 1, ResultState.SUCCESS);
-        assertEquals(ResultState.SUCCESS, result.getState());
+        TestCommandContext context = statusMappingHelper(1, 1, ResultState.SUCCESS);
+        assertEquals(ResultState.SUCCESS, context.getResultState());
     }
 
     public void testStatusMappingNoMatch() throws Exception
     {
-        CommandResult result = statusMappingHelper(2, 1, ResultState.SUCCESS);
-        assertEquals(ResultState.FAILURE, result.getState());
+        TestCommandContext context = statusMappingHelper(2, 1, ResultState.SUCCESS);
+        assertEquals(ResultState.FAILURE, context.getResultState());
     }
 
     public void testStatusMappingError() throws Exception
     {
-        CommandResult result = statusMappingHelper(2, 2, ResultState.ERROR);
-        assertEquals(ResultState.ERROR, result.getState());
+        TestCommandContext context = statusMappingHelper(2, 2, ResultState.ERROR);
+        assertEquals(ResultState.ERROR, context.getResultState());
     }
 
     public void testArgumentCreationEmptyString()
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setArgs("");
-        assertEquals(0, command.getArgs().size());
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setArgs("");
+        assertEquals(0, config.getCombinedArguments().size());
     }
 
     public void testArgumentCreationWhitespaceString()
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setArgs("  ");
-        assertEquals(0, command.getArgs().size());
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setArgs("  ");
+        assertEquals(0, config.getCombinedArguments().size());
     }
 
     public void testArgumentCreationTrimsWhitespace()
     {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setArgs("  a   b ");
-        assertEquals(2, command.getArgs().size());
-        assertEquals("a", command.getArgs().get(0).getText());
-        assertEquals("b", command.getArgs().get(1).getText());
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setArgs("  a   b ");
+        List<String> args = config.getCombinedArguments();
+        assertEquals(2, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("b", args.get(1));
     }
 
-    private CommandResult statusMappingHelper(int exitCode, int mappedCode, ResultState mappedStatus) throws Exception
+    private TestCommandContext statusMappingHelper(int exitCode, int mappedCode, ResultState mappedStatus) throws Exception
     {
         File jarFile = copyInputToDirectory("exit", "jar", baseDir);
 
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("java");
-        command.addArguments("-jar", jarFile.getAbsolutePath(), Integer.toString(exitCode));
-        StatusMapping mapping = command.createStatusMapping();
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("java");
+        config.setExtraArguments(Arrays.asList("-jar", jarFile.getAbsolutePath(), Integer.toString(exitCode)));
+        StatusMappingConfiguration mapping = new StatusMappingConfiguration();
+        config.getStatusMappings().add(mapping);
         mapping.setCode(mappedCode);
-        mapping.setStatus(mappedStatus.getPrettyString());
-        return runCommand(command);
+        mapping.setStatus(mappedStatus);
+
+        return runCommand(new ExecutableCommand(config));
     }
 
-    private CommandResult runCommand(ExecutableCommand command, long buildNumber)
+    private TestCommandContext runCommand(ExecutableCommand command, long buildNumber)
     {
-        PulseExecutionContext context = new PulseExecutionContext();
+        ExecutionContext context = createExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildNumber));
         return super.runCommand(command, context);
     }
 
-    protected String getBuildFileName()
+    private void assertEnvironment(TestCommandContext context, String... contents) throws IOException
     {
-        return null;
-    }
-
-    protected String getBuildFileExt()
-    {
-        return null;
-    }
-
-    protected void checkEnv(CommandResult commandResult, String ...contents) throws IOException
-    {
-        File outputFile =  getCommandEnv(commandResult);
-        checkContents(outputFile, false, contents);
-    }
-
-    protected File getCommandEnv(CommandResult commandResult) throws IOException
-    {
-        return getCommandArtifact(commandResult, commandResult.getArtifact(ExecutableCommand.ENV_ARTIFACT_NAME));
+        assertOutputRegistered(new TestCommandContext.Output(ENV_ARTIFACT_NAME), context);
+        assertFile(ENV_ARTIFACT_NAME, ENV_FILENAME);
+        assertFileContains(ENV_ARTIFACT_NAME, ENV_FILENAME, false, contents);
     }
 }

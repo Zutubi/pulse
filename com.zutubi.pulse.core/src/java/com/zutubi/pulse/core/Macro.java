@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
-import nu.xom.Element;
 import com.zutubi.pulse.core.engine.api.Reference;
+import nu.xom.Element;
 
 /**
  * A macro in a pulse file, which associates a name with a fragment of XML.

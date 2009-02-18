@@ -4,31 +4,25 @@
     #parse("pulse-file/prologue.vm")
 
     <recipe name="ant build">
-        <command name="build">
-            <!-- pull in the ant resource if configured. -->
-            <resource name="ant" required="false"/>
-            <ant
+        <ant name="build"
 #if($buildFile)
-                    build-file="$buildFile"
+             build-file="$buildFile"
 #end
 #if($targets)
-                    targets="$targets"
+             targets="$targets"
 #end
 #if($arguments)
-                    args="$arguments"
+             args="$arguments"
 #end
 #if($workingDir)
-                    working-dir="${base.dir}/$workingDir"
+             working-dir="${base.dir}/$workingDir"
 #end
-                    >
+        >
 #foreach($key in $environment.keySet())
-                <environment name="$key" value="$environment.get($key)"/>
+            <environment name="$key" value="$environment.get($key)"/>
 #end
-                #parse("pulse-file/output.processors.vm")
-            </ant>
-
+            #parse("pulse-file/output.processors.vm")
             #parse("pulse-file/artifacts.vm")
-
-        </command>
+        </ant>
     </recipe>
 </project>

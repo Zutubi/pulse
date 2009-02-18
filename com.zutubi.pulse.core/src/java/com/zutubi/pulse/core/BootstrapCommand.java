@@ -1,11 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 
 /**
  * An adaptation between the command and Bootstrap interfaces that allows
@@ -18,50 +13,21 @@ public class BootstrapCommand implements Command
     public static final String OUTPUT_NAME = "bootstrap output";
     public static final String FILES_FILE = "files.txt";
 
-    private Bootstrapper bootstrapper;
+    private BootstrapCommandConfiguration config;
 
-    public BootstrapCommand(Bootstrapper bootstrapper)
+    public BootstrapCommand(BootstrapCommandConfiguration config)
     {
-        this.bootstrapper = bootstrapper;
+        this.config = config;
     }
 
-    public void execute(ExecutionContext context, CommandResult result)
+    public void execute(CommandContext commandContext)
     {
-        bootstrapper.bootstrap((PulseExecutionContext) context, result);
-    }
-
-    public List<Artifact> getArtifacts()
-    {
-        PrecapturedArtifact artifact = new PrecapturedArtifact();
-        artifact.setName(OUTPUT_NAME);
-        
-        List<Artifact> artifacts = new LinkedList<Artifact>();
-        artifacts.add(artifact);
-        return artifacts;
-    }
-
-    public List<String> getArtifactNames()
-    {
-        return Arrays.asList(OUTPUT_NAME);
-    }
-
-    public String getName()
-    {
-        return "bootstrap";
-    }
-
-    public void setName(String name)
-    {
-        // Ignored
-    }
-
-    public boolean isForce()
-    {
-        return false;
+        commandContext.registerOutput(OUTPUT_NAME, null);
+        config.getBootstrapper().bootstrap(commandContext);
     }
 
     public void terminate()
     {
-        bootstrapper.terminate();
+        config.getBootstrapper().terminate();
     }
 }

@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.personal;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
@@ -182,7 +182,7 @@ public class PatchArchive
         return metadata;
     }
 
-    public void apply(File base, EOLStyle localEOL, CommandResult result) throws PulseException
+    public void apply(File base, EOLStyle localEOL, CommandContext commandContext) throws PulseException
     {
         try
         {
@@ -201,7 +201,7 @@ public class PatchArchive
 
             for(FileStatus fs: statuses)
             {
-                preApply(fs, base, result);
+                preApply(fs, base, commandContext);
             }
 
             unzip(base);
@@ -217,43 +217,43 @@ public class PatchArchive
         }
     }
 
-    private void preApply(FileStatus fileStatus, File base, CommandResult result) throws IOException
+    private void preApply(FileStatus fileStatus, File base, CommandContext context) throws IOException
     {
         switch (fileStatus.getState())
         {
             case MODIFIED:
             case MERGED:
             case METADATA_MODIFIED:
-                checkTargetFile(fileStatus, base, result);
+                checkTargetFile(fileStatus, base, context);
                 break;
 
             case DELETED:
             case REPLACED:
-                File f = checkTargetFile(fileStatus, base, result);
+                File f = checkTargetFile(fileStatus, base, context);
                 if (fileStatus.isDirectory())
                 {
                     if (!FileSystemUtils.rmdir(f))
                     {
-                        result.addFeature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target directory '" + fileStatus.getTargetPath() + "'");
+                        context.addFeature(new Feature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target directory '" + fileStatus.getTargetPath() + "'"));
                     }
                 }
                 else
                 {
                     if (!f.delete())
                     {
-                        result.addFeature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target file '" + fileStatus.getTargetPath() + "'");
+                        context.addFeature(new Feature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target file '" + fileStatus.getTargetPath() + "'"));
                     }
                 }
                 break;
         }
     }
 
-    private File checkTargetFile(FileStatus fileStatus, File base, CommandResult result)
+    private File checkTargetFile(FileStatus fileStatus, File base, CommandContext context)
     {
         File f = new File(base, fileStatus.getTargetPath());
         if (!f.exists())
         {
-            result.addFeature(Feature.Level.WARNING, "Problem applying patch: Target file '" + fileStatus.getTargetPath() + "' with status " + fileStatus.getState() + " in patch does not exist");
+            context.addFeature(new Feature(Feature.Level.WARNING, "Problem applying patch: Target file '" + fileStatus.getTargetPath() + "' with status " + fileStatus.getState() + " in patch does not exist"));
         }
         
         return f;

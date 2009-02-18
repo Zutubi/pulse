@@ -1,10 +1,10 @@
 package com.zutubi.pulse.servercore;
 
+import com.zutubi.pulse.core.GenericReference;
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.ReferenceResolver;
 import com.zutubi.pulse.core.ResolutionException;
 import com.zutubi.pulse.core.engine.api.HashReferenceMap;
-import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
@@ -55,8 +55,8 @@ public class ServerRecipePaths implements RecipePaths
     {
         String pattern = System.getProperty(PROPERTY_PERSISTENT_WORK_DIR, DEFAULT_PERSISTENT_WORK_DIR);
         ReferenceMap references = new HashReferenceMap();
-        references.add(new Property("data", dataDir.getAbsolutePath()));
-        references.add(new Property("project", encode(project)));
+        references.add(new GenericReference<String>("data", dataDir.getAbsolutePath()));
+        references.add(new GenericReference<String>("project", encode(project)));
 
         try
         {

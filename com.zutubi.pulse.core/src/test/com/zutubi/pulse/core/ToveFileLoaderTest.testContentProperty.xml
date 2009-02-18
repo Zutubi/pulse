@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<project>
+    <property name="p" value="v"/>
+    <textual>text content ${p}</textual>
+</project>

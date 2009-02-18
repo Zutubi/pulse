@@ -26,7 +26,7 @@
 
     <bean id="handleAllocator" class="com.zutubi.tove.type.record.DelegatingHandleAllocator"/>
     <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" autowire="byName"/>
-    <bean id="configurationRegistry" class="com.zutubi.pulse.master.tove.config.ConfigurationRegistry" autowire="byName"/>
+    <bean id="configurationRegistry" class="com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry" autowire="byName"/>
     <bean id="configurationExtensionManager" class="com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager" autowire="byName"/>
     <bean id="configurationPersistenceManager" class="com.zutubi.tove.config.ConfigurationPersistenceManager" autowire="byName"/>
     <bean id="configurationReferenceManager" class="com.zutubi.tove.config.ConfigurationReferenceManager" autowire="byName"/>

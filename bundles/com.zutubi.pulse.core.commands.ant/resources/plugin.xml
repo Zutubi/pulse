@@ -2,10 +2,10 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.commands">
-        <command name="ant" class="com.zutubi.pulse.core.commands.ant.AntCommand"/>
+        <command name="ant" class="com.zutubi.pulse.core.commands.ant.AntCommandConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="ant.pp" display-name="ant output processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.commands.ant.AntPostProcessor"/>
+                        default-processor="true" class="com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration"/>
     </extension>
 </plugin>

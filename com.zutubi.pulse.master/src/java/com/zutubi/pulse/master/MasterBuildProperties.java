@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -32,6 +33,11 @@ public class MasterBuildProperties extends BuildProperties
         for(ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
         {
             context.add(property.asResourceProperty());
+        }
+
+        for (PostProcessorConfiguration postProcessor: projectConfiguration.getPostProcessors().values())
+        {
+            context.addValue(postProcessor.getName(), postProcessor);
         }
     }
 

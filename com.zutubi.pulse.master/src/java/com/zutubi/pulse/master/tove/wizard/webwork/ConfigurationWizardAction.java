@@ -2,6 +2,8 @@ package com.zutubi.pulse.master.tove.wizard.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.wizard.SingleTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.Wizard;
 import com.zutubi.pulse.master.tove.wizard.WizardState;
 import com.zutubi.tove.ConventionSupport;

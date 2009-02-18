@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config;
 
 import com.zutubi.pulse.core.plugins.AbstractExtensionManager;
+import com.zutubi.pulse.core.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.TypeException;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;

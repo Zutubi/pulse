@@ -9,7 +9,7 @@ import com.zutubi.pulse.dev.personal.PersonalBuildClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -113,9 +113,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private void editStageToRunOnAgent(String agent) throws Exception
     {
-        String stagePath = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, PROJECT_NAME, "stages", "default");
+        String stagePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PROJECT_NAME, "stages", "default");
         Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
-        stage.put("agent", PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, agent));
+        stage.put("agent", PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
         xmlRpcHelper.saveConfig(stagePath, stage, false);
     }
 

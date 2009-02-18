@@ -1,22 +1,18 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.util.process.ProcessControl;
 import com.zutubi.util.Constants;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.TextUtils;
-import com.zutubi.util.io.ForkOutputStream;
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.io.IgnoreCloseOutputStream;
-import com.zutubi.validation.Validateable;
-import com.zutubi.validation.ValidationContext;
 
 import java.io.*;
 import java.util.*;
@@ -27,7 +23,7 @@ import java.util.*;
  * It exposes two built in artifacts. The command's output and its execution
  * environment.
  */
-public class ExecutableCommand extends CommandSupport implements Validateable
+public class ExecutableCommand extends OutputProducingCommandSupport
 {
     private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
 
@@ -40,70 +36,46 @@ public class ExecutableCommand extends CommandSupport implements Validateable
     public static final String OUTPUT_ARTIFACT_NAME = "command output";
     static final String OUTPUT_FILENAME = "output.txt";
 
-    private String exe;
-    private String exeProperty;
-    private String defaultExe;
-    private List<Arg> args = new LinkedList<Arg>();
-    private File workingDir;
-    private String inputFile;
-    private String outputFile;
-    private List<Environment> env = new LinkedList<Environment>();
-
     private Process child;
     private CancellableReader reader;
     private CancellableReader writer;
     private volatile boolean terminated = false;
 
-    private PrecapturedArtifact outputArtifact;
-    private PrecapturedArtifact envArtifact;
-
-    private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
     private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD PULSE_TEST_SUPPRESSED").split(" +"));
-    private List<StatusMapping> statusMappings = new LinkedList<StatusMapping>();
 
-    /**
-     * Required no arg constructor.
-     */
-    public ExecutableCommand()
+    public ExecutableCommand(ExecutableCommandConfiguration configuration)
     {
-
+        super(configuration);
     }
 
-    protected ExecutableCommand(String exeProperty, String defaultExe)
+    @Override
+    public ExecutableCommandConfiguration getConfig()
     {
-        this.exeProperty = exeProperty;
-        this.defaultExe = defaultExe;
+        return (ExecutableCommandConfiguration) super.getConfig();
     }
 
-    public void execute(ExecutionContext context, CommandResult cmdResult)
+    public void execute(CommandContext commandContext, OutputStream outputStream)
     {
-        File workingDir = getWorkingDir(context.getWorkingDir());
-        ProcessBuilder builder = new ProcessBuilder(constructCommand(context, workingDir));
+        ExecutionContext executionContext = commandContext.getExecutionContext();
+        File workingDir = getWorkingDir(executionContext.getWorkingDir());
+        ProcessBuilder builder = new ProcessBuilder(constructCommand(executionContext, workingDir));
         builder.directory(workingDir);
-        updateChildEnvironment(context, builder);
+        updateChildEnvironment(executionContext, builder);
 
         builder.redirectErrorStream(true);
 
         // record the commands execution environment as an artifact.
-        File outputDir = context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR);
         try
         {
-            captureExecutionEnvironmentArtifact(context, builder, outputDir);
+            captureExecutionEnvironmentArtifact(commandContext, builder);
         }
         catch (IOException e)
         {
             throw new BuildException("Unable to record the process execution environment. ", e);
         }
 
-        File outputFileDir = new File(outputDir, OUTPUT_ARTIFACT_NAME);
-        if (!outputFileDir.mkdir())
-        {
-            throw new BuildException("Unable to create directory for the output artifact '" + outputFileDir.getAbsolutePath() + "'");
-        }
-
         File inFile = checkInputFile(workingDir);
-        
-        if (terminatedCheck(cmdResult))
+        if (terminatedCheck(commandContext))
         {
             // Catches the case where we were asked to terminate before
             // creating the child process.
@@ -118,29 +90,22 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         {
             // CIB-149: try and make friendlier error messages for common problems.
             String message = e.getMessage();
-            if (message.contains("nosuchexe") || message.endsWith("error=2"))
+            if (message.contains("nosuchexe") || message.endsWith("error=2") || message.contains("error=2,"))
             {
-                message = "No such executable '" + exe + "'";
+                message = "No such executable '" + builder.command().get(0) + "'";
             }
             else if (message.endsWith("error=267"))
             {
-                message = "Working directory '" + this.workingDir.getPath() + "' does not exist";
+                message = "Working directory '" + getConfig().getWorkingDir().getPath() + "' does not exist";
             }
 
             throw new BuildException("Unable to create process: " + message, e);
         }
 
-        // capture the command output.
-        File outputArtifact = new File(outputFileDir, OUTPUT_FILENAME);
-
         try
         {
-            // initialise the output artifacts.
-            initialiseOutputArtifact();
-
-            OutputStream output = getOutputStream(context, workingDir, outputArtifact);
             InputStream input = child.getInputStream();
-            reader = new CancellableReader(input, output);
+            reader = new CancellableReader(input, outputStream);
             reader.start();
 
             if(inFile != null)
@@ -149,7 +114,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
                 writer.start();
             }
             
-            if (terminatedCheck(cmdResult))
+            if (terminatedCheck(commandContext))
             {
                 return;
             }
@@ -179,7 +144,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
                 // and so must cut the reader thread loose.  This happens on
                 // Windows, and we have no better solution but to report the
                 // resource leak.
-                cmdResult.error("Unable to cleanly terminate the child process tree.  It is likely that some orphaned processes remain.");
+                commandContext.error("Unable to cleanly terminate the child process tree.  It is likely that some orphaned processes remain.");
             }
 
             if (writer != null)
@@ -200,22 +165,21 @@ public class ExecutableCommand extends CommandSupport implements Validateable
             switch(state)
             {
                 case SUCCESS:
-                    cmdResult.success();
                     break;
                 case FAILURE:
-                    cmdResult.failure("Command '" + commandLine + "' exited with code '" + result + "'");
+                    commandContext.failure("Command '" + commandLine + "' exited with code '" + result + "'");
                     break;
                 default:
-                    cmdResult.error("Command '" + commandLine + "' exited with code '" + result + "'");
+                    commandContext.error("Command '" + commandLine + "' exited with code '" + result + "'");
                     break;
             }
 
-            cmdResult.getProperties().put("exit code", Integer.toString(result));
-            cmdResult.getProperties().put("command line", commandLine);
+            commandContext.addCommandProperty("exit code", Integer.toString(result));
+            commandContext.addCommandProperty("command line", commandLine);
 
             if (builder.directory() != null)
             {
-                cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
+                commandContext.addCommandProperty("working directory", builder.directory().getAbsolutePath());
             }
         }
         catch (IOException e)
@@ -224,7 +188,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         }
         catch (InterruptedException e)
         {
-            if(!terminatedCheck(cmdResult))
+            if(!terminatedCheck(commandContext))
             {
                 throw new BuildException(e);
             }
@@ -240,11 +204,11 @@ public class ExecutableCommand extends CommandSupport implements Validateable
 
     private ResultState mapExitCode(int code)
     {
-        for(StatusMapping mapping: statusMappings)
+        for(StatusMappingConfiguration mapping: getConfig().getStatusMappings())
         {
             if(mapping.getCode() == code)
             {
-                return mapping.getResultState();
+                return mapping.getStatus();
             }
         }
 
@@ -258,44 +222,9 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         }
     }
 
-    private OutputStream getOutputStream(ExecutionContext context, File workingDir, File outputArtifact) throws FileNotFoundException
-    {
-        List<OutputStream> outputs = new ArrayList<OutputStream>(3);
-        outputs.add(new FileOutputStream(outputArtifact));
-
-        if (context.getOutputStream() != null)
-        {
-            // Wrap in an ignore close stream as we don't own this stream and
-            // thus don't want to close it with the rest when done.
-            outputs.add(new IgnoreCloseOutputStream(context.getOutputStream()));
-        }
-
-        if (TextUtils.stringSet(outputFile))
-        {
-            try
-            {
-                outputs.add(new FileOutputStream(new File(workingDir, outputFile)));
-            }
-            catch (FileNotFoundException e)
-            {
-                throw new BuildException("Unable to create output file '" + outputFile + "': " + e.getMessage(), e);
-            }
-        }
-
-        OutputStream output;
-        if (outputs.size() > 1)
-        {
-            output = new ForkOutputStream(outputs.toArray(new OutputStream[outputs.size()]));
-        }
-        else
-        {
-            output = outputs.get(0);
-        }
-        return output;
-    }
-
     private File checkInputFile(File workingDir)
     {
+        String inputFile = getConfig().getInputFile();
         if(TextUtils.stringSet(inputFile))
         {
             File input = new File(workingDir, inputFile);
@@ -315,58 +244,20 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         return null;
     }
 
-    private void initialiseOutputArtifact()
-    {
-        outputArtifact = new PrecapturedArtifact();
-        outputArtifact.setName(OUTPUT_ARTIFACT_NAME);
-        outputArtifact.setType("text/plain");
-        outputArtifact.setProcesses(processes);
-    }
-
-    public List<Artifact> getArtifacts()
-    {
-        List<Artifact> artifacts = new LinkedList<Artifact>();
-        if (envArtifact != null)
-        {
-            artifacts.add(envArtifact);
-        }
-        if (outputArtifact != null)
-        {
-            artifacts.add(outputArtifact);
-        }
-        return artifacts;
-    }
-
-    private boolean terminatedCheck(CommandResult commandResult)
+    private boolean terminatedCheck(CommandContext commandContext)
     {
         if(terminated)
         {
-            commandResult.error("Command terminated");
+            commandContext.error("Command terminated");
             return true;
         }
 
         return false;
     }
 
-    /**
-     * This method records the execution environment and adds it as an artifact to the command result.
-     *
-     * @param context context we are executing in
-     * @param builder is the configured builder used to execute the command.
-     * @param outputDir is the artifact output directory.
-     *
-     * @throws IOException if there are problems recording the execution environment.
-     */
-    private void captureExecutionEnvironmentArtifact(ExecutionContext context, ProcessBuilder builder, File outputDir) throws IOException
+    private void captureExecutionEnvironmentArtifact(CommandContext commandContext, ProcessBuilder builder) throws IOException
     {
-        initialiseEnvironmentArtifact();
-
-        File envFileDir = new File(outputDir, ENV_ARTIFACT_NAME);
-        if (!envFileDir.mkdir())
-        {
-            throw new BuildException("Unable to create directory for the environment artifact '" + envFileDir.getAbsolutePath() + "'");
-        }
-
+        File envFileDir = commandContext.registerOutput(ENV_ARTIFACT_NAME, null);
         File file = new File(envFileDir, ENV_FILENAME);
 
         final String separator = Constants.LINE_SEPARATOR;
@@ -394,7 +285,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         buffer.append("Resources: (via scope)").append(separator);
         buffer.append("----------------------").append(separator);
 
-        PulseScope scope = ((PulseExecutionContext) context).getScope();
+        PulseScope scope = ((PulseExecutionContext) commandContext.getExecutionContext()).getScope();
         if (scope.getEnvironment().size() > 0)
         {
             for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
@@ -410,9 +301,10 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         buffer.append(separator);
         buffer.append("Resources: (via environment tag)").append(separator);
         buffer.append("--------------------------------").append(separator);
-        if (this.env.size() > 0)
+        List<EnvironmentConfiguration> configuredEnv = getConfig().getEnvironments();
+        if (configuredEnv.size() > 0)
         {
-            for (Environment setting : this.env)
+            for (EnvironmentConfiguration setting : configuredEnv)
             {
                 appendProperty(setting.getName(), setting.getValue(), buffer, separator);
             }
@@ -445,32 +337,23 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         buffer.append(key).append("=").append(value).append(separator);
     }
 
-    private void initialiseEnvironmentArtifact()
-    {
-        // Configure the environment artifact.
-        envArtifact = new PrecapturedArtifact();
-        envArtifact.setName(ENV_ARTIFACT_NAME);
-        envArtifact.setType("text/plain");
-    }
-
     private List<String> constructCommand(ExecutionContext context, File workingDir)
     {
-        determineExe(context);
-        String binary = exe;
+        String binary = determineExe(context);
 
-        File exeFile = new File(exe);
+        File exeFile = new File(binary);
         if (!exeFile.isAbsolute())
         {
             // CIB-902: search relative to the working directory before going
             // to the path.
-            File relativeToWork = new File(workingDir, exe);
+            File relativeToWork = new File(workingDir, binary);
             if(relativeToWork.exists())
             {
                 binary = relativeToWork.getAbsolutePath();
             }
             else
             {
-                exeFile = SystemUtils.findInPath(exe, ((PulseExecutionContext) context).getScope().getPathDirectories());
+                exeFile = SystemUtils.findInPath(binary, ((PulseExecutionContext) context).getScope().getPathDirectories());
                 if (exeFile != null)
                 {
                     binary = exeFile.getAbsolutePath();
@@ -480,29 +363,28 @@ public class ExecutableCommand extends CommandSupport implements Validateable
 
         List<String> command = new LinkedList<String>();
         command.add(binary);
-
-        for (Arg arg : args)
-        {
-            command.add(arg.getText());
-        }
-
+        command.addAll(getConfig().getCombinedArguments());
         return command;
     }
 
-    private void determineExe(ExecutionContext context)
+    private String determineExe(ExecutionContext context)
     {
-        if(!TextUtils.stringSet(exe))
+        ExecutableCommandConfiguration configuration = getConfig();
+        String exe = configuration.getExe();
+        if (!TextUtils.stringSet(exe))
         {
-            if(TextUtils.stringSet(exeProperty))
+            if (TextUtils.stringSet(configuration.getExeProperty()))
             {
-                exe = context.getString(exeProperty);
+                exe = context.getString(configuration.getExeProperty());
             }
 
-            if(!TextUtils.stringSet(exe))
+            if (!TextUtils.stringSet(exe))
             {
-                exe = defaultExe;
+                exe = configuration.getDefaultExe();
             }
         }
+
+        return exe;
     }
 
     /**
@@ -518,6 +400,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
      */
     protected File getWorkingDir(File baseDir)
     {
+        File workingDir = getConfig().getWorkingDir();
         if (workingDir == null)
         {
             return baseDir;
@@ -553,7 +436,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         scope.applyEnvironment(childEnvironment);
 
         // Finally things defined on the command
-        for (Environment setting : env)
+        for (EnvironmentConfiguration setting : getConfig().getEnvironments())
         {
             childEnvironment.put(setting.getName(), setting.getValue());
         }
@@ -594,100 +477,6 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         name = name.replaceAll("\\.", "_");
 
         return "PULSE_" + name;
-    }
-
-    public List<String> getArtifactNames()
-    {
-        return Arrays.asList(OUTPUT_ARTIFACT_NAME);
-    }
-
-    public String getExe()
-    {
-        return exe;
-    }
-
-    public void setExe(String exe)
-    {
-        this.exe = exe;
-    }
-
-    /**
-     * Allow the setting of arguments in the form of a space separated list.
-     *
-     * @param args is a space separated list of arguments.
-     */
-    public void setArgs(String args)
-    {
-        for (String arg : args.split(" +"))
-        {
-            if (TextUtils.stringSet(arg))
-            {
-                Arg a = createArg();
-                a.setText(arg);
-            }
-        }
-    }
-
-    public void setWorkingDir(File d)
-    {
-        this.workingDir = d;
-    }
-
-    public void setInputFile(String inputFile)
-    {
-        this.inputFile = inputFile;
-    }
-
-    public void setOutputFile(String outputFile)
-    {
-        this.outputFile = outputFile;
-    }
-
-    public Arg createArg()
-    {
-        Arg arg = new Arg();
-        args.add(arg);
-        return arg;
-    }
-
-    /**
-     * Convenience method for programatically adding arguments to this command.
-     *
-     * @param arguments to be added.
-     */
-    public void addArguments(String ...arguments)
-    {
-        for (String arg : arguments)
-        {
-            Arg argument = createArg();
-            argument.setText(arg);
-        }
-    }
-
-    public Environment createEnvironment()
-    {
-        Environment setting = new Environment();
-        env.add(setting);
-        return setting;
-    }
-
-    public ProcessArtifact createProcess()
-    {
-        ProcessArtifact p = new ProcessArtifact();
-        processes.add(p);
-        return p;
-    }
-
-    public List<StatusMapping> getStatusMappings()
-    {
-        return statusMappings;
-    }
-
-    public StatusMapping createStatusMapping()
-    {
-        StatusMapping mapping = new StatusMapping();
-        statusMappings.add(mapping);
-        return mapping;
     }
 
     private String extractCommandLine(ProcessBuilder builder)
@@ -736,127 +525,6 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         if(reader != null)
         {
             reader.cancel();
-        }
-    }
-
-    List<Arg> getArgs()
-    {
-        return args;
-    }
-
-    public void validate(ValidationContext context)
-    {
-        if(!TextUtils.stringSet(exe) && !TextUtils.stringSet(defaultExe))
-        {
-            context.addFieldError("exe", "exe is required");
-        }
-    }
-
-    /**
-     *
-     */
-    public class Arg
-    {
-        private String text;
-
-        public Arg()
-        {
-            text = "";
-        }
-
-        public Arg(String text)
-        {
-            this.text = text;
-        }
-
-        public String getText()
-        {
-            return text;
-        }
-
-        public void setText(String text)
-        {
-            this.text += text;
-        }
-    }
-
-    /**
-     * The nested environment tag definition.  Instances of this class are added
-     * to the execution environment of ths command.
-     */
-    public class Environment
-    {
-        /**
-         * The name of the environment property.
-         */
-        private String name;
-
-        /**
-         * The value of the environment property.
-         */
-        private String value;
-
-        public Environment()
-        {
-            value = "";
-        }
-
-        /**
-         * Getter for the name property.
-         *
-         * @return the environment variable name.
-         */
-        public String getName()
-        {
-            return name;
-        }
-
-        /**
-         * Setter for the name property.
-         *
-         * @param name the environment variable name.
-         */
-        public void setName(String name)
-        {
-            this.name = name;
-        }
-
-        /**
-         * Getter for the value property.
-         *
-         * @return the environment variable value.
-         */
-        public String getValue()
-        {
-            return value;
-        }
-
-        /**
-         * Setter for the value property.
-         *
-         * @param value the environment variable value.
-         */
-        public void setValue(String value)
-        {
-            this.value = value;
-        }
-
-        /**
-         * This setter supports defining the value of this environment variable as the
-         * body text of the tag. For example:
-         *
-         * <env name="foo">bar</env>
-         *
-         * @param text the environment variable value.
-         */
-        public void setText(String text)
-        {
-            this.value += text;
-        }
-
-        public String getText()
-        {
-            return this.value;
         }
     }
 

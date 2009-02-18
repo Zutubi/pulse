@@ -4,22 +4,22 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.master.model.persistence.UserDao;
-import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.security.AcegiUser;
+import com.zutubi.pulse.master.security.ldap.LdapManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.events.ConfigurationEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
@@ -67,7 +67,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
                     initGroupsByUser();
                 }
             }
-        }, true, true, ConfigurationRegistry.GROUPS_SCOPE);
+        }, true, true, MasterConfigurationRegistry.GROUPS_SCOPE);
 
         TypeListener<UserConfiguration> userListener = new TypeAdapter<UserConfiguration>(UserConfiguration.class)
         {
@@ -161,7 +161,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     private BuiltinGroupConfiguration getBuiltinGroup(String name)
     {
-        return configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, name), BuiltinGroupConfiguration.class);
+        return configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, name), BuiltinGroupConfiguration.class);
     }
 
     /**
@@ -174,7 +174,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     public UserConfiguration getUserConfig(String login)
     {
-        return configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.USERS_SCOPE, login), UserConfiguration.class);
+        return configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.USERS_SCOPE, login), UserConfiguration.class);
     }
 
     public User getUser(String login)
@@ -220,13 +220,13 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     {
         // insert the new user configuration instance.  Note that the state instance will be
         // created separately via a call to {@link UserManager#createState}
-        String insertedPath = configurationProvider.insert(ConfigurationRegistry.USERS_SCOPE, user);
+        String insertedPath = configurationProvider.insert(MasterConfigurationRegistry.USERS_SCOPE, user);
         return configurationProvider.get(insertedPath, UserConfiguration.class);
     }
 
     public GroupConfiguration getGroupConfig(String name)
     {
-        return configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, name), GroupConfiguration.class);
+        return configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, name), GroupConfiguration.class);
     }
 
     public Set<Project> getUserProjects(User user, final ProjectManager projectManager)

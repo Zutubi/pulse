@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.i18n;
 
 import com.zutubi.i18n.context.*;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 
 import java.util.Arrays;
 import java.util.LinkedList;

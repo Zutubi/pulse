@@ -32,8 +32,8 @@ import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -200,16 +200,16 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 globalProject.setPermanent(true);
 
                 // All users can view all projects by default.
-                AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_VIEW));
 
                 // Anonymous users can view all projects by default (but only
                 // when anonymous access is explicitly enabled).
-                group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_VIEW));
 
                 // Project admins can do just that
-                group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.PROJECT_ADMINS_GROUP_NAME), AbstractGroupConfiguration.class);
+                group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.PROJECT_ADMINS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_ADMINISTER));
 
                 // Default cleanup rule to blow away working copy snapshots
@@ -225,7 +225,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
                 MutableRecord globalTemplate = projectType.unstantiate(globalProject);
                 configurationTemplateManager.markAsTemplate(globalTemplate);
-                configurationTemplateManager.insertRecord(ConfigurationRegistry.PROJECTS_SCOPE, globalTemplate);
+                configurationTemplateManager.insertRecord(MasterConfigurationRegistry.PROJECTS_SCOPE, globalTemplate);
             }
             catch (TypeException e)
             {
