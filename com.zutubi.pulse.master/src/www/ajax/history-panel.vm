@@ -18,7 +18,7 @@
                     <a class="unadorned" href="#" id="columns-popup-link-project.history" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
                 #end
                 #if($rssEnabled)
-                    <a class="unadorned" id="rss.builds" href="rss.action?projectId=$project.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+                    <a class="unadorned" id="rss.builds" href="$base/rss.action?projectId=$project.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
                 #end
                 </span>
                 #wwtext("name=historic.builds")
