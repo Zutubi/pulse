@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.PulseExecutionContext;
 import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_FILE;
 import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_NAME;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
@@ -12,10 +11,10 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_BUILD_NU
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
@@ -64,12 +63,11 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         try
         {
             command.execute(context);
-            assertEquals(ResultState.ERROR, context.getResultState());
-            fail("No such executable");
+            fail("Expect a build exception with a bad executable");
         }
         catch (BuildException e)
         {
-            assertThat(e.getMessage(), containsString("No such executable"));
+            assertThat(e.getMessage(), Matchers.anyOf(containsString("No such executable"), containsString("unknown: not found")));
         }
 
         // verify that the env output is captured even with the command failing.

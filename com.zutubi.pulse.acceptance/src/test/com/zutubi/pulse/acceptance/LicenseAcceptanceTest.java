@@ -28,6 +28,7 @@ import java.util.Hashtable;
 public class LicenseAcceptanceTest extends SeleniumTestBase
 {
     private static final String LICENSE_PATH = "settings/license";
+    private static final int BUILD_TIMEOUT = 90000;
 
     @BeforeMethod
     protected void setUp() throws Exception
@@ -275,8 +276,8 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         }
         else
         {
-            SeleniumUtils.refreshUntilElement(selenium, statusId, 30000);
-            SeleniumUtils.refreshUntilText(selenium, statusId, "success", 30000);
+            SeleniumUtils.refreshUntilElement(selenium, statusId, BUILD_TIMEOUT);
+            SeleniumUtils.refreshUntilText(selenium, statusId, "success", BUILD_TIMEOUT);
         }
     }
 }

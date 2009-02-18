@@ -206,7 +206,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         PersonalBuildFilePage filePage = new PersonalBuildFilePage(selenium, urls, buildNumber);
         filePage.waitFor();
         assertTrue(filePage.isHighlightedFilePresent());
-        assertTextPresent("ant build");
+        assertTextPresent("<ant");
 
         PersonalBuildArtifactsPage artifactsPage = new PersonalBuildArtifactsPage(selenium, urls, buildNumber);
         artifactsPage.goTo();
