@@ -204,17 +204,20 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         config.setExe("thisfiledoesnotexist");
 
         ExecutableCommand command = new ExecutableCommand(config);
-        TestCommandContext context = runCommand(command, 1234);
-        assertEquals(ResultState.ERROR, context.getResultState());
-
-        List<Feature> features = context.getFeatures(Feature.Level.ERROR);
-        assertEquals(1, features.size());
-        String message = features.get(0).getSummary();
-        boolean java15 = message.contains("No such executable 'thisfiledoesnotexist'");
-        // In Java 1.6, the error reporting is better, so we are
-        // happy to pass it on through.
-        boolean java16 = message.endsWith("The system cannot find the file specified");
-        assertTrue(java15 || java16);
+        try
+        {
+            runCommand(command, 1234);
+            fail("Command with bad executable should throw.");
+        }
+        catch (BuildException e)
+        {
+            String message = e.getMessage();
+            boolean java15 = message.contains("No such executable 'thisfiledoesnotexist'");
+            // In Java 1.6, the error reporting is better, so we are
+            // happy to pass it on through.
+            boolean java16 = message.endsWith("The system cannot find the file specified");
+            assertTrue(java15 || java16);
+        }
     }
 
     public void testNoSuchWorkDirOnWindows()
@@ -229,15 +232,18 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         config.setWorkingDir(new File("nosuchworkdir"));
 
         ExecutableCommand command = new ExecutableCommand(config);
-        TestCommandContext context = runCommand(command, 1234);
-
-        assertEquals(ResultState.ERROR, context.getResultState());
-        List<Feature> features = context.getFeatures(Feature.Level.ERROR);
-        assertEquals(1, features.size());
-        String message = features.get(0).getSummary();
-        boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
-        boolean java16 = message.endsWith("The directory name is invalid");
-        assertTrue(java15 || java16);
+        try
+        {
+            runCommand(command, 1234);
+            fail("Command with bad working directory should throw.");
+        }
+        catch (BuildException e)
+        {
+            String message = e.getMessage();
+            boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
+            boolean java16 = message.endsWith("The directory name is invalid");
+            assertTrue(java15 || java16);
+        }
     }
 
     public void testProcessId() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException
@@ -295,7 +301,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
     {
         if (SystemUtils.IS_WINDOWS)
         {
-            PulseExecutionContext context = new PulseExecutionContext();
+            ExecutionContext context = createExecutionContext();
             context.add(new ResourceProperty("a<>", "b", true, false, false));
             ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
             config.setExe("dir");

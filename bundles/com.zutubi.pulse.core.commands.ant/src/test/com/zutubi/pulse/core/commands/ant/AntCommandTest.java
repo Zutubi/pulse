@@ -3,6 +3,9 @@ package com.zutubi.pulse.core.commands.ant;
 import com.zutubi.pulse.core.commands.core.EnvironmentConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
+import com.zutubi.pulse.core.commands.api.TestCommandContext;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,7 +83,15 @@ public class AntCommandTest extends ExecutableCommandTestCase
     public void testRunNoBuildFile() throws Exception
     {
         NamedArgumentCommand command = new NamedArgumentCommand(new AntCommandConfiguration());
-        failedRun(command, "Buildfile: build.xml does not exist!");
+        TestCommandContext context = runCommand(command);
+        // Windows batch files have unreliable exit codes, so we don't confirm
+        // on Windows (where the post-processor fixes this).
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            assertEquals(ResultState.FAILURE, context.getResultState());
+        }
+
+        assertDefaultOutputContains("Buildfile: build.xml does not exist!");
     }
 
     public void testRunNonExistantBuildFile() throws Exception
@@ -89,7 +100,15 @@ public class AntCommandTest extends ExecutableCommandTestCase
         config.setBuildFile("nope.xml");
 
         NamedArgumentCommand command = new NamedArgumentCommand(config);
-        failedRun(command, "Buildfile: nope.xml does not exist!");
+        TestCommandContext context = runCommand(command);
+        // Windows batch files have unreliable exit codes, so we don't confirm
+        // on Windows (where the post-processor fixes this).
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            assertEquals(ResultState.FAILURE, context.getResultState());
+        }
+
+        assertDefaultOutputContains("Buildfile: nope.xml does not exist!");
     }
 
     private File copyBuildFile(String name) throws IOException

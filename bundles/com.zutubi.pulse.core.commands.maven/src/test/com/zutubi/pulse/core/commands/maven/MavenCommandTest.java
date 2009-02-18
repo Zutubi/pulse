@@ -1,7 +1,10 @@
 package com.zutubi.pulse.core.commands.maven;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
+import com.zutubi.pulse.core.commands.api.TestCommandContext;
+import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +58,16 @@ public class MavenCommandTest extends ExecutableCommandTestCase
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         command.setTargets("missingTarget");
         command.setWorkingDir(baseDir);
-        failedRun(command, "BUILD FAILED");
+
+        TestCommandContext context = runCommand(new MavenCommand(command));
+        // Windows batch files have unreliable exit codes, so we don't confirm
+        // on Windows (where the post-processor fixes this).
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            assertEquals(ResultState.FAILURE, context.getResultState());
+        }
+
+        assertDefaultOutputContains("BUILD FAILED");
     }
 
     public void testExtraArgument() throws Exception

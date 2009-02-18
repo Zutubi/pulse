@@ -1,9 +1,11 @@
 package com.zutubi.pulse.core.commands.maven2;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.SystemUtils;
 
 import java.io.IOException;
 
@@ -100,6 +102,12 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
 
     private TestCommandContext failedRun(Maven2CommandConfiguration configuration, String... content) throws Exception
     {
-        return failedRun(new Maven2Command(configuration), content);
+        TestCommandContext context = runCommand(new Maven2Command(configuration));
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            assertEquals(ResultState.FAILURE, context.getResultState());
+        }
+        assertDefaultOutputContains(content);
+        return context;
     }
 }

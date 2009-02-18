@@ -21,6 +21,7 @@ public class FileSystemUtils
     private static final Logger LOG = Logger.getLogger(FileSystemUtils.class);
 
     private static final int DELETE_RETRIES = 3;
+    private static final int RENAME_RETRIES = 3;
 
     public static final String NORMAL_SEPARATOR = "/";
     public static final char NORMAL_SEPARATOR_CHAR = NORMAL_SEPARATOR.charAt(0);
@@ -487,26 +488,63 @@ public class FileSystemUtils
     }
 
     /**
+     * Renames a file or directory, optionally deleting any existing
+     * destination, and retrying on non-obvious failures (to work around
+     * problems on windows).
+     *
      * @param src   source file
      * @param dest  detination file
-     * @param force delete the destination directory if it already exists before renaming.
+     * @param force if true, delete the destination if it already exists before
+     *              renaming
      * @return true if the rename was successful, false otherwise.
      */
     public static boolean rename(File src, File dest, boolean force)
     {
-        if (force && dest.exists())
+        if (!src.exists())
         {
-            if (dest.isDirectory())
+            return false;
+        }
+
+        if (dest.exists())
+        {
+            if (force)
             {
-                rmdir(dest);
+                if (dest.isDirectory())
+                {
+                    rmdir(dest);
+                }
+                else
+                {
+                    robustDelete(dest);
+                }
             }
             else
             {
-                robustDelete(dest);
+                return false;
             }
         }
 
-        return src.renameTo(dest);
+        for (int i = 0; i < RENAME_RETRIES; i++)
+        {
+            if (src.renameTo(dest))
+            {
+                return true;
+            }
+
+            // Yes, this is obscene, but it works around a bug in some Windows
+            // JVMs.
+            System.gc();
+            try
+            {
+                Thread.sleep(50);
+            }
+            catch (InterruptedException e)
+            {
+                // Ignore, we will not retry for long.
+            }
+        }
+
+        return false;
     }
 
     public static boolean rename(File src, File dest)

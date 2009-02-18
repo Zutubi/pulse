@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class MsBuildCommandTest extends ExecutableCommandTestCase
 {
-    private static final String BUILD_FILE_NAME = "build.proj.xml";
+    private static final String BUILD_FILE_NAME = "build.proj";
     private static final String EXTENSION_XML = "xml";
 
     public boolean isMsBuildPresent()
