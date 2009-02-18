@@ -23,7 +23,7 @@ public class CompositeType extends AbstractType implements ComplexType
 {
     private static final Logger LOG = Logger.getLogger(CompositeType.class);
 
-    private static final String XML_RPC_SYMBOLIC_NAME = "meta.symbolicName";
+    public static final String XML_RPC_SYMBOLIC_NAME = "meta.symbolicName";
 
     private List<Annotation> annotations = new LinkedList<Annotation>();
     /**

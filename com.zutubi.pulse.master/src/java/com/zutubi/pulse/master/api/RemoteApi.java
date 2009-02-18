@@ -1010,6 +1010,10 @@ public class RemoteApi
         try
         {
             Configuration instance = configurationProvider.get(path, Configuration.class);
+            if (instance == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
             actionManager.execute(action, instance, null);
             return true;
         }
@@ -1052,6 +1056,10 @@ public class RemoteApi
         try
         {
             Configuration instance = configurationProvider.get(path, Configuration.class);
+            if (instance == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(argument);
             CompositeType type = typeRegistry.getType(symbolicName);
