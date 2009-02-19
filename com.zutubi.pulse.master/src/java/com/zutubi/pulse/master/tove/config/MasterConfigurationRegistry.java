@@ -22,7 +22,10 @@ import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTrigge
 import com.zutubi.pulse.master.tove.config.project.triggers.CronBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.*;
+import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.setup.SetupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.*;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
@@ -133,11 +136,6 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
 
             MapType triggers = new MapType(triggerConfig, typeRegistry);
             projectConfig.addProperty(new ExtensionTypeProperty("triggers", triggers));
-
-            // Artifacts.
-            registerConfigurationType(ArtifactConfiguration.class);
-            registerConfigurationType(FileArtifactConfiguration.class);
-            registerConfigurationType(DirectoryArtifactConfiguration.class);
 
             // commit message processors.
             registerConfigurationType(CustomTransformerConfiguration.class);

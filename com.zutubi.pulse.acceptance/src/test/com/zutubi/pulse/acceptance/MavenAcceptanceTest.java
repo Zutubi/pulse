@@ -52,8 +52,6 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
         int buildNumber = runBuild(random);
 
-        loginAsAdmin();
-
         // We expect the summary page to report that 1 test passed.
         BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, random, buildNumber);
         summaryPage.goTo();
