@@ -296,16 +296,42 @@ public class SeleniumTestBase extends PulseTestCase
 
         driver.scmState(scmState);
 
+        String type = driver.selectType();
+
         ProjectTypeSelectState projectTypeState = new ProjectTypeSelectState(selenium);
         projectTypeState.waitFor();
-        projectTypeState.nextFormElements(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP, driver.selectCommand());
+        if (type.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))
+        {
+            projectTypeState.nextFormElements(type, driver.selectCommand());
+            AddProjectWizard.CommandState commandState = createCommandForm(driver.selectCommand());
+            commandState.waitFor();
+            driver.commandState(commandState);
+            return commandState;
+        }
+        else
+        {
+            projectTypeState.nextFormElements(type, null);
+            if (!type.equals(ProjectTypeSelectionConfiguration.TYPE_MULTI_STEP))
+            {
+                AddProjectWizard.TypeState typeState = createTypeForm(type);
+                typeState.waitFor();
+                driver.typeState(typeState);
+            }
+            return null;
+        }
 
-        AddProjectWizard.CommandState commandState = createCommandForm(driver.selectCommand());
-        commandState.waitFor();
+    }
 
-        driver.commandState(commandState);
-
-        return commandState;
+    private AddProjectWizard.TypeState createTypeForm(String s)
+    {
+        if (s.equals(ProjectTypeSelectionConfiguration.TYPE_CUSTOM))
+        {
+            return new AddProjectWizard.CustomTypeState(selenium);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unknown type: " + s);
+        }
     }
 
     private AddProjectWizard.CommandState createCommandForm(String s)
@@ -376,12 +402,26 @@ public class SeleniumTestBase extends PulseTestCase
         void scmState(AddProjectWizard.ScmState form);
 
         /**
+         * @return the type of project, one of the TYPE_* constants in
+         * {@link ProjectTypeSelectionConfiguration}.
+         */
+        String selectType();
+
+        /**
          * @return the symbolic name of the project type to be selected.
          */
         String selectCommand();
 
         /**
          * Callback that allows interaction with the project type
+         * wizard form.
+         *
+         * @param form the form instance.
+         */
+        void typeState(AddProjectWizard.TypeState form);
+
+        /**
+         * Callback that allows interaction with the project command
          * wizard form.
          *
          * @param form the form instance.
@@ -435,9 +475,18 @@ public class SeleniumTestBase extends PulseTestCase
             form.nextFormElements(Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, "CLEAN_CHECKOUT");
         }
 
+        public String selectType()
+        {
+            return ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP;
+        }
+
         public String selectCommand()
         {
             return "zutubi.antCommandConfig";
+        }
+
+        public void typeState(AddProjectWizard.TypeState form)
+        {
         }
 
         public void commandState(AddProjectWizard.CommandState form)

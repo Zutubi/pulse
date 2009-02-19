@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
-import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
@@ -12,7 +12,9 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeView
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.io.IOUtils;
 
+import java.io.IOException;
 import static java.util.Arrays.asList;
 import java.util.Hashtable;
 
@@ -44,7 +46,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // When configuring a template and a single select is shown, that
         // single select should have an empty option added.
         loginAsAdmin();
-        addProject(random, true, ProjectManager.GLOBAL_PROJECT_NAME, false);
+        addProject(random, true, GLOBAL_PROJECT_NAME, false);
         goTo(urls.adminProject(random) + "scm/");
         SubversionForm form = new SubversionForm(selenium);
         form.waitFor();
@@ -180,7 +182,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testCheckFormInWizard() throws Exception
     {
         loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, false);
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, GLOBAL_PROJECT_NAME, false);
         hierarchyPage.goTo();
         hierarchyPage.clickAdd();
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
@@ -554,6 +556,103 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         antState.finishFormElements(null, null, null, null, null, null);
     }
 
+    public void testWizardMultiRecipeProject() throws IOException
+    {
+        loginAsAdmin();
+
+        runAddProjectWizard(new DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
+        {
+            @Override
+            public String selectType()
+            {
+                return ProjectTypeSelectionConfiguration.TYPE_MULTI_STEP;
+            }
+        });
+
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
+        hierarchyPage.waitFor();
+    }
+
+    public void testWizardOverridingMultiRecipeProject() throws Exception
+    {
+        String parent = random + "-parent";
+        String child = random + "-child";
+        
+        xmlRpcHelper.insertProject(parent, GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), xmlRpcHelper.getMultiRecipeTypeConfig());
+
+        loginAsAdmin();
+
+        ProjectHierarchyPage parentHierarchyPage = new ProjectHierarchyPage(selenium, urls, parent, true);
+        parentHierarchyPage.goTo();
+        parentHierarchyPage.clickAdd();
+
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        projectState.waitFor();
+        projectState.nextFormElements(child, null, null);
+
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        subversionState.waitFor();
+        subversionState.finishFormElements(subversionState.getUnchangedValues());
+
+        ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, child, false);
+        childHierarchyPage.waitFor();
+    }
+
+    public void testCustomProject() throws IOException
+    {
+        loginAsAdmin();
+
+        final String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
+
+        runAddProjectWizard(new DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
+        {
+            @Override
+            public String selectType()
+            {
+                return ProjectTypeSelectionConfiguration.TYPE_CUSTOM;
+            }
+
+            @Override
+            public void typeState(AddProjectWizard.TypeState form)
+            {
+                form.finishFormElements(pulseFileString);
+            }
+        });
+
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
+        hierarchyPage.waitFor();
+    }
+
+    public void testWizardOverridingCustomProject() throws Exception
+    {
+        String parent = random + "-parent";
+        String child = random + "-child";
+
+        String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
+        xmlRpcHelper.insertProject(parent, GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), xmlRpcHelper.getCustomTypeConfig(pulseFileString));
+
+        loginAsAdmin();
+
+        ProjectHierarchyPage parentHierarchyPage = new ProjectHierarchyPage(selenium, urls, parent, true);
+        parentHierarchyPage.goTo();
+        parentHierarchyPage.clickAdd();
+
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        projectState.waitFor();
+        projectState.nextFormElements(child, null, null);
+
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        subversionState.waitFor();
+        subversionState.nextFormElements(subversionState.getUnchangedValues());
+
+        AddProjectWizard.CustomTypeState customTypeState = new AddProjectWizard.CustomTypeState(selenium);
+        customTypeState.waitFor();
+        customTypeState.finishFormElements(pulseFileString);
+        
+        ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, child, false);
+        childHierarchyPage.waitFor();
+    }
+
     public void testWizardOverridingScrubRequired() throws Exception
     {
         String parentName = random + "-parent";
@@ -594,7 +693,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String childName = random + "-child";
 
         loginAsAdmin();
-        addProject(parentName, true, ProjectManager.GLOBAL_PROJECT_NAME, false);
+        addProject(parentName, true, GLOBAL_PROJECT_NAME, false);
         addInheritingProject(parentName, childName);
 
         ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));
@@ -609,7 +708,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testValidationInWizard()
     {
         loginAsAdmin();
-        ProjectHierarchyPage projectsPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        ProjectHierarchyPage projectsPage = new ProjectHierarchyPage(selenium, urls, GLOBAL_PROJECT_NAME, true);
         projectsPage.goTo();
         projectsPage.clickAdd();
 
@@ -635,7 +734,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testTemplateValidationInWizard()
     {
         loginAsAdmin();
-        ProjectHierarchyPage projectsPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        ProjectHierarchyPage projectsPage = new ProjectHierarchyPage(selenium, urls, GLOBAL_PROJECT_NAME, true);
         projectsPage.goTo();
         projectsPage.clickAddTemplate();
 
@@ -737,14 +836,14 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testInvalidPathNonExistantProperty() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.adminProject(ProjectManager.GLOBAL_PROJECT_NAME) + "nosuchproperty/");
+        goTo(urls.adminProject(GLOBAL_PROJECT_NAME) + "nosuchproperty/");
         assertGenericError("Invalid path 'projects/global project template/nosuchproperty': references unknown property 'nosuchproperty' of type 'zutubi.projectConfig'");
     }
 
     public void testInvalidPathSimpleProperty() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.adminProject(ProjectManager.GLOBAL_PROJECT_NAME) + "name/");
+        goTo(urls.adminProject(GLOBAL_PROJECT_NAME) + "name/");
         assertGenericError("Invalid path 'projects/global project template/name': references non-complex type");
     }
 
@@ -793,7 +892,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         Hashtable<String, Object> versionedType = xmlRpcHelper.createDefaultConfig(VersionedTypeConfiguration.class);
         versionedType.put(Constants.Project.VersionedType.PULSE_FILE_NAME, "invalid.xml");
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), versionedType);
+        xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), versionedType);
 
         checkListedRecipes("");
     }

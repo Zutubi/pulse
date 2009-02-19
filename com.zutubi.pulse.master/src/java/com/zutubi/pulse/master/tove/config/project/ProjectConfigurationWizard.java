@@ -76,6 +76,10 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
                         return new UnknownTypeState(wizard.getNextUniqueId(), typeType);
                     }
                 }
+                else if (primaryType.equals(ProjectTypeSelectionConfiguration.TYPE_MULTI_STEP))
+                {
+                    return null;
+                }
                 else
                 {
                     CompositeType selectedTypeType = typeRegistry.getType(ProjectTypeSelectionConfiguration.TYPE_MAPPING.get(primaryType));
@@ -105,14 +109,17 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         if (templateParent != null && templateParent.getType() != null)
         {
             TypeConfiguration configuredType = templateParent.getType();
-            TemplateRecord commandTemplate = getSingleCommandTemplate(configuredType);
-            if (commandTemplate == null)
+            if (configuredType instanceof MultiRecipeTypeConfiguration)
             {
-                addWizardStates(states, null, typeType, (TemplateRecord) templateParentRecord.get("type"));
+                TemplateRecord commandTemplate = getSingleCommandTemplate(configuredType);
+                if (commandTemplate != null)
+                {
+                    addWizardStates(states, null, commandType, commandTemplate);
+                }
             }
             else
             {
-                addWizardStates(states, null, commandType, commandTemplate);
+                addWizardStates(states, null, typeType, (TemplateRecord) templateParentRecord.get("type"));
             }
         }
         else
@@ -176,18 +183,44 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             record.put("triggers", triggersRecord);
         }
 
-        TypeWizardState typeState = getCompletedStateForType(typeType);
-        MutableRecord typeRecord;
-        if (typeState == null)
+        MutableRecord typeRecord = null;
+
+        TypeWizardState typeSelectionState = getCompletedStateForType(typeSelectType);
+        if (typeSelectionState == null)
         {
-            typeRecord = createSingleCommandType(templateParentProject);
+            // No type selection because we are overriding an existing type.
+            TypeWizardState typeState = getCompletedStateForType(typeType);
+            if (typeState != null)
+            {
+                typeRecord = typeState.getDataRecord();
+            }
+            else if (getCompletedStateForType(commandType) != null)
+            {
+                typeRecord = createSingleCommandType(templateParentProject);
+            }
         }
         else
         {
-            typeRecord = typeState.getDataRecord();
+            String primaryType = (String) typeSelectionState.getDataRecord().get("primaryType");
+            if (primaryType.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))
+            {
+                typeRecord = createSingleCommandType(templateParentProject);
+            }
+            else if (primaryType.equals(ProjectTypeSelectionConfiguration.TYPE_MULTI_STEP))
+            {
+                typeRecord = createMultiRecipeType();
+            }
+            else
+            {
+                TypeWizardState typeState = getCompletedStateForType(typeType);
+                typeRecord = typeState.getDataRecord();
+            }
         }
-        
-        record.put("type", typeRecord);
+
+        if (typeRecord != null)
+        {
+            record.put("type", typeRecord);
+        }
 
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
         if(template)
@@ -218,8 +251,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             }
         }
 
-        MutableRecord typeRecord;
-        typeRecord = typeRegistry.getType(MultiRecipeTypeConfiguration.class).createNewRecord(true);
+        MutableRecord typeRecord = createMultiRecipeType();
         typeRecord.put("defaultRecipe", DEFAULT_RECIPE);
 
         MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
@@ -231,6 +263,11 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         MutableRecord recipesRecord = (MutableRecord) typeRecord.get("recipes");
         recipesRecord.put(DEFAULT_RECIPE, recipeRecord);
         return typeRecord;
+    }
+
+    private MutableRecord createMultiRecipeType()
+    {
+        return typeRegistry.getType(MultiRecipeTypeConfiguration.class).createNewRecord(true);
     }
 
     private boolean hasScmTrigger(ProjectConfiguration templateParentProject)

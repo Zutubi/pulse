@@ -382,6 +382,11 @@ public class XmlRpcHelper
         return type;
     }
 
+    public Hashtable<String, Object> getMultiRecipeTypeConfig()
+    {
+        return createEmptyConfig(MultiRecipeTypeConfiguration.class);
+    }
+
     public void waitForProjectToInitialise(String name) throws Exception
     {
         long startTime = System.currentTimeMillis();

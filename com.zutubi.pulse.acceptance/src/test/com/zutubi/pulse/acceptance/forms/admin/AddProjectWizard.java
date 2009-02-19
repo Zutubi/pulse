@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.commands.maven.MavenCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -93,6 +94,32 @@ public class AddProjectWizard
         }
     }
 
+    public abstract static class TypeState extends SeleniumForm
+    {
+        public TypeState(Selenium selenium)
+        {
+            super(selenium);
+        }
+    }
+
+    public static class CustomTypeState extends TypeState
+    {
+        public CustomTypeState(Selenium selenium)
+        {
+            super(selenium);
+        }
+
+        public String getFormName()
+        {
+            return CustomTypeConfiguration.class.getName();
+        }
+
+        public String[] getFieldNames()
+        {
+            return new String[]{"pulseFileString"};
+        }
+    }
+
     public abstract static class CommandState extends SeleniumForm
     {
         protected CommandState(Selenium selenium)
@@ -145,7 +172,7 @@ public class AddProjectWizard
 
         public int[] getFieldTypes()
         {
-            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, ITEM_PICKER };
+            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, ITEM_PICKER };
         }
 
         public boolean isBrowseWorkAvailable()

@@ -25,6 +25,7 @@ import java.util.Map;
 public class MultiRecipeTypeConfiguration extends TypeConfiguration
 {
     @Select(optionProvider = "MultiRecipeTypeDefaultRecipeOptionProvider", editable = true)
+    @Wizard.Ignore
     private String defaultRecipe;
     private Map<String, RecipeConfiguration> recipes = new LinkedHashMap<String, RecipeConfiguration>();
     @Transient
