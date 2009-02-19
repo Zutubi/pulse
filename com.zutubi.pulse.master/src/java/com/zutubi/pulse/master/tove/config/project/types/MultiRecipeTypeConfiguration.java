@@ -7,10 +7,7 @@ import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Transient;
-import com.zutubi.tove.annotations.Wire;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.Element;
 
@@ -27,6 +24,7 @@ import java.util.Map;
 @Form(fieldOrder = {"defaultRecipe"})
 public class MultiRecipeTypeConfiguration extends TypeConfiguration
 {
+    @Select(optionProvider = "MultiRecipeTypeDefaultRecipeOptionProvider", editable = true)
     private String defaultRecipe;
     private Map<String, RecipeConfiguration> recipes = new LinkedHashMap<String, RecipeConfiguration>();
     @Transient
@@ -71,6 +69,11 @@ public class MultiRecipeTypeConfiguration extends TypeConfiguration
         this.recipes = recipes;
     }
 
+    public void addRecipe(RecipeConfiguration recipe)
+    {
+        recipes.put(recipe.getName(), recipe);
+    }
+    
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
         this.fileLoaderFactory = fileLoaderFactory;

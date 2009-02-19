@@ -18,6 +18,15 @@ public class RecipeConfiguration extends AbstractNamedConfiguration
     private Map<String, CommandConfiguration> commands = new LinkedHashMap<String, CommandConfiguration>();
     private RecipeVersionConfiguration version;
 
+    public RecipeConfiguration()
+    {
+    }
+
+    public RecipeConfiguration(String name)
+    {
+        super(name);
+    }
+
     public Map<String, CommandConfiguration> getCommands()
     {
         return commands;
