@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -82,6 +83,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private ConfigurationTemplateManager configurationTemplateManager;
     private AccessManager accessManager;
     private ProjectInitialisationService projectInitialisationService;
+    private CommandExtensionManager commandExtensionManager;
 
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
     private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
@@ -987,5 +989,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setProjectInitialisationService(ProjectInitialisationService projectInitialisationService)
     {
         this.projectInitialisationService = projectInitialisationService;
+    }
+
+    public void setCommandExtensionManager(CommandExtensionManager commandExtensionManager)
+    {
+        this.commandExtensionManager = commandExtensionManager;
     }
 }

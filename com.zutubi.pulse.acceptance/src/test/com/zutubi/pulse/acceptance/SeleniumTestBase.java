@@ -314,6 +314,10 @@ public class SeleniumTestBase extends PulseTestCase
         {
             return new AddProjectWizard.AntState(selenium);
         }
+        else if (s.equals("zutubi.mavenCommandConfig"))
+        {
+            return new AddProjectWizard.MavenState(selenium);
+        }
         else if (s.equals("zutubi.maven2CommandConfig"))
         {
             return new AddProjectWizard.Maven2State(selenium);
@@ -393,7 +397,7 @@ public class SeleniumTestBase extends PulseTestCase
      * The default implementation of the project wizard driver that creates a
      * concrete project using subversion and ant.
      */
-    public class DefaultProjectWizardDriver implements ProjectWizardDriver
+    public static class DefaultProjectWizardDriver implements ProjectWizardDriver
     {
         private String name;
         private String parentName;

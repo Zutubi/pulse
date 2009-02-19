@@ -91,7 +91,7 @@ public class Constants
     public static class Output
     {
         public static final String NAME = "name";
-        public static final String POSTPROCESSORS = "postprocessors";
+        public static final String POSTPROCESSORS = "postProcessors";
     }
 
     /**

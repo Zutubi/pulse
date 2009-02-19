@@ -42,6 +42,7 @@ public class DevAcceptanceTestSuite
 
         //---( build tests )---
         suite.addTestSuite(BuildAcceptanceTest.class);
+        suite.addTestSuite(MavenAcceptanceTest.class);
         suite.addTestSuite(PerforceAcceptanceTest.class);
         suite.addTestSuite(BuildHookAcceptanceTest.class);
         suite.addTestSuite(PersonalBuildAcceptanceTest.class);

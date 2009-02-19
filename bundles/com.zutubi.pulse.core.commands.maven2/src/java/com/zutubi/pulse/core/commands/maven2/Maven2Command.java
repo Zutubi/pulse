@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.util.TextUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -17,6 +18,8 @@ import java.util.List;
  */
 public class Maven2Command extends NamedArgumentCommand
 {
+    private static final String DEFAULT_POM_FILE = "pom.xml";
+
     public Maven2Command(Maven2CommandConfiguration configuration)
     {
         super(configuration);
@@ -37,11 +40,22 @@ public class Maven2Command extends NamedArgumentCommand
         {
             //TODO: use the context's variables to transfer this maven specific information around.
             PulseExecutionContext pec = (PulseExecutionContext) commandContext.getExecutionContext();
-            pec.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(pec.getWorkingDir()), "pom.xml"), "version"));
+            pec.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(pec.getWorkingDir()), getPomFile()), "version"));
         }
         catch (PulseException e)
         {
             commandContext.addFeature(new Feature(Feature.Level.WARNING, e.getMessage()));
         }
+    }
+
+    private String getPomFile()
+    {
+        Maven2CommandConfiguration config = (Maven2CommandConfiguration) getConfig();
+        String pomFile = config.getPomFile();
+        if (!TextUtils.stringSet(pomFile))
+        {
+            pomFile = DEFAULT_POM_FILE;
+        }
+        return pomFile;
     }
 }

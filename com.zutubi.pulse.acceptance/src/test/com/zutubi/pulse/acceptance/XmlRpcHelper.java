@@ -10,9 +10,9 @@ import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
-import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -263,14 +263,14 @@ public class XmlRpcHelper
     }
 
     @SuppressWarnings({"unchecked"})
-    public Hashtable<String, Object> getProjectCapture(String projectName, String captureName) throws Exception
+    public Hashtable<String, Object> getProjectCapture(String projectName, String recipeName, String commandName, String captureName) throws Exception
     {
         Hashtable<String, Object> projectConfig = getConfig(MasterConfigurationRegistry.PROJECTS_SCOPE + "/" + projectName);
         Hashtable<String, Object> projectType = (Hashtable<String, Object>) projectConfig.get(Constants.Project.TYPE);
         Hashtable<String, Object> recipes = (Hashtable<String, Object>) projectType.get("recipes");
-        Hashtable<String, Object> recipe = (Hashtable<String, Object>) recipes.get("default");
+        Hashtable<String, Object> recipe = (Hashtable<String, Object>) recipes.get(recipeName);
         Hashtable<String, Object> commands = (Hashtable<String, Object>) recipe.get("commands");
-        Hashtable<String, Object> command = (Hashtable<String, Object>) commands.get("build");
+        Hashtable<String, Object> command = (Hashtable<String, Object>) commands.get(commandName);
         Hashtable<String, Object> captures = (Hashtable<String, Object>) command.get(Constants.Project.Command.CAPTURES);
         return (Hashtable<String, Object>) captures.get(captureName);
     }

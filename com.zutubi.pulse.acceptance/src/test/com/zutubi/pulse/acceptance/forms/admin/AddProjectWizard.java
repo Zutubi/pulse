@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
+import com.zutubi.pulse.core.commands.maven.MavenCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -144,7 +145,7 @@ public class AddProjectWizard
 
         public int[] getFieldTypes()
         {
-            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, ITEM_PICKER };
+            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, ITEM_PICKER };
         }
 
         public boolean isBrowseWorkAvailable()
@@ -155,6 +156,34 @@ public class AddProjectWizard
         public boolean isBrowseFileAvailable()
         {
             return isBrowseFieldAvailable("buildFile");
+        }
+    }
+
+    public static class MavenState extends CommandState
+    {
+        public MavenState(Selenium selenium)
+        {
+            super(selenium);
+        }
+
+        public String getFormName()
+        {
+            return MavenCommandConfiguration.class.getName();
+        }
+
+        public String[] getFieldNames()
+        {
+            return new String[]{ "name", "workingDir", "projectFile", "targets", "args", "postProcessors" };
+        }
+
+        public int[] getFieldTypes()
+        {
+            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, ITEM_PICKER };
+        }
+
+        public boolean isBrowseWorkAvailable()
+        {
+            return isBrowseFieldAvailable("workingDir");
         }
     }
 
@@ -172,7 +201,7 @@ public class AddProjectWizard
 
         public String[] getFieldNames()
         {
-            return new String[]{ "name", "workingDir", "goals", "args", "postProcessors" };
+            return new String[]{ "name", "workingDir", "pomFile", "goals", "args", "postProcessors" };
         }
 
         public int[] getFieldTypes()

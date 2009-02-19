@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.master.tove.wizard.*;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
@@ -39,6 +40,12 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
     private CompositeType commandType;
 
     private ConfigurationProvider configurationProvider;
+    private ConfigurationReferenceManager configurationReferenceManager;
+
+    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
+    {
+        this.configurationReferenceManager = configurationReferenceManager;
+    }
 
     public class ProjectTypeSelectState extends SingleStepWizardState
     {
@@ -144,31 +151,6 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         record.update(getCompletedStateForType(projectType).getDataRecord());
         record.put("scm", getCompletedStateForType(scmType).getDataRecord());
 
-        TypeWizardState typeState = getCompletedStateForType(typeType);
-        MutableRecord typeRecord;
-        if (typeState == null)
-        {
-            TypeWizardState commandState = getCompletedStateForType(commandType);
-            typeRecord = typeRegistry.getType(MultiRecipeTypeConfiguration.class).createNewRecord(true);
-            typeRecord.put("defaultRecipe", DEFAULT_RECIPE);
-
-            MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
-            recipeRecord.put("name", DEFAULT_RECIPE);
-            MutableRecord commandsRecord = (MutableRecord) recipeRecord.get("commands");
-            Record commandRenderRecord = commandState.getRenderRecord();
-            MutableRecord commandRecord = commandState.getDataRecord();
-            commandsRecord.put((String) commandRenderRecord.get("name"), commandRecord);
-
-            MutableRecord recipesRecord = (MutableRecord) typeRecord.get("recipes");
-            recipesRecord.put(DEFAULT_RECIPE, recipeRecord);
-        }
-        else
-        {
-            typeRecord = typeState.getDataRecord();
-        }
-        
-        record.put("type", typeRecord);
-
         ProjectConfiguration templateParentProject = configurationProvider.get(templateParentPath, ProjectConfiguration.class);
         if(templateParentProject.getStages().size() == 0)
         {
@@ -194,6 +176,19 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             record.put("triggers", triggersRecord);
         }
 
+        TypeWizardState typeState = getCompletedStateForType(typeType);
+        MutableRecord typeRecord;
+        if (typeState == null)
+        {
+            typeRecord = createSingleCommandType(templateParentProject);
+        }
+        else
+        {
+            typeRecord = typeState.getDataRecord();
+        }
+        
+        record.put("type", typeRecord);
+
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
         if(template)
         {
@@ -201,6 +196,41 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         }
         
         successPath = configurationTemplateManager.insertRecord(MasterConfigurationRegistry.PROJECTS_SCOPE, record);
+    }
+
+    private MutableRecord createSingleCommandType(ProjectConfiguration templateParentProject)
+    {
+        TypeWizardState commandState = getCompletedStateForType(commandType);
+        MutableRecord commandDataRecord = commandState.getDataRecord();
+        if (templateParentProject.getType() == null)
+        {
+            SimpleInstantiator instantiator = new SimpleInstantiator(templateParentPath, configurationReferenceManager, configurationTemplateManager);
+            try
+            {
+                CommandConfiguration commandConfig = (CommandConfiguration) instantiator.instantiate(commandState.getType(), commandDataRecord);
+                commandConfig.initialiseSingleCommandProject(templateParentProject.getPostProcessors());
+                commandDataRecord = commandState.getType().unstantiate(commandConfig);
+            }
+            catch (TypeException e)
+            {
+                // This is not fatal, we just won't get any extra initialisation.
+                LOG.severe(e);
+            }
+        }
+
+        MutableRecord typeRecord;
+        typeRecord = typeRegistry.getType(MultiRecipeTypeConfiguration.class).createNewRecord(true);
+        typeRecord.put("defaultRecipe", DEFAULT_RECIPE);
+
+        MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
+        recipeRecord.put("name", DEFAULT_RECIPE);
+        MutableRecord commandsRecord = (MutableRecord) recipeRecord.get("commands");
+        Record commandRenderRecord = commandState.getRenderRecord();
+        commandsRecord.put((String) commandRenderRecord.get("name"), commandDataRecord);
+
+        MutableRecord recipesRecord = (MutableRecord) typeRecord.get("recipes");
+        recipesRecord.put(DEFAULT_RECIPE, recipeRecord);
+        return typeRecord;
     }
 
     private boolean hasScmTrigger(ProjectConfiguration templateParentProject)

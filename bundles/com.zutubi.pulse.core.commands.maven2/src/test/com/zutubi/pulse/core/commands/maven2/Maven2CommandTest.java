@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.commands.maven2;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 
@@ -65,7 +65,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
 
         Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
-        command.setArgs("-f blah/pom.xml");
+        command.setPomFile("blah/pom.xml");
         successRun(command, "[compiler:compile]", "BUILD SUCCESSFUL");
     }
 

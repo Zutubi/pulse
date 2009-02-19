@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.commands.maven;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
+import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.SystemUtils;
 
 import java.io.File;
@@ -27,7 +27,7 @@ public class MavenCommandTest extends ExecutableCommandTestCase
 
     public void testExtractVersion() throws Exception
     {
-        copyMavenFile("basic");
+        copyMavenFile("basic", "project.xml");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         PulseExecutionContext context = (PulseExecutionContext) createExecutionContext();
         runCommand(new MavenCommand(command), context);
@@ -93,10 +93,5 @@ public class MavenCommandTest extends ExecutableCommandTestCase
     private void successRun(MavenCommandConfiguration configuration, String... content) throws Exception
     {
         successRun(new MavenCommand(configuration), content);
-    }
-
-    private void failedRun(MavenCommandConfiguration configuration, String... content) throws Exception
-    {
-        failedRun(new MavenCommand(configuration), content);
     }
 }

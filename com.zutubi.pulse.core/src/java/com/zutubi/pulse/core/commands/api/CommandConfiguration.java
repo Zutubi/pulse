@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.Command;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wizard;
@@ -16,6 +17,26 @@ import java.util.Map;
 @SymbolicName("zutubi.commandConfig")
 public interface CommandConfiguration extends NamedConfiguration
 {
+    /**
+     * Callback to allow for customised configuration of a command that is part
+     * of a single-command project.  This is invoked when a user creates such a
+     * project (or template project) via the wizard, and allows the command to
+     * be configured with extra bits and pieces that could be useful by default.
+     * <p/>
+     * For example, the command could have default captures added with post-
+     * processing if the likely location of such captures is known.  Note that
+     * only the passed in processors are available - it is not possible to
+     * create a processor and add it to a capture as they must be added by
+     * reference (they are defined at the project level).
+     *
+     * @param availableProcessors mapping from processor name to configuration
+     *                            for all post-processors available in the
+     *                            created project.  If no suitable processor
+     *                            exists then it is best to just omit any
+     *                            configuration which may have used it.
+     */
+    void initialiseSingleCommandProject(Map<String, PostProcessorConfiguration> availableProcessors);
+
     /**
      * Indicates if the command should be executed even if the recipe has
      * already failed.

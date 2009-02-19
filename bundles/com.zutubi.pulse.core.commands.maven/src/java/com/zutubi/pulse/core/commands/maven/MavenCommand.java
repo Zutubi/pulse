@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.util.TextUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -17,6 +18,8 @@ import java.util.List;
  */
 public class MavenCommand extends NamedArgumentCommand
 {
+    private static final String DEFAULT_PROJECT_FILE = "project.xml";
+
     public MavenCommand(MavenCommandConfiguration configuration)
     {
         super(configuration);
@@ -37,11 +40,23 @@ public class MavenCommand extends NamedArgumentCommand
         {
             //TODO: use the context's variables to transfer this maven specific information around.
             PulseExecutionContext pec = (PulseExecutionContext) commandContext.getExecutionContext();
-            pec.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(pec.getWorkingDir()), "maven.xml"), "currentVersion"));
+            String projectFile = getProjectFile();
+            pec.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(pec.getWorkingDir()), projectFile), "currentVersion"));
         }
         catch (PulseException e)
         {
             commandContext.addFeature(new Feature(Feature.Level.WARNING, e.getMessage()));
         }
+    }
+
+    private String getProjectFile()
+    {
+        MavenCommandConfiguration config = (MavenCommandConfiguration) getConfig();
+        String projectFile = config.getProjectFile();
+        if (!TextUtils.stringSet(projectFile))
+        {
+            projectFile = DEFAULT_PROJECT_FILE;
+        }
+        return projectFile;
     }
 }
