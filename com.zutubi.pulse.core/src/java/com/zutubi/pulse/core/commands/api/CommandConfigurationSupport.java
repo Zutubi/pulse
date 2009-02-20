@@ -36,6 +36,15 @@ public abstract class CommandConfigurationSupport extends AbstractNamedConfigura
         // Nothing to do by default.
     }
 
+    /**
+     * Retrieves the name of the default post-processor of the given type, if
+     * one exists.  This may be used during {@link #initialiseSingleCommandProject(java.util.Map)}
+     * to determine what name should be used to look up a processor.
+     *
+     * @param type the type of processor to look up
+     * @return the name of the default processor of the given type, or null if
+     *         there is no default of the type
+     */
     protected String getDefaultPostProcessorName(Class<? extends PostProcessorConfiguration> type)
     {
         return postProcessorExtensionManager.getDefaultProcessorName(type);

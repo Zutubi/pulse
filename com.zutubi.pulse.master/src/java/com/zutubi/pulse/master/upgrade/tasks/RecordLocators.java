@@ -6,6 +6,19 @@ package com.zutubi.pulse.master.upgrade.tasks;
 public class RecordLocators
 {
     /**
+     * Create a new locator that will combine all the records returned by the
+     * given delegate locators.
+     *
+     * @param delegates delegate locators to combine
+     * @return a locator that will return the union of all records returned by
+     *         the delegates
+     */
+    public static RecordLocator newUnion(RecordLocator... delegates)
+    {
+        return new UnionRecordLocator(delegates);
+    }
+
+    /**
      * Create a new locator that finds a single record by a specific path.  If
      * the path does not exist, no records will be returned.
      *

@@ -24,6 +24,20 @@ public class MavenAcceptanceTest extends SeleniumTestBase
     private static final String COMMAND_NAME = "build";
     private static final String JUNIT_PROCESSOR_NAME = "junit xml report processor";
 
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        xmlRpcHelper.loginAsAdmin();
+    }
+
+    @Override
+    protected void tearDown() throws Exception
+    {
+        xmlRpcHelper.logout();
+        super.tearDown();
+    }
+
     public void testMavenDefaultTestCaptureConfiguration() throws Exception
     {
         loginAsAdmin();
@@ -33,6 +47,8 @@ public class MavenAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> capture = getCaptureConfiguration(random, "test reports");
         assertNotNull(capture);
         assertCaptureConfiguration(capture, "test reports", "target/test-reports", "TEST-*.xml", JUNIT_PROCESSOR_NAME);
+
+        assertDefaultRequirement(random, "maven");
     }
 
     public void testMaven2DefaultTestArtifactConfiguration() throws Exception
@@ -44,6 +60,8 @@ public class MavenAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> capture = getCaptureConfiguration(random, "test reports");
         assertNotNull(capture);
         assertCaptureConfiguration(capture, "test reports", "target/surefire-reports", "TEST-*.xml", JUNIT_PROCESSOR_NAME);
+
+        assertDefaultRequirement(random, "maven2");
     }
 
     public void testMaven2BuildPicksUpTests() throws Exception
@@ -62,6 +80,16 @@ public class MavenAcceptanceTest extends SeleniumTestBase
         BuildArtifactsPage artifactsPage = new BuildArtifactsPage(selenium, urls, random, buildNumber);
         artifactsPage.goTo();
         SeleniumUtils.waitForLocator(selenium, artifactsPage.getArtifactLocator("test reports"));
+    }
+
+    private void assertDefaultRequirement(String projectName, String resourceName) throws Exception
+    {
+        Vector<Hashtable<String, Object>> requiredResources = xmlRpcHelper.getConfig(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, Constants.Project.REQUIREMENTS));
+        assertEquals(1, requiredResources.size());
+        Hashtable<String, Object> requirement = requiredResources.get(0);
+        assertEquals(resourceName, requirement.get("resource"));
+        assertEquals(true, requirement.get("defaultVersion"));
+        assertEquals(true, requirement.get("optional"));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -118,27 +146,11 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     private int runBuild(String projectName) throws Exception
     {
-        try
-        {
-            xmlRpcHelper.loginAsAdmin();
-            return xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
+        return xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
     }
 
     private Hashtable<String, Object> getCaptureConfiguration(String projectName, String artifactName) throws Exception
     {
-        try
-        {
-            xmlRpcHelper.loginAsAdmin();
-            return xmlRpcHelper.getProjectCapture(projectName, "default", COMMAND_NAME, artifactName);
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
+        return xmlRpcHelper.getProjectCapture(projectName, "default", COMMAND_NAME, artifactName);
     }
 }

@@ -1,7 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -16,6 +18,8 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -31,7 +35,10 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
     private static final Logger LOG = Logger.getLogger(ProjectConfigurationWizard.class);
 
     public static final String DEFAULT_STAGE = "default";
-    private static final String DEFAULT_RECIPE = "default";
+    public static final String DEFAULT_RECIPE = "default";
+    public static final String DEFAULT_COMMAND = "build";
+
+    private static final String PROPERTY_PROJECT_REQUIREMENTS = "requirements";
 
     private CompositeType projectType;
     private CompositeType scmType;
@@ -41,11 +48,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 
     private ConfigurationProvider configurationProvider;
     private ConfigurationReferenceManager configurationReferenceManager;
-
-    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
-    {
-        this.configurationReferenceManager = configurationReferenceManager;
-    }
+    private CommandExtensionManager commandExtensionManager;
 
     public class ProjectTypeSelectState extends SingleStepWizardState
     {
@@ -69,7 +72,9 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
                     if (TextUtils.stringSet(commandSymbolicName))
                     {
                         CompositeType selectedCommandType = typeRegistry.getType(commandSymbolicName);
-                        return new SingleStepWizardState(ProjectConfigurationWizard.this, wizard.getNextUniqueId(), null, commandType, selectedCommandType, null);
+                        SingleStepWizardState commandState = new SingleStepWizardState(ProjectConfigurationWizard.this, wizard.getNextUniqueId(), null, commandType, selectedCommandType, null);
+                        commandState.getDataRecord().put("name", DEFAULT_COMMAND);
+                        return commandState;
                     }
                     else
                     {
@@ -159,7 +164,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         record.put("scm", getCompletedStateForType(scmType).getDataRecord());
 
         ProjectConfiguration templateParentProject = configurationProvider.get(templateParentPath, ProjectConfiguration.class);
-        if(templateParentProject.getStages().size() == 0)
+        if (templateParentProject.getStages().size() == 0)
         {
             // Add a default stage to our new project.
             CollectionType stagesType = (CollectionType) projectType.getProperty("stages").getType();
@@ -171,7 +176,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             record.put("stages", stagesRecord);
         }
 
-        if(!hasScmTrigger(templateParentProject))
+        if (!hasScmTrigger(templateParentProject))
         {
             // Add a default SCM trigger
             CollectionType triggersType = (CollectionType) projectType.getProperty("triggers").getType();
@@ -205,6 +210,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             if (primaryType.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))
             {
                 typeRecord = createSingleCommandType(templateParentProject);
+                addDefaultResourceRequirements(record, getCompletedStateForType(commandType).getType());
             }
             else if (primaryType.equals(ProjectTypeSelectionConfiguration.TYPE_MULTI_STEP))
             {
@@ -223,12 +229,39 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         }
 
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
-        if(template)
+        if (template)
         {
             configurationTemplateManager.markAsTemplate(record);
         }
-        
+
         successPath = configurationTemplateManager.insertRecord(MasterConfigurationRegistry.PROJECTS_SCOPE, record);
+    }
+
+    private void addDefaultResourceRequirements(MutableRecord projectRecord, CompositeType commandType)
+    {
+        Object existingRequirements = projectRecord.get(PROPERTY_PROJECT_REQUIREMENTS);
+        if (existingRequirements == null || ((Record) existingRequirements).size() == 0)
+        {
+            @SuppressWarnings("unchecked")
+            List<ResourceRequirement> defaultRequirements = commandExtensionManager.getDefaultResourceRequirements((Class<? extends CommandConfiguration>) commandType.getClazz());
+            List<ResourceRequirementConfiguration> configurations = CollectionUtils.map(defaultRequirements, new Mapping<ResourceRequirement, ResourceRequirementConfiguration>()
+            {
+                public ResourceRequirementConfiguration map(ResourceRequirement resourceRequirement)
+                {
+                    return new ResourceRequirementConfiguration(resourceRequirement);
+                }
+            });
+
+            try
+            {
+                projectRecord.put(PROPERTY_PROJECT_REQUIREMENTS, projectType.getProperty(PROPERTY_PROJECT_REQUIREMENTS).getType().unstantiate(configurations));
+            }
+            catch (TypeException e)
+            {
+                // We can continue without these defaults.
+                LOG.severe(e);
+            }
+        }
     }
 
     private MutableRecord createSingleCommandType(ProjectConfiguration templateParentProject)
@@ -272,10 +305,11 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 
     private boolean hasScmTrigger(ProjectConfiguration templateParentProject)
     {
+        @SuppressWarnings("unchecked")
         Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) templateParentProject.getExtensions().get("triggers");
-        for(TriggerConfiguration trigger: triggers.values())
+        for (TriggerConfiguration trigger : triggers.values())
         {
-            if(trigger instanceof ScmBuildTriggerConfiguration)
+            if (trigger instanceof ScmBuildTriggerConfiguration)
             {
                 return true;
             }
@@ -292,5 +326,15 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
+    {
+        this.configurationReferenceManager = configurationReferenceManager;
+    }
+
+    public void setCommandExtensionManager(CommandExtensionManager commandExtensionManager)
+    {
+        this.commandExtensionManager = commandExtensionManager;
     }
 }

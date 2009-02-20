@@ -5,7 +5,7 @@ import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
-@Table(columns = {"resource", "displayVersion"})
+@Table(columns = {"resource", "displayVersion", "optional"})
 @Form(fieldOrder = {"resource", "defaultVersion", "version"})
 @SymbolicName("zutubi.resourceRequirementConfig")
 public class ResourceRequirementConfiguration extends AbstractConfiguration
@@ -13,22 +13,27 @@ public class ResourceRequirementConfiguration extends AbstractConfiguration
     @Required
     @FieldAction(template = "ResourceRequirementConfiguration.browser")
     private String resource;
-
-    @Required // if version is enabled, it is also required.
-    private String version;
-
     @ControllingCheckbox(invert = true, dependentFields = {"version"})
     private boolean defaultVersion = true;
+    @Required // if version is enabled, it is also required.
+    private String version;
+    private boolean optional;
 
     public ResourceRequirementConfiguration()
     {
     }
 
-    public ResourceRequirementConfiguration(String resource, String version, boolean defaultVersion)
+    public ResourceRequirementConfiguration(String resource, String version, boolean defaultVersion, boolean optional)
     {
         this.resource = resource;
         this.version = version;
         this.defaultVersion = defaultVersion;
+        this.optional = optional;
+    }
+
+    public ResourceRequirementConfiguration(ResourceRequirement requirement)
+    {
+        this(requirement.getResource(), requirement.getVersion(), requirement.isDefaultVersion(), requirement.isOptional());
     }
 
     public String getResource()
@@ -71,9 +76,19 @@ public class ResourceRequirementConfiguration extends AbstractConfiguration
         this.version = version;
     }
 
+    public boolean isOptional()
+    {
+        return optional;
+    }
+
+    public void setOptional(boolean optional)
+    {
+        this.optional = optional;
+    }
+
     public ResourceRequirementConfiguration copy()
     {
-        return new ResourceRequirementConfiguration(resource, version, defaultVersion);
+        return new ResourceRequirementConfiguration(resource, version, defaultVersion, optional);
     }
 
     public String toString()
@@ -83,7 +98,14 @@ public class ResourceRequirementConfiguration extends AbstractConfiguration
 
     public ResourceRequirement asResourceRequirement()
     {
-        return new ResourceRequirement(getResource(), getVersion(), isDefaultVersion());
+        if (isDefaultVersion())
+        {
+            return new ResourceRequirement(resource, optional);
+        }
+        else
+        {
+            return new ResourceRequirement(resource, version, optional);
+        }
     }
 }
 

@@ -26,7 +26,7 @@ public class AnyCapableAgentRequirements implements AgentRequirements
         List<ResourceRequirement> requirements = request.getResourceRequirements();
         for(ResourceRequirement requirement: requirements)
         {
-            if(!service.hasResource(requirement))
+            if (!requirement.isOptional() && !service.hasResource(requirement))
             {
                 return false;
             }
