@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.FileSystemUtils;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -73,7 +74,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
             assertEquals(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "postProcessors", expectedPostProcessors[i]), postprocessors.get(i));
         }
         assertEquals(expectedName, capture.get(Constants.DirectoryOutput.NAME));
-        assertEquals(expectedBase, capture.get(Constants.DirectoryOutput.BASE));
+        assertEquals(expectedBase, FileSystemUtils.normaliseSeparators((String) capture.get(Constants.DirectoryOutput.BASE)));
         assertEquals(expectedIncludes, ((Vector) capture.get(Constants.DirectoryOutput.INCLUSIONS)).get(0));
     }
 
