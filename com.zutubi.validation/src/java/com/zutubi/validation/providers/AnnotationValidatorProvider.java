@@ -2,6 +2,7 @@ package com.zutubi.validation.providers;
 
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.validation.FieldValidator;
@@ -9,6 +10,7 @@ import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.ValidatorProvider;
 import com.zutubi.validation.annotations.Constraint;
+import com.zutubi.validation.annotations.ConstraintProperty;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -194,7 +196,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
                 {
                     Class<? extends Validator> validatorClass = ClassLoaderUtils.loadAssociatedClass(clazz, validatorClassName);
                     Validator validator = objectFactory.buildBean(validatorClass);
-                    AnnotationUtils.setPropertiesFromAnnotation(annotation, validator);
+                    copyConstraintProperties(annotation, validator);
                     if (validator instanceof FieldValidator)
                     {
                         ((FieldValidator)validator).setFieldName(descriptor.getName());
@@ -209,5 +211,34 @@ public class AnnotationValidatorProvider implements ValidatorProvider
             }
         }
         return validators;
+    }
+
+    private void copyConstraintProperties(Annotation annotation, Validator validator)
+    {
+        for (Method annotationMethod : annotation.annotationType().getMethods())
+        {
+            try
+            {
+                if (AnnotationUtils.isUserDeclared(annotationMethod) && !AnnotationUtils.isDefault(annotation, annotationMethod))
+                {
+                    String targetProperty;
+                    ConstraintProperty declaredTargetProperty = annotationMethod.getAnnotation(ConstraintProperty.class);
+                    if (declaredTargetProperty == null)
+                    {
+                        targetProperty = annotationMethod.getName();
+                    }
+                    else
+                    {
+                        targetProperty = declaredTargetProperty.value();
+                    }
+
+                    BeanUtils.setProperty(targetProperty, annotationMethod.invoke(annotation), validator);
+                }
+            }
+            catch (Exception e)
+            {
+                // noop.
+            }
+        }
     }
 }

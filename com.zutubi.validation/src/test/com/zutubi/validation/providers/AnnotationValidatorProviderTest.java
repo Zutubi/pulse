@@ -1,16 +1,13 @@
 package com.zutubi.validation.providers;
 
+import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.annotations.*;
 import com.zutubi.validation.mock.*;
 import com.zutubi.validation.validators.*;
-import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.List;
 
-/**
- * <class-comment/>
- */
 public class AnnotationValidatorProviderTest extends ZutubiTestCase
 {
     private AnnotationValidatorProvider provider;
@@ -18,15 +15,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-
         provider = new AnnotationValidatorProvider();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        provider = null;
-
-        super.tearDown();
     }
 
     public void testPropertyConstraint()
@@ -88,7 +77,6 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
         List<Validator> validators = provider.getValidators(book, null);
 
         assertEquals(2, validators.size());
-        validators.get(0);
 
         // ensure that the readable validator is picked up only once, even through the interface is
         // implemented multiple times.
@@ -96,41 +84,19 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
         validators = provider.getValidators(niceBook, null);
 
         assertEquals(2, validators.size());
-        validators.get(0);
     }
 
     public void testValidatorOrdering()
     {
-        MockStraightJacket jacket = new MockStraightJacket();
-        List<Validator> validators = provider.getValidators(jacket, null);
-        assertEquals(4, validators.size());
-        assertTrue(validators.get(0) instanceof RequiredValidator);
-        assertTrue(validators.get(1) instanceof EmailValidator);
-        assertTrue(validators.get(2) instanceof NameValidator);
-        assertTrue(validators.get(3) instanceof RegexValidator);
+        typedValidatorHelper(new MockStraightJacket(), RequiredValidator.class, EmailValidator.class, NameValidator.class, RegexValidator.class);
     }
 
     public void testIndirectConstraintsOnField()
     {
-        MockIndirectConstraintsOnField mock = new MockIndirectConstraintsOnField();
-        List<Validator> validators = provider.getValidators(mock, null);
-        assertEquals(4, validators.size());
-        assertTrue(validators.get(0) instanceof RequiredValidator);
-        assertTrue(validators.get(1) instanceof EmailValidator);
-        assertTrue(validators.get(2) instanceof NameValidator);
-        assertTrue(validators.get(3) instanceof RegexValidator);
+        typedValidatorHelper(new IndirectConstraintsOnField(), RequiredValidator.class, EmailValidator.class, NameValidator.class, RegexValidator.class);
     }
 
-    public void testDirectConstraintsOnField()
-    {
-        MockDirectConstraintsOnField mock = new MockDirectConstraintsOnField();
-        List<Validator> validators = provider.getValidators(mock, null);
-        assertEquals(2, validators.size());
-        assertTrue(validators.get(0) instanceof RequiredValidator);
-        assertTrue(validators.get(1) instanceof EmailValidator);
-    }
-
-    public class MockIndirectConstraintsOnField
+    public static class IndirectConstraintsOnField
     {
         @Required @Email @Name @Regex(pattern = ".")
         private String field;
@@ -146,7 +112,12 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
         }
     }
 
-    public class MockDirectConstraintsOnField
+    public void testDirectConstraintsOnField()
+    {
+        typedValidatorHelper(new DirectConstraintsOnField(), RequiredValidator.class, EmailValidator.class);
+    }
+
+    public static class DirectConstraintsOnField
     {
         @Constraint({"com.zutubi.validation.validators.RequiredValidator", "com.zutubi.validation.validators.EmailValidator"})
         private String field;
@@ -160,5 +131,75 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
         {
             this.field = field;
         }
+    }
+
+    public void testIndirectInheritedFromSuperClass()
+    {
+        typedValidatorHelper(new IndirectInheritedFromSuperClassSub(), NumericValidator.class);
+    }
+
+    public static class IndirectInheritedFromSuperClassSuper
+    {
+        @Min(0)
+        private int f;
+
+        public int getF()
+        {
+            return f;
+        }
+
+        public void setF(int f)
+        {
+            this.f = f;
+        }
+    }
+
+    public static class IndirectInheritedFromSuperClassSub extends IndirectInheritedFromSuperClassSuper
+    {
+    }
+
+    public void testConstraintPropertyApplied()
+    {
+        List<Validator> validators = typedValidatorHelper(new ConstraintPropertyApplied(), NumericValidator.class);
+        NumericValidator numericValidator = (NumericValidator) validators.get(0);
+        assertEquals(11, numericValidator.getMin());
+    }
+
+    public static class ConstraintPropertyApplied
+    {
+        @Min(11)
+        private int i;
+
+        public int getI()
+        {
+            return i;
+        }
+
+        public void setI(int i)
+        {
+            this.i = i;
+        }
+    }
+
+    /**
+     * Helper for tests that just check the number, order and type of
+     * validators returned for an instance.
+     *
+     * @param instance      instance to get the validators for
+     * @param expectedTypes expected classes for the returned validators, in
+     * @return the found validators
+     */
+    private List<Validator> typedValidatorHelper(Object instance, Class<? extends Validator>... expectedTypes)
+    {
+        List<Validator> validators = provider.getValidators(instance, null);
+        assertEquals(expectedTypes.length, validators.size());
+        int i = 0;
+        for (Validator validator: validators)
+        {
+            assertSame(validator.getClass(), expectedTypes[i]);
+            i++;
+        }
+
+        return validators;
     }
 }
