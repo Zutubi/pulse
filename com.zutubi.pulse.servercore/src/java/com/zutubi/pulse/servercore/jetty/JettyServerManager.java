@@ -22,7 +22,8 @@ public class JettyServerManager implements Stoppable
     private final Map<String, Server> servers = new HashMap<String, Server>();
 
     /**
-     * Create a new jetty server using the provided handler to configure the instance.
+     * Configure a server using the provided handler to configure the instance.  If the named server does
+     * not already exist, a new one is created.
      *
      * @param name      a key that can be used with {@link JettyServerManager#getServer} to retrieve
      * the server instance
@@ -31,11 +32,15 @@ public class JettyServerManager implements Stoppable
      *
      * @throws IOException on configuration error.
      */
-    public synchronized Server createNewServer(String name, ServerConfigurationHandler handler) throws IOException
+    public synchronized Server configureServer(String name, ServerConfigurationHandler handler) throws IOException
     {
-        Server server = new Server();
+        if (!servers.containsKey(name))
+        {
+            Server server = new Server();
+            servers.put(name, server);
+        }
+        Server server = servers.get(name);
         handler.configure(server);
-        servers.put(name, server);
         return server;
     }
 

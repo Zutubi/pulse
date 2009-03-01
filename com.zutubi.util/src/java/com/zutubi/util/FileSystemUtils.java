@@ -555,6 +555,15 @@ public class FileSystemUtils
         }
     }
 
+    public static File createTempFile(File dir) throws IOException
+    {
+        if (!dir.exists() && !dir.mkdirs())
+        {
+            throw new IOException("Failed to create new directory '" + dir.getCanonicalPath() + "'.");
+        }
+        return File.createTempFile("tmp", null, dir);
+    }
+
     public static File createTempFile(String prefix, String suffix, byte[] data) throws IOException
     {
         File file = File.createTempFile(prefix, suffix);

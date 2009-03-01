@@ -1,10 +1,10 @@
-package com.zutubi.pulse.acceptance;
+package com.zutubi.pulse.acceptance.dependencies;
 
+import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
+import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
+import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.util.FileSystemUtils;
 
-import java.io.IOException;
-import java.io.File;
 import java.util.Hashtable;
 
 public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
@@ -26,8 +26,6 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     protected void tearDown() throws Exception
     {
-        clearArtifactRepository();
-
         logout();
         
         super.tearDown();
@@ -35,12 +33,15 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testIvyCanPublishToRepository() throws Exception
     {
-        assertNotInArtifactRepository("zutubi/com.zutubi.sample/jars");
+        assertTrue(isNotInArtifactRepository("zutubi/com.zutubi.sample/jars"));
 
         // run the ivyant build, verify that a new artifact is added to the repository.
-        createAndRunIvyAntProject("publish");
+        int buildNumber = createAndRunIvyAntProject("publish");
 
-        assertInArtifactRepository("zutubi/com.zutubi.sample/jars");
+        assertTrue(isInArtifactRepository("zutubi/com.zutubi.sample/jars"));
+        
+        // ensure that the build passed.
+        assertTrue(isBuildSuccessful(random, buildNumber));
     }
 
     public void testIvyCanRetrieveFromRepository() throws Exception
@@ -52,8 +53,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = createAndRunIvyAntProject("retrieve");
 
         // ensure that the build passed.
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, buildNumber);
-        assertEquals("success", build.get("status"));
+        assertTrue(isBuildSuccessful(random, buildNumber));
     }
 
     public void testMavenCanPublishToRepository()
@@ -69,33 +69,4 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.IVY_ANT_REPOSITORY), antConfig);
         return xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
     }
-
-    private void assertInArtifactRepository(String path) throws IOException
-    {
-        assertTrue(new File(getArtifactRepository(), path).exists());
-    }
-
-    private void assertNotInArtifactRepository(String path) throws IOException
-    {
-        assertFalse(new File(getArtifactRepository(), path).exists());
-    }
-
-    private void clearArtifactRepository() throws IOException
-    {
-        assertTrue(FileSystemUtils.rmdir(getArtifactRepository()));
-        assertTrue(getArtifactRepository().mkdirs());
-    }
-
-    private void createArtifactFile(String path) throws IOException
-    {
-        File file = new File(getArtifactRepository(), path);
-        assertTrue(file.getParentFile().mkdirs());
-        assertTrue(file.createNewFile());
-    }
-
-    private File getArtifactRepository() throws IOException
-    {
-        return new File(AcceptanceTestUtils.getDataDirectory(), "repository");
-    }
-
 }

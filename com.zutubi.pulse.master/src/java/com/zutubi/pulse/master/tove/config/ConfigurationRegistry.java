@@ -16,6 +16,8 @@ import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
 import com.zutubi.pulse.master.tove.config.misc.TransientConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependenciesConfiguration;
+import com.zutubi.pulse.master.tove.config.project.LocalDependenciesConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.*;
 import com.zutubi.pulse.master.tove.config.project.commit.CustomTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
@@ -111,6 +113,9 @@ public class ConfigurationRegistry
             registerConfigurationType(MsBuildTypeConfiguration.class);
             registerConfigurationType(VersionedTypeConfiguration.class);
             registerConfigurationType(XCodeTypeConfiguration.class);
+
+            registerConfigurationType(DependenciesConfiguration.class);
+            registerConfigurationType(LocalDependenciesConfiguration.class);
 
             // change viewer configuration
             registerConfigurationType(ChangeViewerConfiguration.class);

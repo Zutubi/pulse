@@ -904,6 +904,10 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         {
         }
 
+        public void publish(PulseExecutionContext context, RecipeRequest request)
+        {
+        }
+
         public void cleanup(String project, long recipeId, boolean incremental)
         {
         }

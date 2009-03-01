@@ -3,16 +3,13 @@ package com.zutubi.pulse.master.bootstrap.tasks;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.jetty.*;
+import com.zutubi.pulse.master.bootstrap.WebManager;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.mortbay.jetty.Server;
-import org.mortbay.http.handler.AbstractHttpHandler;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
-import org.mortbay.http.HttpException;
 import org.mortbay.http.HttpHandler;
 
 /**
@@ -30,17 +27,20 @@ public class DeployArtifactRepositoryStartupTask implements StartupTask
 
         ArtifactRepositoryConfigurationHandler repository = new ArtifactRepositoryConfigurationHandler();
         repository.setHost(sysConfig.getBindAddress());
-        repository.setPort(8888); // need to make this configurable.
+        repository.setPort(sysConfig.getServerPort());
 
         repository.setSecurityHandler(securityHandler);
 
-        File repositoryBase = new File(configurationManager.getUserPaths().getData(), "repository");
+        File repositoryBase = ((MasterUserPaths)configurationManager.getUserPaths()).getRepositoryRoot();
         ensureIsDirectory(repositoryBase);
 
         repository.setBase(repositoryBase); // need to make this configurable.
 
-        Server server = jettyServerManager.createNewServer("repository", repository);
-        server.start();
+        Server server = jettyServerManager.configureServer(WebManager.WEBAPP_PULSE, repository);
+        if (!server.isStarted())
+        {
+            server.start();
+        }
     }
 
     private void ensureIsDirectory(File dir)

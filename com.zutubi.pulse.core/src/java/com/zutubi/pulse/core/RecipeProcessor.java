@@ -2,6 +2,10 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
+import com.zutubi.pulse.core.dependency.ivy.IvySupport;
+import com.zutubi.pulse.core.dependency.ivy.PublishArtifactsCommand;
+import com.zutubi.pulse.core.dependency.ivy.RetrieveDependenciesCommand;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
@@ -29,7 +33,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The recipe processor, as the name suggests, is responsible for running recipies.
- *
  */
 public class RecipeProcessor
 {
@@ -41,6 +44,8 @@ public class RecipeProcessor
     private Recipe runningRecipeInstance = null;
     private boolean terminating = false;
     private PulseFileLoaderFactory fileLoaderFactory;
+
+    private IvyProvider ivyProvider;
 
     public RecipeProcessor()
     {
@@ -92,7 +97,13 @@ public class RecipeProcessor
                 throw new BuildException("Undefined recipe '" + recipeName + "'");
             }
 
+            IvySupport ivy = new IvySupport(ivyProvider);
+            RetrieveDependenciesCommand retrieveCommand = new RetrieveDependenciesCommand(ivy);
+            PublishArtifactsCommand publishCommand = new PublishArtifactsCommand(ivy, request);
+
+            recipe.addFirstCommand(retrieveCommand);
             recipe.addFirstCommand(bootstrapCommand);
+            recipe.addLastCommand(publishCommand);
 
             runningRecipeInstance = recipe;
 
@@ -291,5 +302,10 @@ public class RecipeProcessor
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
         this.fileLoaderFactory = fileLoaderFactory;
+    }
+
+    public void setIvyProvider(IvyProvider ivyProvider)
+    {
+        this.ivyProvider = ivyProvider;
     }
 }

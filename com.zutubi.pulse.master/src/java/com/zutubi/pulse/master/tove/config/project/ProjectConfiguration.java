@@ -20,7 +20,7 @@ import java.util.*;
  * be represented by many projects in Pulse.  For example, there may be one
  * Pulse project for a nightly build and another for a continuous build.
  */
-@Form(fieldOrder = {"name", "url", "description"})
+@Form(fieldOrder = {"name", "org", "url", "description"})
 @Listing(order = {"type", "requirements", "properties", "stages", "options", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "permissions"})
 @Table(columns = {"name"})
 @SymbolicName("zutubi.projectConfig")
@@ -43,6 +43,10 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private ScmConfiguration scm;
     @Essential
     private TypeConfiguration type;
+
+    private String org;
+
+    private DependenciesConfiguration dependencies = new LocalDependenciesConfiguration();
 
     @Ordered
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
@@ -237,5 +241,25 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     public void addPermission(ProjectAclConfiguration permission)
     {
         permissions.add(permission);
+    }
+
+    public DependenciesConfiguration getDependencies()
+    {
+        return dependencies;
+    }
+
+    public void setDependencies(DependenciesConfiguration dependencies)
+    {
+        this.dependencies = dependencies;
+    }
+
+    public String getOrg()
+    {
+        return org;
+    }
+
+    public void setOrg(String org)
+    {
+        this.org = org;
     }
 }

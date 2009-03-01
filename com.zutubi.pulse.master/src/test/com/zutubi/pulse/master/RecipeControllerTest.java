@@ -5,8 +5,6 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
@@ -29,12 +27,10 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.AnyCapableAgentRequirements;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
-import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.services.UpgradeState;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.util.FileSystemUtils;
 import static org.mockito.Mockito.*;
 
@@ -47,7 +43,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     private MockRecipeQueue recipeQueue;
     private MockBuildManager buildManager;
-    private MockAgentService buildService;
+    private AgentService buildService;
 
     private RecipeResult rootResult;
     private RecipeResultNode rootNode;
@@ -62,8 +58,8 @@ public class RecipeControllerTest extends PulseTestCase
         MockRecipeResultCollector resultCollector = new MockRecipeResultCollector();
         recipeQueue = new MockRecipeQueue();
         buildManager = new MockBuildManager();
-        buildService = new MockAgentService();
-        RecipeLogger logger = new MockRecipeLogger();
+        buildService = mock(AgentService.class);
+        RecipeLogger logger = mock(RecipeLogger.class);
 
         rootResult = new RecipeResult("root recipe");
         rootResult.setId(100);
@@ -133,9 +129,15 @@ public class RecipeControllerTest extends PulseTestCase
         testDispatchRequest();
         buildManager.clear();
 
+        Agent agent = mock(Agent.class);
+        stub(agent.getService()).toReturn(buildService);
+        stub(agent.isOnline()).toReturn(true);
+        stub(agent.getStatus()).toReturn(Status.IDLE);
+        stub(agent.getConfig()).toReturn(new AgentConfiguration());
+        
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeAssignedEvent event = new RecipeAssignedEvent(this, new RecipeRequest(makeContext("project", rootResult.getId(), "test")), new MockAgent(buildService));
+        RecipeAssignedEvent event = new RecipeAssignedEvent(this, new RecipeRequest(makeContext("project", rootResult.getId(), "test")), agent);
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
         assertEquals(buildService.getHostName(), rootNode.getHost());
@@ -397,310 +399,6 @@ public class RecipeControllerTest extends PulseTestCase
         public RecipeAssignmentRequest getRequest(long recipeId)
         {
             return dispatched.get(recipeId);
-        }
-    }
-
-    class MockAgent implements Agent
-    {
-        private AgentService service;
-
-        public MockAgent(AgentService service)
-        {
-            this.service = service;
-        }
-
-        public long getId()
-        {
-            return 0;
-        }
-
-        public AgentService getService()
-        {
-            return service;
-        }
-
-        public long getSecondsSincePing()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public long getRecipeId()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void setRecipeId(long recipeId)
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public boolean isOnline()
-        {
-            return true;
-        }
-
-        public boolean isEnabled()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public boolean isDisabling()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public boolean isDisabled()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public boolean isUpgrading()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public boolean isFailedUpgrade()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public boolean isAvailable()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public AgentState.EnableState getEnableState()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public void setAgentState(AgentState agentState)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public Status getStatus()
-        {
-            return Status.IDLE;
-        }
-
-        public String getLocation()
-        {
-            return "mock";
-        }
-
-        public UpgradeState getUpgradeState()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void updateStatus(SlaveStatus status)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public void updateStatus(Status status)
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void updateStatus(Status status, long recipeId)
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void copyStatus(Agent agent)
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void upgradeStatus(UpgradeState state, int progress, String message)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public AgentConfiguration getConfig()
-        {
-            return new AgentConfiguration();
-        }
-
-        public String getName()
-        {
-            return "mock";
-        }
-    }
-
-    class MockAgentService implements AgentService
-    {
-        public int ping()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public SlaveStatus getStatus(String masterLocation)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public List<Resource> discoverResources()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public SystemInfo getSystemInfo()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public List<CustomLogRecord> getRecentMessages()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public AgentConfiguration getAgentConfig()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public boolean hasResource(ResourceRequirement requirement)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public boolean build(RecipeRequest request)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void cleanup(String project, long recipeId, boolean incremental)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void terminateRecipe(long recipeId)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public String getHostName()
-        {
-            return "mock build service";
-        }
-
-        public void garbageCollect()
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public String getUrl()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-    }
-
-    public class MockRecipeLogger implements RecipeLogger
-    {
-        public void log(RecipeAssignedEvent event)
-        {
-        }
-
-        public void log(RecipeDispatchedEvent event)
-        {
-        }
-
-        public void log(RecipeCommencedEvent event, RecipeResult result)
-        {
-        }
-
-        public void log(CommandCommencedEvent event, CommandResult result)
-        {
-        }
-
-        public void log(CommandCompletedEvent event, CommandResult result)
-        {
-        }
-
-        public void log(RecipeCompletedEvent event, RecipeResult result)
-        {
-        }
-
-        public void log(RecipeStatusEvent event)
-        {
-        }
-
-        public void log(RecipeErrorEvent event, RecipeResult result)
-        {
-        }
-
-        public void prepare()
-        {
-        }
-
-        public void complete(RecipeResult result)
-        {
-        }
-
-        public void collecting(RecipeResult recipeResult, boolean collectWorkingCopy)
-        {
-        }
-
-        public void collectionComplete()
-        {
-        }
-
-        public void cleaning()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void cleaningComplete()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void postStage()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void postStageComplete()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void close()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        public void hookCommenced(String name)
-        {
-            throw new RuntimeException("Method not yet implemented");
-        }
-
-        public void hookCompleted(String name)
-        {
-            throw new RuntimeException("Method not yet implemented");
-        }
-
-        public void log(byte[] output)
-        {
-            throw new RuntimeException("Method not yet implemented");
-        }
-
-        public void log(byte[] output, int offset, int length)
-        {
-            throw new RuntimeException("Method not yet implemented");
         }
     }
 }

@@ -70,7 +70,7 @@ public class WebManager
         
         try
         {
-            server = jettyServerManager.createNewServer(WEBAPP_PULSE, webapp);
+            server = jettyServerManager.configureServer(WEBAPP_PULSE, webapp);
             server.start();
         }
         catch (Exception e)

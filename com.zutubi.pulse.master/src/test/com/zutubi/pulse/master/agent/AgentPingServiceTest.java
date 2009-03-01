@@ -6,6 +6,7 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;

@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.net.URL;
 import java.util.Vector;
+import java.util.Hashtable;
 
 /**
  * Helper base class for test cases that call the remote api.  Provides
@@ -15,7 +16,7 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
 {
     public static final String SYMBOLIC_NAME_KEY = XmlRpcHelper.SYMBOLIC_NAME_KEY;
 
-    XmlRpcHelper xmlRpcHelper;
+    protected XmlRpcHelper xmlRpcHelper;
 
     public BaseXmlRpcAcceptanceTest()
     {
@@ -102,5 +103,26 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
         {
             assertTrue("Message '" + e.getMessage() + "' does not contain '" + error + "'", e.getMessage().contains(error));
         }
+    }
+
+    protected boolean isBuildSuccessful(String projectName, int buildNumber) throws Exception
+    {
+        return "success".compareTo(getBuildStatus(projectName, buildNumber)) == 0;
+    }
+
+    protected boolean isBuildFailed(String projectName, int buildNumber) throws Exception
+    {
+        return "failed".compareTo(getBuildStatus(projectName, buildNumber)) == 0;
+    }
+
+    protected boolean isBuildErrored(String projectName, int buildNumber) throws Exception
+    {
+        return "error".compareTo(getBuildStatus(projectName, buildNumber)) == 0;
+    }
+
+    protected String getBuildStatus(String projectName, int buildNumber) throws Exception
+    {
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
+        return (String) build.get("status");
     }
 }

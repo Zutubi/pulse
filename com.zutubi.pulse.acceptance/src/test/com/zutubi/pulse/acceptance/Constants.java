@@ -18,6 +18,11 @@ public class Constants
      */
     public static final String IVY_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "ivyant";
     /**
+     * Subversion URL for the dep-ant project that supports creating files and asserting the existance
+     * of files.  For testing, these files simulate artifacts.
+     */
+    public static final String DEP_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "depant";
+    /**
      * Subversion URL for a small sample ant project that contains a build file as well as src and
      * test directories.
      */

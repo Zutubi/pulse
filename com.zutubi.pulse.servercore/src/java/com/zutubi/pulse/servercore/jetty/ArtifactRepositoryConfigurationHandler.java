@@ -1,21 +1,21 @@
 package com.zutubi.pulse.servercore.jetty;
 
+import org.mortbay.http.HttpContext;
+import org.mortbay.http.HttpHandler;
+import org.mortbay.http.HttpRequest;
+import org.mortbay.http.HttpListener;
+import org.mortbay.http.handler.NotFoundHandler;
 import org.mortbay.jetty.Server;
 import org.mortbay.util.InetAddrPort;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpHandler;
-import org.mortbay.http.handler.ResourceHandler;
-import org.mortbay.http.handler.NotFoundHandler;
 
-import javax.servlet.Filter;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.LinkedList;
+
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 /**
- * The artifact repository provides http access to the file system. 
+ * The artifact repository provides http access to the file system.
  */
 public class ArtifactRepositoryConfigurationHandler implements ServerConfigurationHandler
 {
@@ -38,11 +38,35 @@ public class ArtifactRepositoryConfigurationHandler implements ServerConfigurati
 
     public void configure(Server server) throws IOException
     {
-        server.addListener(new InetAddrPort(host, port));
-        HttpContext context = server.addContext("/");
+        HttpListener listener = CollectionUtils.find(server.getListeners(), new Predicate<HttpListener>()
+        {
+            public boolean satisfied(HttpListener httpListener)
+            {
+                return httpListener.getHost().compareTo(host) == 0 && httpListener.getPort() == port;
+            }
+        });
+        if (listener == null)
+        {
+            server.addListener(new InetAddrPort(host, port));
+        }
+
+        HttpContext context = CollectionUtils.find(server.getContexts(), new Predicate<HttpContext>()
+        {
+            public boolean satisfied(HttpContext httpContext)
+            {
+                return httpContext.getContextPath().compareTo("/repository") == 0;
+            }
+        });
+
+        if (context != null)
+        {
+            throw new IOException("Repository context is already defined.  We can not overide it.");
+        }
+        context = server.addContext("/repository");
+
         context.setResourceBase(base.getCanonicalPath());
         context.addHandler(securityHandler);
-        
+
         // the resource handler does all of the file system work.
         context.addHandler(new CreateRepositoryDirectoryHandler());
         ResourceHandler handler = new ResourceHandler();
@@ -58,6 +82,18 @@ public class ArtifactRepositoryConfigurationHandler implements ServerConfigurati
 
         // boilerplate handler for invalid requests.
         context.addHandler(new NotFoundHandler());
+
+        if (server.isStarted())
+        {
+            try
+            {
+                context.start();
+            }
+            catch (Exception e)
+            {
+                throw new IOException("Failed to start repository context.");
+            }
+        }
     }
 
     public void setBase(File base)

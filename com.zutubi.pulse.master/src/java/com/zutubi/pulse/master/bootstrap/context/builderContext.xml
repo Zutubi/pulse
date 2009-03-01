@@ -202,4 +202,12 @@
         </property>
     </bean>
 
+    <bean id="ivyProvider" class="com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider">
+        <property name="repositoryBase" value="http://localhost:8080/repository"/>
+    </bean>
+
+    <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
+        <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
+    </bean>
+
 </beans>

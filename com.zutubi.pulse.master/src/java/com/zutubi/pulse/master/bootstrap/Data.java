@@ -52,6 +52,7 @@ public class Data implements MasterUserPaths
     private File userTemplateRoot;
     private File recordRoot;
     private File driverRoot;
+    private File repositoryRoot;
 
     private File backupRoot;
     private File restoreRoot;
@@ -342,6 +343,15 @@ public class Data implements MasterUserPaths
             driverRoot = new File(getData(), "driver");
         }
         return driverRoot;
+    }
+
+    public File getRepositoryRoot()
+    {
+        if (repositoryRoot == null)
+        {
+            repositoryRoot = new File(getData(), "repository");
+        }
+        return repositoryRoot;
     }
 
     public Config loadConfig()

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="1.0">
+	<info organisation="" module="projectb" revision="1" status="integration" publication="20090218171224"/>
+	<configurations>
+		<conf name="build" visibility="public"/>
+	</configurations>
+	<publications>
+	</publications>
+	<dependencies>
+		<dependency org="pulse" name="projecta" rev="18" revConstraint="latest.integration" force="true" conf="build->*"/>
+	</dependencies>
+</ivy-module>

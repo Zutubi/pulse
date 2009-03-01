@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivysettings>
+<!--  This is a blank settings instance that is used to configure ivy with a fresh configuration, rather
+than the default it comes with.  Any non configurable defaults can be defined here.
+-->
+    <settings validate="false"/>
+</ivysettings>

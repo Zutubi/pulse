@@ -117,6 +117,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_PERSONAL_BUILD          = "personal.build";
     /**
+     * The name of the organisation of the project being built.
+     */
+    public static final String PROPERTY_ORG                     = "org";
+    /**
      * The name of the project being built.
      */
     public static final String PROPERTY_PROJECT                 = "project";
@@ -193,6 +197,20 @@ public class BuildProperties
      * The name of the stage being built.
      */
     public static final String PROPERTY_STAGE                   = "stage";
+    /**
+     * The pattern that defines where to find the publications produced by a build. 
+     */
+    public static final String PROPERTY_PUBLICATION_PATTERN     = "publication.pattern";
+    /**
+     * The pattern that defines where retrieved dependencies are to be delivered.
+     */
+    public static final String PROPERTY_RETRIEVAL_PATTERN       = "retrieval.pattern";
+    
+    /**
+     * The dependency descriptor instance for a build.  This is an instance of the ivy ModuleDescriptor.
+     */
+    public static final String PROPERTY_DEPENDENCY_DESCRIPTOR   = "dependency.descriptor";
+
     /**
      * Internal property used to collect test results for a recipe.
      */

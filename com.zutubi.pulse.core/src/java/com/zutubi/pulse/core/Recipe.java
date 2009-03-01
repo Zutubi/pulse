@@ -151,6 +151,16 @@ public class Recipe extends SelfReference
     }
 
     /**
+     * Add a command to the end of the command execution list.  This command will be executed last
+     * 
+     * @param command to be scheduled after all existing commands.
+     */
+    public void addLastCommand(Command command)
+    {
+        commands.addLast(new Pair<Command, Scope>(command, null));
+    }
+
+    /**
      * Terminate this
      */
     public void terminate()

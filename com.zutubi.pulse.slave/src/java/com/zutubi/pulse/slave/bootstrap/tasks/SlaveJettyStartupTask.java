@@ -25,7 +25,7 @@ public class SlaveJettyStartupTask implements StartupTask
         webapp.setLogDir(configurationManager.getSystemPaths().getLogRoot());
         webapp.setTmpDir(configurationManager.getSystemPaths().getTmpRoot());
 
-        Server server = jettyServerManager.createNewServer(WEBAPP_PULSE, webapp);
+        Server server = jettyServerManager.configureServer(WEBAPP_PULSE, webapp);
         server.start();
     }
 

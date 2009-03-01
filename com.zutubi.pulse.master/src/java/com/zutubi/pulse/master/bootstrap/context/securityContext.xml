@@ -97,7 +97,7 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="accessManager" ref="accessManager"/>
         <property name="definitions">
             <value>
-                /,ROLE_ANONYMOUS,GET,PUT
+                /,ROLE_ANONYMOUS,GET,PUT,HEAD
             </value>
         </property>
     </bean>
