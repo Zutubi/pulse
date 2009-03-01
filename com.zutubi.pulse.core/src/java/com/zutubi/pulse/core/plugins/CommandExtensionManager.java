@@ -21,6 +21,7 @@ public class CommandExtensionManager extends AbstractExtensionManager
     private static final Logger LOG = Logger.getLogger(CommandExtensionManager.class);
 
     private static final String ELEMENT_RESOURCE = "resource";
+    private static final String ATTRIBUTE_CLASS = "class";
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_OPTIONAL = "optional";
 
@@ -37,7 +38,7 @@ public class CommandExtensionManager extends AbstractExtensionManager
     protected void handleConfigurationElement(IExtension extension, IExtensionTracker tracker, IConfigurationElement config)
     {
         String name = config.getAttribute(ATTRIBUTE_NAME);
-        String cls = config.getAttribute("class");
+        String cls = config.getAttribute(ATTRIBUTE_CLASS);
 
         Class<?> clazz = loadClass(extension, cls);
         if(clazz == null)
