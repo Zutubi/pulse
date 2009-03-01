@@ -15,7 +15,7 @@ import java.util.Map;
 class TypeFilterRecordLocator implements RecordLocator
 {
     private RecordLocator delegate;
-    public String[] acceptableSymbolicNames;
+    private String[] acceptableSymbolicNames;
 
     /**
      * @param delegate                delegate locator used to find records to

@@ -47,6 +47,7 @@
                 <ref local="skippedTestCases"/>
                 <ref local="ensureGlobalConfigPermanent"/>
                 <ref local="dashboardShowUngrouped"/>
+                <ref local="fixPermanentUsers"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -150,5 +151,9 @@
 
     <bean id="dashboardShowUngrouped" class="com.zutubi.pulse.master.upgrade.tasks.DashboardShowUngroupedUpgradeTask">
         <property name="buildNumber" value="200022001"/>
+    </bean>
+
+    <bean id="fixPermanentUsers" class="com.zutubi.pulse.master.upgrade.tasks.FixPermanentUsersUpgradeTask">
+        <property name="buildNumber" value="200023001"/>
     </bean>
 </beans>
