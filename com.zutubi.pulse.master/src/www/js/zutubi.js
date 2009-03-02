@@ -232,7 +232,6 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
 
         this.el.setHeight(this.entryHeight * this.size);
         this.view.on('selectionchange', this.onSelectionChange, this);
-        this.initValue();
     },
 
     initValue: function()
@@ -302,6 +301,9 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
             value.push(this.store.getAt(selections[i]).get(this.valueField));
         }
 
+        // Ordering does not matter, and always sorting helps simplify
+        // dirty-checking.
+        value.sort();
         return value;
     },
 
