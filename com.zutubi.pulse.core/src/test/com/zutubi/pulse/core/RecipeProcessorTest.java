@@ -4,6 +4,8 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
+import com.zutubi.pulse.core.dependency.ivy.IvySupport;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -12,10 +14,9 @@ import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.bean.DefaultObjectFactory;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,12 +31,14 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private File outputDir;
     private RecipePaths paths;
     private RecipeProcessor recipeProcessor;
-    private EventManager eventManager;
-    private WiringObjectFactory objectFactory;
     private BlockingQueue<Event> events;
     private boolean waitMode = false;
     private Semaphore semaphore = new Semaphore(0);
     private ResourceRepository resourceRepository = new FileResourceRepository();
+
+    // these two fields can not be made local because they are used by the WiringObjectFactories initProperties
+    private EventManager eventManager;
+    private WiringObjectFactory objectFactory;
 
     public void setUp() throws Exception
     {
@@ -61,6 +64,15 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommand.class);
 
         recipeProcessor.setFileLoaderFactory(fileLoaderFactory);
+
+        // we know that we need the dependency commands to be executed, but we do not want to tie into the
+        // dependency system during this test, so we replace the default commands with noop commands.
+        IvySupport ivySupport = mock(IvySupport.class);
+        stub(ivySupport.getRetrieveCommandWrapper()).toReturn(new NoopCommand("retrieve"));
+        stub(ivySupport.getPublishCommandWrapper((RecipeRequest) anyObject())).toReturn(new NoopCommand("publish"));
+        IvyProvider provider = mock(IvyProvider.class);
+        stub(provider.getIvySupport()).toReturn(ivySupport);
+        recipeProcessor.setIvyProvider(provider);
     }
 
     protected void tearDown() throws Exception
@@ -77,7 +89,11 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, "default");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandCommenced(1, "retrieve");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "greeting");
+        assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandCommenced(1, "publish");
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
@@ -89,6 +105,10 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, "version");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandCommenced(1, "retrieve");
+        assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandCommenced(1, "publish");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
         assertEquals("test version", context.getVersion());
@@ -96,6 +116,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testExceptionDuringBootstrap() throws Exception
     {
+        @SuppressWarnings({"ThrowableInstanceNeverThrown"})
         ErrorBootstrapper bootstrapper = new ErrorBootstrapper(new BuildException("test exception"));
         recipeProcessor.build(new RecipeRequest(bootstrapper, getPulseFile("basic"), makeContext(1, "default")));
         assertRecipeCommenced(1, "default");
@@ -121,6 +142,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, "failure");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandCommenced(1, "retrieve");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "born to fail");
         assertCommandFailure(1, "failure command");
         // Counter intuitive perhaps: the state is maintained by
@@ -135,6 +158,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, "exception");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandCommenced(1, "retrieve");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "predictable");
         assertCommandError(1, "exception command");
         // Counter intuitive perhaps: the state is maintained by
@@ -148,6 +173,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         runBasicRecipe("unexpected exception");
         assertRecipeCommenced(1, "unexpected exception");
         assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandCommenced(1, "retrieve");
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "oops");
         assertCommandError(1, "Unexpected error: unexpected exception command");
@@ -208,6 +235,10 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         semaphore.release();
         assertCommandCompleted(1, ResultState.SUCCESS);
         semaphore.release();
+        assertCommandCommenced(1, "retrieve");
+        semaphore.release();
+        assertCommandCompleted(1, ResultState.SUCCESS);
+        semaphore.release();
         // Try and make the race fair...
         Thread.sleep(500);
         recipeProcessor.terminateRecipe(1);
@@ -245,6 +276,10 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, "default");
         semaphore.release();
         assertCommandCommenced(1, "bootstrap");
+        semaphore.release();
+        assertCommandCompleted(1, ResultState.SUCCESS);
+        semaphore.release();
+        assertCommandCommenced(1, "retrieve");
         semaphore.release();
         assertCommandCompleted(1, ResultState.SUCCESS);
         semaphore.release();

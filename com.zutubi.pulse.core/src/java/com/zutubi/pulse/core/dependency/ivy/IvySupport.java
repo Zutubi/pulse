@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import com.zutubi.util.TextUtils;
+import com.zutubi.pulse.core.Command;
+import com.zutubi.pulse.core.RecipeRequest;
 
 /**
  * The IvyCore provides a facade around the ivy dependency management system
@@ -36,11 +38,6 @@ public class IvySupport
     public IvySupport(Ivy ivy)
     {
         this.ivy = ivy;
-    }
-
-    public IvySupport(IvyProvider ivyProvider) throws Exception
-    {
-        this.ivy = ivyProvider.getIvy();
     }
 
     /**
@@ -210,4 +207,34 @@ public class IvySupport
         return ivy.getSettings().getDefaultResolver();
     }
 
+    /**
+     * Get a command that wraps the dependency retrieve process.
+     *
+     * @return a command instance able to run a dependency retrieve during a
+     * recipe execution.
+     */
+    public Command getRetrieveCommandWrapper()
+    {
+        // Note: the creation of this command is being embedded in teh ivy support
+        // to allow the recipe processor tests to 'override' the retrieve command
+        // with a noop.
+        return new RetrieveDependenciesCommand(this);
+    }
+
+    /**
+     * Get a command that wraps the artifact publish process.
+     *
+     * @param request   the recipe request during which this publish is
+     * being run.
+     *
+     * @return a command instance able to run a publish at the end of a
+     * recipe execution.
+     */
+    public Command getPublishCommandWrapper(RecipeRequest request)
+    {
+        // Note: the creation of this command is being embedded in teh ivy support
+        // to allow the recipe processor tests to 'override' the publish command
+        // with a noop.
+        return new PublishArtifactsCommand(this, request);
+    }
 }

@@ -4,13 +4,22 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 
 /**
- * <class comment/>
+ * A simple command that does no processing.
  */
 public class NoopCommand extends CommandSupport
 {
     private boolean executed;
 
     private boolean terminated;
+
+    public NoopCommand()
+    {
+    }
+
+    public NoopCommand(String name)
+    {
+        super(name);
+    }
 
     public void execute(ExecutionContext context, CommandResult result)
     {

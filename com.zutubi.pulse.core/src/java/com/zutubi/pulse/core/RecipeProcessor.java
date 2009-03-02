@@ -97,9 +97,9 @@ public class RecipeProcessor
                 throw new BuildException("Undefined recipe '" + recipeName + "'");
             }
 
-            IvySupport ivy = new IvySupport(ivyProvider);
-            RetrieveDependenciesCommand retrieveCommand = new RetrieveDependenciesCommand(ivy);
-            PublishArtifactsCommand publishCommand = new PublishArtifactsCommand(ivy, request);
+            IvySupport ivy = ivyProvider.getIvySupport();
+            Command retrieveCommand = ivy.getRetrieveCommandWrapper();
+            Command publishCommand = ivy.getPublishCommandWrapper(request);
 
             recipe.addFirstCommand(retrieveCommand);
             recipe.addFirstCommand(bootstrapCommand);

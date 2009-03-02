@@ -34,7 +34,7 @@ public class DefaultIvyProvider implements IvyProvider
      */
     private String repositoryBase;
 
-    public Ivy getIvy() throws Exception
+    public IvySupport getIvySupport() throws Exception
     {
         IvyVariableContainer variables = new IvyVariableContainerImpl();
         variables.setVariable(VARIABLE_REPOSITORY_BASE, repositoryBase, true);
@@ -62,7 +62,7 @@ public class DefaultIvyProvider implements IvyProvider
         settings.addResolver(urlResolver);
         settings.setDefaultResolver(urlResolver.getName());
 
-        return Ivy.newInstance(settings);
+        return new IvySupport(Ivy.newInstance(settings));
     }
 
     public void setRepositoryBase(String repositoryBase)

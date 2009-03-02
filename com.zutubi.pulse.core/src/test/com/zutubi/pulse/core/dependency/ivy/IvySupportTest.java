@@ -33,31 +33,26 @@ public class IvySupportTest extends PulseTestCase
 
         tmp = FileSystemUtils.createTempDir();
 
-        core = new IvySupport(new IvyProvider()
-        {
-            public Ivy getIvy() throws Exception
-            {
-                IvyVariableContainer variables = new IvyVariableContainerImpl();
-                variables.setVariable("repository.base", tmp.getAbsolutePath(), true);
+        IvyVariableContainer variables = new IvyVariableContainerImpl();
+        variables.setVariable("repository.base", tmp.getAbsolutePath(), true);
 
-                IvySettings settings = new IvySettings(variables);
-                settings.load(DefaultIvyProvider.class.getResource("ivysettings.xml"));
+        IvySettings settings = new IvySettings(variables);
+        settings.load(DefaultIvyProvider.class.getResource("ivysettings.xml"));
 
-                String artifactPattern = "${repository.base}/repository/[organisation]/[module]/([stage]/)[type]s/[artifact]-[revision].[type]";
-                String ivyPattern = "${repository.base}/repository/[organisation]/[module]/([stage]/)ivy-[revision].xml";
+        String artifactPattern = "${repository.base}/repository/[organisation]/[module]/([stage]/)[type]s/[artifact]-[revision].[type]";
+        String ivyPattern = "${repository.base}/repository/[organisation]/[module]/([stage]/)ivy-[revision].xml";
 
-                FileSystemResolver resolver = new FileSystemResolver();
-                resolver.setName("pulse");
-                resolver.addArtifactPattern(IvyPatternHelper.substituteVariables(artifactPattern, variables));
-                resolver.addIvyPattern(IvyPatternHelper.substituteVariables(ivyPattern, variables));
-                resolver.setCheckmodified(true);
+        FileSystemResolver resolver = new FileSystemResolver();
+        resolver.setName("pulse");
+        resolver.addArtifactPattern(IvyPatternHelper.substituteVariables(artifactPattern, variables));
+        resolver.addIvyPattern(IvyPatternHelper.substituteVariables(ivyPattern, variables));
+        resolver.setCheckmodified(true);
 
-                settings.addResolver(resolver);
-                settings.setDefaultResolver(resolver.getName());
+        settings.addResolver(resolver);
+        settings.setDefaultResolver(resolver.getName());
 
-                return Ivy.newInstance(settings);
-            }
-        });
+        Ivy ivy = Ivy.newInstance(settings);
+        core = new IvySupport(ivy);
     }
 
     public void testPublishSingleArtifact() throws IOException, ParseException

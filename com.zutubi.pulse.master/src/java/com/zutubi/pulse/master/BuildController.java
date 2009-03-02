@@ -964,7 +964,7 @@ public class BuildController implements EventListener
         File tmp = null;
         try
         {
-            IvySupport ivy = new IvySupport(ivyProvider);
+            IvySupport ivy = ivyProvider.getIvySupport();
 
             ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
             descriptor.getModuleRevisionId().getOrganisation();
