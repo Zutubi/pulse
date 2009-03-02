@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.resources;
 
+import com.zutubi.pulse.core.FileResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 
 import java.util.List;
@@ -30,5 +31,17 @@ public class ResourceDiscoverer
                 new MsBuildResourceLocator()
         );
         return locator.locate();
+    }
+
+    public void discoverAndAdd(FileResourceRepository repository)
+    {
+        List<Resource> resources = discover();
+        for(Resource r: resources)
+        {
+            if(!repository.hasResource(r.getName()))
+            {
+                repository.addResource(r);
+            }
+        }
     }
 }
