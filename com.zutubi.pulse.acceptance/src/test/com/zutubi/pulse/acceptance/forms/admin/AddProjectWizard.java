@@ -233,7 +233,7 @@ public class AddProjectWizard
 
         public int[] getFieldTypes()
         {
-            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, ITEM_PICKER };
+            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, ITEM_PICKER };
         }
 
         public boolean isBrowseWorkAvailable()
