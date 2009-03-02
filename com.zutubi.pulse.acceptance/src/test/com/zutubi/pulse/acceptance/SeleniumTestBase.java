@@ -21,6 +21,8 @@ import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.net.URL;
 import java.util.Collections;
@@ -156,7 +158,7 @@ public class SeleniumTestBase extends PulseTestCase
     {
         SeleniumUtils.refreshUntilElement(selenium, IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
         String text = selenium.getText(IDs.STATUS_MESSAGE);
-        assertTrue(text.contains(message));        
+        assertThat(text, containsString(message));        
     }
 
     protected String addProject(String name, boolean useAPI)

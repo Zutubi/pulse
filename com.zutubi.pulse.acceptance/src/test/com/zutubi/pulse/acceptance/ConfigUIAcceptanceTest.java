@@ -3,8 +3,10 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
@@ -233,23 +235,18 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testClearMultiSelect() throws Exception
     {
-        // FIXME loader need to id a new multiselect box
-//        ensureProject(random);
-//
-//        loginAsAdmin();
-//        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
-//        configPage.goTo();
-//        configPage.clickComposite("type", "recipes, commands and captures");
-//        AntCommandForm form = new AntCommandForm(selenium);
-//        form.waitFor();
-//        assertFormElements(form, null, "", "build.xml", "", "", "", null);
-//        form.applyFormElements(null, null, null, null, "ant");
-//        form.waitFor();
-//        assertFormElements(form, "", "build.xml", "", "", "ant");
-//
-//        form.applyFormElements(null, null, null, null, "");
-//        form.waitFor();
-//        assertFormElements(form, "", "build.xml", "", "", "");
+        loginAsAdmin();
+
+        goTo(urls.adminGroup(UserManager.ANONYMOUS_USERS_GROUP_NAME));
+        BuiltinGroupForm groupForm = new BuiltinGroupForm(selenium);
+        groupForm.waitFor();
+        groupForm.applyFormElements(null, ServerPermission.PERSONAL_BUILD.toString());
+        groupForm.waitFor();
+        assertFormElements(groupForm, null, ServerPermission.PERSONAL_BUILD.toString());
+
+        groupForm.applyFormElements(null, "");
+        groupForm.waitFor();
+        assertFormElements(groupForm, null, "");
     }
 
     public void testNameValidationDuplicate() throws Exception
@@ -574,7 +571,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         hierarchyPage.waitFor();
 
         String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
-        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, xmlRpcHelper.getConfig(projectTypePath).get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> type = xmlRpcHelper.getConfig(projectTypePath);
+        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingMultiRecipeProject() throws Exception
@@ -602,7 +600,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         childHierarchyPage.waitFor();
 
         String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
-        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, xmlRpcHelper.getConfig(childTypePath).get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> type = xmlRpcHelper.getConfig(childTypePath);
+        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
     public void testCustomProject() throws Exception
@@ -630,7 +629,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         hierarchyPage.waitFor();
 
         String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
-        assertEquals(SYMBOLIC_NAME_CUSTOM, xmlRpcHelper.getConfig(projectTypePath).get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> type = xmlRpcHelper.getConfig(projectTypePath);
+        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingCustomProject() throws Exception
@@ -663,7 +663,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         childHierarchyPage.waitFor();
 
         String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
-        assertEquals(SYMBOLIC_NAME_CUSTOM, xmlRpcHelper.getConfig(childTypePath).get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> type = xmlRpcHelper.getConfig(childTypePath);
+        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingScrubRequired() throws Exception

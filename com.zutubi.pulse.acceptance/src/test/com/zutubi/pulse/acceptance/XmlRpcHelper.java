@@ -144,9 +144,10 @@ public class XmlRpcHelper
         return call("getTemplateChildren", path);
     }
 
-    public <T> Hashtable<String, T> getConfig(String path) throws Exception
+    @SuppressWarnings({"unchecked"})
+    public <T> T getConfig(String path) throws Exception
     {
-        return (Hashtable<String, T>) call("getConfig", path);
+        return (T) call("getConfig", path);
     }
 
     public String getConfigHandle(String path) throws Exception

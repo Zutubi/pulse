@@ -39,7 +39,6 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
             waitForBuildToComplete(i);
         }
         
-        logout();
         xmlRpcHelper.logout();
         super.tearDown();
     }
