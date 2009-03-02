@@ -14,7 +14,6 @@ import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfigurat
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.io.IOUtils;
 
-import java.io.IOException;
 import static java.util.Arrays.asList;
 import java.util.Hashtable;
 
@@ -28,6 +27,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     private static final String ACTION_DOWN = "down";
     private static final String ACTION_UP   = "up";
+    private static final String SYMBOLIC_NAME_MULTI_RECIPE = "zutubi.multiRecipeTypeConfig";
+    private static final String SYMBOLIC_NAME_CUSTOM       = "zutubi.customTypeConfig";
 
     protected void setUp() throws Exception
     {
@@ -556,7 +557,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         antState.finishFormElements(null, null, null, null, null, null);
     }
 
-    public void testWizardMultiRecipeProject() throws IOException
+    public void testWizardMultiRecipeProject() throws Exception
     {
         loginAsAdmin();
 
@@ -571,6 +572,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
         hierarchyPage.waitFor();
+
+        String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
+        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, xmlRpcHelper.getConfig(projectTypePath).get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingMultiRecipeProject() throws Exception
@@ -596,9 +600,12 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, child, false);
         childHierarchyPage.waitFor();
+
+        String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
+        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, xmlRpcHelper.getConfig(childTypePath).get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
-    public void testCustomProject() throws IOException
+    public void testCustomProject() throws Exception
     {
         loginAsAdmin();
 
@@ -621,6 +628,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
         hierarchyPage.waitFor();
+
+        String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
+        assertEquals(SYMBOLIC_NAME_CUSTOM, xmlRpcHelper.getConfig(projectTypePath).get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingCustomProject() throws Exception
@@ -651,6 +661,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         
         ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, child, false);
         childHierarchyPage.waitFor();
+
+        String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
+        assertEquals(SYMBOLIC_NAME_CUSTOM, xmlRpcHelper.getConfig(childTypePath).get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingScrubRequired() throws Exception

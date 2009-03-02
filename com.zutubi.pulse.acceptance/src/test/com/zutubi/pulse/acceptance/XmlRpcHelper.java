@@ -144,9 +144,9 @@ public class XmlRpcHelper
         return call("getTemplateChildren", path);
     }
 
-    public <T> T getConfig(String path) throws Exception
+    public <T> Hashtable<String, T> getConfig(String path) throws Exception
     {
-        return (T)call("getConfig", path);
+        return (Hashtable<String, T>) call("getConfig", path);
     }
 
     public String getConfigHandle(String path) throws Exception
