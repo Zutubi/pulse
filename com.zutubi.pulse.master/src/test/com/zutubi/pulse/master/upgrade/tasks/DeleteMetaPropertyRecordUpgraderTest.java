@@ -10,7 +10,7 @@ public class DeleteMetaPropertyRecordUpgraderTest extends PulseTestCase
 
     private DeleteMetaPropertyRecordUpgrader upgrader = new DeleteMetaPropertyRecordUpgrader(PROPERTY_NAME);
 
-    public void testPropertyExists()
+    public void testMetaPropertyExists()
     {
         MutableRecord record = new MutableRecordImpl();
         record.putMeta(PROPERTY_NAME, "anything");
@@ -18,10 +18,31 @@ public class DeleteMetaPropertyRecordUpgraderTest extends PulseTestCase
         assertNull(record.getMeta(PROPERTY_NAME));
     }
 
-    public void testPropertyDoesNotExist()
+    public void testMetaPropertyDoesNotExist()
     {
         MutableRecord record = new MutableRecordImpl();
         upgrader.upgrade(null, record);
         assertNull(record.getMeta(PROPERTY_NAME));
+    }
+
+    public void testOtherMetaPropertyUntouched()
+    {
+        final String OTHER_NAME = PROPERTY_NAME + "x";
+        final String VALUE = "anything";
+
+        MutableRecord record = new MutableRecordImpl();
+        record.putMeta(OTHER_NAME, VALUE);
+        upgrader.upgrade(null, record);
+        assertEquals(VALUE, record.getMeta(OTHER_NAME));
+    }
+
+    public void testNonMetaPropertyUntouched()
+    {
+        final String VALUE = "anything";
+
+        MutableRecord record = new MutableRecordImpl();
+        record.put(PROPERTY_NAME, VALUE);
+        upgrader.upgrade(null, record);
+        assertEquals(VALUE, record.get(PROPERTY_NAME));
     }
 }
