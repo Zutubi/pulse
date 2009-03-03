@@ -59,8 +59,8 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         }
         
         String displayName = ConfigUtils.getString(config, "display-name", name);
-        boolean defaultTemplate = ConfigUtils.getBoolean(config, "default-processor", false);
-        PostProcessorDescriptor descriptor = new PostProcessorDescriptor(name, displayName, defaultTemplate, clazz);
+        boolean contributeDefault = ConfigUtils.getBoolean(config, "default-processor", false);
+        PostProcessorDescriptor descriptor = new PostProcessorDescriptor(name, displayName, contributeDefault, clazz);
 
         if (PluginManager.VERBOSE_EXTENSIONS)
         {

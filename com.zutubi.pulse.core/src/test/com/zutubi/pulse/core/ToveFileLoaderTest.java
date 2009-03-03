@@ -3,7 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Content;
-import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.Referenceable;
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -44,7 +44,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         loader.register("referrer", registry.getType(Referrer.class));
         loader.register("collection-referrer", registry.getType(CollectionReferrer.class));
         loader.register("textual", registry.getType(Textual.class));
-        loader.register("property", registry.register(Property.class));
+        loader.register("property", registry.register(PropertyConfiguration.class));
         loader.register("validateable", registry.register(SimpleValidateable.class));
         loader.register("enumerator", registry.register(Enumerator.class));
         loader.register("string-list", registry.register(StringList.class));

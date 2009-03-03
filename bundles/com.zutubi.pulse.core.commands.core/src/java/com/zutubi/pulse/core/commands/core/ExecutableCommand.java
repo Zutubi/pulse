@@ -94,7 +94,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             {
                 message = "No such executable '" + builder.command().get(0) + "'";
             }
-            else if (message.endsWith("error=267"))
+            else if (message.endsWith("error=267") || message.contains("error=267,"))
             {
                 message = "Working directory '" + getConfig().getWorkingDir().getPath() + "' does not exist";
             }

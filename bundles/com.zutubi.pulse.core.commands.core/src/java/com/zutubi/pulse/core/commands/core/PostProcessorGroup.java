@@ -32,7 +32,7 @@ public class PostProcessorGroup implements PostProcessor
 
     protected PostProcessor createChildProcessor(PostProcessorConfiguration childConfig)
     {
-        return postProcessorFactory.createProcessor(childConfig);
+        return postProcessorFactory.create(childConfig);
     }
 
     public void process(File artifactFile, PostProcessorContext ppContext)

@@ -157,7 +157,7 @@ public class Recipe
             return false;
         }
 
-        Command command = commandFactory.createCommand(commandConfig);
+        Command command = commandFactory.create(commandConfig);
         runningCommand = command;
         runningLock.unlock();
 
@@ -182,7 +182,7 @@ public class Recipe
         }
         finally
         {
-            commandContext.addArtifacts();
+            commandContext.addArtifactsToResult();
 
             runningLock.lock();
             runningCommand = null;

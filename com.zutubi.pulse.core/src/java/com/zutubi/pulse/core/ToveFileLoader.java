@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.ReferenceResolver.ResolutionStrategy.*;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.util.XMLUtils;
@@ -33,6 +34,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Loads configuration objects from XML files, using the type properties and
+ * annotations to determine how to bind attributes and child tags.
+ *
+ * @see ToveFileStorer
  */
 public class ToveFileLoader
 {
@@ -302,17 +307,57 @@ public class ToveFileLoader
         return null;
     }
 
+    /**
+     * Interface for classes that know how to bind a child element to a
+     * property in a composite config instance.
+     */
     private interface Binder
     {
+        /**
+         * Indicates the type of the object corresponding to the child element.
+         *
+         * @return the type of the object identified or created for the child
+         *         element
+         */
         CompositeType getType();
 
+        /**
+         * Returns the instance specified by the child element, which may be
+         * a new instance, or an existing one depending on the binding.
+         *
+         * @param element            the child element
+         * @param scope              scope in which the element should be
+         *                           loaded
+         * @param resolutionStrategy specifies how to resolve references
+         * @return the instance specified by the child element
+         * @throws Exception on any error
+         */
         Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception;
 
+        /**
+         * Indicates if the instance returned by {@link #getInstance(nu.xom.Element, com.zutubi.pulse.core.engine.api.Scope, com.zutubi.pulse.core.ReferenceResolver.ResolutionStrategy)}
+         * should be initialised.
+         *
+         * @return true to indicate the instance requires initialisation, false
+         *         otherwise
+         */
         boolean initInstance();
 
+        /**
+         * Binds the actual instance to the appropriate property of the given
+         * parent instance.
+         *
+         * @param parent   the parent instance to bind to
+         * @param instance the child instance created by this binder
+         * @throws Exception on any error
+         */
         void set(Configuration parent, Object instance) throws Exception;
     }
 
+    /**
+     * Abstract base for binders which create a new object for the nested
+     * element (as opposed to, for example, referencing an existing object).
+     */
     private abstract class CreatingBinder implements Binder
     {
         public boolean initInstance()
@@ -326,10 +371,20 @@ public class ToveFileLoader
         }
     }
 
+    /**
+     * A binder that just loads a child instance, but never sets it on the
+     * parent.  Used for types registered at the top-level, which may nest
+     * anywhere.
+     */
     private class Loader extends CreatingBinder
     {
         private CompositeType type;
 
+        /**
+         * Creates a new loader.
+         *
+         * @param type the type of instance to create
+         */
         public Loader(CompositeType type)
         {
             this.type = type;
@@ -346,10 +401,18 @@ public class ToveFileLoader
         }
     }
 
+    /**
+     * A binder which sets the child instance to a singular composite property.
+     */
     private class Setter extends CreatingBinder
     {
         private TypeProperty property;
 
+        /**
+         * Creates a setter.
+         *
+         * @param property the property of the parent instance to set
+         */
         public Setter(TypeProperty property)
         {
             this.property = property;
@@ -366,10 +429,20 @@ public class ToveFileLoader
         }
     }
 
+    /**
+     * Abstract base for binders which add the child instance to a collection
+     * property.
+     */
     private abstract class Adder implements Binder
     {
         private TypeProperty property;
 
+        /**
+         * Creates an adder.
+         *
+         * @param property the collection property of the parent instance to
+         *                 which child instances are added
+         */
         protected Adder(TypeProperty property)
         {
             this.property = property;
@@ -404,19 +477,30 @@ public class ToveFileLoader
         }
     }
 
+    /**
+     * An adder which creates child instances from the child element before
+     * adding them to the collection property.
+     */
     private class NestedAdder extends Adder
     {
         private CompositeType type;
 
-        public CompositeType getType()
-        {
-            return type;
-        }
-
+        /**
+         * Creates a nested adder.
+         *
+         * @param property the collection property of the parent instance to
+         *                 which child instances are added
+         * @param type     the type of the child instance to create
+         */
         protected NestedAdder(TypeProperty property, CompositeType type)
         {
             super(property);
             this.type = type;
+        }
+
+        public CompositeType getType()
+        {
+            return type;
         }
 
         public Object getInstance(Element element, Scope scope, ReferenceResolver.ResolutionStrategy resolutionStrategy) throws Exception
@@ -430,11 +514,25 @@ public class ToveFileLoader
         }
     }
 
+    /**
+     * An adder which looks up child instances by reference before adding them
+     * to the collection property.
+     */
     private class ReferenceAdder extends Adder
     {
         private ReferenceType referenceType;
         private String attribute;
 
+        /**
+         * Creates a reference adder.
+         *
+         * @param property      the collection property of the parent instance
+         *                      to which child instances are added
+         * @param referenceType the reference type for items of the collection
+         * @param attribute     the attribute of the child element that
+         *                      contains the reference (may be empty to
+         *                      indicate nested text content should be used)
+         */
         private ReferenceAdder(TypeProperty property, ReferenceType referenceType, String attribute)
         {
             super(property);
@@ -466,11 +564,25 @@ public class ToveFileLoader
         }
     }
 
+    /**
+     * An adder which creates simple child instances (i.e. primitives or enums)
+     * before adding them to the collection property.
+     */
     private class SimpleAdder extends Adder
     {
         private SimpleType type;
         private String attribute;
 
+        /**
+         * Creates a simple adder.
+         *
+         * @param property  the collection property of the parent instance to
+         *                  which child instances are added
+         * @param type      the simple type for items of the collection
+         * @param attribute the attribute of the child element that contains
+         *                  the simple value (may be empty to indicate nested
+         *                  text content should be used)
+         */
         protected SimpleAdder(TypeProperty property, SimpleType type, String attribute)
         {
             super(property);
@@ -587,16 +699,16 @@ public class ToveFileLoader
 
     private ReferenceResolver.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Object type, Element e)
     {
-        ReferenceResolver.ResolutionStrategy resolutionStrategy = ReferenceResolver.ResolutionStrategy.RESOLVE_NONE;
+        ReferenceResolver.ResolutionStrategy resolutionStrategy = RESOLVE_NONE;
         if (predicate.resolveReferences(type, e))
         {
             if (predicate.allowUnresolved(type, e))
             {
-                resolutionStrategy = ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
+                resolutionStrategy = RESOLVE_NON_STRICT;
             }
             else
             {
-                resolutionStrategy = ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT;
+                resolutionStrategy = RESOLVE_STRICT;
             }
         }
         return resolutionStrategy;
@@ -759,7 +871,7 @@ public class ToveFileLoader
             }
             catch (Exception e)
             {
-                throw new FileLoadException("Unable to convert value of attribute '" + a.getLocalName() + "' to expected type: " + e.getMessage(), e);
+                throw new FileLoadException("Unable to convert value of attribute '" + a.getLocalName() + "' to expected type '" + property.getType().getClazz().getName() + "': " + e.getMessage(), e);
             }
 
         }
@@ -772,10 +884,6 @@ public class ToveFileLoader
             if (type instanceof ReferenceType)
             {
                 return resolveReference(value, ((ReferenceType) type).getReferencedType().getClazz(), scope);
-            }
-            else if (type instanceof EnumType)
-            {
-                return coerceEnum((EnumType)type, ReferenceResolver.resolveReferences(value, scope, resolutionStrategy));
             }
             else
             {
@@ -824,20 +932,6 @@ public class ToveFileLoader
         }
 
         throw new FileLoadException("No conversion available to property type '" + type.toString() + "'");
-    }
-
-    private Object coerceEnum(EnumType enumType, String s) throws FileLoadException
-    {
-        Class<? extends Enum> clazz = enumType.getClazz();
-        String converted = s.toUpperCase().replace(' ', '_');
-        try
-        {
-            return Enum.valueOf(clazz, converted);
-        }
-        catch (IllegalArgumentException e)
-        {
-            throw new FileLoadException("Invalid value '" + s + "'");
-        }
     }
 
     private Object resolveReference(String rawReference, Class<? extends Configuration> expectedType, Scope scope) throws ResolutionException

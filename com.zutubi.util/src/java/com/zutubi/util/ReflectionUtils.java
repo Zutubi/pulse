@@ -333,7 +333,7 @@ public class ReflectionUtils
     /**
      * Gets all bean properties from a class, traversing all of its
      * superinterfaces to find properties defined therein.  This is in contrast
-     * to the normal behaviour of of {@link java.beans.Introspector} which does
+     * to the normal behaviour of {@link java.beans.Introspector} which does
      * not search superinterfaces of interfaces.
      * <p/>
      * The stop class is always Object for classes, and null for interfaces.

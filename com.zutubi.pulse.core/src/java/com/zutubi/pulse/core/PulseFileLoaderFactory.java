@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
-import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.ObjectFactory;
@@ -25,7 +25,7 @@ public class PulseFileLoaderFactory
 
     public void init()
     {
-        register("property", Property.class);
+        register("property", PropertyConfiguration.class);
         register("recipe", RecipeConfiguration.class);
         register("dir-artifact", DirectoryOutputConfiguration.class);
         register("link-artifact", LinkOutputConfiguration.class);

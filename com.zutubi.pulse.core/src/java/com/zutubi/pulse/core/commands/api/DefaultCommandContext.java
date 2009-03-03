@@ -33,7 +33,7 @@ public class DefaultCommandContext implements CommandContext
         this.postProcessorFactory = postProcessorFactory;
     }
 
-    public void addArtifacts()
+    public void addArtifactsToResult()
     {
         for (OutputSpec spec: registeredOutputs.values())
         {
@@ -127,7 +127,7 @@ public class DefaultCommandContext implements CommandContext
             {
                 public PostProcessor map(PostProcessorConfiguration postProcessorConfiguration)
                 {
-                    return postProcessorFactory.createProcessor(postProcessorConfiguration);
+                    return postProcessorFactory.create(postProcessorConfiguration);
                 }
             });
 

@@ -11,15 +11,15 @@ public class PostProcessorDescriptor
 {
     private String name;
     private String displayName;
-    private boolean defaultFragment;
+    private boolean contributeDefault;
     private Class<? extends PostProcessorConfiguration> clazz;
     private List<String> templateFragments = new LinkedList<String>();
 
-    public PostProcessorDescriptor(String name, String displayName, boolean defaultFragment, Class<? extends PostProcessorConfiguration> clazz)
+    public PostProcessorDescriptor(String name, String displayName, boolean contributeDefault, Class<? extends PostProcessorConfiguration> clazz)
     {
         this.name = name;
         this.displayName = displayName;
-        this.defaultFragment = defaultFragment;
+        this.contributeDefault = contributeDefault;
         this.clazz = clazz;
     }
 
@@ -33,9 +33,9 @@ public class PostProcessorDescriptor
         return name;
     }
 
-    public boolean isDefaultFragment()
+    public boolean isContributeDefault()
     {
-        return defaultFragment;
+        return contributeDefault;
     }
 
     public String getDisplayName()

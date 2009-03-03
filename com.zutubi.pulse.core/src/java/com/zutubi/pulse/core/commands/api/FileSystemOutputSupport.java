@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Support base class for output that captures files from the base directory
+ * into the output directory.
  */
 public abstract class FileSystemOutputSupport<T extends FileSystemOutputConfigurationSupport> extends OutputSupport<T>
 {
@@ -25,6 +27,15 @@ public abstract class FileSystemOutputSupport<T extends FileSystemOutputConfigur
         context.registerProcessors(config.getName(), config.getPostProcessors());
     }
 
+    /**
+     * Helper method to capture a single file in a consistent way.
+     *
+     * @param toFile   destination file (should be within the output directory)
+     * @param fromFile source file (within the base directory)
+     * @param context  context in which the command is executing
+     * @return true if the file was capture, false if it was skipped
+     * @throws BuildException is there is an I/O error
+     */
     protected boolean captureFile(File toFile, File fromFile, CommandContext context)
     {
         long recipeTimestamp = context.getExecutionContext().getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, 0);
@@ -46,5 +57,13 @@ public abstract class FileSystemOutputSupport<T extends FileSystemOutputConfigur
         }
     }
 
+    /**
+     * Method to implement to find and capture the desired files.  The method
+     * should identify individual files to capture and use {@link #captureFile(java.io.File, java.io.File, CommandContext)}
+     * to do the actual capturing.
+     *
+     * @param toDir   the output directory to which files should be captured
+     * @param context ontext in which the command is executing
+     */
     protected abstract void captureFiles(File toDir, CommandContext context);
 }

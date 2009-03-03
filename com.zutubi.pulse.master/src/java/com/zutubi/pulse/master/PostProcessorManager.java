@@ -10,8 +10,6 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.config.TemplateHierarchy;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Map;
@@ -29,15 +27,13 @@ public class PostProcessorManager implements EventListener
 
     public void init()
     {
-        TemplateHierarchy templateHierarchy = configurationTemplateManager.getTemplateHierarchy(MasterConfigurationRegistry.PROJECTS_SCOPE);
-        String globalProjectName = templateHierarchy.getRoot().getId();
-        ProjectConfiguration globalProject = (ProjectConfiguration) configurationTemplateManager.getInstance(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, globalProjectName));
+        ProjectConfiguration globalProject = configurationTemplateManager.getRootInstance(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectConfiguration.class);
         boolean changed = false;
         Map<String, PostProcessorConfiguration> postProcessors = globalProject.getPostProcessors();
 
         for (PostProcessorDescriptor descriptor: postProcessorExtensionManager.getPostProcessors())
         {
-            if (descriptor.isDefaultFragment())
+            if (descriptor.isContributeDefault())
             {
                 if (!postProcessors.containsKey(descriptor.getDisplayName()))
                 {

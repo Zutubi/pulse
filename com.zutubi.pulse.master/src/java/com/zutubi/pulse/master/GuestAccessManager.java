@@ -4,8 +4,8 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.model.GrantedAuthority;
-import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
@@ -39,7 +39,7 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
         newAttribute.addAuthority(new GrantedAuthorityImpl(GrantedAuthority.ANONYMOUS));
         if(configurationProvider.get(GlobalConfiguration.class).isAnonymousAccessEnabled())
         {
-            BuiltinGroupConfiguration group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), BuiltinGroupConfiguration.class);
+            BuiltinGroupConfiguration group = configurationProvider.get(PathUtils.getPath(GROUPS_SCOPE, ANONYMOUS_USERS_GROUP_NAME), BuiltinGroupConfiguration.class);
             if(group != null)
             {
                 for(String authority: group.getGrantedAuthorities())

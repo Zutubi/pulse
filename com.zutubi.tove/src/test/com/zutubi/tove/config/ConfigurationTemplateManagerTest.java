@@ -64,11 +64,6 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         });
     }
 
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testInsertIntoCollection()
     {
         MockA a = new MockA("a");
@@ -1480,6 +1475,30 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testIsDeeplyCompleteIndirectInstanceNull()
     {
         assertTrue(configurationTemplateManager.isDeeplyCompleteAndValid(new MockA("a")));
+    }
+
+    public void testGetRootInstanceNonTemplated()
+    {
+        try
+        {
+            configurationTemplateManager.getRootInstance(SCOPE_SAMPLE, MockA.class);
+            fail("Can't get root of non-templated scope");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("Path 'sample' does not refer to a templated collection", e.getMessage());
+        }
+    }
+
+    public void testGetRootInstanceTemplatedEmpty() throws TypeException
+    {
+        assertNull(configurationTemplateManager.getRootInstance(SCOPE_TEMPLATED, MockA.class));
+    }
+
+    public void testGetRootInstanceTemplated() throws TypeException
+    {
+        insertParentAndChildA(new MockA("parent"), new MockA("child"));
+        assertEquals("parent", configurationTemplateManager.getRootInstance(SCOPE_TEMPLATED, MockA.class).getName());
     }
 
     private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException

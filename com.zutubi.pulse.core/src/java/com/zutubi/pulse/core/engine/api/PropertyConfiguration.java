@@ -8,15 +8,15 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
  */
 @SymbolicName("zutubi.property")
 @Referenceable(valueProperty = "value")
-public class Property extends AbstractNamedConfiguration
+public class PropertyConfiguration extends AbstractNamedConfiguration
 {
     private String value;
 
-    public Property()
+    public PropertyConfiguration()
     {
     }
 
-    public Property(String name, String value)
+    public PropertyConfiguration(String name, String value)
     {
         setName(name);
         this.value = value;

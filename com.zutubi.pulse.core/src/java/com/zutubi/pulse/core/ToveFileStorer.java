@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Stores configuration objects to XML files in a human-readable way.  Uses
+ * type properties and their annotations to decide the XML format.
+ *
+ * @see ToveFileLoader
  */
 public class ToveFileStorer
 {

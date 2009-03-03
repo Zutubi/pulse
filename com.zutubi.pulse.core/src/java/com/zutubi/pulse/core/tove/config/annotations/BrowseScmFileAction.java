@@ -9,6 +9,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * An action that allows a text field to be configured by browsing for a
+ * file in a project's SCM.
  */
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -16,5 +18,14 @@ import java.lang.annotation.Target;
 @Handler(className = "com.zutubi.pulse.master.tove.config.project.BrowseScmFileAnnotationHandler")
 public @interface BrowseScmFileAction
 {
+    /**
+     * Indicates an (optional) property that should be used as the base
+     * directory for browsing (i.e. if another field indicates a working
+     * directory, the file path should be browsed from that base rather
+     * than the SCM root).
+     *
+     * @return the name of the field that contains the base directory
+     *         to browse from, if any
+     */
     String baseDirField() default "work";
 }

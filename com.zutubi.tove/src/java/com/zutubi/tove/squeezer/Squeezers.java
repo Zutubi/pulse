@@ -36,9 +36,16 @@ public class Squeezers
         register(File.class, new FileSqueezer());
     }
 
-    public static TypeSqueezer findSqueezer(Class type)
+    public static TypeSqueezer findSqueezer(Class<?> type)
     {
-        return registry.get(type);
+        if (type.isEnum())
+        {
+            return new EnumSqueezer(type.asSubclass(Enum.class));
+        }
+        else
+        {
+            return registry.get(type);
+        }
     }
 
     public static void register(Class type, TypeSqueezer squeezer)

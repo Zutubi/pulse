@@ -13,7 +13,7 @@ import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.PersistentFeature;
@@ -64,7 +64,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         typeRegistry = new TypeRegistry();
         typeRegistry.register(ProjectRecipesConfiguration.class);
         typeRegistry.register(RecipeConfiguration.class);
-        typeRegistry.register(Property.class);
+        typeRegistry.register(PropertyConfiguration.class);
         typeRegistry.register(DirectoryOutputConfiguration.class);
         typeRegistry.register(LinkOutputConfiguration.class);
         typeRegistry.register(FileOutputConfiguration.class);

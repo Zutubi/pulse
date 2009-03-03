@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.tove.config;
 import com.zutubi.pulse.core.ResourcesConfiguration;
 import com.zutubi.pulse.core.commands.api.*;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
-import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.*;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
@@ -28,7 +28,7 @@ public class CoreConfigurationRegistry implements ConfigurationRegistry
         try
         {
             registerConfigurationType(ProjectRecipesConfiguration.class);
-            registerConfigurationType(Property.class);
+            registerConfigurationType(PropertyConfiguration.class);
             registerConfigurationType(OutputConfiguration.class);
             registerConfigurationType(OutputConfigurationSupport.class);
             registerConfigurationType(FileSystemOutputConfigurationSupport.class);

@@ -17,5 +17,5 @@ public interface CommandFactory
      * @return the created command
      * @throws com.zutubi.pulse.core.engine.api.BuildException on any error
      */
-    Command createCommand(CommandConfiguration configuration);
+    Command create(CommandConfiguration configuration);
 }

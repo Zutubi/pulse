@@ -15,5 +15,5 @@ public interface PostProcessorFactory
      * @return the created processor
      * @throws com.zutubi.pulse.core.engine.api.BuildException on any error
      */
-    PostProcessor createProcessor(PostProcessorConfiguration configuration);
+    PostProcessor create(PostProcessorConfiguration configuration);
 }

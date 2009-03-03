@@ -2294,6 +2294,36 @@ public class ConfigurationTemplateManager
         return null;
     }
 
+    /**
+     * Returns the root instance for a templated scope (i.e. the instance at
+     * the root of the hierarchy).
+     *
+     * @param scope the scope to retrieve the root from - must be a templated
+     *              collection
+     * @param clazz class for the expected type of the returned instance
+     * @param <T> expected type of the returned instance
+     * @return the root instance from the given scope, or null if there is no
+     *         such instance
+     * @throws IllegalArgumentException if scope does not refer to a templated
+     *         collection
+     */
+    public <T extends Configuration> T getRootInstance(String scope, Class<T> clazz)
+    {
+        if (!isTemplatedCollection(scope))
+        {
+            throw new IllegalArgumentException("Path '" + scope + "' does not refer to a templated collection");
+        }
+
+        TemplateHierarchy templateHierarchy = getTemplateHierarchy(scope);
+        if (templateHierarchy == null)
+        {
+            return null;
+        }
+        
+        String rootId = templateHierarchy.getRoot().getId();
+        return getInstance(PathUtils.getPath(scope, rootId), clazz);
+    }
+
     public void markAsTemplate(MutableRecord record)
     {
         record.putMeta(TemplateRecord.TEMPLATE_KEY, "true");
