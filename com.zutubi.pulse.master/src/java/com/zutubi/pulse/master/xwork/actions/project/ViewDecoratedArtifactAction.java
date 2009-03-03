@@ -67,7 +67,7 @@ public class ViewDecoratedArtifactAction extends FileArtifactActionBase
         File artifactFile = new File(getCommandResult().getAbsoluteOutputDir(configurationManager.getDataDirectory()), artifact.getPath());
         if(!artifactFile.isFile())
         {
-            addActionError("LocalArtifact file '" + artifactFile.getAbsolutePath() + "' does not exist");
+            addActionError("Artifact file '" + artifactFile.getAbsolutePath() + "' does not exist");
             return ERROR;
         }
 
