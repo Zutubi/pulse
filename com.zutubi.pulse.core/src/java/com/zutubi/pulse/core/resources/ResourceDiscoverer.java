@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.resources;
 
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class ResourceDiscoverer
      *
      * @return list of discovered resources.
      */
-    public List<Resource> discover()
+    public List<ResourceConfiguration> discover()
     {
         CompositeResourceLocator locator = new CompositeResourceLocator(
                 new StandardHomeDirectoryResourceLocator("ant", true),

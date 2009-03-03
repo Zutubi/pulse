@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -12,7 +12,6 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;

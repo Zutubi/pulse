@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.resources;
 
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 
 import java.util.List;
 
@@ -28,5 +28,5 @@ import java.util.List;
  */
 public interface ResourceLocator
 {
-    List<Resource> locate();
+    List<ResourceConfiguration> locate();
 }

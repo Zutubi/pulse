@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.RemoteService;
@@ -20,7 +20,7 @@ public interface AgentService extends RemoteService
     SlaveStatus getStatus(String masterLocation);
     boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize);
 
-    List<Resource> discoverResources();
+    List<ResourceConfiguration> discoverResources();
     SystemInfo getSystemInfo();
     List<CustomLogRecord> getRecentMessages();
 

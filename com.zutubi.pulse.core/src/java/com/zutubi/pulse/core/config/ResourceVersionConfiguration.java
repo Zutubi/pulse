@@ -1,8 +1,6 @@
-package com.zutubi.pulse.master.tove.config.project;
+package com.zutubi.pulse.core.config;
 
-import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.core.engine.api.FileLoadException;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.annotations.Ordered;
@@ -18,7 +16,7 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
 {
     @ID
     private String value;
-    @Ordered
+    @Ordered @Addable("property")
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
 
     public ResourceVersionConfiguration()
@@ -31,14 +29,14 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
         this.value = value;
     }
 
-    public ResourceVersionConfiguration(ResourceVersion v)
+    public ResourceVersionConfiguration(ResourceVersionConfiguration v)
     {
         this.value = v.getValue();
 
         // properties
-        for (ResourceProperty rp : v.getProperties().values())
+        for (ResourcePropertyConfiguration rp : v.getProperties().values())
         {
-            ResourcePropertyConfiguration rpc = new ResourcePropertyConfiguration(rp);
+            ResourcePropertyConfiguration rpc = rp.copy();
             addProperty(rpc);
         }
     }
@@ -86,25 +84,6 @@ public class ResourceVersionConfiguration  extends AbstractConfiguration
     public void deleteProperty(String name)
     {
         properties.remove(name);
-    }
-
-    public ResourceVersion asResourceVersion()
-    {
-        ResourceVersion v = new ResourceVersion(getValue());
-
-        for (ResourcePropertyConfiguration rpc : getProperties().values())
-        {
-            try
-            {
-                v.addProperty(rpc.asResourceProperty());
-            }
-            catch (FileLoadException e)
-            {
-                // not going to happen.
-            }
-        }
-
-        return v;
     }
 }
 

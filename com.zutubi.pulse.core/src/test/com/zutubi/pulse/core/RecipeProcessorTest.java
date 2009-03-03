@@ -45,7 +45,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private BlockingQueue<Event> events;
     private boolean waitMode = false;
     private Semaphore semaphore = new Semaphore(0);
-    private ResourceRepository resourceRepository = new FileResourceRepository();
+    private ResourceRepository resourceRepository = new InMemoryResourceRepository();
     private TypeRegistry typeRegistry;
 
     public void setUp() throws Exception

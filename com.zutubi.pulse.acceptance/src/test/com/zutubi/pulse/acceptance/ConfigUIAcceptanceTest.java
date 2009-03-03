@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -9,7 +10,6 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;

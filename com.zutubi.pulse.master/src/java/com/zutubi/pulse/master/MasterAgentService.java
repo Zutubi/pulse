@@ -2,7 +2,7 @@ package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
@@ -73,7 +73,7 @@ public class MasterAgentService implements AgentService
         return true;
     }
 
-    public List<Resource> discoverResources()
+    public List<ResourceConfiguration> discoverResources()
     {
         ResourceDiscoverer discoverer = new ResourceDiscoverer();
         return discoverer.discover();

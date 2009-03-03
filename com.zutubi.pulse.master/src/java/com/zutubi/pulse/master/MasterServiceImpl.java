@@ -3,7 +3,7 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ResourceManager;
@@ -45,7 +45,7 @@ public class MasterServiceImpl implements MasterService
         }
     }
 
-    public Resource getResource(String token, long agentHandle, String name) throws InvalidTokenException
+    public ResourceConfiguration getResource(String token, long agentHandle, String name) throws InvalidTokenException
     {
         if (validateToken(token))
         {

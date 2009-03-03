@@ -2,6 +2,7 @@ package com.zutubi.pulse.master;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -13,7 +14,6 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

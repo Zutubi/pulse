@@ -3,7 +3,7 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -24,6 +24,7 @@ public class LocalBuild
     private int failureLimit = DEFAULT_FAILURE_LIMIT;
     private EventManager eventManager;
     private RecipeProcessor recipeProcessor;
+    private ResourceFileLoader resourceFileLoader;
 
     @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
     public static void main(String argv[])
@@ -107,18 +108,18 @@ public class LocalBuild
         return SpringComponentContext.getBean("localBuild");
     }
 
-    private FileResourceRepository createRepository(String resourcesFile) throws PulseException
+    private InMemoryResourceRepository createRepository(String resourcesFile) throws PulseException
     {
         if (resourcesFile == null)
         {
-            return new FileResourceRepository();
+            return new InMemoryResourceRepository();
         }
 
         FileInputStream stream = null;
         try
         {
             stream = new FileInputStream(resourcesFile);
-            return ResourceFileLoader.load(stream);
+            return resourceFileLoader.load(stream);
         }
         catch (FileNotFoundException e)
         {
@@ -149,7 +150,7 @@ public class LocalBuild
     {
         printPrologue(pulseFileName, resourcesFile, outputDir);
 
-        FileResourceRepository repository = createRepository(resourcesFile);
+        InMemoryResourceRepository repository = createRepository(resourcesFile);
         discoverResources(repository);
 
         RecipePaths paths = new LocalRecipePaths(baseDir, outputDir);
@@ -190,11 +191,11 @@ public class LocalBuild
         printEpilogue(logFile);
     }
 
-    private void discoverResources(FileResourceRepository repository)
+    private void discoverResources(InMemoryResourceRepository repository)
     {
         ResourceDiscoverer discoverer = new ResourceDiscoverer();
-        List<Resource> resources = discoverer.discover();
-        for(Resource r: resources)
+        List<ResourceConfiguration> resources = discoverer.discover();
+        for(ResourceConfiguration r: resources)
         {
             if(!repository.hasResource(r.getName()))
             {
@@ -265,5 +266,10 @@ public class LocalBuild
     public void setRecipeProcessor(RecipeProcessor recipeProcessor)
     {
         this.recipeProcessor = recipeProcessor;
+    }
+
+    public void setResourceFileLoader(ResourceFileLoader resourceFileLoader)
+    {
+        this.resourceFileLoader = resourceFileLoader;
     }
 }

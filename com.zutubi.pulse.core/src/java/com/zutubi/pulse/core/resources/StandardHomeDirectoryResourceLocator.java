@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.resources;
 
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import static com.zutubi.pulse.core.resources.StandardHomeDirectoryConstants.convertResourceNameToEnvironmentVariable;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class StandardHomeDirectoryResourceLocator implements ResourceLocator
         delegate = new FileSystemResourceLocator(new StandardHomeDirectoryFileLocator(environmentVariable, binaryName, script), new StandardHomeDirectoryResourceBuilder(resourceName, binaryName, script));
     }
 
-    public List<Resource> locate()
+    public List<ResourceConfiguration> locate()
     {
         return delegate.locate();
     }

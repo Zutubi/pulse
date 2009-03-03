@@ -115,7 +115,7 @@
     <bean id="serverMessagesHandler" class="com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler" autowire="byName" init-method="init"/>
 
     <!-- Needs a user config root -->
-    <bean id="resourceRepository" class="com.zutubi.pulse.core.FileResourceRepository"/>
+    <bean id="resourceRepository" class="com.zutubi.pulse.core.InMemoryResourceRepository"/>
 
     <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
         <property name="stoppables">

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.ZipUtils;
@@ -63,7 +63,7 @@ public class SlaveAgentService implements AgentService
         return service.updateVersion(serviceTokenManager.getToken(), masterBuild, masterUrl, handle, packageUrl, packageSize);
     }
 
-    public List<Resource> discoverResources()
+    public List<ResourceConfiguration> discoverResources()
     {
         return service.discoverResources(serviceTokenManager.getToken());
     }

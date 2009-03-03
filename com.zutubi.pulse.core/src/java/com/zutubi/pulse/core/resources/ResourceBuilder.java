@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.resources;
 
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 
 import java.io.File;
 
@@ -15,5 +15,5 @@ public interface ResourceBuilder
     static final String PROPERTY_SUFFIX_BINARY_DIRECTORY  = PROPERTY_SUFFIX_BINARY + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_DIRECTORY;
     static final String PROPERTY_SUFFIX_LIBRARY_DIRECTORY = PROPERTY_SUFFIX_LIBRARY + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_DIRECTORY;
 
-    Resource buildResource(File file);
+    ResourceConfiguration buildResource(File file);
 }

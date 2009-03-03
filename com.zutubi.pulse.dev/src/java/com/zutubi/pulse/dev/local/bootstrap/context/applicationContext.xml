@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans default-autowire="byName" >
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/eventContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml"/>
 
-    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" autowire="byName"/>
+    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry"/>
 
-    <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" autowire="byName" init-method="init"/>
+    <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" init-method="init"/>
 
-    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName"/>
+    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor"/>
 
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName" init-method="init"/>
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" init-method="init"/>
 
-    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory" autowire="byName"/>
+    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory"/>
 
-    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory" autowire="byName"/>
+    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory"/>
 
     <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
-    <bean id="localBuild" class="com.zutubi.pulse.dev.local.LocalBuild" autowire="byName"/>
+    <bean id="resourceFileLoader" class="com.zutubi.pulse.core.ResourceFileLoader"/>
+
+    <bean id="localBuild" class="com.zutubi.pulse.dev.local.LocalBuild"/>
 </beans>

@@ -1,8 +1,6 @@
-package com.zutubi.pulse.master.tove.config.project;
+package com.zutubi.pulse.core.config;
 
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
@@ -19,11 +17,12 @@ import java.util.Map;
 @SymbolicName("zutubi.resource")
 public class ResourceConfiguration  extends AbstractNamedConfiguration
 {
-    @Ordered
+    @Ordered @Addable("property")
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
 
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.core.ResourceVersionOptionProvider")
     private String defaultVersion;
+    @Addable("version")
     private Map<String, ResourceVersionConfiguration> versions = new HashMap<String, ResourceVersionConfiguration>();
 
     public ResourceConfiguration()
@@ -34,26 +33,6 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
     public ResourceConfiguration(String name)
     {
         setName(name);
-    }
-
-    public ResourceConfiguration(Resource resource)
-    {
-        setName(resource.getName());
-        this.defaultVersion = resource.getDefaultVersion();
-
-        // properties
-        for (ResourceProperty rp : resource.getProperties().values())
-        {
-            ResourcePropertyConfiguration rpc = new ResourcePropertyConfiguration(rp);
-            addProperty(rpc);
-        }
-
-        // versions.
-        for (ResourceVersion rv : resource.getVersions().values())
-        {
-            ResourceVersionConfiguration rvc = new ResourceVersionConfiguration(rv);
-            add(rvc);
-        }
     }
 
     public boolean hasVersion(String value)
@@ -85,16 +64,6 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
     public void setVersions(Map<String, ResourceVersionConfiguration> versions)
     {
         this.versions = versions;
-    }
-
-    public void deleteVersion(ResourceVersionConfiguration version)
-    {
-        if(version.getValue().equals(defaultVersion))
-        {
-            defaultVersion = null;
-        }
-
-        versions.remove(version.getValue());
     }
 
     public Map<String, ResourcePropertyConfiguration> getProperties()
@@ -163,23 +132,5 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
         }
 
         return count;
-    }
-
-    public Resource asResource()
-    {
-        Resource r = new Resource(getName());
-        r.setDefaultVersion(getDefaultVersion());
-
-        for (ResourcePropertyConfiguration rpc : getProperties().values())
-        {
-            r.addProperty(rpc.asResourceProperty());
-        }
-
-        for (ResourceVersionConfiguration rvc : getVersions().values())
-        {
-            r.add(rvc.asResourceVersion());
-        }
-
-        return r;
     }
 }

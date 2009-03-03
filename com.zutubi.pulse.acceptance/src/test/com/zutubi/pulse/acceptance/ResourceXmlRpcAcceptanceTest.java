@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourceVersionConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.TextUtils;

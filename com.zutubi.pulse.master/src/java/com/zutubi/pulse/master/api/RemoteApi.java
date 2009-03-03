@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
@@ -21,7 +22,6 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;

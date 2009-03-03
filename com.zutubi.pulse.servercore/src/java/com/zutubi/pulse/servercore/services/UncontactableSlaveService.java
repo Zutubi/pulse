@@ -1,10 +1,10 @@
 package com.zutubi.pulse.servercore.services;
 
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.servercore.SystemInfo;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 
 import java.util.List;
 
@@ -61,7 +61,7 @@ public class UncontactableSlaveService implements SlaveService
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
-    public List<Resource> discoverResources(String token)
+    public List<ResourceConfiguration> discoverResources(String token)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

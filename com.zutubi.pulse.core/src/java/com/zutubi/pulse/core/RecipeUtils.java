@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.util.TextUtils;
 
 import java.util.List;
@@ -17,15 +17,15 @@ public class RecipeUtils
         {
             for(ResourceRequirement requirement: resourceRequirements)
             {
-                Resource resource = resourceRepository.getResource(requirement.getResource());
+                ResourceConfiguration resource = resourceRepository.getResource(requirement.getResource());
                 if(resource == null)
                 {
                     return;
                 }
 
-                for(ResourceProperty property: resource.getProperties().values())
+                for(ResourcePropertyConfiguration property: resource.getProperties().values())
                 {
-                    context.add(property);
+                    context.add(property.asResourceProperty());
                 }
 
                 String importVersion = requirement.getVersion();
@@ -36,15 +36,15 @@ public class RecipeUtils
 
                 if(TextUtils.stringSet(importVersion))
                 {
-                    ResourceVersion version = resource.getVersion(importVersion);
+                    ResourceVersionConfiguration version = resource.getVersion(importVersion);
                     if(version == null)
                     {
                         return;
                     }
 
-                    for(ResourceProperty property: version.getProperties().values())
+                    for(ResourcePropertyConfiguration property: version.getProperties().values())
                     {
-                        context.add(property);
+                        context.add(property.asResourceProperty());
                     }
                 }
             }

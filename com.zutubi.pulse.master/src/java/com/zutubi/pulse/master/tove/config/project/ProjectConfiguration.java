@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;

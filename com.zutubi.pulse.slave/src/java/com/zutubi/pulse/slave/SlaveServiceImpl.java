@@ -2,7 +2,7 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.SystemInfo;
@@ -155,7 +155,7 @@ public class SlaveServiceImpl implements SlaveService
 
     //---( Resource API )---
 
-    public List<Resource> discoverResources(String token)
+    public List<ResourceConfiguration> discoverResources(String token)
     {
         ResourceDiscoverer discoverer = new ResourceDiscoverer();
         return discoverer.discover();

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;

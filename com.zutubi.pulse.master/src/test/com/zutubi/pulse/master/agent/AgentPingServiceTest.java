@@ -6,7 +6,7 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.AgentService;
@@ -27,8 +27,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-/**
- */
 public class AgentPingServiceTest extends PulseTestCase
 {
     private static final String TEST_MASTER = "master.location";
@@ -235,7 +233,7 @@ public class AgentPingServiceTest extends PulseTestCase
             throw new RuntimeException("Not implemented");
         }
 
-        public List<Resource> discoverResources()
+        public List<ResourceConfiguration> discoverResources()
         {
             throw new RuntimeException("Not implemented");
         }
