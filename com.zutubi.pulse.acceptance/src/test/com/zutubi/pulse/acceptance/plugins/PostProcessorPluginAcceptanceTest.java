@@ -1,20 +1,18 @@
 package com.zutubi.pulse.acceptance.plugins;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
-import com.zutubi.pulse.core.PulseFile;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
+import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
-import com.zutubi.tove.type.TypeRegistry;
 
 import java.io.File;
 

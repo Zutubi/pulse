@@ -1,0 +1,16 @@
+pulse file    : 'PostProcessCommandTest.pulse.xml'
+post-processor: 'test'
+input file    : 'PostProcessCommandTest.in.txt'
+
+Running processor...
+Post-processing complete.
+Features:
+  No features found.
+Tests:
+  Found 6 tests (3 passed, 2 failed, 1 error):
+    pass   : Test foo
+    failure: Test bar: detail message
+    error  : Test baz: this is a repetitive and therefore long detail message this is a repetitive and therefore long detail message this is a repetitive and therefore long detail message
+    pass   : Test jim
+    failure: Test bob: another failure, sheesh!
+    pass   : Test tom

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<project default-recipe="tests">
+    <regex-test.pp name="test"
+                   name-group="1"
+                   status-group="2"
+                   details-group="3"
+                   pass-status="passed"
+                   failure-status="failed"
+                   error-status="error"
+                   regex="(.*?): (.*?)(?:: (.*))?"/>
+
+    <regex.pp name="compile">
+        <pattern category="error" expression="error"/>
+        <pattern category="warning" expression="failure"/>
+    </regex.pp>
+
+    <recipe name="tests">
+    </recipe>
+</project>

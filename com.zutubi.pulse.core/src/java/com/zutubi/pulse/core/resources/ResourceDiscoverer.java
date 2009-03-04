@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.resources;
 
+import com.zutubi.pulse.core.InMemoryResourceRepository;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 
 import java.util.List;
@@ -30,5 +31,17 @@ public class ResourceDiscoverer
                 new MsBuildResourceLocator()
         );
         return locator.locate();
+    }
+
+    public void discoverAndAdd(InMemoryResourceRepository repository)
+    {
+        List<ResourceConfiguration> resources = discover();
+        for(ResourceConfiguration r: resources)
+        {
+            if(!repository.hasResource(r.getName()))
+            {
+                repository.addResource(r);
+            }
+        }
     }
 }

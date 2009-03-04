@@ -3,7 +3,6 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -12,7 +11,6 @@ import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.*;
 
 import java.io.*;
-import java.util.List;
 
 /**
  * Entry point for executing local builds within a development tree.
@@ -151,7 +149,8 @@ public class LocalBuild
         printPrologue(pulseFileName, resourcesFile, outputDir);
 
         InMemoryResourceRepository repository = createRepository(resourcesFile);
-        discoverResources(repository);
+        ResourceDiscoverer discoverer = new ResourceDiscoverer();
+        discoverer.discoverAndAdd(repository);
 
         RecipePaths paths = new LocalRecipePaths(baseDir, outputDir);
 
@@ -189,19 +188,6 @@ public class LocalBuild
         }
 
         printEpilogue(logFile);
-    }
-
-    private void discoverResources(InMemoryResourceRepository repository)
-    {
-        ResourceDiscoverer discoverer = new ResourceDiscoverer();
-        List<ResourceConfiguration> resources = discoverer.discover();
-        for(ResourceConfiguration r: resources)
-        {
-            if(!repository.hasResource(r.getName()))
-            {
-                repository.addResource(r);
-            }
-        }
     }
 
     private String loadPulseFile(File baseDir, String pulseFileName) throws PulseException
@@ -245,7 +231,6 @@ public class LocalBuild
         System.out.println();
         System.out.println("Build report saved to '" + logFile.getPath() + "'.");
     }
-
 
     private static void fatal(Throwable throwable)
     {
