@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.Predicate;
+
 /**
  * Static factory methods for creating {@link RecordLocator} instances.
  */
@@ -56,5 +59,19 @@ public class RecordLocators
     public static RecordLocator newTypeFilter(RecordLocator delegate, String... acceptableSymbolicNames)
     {
         return new TypeFilterRecordLocator(delegate, acceptableSymbolicNames);
+    }
+
+    /**
+     * Create a new locator that can filter the output of another locator based
+     * on an arbitrary record predicate.  Only records that satisfy the
+     * predicate will be allowed to pass.
+     *
+     * @param delegate  delegate locator used to find records to filter
+     * @param predicate defines the records that this filter will allow to pass
+     * @return a predicate-filtering locater
+     */
+    public static RecordLocator newPredicateFilter(RecordLocator delegate, Predicate<Record> predicate)
+    {
+        return new PredicateFilterRecordLocator(delegate, predicate);
     }
 }
