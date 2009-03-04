@@ -2,9 +2,11 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.marshal.ToveFileLoader;
+import com.zutubi.pulse.core.marshal.TypeDefinitions;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.type.TypeRegistry;
-import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.io.InputStream;
 
@@ -14,6 +16,7 @@ import java.io.InputStream;
 public class ResourceFileLoader
 {
     private TypeRegistry typeRegistry;
+    private ObjectFactory objectFactory;
 
     public InMemoryResourceRepository load(InputStream input) throws PulseException
     {
@@ -35,16 +38,24 @@ public class ResourceFileLoader
 
     private ToveFileLoader createLoader()
     {
+        TypeDefinitions definitions = new TypeDefinitions();
+        definitions.register("resource", typeRegistry.getType(ResourceConfiguration.class));
+
         ToveFileLoader loader = new ToveFileLoader();
-        loader.setObjectFactory(new DefaultObjectFactory());
+        loader.setObjectFactory(objectFactory);
         loader.setValidationManager(new PulseValidationManager());
         loader.setTypeRegistry(typeRegistry);
-        loader.register("resource", typeRegistry.getType(ResourceConfiguration.class));
+        loader.setTypeDefinitions(definitions);
         return loader;
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

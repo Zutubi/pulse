@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.zutubi.pulse.core.ToveFileStorer;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.marshal.ToveFileStorer;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;

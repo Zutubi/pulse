@@ -18,13 +18,10 @@ import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -67,7 +64,7 @@ public class RecipeProcessor
         try
         {
             // Now we can load the recipe from the pulse file
-            ProjectRecipesConfiguration recipesConfiguration= loadPulseFile(request, context);
+            ProjectRecipesConfiguration recipesConfiguration = loadPulseFile(request, context);
 
             String recipeName = request.getRecipeName();
             if (!TextUtils.stringSet(recipeName))
@@ -230,23 +227,14 @@ public class RecipeProcessor
         }
 
         // load the pulse file from the source.
-        InputStream stream = null;
         try
         {
-            stream = new ByteArrayInputStream(pulseFileSource.getBytes());
-
-            ProjectRecipesConfiguration result = new ProjectRecipesConfiguration();
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-            fileLoader.load(stream, result, globalScope, new RecipeLoadPredicate(result, request.getRecipeName()));
-            return result;
+            return fileLoader.loadRecipe(pulseFileSource, request.getRecipeName(), globalScope);
         }
         catch (Exception e)
         {
             throw new BuildException("Unable to parse pulse file: " + e.getMessage(), e);
-        }
-        finally
-        {
-            IOUtils.close(stream);
         }
     }
 

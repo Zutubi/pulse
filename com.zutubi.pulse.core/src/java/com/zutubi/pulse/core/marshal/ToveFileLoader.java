@@ -1,8 +1,15 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.marshal;
 
+import com.zutubi.pulse.core.GenericReference;
+import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.ReferenceResolver;
 import static com.zutubi.pulse.core.ReferenceResolver.ResolutionStrategy.*;
+import com.zutubi.pulse.core.ResolutionException;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.api.*;
+import com.zutubi.pulse.core.engine.api.Addable;
+import com.zutubi.pulse.core.engine.api.Content;
+import com.zutubi.pulse.core.engine.api.Referenceable;
+import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.core.validation.PulseValidationContext;
@@ -28,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +49,7 @@ public class ToveFileLoader
 {
     private static final int MAX_RECURSION_DEPTH = 128;
 
-    private final Map<String, CompositeType> typeDefinitions = new HashMap<String, CompositeType>();
-
+    private TypeDefinitions typeDefinitions;
     private ObjectFactory factory;
     private TypeRegistry typeRegistry;
     private ValidationManager validationManager = new PulseValidationManager();
@@ -228,7 +233,7 @@ public class ToveFileLoader
         Binder binder = getAdderByName(parentType, propertyName);
         if (binder == null)
         {
-            CompositeType type = typeDefinitions.get(elementName);
+            CompositeType type = typeDefinitions.getType(elementName);
             if (type == null)
             {
                 throw new FileLoadException("Unknown child element '" + elementName + "'");
@@ -945,16 +950,6 @@ public class ToveFileLoader
         return obj;
     }
 
-    public void register(String name, CompositeType type)
-    {
-        typeDefinitions.put(name, type);
-    }
-
-    public boolean registered(String name)
-    {
-        return typeDefinitions.containsKey(name);
-    }
-
     public void setObjectFactory(ObjectFactory factory)
     {
         this.factory = factory;
@@ -968,5 +963,10 @@ public class ToveFileLoader
     public void setValidationManager(ValidationManager validationManager)
     {
         this.validationManager = validationManager;
+    }
+
+    public void setTypeDefinitions(TypeDefinitions typeDefinitions)
+    {
+        this.typeDefinitions = typeDefinitions;
     }
 }

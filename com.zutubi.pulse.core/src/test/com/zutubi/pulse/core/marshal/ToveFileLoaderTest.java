@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.marshal;
 
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Addable;
@@ -36,18 +36,21 @@ public class ToveFileLoaderTest extends PulseTestCase
         registry = new TypeRegistry();
         rootType = registry.register(SimpleRoot.class);
 
+        TypeDefinitions definitions = new TypeDefinitions();
+        definitions.register("reference", registry.getType(SimpleReference.class));
+        definitions.register("referrer", registry.getType(Referrer.class));
+        definitions.register("collection-referrer", registry.getType(CollectionReferrer.class));
+        definitions.register("textual", registry.getType(Textual.class));
+        definitions.register("property", registry.register(PropertyConfiguration.class));
+        definitions.register("validateable", registry.register(SimpleValidateable.class));
+        definitions.register("enumerator", registry.register(Enumerator.class));
+        definitions.register("string-list", registry.register(StringList.class));
+        
         loader = new ToveFileLoader();
         loader.setTypeRegistry(registry);
         loader.setObjectFactory(new DefaultObjectFactory());
         loader.setValidationManager(new PulseValidationManager());
-        loader.register("reference", registry.getType(SimpleReference.class));
-        loader.register("referrer", registry.getType(Referrer.class));
-        loader.register("collection-referrer", registry.getType(CollectionReferrer.class));
-        loader.register("textual", registry.getType(Textual.class));
-        loader.register("property", registry.register(PropertyConfiguration.class));
-        loader.register("validateable", registry.register(SimpleValidateable.class));
-        loader.register("enumerator", registry.register(Enumerator.class));
-        loader.register("string-list", registry.register(StringList.class));
+        loader.setTypeDefinitions(definitions);
     }
 
     public void testSimpleReference() throws Exception

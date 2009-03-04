@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.engine.api;
+package com.zutubi.pulse.core.marshal;
 
 import com.zutubi.pulse.core.api.PulseException;
 

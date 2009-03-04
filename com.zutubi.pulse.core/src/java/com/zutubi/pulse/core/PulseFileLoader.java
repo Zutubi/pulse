@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.marshal.ToveFileLoader;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
@@ -10,16 +11,25 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 /**
- * Convenience class for creating loaders for pulse files with types registered.
+ * Convenience class for common pulse file loading operations.
  */
 public class PulseFileLoader extends ToveFileLoader
 {
     /**
-     * Use the PulseFileLoaderFactory to create a correctly configured instance of
-     * the PulseFileLoader.
+     * Loads a pulse file, isolating a single recipe.
+     *
+     * @param pulseFile   source of the pulse file (an XML string)
+     * @param recipeName  name of the recipe to load
+     * @param globalScope scope to use as basis for loading
+     * @return configuration for the loaded recipe
+     * @throws PulseException if the file cannot be loaded
      */
-    public PulseFileLoader()
+    public ProjectRecipesConfiguration loadRecipe(String pulseFile, String recipeName, PulseScope globalScope) throws PulseException
     {
+        ProjectRecipesConfiguration recipes = new ProjectRecipesConfiguration();
+        RecipeLoadPredicate predicate = new RecipeLoadPredicate(recipes, recipeName);
+        load(new ByteArrayInputStream(pulseFile.getBytes()), recipes, globalScope, predicate);
+        return recipes;
     }
 
     /**

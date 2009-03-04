@@ -6,12 +6,11 @@ import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
+import com.zutubi.pulse.core.marshal.ToveFileStorer;
+import com.zutubi.pulse.core.marshal.TypeDefinitions;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.ObjectFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A factory for creating PulseFileLoader objects that are aware of the
@@ -19,7 +18,7 @@ import java.util.Map;
  */
 public class PulseFileLoaderFactory
 {
-    private Map<String, CompositeType> types = new HashMap<String, CompositeType>();
+    private TypeDefinitions typeDefinitions = new TypeDefinitions();
     private ObjectFactory objectFactory;
     private TypeRegistry typeRegistry;
 
@@ -36,20 +35,14 @@ public class PulseFileLoaderFactory
     public PulseFileLoader createLoader()
     {
         PulseFileLoader loader = objectFactory.buildBean(PulseFileLoader.class);
-        for(Map.Entry<String, CompositeType> entry: types.entrySet())
-        {
-            loader.register(entry.getKey(), entry.getValue());
-        }
+        loader.setTypeDefinitions(typeDefinitions);
         return loader;
     }
 
     public ToveFileStorer createStorer()
     {
         ToveFileStorer storer = objectFactory.buildBean(ToveFileStorer.class);
-        for(Map.Entry<String, CompositeType> entry: types.entrySet())
-        {
-            storer.register(entry.getValue(), entry.getKey());
-        }
+        storer.setTypeDefinitions(typeDefinitions);
         return storer;
     }
 
@@ -61,12 +54,12 @@ public class PulseFileLoaderFactory
             throw new PulseRuntimeException("Attempt to register unknown type with file loader: " + clazz.getName());
         }
 
-        types.put(name, type);
+        typeDefinitions.register(name, type);
     }
 
     public void unregister(String name)
     {
-        types.remove(name);
+        typeDefinitions.unregister(name);
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

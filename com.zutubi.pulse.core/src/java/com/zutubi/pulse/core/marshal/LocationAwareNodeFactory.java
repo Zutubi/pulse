@@ -1,9 +1,9 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.marshal;
 
-import nu.xom.NodeFactory;
 import nu.xom.Element;
-import org.xml.sax.Locator;
+import nu.xom.NodeFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
 
 
 /**

@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ public class ResourceFileLoaderTest extends PulseTestCase
         registry.register(ResourcesConfiguration.class);
         loader = new ResourceFileLoader();
         loader.setTypeRegistry(registry);
+        loader.setObjectFactory(new DefaultObjectFactory());
     }
 
     public void testEmptyRepo() throws Exception

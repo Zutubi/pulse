@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.marshal;
 
 import nu.xom.Element;
 

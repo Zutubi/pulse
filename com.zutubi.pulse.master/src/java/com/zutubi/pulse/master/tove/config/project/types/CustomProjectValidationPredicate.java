@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.pulse.core.TypeLoadPredicate;
+import com.zutubi.pulse.core.marshal.TypeLoadPredicate;
 import nu.xom.Element;
 
 /**

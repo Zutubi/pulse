@@ -1,7 +1,8 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.marshal.TypeLoadPredicate;
+import com.zutubi.util.TextUtils;
 import nu.xom.Element;
 
 /**
