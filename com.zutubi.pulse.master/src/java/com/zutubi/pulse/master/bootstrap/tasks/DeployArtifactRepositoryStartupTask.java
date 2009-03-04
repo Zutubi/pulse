@@ -1,16 +1,14 @@
 package com.zutubi.pulse.master.bootstrap.tasks;
 
-import com.zutubi.pulse.servercore.bootstrap.StartupTask;
-import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
-import com.zutubi.pulse.servercore.jetty.*;
 import com.zutubi.pulse.master.bootstrap.WebManager;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
+import com.zutubi.pulse.servercore.bootstrap.StartupTask;
+import com.zutubi.pulse.servercore.jetty.ArtifactRepositoryConfigurationHandler;
+import com.zutubi.pulse.servercore.jetty.JettyServerManager;
+import org.mortbay.http.HttpHandler;
 
 import java.io.File;
-
-import org.mortbay.jetty.Server;
-import org.mortbay.http.HttpHandler;
 
 /**
  * Startup task responsible for starting the artifact repository.
@@ -23,12 +21,7 @@ public class DeployArtifactRepositoryStartupTask implements StartupTask
 
     public void execute() throws Exception
     {
-        SystemConfiguration sysConfig = configurationManager.getSystemConfig();
-
         ArtifactRepositoryConfigurationHandler repository = new ArtifactRepositoryConfigurationHandler();
-        repository.setHost(sysConfig.getBindAddress());
-        repository.setPort(sysConfig.getServerPort());
-
         repository.setSecurityHandler(securityHandler);
 
         File repositoryBase = ((MasterUserPaths)configurationManager.getUserPaths()).getRepositoryRoot();
@@ -36,11 +29,7 @@ public class DeployArtifactRepositoryStartupTask implements StartupTask
 
         repository.setBase(repositoryBase); // need to make this configurable.
 
-        Server server = jettyServerManager.configureServer(WebManager.WEBAPP_PULSE, repository);
-        if (!server.isStarted())
-        {
-            server.start();
-        }
+        jettyServerManager.configureContext(WebManager.WEBAPP_PULSE, "/repository", repository);
     }
 
     private void ensureIsDirectory(File dir)

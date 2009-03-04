@@ -7,6 +7,7 @@ import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.plugins.repository.url.URLRepository;
 import static org.mockito.Mockito.*;
 import org.mortbay.jetty.Server;
+import org.mortbay.http.SocketListener;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -35,8 +36,6 @@ public class ArtifactRepositoryUnitTest extends PulseTestCase
         serverManager = new JettyServerManager();
 
         ArtifactRepositoryConfigurationHandler repository = new ArtifactRepositoryConfigurationHandler();
-        repository.setHost("localhost");
-        repository.setPort(8888);
         repository.setBase(repositoryBase);
 
         // disable security until we can sort out how to properly set the credentials.
@@ -46,9 +45,22 @@ public class ArtifactRepositoryUnitTest extends PulseTestCase
         security.setAccessManager(accessManager);
         repository.setSecurityHandler(security);
 
-        baseRepoUrl = "http://localhost:8888/";
+        baseRepoUrl = "http://localhost:8765/repository";
 
-//        startServer(serverManager.createNewServer("repository", repository));
+        Server server = serverManager.configureServer("test", new ServerConfigurationHandler()
+        {
+            public void configure(Server server) throws IOException
+            {
+                SocketListener listener = new SocketListener();
+                listener.setHost("localhost");
+                listener.setPort(8765);
+                server.addListener(listener);
+            }
+        });
+
+        serverManager.configureContext("test", "/repository", repository);
+
+        startServer(server);
     }
 
     protected void tearDown() throws Exception
@@ -68,47 +80,32 @@ public class ArtifactRepositoryUnitTest extends PulseTestCase
         assertCanPublish("b.txt", "jumped over the log");
     }
 
-/*
-    public void testDelete() throws IOException
-    {
-        File repoFile = createFile(repositoryBase, "x.txt", "sample");
-        assertTrue(repoFile.isFile());
-
-        URLRepository repositoryClient = new URLRepository();
-        repositoryClient.put(null, baseRepoUrl + "x.txt", true);
-
-        assertFalse(repoFile.isFile());
-    }
-*/
-
     public void testBrowse() throws IOException
     {
-        // this needs selenium, so is more in line with the existing acceptance tests.
-        // create a bunch of files, and verify that we can browse through the UI.
         createFile(repositoryBase, "x.txt", "sample");
         createFile(repositoryBase, "a/a.txt", "sample");
         createFile(repositoryBase, "a/b.txt", "sample");
         createFile(repositoryBase, "a/b/1.txt", "sample");
         createFile(repositoryBase, "a/b/2.txt", "sample");
 
+        assertListing(baseRepoUrl, "x.txt");
+        assertListing(baseRepoUrl + "/a", "a.txt", "b.txt");
+        assertListing(baseRepoUrl + "/a/b", "1.txt", "2.txt");
+    }
+
+    private void assertListing(String url, String... expected) throws IOException
+    {
         URLRepository repositoryClient = new URLRepository();
-        List listing = repositoryClient.list(baseRepoUrl);
+        List listing = repositoryClient.list(url);
 
-        // bug in the html returned by the Resource.getListHtml from jetty prevents the correct interpretation of the response.
-//        assertEquals(2, listing.size());
+        // for some reason the URLRepository listing does not return
+        // directories, annoying but not fatal.
 
-        // navigate to http://localhost:8888
-        // assert link present for x.txt
-        // assert link present for a
-        // click link a
-        // assert link present for a.txt
-        // assert link present for b.txt
-        // assert link present for b
-        // assert link present for parent directory.
-        // click link b
-        // assert link present for 1.txt
-        // assert link present for 2.txt
-        // assert link present for parent directory.
+        assertEquals(expected.length, listing.size());
+        for (String s : expected)
+        {
+            assertTrue(listing.contains(url + "/" + s));
+        }
     }
 
     private void assertCanPublish(String path, String content) throws IOException
@@ -117,7 +114,7 @@ public class ArtifactRepositoryUnitTest extends PulseTestCase
 
         // use ivy to handle the interaction with the repository.
         URLRepository repositoryClient = new URLRepository();
-        repositoryClient.put(toPublish, baseRepoUrl + path, true);
+        repositoryClient.put(toPublish, baseRepoUrl + "/" + path, true);
 
         File uploadedRepositoryFile = new File(repositoryBase, path);
         assertTrue(uploadedRepositoryFile.isFile());
@@ -132,7 +129,7 @@ public class ArtifactRepositoryUnitTest extends PulseTestCase
 
         // use ivy to handle the interaction with the repository.
         URLRepository repositoryClient = new URLRepository();
-        repositoryClient.get(baseRepoUrl + path, dest);
+        repositoryClient.get(baseRepoUrl + "/" + path, dest);
 
         assertEquals(content, IOUtils.fileToString(dest));
     }
@@ -149,12 +146,12 @@ public class ArtifactRepositoryUnitTest extends PulseTestCase
                     server.start();
                     while (server.isStarted())
                     {
-                        Thread.sleep(1000);
+                        Thread.yield();
                     }
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    // noop.
                 }
             }
         });

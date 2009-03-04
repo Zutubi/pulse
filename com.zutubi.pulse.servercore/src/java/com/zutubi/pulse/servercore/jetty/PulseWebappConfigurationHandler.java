@@ -1,29 +1,22 @@
 package com.zutubi.pulse.servercore.jetty;
 
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import org.mortbay.http.HttpListener;
+import org.mortbay.http.NCSARequestLog;
+import org.mortbay.http.SocketListener;
+import org.mortbay.http.SslListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
-import org.mortbay.http.HttpListener;
-import org.mortbay.http.SslListener;
-import org.mortbay.http.SocketListener;
-import org.mortbay.http.NCSARequestLog;
-import org.mortbay.util.MultiException;
 
-import java.io.IOException;
 import java.io.File;
-import java.util.List;
-import java.net.BindException;
-
-import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
-import com.zutubi.util.logging.Logger;
+import java.io.IOException;
 
 /**
  * The configuration handler for the main Pulse web application.
  */
-public class PulseWebappConfigurationHandler implements ServerConfigurationHandler
+public class PulseWebappConfigurationHandler implements ServerConfigurationHandler, WebappConfigurationHandler
 {
-    private static final Logger LOG = Logger.getLogger(PulseWebappConfigurationHandler.class);
-
     private static final String[] LOGGING_IGNORE_PATHS = new String[]{"/images/*.*", "*.css", "*.js", "*.ico", "*.gif"};
 
     private ConfigurationManager configurationManager;
@@ -66,49 +59,26 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
 
         server.addListener(listener);
 
-        try
+    }
+
+    public void configure(WebApplicationContext context) throws IOException
+    {
+        SystemConfiguration config = configurationManager.getSystemConfig();
+
+        context.setWAR(configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
+        context.setContextPath(config.getContextPath());
+        context.setDefaultsDescriptor(null);
+        context.setAttribute("javax.servlet.context.tempdir", tmpDir);
+
+        if (isRequestLoggingEnabled())
         {
-            WebApplicationContext appContext = server.addWebApplication(
-                    config.getContextPath(), configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
-            appContext.setDefaultsDescriptor(null);
-            appContext.setAttribute("javax.servlet.context.tempdir", tmpDir);
-
-            if (isRequestLoggingEnabled())
-            {
-                NCSARequestLog requestLog = new NCSARequestLog();
-                requestLog.setAppend(false);
-                requestLog.setExtended(isRequestLoggingExtended());
-                requestLog.setIgnorePaths(getRequestLoggingIgnorePaths());
-                requestLog.setRetainDays(getDaysLogsRetained());
-                requestLog.setFilename(new File(logDir, "yyyy_mm_dd.request.log").getAbsolutePath());
-                appContext.setRequestLog(requestLog);
-            }
-
-            server.start();
-        }
-        catch(MultiException e)
-        {
-            for(Exception nested: (List<Exception>)e.getExceptions())
-            {
-                if (nested instanceof BindException)
-                {
-                    handleBindException(config);
-                }
-                else
-                {
-                    LOG.severe("Unable to start server: " + nested.getMessage(), nested);
-                }
-            }
-
-            // This is fatal.
-            System.exit(1);
-        }
-        catch (Exception e)
-        {
-            LOG.severe("Unable to start server: " + e.getMessage(), e);
-
-            // This is fatal.
-            System.exit(1);
+            NCSARequestLog requestLog = new NCSARequestLog();
+            requestLog.setAppend(false);
+            requestLog.setExtended(isRequestLoggingExtended());
+            requestLog.setIgnorePaths(getRequestLoggingIgnorePaths());
+            requestLog.setRetainDays(getDaysLogsRetained());
+            requestLog.setFilename(new File(logDir, "yyyy_mm_dd.request.log").getAbsolutePath());
+            context.setRequestLog(requestLog);
         }
     }
 
@@ -131,13 +101,6 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
     {
         return Boolean.getBoolean("pulse.enable.request.logging");
     }
-
-    private void handleBindException(SystemConfiguration config)
-    {
-        LOG.severe(String.format("Unable to start on port %s because it " +
-                "is being used by another process.  Please select a different port and restart pulse.", config.getServerPort()));
-    }
-
 
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {

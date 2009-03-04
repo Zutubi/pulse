@@ -31,6 +31,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         super.tearDown();
     }
 
+    // test that an external ivy process can publish to the internal artifact repository.
     public void testIvyCanPublishToRepository() throws Exception
     {
         assertTrue(isNotInArtifactRepository("zutubi/com.zutubi.sample/jars"));
@@ -38,12 +39,13 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // run the ivyant build, verify that a new artifact is added to the repository.
         int buildNumber = createAndRunIvyAntProject("publish");
 
-        assertTrue(isInArtifactRepository("zutubi/com.zutubi.sample/jars"));
-        
         // ensure that the build passed.
         assertTrue(isBuildSuccessful(random, buildNumber));
+
+        assertTrue(isInArtifactRepository("zutubi/com.zutubi.sample/jars"));
     }
 
+    // test that an external ivy process can retrieve from the internal artifact repository.
     public void testIvyCanRetrieveFromRepository() throws Exception
     {
         // create the expected artifact file.
@@ -60,6 +62,11 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         // to be completed.
     }
+
+    // The following tests are somewhere between acceptance and unit testes.  They are not end to end, but
+    // to make use of a running artifact repository.
+
+
 
     private int createAndRunIvyAntProject(String target) throws Exception
     {
