@@ -1,17 +1,10 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.pulse.core.Command;
-import com.zutubi.pulse.core.Artifact;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_DEPENDENCY_DESCRIPTOR;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_RETRIEVAL_PATTERN;
-
-import java.util.List;
-import java.util.Collections;
-
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 
 /**
@@ -27,8 +20,9 @@ public class RetrieveDependenciesCommand implements Command
         this.ivy = ivy;
     }
 
-    public void execute(ExecutionContext context, CommandResult result)
+    public void execute(CommandContext commandContext)
     {
+        ExecutionContext context = commandContext.getExecutionContext();
         try
         {
             ModuleDescriptor descriptor = context.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
@@ -44,27 +38,6 @@ public class RetrieveDependenciesCommand implements Command
         {
             throw new BuildException("Error running dependency retrieval: " + e.getMessage(), e);
         }
-    }
-
-    public List<Artifact> getArtifacts()
-    {
-        // return the list of artifacts actually retrieved.
-        return Collections.emptyList();
-    }
-
-    public String getName()
-    {
-        return "retrieve";
-    }
-
-    public void setName(String name)
-    {
-        // noop.
-    }
-
-    public boolean isForce()
-    {
-        return false;
     }
 
     public void terminate()

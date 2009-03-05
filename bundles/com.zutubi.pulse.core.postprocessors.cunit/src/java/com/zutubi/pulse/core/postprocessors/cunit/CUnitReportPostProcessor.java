@@ -32,9 +32,9 @@ public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
     private static final String ELEMENT_TEST_LINE_NUMBER     = "LINE_NUMBER";
     private static final String ELEMENT_TEST_CONDITION       = "CONDITION";
 
-    public CUnitReportPostProcessor()
+    public CUnitReportPostProcessor(CUnitReportPostProcessorConfiguration config)
     {
-        super("CUnit");
+        super(config);
     }
 
     protected Builder createBuilder()

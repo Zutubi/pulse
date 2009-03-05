@@ -22,7 +22,7 @@ public class NamedStageFileObject extends AbstractPulseFileObject implements Rec
         this.recipeName = recipeName;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
         return objectFactory.buildBean(NamedCommandFileObject.class,

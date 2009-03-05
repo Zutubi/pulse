@@ -1,56 +1,23 @@
 package com.zutubi.pulse.core.commands.make;
 
-import com.zutubi.pulse.core.commands.core.ExecutableCommand;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  */
-public class MakeCommand extends ExecutableCommand
+public class MakeCommand extends NamedArgumentCommand
 {
-    private String makefile;
-    private String targets;
-
-    public MakeCommand()
+    public MakeCommand(MakeCommandConfiguration configuration)
     {
-        super("make.bin", "make");
+        super(configuration);
     }
 
-    public void execute(ExecutionContext context, CommandResult cmdResult)
+    @Override
+    protected List<Class<? extends PostProcessorConfiguration>> getDefaultPostProcessorTypes()
     {
-
-        if (makefile != null)
-        {
-            addArguments("-f", makefile);
-            cmdResult.getProperties().put("makefile", makefile);
-        }
-
-        if (targets != null)
-        {
-            addArguments(targets.split(" +"));
-            cmdResult.getProperties().put("targets", targets);
-        }
-
-        super.execute(context, cmdResult);
-    }
-
-    public String getMakefile()
-    {
-        return makefile;
-    }
-
-    public void setMakefile(String makefile)
-    {
-        this.makefile = makefile;
-    }
-
-    public String getTargets()
-    {
-        return targets;
-    }
-
-    public void setTargets(String targets)
-    {
-        this.targets = targets;
+        return Arrays.<Class<? extends PostProcessorConfiguration>>asList(MakePostProcessorConfiguration.class);
     }
 }

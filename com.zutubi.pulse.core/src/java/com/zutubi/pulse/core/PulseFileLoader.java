@@ -1,53 +1,35 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.marshal.ToveFileLoader;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.TextUtils;
 
 import java.io.ByteArrayInputStream;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Convenience class for creating loaders for pulse files with types registered.
+ * Convenience class for common pulse file loading operations.
  */
-public class PulseFileLoader extends FileLoader
+public class PulseFileLoader extends ToveFileLoader
 {
     /**
-     * Use the PulseFileLoaderFactory to create a correctly configured instance of
-     * the PulseFileLoader.
+     * Loads a pulse file, isolating a single recipe.
+     *
+     * @param pulseFile   source of the pulse file (an XML string)
+     * @param recipeName  name of the recipe to load
+     * @param globalScope scope to use as basis for loading
+     * @return configuration for the loaded recipe
+     * @throws PulseException if the file cannot be loaded
      */
-    public PulseFileLoader()
+    public ProjectRecipesConfiguration loadRecipe(String pulseFile, String recipeName, PulseScope globalScope) throws PulseException
     {
-    }
-
-    public List<ResourceRequirement> loadRequiredResources(String pulseFile, String recipe) throws PulseException
-    {
-        List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
-
-        PulseFile file = new PulseFile();
-        ResourceRequirementsPredicate predicate = new ResourceRequirementsPredicate(file, recipe);
-        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), new FileResourceRepository(), predicate);
-
-        for(ResourceReference reference: predicate.getReferences())
-        {
-            if(reference.isRequired())
-            {
-                // if a version is specified, then we want that version, otherwise the default is fine.
-                if (TextUtils.stringSet(reference.getVersion()))
-                {
-                    requirements.add(new ResourceRequirement(reference.getName(), reference.getVersion(), false));
-                }
-                else
-                {
-                    requirements.add(new ResourceRequirement(reference.getName(), reference.getVersion(), true));
-                }
-            }
-        }
-
-        return requirements;
+        ProjectRecipesConfiguration recipes = new ProjectRecipesConfiguration();
+        RecipeLoadPredicate predicate = new RecipeLoadPredicate(recipes, recipeName);
+        load(new ByteArrayInputStream(pulseFile.getBytes()), recipes, globalScope, predicate);
+        return recipes;
     }
 
     /**
@@ -59,13 +41,13 @@ public class PulseFileLoader extends FileLoader
      */
     public List<String> loadAvailableRecipes(String pulseFile) throws PulseException
     {
-        PulseFile file = new PulseFile();
+        ProjectRecipesConfiguration recipes = new ProjectRecipesConfiguration();
         RecipeListingPredicate predicate = new RecipeListingPredicate();
-        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), new FileResourceRepository(), predicate);
+        load(new ByteArrayInputStream(pulseFile.getBytes()), recipes, new PulseScope(), predicate);
 
-        return CollectionUtils.map(file.getRecipes(), new Mapping<Recipe, String>()
+        return CollectionUtils.map(recipes.getRecipes().values(), new Mapping<RecipeConfiguration, String>()
         {
-            public String map(Recipe recipe)
+            public String map(RecipeConfiguration recipe)
             {
                 return recipe.getName();
             }

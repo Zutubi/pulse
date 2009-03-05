@@ -18,14 +18,14 @@ public class BuildValidator extends StringFieldValidatorSupport
     public void validateStringField(String build)
     {
         ConfigurationValidationContext context = (ConfigurationValidationContext) getValidationContext();
-        String[] parentPathElenents = PathUtils.getPathElements(context.getParentPath());
-        if(parentPathElenents.length < 2)
+        String[] parentPathElements = PathUtils.getPathElements(context.getParentPath());
+        if(parentPathElements.length < 2)
         {
             context.addFieldError(getFieldName(), context.getText("invalid.parent.path", context.getParentPath()));
             return;
         }
 
-        String projectName = parentPathElenents[1];
+        String projectName = parentPathElements[1];
         Project project = projectManager.getProject(projectName, true);
         if (project == null)
         {

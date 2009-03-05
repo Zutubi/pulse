@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import antlr.collections.AST;
-import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.master.condition.FalseNotifyCondition;
 import com.zutubi.pulse.master.condition.NotifyCondition;
 import com.zutubi.pulse.master.condition.NotifyConditionFactory;
@@ -12,10 +11,12 @@ import com.zutubi.pulse.master.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.logging.Logger;
 
 import java.io.StringReader;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
      * the subscription is associated with all projects.
      */
     @Reference
-    private List<ProjectConfiguration> projects;
+    private List<ProjectConfiguration> projects = new LinkedList<ProjectConfiguration>();
     /**
      * Condition to be satisfied before notifying.
      */

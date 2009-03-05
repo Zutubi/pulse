@@ -25,7 +25,7 @@ public class CommandResultFileObject extends AbstractPulseFileObject implements 
         this.commandResultId = commandResultId;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         long artifactId = Long.parseLong(fileName.getBaseName());
 

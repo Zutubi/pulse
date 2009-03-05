@@ -39,7 +39,6 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
             waitForBuildToComplete(i);
         }
         
-        logout();
         xmlRpcHelper.logout();
         super.tearDown();
     }
@@ -156,7 +155,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> svn = xmlRpcHelper.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
         Hashtable<String,Object> ant = xmlRpcHelper.getAntConfig();
         ant.put(Constants.Project.AntType.ARGUMENTS, getFileArgument(waitFile));
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svn, ant);
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svn, ant);
 
         xmlRpcHelper.triggerBuild(random);
         xmlRpcHelper.waitForBuildInProgress(random, thisBuild, TIMEOUT);

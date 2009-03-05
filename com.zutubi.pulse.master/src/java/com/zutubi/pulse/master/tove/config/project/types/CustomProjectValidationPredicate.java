@@ -1,18 +1,17 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.pulse.core.ResourceReference;
-import com.zutubi.pulse.core.TypeLoadPredicate;
+import com.zutubi.pulse.core.marshal.TypeLoadPredicate;
 import nu.xom.Element;
 
 /**
  * A predicate used when validating the pulse file for a custom project.  We
- * don't resolve references and don't load resource references.
+ * allow unresolved references.
  */
 public class CustomProjectValidationPredicate implements TypeLoadPredicate
 {
     public boolean loadType(Object type, Element element)
     {
-        return !(type instanceof ResourceReference);
+        return true;
     }
 
     public boolean resolveReferences(Object type, Element element)

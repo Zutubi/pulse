@@ -2,7 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.postprocessors">
-        <post-processor name="unittestpp.pp" display-name="UnitTest++ XML report processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.postprocessors.unittestpp.UnitTestPlusPlusReportPostProcessor"/>
+        <post-processor name="unittestpp.pp" display-name="unittest++ xml report processor"
+                        default-processor="true" class="com.zutubi.pulse.core.postprocessors.unittestpp.UnitTestPlusPlusReportPostProcessorConfiguration"/>
     </extension>
 </plugin>

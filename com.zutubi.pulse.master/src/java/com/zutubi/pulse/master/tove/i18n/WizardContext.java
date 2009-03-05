@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.i18n;
 
 import com.zutubi.i18n.context.Context;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 
 import java.io.InputStream;
 

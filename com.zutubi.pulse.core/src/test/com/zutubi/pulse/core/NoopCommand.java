@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.commands.api.CommandSupport;
 
 /**
  * A simple command that does no processing.
@@ -12,22 +12,18 @@ public class NoopCommand extends CommandSupport
 
     private boolean terminated;
 
-    public NoopCommand()
+    public NoopCommand(NoopCommandConfiguration config)
     {
+        super(config);
     }
 
-    public NoopCommand(String name)
-    {
-        super(name);
-    }
-
-    public void execute(ExecutionContext context, CommandResult result)
+    public void execute(CommandContext commandContext)
     {
         executed = true;
 
         if (terminated)
         {
-            result.error("Command terminated");
+            commandContext.error("Command terminated");
         }
     }
 

@@ -1,10 +1,11 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizardState;
+import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
-import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
 import com.zutubi.util.Predicate;
 
 /**
@@ -13,14 +14,14 @@ import com.zutubi.util.Predicate;
  */
 public class WizardTypeHelpAction extends TypeHelpActionSupport
 {
-    private AbstractTypeWizard.AbstractTypeWizardState state;
+    private AbstractTypeWizardState state;
 
     private void ensureState()
     {
         if(state == null)
         {
             AbstractTypeWizard wizardInstance = (AbstractTypeWizard) ConfigurationWizardAction.getWizardInstance(getPath());
-            state = (AbstractTypeWizard.AbstractTypeWizardState) wizardInstance.getCurrentState();
+            state = (AbstractTypeWizardState) wizardInstance.getCurrentState();
         }
     }
 

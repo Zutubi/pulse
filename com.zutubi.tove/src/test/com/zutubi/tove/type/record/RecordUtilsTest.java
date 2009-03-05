@@ -36,12 +36,22 @@ public class RecordUtilsTest extends ZutubiTestCase
 
     public void testValuesEqualFirstNull()
     {
-        assertFalse(RecordUtils.valuesEqual(null, ""));
+        assertFalse(RecordUtils.valuesEqual(null, "hey"));
     }
 
     public void testValuesEqualSecondNull()
     {
-        assertFalse(RecordUtils.valuesEqual("", null));
+        assertFalse(RecordUtils.valuesEqual("you", null));
+    }
+
+    public void testValuesEqualFirstNullSecondEmptyString()
+    {
+        assertTrue(RecordUtils.valuesEqual(null, ""));
+    }
+
+    public void testValuesEqualFirstEmptyStringSecondNull()
+    {
+        assertTrue(RecordUtils.valuesEqual("", null));
     }
 
     public void testValuesEqualEqualStrings()

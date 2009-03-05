@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.validation;
 
 import com.zutubi.pulse.master.condition.NotifyConditionFactory;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.user.*;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.PathUtils;
 
@@ -20,7 +20,7 @@ public class SubscriptionValidationTest extends AbstractValidationTestCase
 
         super.setUp();
         UserConfiguration user = new UserConfiguration("admin", "admin");
-        String userPath = configurationTemplateManager.insert(ConfigurationRegistry.USERS_SCOPE, user);
+        String userPath = configurationTemplateManager.insert(MasterConfigurationRegistry.USERS_SCOPE, user);
 
         EmailContactConfiguration contact = new EmailContactConfiguration();
         contact.setName("contact");

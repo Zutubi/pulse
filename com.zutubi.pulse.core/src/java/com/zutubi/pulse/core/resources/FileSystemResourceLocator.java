@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.resources;
 
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
@@ -21,19 +21,19 @@ public class FileSystemResourceLocator implements ResourceLocator
         this.resourceBuilder = resourceBuilder;
     }
 
-    public List<Resource> locate()
+    public List<ResourceConfiguration> locate()
     {
-        List<Resource> resources = CollectionUtils.map(fileLocator.locate(), new Mapping<File, Resource>()
+        List<ResourceConfiguration> resources = CollectionUtils.map(fileLocator.locate(), new Mapping<File, ResourceConfiguration>()
         {
-            public Resource map(File file)
+            public ResourceConfiguration map(File file)
             {
                 return resourceBuilder.buildResource(file);
             }
         });
 
-        resources = CollectionUtils.filter(resources, new Predicate<Resource>()
+        resources = CollectionUtils.filter(resources, new Predicate<ResourceConfiguration>()
         {
-            public boolean satisfied(Resource resource)
+            public boolean satisfied(ResourceConfiguration resource)
             {
                 return resource != null;
             }

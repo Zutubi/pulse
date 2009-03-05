@@ -28,9 +28,9 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
 
     private Map<String, TestSuiteResult> suites;
 
-    public CppUnitReportPostProcessor()
+    public CppUnitReportPostProcessor(CppUnitReportPostProcessorConfiguration config)
     {
-        super("CppUnit");
+        super(config);
     }
 
     protected void processDocument(Document doc, TestSuiteResult tests)
@@ -198,5 +198,4 @@ public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSuppor
 
         return message;
     }
-
 }

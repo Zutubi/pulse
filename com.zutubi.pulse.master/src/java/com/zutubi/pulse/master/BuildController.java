@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
@@ -494,7 +495,8 @@ public class BuildController implements EventListener
             {
                 public Revision process(ScmClient client, ScmContext context) throws ScmException
                 {
-                    boolean supportsRevisions = client.getCapabilities(project.isInitialised()).contains(ScmCapability.REVISIONS);
+                    ScmContext c = (project.isInitialised()) ? context : null;
+                    boolean supportsRevisions = client.getCapabilities(c).contains(ScmCapability.REVISIONS);
                     return supportsRevisions ? client.getLatestRevision(context) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
                 }
             });
@@ -515,6 +517,7 @@ public class BuildController implements EventListener
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
         }
         return pulseFile;
@@ -779,7 +782,7 @@ public class BuildController implements EventListener
                 ScmClient client = null;
                 try
                 {
-                    Set<ScmCapability> capabilities = getCapabilities(scm, scmManager, project.isInitialised());
+                    Set<ScmCapability> capabilities = getCapabilities(project, projectConfig, scmManager);
                     if(capabilities.contains(ScmCapability.CHANGESETS))
                     {
                         ScmContext context = scmManager.createContext(projectConfig);

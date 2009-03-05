@@ -11,16 +11,6 @@ import java.util.List;
  */
 public class BuildCompletedTriggerPropagateRevisionUpgradeTask extends AbstractRecordPropertiesUpgradeTask
 {
-    public String getName()
-    {
-        return "Build Completed Trigger Propagate Revisions";
-    }
-
-    public String getDescription()
-    {
-        return "Adds new configuration fields to build completed triggers to support propagating the build revision";
-    }
-
     public boolean haltOnFailure()
     {
         return true;

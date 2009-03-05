@@ -48,6 +48,8 @@ public class Constants
      */
     public static class Project
     {
+        public static final String HOOKS = "buildHooks";
+        public static final String REQUIREMENTS = "requirements";
         public static final String STAGES = "stages";
         public static final String SCM = "scm";
         public static final String TYPE = "type";
@@ -79,9 +81,9 @@ public class Constants
         /**
          * The constants for the property names in the project template type class.
          */
-        public static class Type
+        public static class Command
         {
-            public static final String ARTIFACTS = "artifacts";
+            public static final String CAPTURES = "outputs";
         }
 
         /**
@@ -96,20 +98,20 @@ public class Constants
     /**
      * The constants for the property names in the ArtifactConfiguration class.
      */
-    public static class Artifact
+    public static class Output
     {
         public static final String NAME = "name";
-        public static final String POSTPROCESSORS = "postprocessors";
+        public static final String POSTPROCESSORS = "postProcessors";
     }
 
     /**
      * The constants for the property names in the DirectoryArtifactConfiguration class.
      */
-    public static class DirectoryArtifact extends Artifact
+    public static class DirectoryOutput extends Output
     {
         public static final String BASE = "base";
-        public static final String INCLUDES = "includes";
-        public static final String EXCLUDES = "excludes";
+        public static final String INCLUSIONS = "inclusions";
+        public static final String EXCLUSIONS = "exclusions";
         public static final String MIME_TYPE = "type";
     }
 }

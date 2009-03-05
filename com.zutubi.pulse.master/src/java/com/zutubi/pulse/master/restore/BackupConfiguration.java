@@ -5,7 +5,6 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Constraint;
-import com.zutubi.validation.annotations.Required;
 
 /**
  * Settings for automatic backups.  By default backups are enabled and run
@@ -17,7 +16,6 @@ public class BackupConfiguration extends AbstractConfiguration
 {
     public static final String DEFAULT_CRON_SCHEDULE = "0 0 5 * * ?";
 
-    @Required
     @Constraint("com.zutubi.pulse.master.tove.config.project.triggers.CronExpressionValidator")
     private String cronSchedule = DEFAULT_CRON_SCHEDULE;
 

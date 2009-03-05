@@ -1,3 +1,0 @@
-#foreach($pp in $postProcessorFragments)
-    $pp
-#end

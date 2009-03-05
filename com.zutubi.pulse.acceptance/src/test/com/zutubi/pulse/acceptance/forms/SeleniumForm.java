@@ -300,7 +300,7 @@ public abstract class SeleniumForm
     public void setFormElements(String... values)
     {
         int[] types = getActualFieldTypes();
-        Assert.assertEquals(values.length, types.length);
+        Assert.assertEquals(types.length, values.length);
 
         String[] names = getActualFieldNames();
         for (int i = 0; i < types.length; i++)

@@ -36,8 +36,9 @@ public class ConfigurationDocsManager
 
     private static final Map<String, String> EXAMPLE_KEY_MAP = asOrderedMap(asPair("blurb", "blurb"));
 
-    private Map<String, TypeDocs> cache = new HashMap<String, TypeDocs>();
     private static final int TRIM_LIMIT = 100;
+
+    private Map<String, TypeDocs> cache = new HashMap<String, TypeDocs>();
 
     public synchronized TypeDocs getDocs(CompositeType type)
     {

@@ -1,8 +1,7 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.CommandSupport;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.commands.api.CommandSupport;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -12,35 +11,32 @@ import java.util.concurrent.TimeUnit;
  */
 public class SleepCommand extends CommandSupport
 {
-    /**
-     * Number of milliseconds to sleep.
-     */
-    private long interval;
     private Semaphore terminatedSemaphore = new Semaphore(0);
 
-    public void execute(ExecutionContext context, CommandResult result)
+    public SleepCommand(SleepCommandConfiguration config)
+    {
+        super(config);
+    }
+
+    @Override
+    public SleepCommandConfiguration getConfig()
+    {
+        return (SleepCommandConfiguration) super.getConfig();
+    }
+
+    public void execute(CommandContext commandContext)
     {
         try
         {
-            if (terminatedSemaphore.tryAcquire(interval, TimeUnit.MILLISECONDS))
+            if (terminatedSemaphore.tryAcquire(getConfig().getInterval(), TimeUnit.MILLISECONDS))
             {
-                result.error("Terminated");
+                commandContext.error("Terminated");
             }
         }
         catch (InterruptedException e)
         {
             // Empty
         }
-    }
-
-    /**
-     * The sleep interval in milliseconds.
-     *
-     * @param interval value.
-     */
-    public void setInterval(long interval)
-    {
-        this.interval = interval;
     }
 
     public void terminate()

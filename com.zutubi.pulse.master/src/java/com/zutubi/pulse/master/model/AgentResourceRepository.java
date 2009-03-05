@@ -1,10 +1,9 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +31,7 @@ public class AgentResourceRepository implements ResourceRepository
         String name = requirement.getResource();
         String version = requirement.getVersion();
 
-        Resource r = getResource(name);
+        ResourceConfiguration r = getResource(name);
         if (r == null)
         {
             return false;
@@ -46,17 +45,9 @@ public class AgentResourceRepository implements ResourceRepository
         return getResource(name) != null;
     }
 
-    public Resource getResource(String name)
+    public ResourceConfiguration getResource(String name)
     {
-        ResourceConfiguration resourceConfig = agentConfig.getResources().get(name);
-        if (resourceConfig == null)
-        {
-            return null;
-        }
-        else
-        {
-            return resourceConfig.asResource();
-        }
+        return agentConfig.getResources().get(name);
     }
 
     public List<String> getResourceNames()

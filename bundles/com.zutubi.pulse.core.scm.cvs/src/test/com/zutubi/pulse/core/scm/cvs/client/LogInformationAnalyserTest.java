@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
+import com.zutubi.pulse.core.scm.cvs.CvsTestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
@@ -21,14 +22,14 @@ import java.util.*;
 
 /**
  *
- * 
+ *
  */
 public class LogInformationAnalyserTest extends PulseTestCase
 {
     private static final SimpleDateFormat LOCAL_DATE;
     private static final SimpleDateFormat SERVER_DATE;
 
-    static 
+    static
     {
         LOCAL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         LOCAL_DATE.setTimeZone(TimeZone.getTimeZone("EST"));
@@ -48,7 +49,8 @@ public class LogInformationAnalyserTest extends PulseTestCase
         super.setUp();
         Logger.setLogging("system");
 
-        String cvsRoot = ":ext:daniel:xxxxx@zutubi.com:/cvsroots/default";
+        String password = CvsTestUtils.getPassword("cvs-1.12.9");
+        String cvsRoot = ":ext:cvs-1.12.9:" + password + "@zutubi.com:/cvsroots/default";
         cvs = new CvsCore();
         cvs.setRoot(CVSRoot.parse(cvsRoot));
         analyser = new LogInformationAnalyser(CVSRoot.parse(cvsRoot));
@@ -310,7 +312,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
 
         fromRevision.setBranch("BRANCH");
         toRevision.setBranch("BRANCH");
-        
+
         infos = cvs.rlog(module, fromRevision, toRevision);
         changes = analyser.extractChangelists(infos, "BRANCH");
 
@@ -352,7 +354,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
 
     private static void assertValidChangeSets(List<Changelist> changelists)
     {
-        for(Changelist changelist : changelists)
+        for (Changelist changelist : changelists)
         {
             assertValidChangeSet(changelist);
         }
@@ -363,7 +365,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         List<FileChange> changes = changelist.getChanges();
         Map<String, String> filenames = new HashMap<String, String>();
 
-        for(FileChange change : changes)
+        for (FileChange change : changes)
         {
             assertFalse(filenames.containsKey(change.getPath()));
             filenames.put(change.getPath(), change.getPath());

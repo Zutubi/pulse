@@ -57,4 +57,15 @@ public class RecordUpgraders
     {
         return new AddMetaPropertyRecordUpgrader(name, value);
     }
+
+    /**
+     * Create a new upgrader that will delete a meta property from records.
+     *
+     * @param name the name of the meta property to delete
+     * @return the new upgrader
+     */
+    public static RecordUpgrader newDeleteMetaProperty(String name)
+    {
+        return new DeleteMetaPropertyRecordUpgrader(name);
+    }
 }

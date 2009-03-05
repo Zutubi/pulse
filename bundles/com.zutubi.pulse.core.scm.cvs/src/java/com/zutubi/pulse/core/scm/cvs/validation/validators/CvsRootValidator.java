@@ -5,13 +5,21 @@ import com.zutubi.validation.validators.StringFieldValidatorSupport;
 import org.netbeans.lib.cvsclient.CVSRoot;
 
 /**
- *
- *
  */
 public class CvsRootValidator extends StringFieldValidatorSupport
 {
+    public CvsRootValidator()
+    {
+        setAllowEmpty(true);
+    }
+
     public void validateStringField(String value) throws ValidationException
     {
+        if (value == null)
+        {
+            return;
+        }
+        
         try
         {
             CVSRoot.parse(value);

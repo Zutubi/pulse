@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.model.ResourceManager;
-import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
 import java.util.*;

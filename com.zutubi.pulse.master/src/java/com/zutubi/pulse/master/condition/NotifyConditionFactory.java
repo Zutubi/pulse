@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.condition;
 
-import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 
@@ -83,27 +82,11 @@ public class NotifyConditionFactory
             throw new IllegalArgumentException("Invalid token '" + token + "' specified.");
         }
         Class definition = typeMap.get(token);
-
-        try
-        {
-            return (T) objectFactory.buildBean(definition);
-        }
-        catch (Exception e)
-        {
-            throw new PulseRuntimeException(e);
-        }
+        return (T) objectFactory.buildBean(definition);
     }
-
 
     public <T> T build(Class<T> clazz, Class[] argTypes, Object[] args)
     {
-        try
-        {
-            return objectFactory.buildBean(clazz, argTypes, args);
-        }
-        catch (Exception e)
-        {
-            throw new PulseRuntimeException(e);
-        }
+        return objectFactory.buildBean(clazz, argTypes, args);
     }
 }

@@ -53,7 +53,12 @@ public class ToveUtils
         String result = (namespace != null) ? namespace : PulseActionMapper.ADMIN_NAMESPACE;
         if (path != null)
         {
-            result = StringUtils.join("/", true, true, result, path);
+            String[] elements = PathUtils.getPathElements(path);
+            for (String element: elements)
+            {
+                result += "/";
+                result += StringUtils.uriComponentEncode(element);
+            }
         }
 
         result = PathUtils.normalisePath(result);

@@ -64,11 +64,6 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         });
     }
 
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testInsertIntoCollection()
     {
         MockA a = new MockA("a");
@@ -810,7 +805,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         String path = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
         record = typeA.unstantiate(new MockA("child"));
-        configurationTemplateManager.setParentTemplate(record, configurationReferenceManager.getHandleForPath(path));
+        configurationTemplateManager.setParentTemplate(record, recordManager.select(path).getHandle());
         path = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
         return path;
     }
@@ -1482,12 +1477,36 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertTrue(configurationTemplateManager.isDeeplyCompleteAndValid(new MockA("a")));
     }
 
+    public void testGetRootInstanceNonTemplated()
+    {
+        try
+        {
+            configurationTemplateManager.getRootInstance(SCOPE_SAMPLE, MockA.class);
+            fail("Can't get root of non-templated scope");
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("Path 'sample' does not refer to a templated collection", e.getMessage());
+        }
+    }
+
+    public void testGetRootInstanceTemplatedEmpty() throws TypeException
+    {
+        assertNull(configurationTemplateManager.getRootInstance(SCOPE_TEMPLATED, MockA.class));
+    }
+
+    public void testGetRootInstanceTemplated() throws TypeException
+    {
+        insertParentAndChildA(new MockA("parent"), new MockA("child"));
+        assertEquals("parent", configurationTemplateManager.getRootInstance(SCOPE_TEMPLATED, MockA.class).getName());
+    }
+
     private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException
     {
         MutableRecord record = typeA.unstantiate(parent);
         configurationTemplateManager.markAsTemplate(record);
         String parentPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
-        long parentHandle = configurationReferenceManager.getHandleForPath(parentPath);
+        long parentHandle = recordManager.select(parentPath).getHandle();
 
         record = typeA.unstantiate(child);
         configurationTemplateManager.setParentTemplate(record, parentHandle);
@@ -1499,13 +1518,13 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MutableRecord record = typeA.unstantiate(parent);
         configurationTemplateManager.markAsTemplate(record);
         String parentPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
-        long parentHandle = configurationReferenceManager.getHandleForPath(parentPath);
+        long parentHandle = recordManager.select(parentPath).getHandle();
 
         record = typeA.unstantiate(child);
         configurationTemplateManager.markAsTemplate(record);
         configurationTemplateManager.setParentTemplate(record, parentHandle);
         String childPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
-        long childHandle = configurationReferenceManager.getHandleForPath(childPath);
+        long childHandle = recordManager.select(childPath).getHandle();
 
         record = typeA.unstantiate(grandchild);
         configurationTemplateManager.setParentTemplate(record, childHandle);

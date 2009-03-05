@@ -1,29 +1,28 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.util.TextUtils;
 import org.apache.ivy.Ivy;
-import org.apache.ivy.util.MessageLogger;
+import org.apache.ivy.core.cache.ResolutionCacheManager;
+import org.apache.ivy.core.deliver.DeliverOptions;
+import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
+import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.core.publish.PublishOptions;
+import org.apache.ivy.core.resolve.ResolveEngine;
+import org.apache.ivy.core.resolve.ResolveOptions;
+import org.apache.ivy.core.retrieve.RetrieveOptions;
+import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.resolver.AbstractPatternsBasedResolver;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
-import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.core.deliver.DeliverOptions;
-import org.apache.ivy.core.retrieve.RetrieveOptions;
-import org.apache.ivy.core.publish.PublishOptions;
-import org.apache.ivy.core.resolve.ResolveOptions;
-import org.apache.ivy.core.resolve.ResolveEngine;
-import org.apache.ivy.core.cache.ResolutionCacheManager;
-import org.apache.ivy.core.settings.IvySettings;
+import org.apache.ivy.util.MessageLogger;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-
-import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.core.Command;
-import com.zutubi.pulse.core.RecipeRequest;
 
 /**
  * The IvyCore provides a facade around the ivy dependency management system
@@ -219,12 +218,14 @@ public class IvySupport
      * @return a command instance able to run a dependency retrieve during a
      * recipe execution.
      */
-    public Command getRetrieveCommandWrapper()
+    public CommandConfiguration getRetrieveCommand()
     {
         // Note: the creation of this command is being embedded in teh ivy support
         // to allow the recipe processor tests to 'override' the retrieve command
         // with a noop.
-        return new RetrieveDependenciesCommand(this);
+        RetrieveDependenciesCommandConfiguration command = new RetrieveDependenciesCommandConfiguration();
+        command.setIvy(this);
+        return command;
     }
 
     /**
@@ -236,11 +237,14 @@ public class IvySupport
      * @return a command instance able to run a publish at the end of a
      * recipe execution.
      */
-    public Command getPublishCommandWrapper(RecipeRequest request)
+    public CommandConfiguration getPublishCommand(RecipeRequest request)
     {
         // Note: the creation of this command is being embedded in teh ivy support
         // to allow the recipe processor tests to 'override' the publish command
         // with a noop.
-        return new PublishArtifactsCommand(this, request);
+        PublishArtifactsCommandConfiguration command = new PublishArtifactsCommandConfiguration();
+        command.setRequest(request);
+        command.setIvy(this);
+        return command;
     }
 }

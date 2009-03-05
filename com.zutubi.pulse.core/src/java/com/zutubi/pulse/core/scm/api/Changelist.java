@@ -3,9 +3,9 @@ package com.zutubi.pulse.core.scm.api;
 import com.zutubi.util.StringUtils;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
 
 
 /**
@@ -98,8 +98,7 @@ public class Changelist implements Comparable<Changelist>
     }
 
     /**
-     * @return the list of file changes that make up this changelist
-     *         (immutable)
+     * @return the list of file changes that make up this changelist (immutable).
      */
     public List<FileChange> getChanges()
     {

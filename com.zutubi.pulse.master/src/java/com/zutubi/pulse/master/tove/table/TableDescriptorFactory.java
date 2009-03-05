@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.table;
 
-import com.zutubi.tove.annotations.Table;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.security.AccessManager;
@@ -52,14 +52,7 @@ public class TableDescriptorFactory
 
     private ColumnDescriptor newColumnDescriptor(String name, CompositeType type)
     {
-        try
-        {
-            return objectFactory.buildBean(ColumnDescriptor.class, new Class[]{String.class, CompositeType.class}, new Object[]{name, type});
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Failed to bulid internal class: " + e.getMessage(), e);
-        }
+        return objectFactory.buildBean(ColumnDescriptor.class, new Class[]{String.class, CompositeType.class}, new Object[]{name, type});
     }
 
     public void setActionManager(ActionManager actionManager)

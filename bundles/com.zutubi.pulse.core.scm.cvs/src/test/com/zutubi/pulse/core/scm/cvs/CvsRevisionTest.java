@@ -96,4 +96,13 @@ public class CvsRevisionTest extends PulseTestCase
         assertNull(revision.getDate());
         assertEquals(":BRANCH:", revision.getRevisionString());
     }
+
+    public void testSanity() throws ScmException, ParseException
+    {
+        CvsRevision revision = new CvsRevision("author:BRANCH:20070201-01:02:33");
+        assertEquals("author", revision.getAuthor());
+        assertEquals("BRANCH", revision.getBranch());
+        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
+        assertEquals("author:BRANCH:20070201-01:02:33", revision.getRevisionString());
+    }
 }

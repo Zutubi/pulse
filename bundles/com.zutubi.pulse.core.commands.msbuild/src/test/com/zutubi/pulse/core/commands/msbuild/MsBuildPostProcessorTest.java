@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.commands.msbuild;
 
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
 
@@ -10,11 +11,11 @@ import java.io.IOException;
  */
 public class MsBuildPostProcessorTest extends PostProcessorTestBase
 {
-    private MsBuildPostProcessor pp;
+    private RegexPostProcessor pp;
 
     public void setUp() throws IOException
     {
-        pp = new MsBuildPostProcessor();
+        pp = new RegexPostProcessor(new MsBuildPostProcessorConfiguration());
         super.setUp();
     }
 

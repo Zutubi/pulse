@@ -4,6 +4,7 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
+import com.zutubi.pulse.acceptance.forms.admin.ProjectTypeSelectState;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -11,7 +12,8 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ExceptionWrappingRunnable;
@@ -19,6 +21,8 @@ import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.net.URL;
 import java.util.Collections;
@@ -30,6 +34,8 @@ import java.util.Vector;
  */
 public class SeleniumTestBase extends PulseTestCase
 {
+    private static final long STATUS_TIMEOUT = 30000;
+
     /**
      * Shared agent used for simple single-agent builds.  Makes it easier to
      * run these tests in development environments (just manually run one
@@ -150,9 +156,9 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void waitForStatus(String message)
     {
-        SeleniumUtils.waitForVisible(selenium, IDs.STATUS_MESSAGE);
+        SeleniumUtils.refreshUntilElement(selenium, IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
         String text = selenium.getText(IDs.STATUS_MESSAGE);
-        assertTrue(text.contains(message));        
+        assertThat(text, containsString(message));        
     }
 
     protected String addProject(String name, boolean useAPI)
@@ -193,7 +199,7 @@ public class SeleniumTestBase extends PulseTestCase
             }
         }
 
-        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, name);
+        return PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, name);
     }
 
     protected boolean ensureProject(final String name) throws Exception
@@ -263,18 +269,19 @@ public class SeleniumTestBase extends PulseTestCase
      * driver instance to guide the process.
      *
      * @param driver the driver instance
+     * @return the final state of the wizard
      */
-    public AddProjectWizard.TypeState runAddProjectWizard(ProjectWizardDriver driver)
+    public AddProjectWizard.CommandState runAddProjectWizard(ProjectWizardDriver driver)
     {
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, driver.getParentName(), true);
-        globalPage.goTo();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, driver.getParentName(), true);
+        hierarchyPage.goTo();
         if (driver.isTemplate())
         {
-            globalPage.clickAddTemplate();
+            hierarchyPage.clickAddTemplate();
         }
         else
         {
-            globalPage.clickAdd();
+            hierarchyPage.clickAdd();
         }
 
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
@@ -291,31 +298,61 @@ public class SeleniumTestBase extends PulseTestCase
 
         driver.scmState(scmState);
 
-        SelectTypeState projectTypeState = new SelectTypeState(selenium);
+        String type = driver.selectType();
+
+        ProjectTypeSelectState projectTypeState = new ProjectTypeSelectState(selenium);
         projectTypeState.waitFor();
-        scmTypeState.nextFormElements(driver.selectType());
+        if (type.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))
+        {
+            projectTypeState.nextFormElements(type, driver.selectCommand());
+            AddProjectWizard.CommandState commandState = createCommandForm(driver.selectCommand());
+            commandState.waitFor();
+            driver.commandState(commandState);
+            return commandState;
+        }
+        else
+        {
+            projectTypeState.nextFormElements(type, null);
+            if (!type.equals(ProjectTypeSelectionConfiguration.TYPE_MULTI_STEP))
+            {
+                AddProjectWizard.TypeState typeState = createTypeForm(type);
+                typeState.waitFor();
+                driver.typeState(typeState);
+            }
+            return null;
+        }
 
-        AddProjectWizard.TypeState typeState = createTypeForm(driver.selectType());
-        typeState.waitFor();
-
-        driver.typeState(typeState);
-
-        return typeState;
     }
 
     private AddProjectWizard.TypeState createTypeForm(String s)
     {
-        if (s.equals("zutubi.antTypeConfig"))
+        if (s.equals(ProjectTypeSelectionConfiguration.TYPE_CUSTOM))
+        {
+            return new AddProjectWizard.CustomTypeState(selenium);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unknown type: " + s);
+        }
+    }
+
+    private AddProjectWizard.CommandState createCommandForm(String s)
+    {
+        if (s.equals("zutubi.antCommandConfig"))
         {
             return new AddProjectWizard.AntState(selenium);
         }
-        else if (s.equals("zutubi.maven2TypeConfig"))
+        else if (s.equals("zutubi.mavenCommandConfig"))
+        {
+            return new AddProjectWizard.MavenState(selenium);
+        }
+        else if (s.equals("zutubi.maven2CommandConfig"))
         {
             return new AddProjectWizard.Maven2State(selenium);
         }
         else
         {
-            throw new IllegalArgumentException("Unknown type config: " + s);
+            throw new IllegalArgumentException("Unknown command config: " + s);
         }
     }
 
@@ -367,9 +404,15 @@ public class SeleniumTestBase extends PulseTestCase
         void scmState(AddProjectWizard.ScmState form);
 
         /**
-         * @return the symbolic name of the project type to be selected.
+         * @return the type of project, one of the TYPE_* constants in
+         * {@link ProjectTypeSelectionConfiguration}.
          */
         String selectType();
+
+        /**
+         * @return the symbolic name of the project type to be selected.
+         */
+        String selectCommand();
 
         /**
          * Callback that allows interaction with the project type
@@ -378,6 +421,14 @@ public class SeleniumTestBase extends PulseTestCase
          * @param form the form instance.
          */
         void typeState(AddProjectWizard.TypeState form);
+
+        /**
+         * Callback that allows interaction with the project command
+         * wizard form.
+         *
+         * @param form the form instance.
+         */
+        void commandState(AddProjectWizard.CommandState form);
 
         String getParentName();
 
@@ -388,7 +439,7 @@ public class SeleniumTestBase extends PulseTestCase
      * The default implementation of the project wizard driver that creates a
      * concrete project using subversion and ant.
      */
-    public class DefaultProjectWizardDriver implements ProjectWizardDriver
+    public static class DefaultProjectWizardDriver implements ProjectWizardDriver
     {
         private String name;
         private String parentName;
@@ -428,12 +479,21 @@ public class SeleniumTestBase extends PulseTestCase
 
         public String selectType()
         {
-            return "zutubi.antTypeConfig";
+            return ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP;
+        }
+
+        public String selectCommand()
+        {
+            return "zutubi.antCommandConfig";
         }
 
         public void typeState(AddProjectWizard.TypeState form)
         {
-            form.finishFormElements(null, "build.xml", null, null);
+        }
+
+        public void commandState(AddProjectWizard.CommandState form)
+        {
+            form.finishFormElements("build", null, "build.xml", null, null, null);
         }
     }
 

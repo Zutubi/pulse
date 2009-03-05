@@ -14,7 +14,7 @@ public class ArtifactsFileObject extends AbstractPulseFileObject
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         long artifactId = Long.parseLong(fileName.getBaseName());
         return objectFactory.buildBean(ArtifactFileObject.class,

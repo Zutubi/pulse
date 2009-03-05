@@ -6,12 +6,14 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileSystemManager;
@@ -33,15 +35,25 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
 
     public boolean satisfied(FieldDescriptor field, FieldAction annotation)
     {
-        String projectPath = field.getParentPath();
-        if(TextUtils.stringSet(field.getBaseName()))
+        String parentPath = field.getParentPath();
+        String projectPath;
+
+        if (MasterConfigurationRegistry.PROJECTS_SCOPE.equals(PathUtils.getParentPath(parentPath)))
         {
-            projectPath = "c" + projectPath;
+            if(TextUtils.stringSet(field.getBaseName()))
+            {
+                projectPath = "c" + parentPath;
+            }
+            else
+            {
+                projectPath = "wizards/" + parentPath;
+            }
         }
         else
         {
-            projectPath = "wizards/" + projectPath;
+            projectPath = PathUtils.getPath(0, 2, PathUtils.getPathElements(parentPath));
         }
+
         try
         {
             AbstractPulseFileObject pfo = (AbstractPulseFileObject) fileSystemManager.resolveFile("pulse:///" + projectPath);
@@ -54,7 +66,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
                 ScmConfiguration config = projectConfig.getScm();
                 if (config != null && configurationTemplateManager.isDeeplyCompleteAndValid(config))
                 {
-                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(config, scmManager, project != null && project.isInitialised());
+                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(project, projectConfig, scmManager);
                     return capabilities.contains(ScmCapability.BROWSE);
                 }
             }

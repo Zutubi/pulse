@@ -17,7 +17,7 @@ public class BuildsFileObject extends AbstractPulseFileObject
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
         long buildId = convertToBuildId(fileName.getBaseName());
         if (buildId != -1)

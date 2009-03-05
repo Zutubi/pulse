@@ -1,23 +1,21 @@
 package com.zutubi.pulse.core.commands.maven2;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.commands.core.ExecutableCommandTestBase;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.PersistentFeature;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.commands.api.TestCommandContext;
+import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.SystemUtils;
 
-import java.io.*;
-import java.util.List;
+import java.io.IOException;
 
-public class Maven2CommandTest extends ExecutableCommandTestBase
+public class Maven2CommandTest extends ExecutableCommandTestCase
 {
     public void testBasic() throws Exception
     {
         prepareBaseDir("basic");
 
-        Maven2Command command = new Maven2Command();
+        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
         successRun(command, "[compiler:compile]", "BUILD SUCCESSFUL");
     }
@@ -26,10 +24,10 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
     {
         prepareBaseDir("basic");
 
-        Maven2Command command = new Maven2Command();
+        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
-        PulseExecutionContext context = new PulseExecutionContext();
-        runCommand(command, context);
+        PulseExecutionContext context = (PulseExecutionContext) createExecutionContext();
+        runCommand(new Maven2Command(command), context);
         assertEquals("1.0-SNAPSHOT", context.getVersion());
     }
 
@@ -37,7 +35,7 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
     {
         prepareBaseDir("basic");
 
-        Maven2Command command = new Maven2Command();
+        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         failedRun(command, "BUILD FAILURE", "You must specify at least one goal");
     }
 
@@ -45,7 +43,7 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
     {
         prepareBaseDir("basic");
 
-        Maven2Command command = new Maven2Command();
+        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile test");
         successRun(command, "BUILD SUCCESSFUL", "Running com.zutubi.maven2.test.AppTest",
                 "task-segment: [compile, test]", "[compiler:compile]", "[compiler:testCompile]", "[surefire:test]",
@@ -56,7 +54,7 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
     {
         prepareBaseDir("nopom");
 
-        Maven2Command command = new Maven2Command();
+        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
         failedRun(command, "BUILD ERROR", "Cannot execute mojo: resources", "It requires a project with an existing pom.xml");
     }
@@ -65,10 +63,9 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
     {
         prepareBaseDir("nondefaultpom");
 
-        Maven2Command command = new Maven2Command();
+        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
-        command.addArguments("-f");
-        command.addArguments("blah/pom.xml");
+        command.setPomFile("blah/pom.xml");
         successRun(command, "[compiler:compile]", "BUILD SUCCESSFUL");
     }
 
@@ -76,7 +73,7 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
     {
         prepareBaseDir("compilererror");
 
-        Maven2Command command = new Maven2Command();
+        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
         failedRun(command, "Compilation failure", "BUILD FAILURE", "task-segment: [compile]");
     }
@@ -85,25 +82,9 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
     {
         prepareBaseDir("testfailure");
 
-        Maven2Command command = new Maven2Command();
+        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("test");
         failedRun(command, "task-segment: [test]", "There are test failures.");
-    }
-
-    public void testAppliesProcessor() throws Exception
-    {
-        prepareBaseDir("testfailure");
-
-        Maven2Command command = new Maven2Command();
-        command.setGoals("test");
-        CommandResult result = failedRun(command);
-        List<PersistentFeature> features = result.getArtifact("command output").getFeatures(Feature.Level.ERROR);
-        // unfortunately, different versions of the maven surefire plugin (responsible for running the unit tests)
-        // result in different output, significantly to the point where a different number of features are captured.
-        // For this reason we assert that we have some features captured, not that we have exactly 2 (plugin version 1.5.3)
-        // or 3 (plugin version 2.0).
-        assertTrue(features.size() > 0);
-        assertOutputContains(features.get(0).getSummary(), "Running com.zutubi.maven2.test.AppTest", "Tests run: 1, Failures: 1, Errors: 0,");
     }
 
     private void prepareBaseDir(String name) throws IOException
@@ -114,49 +95,19 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
         unzipInput(name, baseDir);
     }
 
-    protected File getCommandOutput(CommandResult commandResult) throws IOException
+    private TestCommandContext successRun(Maven2CommandConfiguration configuration, String... content) throws Exception
     {
-        File output = getCommandArtifact(commandResult, commandResult.getArtifact(Maven2Command.OUTPUT_ARTIFACT_NAME));
-
-        File cleaned = new File(output.getAbsolutePath() + ".cleaned");
-
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
-
-        try
-        {
-            reader = new BufferedReader(new FileReader(output));
-            writer = new BufferedWriter(new FileWriter(cleaned));
-            String line;
-            while ((line = reader.readLine()) != null)
-            {
-                if (!line.contains("Total time") && !line.contains("Finished at") && !line.contains("Final Memory"))
-                {
-                    line = line.replace(baseDir.getAbsolutePath(), "base.dir");
-                    line = line.replaceAll("elapsed: .* sec", "elapsed: x sec");
-                    writer.write(line);
-                    writer.newLine();
-                }
-            }
-        }
-        finally
-        {
-            IOUtils.close(reader);
-            IOUtils.close(writer);
-        }
-
-        return cleaned;
+        return successRun(new Maven2Command(configuration), content);
     }
 
-    protected String getBuildFileName()
+    private TestCommandContext failedRun(Maven2CommandConfiguration configuration, String... content) throws Exception
     {
-        // we do not use the available copyBuildFile method in the base class.
-        return null;
-    }
-
-    protected String getBuildFileExt()
-    {
-        // we do not use the available copyBuildFile method in the base class.
-        return null;
+        TestCommandContext context = runCommand(new Maven2Command(configuration));
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            assertEquals(ResultState.FAILURE, context.getResultState());
+        }
+        assertDefaultOutputContains(content);
+        return context;
     }
 }

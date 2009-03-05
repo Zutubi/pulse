@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.renderer;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -11,10 +12,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  */
@@ -27,6 +25,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     private Configuration freemarkerConfiguration;
     private SystemPaths systemPaths;
+    private MasterUserPaths userPaths;
 
     public void render(BuildResult result, Map<String, Object> dataMap, String templateName, Writer writer)
     {
@@ -65,7 +64,9 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     {
         // Templates are stored under <root>/notifications/builds/<name>.ftl
         List<TemplateInfo> result = new ArrayList<TemplateInfo>();
-        List<File> templateRoots = systemPaths.getTemplateRoots();
+        List<File> templateRoots = new LinkedList<File>(systemPaths.getTemplateRoots());
+        templateRoots.add(userPaths.getUserTemplateRoot());
+
         for (File root : templateRoots)
         {
             File dir = new File(root, getTemplatePath(personal));
@@ -186,5 +187,10 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     public void setSystemPaths(SystemPaths systemPaths)
     {
         this.systemPaths = systemPaths;
+    }
+
+    public void setUserPaths(MasterUserPaths userPaths)
+    {
+        this.userPaths = userPaths;
     }
 }

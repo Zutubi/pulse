@@ -82,15 +82,8 @@ public class ServletWrapper implements Servlet
             throw new ServletException("Required init parameter " + DELEGATE_CLASS_NAME + " is missing.");
         }
 
-        try
-        {
-            ObjectFactory objectFactory = (ObjectFactory) SpringComponentContext.getBean("objectFactory");
-            return objectFactory.buildBean(className, Servlet.class);
-        }
-        catch (Exception e)
-        {
-            throw new ServletException("Error creating servlet delegate.", e);
-        }
+        ObjectFactory objectFactory = (ObjectFactory) SpringComponentContext.getBean("objectFactory");
+        return objectFactory.buildBean(className, Servlet.class);
     }
 
     protected Servlet getDelegate()

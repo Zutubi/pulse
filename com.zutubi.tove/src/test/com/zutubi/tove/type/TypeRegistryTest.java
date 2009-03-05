@@ -6,33 +6,16 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- *
- */
 public class TypeRegistryTest extends ZutubiTestCase
 {
-    private TypeRegistry typeRegistry;
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        typeRegistry = new TypeRegistry();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        typeRegistry = null;
-
-        super.tearDown();
-    }
+    private TypeRegistry typeRegistry = new TypeRegistry();
 
     public void testSimpleObject() throws TypeException
     {
@@ -138,6 +121,110 @@ public class TypeRegistryTest extends ZutubiTestCase
     {
         CompositeType c = typeRegistry.register(TransientFieldA.class);
         assertNull(c.getProperty("a"));
+    }
+
+    public void testExtensionOfInterface() throws TypeException
+    {
+        CompositeType iType = typeRegistry.register(IExtend.class);
+        CompositeType eType = typeRegistry.register(MeImplement.class);
+        
+        assertEquals(1, iType.getExtensions().size());
+        assertEquals(eType, iType.getExtensions().get(0));
+    }
+
+    @SymbolicName("iExtend")
+    public static interface IExtend extends Configuration
+    {
+    }
+
+    @SymbolicName("meImplement")
+    public static class MeImplement extends AbstractConfiguration implements IExtend
+    {
+    }
+    
+    public void testExtensionOfAbstractClass() throws TypeException
+    {
+        CompositeType baseType = typeRegistry.register(AbstractBase.class);
+        CompositeType extensionType = typeRegistry.register(AbstractExtension.class);
+
+        assertEquals(1, baseType.getExtensions().size());
+        assertEquals(extensionType, baseType.getExtensions().get(0));
+    }
+
+    @SymbolicName("abstractBase")
+    public static abstract class AbstractBase extends AbstractConfiguration
+    {
+    }
+
+    @SymbolicName("abstractExtension")
+    public static class AbstractExtension extends AbstractBase
+    {
+    }
+
+    public void testExtensionOfConcreteClass() throws TypeException
+    {
+        CompositeType baseType = typeRegistry.register(ConcreteBase.class);
+        typeRegistry.register(ConcreteExtension.class);
+
+        assertEquals(0, baseType.getExtensions().size());
+    }
+
+    @SymbolicName("concreteBase")
+    public static class ConcreteBase extends AbstractConfiguration
+    {
+    }
+
+    @SymbolicName("concreteExtension")
+    public static class ConcreteExtension extends ConcreteBase
+    {
+    }
+
+    public void testMultipleAndIndirectExtensions() throws TypeException
+    {
+        CompositeType theBaseType = typeRegistry.register(TheBase.class);
+        CompositeType directConcreteExtensionType = typeRegistry.register(DirectConcreteExtension.class);
+        CompositeType directAbstractExtensionType = typeRegistry.register(DirectAbstractExtension.class);
+        CompositeType concreteExtensionOfConcreteExtensionType = typeRegistry.register(ConcreteExtensionOfConcreteExtension.class);
+        CompositeType concreteExtensionOfAbstractExtensionType = typeRegistry.register(ConcreteExtensionOfAbstractExtension.class);
+
+        List<CompositeType> extensions = theBaseType.getExtensions();
+        assertEquals(3, extensions.size());
+        assertTrue(extensions.contains(directConcreteExtensionType));
+        assertTrue(extensions.contains(concreteExtensionOfConcreteExtensionType));
+        assertTrue(extensions.contains(concreteExtensionOfAbstractExtensionType));
+        assertFalse(extensions.contains(directAbstractExtensionType));
+
+        extensions = directConcreteExtensionType.getExtensions();
+        assertEquals(0, extensions.size());
+        
+        extensions = directAbstractExtensionType.getExtensions();
+        assertEquals(1, extensions.size());
+        assertTrue(extensions.contains(concreteExtensionOfAbstractExtensionType));
+    }
+
+    @SymbolicName("theBase")
+    public static abstract class TheBase extends AbstractConfiguration
+    {
+    }
+
+    @SymbolicName("directConcreteExtension")
+    public static class DirectConcreteExtension extends TheBase
+    {
+    }
+
+    @SymbolicName("directAbstractExtension")
+    public static abstract class DirectAbstractExtension extends TheBase
+    {
+    }
+
+    @SymbolicName("concreteExtensionOfConcreteExtension")
+    public static class ConcreteExtensionOfConcreteExtension extends DirectConcreteExtension
+    {
+    }
+
+    @SymbolicName("concreteExtensionOfAbstractExtension")
+    public static class ConcreteExtensionOfAbstractExtension extends DirectAbstractExtension
+    {
     }
 
     /**
@@ -317,7 +404,7 @@ public class TypeRegistryTest extends ZutubiTestCase
     }
 
     @SymbolicName("simpleInterface")
-    public static interface SimpleInterface
+    public static interface SimpleInterface extends Configuration
     {
         String getA();
         void setA(String str);

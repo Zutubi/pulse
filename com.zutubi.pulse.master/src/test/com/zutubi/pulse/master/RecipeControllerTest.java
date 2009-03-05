@@ -20,7 +20,6 @@ import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
-import com.zutubi.pulse.master.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -29,8 +28,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
-import com.zutubi.pulse.servercore.services.SlaveStatus;
-import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.util.FileSystemUtils;
 import static org.mockito.Mockito.*;
 
@@ -134,7 +131,7 @@ public class RecipeControllerTest extends PulseTestCase
         stub(agent.isOnline()).toReturn(true);
         stub(agent.getStatus()).toReturn(Status.IDLE);
         stub(agent.getConfig()).toReturn(new AgentConfiguration());
-        
+
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
         RecipeAssignedEvent event = new RecipeAssignedEvent(this, new RecipeRequest(makeContext("project", rootResult.getId(), "test")), agent);

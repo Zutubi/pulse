@@ -1,14 +1,16 @@
 package com.zutubi.pulse.acceptance.plugins;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
-import com.zutubi.pulse.core.PulseFile;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
+import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 
@@ -16,7 +18,7 @@ import java.io.File;
 
 public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 {
-    private static final String JAR_NAME = "com.zutubi.bundles.postprocessor.sample_1.0.0";
+    private static final String JAR_NAME = "com.zutubi.pulse.core.postprocessors.test";
 
     private PostProcessorExtensionManager extensionManager;
 
@@ -25,6 +27,8 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
     private File tmpDir;
     private PluginSystem pluginSystem;
     private File samplePostProcessorPlugin;
+    private CoreConfigurationRegistry configurationRegistry;
+    private TypeRegistry typeRegistry;
 
     protected void setUp() throws Exception
     {
@@ -46,12 +50,21 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 
         objectFactory = new WiringObjectFactory();
 
+        typeRegistry = new TypeRegistry();
+
+        configurationRegistry = new CoreConfigurationRegistry();
+        configurationRegistry.setTypeRegistry(typeRegistry);
+        configurationRegistry.init();
+
         loaderFactory = new PulseFileLoaderFactory();
+        loaderFactory.setTypeRegistry(typeRegistry);
         loaderFactory.setObjectFactory(objectFactory);
+        loaderFactory.init();
 
         extensionManager = new PostProcessorExtensionManager();
         extensionManager.setPluginManager(pluginSystem.getPluginManager());
         extensionManager.setFileLoaderFactory(loaderFactory);
+        extensionManager.setConfigurationRegistry(configurationRegistry);
         extensionManager.init();
         extensionManager.initialiseExtensions();
 
@@ -66,26 +79,24 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testPostProcessorPlugins() throws PulseException, InterruptedException
+    public void testPostProcessorPlugin() throws PulseException, InterruptedException
     {
         // install test plugin.
         Plugin plugin = pluginSystem.install(samplePostProcessorPlugin);
         assertEquals(Plugin.State.ENABLED, plugin.getState());
 
-        // need to yield since the extension manager is notified of the new plugin asynchronously.
-        Thread.yield();
-
         // ensure that we are picking up the expected post processors from the installed plugin.
-        assertNotNull(extensionManager.getPostProcessor("sample.pp"));
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return extensionManager.getPostProcessor("test.pp") != null;
+            }
+        }, 30000, "test processor to be ready");
 
-        PulseFile pf = new PulseFile();
+        ProjectRecipesConfiguration prc = new ProjectRecipesConfiguration();
 
         PulseFileLoader loader = loaderFactory.createLoader();
-        loader.load(getInput("testPostProcessorPlugin", "xml"), pf);
-
-        Reference ref = pf.getReference("sample.pp");
-
-        // verify that the reference is to the expected instance.
-        assertNotNull(ref.getValue());
+        loader.load(getInput("xml"), prc);
     }
 }

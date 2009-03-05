@@ -1,12 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.PulseFileLoader;
-import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.RecipeAssignmentRequest;
-import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 
@@ -16,10 +12,6 @@ import java.util.List;
  */
 public class AnyCapableAgentRequirements implements AgentRequirements
 {
-    private static final Logger LOG = Logger.getLogger(AnyCapableAgentRequirements.class);
-
-    private PulseFileLoaderFactory fileLoaderFactory;
-
     public AnyCapableAgentRequirements()
     {
     }
@@ -34,35 +26,12 @@ public class AnyCapableAgentRequirements implements AgentRequirements
         List<ResourceRequirement> requirements = request.getResourceRequirements();
         for(ResourceRequirement requirement: requirements)
         {
-            if(!service.hasResource(requirement))
+            if (!requirement.isOptional() && !service.hasResource(requirement))
             {
                 return false;
             }
         }
 
-        PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-        try
-        {
-            requirements = fileLoader.loadRequiredResources(request.getRevision().getPulseFile(), request.getRequest().getRecipeName());
-            for(ResourceRequirement requirement: requirements)
-            {
-                if(!service.hasResource(requirement))
-                {
-                    return false;
-                }
-            }
-        }
-        catch (PulseException e)
-        {
-            // Continue, assuming no further requirements.
-            LOG.warning("Unable to load resource requirements from pulse file for project '" + request.getProject().getName() + "': " + e.getMessage(), e);
-        }
-
         return true;
-    }
-
-    public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
-    {
-        this.fileLoaderFactory = fileLoaderFactory;
     }
 }

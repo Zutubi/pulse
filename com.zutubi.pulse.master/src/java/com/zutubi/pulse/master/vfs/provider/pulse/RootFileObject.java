@@ -44,7 +44,7 @@ public class RootFileObject extends AbstractPulseFileObject
         return rootPaths.toArray(new String[rootPaths.size()]);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
         if (nodesDefinitions.containsKey(name))

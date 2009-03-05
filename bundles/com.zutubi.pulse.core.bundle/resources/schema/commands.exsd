@@ -1,58 +1,83 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <schema targetNamespace="com.zutubi.pulse.core">
-<annotation>
-      <appInfo>
-         <meta.schema plugin="com.zutubi.pulse.core" id="commands" name="Commands"/>
-      </appInfo>
-      <documentation>
-      </documentation>
-   </annotation>
+    <annotation>
+        <appInfo>
+            <meta.schema plugin="com.zutubi.pulse.core" id="commands" name="Commands"/>
+        </appInfo>
+        <documentation>
+        </documentation>
+    </annotation>
 
-   <element name="extension">
-      <complexType>
-         <sequence>
-            <element ref="command" minOccurs="1" maxOccurs="unbounded"/>
-         </sequence>
-         <attribute name="point" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The extension-point of this extension.
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="id" type="string">
-            <annotation>
-               <documentation>
-                  Extension identifier.
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="name" type="string">
-            <annotation>
-               <documentation>
-                  Name of this extension.
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
+    <element name="extension">
+        <complexType>
+            <sequence>
+                <element ref="command" minOccurs="1" maxOccurs="unbounded"/>
+            </sequence>
+            <attribute name="point" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The extension-point of this extension.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="id" type="string">
+                <annotation>
+                    <documentation>
+                        Extension identifier.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="name" type="string">
+                <annotation>
+                    <documentation>
+                        Name of this extension.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
 
-   <element name="command">
-      <complexType>
-         <attribute name="name" type="string">
-            <annotation>
-               <documentation>
-                  The name of the command.
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="class" type="string">
-            <annotation>
-               <documentation>
-                  The specific class implementing the command.
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
+    <element name="command">
+        <complexType>
+            <sequence>
+                <element ref="resource" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+            <attribute name="name" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The name of the command.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="class" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The specific class implementing the command.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
+
+    <!-- Defines a default resource requirement that should be added to
+         single-command projects for this type. -->
+    <element name="resource">
+        <complexType>
+            <attribute name="name" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The name of the resource to import.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="optional" type="boolean" use="required">
+                <annotation>
+                    <documentation>
+                        Indicates if the resource should be optional.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
 </schema>
+        

@@ -2,10 +2,12 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.commands">
-        <command name="make" class="com.zutubi.pulse.core.commands.make.MakeCommand"/>
+        <command name="make" class="com.zutubi.pulse.core.commands.make.MakeCommandConfiguration">
+            <resource name="make" optional="true"/>
+        </command>
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="make.pp" display-name="make output processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.commands.make.MakePostProcessor"/>
+                        default-processor="true" class="com.zutubi.pulse.core.commands.make.MakePostProcessorConfiguration"/>
     </extension>
 </plugin>

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.marshal.TypeLoadPredicate;
 import nu.xom.Element;
 
 /**

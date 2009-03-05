@@ -7,8 +7,7 @@ import com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
 
 /**
- *
- *
+ * Scm client factory implementation that uses a CvsConfiguration to create a cvs client.
  */
 public class CvsClientFactory implements ScmClientFactory<CvsConfiguration>
 {

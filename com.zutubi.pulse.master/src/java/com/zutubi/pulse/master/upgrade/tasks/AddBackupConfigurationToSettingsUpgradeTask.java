@@ -15,16 +15,6 @@ public class AddBackupConfigurationToSettingsUpgradeTask extends AbstractUpgrade
 {
     private RecordManager recordManager;
 
-    public String getName()
-    {
-        return "Backup Configuration";
-    }
-
-    public String getDescription()
-    {
-        return "Add a new configuration record for the newly added backup configuration.";
-    }
-
     public void execute() throws TaskException
     {
         Record globalSettings = recordManager.select("settings");

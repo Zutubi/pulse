@@ -24,7 +24,7 @@ public class NamedArtifactFileObject extends AbstractPulseFileObject implements 
         this.artifactName = artifactName;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
         String name = fileName.getBaseName();
         File newFile = new File(getArtifactBase(), name);

@@ -7,13 +7,11 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-/**
- */
 public class CUnitReportPostProcessorTest extends XMLTestReportPostProcessorTestBase
 {
     public CUnitReportPostProcessorTest()
     {
-        super(new CUnitReportPostProcessor());
+        super(new CUnitReportPostProcessor(new CUnitReportPostProcessorConfiguration()));
     }
 
     protected File getOutputDir() throws URISyntaxException

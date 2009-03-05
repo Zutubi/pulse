@@ -1,6 +1,5 @@
 package com.zutubi.pulse.dev.local;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.pulse.core.events.*;
@@ -152,17 +151,7 @@ public class BuildStatusPrinter implements EventListener
             for (StoredFileArtifact fileArtifact : artifact.getChildren())
             {
                 indenter.println("* " + getFilePath(result, fileArtifact.getPath()));
-
-                for (Feature.Level level : Feature.Level.values())
-                {
-                    List<PersistentFeature> features = fileArtifact.getFeatures(level);
-                    if (features.size() > 0)
-                    {
-                        indenter.indent();
-                        showFeatures(level, features);
-                        indenter.dedent();
-                    }
-                }
+                PrintSupport.showFeatures(indenter, fileArtifact);
             }
 
             indenter.dedent();
@@ -181,19 +170,6 @@ public class BuildStatusPrinter implements EventListener
         }
 
         return result;
-    }
-
-    private void showFeatures(Feature.Level level, List<PersistentFeature> features)
-    {
-        indenter.println(level.toString().toLowerCase() + " features:");
-        indenter.indent();
-
-        for (PersistentFeature f : features)
-        {
-            indenter.println("* " + f.getSummary());
-        }
-
-        indenter.dedent();
     }
 
     private void handleRecipeCompleted(RecipeCompletedEvent event)
@@ -256,37 +232,13 @@ public class BuildStatusPrinter implements EventListener
             try
             {
                 PersistentTestSuiteResult failedTests = persister.read(null, new File(outputDir, RecipeResult.TEST_DIR), true, true, failureLimit);
-                showTestSuite(failedTests, "");
+                PrintSupport.showTestSuite(indenter, failedTests);
             }
             catch (Exception e)
             {
                 indenter.println("Unable to load failed test results: " + e.getMessage());
             }
             indenter.dedent();
-        }
-    }
-
-    private void showTestSuite(PersistentTestSuiteResult suiteResult, String prefix)
-    {
-        if(suiteResult.getName() != null)
-        {
-            prefix += suiteResult.getName() + ".";
-        }
-
-        for(PersistentTestSuiteResult nested: suiteResult.getSuites())
-        {
-            showTestSuite(nested, prefix);
-        }
-
-        for(PersistentTestCaseResult caseResult: suiteResult.getCases())
-        {
-            String message = String.format("%s%-7s: %s", prefix, caseResult.getStatus().toString().toLowerCase(), caseResult.getName());
-            if(TextUtils.stringSet(caseResult.getMessage()))
-            {
-                message += ": " + caseResult.getMessage();
-            }
-            
-            indenter.println(message);
         }
     }
 

@@ -68,7 +68,7 @@ public class PulseFileSystem extends AbstractFileSystem
         throw new FileSystemException(String.format("failed to resolve the requested file: '%s'", fileName.getPath()));
     }
 
-    private FileObject getRootFile(FileName fileName) throws Exception
+    private FileObject getRootFile(FileName fileName)
     {
         synchronized(this)
         {

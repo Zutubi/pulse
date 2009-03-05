@@ -1,26 +1,19 @@
 package com.zutubi.pulse.core.commands.bjam;
 
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
 
 import java.io.IOException;
 
-/**
- */
 public class BJamPostProcessorTest extends PostProcessorTestBase
 {
-    private BJamPostProcessor pp;
+    private RegexPostProcessor pp;
 
     public void setUp() throws IOException
     {
-        pp = new BJamPostProcessor();
         super.setUp();
-    }
-
-    public void tearDown()
-    {
-        super.tearDown();
-        pp = null;
+        pp = new RegexPostProcessor(new BJamPostProcessorConfiguration());
     }
 
     public void testSuccess() throws Exception

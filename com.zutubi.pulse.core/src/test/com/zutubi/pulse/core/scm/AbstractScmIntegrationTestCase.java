@@ -55,8 +55,15 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
     {
         for (ScmFile file : files)
         {
-            //FIXME: check if file represents file or directory, and assert accordingly.
-            assertTrue(new File(workingDir, file.getPath()).exists());
+            File f = new File(workingDir, file.getPath());
+            if (file.isDirectory())
+            {
+                assertTrue(f.isDirectory());
+            }
+            else
+            {
+                assertTrue(f.isFile());
+            }
         }
     }
 
@@ -147,16 +154,6 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
         // - do we also want to check that only the expected files are there? This is a little more difficult since
         //   scm administration files will also be present...
         assertFilesExist(testData.getFilesFor(revision));
-
-        Changelist expectedChangelist = testData.getAggregatedChanges(null, revision);
-
-/*
-        // these properties are specific to the cvs implementation...
-        Properties scmProperties = context.getProperties();
-        assertEquals(null, scmProperties.getProperty("cvs.branch"));
-        assertEquals(CVSROOT, scmProperties.getProperty("cvs.root"));
-        assertEquals(MODULE, scmProperties.getProperty("cvs.module"));
-*/
     }
 
     public void testPrepareAnExistingDirectory() throws ScmException
@@ -277,6 +274,11 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
 
     public void testBrowse() throws ScmException
     {
+        if (!client.getCapabilities(context).contains(ScmCapability.BROWSE))
+        {
+            return;
+        }
+
         // FIXME: using full repository path rather than data path.
         List<ScmFile> listing = client.browse(context, prefix + "project", null);
 
@@ -300,6 +302,11 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
 
     public void testAttemptingToBrowseFile() throws ScmException
     {
+        if (!client.getCapabilities(context).contains(ScmCapability.BROWSE))
+        {
+            return;
+        }
+
         // FIXME: using full repository path rather than data path.
         List<ScmFile> listing = client.browse(context, prefix + "project/README.txt", null);
         List<ScmFile> expectedListing = this.testData.browse(prefix + "project/README.txt");

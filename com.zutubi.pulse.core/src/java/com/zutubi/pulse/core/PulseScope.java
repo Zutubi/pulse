@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
@@ -174,7 +173,7 @@ public class PulseScope implements Scope
                 String value = environment.get(envName);
                 if(value != null)
                 {
-                    result = new Property(name, value);
+                    result = new GenericReference<String>(name, value);
                 }
             }
 
@@ -186,11 +185,11 @@ public class PulseScope implements Scope
                 {
                     if(result == null)
                     {
-                        result = new Property(name, pathPrefix.substring(0, pathPrefix.length() - 1));
+                        result = new GenericReference<String>(name, pathPrefix.substring(0, pathPrefix.length() - 1));
                     }
                     else if((result.getValue() instanceof String))
                     {
-                        result = new Property(name, pathPrefix + result.getValue());
+                        result = new GenericReference<String>(name, pathPrefix + result.getValue());
                     }
                 }
             }
@@ -366,7 +365,7 @@ public class PulseScope implements Scope
         }
 
         String name = resourceProperty.getName();
-        references.put(name, new ReferenceInfo(new Property(name, value), resourceProperty.getAddToEnvironment(), resourceProperty.getAddToPath()));
+        references.put(name, new ReferenceInfo(new GenericReference<String>(name, value), resourceProperty.getAddToEnvironment(), resourceProperty.getAddToPath()));
     }
 
     /**
@@ -384,7 +383,7 @@ public class PulseScope implements Scope
             name = name.toUpperCase();
         }
 
-        add(new Property("env." + name, value));
+        add(new GenericReference<String>("env." + name, value));
     }
 
     public PulseScope copyTo(Scope scope)

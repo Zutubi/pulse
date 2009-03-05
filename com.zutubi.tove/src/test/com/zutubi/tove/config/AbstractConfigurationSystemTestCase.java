@@ -1,12 +1,12 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.events.DefaultEventManager;
-import com.zutubi.tove.config.cleanup.ConfigurationCleanupManager;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.cleanup.ConfigurationCleanupManager;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.security.ActorProvider;
-import com.zutubi.tove.security.DefaultAccessManager;
 import com.zutubi.tove.security.AuthorityProvider;
+import com.zutubi.tove.security.DefaultAccessManager;
 import com.zutubi.tove.transaction.AbstractTransactionTestCase;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.CompositeType;
@@ -26,10 +26,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
-/**
- *
- *
- */
 public abstract class AbstractConfigurationSystemTestCase extends AbstractTransactionTestCase
 {
     protected WiringObjectFactory objectFactory = new WiringObjectFactory();
@@ -164,19 +160,6 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
         typeRegistry.setHandleAllocator(recordManager);
 
         objectFactory.initProperties(this);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        configurationTemplateManager = null;
-        typeRegistry = null;
-        eventManager = null;
-        recordManager = null;
-        configurationReferenceManager = null;
-        configurationPersistenceManager = null;
-        configurationStateManager = null;
-
-        super.tearDown();
     }
 
     public MutableRecord unstantiate(Configuration c) throws TypeException

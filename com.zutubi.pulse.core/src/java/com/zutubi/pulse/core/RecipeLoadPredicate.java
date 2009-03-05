@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.marshal.TypeLoadPredicate;
 import com.zutubi.util.TextUtils;
 import nu.xom.Element;
 
@@ -8,12 +10,12 @@ import nu.xom.Element;
  */
 public class RecipeLoadPredicate implements TypeLoadPredicate
 {
-    private PulseFile pulseFile;
+    private ProjectRecipesConfiguration recipesConfiguration;
     private String recipeName;
 
-    public RecipeLoadPredicate(PulseFile pulseFile, String recipeName)
+    public RecipeLoadPredicate(ProjectRecipesConfiguration recipesConfiguration, String recipeName)
     {
-        this.pulseFile = pulseFile;
+        this.recipesConfiguration = recipesConfiguration;
         this.recipeName = recipeName;
     }
 
@@ -23,7 +25,7 @@ public class RecipeLoadPredicate implements TypeLoadPredicate
         {
             if(!TextUtils.stringSet(recipeName))
             {
-                recipeName = pulseFile.getDefaultRecipe();
+                recipeName = recipesConfiguration.getDefaultRecipe();
             }
 
             if(!TextUtils.stringSet(recipeName))

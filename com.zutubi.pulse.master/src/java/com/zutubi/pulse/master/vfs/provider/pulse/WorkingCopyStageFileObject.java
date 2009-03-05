@@ -32,7 +32,7 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
         this.recipeId = recipeId;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
         String child = fileName.getBaseName();
         if (child.equals(NO_WORKING_COPY_AVAILABLE))

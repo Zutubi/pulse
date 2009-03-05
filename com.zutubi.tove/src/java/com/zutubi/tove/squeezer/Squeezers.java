@@ -2,6 +2,7 @@ package com.zutubi.tove.squeezer;
 
 import com.zutubi.tove.squeezer.squeezers.*;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,11 +33,19 @@ public class Squeezers
         register(Short.TYPE, new ShortSqueezer());
         register(Float.class, new FloatSqueezer());
         register(Float.TYPE, new FloatSqueezer());
+        register(File.class, new FileSqueezer());
     }
 
-    public static TypeSqueezer findSqueezer(Class type)
+    public static TypeSqueezer findSqueezer(Class<?> type)
     {
-        return registry.get(type);
+        if (type.isEnum())
+        {
+            return new EnumSqueezer(type.asSubclass(Enum.class));
+        }
+        else
+        {
+            return registry.get(type);
+        }
     }
 
     public static void register(Class type, TypeSqueezer squeezer)

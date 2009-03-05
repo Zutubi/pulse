@@ -2,16 +2,16 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.SystemInfo;
-import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.services.*;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
@@ -130,7 +130,7 @@ public class SlaveServiceImpl implements SlaveService
             ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(masterProxyFactory.createProxy(master), serviceTokenManager.getToken(), request.getId(), command);
             return slaveQueue.enqueueExclusive(runnable);
         }
-        catch (Exception e)
+        catch (MalformedURLException e)
         {
             throw new RuntimeException(e);
         }
@@ -155,7 +155,7 @@ public class SlaveServiceImpl implements SlaveService
 
     //---( Resource API )---
 
-    public List<Resource> discoverResources(String token)
+    public List<ResourceConfiguration> discoverResources(String token)
     {
         ResourceDiscoverer discoverer = new ResourceDiscoverer();
         return discoverer.discover();

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -31,7 +31,7 @@ public class ProjectConfigFileObject extends AbstractPulseFileObject implements 
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
         if (nodesDefinitions.containsKey(name))
@@ -58,7 +58,7 @@ public class ProjectConfigFileObject extends AbstractPulseFileObject implements 
 
     public ProjectConfiguration getProjectConfig()
     {
-        return configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, getName().getBaseName()), ProjectConfiguration.class);
+        return configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, getName().getBaseName()), ProjectConfiguration.class);
     }
 
     public boolean isLocal()

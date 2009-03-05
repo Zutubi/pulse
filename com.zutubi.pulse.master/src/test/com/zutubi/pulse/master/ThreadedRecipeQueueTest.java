@@ -5,7 +5,7 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -865,7 +865,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public List<Resource> discoverResources()
+        public List<ResourceConfiguration> discoverResources()
         {
             throw new RuntimeException("Method not yet implemented.");
         }

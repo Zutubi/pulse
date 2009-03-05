@@ -222,6 +222,30 @@ public class ConfigurationTemplateManager
         return parentTemplateRecord;
     }
 
+    /**
+     * Calculates the template owner path for a given path if that path points
+     * within a templated instance.  The template owner path is the path to the
+     * item in the templated collection that contains the given path.  For
+     * example, for path "projects/foo/stages/default" in templated scope
+     * "projects", the result will be "projects/foo".
+     *
+     * @param path the path to retrieve the template owner of
+     * @return the template owner path, or null if the given path is not within
+     *         a templated collection item
+     */
+    public String getTemplateOwnerPath(String path)
+    {
+        String[] pathElements = PathUtils.getPathElements(path);
+        if (pathElements.length >= 2 && isTemplatedCollection(pathElements[0]))
+        {
+            return PathUtils.getPath(pathElements[0], pathElements[1]);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     private Record templatiseRecord(String path, Record record)
     {
         // We need to understand the root level can be templated.
@@ -448,15 +472,15 @@ public class ConfigurationTemplateManager
             public boolean handle(TemplateNode templateNode)
             {
                 String descendentPath = PathUtils.getPath(scope, templateNode.getId(), remainderPath);
-                if (recordManager.select(descendentPath) == null)
+                if (recordManager.select(descendentPath) == null && recordManager.select(PathUtils.getParentPath(descendentPath)) != null)
                 {
                     recordManager.insert(descendentPath, skeleton);
                     return true;
                 }
                 else
                 {
-                    // We hit an existing record, bail out of this
-                    // subtree.
+                    // We either hit an existing record OR are within a hidden
+                    // item, so bail out of this subtree.
                     return false;
                 }
             }
@@ -599,7 +623,7 @@ public class ConfigurationTemplateManager
                     boolean concrete = isConcreteOwner(record);
                     try
                     {
-                        PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager, this);
+                        PersistentInstantiator instantiator = new PersistentInstantiator(itemPath, path, instances, configurationReferenceManager, this);
                         Configuration instance = (Configuration) instantiator.instantiate(id, true, templatedType, record);
 
                         // Concrete instances go into the collection
@@ -618,7 +642,7 @@ public class ConfigurationTemplateManager
             {
                 try
                 {
-                    PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager, this);
+                    PersistentInstantiator instantiator = new PersistentInstantiator(null, path, instances, configurationReferenceManager, this);
                     instantiator.instantiate(path, false, type, topRecord);
                 }
                 catch (TypeException e)
@@ -994,7 +1018,7 @@ public class ConfigurationTemplateManager
      * @param parentPath    parent of the path where the record is to be
      *                      stored
      * @param baseName      base name of the path where the record is to be
-     *                      stored
+     *                      stored, may be null for a new instance
      * @param subject       record to validate
      * @param concrete      if true, the record should be validated as a
      *                      concrete (i.e. complete) instance
@@ -1016,9 +1040,30 @@ public class ConfigurationTemplateManager
             throw new TypeException("Attempt to validate record with unrecognised symbolic name '" + subject.getSymbolicName() + "'");
         }
 
+        // The template owner path is tricky to calculate when inserting a new
+        // item into a templated scope.  We need to use the path of the parent
+        // template item.
+        String templateOwnerPath;
+        if (baseName == null && parentPath != null && isTemplatedCollection(parentPath))
+        {
+            long templateParentHandle = getTemplateParentHandle(null, subject);
+            if (templateParentHandle == 0)
+            {
+                templateOwnerPath = null;
+            }
+            else
+            {
+                templateOwnerPath = recordManager.getPathForHandle(templateParentHandle);
+            }
+        }
+        else
+        {
+            templateOwnerPath = getTemplateOwnerPath(parentPath);
+        }
+
         // Create an instance of the object represented by the record.  It is
         // during the instantiation that type conversion errors are detected.
-        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager, this);
+        SimpleInstantiator instantiator = new SimpleInstantiator(templateOwnerPath, configurationReferenceManager, this);
         @SuppressWarnings({"unchecked"})
         T instance = (T) instantiator.instantiate(type, subject);
 
@@ -2093,18 +2138,18 @@ public class ConfigurationTemplateManager
     }
 
     @SuppressWarnings({"unchecked"})
-    <T extends Configuration> T deepClone(T instance)
+    public <T extends Configuration> T deepClone(T instance)
     {
         final String path = instance.getConfigurationPath();
         Record record = getRecord(path);
         ComplexType type = getType(path);
         final DefaultInstanceCache cache = new DefaultInstanceCache();
-        PersistentInstantiator instantiator = new PersistentInstantiator(path, cache, new ReferenceResolver()
+        PersistentInstantiator instantiator = new PersistentInstantiator(getTemplateOwnerPath(path), path, cache, new ReferenceResolver()
         {
-            public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
+            public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, String indexPath) throws TypeException
             {
                 InstanceSource source = getState().instances;
-                String targetPath = configurationReferenceManager.getPathForHandle(toHandle);
+                String targetPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, toHandle);
                 if(targetPath.startsWith(path))
                 {
                     // This reference points within the object tree we are cloning.
@@ -2118,7 +2163,7 @@ public class ConfigurationTemplateManager
                     };
                 }
 
-                return configurationReferenceManager.resolveReference(path, toHandle, instantiator, source);
+                return configurationReferenceManager.resolveReference(templateOwnerPath, toHandle, instantiator, source, path);
             }
         }, this);
 
@@ -2139,7 +2184,7 @@ public class ConfigurationTemplateManager
      * @param path path of the instance to retrieve
      * @return object defined by the path.
      */
-    Configuration getInstance(String path)
+    public Configuration getInstance(String path)
     {
         State state = getState();
         if (state == null)
@@ -2249,6 +2294,36 @@ public class ConfigurationTemplateManager
         return null;
     }
 
+    /**
+     * Returns the root instance for a templated scope (i.e. the instance at
+     * the root of the hierarchy).
+     *
+     * @param scope the scope to retrieve the root from - must be a templated
+     *              collection
+     * @param clazz class for the expected type of the returned instance
+     * @param <T> expected type of the returned instance
+     * @return the root instance from the given scope, or null if there is no
+     *         such instance
+     * @throws IllegalArgumentException if scope does not refer to a templated
+     *         collection
+     */
+    public <T extends Configuration> T getRootInstance(String scope, Class<T> clazz)
+    {
+        if (!isTemplatedCollection(scope))
+        {
+            throw new IllegalArgumentException("Path '" + scope + "' does not refer to a templated collection");
+        }
+
+        TemplateHierarchy templateHierarchy = getTemplateHierarchy(scope);
+        if (templateHierarchy == null)
+        {
+            return null;
+        }
+        
+        String rootId = templateHierarchy.getRoot().getId();
+        return getInstance(PathUtils.getPath(scope, rootId), clazz);
+    }
+
     public void markAsTemplate(MutableRecord record)
     {
         record.putMeta(TemplateRecord.TEMPLATE_KEY, "true");
@@ -2280,6 +2355,16 @@ public class ConfigurationTemplateManager
         return getState().templateHierarchies.get(scope);
     }
 
+    /**
+     * Retrieves the template path of the template collection item at the
+     * given configuration path.  The template path is composed of an element
+     * for each item in the ancestry of the element (including the item's
+     * id itself as the last element).
+     *
+     * @param path the configuration path of the templated collection item
+     * @return the item's template path, or null if the path does not refer to
+     *         an item of a templated collection
+     */
     public String getTemplatePath(String path)
     {
         TemplateNode templateNode = getTemplateNode(path);
@@ -2293,11 +2378,11 @@ public class ConfigurationTemplateManager
 
     /**
      * Retrieves the template node for the given path, which should be an
-     * element of a templated collection.
+     * item of a templated collection.
      *
      * @param path the path to retrieve the node for
      * @return the template node, or null if this path does not refer to an
-     *         element of a templated collection
+     *         item of a templated collection
      */
     public TemplateNode getTemplateNode(String path)
     {

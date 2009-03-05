@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
+import com.zutubi.pulse.core.scm.cvs.CvsTestUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;
@@ -28,7 +29,8 @@ public class CvsAcceptanceTest extends ZutubiTestCase
 
         Logger.setLogging("system");
 
-        String cvsRoot = ":ext:daniel:xxxx@zutubi.com:/cvsroots/default";
+        String password = CvsTestUtils.getPassword("cvs-1.12.9");
+        String cvsRoot = ":ext:cvs-1.12.9:" + password + "@zutubi.com:/cvsroots/default";
 
         cvs = new CvsCore();
         cvs.setRoot(CVSRoot.parse(cvsRoot));

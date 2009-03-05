@@ -35,7 +35,7 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         this.projectId = projectId;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
         if (nodesDefinitions.containsKey(name))

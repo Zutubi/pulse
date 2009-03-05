@@ -16,16 +16,6 @@ import java.io.IOException;
  */
 public class FixPersistentTriggerStateUpgradeTask extends DatabaseUpgradeTask
 {
-    public String getName()
-    {
-        return "Fix persistent trigger state.";
-    }
-
-    public String getDescription()
-    {
-        return "Update the persistent trigger state from NONE to SCHEDULED.";
-    }
-
     public boolean haltOnFailure()
     {
         return false;

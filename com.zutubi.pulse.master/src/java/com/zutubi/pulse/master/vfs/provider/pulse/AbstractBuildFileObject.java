@@ -20,7 +20,7 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
         if (name.equals("wc"))

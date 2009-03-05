@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
@@ -18,7 +19,7 @@ import com.zutubi.pulse.master.model.*;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -265,7 +266,7 @@ public class RemoteApi
                 }
             });
 
-            configurationSecurityManager.filterPaths(ConfigurationRegistry.PROJECTS_SCOPE, names, AccessManager.ACTION_VIEW);
+            configurationSecurityManager.filterPaths(MasterConfigurationRegistry.PROJECTS_SCOPE, names, AccessManager.ACTION_VIEW);
             return new Vector<String>(names);
         }
         finally
@@ -308,7 +309,7 @@ public class RemoteApi
         }
 
         MutableRecord record = type.createNewRecord(true);
-        return type.toXmlRpc(record);
+        return type.toXmlRpc(null, record);
     }
 
     /**
@@ -352,7 +353,7 @@ public class RemoteApi
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
 
             Type t = configurationTemplateManager.getType(path);
-            return t.toXmlRpc(t.unstantiate(instance));
+            return t.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), t.unstantiate(instance));
         }
         finally
         {
@@ -421,7 +422,7 @@ public class RemoteApi
 
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
             Type t = configurationTemplateManager.getType(path);
-            return t.toXmlRpc(record);
+            return t.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), record);
         }
         finally
         {
@@ -1009,6 +1010,10 @@ public class RemoteApi
         try
         {
             Configuration instance = configurationProvider.get(path, Configuration.class);
+            if (instance == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
             actionManager.execute(action, instance, null);
             return true;
         }
@@ -1051,11 +1056,15 @@ public class RemoteApi
         try
         {
             Configuration instance = configurationProvider.get(path, Configuration.class);
+            if (instance == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(argument);
             CompositeType type = typeRegistry.getType(symbolicName);
             MutableRecord record = type.fromXmlRpc(argument);
-            Configuration arg = configurationTemplateManager.validate(null, null, record, true, true);
+            Configuration arg = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, true, true);
             if(!type.isValid(arg))
             {
                 throw new ValidationException(type, arg);
@@ -1898,6 +1907,8 @@ public class RemoteApi
         buildDetails.put("status", result.getState().getPrettyString());
         buildDetails.put("completed", result.completed());
         buildDetails.put("succeeded", result.succeeded());
+        buildDetails.put("errorCount", result.getErrorFeatureCount());
+        buildDetails.put("warningCount", result.getWarningFeatureCount());
 
         TimeStamps timeStamps = result.getStamps();
         buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
@@ -2276,6 +2287,7 @@ public class RemoteApi
      * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String, String) 
+     * @see #triggerBuild(String, String, String, Hashtable)
      */
     public boolean triggerBuild(String token, String projectName)
     {
@@ -2288,12 +2300,35 @@ public class RemoteApi
      * 
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project to trigger
-     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number)
+     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
+     *                    may be the empty string to indicate the latest revision should be used
      * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String) 
+     * @see #triggerBuild(String, String, String, Hashtable)
      */
-    public boolean triggerBuild(String token, String projectName, final String revision)
+    public boolean triggerBuild(String token, String projectName, String revision)
+    {
+        return triggerBuild(token, projectName, revision, null);
+    }
+
+    /**
+     * Triggers a build of the given project at the given revision with the given project property
+     * values.  The revision will be verified before requesting the build.  The properties are added
+     * to the project configuration (for properties that already exist, the values are overridden)
+     * for this build only.  This function returns as soon as the request has been made.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project to trigger
+     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
+     *                    may be empty to indicate the latest revision should be used
+     * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
+     * @return true
+     * @access requires trigger permission for the given project
+     * @see #triggerBuild(String, String)
+     * @see #triggerBuild(String, String, String)
+     */
+    public boolean triggerBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
     {
         User user = tokenManager.loginAndReturnUser(token);
         try
@@ -2309,7 +2344,8 @@ public class RemoteApi
                     {
                         public Revision process(ScmClient client, ScmContext context) throws ScmException
                         {
-                            if(client.getCapabilities(project.isInitialised()).contains(ScmCapability.REVISIONS))
+                            ScmContext c = (project.isInitialised()) ? context : null;
+                            if(client.getCapabilities(c).contains(ScmCapability.REVISIONS))
                             {
                                 return client.parseRevision(context, revision);
                             }
@@ -2326,7 +2362,25 @@ public class RemoteApi
                 }
             }
 
-            projectManager.triggerBuild(project.getConfig(), new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
+            ProjectConfiguration projectConfig = project.getConfig();
+            if (properties != null)
+            {
+                projectConfig = configurationProvider.deepClone(projectConfig);
+                for (Map.Entry<String, String> property: properties.entrySet())
+                {
+                    ResourcePropertyConfiguration existingProperty = projectConfig.getProperty(property.getKey());
+                    if (existingProperty == null)
+                    {
+                        projectConfig.getProperties().put(property.getKey(), new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
+                    }
+                    else
+                    {
+                        existingProperty.setValue(property.getValue());
+                    }
+                }
+            }
+
+            projectManager.triggerBuild(projectConfig, new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
             return true;
         }
         finally
@@ -2334,7 +2388,7 @@ public class RemoteApi
             tokenManager.logoutUser();
         }
     }
-
+    
     /**
      * Request that the given active build is cancelled.  This function returns when the request is
      * made, which is likely to be before the build is cancelled (if indeed it is cancelled).

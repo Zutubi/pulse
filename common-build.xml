@@ -123,6 +123,7 @@
                 <exclude name="**/*Subversion*Test*"/>
                 <exclude name="**/*WorkingCopyTest*"/>
                 <exclude name="**/LocalBuildTest.java"/>
+                <exclude name="**/PostProcessCommandTest.java"/>
                 <exclude name="**/*Perforce*Test*"/>
             </fileset>
         </path>

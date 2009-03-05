@@ -85,7 +85,6 @@ public class CustomHessianServlet extends GenericServlet
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-
             CustomHessianClassLoader customClassLoader = objectFactory.buildBean(CustomHessianClassLoader.class, new Class[]{ClassLoader.class}, new Object[]{originalClassLoader});
             
             Thread.currentThread().setContextClassLoader(customClassLoader);

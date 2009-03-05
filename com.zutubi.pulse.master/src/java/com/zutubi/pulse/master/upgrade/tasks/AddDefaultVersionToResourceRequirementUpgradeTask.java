@@ -20,16 +20,6 @@ public class AddDefaultVersionToResourceRequirementUpgradeTask extends AbstractU
 
     private RecordManager recordManager;
 
-    public String getName()
-    {
-        return "Resource Requirement Configuration";
-    }
-
-    public String getDescription()
-    {
-        return "Add the new 'default version' field to the resource requirement configuration.";
-    }
-
     public boolean haltOnFailure()
     {
         return false;

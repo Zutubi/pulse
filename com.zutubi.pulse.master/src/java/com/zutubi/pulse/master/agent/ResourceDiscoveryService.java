@@ -3,14 +3,11 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentResourcesDiscoveredEvent;
 import com.zutubi.pulse.master.model.ResourceManager;
-import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -59,15 +56,8 @@ public class ResourceDiscoveryService implements EventListener
                 Agent agent = event.getAgent();
                 try
                 {
-                    List<Resource> resources = agent.getService().discoverResources();
-                    List<ResourceConfiguration> resourceConfigurations = CollectionUtils.map(resources, new Mapping<Resource, ResourceConfiguration>()
-                    {
-                        public ResourceConfiguration map(Resource resource)
-                        {
-                            return new ResourceConfiguration(resource);
-                        }
-                    });
-                    resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resourceConfigurations);
+                    List<ResourceConfiguration> resources = agent.getService().discoverResources();
+                    resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resources);
                     eventManager.publish(new AgentResourcesDiscoveredEvent(this, agent));
                 }
                 catch (Exception e)

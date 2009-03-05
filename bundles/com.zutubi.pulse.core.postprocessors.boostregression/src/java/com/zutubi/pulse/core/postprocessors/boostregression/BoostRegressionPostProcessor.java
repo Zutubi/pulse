@@ -31,9 +31,9 @@ public class BoostRegressionPostProcessor extends XMLTestReportPostProcessorSupp
     // Possible results
     private static final String RESULT_FAILURE = "fail";
 
-    public BoostRegressionPostProcessor()
+    public BoostRegressionPostProcessor(BoostRegressionPostProcessorConfiguration config)
     {
-        super("Boost.Regression");
+        super(config);
     }
 
     protected void processDocument(Document doc, TestSuiteResult tests)

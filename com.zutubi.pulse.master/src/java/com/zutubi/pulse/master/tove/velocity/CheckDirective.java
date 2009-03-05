@@ -2,15 +2,15 @@ package com.zutubi.pulse.master.tove.velocity;
 
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.tove.model.FormDescriptor;
 import com.zutubi.pulse.master.tove.model.FormDescriptorFactory;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
-import com.zutubi.pulse.master.tove.model.Form;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -38,7 +38,7 @@ public class CheckDirective extends ToveDirective
     private String symbolicName;
 
     private FormDescriptorFactory formDescriptorFactory;
-    private ConfigurationRegistry configurationRegistry;
+    private MasterConfigurationRegistry configurationRegistry;
     private TypeRegistry typeRegistry;
     private Configuration configuration;
 
@@ -146,7 +146,7 @@ public class CheckDirective extends ToveDirective
         this.configuration = configuration;
     }
 
-    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
+    public void setConfigurationRegistry(MasterConfigurationRegistry configurationRegistry)
     {
         this.configurationRegistry = configurationRegistry;
     }

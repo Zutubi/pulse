@@ -3,7 +3,7 @@ package com.zutubi.tove.transaction;
 import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.AssertionFailedError;
 
-public class AbstractTransactionTestCase extends ZutubiTestCase
+public abstract class AbstractTransactionTestCase extends ZutubiTestCase
 {
     protected void executeOnSeparateThreadAndWait(final Runnable r)
     {

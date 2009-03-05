@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.commands.ant;
 
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
 
@@ -10,11 +11,11 @@ import java.io.IOException;
  */
 public class AntPostProcessorTest extends PostProcessorTestBase
 {
-    private AntPostProcessor pp;
+    private RegexPostProcessor pp;
 
     public void setUp() throws IOException
     {
-        pp = new AntPostProcessor();
+        pp = new RegexPostProcessor(new AntPostProcessorConfiguration());
         super.setUp();
     }
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -10,9 +10,8 @@ import com.zutubi.pulse.master.scm.ScmClientUtils;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
@@ -82,7 +81,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public void setPath(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
-        if(elements.length == 2 && elements[0].equals(ConfigurationRegistry.PROJECTS_SCOPE))
+        if(elements.length == 2 && elements[0].equals(MasterConfigurationRegistry.PROJECTS_SCOPE))
         {
             setProjectName(elements[1]);
         }
@@ -124,7 +123,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         field = new Field(FieldType.TEXT, "revision");
         field.setLabel("revision");
         field.setValue(revision);
-        addLatestAction(field, project.getConfig().getScm(), project);
+        addLatestAction(field, project, project.getConfig());
 
         form.add(field);
 
@@ -149,11 +148,11 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         newPanel = new ConfigurationPanel("aaction/edit-build-properties.vm");
     }
 
-    private void addLatestAction(Field field, ScmConfiguration scm, Project project)
+    private void addLatestAction(Field field, Project project, ProjectConfiguration projectConfig)
     {
         try
         {
-            Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(scm, scmManager, project.isInitialised());
+            Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(project, projectConfig, scmManager);
             if(capabilities.contains(ScmCapability.REVISIONS))
             {
                 field.addParameter(ACTIONS, Arrays.asList("getlatest"));
@@ -181,7 +180,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
     private String getPath()
     {
-        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, getProjectName());
+        return PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, getProjectName());
     }
 
     public String getProjectPath()
@@ -207,9 +206,6 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         // Ensure we are allowed to change the project configuration.
         ProjectConfiguration projectConfig = configurationProvider.deepClone(project.getConfig());
         mapProperties(projectConfig);
-
-        // Rewire the now cloned instance of the projectConfiguration to the project state.
-        project.setConfig(projectConfig);
 
         Revision r = null;
         if(TextUtils.stringSet(revision))
@@ -249,7 +245,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         try
         {
-            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason((String)getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
+            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason(getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
         }
         catch (Exception e)
         {

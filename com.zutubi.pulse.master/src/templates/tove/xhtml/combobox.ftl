@@ -9,7 +9,6 @@
 
     fc.store = data;
     fc.mode = 'local';
-    fc.emptyText = '[default]';
     fc.triggerAction = 'all';
     fc.editable = true;
     fc.forceSelection = false;

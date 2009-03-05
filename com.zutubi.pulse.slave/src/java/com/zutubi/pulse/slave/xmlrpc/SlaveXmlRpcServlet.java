@@ -15,16 +15,8 @@ public class SlaveXmlRpcServlet extends XmlRpcServlet
     {
         super.init(config);
 
-        try
-        {
-            RemoteApi remoteApi = objectFactory.buildBean(RemoteApi.class);
-
-            xmlrpc.addHandler("RemoteApi", remoteApi);
-        }
-        catch (Exception e)
-        {
-            throw new ServletException(e);
-        }
+        RemoteApi remoteApi = objectFactory.buildBean(RemoteApi.class);
+        xmlrpc.addHandler("RemoteApi", remoteApi);
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

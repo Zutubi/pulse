@@ -31,6 +31,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(PluginUIAcceptanceTest.class);
         suite.addTestSuite(GroupAcceptanceTest.class);
         suite.addTestSuite(ProjectLabelAcceptanceTest.class);
+        suite.addTestSuite(ProjectPermissionsAcceptanceTest.class);
         suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
         suite.addTestSuite(LicenseAcceptanceTest.class);
         suite.addTestSuite(DashboardAcceptanceTest.class);
@@ -42,6 +43,7 @@ public class DevAcceptanceTestSuite
 
         //---( build tests )---
         suite.addTestSuite(BuildAcceptanceTest.class);
+        suite.addTestSuite(MavenAcceptanceTest.class);
         suite.addTestSuite(PerforceAcceptanceTest.class);
         suite.addTestSuite(BuildHookAcceptanceTest.class);
         suite.addTestSuite(PersonalBuildAcceptanceTest.class);
@@ -51,5 +53,4 @@ public class DevAcceptanceTestSuite
 
         return suite;
     }
-
 }

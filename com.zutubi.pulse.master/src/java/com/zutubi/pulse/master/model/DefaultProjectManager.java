@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -32,8 +33,8 @@ import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -82,6 +83,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private ConfigurationTemplateManager configurationTemplateManager;
     private AccessManager accessManager;
     private ProjectInitialisationService projectInitialisationService;
+    private CommandExtensionManager commandExtensionManager;
 
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
     private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
@@ -200,16 +202,16 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 globalProject.setPermanent(true);
 
                 // All users can view all projects by default.
-                AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_VIEW));
 
                 // Anonymous users can view all projects by default (but only
                 // when anonymous access is explicitly enabled).
-                group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_VIEW));
 
                 // Project admins can do just that
-                group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.PROJECT_ADMINS_GROUP_NAME), AbstractGroupConfiguration.class);
+                group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.PROJECT_ADMINS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_ADMINISTER));
 
                 // Default cleanup rule to blow away working copy snapshots
@@ -225,7 +227,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
                 MutableRecord globalTemplate = projectType.unstantiate(globalProject);
                 configurationTemplateManager.markAsTemplate(globalTemplate);
-                configurationTemplateManager.insertRecord(ConfigurationRegistry.PROJECTS_SCOPE, globalTemplate);
+                configurationTemplateManager.insertRecord(MasterConfigurationRegistry.PROJECTS_SCOPE, globalTemplate);
             }
             catch (TypeException e)
             {
@@ -531,6 +533,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         Project project = getProject(projectConfig.getProjectId(), false);
 
+        // Rewire the project instance with the passed-in configuration, which may not be identical
+        // to the persistent version (e.g. it could have additional properties).
+        project.setConfig(projectConfig);
+
         if(revision == null)
         {
             if(projectConfig.getOptions().getIsolateChangelists())
@@ -539,7 +545,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 // outstanding revisions and if so create requests for each one.
                 try
                 {
-                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(projectConfig.getScm(), scmManager, project.isInitialised());
+                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(project, projectConfig, scmManager);
                     if(capabilities.contains(ScmCapability.REVISIONS))
                     {
                             List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
@@ -983,5 +989,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setProjectInitialisationService(ProjectInitialisationService projectInitialisationService)
     {
         this.projectInitialisationService = projectInitialisationService;
+    }
+
+    public void setCommandExtensionManager(CommandExtensionManager commandExtensionManager)
+    {
+        this.commandExtensionManager = commandExtensionManager;
     }
 }

@@ -1,7 +1,7 @@
 package com.zutubi.tove.type;
 
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationList;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.HandleAllocator;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
@@ -210,7 +210,7 @@ public class ListType extends CollectionType
         return result;
     }
 
-    public Object toXmlRpc(Object data) throws TypeException
+    public Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         if(data == null)
         {
@@ -225,7 +225,7 @@ public class ListType extends CollectionType
             Vector<Object> result = new Vector<Object>(items.length);
             for(String item: items)
             {
-                result.add(type.toXmlRpc(item));
+                result.add(type.toXmlRpc(templateOwnerPath, item));
             }
 
             return result;
@@ -236,7 +236,7 @@ public class ListType extends CollectionType
 
             Record record = (Record) data;
             Vector<Object> result = new Vector<Object>(record.size());
-            convertFromRecord(record, result, new XmlRpcFromRecord());
+            convertFromRecord(record, result, new XmlRpcFromRecord(templateOwnerPath));
             return result;
         }
     }
@@ -392,6 +392,13 @@ public class ListType extends CollectionType
 
     private static class XmlRpcFromRecord implements FromRecord
     {
+        private String templateOwnerPath;
+
+        public XmlRpcFromRecord(String templateOwnerPath)
+        {
+            this.templateOwnerPath = templateOwnerPath;
+        }
+
         public void handleFieldError(String key, String error)
         {
             // Do nothing
@@ -399,7 +406,7 @@ public class ListType extends CollectionType
 
         public Object convert(String key, Type type, Object child) throws TypeException
         {
-            return type.toXmlRpc(child);
+            return type.toXmlRpc(templateOwnerPath, child);
         }
     }
 

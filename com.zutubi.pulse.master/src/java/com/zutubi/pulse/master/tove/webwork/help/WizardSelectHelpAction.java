@@ -1,11 +1,12 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
+import com.zutubi.pulse.master.tove.wizard.TwoStepStateBuilder;
+import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
 import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.CompositeType;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
-import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class WizardSelectHelpAction extends HelpActionSupport
     public String execute() throws Exception
     {
         AbstractTypeWizard wizardInstance = (AbstractTypeWizard) ConfigurationWizardAction.getWizardInstance(getPath());
-        AbstractTypeWizard.TwoStepStateBuilder.SelectWizardState state = (AbstractTypeWizard.TwoStepStateBuilder.SelectWizardState) wizardInstance.getCurrentState();
+        TwoStepStateBuilder.SelectWizardState state = (TwoStepStateBuilder.SelectWizardState) wizardInstance.getCurrentState();
 
         CompositeType type = state.getType();
         messages = Messages.getInstance(type.getClazz());

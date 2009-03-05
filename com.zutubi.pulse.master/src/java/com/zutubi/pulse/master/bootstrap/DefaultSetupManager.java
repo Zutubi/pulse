@@ -16,12 +16,12 @@ import com.zutubi.pulse.master.restore.ArchiveException;
 import com.zutubi.pulse.master.restore.RestoreManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
+import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.*;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
-import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
 import com.zutubi.tove.type.record.RecordManager;
@@ -183,7 +183,7 @@ public class DefaultSetupManager implements SetupManager
     {
         loadContexts(configContexts);
 
-        ConfigurationRegistry configurationRegistry = SpringComponentContext.getBean("configurationRegistry");
+        MasterConfigurationRegistry configurationRegistry = SpringComponentContext.getBean("configurationRegistry");
         configurationRegistry.initSetup();
     }
 
@@ -440,7 +440,7 @@ public class DefaultSetupManager implements SetupManager
         ConfigurationReferenceManager configurationReferenceManager = SpringComponentContext.getBean("configurationReferenceManager");
         ConfigurationTemplateManager configurationTemplateManager = SpringComponentContext.getBean("configurationTemplateManager");
         ConfigurationRefactoringManager configurationRefactoringManager = SpringComponentContext.getBean("configurationRefactoringManager");
-        ConfigurationRegistry configurationRegistry = SpringComponentContext.getBean("configurationRegistry");
+        MasterConfigurationRegistry configurationRegistry = SpringComponentContext.getBean("configurationRegistry");
         ConfigurationExtensionManager configurationExtensionManager = SpringComponentContext.getBean("configurationExtensionManager");
         ConfigurationStateManager configurationStateManager = SpringComponentContext.getBean("configurationStateManager");
 
@@ -561,7 +561,7 @@ public class DefaultSetupManager implements SetupManager
     private boolean isSetupRequired()
     {
         ConfigurationTemplateManager configurationTemplateManager = SpringComponentContext.getBean("configurationTemplateManager");
-        return configurationTemplateManager.getRecord(ConfigurationRegistry.USERS_SCOPE).size() == 0;
+        return configurationTemplateManager.getRecord(MasterConfigurationRegistry.USERS_SCOPE).size() == 0;
     }
 
     private void updateVersionIfNecessary()

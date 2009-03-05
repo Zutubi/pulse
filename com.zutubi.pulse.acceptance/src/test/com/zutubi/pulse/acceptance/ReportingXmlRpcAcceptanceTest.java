@@ -3,8 +3,14 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
+import com.zutubi.util.io.IOUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +24,7 @@ import java.util.Vector;
 public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private static final int BUILD_TIMEOUT = 90000;
-
+    
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -196,6 +202,27 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals("success", build.get("status"));
     }
 
+    public void testErrorAndWarningCounts() throws Exception
+    {
+        String projectName = randomName();
+        Hashtable<String, Object> customType = xmlRpcHelper.createDefaultConfig(CustomTypeConfiguration.class);
+        customType.put("pulseFileString", IOUtils.inputStreamToString(getInput("xml")));
+
+        xmlRpcHelper.insertProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), customType);
+        int number = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, number);
+        assertNotNull(build);
+        assertEquals(4, build.get("errorCount"));
+        assertEquals(1, build.get("warningCount"));
+
+        @SuppressWarnings("unchecked")
+        Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
+        Hashtable<String, Object> stage = stages.get(0);
+        assertEquals(3, stage.get("errorCount"));
+        assertEquals(1, stage.get("warningCount"));
+    }
+
     public void testGetBuildUnknownProject()
     {
         try
@@ -244,6 +271,37 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String projectName = randomName();
         insertSimpleProject(projectName);
         assertFalse(xmlRpcHelper.deleteBuild(projectName, 1));
+    }
+
+    public void testTriggerBuildWithProperties() throws Exception
+    {
+        final String projectName = randomName();
+        insertSimpleProject(projectName);
+        xmlRpcHelper.insertProjectProperty(projectName, "existing.property", "existing value");
+
+        Hashtable<String, String> properties = new Hashtable<String, String>();
+        properties.put("existing.property", "overriding value");
+        properties.put("new.property", "new value");
+
+        int number = xmlRpcHelper.getNextBuildNumber(projectName);
+        xmlRpcHelper.triggerBuild(projectName, "", properties);
+        xmlRpcHelper.waitForBuildToComplete(projectName, number, BUILD_TIMEOUT);
+
+        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(projectName, number);
+        Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
+        {
+            public boolean satisfied(Hashtable<String, Object> artifact)
+            {
+                return artifact.get("name").equals("environment");
+            }
+        });
+
+        assertNotNull(artifact);
+        String permalink = (String) artifact.get("permalink");
+        String text = downloadAsAdmin(baseUrl + permalink.substring(1) + "env.txt");
+
+        assertThat(text, containsString("PULSE_EXISTING_PROPERTY=overriding value"));
+        assertThat(text, containsString("PULSE_NEW_PROPERTY=new value"));
     }
 
     private void getAllHelper(GetAllHelper helper) throws Exception

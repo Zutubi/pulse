@@ -7,41 +7,20 @@ import nu.xom.*;
  */
 public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
-    private static final String ELEMENT_SUITE   = "testsuite";
-    private static final String ELEMENT_CASE    = "testcase";
-    private static final String ELEMENT_ERROR   = "error";
-    private static final String ELEMENT_FAILURE = "failure";
-    private static final String ELEMENT_SKIPPED = "skipped";
-
-    private static final String ATTRIBUTE_CLASS   = "classname";
-    private static final String ATTRIBUTE_MESSAGE = "message";
-    private static final String ATTRIBUTE_NAME    = "name";
-    private static final String ATTRIBUTE_PACKAGE = "package";
-    private static final String ATTRIBUTE_TIME    = "time";
-
-    private String suiteElement     = ELEMENT_SUITE;
-    private String caseElement      = ELEMENT_CASE;
-    private String errorElement     = ELEMENT_ERROR;
-    private String failureElement   = ELEMENT_FAILURE;
-    private String skippedElement   = ELEMENT_SKIPPED;
-    private String classAttribute   = ATTRIBUTE_CLASS;
-    private String messageAttribute = ATTRIBUTE_MESSAGE;
-    private String nameAttribute    = ATTRIBUTE_NAME;
-    private String packageAttribute = ATTRIBUTE_PACKAGE;
-    private String timeAttribute    = ATTRIBUTE_TIME;
-
-    public JUnitReportPostProcessor()
+    public JUnitReportPostProcessor(JUnitReportPostProcessorConfiguration config)
     {
-        super("JUnit");
+        super(config);
     }
 
-    public JUnitReportPostProcessor(String reportType)
+    @Override
+    public JUnitReportPostProcessorConfiguration getConfig()
     {
-        super(reportType);
+        return (JUnitReportPostProcessorConfiguration) super.getConfig();
     }
 
     protected void processDocument(Document doc, TestSuiteResult tests)
     {
+        String suiteElement = getConfig().getSuiteElement();
         Element root = doc.getRootElement();
         if(root.getLocalName().equals(suiteElement))
         {
@@ -61,15 +40,16 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 
     private void processSuite(Element element, TestSuiteResult tests)
     {
+        JUnitReportPostProcessorConfiguration config = getConfig();
         String name = "";
 
-        String attr = element.getAttributeValue(packageAttribute);
+        String attr = element.getAttributeValue(config.getPackageAttribute());
         if(attr != null)
         {
             name += attr + '.';
         }
 
-        attr = element.getAttributeValue(nameAttribute);
+        attr = element.getAttributeValue(config.getNameAttribute());
         if(attr != null)
         {
             name += attr;
@@ -84,13 +64,13 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         long duration = getDuration(element);
 
         TestSuiteResult suite = new TestSuiteResult(name, duration);
-        Elements nested = element.getChildElements(suiteElement);
+        Elements nested = element.getChildElements(config.getSuiteElement());
         for(int i = 0; i < nested.size(); i++)
         {
             processSuite(nested.get(i), suite);
         }
 
-        Elements cases = element.getChildElements(caseElement);
+        Elements cases = element.getChildElements(config.getCaseElement());
         for(int i = 0; i < cases.size(); i++)
         {
             processCase(cases.get(i), suite);
@@ -101,14 +81,15 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 
     private void processCase(Element element, TestSuiteResult suite)
     {
-        String name = element.getAttributeValue(nameAttribute);
+        JUnitReportPostProcessorConfiguration config = getConfig();
+        String name = element.getAttributeValue(config.getNameAttribute());
         if(name == null)
         {
             // Ignore nameless tests
             return;
         }
 
-        String className = element.getAttributeValue(classAttribute);
+        String className = element.getAttributeValue(config.getClassAttribute());
         if(className != null && !suite.getName().equals(className))
         {
             name = className + "." + name;
@@ -118,7 +99,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         TestCaseResult caseResult = new TestCaseResult(name, duration, TestStatus.PASS);
         suite.addCase(caseResult);
 
-        Element child = element.getFirstChildElement(errorElement);
+        Element child = element.getFirstChildElement(config.getErrorElement());
         if(child != null)
         {
             caseResult.setStatus(TestStatus.ERROR);
@@ -130,7 +111,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
             return;
         }
 
-        child = element.getFirstChildElement(failureElement);
+        child = element.getFirstChildElement(config.getFailureElement());
         if(child != null)
         {
             caseResult.setStatus(TestStatus.FAILURE);
@@ -138,7 +119,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
             return;
         }
 
-        child = element.getFirstChildElement(skippedElement);
+        child = element.getFirstChildElement(config.getSkippedElement());
         if (child != null)
         {
             caseResult.setStatus(TestStatus.SKIPPED);
@@ -157,7 +138,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         }
         else
         {
-            String message = element.getAttributeValue(messageAttribute);
+            String message = element.getAttributeValue(getConfig().getMessageAttribute());
             if(message != null)
             {
                 caseResult.setMessage(message);
@@ -168,7 +149,7 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
     private long getDuration(Element element)
     {
         long duration = TestResult.DURATION_UNKNOWN;
-        String attr = element.getAttributeValue(timeAttribute);
+        String attr = element.getAttributeValue(getConfig().getTimeAttribute());
 
         if(attr != null)
         {
@@ -184,55 +165,5 @@ public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
         }
 
         return duration;
-    }
-
-    public void setSuiteElement(String suiteElement)
-    {
-        this.suiteElement = suiteElement;
-    }
-
-    public void setCaseElement(String caseElement)
-    {
-        this.caseElement = caseElement;
-    }
-
-    public void setErrorElement(String errorElement)
-    {
-        this.errorElement = errorElement;
-    }
-
-    public void setFailureElement(String failureElement)
-    {
-        this.failureElement = failureElement;
-    }
-
-    public void setSkippedElement(String skippedElement)
-    {
-        this.skippedElement = skippedElement;
-    }
-
-    public void setClassAttribute(String classAttribute)
-    {
-        this.classAttribute = classAttribute;
-    }
-
-    public void setMessageAttribute(String messageAttribute)
-    {
-        this.messageAttribute = messageAttribute;
-    }
-
-    public void setNameAttribute(String nameAttribute)
-    {
-        this.nameAttribute = nameAttribute;
-    }
-
-    public void setPackageAttribute(String packageAttribute)
-    {
-        this.packageAttribute = packageAttribute;
-    }
-
-    public void setTimeAttribute(String timeAttribute)
-    {
-        this.timeAttribute = timeAttribute;
     }
 }

@@ -3,7 +3,6 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.Resource;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -12,7 +11,6 @@ import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.*;
 
 import java.io.*;
-import java.util.List;
 
 /**
  * Entry point for executing local builds within a development tree.
@@ -24,6 +22,7 @@ public class LocalBuild
     private int failureLimit = DEFAULT_FAILURE_LIMIT;
     private EventManager eventManager;
     private RecipeProcessor recipeProcessor;
+    private ResourceFileLoader resourceFileLoader;
 
     @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
     public static void main(String argv[])
@@ -107,18 +106,18 @@ public class LocalBuild
         return SpringComponentContext.getBean("localBuild");
     }
 
-    private FileResourceRepository createRepository(String resourcesFile) throws PulseException
+    private InMemoryResourceRepository createRepository(String resourcesFile) throws PulseException
     {
         if (resourcesFile == null)
         {
-            return new FileResourceRepository();
+            return new InMemoryResourceRepository();
         }
 
         FileInputStream stream = null;
         try
         {
             stream = new FileInputStream(resourcesFile);
-            return ResourceFileLoader.load(stream);
+            return resourceFileLoader.load(stream);
         }
         catch (FileNotFoundException e)
         {
@@ -149,8 +148,9 @@ public class LocalBuild
     {
         printPrologue(pulseFileName, resourcesFile, outputDir);
 
-        FileResourceRepository repository = createRepository(resourcesFile);
-        discoverResources(repository);
+        InMemoryResourceRepository repository = createRepository(resourcesFile);
+        ResourceDiscoverer discoverer = new ResourceDiscoverer();
+        discoverer.discoverAndAdd(repository);
 
         RecipePaths paths = new LocalRecipePaths(baseDir, outputDir);
 
@@ -188,19 +188,6 @@ public class LocalBuild
         }
 
         printEpilogue(logFile);
-    }
-
-    private void discoverResources(FileResourceRepository repository)
-    {
-        ResourceDiscoverer discoverer = new ResourceDiscoverer();
-        List<Resource> resources = discoverer.discover();
-        for(Resource r: resources)
-        {
-            if(!repository.hasResource(r.getName()))
-            {
-                repository.addResource(r);
-            }
-        }
     }
 
     private String loadPulseFile(File baseDir, String pulseFileName) throws PulseException
@@ -245,7 +232,6 @@ public class LocalBuild
         System.out.println("Build report saved to '" + logFile.getPath() + "'.");
     }
 
-
     private static void fatal(Throwable throwable)
     {
         System.err.println(throwable.getMessage());
@@ -265,5 +251,10 @@ public class LocalBuild
     public void setRecipeProcessor(RecipeProcessor recipeProcessor)
     {
         this.recipeProcessor = recipeProcessor;
+    }
+
+    public void setResourceFileLoader(ResourceFileLoader resourceFileLoader)
+    {
+        this.resourceFileLoader = resourceFileLoader;
     }
 }

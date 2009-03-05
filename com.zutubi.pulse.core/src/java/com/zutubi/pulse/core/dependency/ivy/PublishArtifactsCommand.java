@@ -1,19 +1,16 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import com.zutubi.pulse.core.Artifact;
 import com.zutubi.pulse.core.Command;
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,8 +28,9 @@ public class PublishArtifactsCommand implements Command
         this.request = request;
     }
 
-    public void execute(ExecutionContext context, CommandResult result)
+    public void execute(CommandContext commandContext)
     {
+        ExecutionContext context = commandContext.getExecutionContext();
         try
         {
             String stageName = request.getStageName();
@@ -49,27 +47,6 @@ public class PublishArtifactsCommand implements Command
         {
             throw new BuildException("Error publishing artifacts: " + e.getMessage(), e);
         }
-    }
-
-    public List<Artifact> getArtifacts()
-    {
-        // return a list of artifacts actually published.
-        return Collections.emptyList();
-    }
-
-    public String getName()
-    {
-        return "publish";
-    }
-
-    public void setName(String name)
-    {
-        // noop.
-    }
-
-    public boolean isForce()
-    {
-        return false;
     }
 
     public void terminate()

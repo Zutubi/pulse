@@ -13,16 +13,6 @@ import java.sql.SQLException;
  */
 public class ProjectLifecycleUpgradeTask extends DatabaseUpgradeTask
 {
-    public String getName()
-    {
-        return "Project lifecycle";
-    }
-
-    public String getDescription()
-    {
-        return "Puts projects into the initial state so they start the new project lifecycle.";
-    }
-
     public boolean haltOnFailure()
     {
         return false;

@@ -32,7 +32,7 @@ public class ExtensionOptionProvider extends MapOptionProvider
         return null;
     }
 
-    protected Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
+    public Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
     {
         List<CompositeType> extensions;
         if (this.extensions != null)

@@ -26,16 +26,11 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
     private static final Pattern SUITE_SUMMARY_PATTERN = Pattern.compile("Executed (\\d*) test[s]?, with (\\d*) failure[s]? \\((\\d*) unexpected\\) in (\\d*\\.\\d*) \\((\\d*\\.\\d*)\\) second[s]?$");
     private static final Pattern CASE_SUMMARY_PATTERN = Pattern.compile("Test Case '-\\[(.*?) (.*?)\\]' (.*?) \\((\\d*\\.\\d*) second[s]?\\)\\.$");
 
-    public OCUnitReportPostProcessor()
+    public OCUnitReportPostProcessor(OCUnitReportPostProcessorConfiguration config)
     {
-
+        super(config);
     }
 
-    public OCUnitReportPostProcessor(String name)
-    {
-        setName(name);
-    }
-    
     protected void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult suite)
     {
         try

@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
@@ -77,8 +77,8 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         globalNode.addChild(createNode(p2.getName(), true));
         globalNode.addChild(createNode(p3.getName(), true));
 
-        TemplateHierarchy hierarchy = new TemplateHierarchy(ConfigurationRegistry.PROJECTS_SCOPE, globalNode);
-        stub(configurationTemplateManager.getTemplateHierarchy(ConfigurationRegistry.PROJECTS_SCOPE)).toReturn(hierarchy);
+        TemplateHierarchy hierarchy = new TemplateHierarchy(MasterConfigurationRegistry.PROJECTS_SCOPE, globalNode);
+        stub(configurationTemplateManager.getTemplateHierarchy(MasterConfigurationRegistry.PROJECTS_SCOPE)).toReturn(hierarchy);
         
         final List<Project> allProjects = Arrays.asList(p1, p2, p3, cp1, cp2, cp3);
         groups = groupProjects(allProjects);
@@ -130,7 +130,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
 
     private TemplateNode createNode(String name, boolean concrete)
     {
-        return new TemplateNode(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, name), name, concrete);
+        return new TemplateNode(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, name), name, concrete);
     }
 
     private Map<String, ProjectGroup> groupProjects(List<Project> allProjects)
@@ -159,7 +159,15 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
         config.setHierarchyShown(false);
 
-        assertProjectsModelLists(getAllFlatGroups(), helper.createProjectsModels(config));
+        assertProjectsModelLists(getAllFlatGroups(true), helper.createProjectsModels(config, true));
+    }
+
+    public void testNoHierarchyNoUngrouped()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        config.setHierarchyShown(false);
+
+        assertProjectsModelLists(getAllFlatGroups(false), helper.createProjectsModels(config, false));
     }
 
     public void testHierarchyFull()
@@ -174,7 +182,21 @@ public class ProjectsModelsHelperTest extends PulseTestCase
                 createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_GLOBAL, TEMPLATE_CHILD, cp1, cp2),
                 createHierarchicalGroup(null, TEMPLATE_GLOBAL, p2, TEMPLATE_CHILD, cp3)
         );
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, true));
+    }
+
+    public void testHierarchyFullNoUngrouped()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        config.setHierarchyShown(true);
+        config.setHiddenHierarchyLevels(0);
+
+        List<ProjectsModel> expectedModels = Arrays.asList(
+                createHierarchicalGroup(LABEL_LONELY, TEMPLATE_GLOBAL, p1),
+                createHierarchicalGroup(LABEL_ODD, TEMPLATE_GLOBAL, p1, p3, TEMPLATE_CHILD, cp1),
+                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_GLOBAL, TEMPLATE_CHILD, cp1, cp2)
+        );
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, false));
     }
 
     public void testHierarchyOneLevelHidden()
@@ -189,16 +211,30 @@ public class ProjectsModelsHelperTest extends PulseTestCase
                 createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2),
                 createHierarchicalGroup(null, p2, TEMPLATE_CHILD, cp3)
         );
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, true));
     }
 
+    public void testHierarchyOneLevelHiddenNoUngrouped()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        config.setHierarchyShown(true);
+        config.setHiddenHierarchyLevels(1);
+
+        List<ProjectsModel> expectedModels = Arrays.asList(
+                createHierarchicalGroup(LABEL_LONELY, p1),
+                createHierarchicalGroup(LABEL_ODD, p1, p3, TEMPLATE_CHILD, cp1),
+                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)
+        );
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, false));
+    }
+    
     public void testHierarchyTwoLevelsHidden()
     {
         ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(2);
 
-        assertProjectsModelLists(getAllFlatGroups(), helper.createProjectsModels(config));
+        assertProjectsModelLists(getAllFlatGroups(true), helper.createProjectsModels(config, true));
     }
 
     public void testHierarchyThreeLevelsHidden()
@@ -207,7 +243,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(3);
 
-        assertProjectsModelLists(getAllFlatGroups(), helper.createProjectsModels(config));
+        assertProjectsModelLists(getAllFlatGroups(true), helper.createProjectsModels(config, true));
     }
 
     public void testFilterOutAllGroupsNoHierarchy()
@@ -216,7 +252,15 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHierarchyShown(false);
 
         List<ProjectsModel> expectedModels = Arrays.asList(createFlatGroup(null, cp1, cp2, cp3, p1, p2, p3));
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>()));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
+    }
+
+    public void testFilterOutAllGroupsNoUngroupedNoHierarchy()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        config.setHierarchyShown(false);
+
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), false));
     }
 
     public void testFilterOutAllGroupsHierarchyFull()
@@ -226,7 +270,16 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHiddenHierarchyLevels(0);
 
         List<ProjectsModel> expectedModels = Arrays.asList(createHierarchicalGroup(null, TEMPLATE_GLOBAL, p1, p2, p3, TEMPLATE_CHILD, cp1, cp2, cp3));
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>()));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
+    }
+
+    public void testFilterOutAllGroupsNoUngroupedHierarchyFull()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        config.setHierarchyShown(true);
+        config.setHiddenHierarchyLevels(0);
+
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), false));
     }
 
     public void testFilterOutAllGroupsHierarchyOneLevelHidden()
@@ -236,7 +289,16 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHiddenHierarchyLevels(1);
 
         List<ProjectsModel> expectedModels = Arrays.asList(createHierarchicalGroup(null, p1, p2, p3, TEMPLATE_CHILD, cp1, cp2, cp3));
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>()));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
+    }
+
+    public void testFilterOutAllGroupsNoUngroupedHierarchyOneLevelHidden()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        config.setHierarchyShown(true);
+        config.setHiddenHierarchyLevels(1);
+
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), false));
     }
 
     public void testFilterOutSpecificGroupsNoHierarchy()
@@ -250,7 +312,21 @@ public class ProjectsModelsHelperTest extends PulseTestCase
                 createFlatGroup(null, cp3, p2, p3)
         );
 
-        List<ProjectsModel> gotModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)));
+        List<ProjectsModel> gotModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), true);
+        assertProjectsModelLists(expectedModels, gotModels);
+    }
+
+    public void testFilterOutSpecificGroupsNoUngroupedNoHierarchy()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        config.setHierarchyShown(false);
+
+        List<ProjectsModel> expectedModels = Arrays.asList(
+                createFlatGroup(LABEL_LONELY, p1),
+                createFlatGroup(LABEL_STRANGE, cp1, cp2)
+        );
+
+        List<ProjectsModel> gotModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), false);
         assertProjectsModelLists(expectedModels, gotModels);
     }
 
@@ -266,16 +342,31 @@ public class ProjectsModelsHelperTest extends PulseTestCase
                 createHierarchicalGroup(null, p2, p3, TEMPLATE_CHILD, cp3)
         );
 
-        List<ProjectsModel> gotModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)));
+        List<ProjectsModel> gotModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), true);
         assertProjectsModelLists(expectedModels, gotModels);
     }
 
+    public void testFilterOutSpecificGroupsNoUngroupedHierarchyOneLevelHidden()
+    {
+        ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
+        config.setHierarchyShown(true);
+        config.setHiddenHierarchyLevels(1);
+
+        List<ProjectsModel> expectedModels = Arrays.asList(
+                createHierarchicalGroup(LABEL_LONELY, p1),
+                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)
+        );
+
+        List<ProjectsModel> gotModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), false);
+        assertProjectsModelLists(expectedModels, gotModels);
+    }
+    
     public void testFilterOutAllProjectsNoHierarchy()
     {
         ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
         config.setHierarchyShown(false);
 
-        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, new FalsePredicate<Project>(), new TruePredicate<ProjectGroup>()));
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, new FalsePredicate<Project>(), new TruePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutAllProjectsHierarchyFull()
@@ -284,7 +375,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(0);
 
-        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, new FalsePredicate<Project>(), new TruePredicate<ProjectGroup>()));
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, new FalsePredicate<Project>(), new TruePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutSpecificProjectsNoHierarchy()
@@ -298,7 +389,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
                 createFlatGroup(null, p2)
         );
 
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new TruePredicate<ProjectGroup>()));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new TruePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutSpecificProjectsHierarchyOneLevelHidden()
@@ -313,7 +404,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
                 createHierarchicalGroup(null, p2)
         );
 
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new TruePredicate<ProjectGroup>()));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new TruePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutSpecificProjectsAndGroupsNoHierarchy()
@@ -326,7 +417,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
                 createFlatGroup(null, cp2, p2)
         );
 
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_ODD))));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_ODD)), true));
     }
 
     public void testBuildCountApplied()
@@ -334,7 +425,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
         config.setBuildsPerProject(3);
         
-        helper.createProjectsModels(config, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)));
+        helper.createProjectsModels(config, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
         verify(buildManager).getLatestBuildResultsForProject(p1, 3);
         verifyNoMoreInteractions(buildManager);
     }
@@ -344,7 +435,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
         config.setBuildsPerProject(1);
         
-        helper.createProjectsModels(config, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)));
+        helper.createProjectsModels(config, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
         verify(buildManager).getLatestBuildResultsForProject(p1, 2);
         verifyNoMoreInteractions(buildManager);
     }
@@ -352,7 +443,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
     public void testLabellingOfUngroupedSomeGroups()
     {
         ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
-        List<ProjectsModel> projectsModels = helper.createProjectsModels(config);
+        List<ProjectsModel> projectsModels = helper.createProjectsModels(config, true);
         // Upgrouped projects come last.
         ProjectsModel ungroup = projectsModels.get(projectsModels.size() - 1);
         assertFalse(ungroup.isLabelled());
@@ -362,7 +453,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
     public void testLabellingOfUngroupedNoGroups()
     {
         ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
-        List<ProjectsModel> projectsModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>());
+        List<ProjectsModel> projectsModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true);
 
         // When there are no other groups, don't use the "ungrouped" term
         ProjectsModel ungroup = projectsModels.get(projectsModels.size() - 1);
@@ -421,14 +512,20 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         assertSame(expected.getProject(), got.getProject());
     }
 
-    private List<ProjectsModel> getAllFlatGroups()
+    private List<ProjectsModel> getAllFlatGroups(boolean includeUngrouped)
     {
-        return Arrays.asList(
-                createFlatGroup(LABEL_LONELY, p1),
-                createFlatGroup(LABEL_ODD, cp1, p1, p3),
-                createFlatGroup(LABEL_STRANGE, cp1, cp2),
-                createFlatGroup(null, cp3, p2)
-        );
+        List<ProjectsModel> flatGroups = new LinkedList<ProjectsModel>(Arrays.asList(
+            createFlatGroup(LABEL_LONELY, p1),
+            createFlatGroup(LABEL_ODD, cp1, p1, p3),
+            createFlatGroup(LABEL_STRANGE, cp1, cp2)
+        ));
+
+        if (includeUngrouped)
+        {
+            flatGroups.add(createFlatGroup(null, cp3, p2));
+        }
+
+        return flatGroups;
     }
 
     /**

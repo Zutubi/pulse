@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.admin.AntTypeForm;
 import com.zutubi.pulse.acceptance.forms.admin.CustomTypeForm;
+import com.zutubi.pulse.acceptance.forms.admin.MultiRecipeTypeForm;
 import com.zutubi.pulse.acceptance.forms.admin.SetPasswordForm;
 import com.zutubi.pulse.acceptance.forms.admin.UserForm;
 import com.zutubi.pulse.acceptance.pages.WelcomePage;
@@ -9,7 +9,7 @@ import com.zutubi.pulse.acceptance.pages.admin.AgentConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
@@ -22,6 +22,8 @@ import java.util.Hashtable;
  */
 public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 {
+    private static final String EXPECTED_FILE_CONTENT = "build.xml";
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -98,7 +100,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialUser(random);
 
         loginAsAdmin();
-        ListPage usersPage = new ListPage(selenium, urls, ConfigurationRegistry.USERS_SCOPE);
+        ListPage usersPage = new ListPage(selenium, urls, MasterConfigurationRegistry.USERS_SCOPE);
         usersPage.goTo();
         usersPage.clickAction(random, "setPassword");
         return usersPage;
@@ -112,7 +114,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config
-        assertTrue(form.getFieldValue("pulseFileString").contains("pull in the ant resource"));
+        assertTrue(form.getFieldValue("pulseFileString").contains(EXPECTED_FILE_CONTENT));
         form.saveFormElements(new String[]{null});
 
         projectPage.waitFor();
@@ -120,7 +122,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         projectPage.clickComposite("type", "custom pulse file");
 
         form.waitFor();
-        assertTrue(form.getFieldValue("pulseFileString").contains("pull in the ant resource"));
+        assertTrue(form.getFieldValue("pulseFileString").contains(EXPECTED_FILE_CONTENT));
     }
 
     public void testPrepareActionCancel() throws Exception
@@ -133,11 +135,11 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         projectPage.waitFor();
         assertFalse(projectPage.isTreeLinkPresent("pulse file"));
-        assertTrue(projectPage.isTreeLinkPresent("ant command and artifacts"));
+        assertTrue(projectPage.isTreeLinkPresent("recipes, commands and captures"));
 
-        projectPage.clickComposite("type", "ant command and artifacts");
-        AntTypeForm antForm = new AntTypeForm(selenium);
-        antForm.waitFor();
+        projectPage.clickComposite("type", "recipes, commands and captures");
+        MultiRecipeTypeForm typeForm = new MultiRecipeTypeForm(selenium);
+        typeForm.waitFor();
     }
 
     public void testPrepareActionValidation() throws Exception
@@ -148,11 +150,11 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config
-        assertTrue(form.getFieldValue("pulseFileString").contains("pull in the ant resource"));
+        assertTrue(form.getFieldValue("pulseFileString").contains(EXPECTED_FILE_CONTENT));
         form.saveFormElements("<?xml version=\"1.0\"?><project><nosuchtag/></project>");
         form.waitFor();
 
-        assertTextPresent("Undefined type 'nosuchtag'");
+        assertTextPresent("Unknown child element 'nosuchtag'");
     }
 
     private ProjectConfigPage prepareActionPrelude() throws Exception
@@ -195,7 +197,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         String childTypePath = PathUtils.getPath(childPath, "type");
         Hashtable<String, Object> childType = xmlRpcHelper.getConfig(childTypePath);
-        childType.put("file", "meoverridenow");
+        childType.put("defaultRecipe", "meoverridenow");
         xmlRpcHelper.saveConfig(childTypePath, childType, false);
 
         projectPage.goTo();

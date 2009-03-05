@@ -1,11 +1,20 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.i18n.Messages;
+
 /**
  * Provides a small amoutn of summary information for a group of tests
  * results.
  */
 public class TestResultSummary extends Entity
 {
+    private static final Messages I18N = Messages.getInstance(TestResultSummary.class);
+
+    private static final String KEY_ALL_PASSED = "tests.all.passed";
+    private static final String KEY_SOME_BROKEN = "tests.some.broken";
+    private static final String KEY_SOME_SKIPPED = "tests.some.skipped";
+    private static final String KEY_NONE= "tests.none";
+
     /**
      * Number of cases with failure status.
      */
@@ -180,31 +189,35 @@ public class TestResultSummary extends Entity
         return String.format("%.2f", rate);
     }
 
-
-    public String toString()
+    public String format(Messages messages)
     {
         String result;
         if (hasTests())
         {
             if (hasBroken())
             {
-                result = Integer.toString(getBroken()) + " of " + (total  - skipped) + " broken";
+                result = messages.format(KEY_SOME_BROKEN, getBroken() , getTotal() - getSkipped());
             }
             else
             {
-                result = total - skipped + " passed";
+                result = messages.format(KEY_ALL_PASSED, getTotal() - getSkipped());
             }
 
             if (hasSkipped())
             {
-                result += " (" + skipped + " skipped)";
+                result += " " + messages.format(KEY_SOME_SKIPPED, getSkipped());
             }
         }
         else
         {
-            result = "none";
+            result = messages.format(KEY_NONE);
         }
 
         return result;
+    }
+
+    public String toString()
+    {
+        return format(I18N);
     }
 }

@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Arrays;
 
 /**
  * Helpers shared amongst SCM implementations.
@@ -22,25 +24,26 @@ public class ScmUtils
      */
     public static List<Changelist> filter(List<Changelist> changelists, PathFilter filter)
     {
+        List<Changelist> filteredChangelists = new LinkedList<Changelist>();
+
         Iterator<Changelist> changelist = changelists.iterator();
         while (changelist.hasNext())
         {
+            List<FileChange> changes = new LinkedList<FileChange>();
             Changelist ch = changelist.next();
-            Iterator<FileChange> i = ch.getChanges().iterator();
-            while (i.hasNext())
+            for (FileChange c : ch.getChanges())
             {
-                FileChange c = i.next();
-                if (filter != null && !filter.accept(c.getPath()))
+                if (filter == null || filter.accept(c.getPath()))
                 {
-                    i.remove();
+                    changes.add(c);
                 }
             }
-            if (ch.getChanges().size() == 0)
+            if (changes.size() > 0)
             {
-                changelist.remove();
+                Changelist filtered = new Changelist(ch.getRevision(), ch.getTime(), ch.getAuthor(), ch.getComment(), changes);
+                filteredChangelists.add(filtered);
             }
         }
-        return changelists;
+        return filteredChangelists;
     }
-
 }

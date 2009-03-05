@@ -1,12 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.master.AgentService;
-import com.zutubi.pulse.master.RecipeAssignmentRequest;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -25,8 +23,6 @@ import java.util.Map;
 @Wire
 public class BuildStageConfiguration extends AbstractNamedConfiguration
 {
-    private static final Logger LOG = Logger.getLogger(BuildStageConfiguration.class);
-
     @Reference(optionProvider = "BuildStageAgentOptionProvider")
     private AgentConfiguration agent;
     @Select(optionProvider = "BuildStageRecipeOptionProvider", editable = true)
@@ -130,32 +126,13 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     @Transient
     public AgentRequirements getAgentRequirements()
     {
-        try
+        if(agent == null)
         {
-            if(agent == null)
-            {
-                return objectFactory.buildBean(AnyCapableAgentRequirements.class);
-            }
-            else
-            {
-                return objectFactory.buildBean(SpecificAgentRequirements.class, new Class[]{ AgentConfiguration.class }, new Object[]{ agent });
-            }
+            return objectFactory.buildBean(AnyCapableAgentRequirements.class);
         }
-        catch (Exception e)
+        else
         {
-            LOG.severe(e);
-            return new AgentRequirements()
-            {
-                public String getSummary()
-                {
-                    return "[none]";
-                }
-
-                public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
-                {
-                    return false;
-                }
-            };
+            return objectFactory.buildBean(SpecificAgentRequirements.class, new Class[]{ AgentConfiguration.class }, new Object[]{ agent });
         }
     }
 

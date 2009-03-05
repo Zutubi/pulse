@@ -2,11 +2,11 @@ package com.zutubi.pulse.master.tove.webwork;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
-import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
@@ -27,7 +27,7 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
     protected ConfigurationUIModel configuration;
 
     protected TypeRegistry typeRegistry;
-    protected ConfigurationRegistry configurationRegistry;
+    protected MasterConfigurationRegistry configurationRegistry;
     protected ConfigurationTemplateManager configurationTemplateManager;
     protected ConfigurationProvider configurationProvider;
     protected ObjectFactory objectFactory;
@@ -129,7 +129,7 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
         return record;
     }
 
-    protected void prepare() throws Exception
+    protected void prepare()
     {
         // default handling - render the page.
         configuration = objectFactory.buildBean(ConfigurationUIModel.class, new Class[]{String.class}, new Object[]{path});
@@ -177,7 +177,7 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
         this.typeRegistry = typeRegistry;
     }
 
-    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
+    public void setConfigurationRegistry(MasterConfigurationRegistry configurationRegistry)
     {
         this.configurationRegistry = configurationRegistry;
     }

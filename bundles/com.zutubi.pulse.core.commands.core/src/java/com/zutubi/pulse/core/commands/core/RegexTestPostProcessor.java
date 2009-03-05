@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -9,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,34 +24,23 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 
     private String currentLine;
 
-    private String regex;
-    private int statusGroup;
-    private int nameGroup;
-    private int detailsGroup = -1;
-
-    private boolean autoFail = false;
-    private boolean trim = true;
-    
-    private Map<String, TestStatus> statusMap = new HashMap<String, TestStatus>();
-
-    public RegexTestPostProcessor()
+    public RegexTestPostProcessor(RegexTestPostProcessorConfiguration config)
     {
-        // provide some defaults.
-        this.statusMap.put("PASS", TestStatus.PASS);
-        this.statusMap.put("FAILURE", TestStatus.FAILURE);
-        this.statusMap.put("ERROR", TestStatus.ERROR);
-        this.statusMap.put("SKIPPED", TestStatus.SKIPPED);
+        super(config);
     }
 
-    public RegexTestPostProcessor(String name)
+    @Override
+    public RegexTestPostProcessorConfiguration getConfig()
     {
-        setName(name);
+        return (RegexTestPostProcessorConfiguration) super.getConfig();
     }
 
     public void extractTestResults(File file, PostProcessorContext ppContext, TestSuiteResult tests)
     {
         // clean up any whitespace from the regex which may have been added via the setText()
-        if (trim)
+        RegexTestPostProcessorConfiguration config = getConfig();
+        String regex = config.getRegex();
+        if (config.isTrim())
         {
             regex = regex.trim();
         }
@@ -65,7 +52,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
             // read until you locate the start of a test suite.
             try
             {
-                processFile(tests);
+                processFile(tests, regex);
             }
             catch (IllegalStateException e)
             {
@@ -84,8 +71,11 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
         }
     }
 
-    private void processFile(TestSuiteResult tests) throws IOException
+    private void processFile(TestSuiteResult tests, String regex) throws IOException
     {
+        RegexTestPostProcessorConfiguration  config = getConfig();
+        Map<String, TestStatus> statusMap = config.getStatusMap();
+
         Pattern pattern = Pattern.compile(regex);
 
         currentLine = nextLine();
@@ -94,14 +84,14 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
             Matcher m = pattern.matcher(currentLine);
             if (m.matches())
             {
-                String statusString = m.group(statusGroup);
-                if(autoFail || statusMap.containsKey(statusString))
+                String statusString = m.group(config.getStatusGroup());
+                if(config.isAutoFail() || statusMap.containsKey(statusString))
                 {
-                    String testName = m.group(nameGroup);
+                    String testName = m.group(config.getNameGroup());
                     String message = null;
-                    if (detailsGroup >= 0)
+                    if (config.getDetailsGroup() >= 0)
                     {
-                        message = m.group(detailsGroup);
+                        message = m.group(config.getDetailsGroup());
                     }
 
                     TestStatus status = statusMap.get(statusString);
@@ -126,117 +116,5 @@ public class RegexTestPostProcessor extends TestReportPostProcessorSupport
     {
         currentLine = reader.readLine();
         return currentLine;
-    }
-
-    public void setRegex(String regex)
-    {
-        this.regex = regex;
-    }
-
-    public String getRegex()
-    {
-        return regex;
-    }
-
-    public void setStatusGroup(int i)
-    {
-        this.statusGroup = i;
-    }
-
-    public int getStatusGroup()
-    {
-        return statusGroup;
-    }
-
-    public void setNameGroup(int i)
-    {
-        this.nameGroup = i;
-    }
-
-    public int getNameGroup()
-    {
-        return nameGroup;
-    }
-
-    public int getDetailsGroup()
-    {
-        return detailsGroup;
-    }
-
-    public void setDetailsGroup(int detailsGroup)
-    {
-        this.detailsGroup = detailsGroup;
-    }
-
-    public String getPassStatus()
-    {
-        return findStatus(TestStatus.PASS);
-    }
-
-    public void setPassStatus(String status)
-    {
-        this.statusMap.put(status, TestStatus.PASS);
-    }
-
-    public String getFailureStatus()
-    {
-        return findStatus(TestStatus.FAILURE);
-    }
-
-    public void setFailureStatus(String status)
-    {
-        this.statusMap.put(status, TestStatus.FAILURE);
-    }
-
-    public String getErrorStatus()
-    {
-        return findStatus(TestStatus.ERROR);
-    }
-
-    public void setErrorStatus(String status)
-    {
-        this.statusMap.put(status, TestStatus.ERROR);
-    }
-
-    public String getSkippedStatus()
-    {
-        return findStatus(TestStatus.SKIPPED);
-    }
-
-    public void setSkippedStatus(String status)
-    {
-        this.statusMap.put(status, TestStatus.SKIPPED);
-    }
-
-    private String findStatus(TestStatus status)
-    {
-        for(Map.Entry<String, TestStatus> entry: statusMap.entrySet())
-        {
-            if(entry.getValue().equals(status))
-            {
-                return entry.getKey();
-            }
-        }
-
-        return null;
-    }
-
-    public void setText(String txt)
-    {
-        // first lets check to see if there is a valid regex here.
-        if (TextUtils.stringSet(txt) && TextUtils.stringSet(txt.trim()))
-        {
-            regex = txt;
-        }
-    }
-
-    public void setAutoFail(boolean autoFail)
-    {
-        this.autoFail = autoFail;
-    }
-
-    public void setTrim(boolean trim)
-    {
-        this.trim = trim;
     }
 }

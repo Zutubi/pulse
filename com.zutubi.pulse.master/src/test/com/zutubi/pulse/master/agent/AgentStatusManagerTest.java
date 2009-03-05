@@ -4,10 +4,10 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.GenericReference;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
-import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.AgentService;
@@ -1057,7 +1057,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     private void sendRecipeAssigned(Agent agent, int recipeId)
     {
         PulseExecutionContext context = new PulseExecutionContext();
-        context.add(BuildProperties.NAMESPACE_INTERNAL, new Property(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeId)));
+        context.add(BuildProperties.NAMESPACE_INTERNAL, new GenericReference<String>(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeId)));
         eventManager.publish(new RecipeAssignedEvent(this, new RecipeRequest(context), agent));
     }
 

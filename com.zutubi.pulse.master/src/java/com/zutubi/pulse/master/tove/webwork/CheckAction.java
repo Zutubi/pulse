@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
-import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.SimpleInstantiator;
 import com.zutubi.tove.type.Type;
@@ -69,8 +69,10 @@ public class CheckAction extends ToveActionSupport
 
         try
         {
-            Configuration checkInstance = configurationTemplateManager.validate(null, null, checkRecord, true, false);
-            Configuration mainInstance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, true, false);
+            String parentPath = PathUtils.getParentPath(path);
+            String baseName = PathUtils.getBaseName(path);
+            Configuration checkInstance = configurationTemplateManager.validate(parentPath, baseName, checkRecord, true, false);
+            Configuration mainInstance = configurationTemplateManager.validate(parentPath, baseName, record, true, false);
             if (!checkInstance.isValid() || !mainInstance.isValid())
             {
                 ToveUtils.mapErrors(checkInstance, this, null);
@@ -88,7 +90,7 @@ public class CheckAction extends ToveActionSupport
         }
 
         // Instantiate the primary configuration object.
-        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager, configurationTemplateManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(configurationTemplateManager.getTemplateOwnerPath(path), configurationReferenceManager, configurationTemplateManager);
         Configuration instance = (Configuration) instantiator.instantiate(type, record);
 
         // Instantiate and execute the check handler.

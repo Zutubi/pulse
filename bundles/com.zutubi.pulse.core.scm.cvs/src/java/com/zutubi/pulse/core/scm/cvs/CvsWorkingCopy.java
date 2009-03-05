@@ -62,7 +62,7 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
 
         UpdateHandler updateHandler = new UpdateHandler();
 
-        CvsRevision cvsRevision = revision == null ? new CvsRevision(null, branch, null, new Date()) : new CvsRevision(revision.getRevisionString());
+        CvsRevision cvsRevision = revision == null ? new CvsRevision(null, branch, null, null) : new CvsRevision(revision.getRevisionString());
         getCore(context).update(context.getBase(), cvsRevision, updateHandler);
         return CvsClient.convertRevision(cvsRevision);
     }

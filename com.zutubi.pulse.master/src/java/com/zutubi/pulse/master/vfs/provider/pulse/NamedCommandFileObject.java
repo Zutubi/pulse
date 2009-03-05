@@ -21,7 +21,7 @@ public class NamedCommandFileObject extends AbstractPulseFileObject implements C
         this.commandName = commandName;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
         return objectFactory.buildBean(NamedArtifactFileObject.class,

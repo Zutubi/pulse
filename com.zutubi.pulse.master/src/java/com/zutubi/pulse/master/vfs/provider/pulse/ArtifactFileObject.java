@@ -31,7 +31,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         this.artifactId = artifactId;
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName)
     {
         File base = getArtifactBase();
         File newBase = new File(base, fileName.getBaseName());

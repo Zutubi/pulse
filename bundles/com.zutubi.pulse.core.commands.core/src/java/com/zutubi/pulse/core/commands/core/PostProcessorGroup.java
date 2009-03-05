@@ -1,11 +1,13 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.engine.api.SelfReference;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -13,35 +15,44 @@ import java.util.List;
  * A group of post-processors.  Simply applies all processors in the group in
  * order.
  */
-public class PostProcessorGroup extends SelfReference implements PostProcessor
+public class PostProcessorGroup implements PostProcessor
 {
-    private List<PostProcessor> processors = new LinkedList<PostProcessor>();
+    private PostProcessorFactory postProcessorFactory;
+    private PostProcessorGroupConfiguration config;
+
+    public PostProcessorGroup(PostProcessorGroupConfiguration config)
+    {
+        this.config = config;
+    }
+
+    public PostProcessorGroupConfiguration getConfig()
+    {
+        return config;
+    }
+
+    protected PostProcessor createChildProcessor(PostProcessorConfiguration childConfig)
+    {
+        return postProcessorFactory.create(childConfig);
+    }
 
     public void process(File artifactFile, PostProcessorContext ppContext)
     {
+        List<PostProcessor> processors = CollectionUtils.map(config.getProcessors().values(), new Mapping<PostProcessorConfiguration, PostProcessor>()
+        {
+            public PostProcessor map(PostProcessorConfiguration childConfig)
+            {
+                return createChildProcessor(childConfig);
+            }
+        });
+
         for (PostProcessor processor : processors)
         {
             processor.process(artifactFile, ppContext);
         }
     }
 
-    public void add(PostProcessor processor)
+    public void setPostProcessorFactory(PostProcessorFactory postProcessorFactory)
     {
-        processors.add(processor);
-    }
-
-    public int size()
-    {
-        return processors.size();
-    }
-
-    public List<PostProcessor> getProcessors()
-    {
-        return processors;
-    }
-
-    public PostProcessor get(int index)
-    {
-        return processors.get(index);
+        this.postProcessorFactory = postProcessorFactory;
     }
 }

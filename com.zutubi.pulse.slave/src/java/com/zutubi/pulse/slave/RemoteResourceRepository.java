@@ -1,7 +1,7 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.servercore.services.MasterService;
@@ -32,7 +32,7 @@ public class RemoteResourceRepository implements ResourceRepository
         String name = requirement.getResource();
         String version = requirement.getVersion();
         
-        Resource r = getResource(name);
+        ResourceConfiguration r = getResource(name);
         if (r == null)
         {
             return false;
@@ -46,7 +46,7 @@ public class RemoteResourceRepository implements ResourceRepository
         return getResource(name) != null;
     }
 
-    public Resource getResource(String name)
+    public ResourceConfiguration getResource(String name)
     {
         try
         {

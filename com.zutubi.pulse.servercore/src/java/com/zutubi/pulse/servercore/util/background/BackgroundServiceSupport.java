@@ -2,9 +2,7 @@ package com.zutubi.pulse.servercore.util.background;
 
 import com.zutubi.pulse.core.Stoppable;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -23,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class BackgroundServiceSupport implements Stoppable
 {
-    private ExecutorService executorService;
+    private ThreadPoolExecutor executorService;
     private AtomicInteger nextId = new AtomicInteger(1);
     private String serviceName;
 
@@ -46,15 +44,21 @@ public class BackgroundServiceSupport implements Stoppable
      */
     public void init()
     {
-        executorService = Executors.newCachedThreadPool(new ThreadFactory()
-        {
-            public Thread newThread(Runnable r)
-            {
-                Thread thread = threadFactory.newThread(r);
-                thread.setName(serviceName + " Service Worker " + nextId.getAndIncrement());
-                return thread;
-            }
-        });
+        executorService = new ThreadPoolExecutor(
+                0,
+                Integer.MAX_VALUE,
+                60L,
+                TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>(),
+                new ThreadFactory()
+                {
+                    public Thread newThread(Runnable r)
+                    {
+                        Thread thread = threadFactory.newThread(r);
+                        thread.setName(serviceName + " Service Worker " + nextId.getAndIncrement());
+                        return thread;
+                    }
+                });
     }
 
     /**
@@ -75,6 +79,7 @@ public class BackgroundServiceSupport implements Stoppable
      */
     public void stop(boolean force)
     {
+        executorService.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         if (force)
         {
             executorService.shutdownNow();

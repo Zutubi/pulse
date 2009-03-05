@@ -15,7 +15,7 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
 {
     public CppUnitReportPostProcessorTest()
     {
-        super(new CppUnitReportPostProcessor());
+        super(new CppUnitReportPostProcessor(new CppUnitReportPostProcessorConfiguration()));
     }
 
     protected File getOutputDir() throws URISyntaxException
@@ -70,7 +70,7 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
 
     public void testParentSuite() throws Exception
     {
-        pp.setSuite("parent");
+        pp.getConfig().setSuite("parent");
         PersistentTestSuiteResult tests = runProcessor("basic");
 
         List<PersistentTestSuiteResult> topLevelSuites = tests.getSuites();

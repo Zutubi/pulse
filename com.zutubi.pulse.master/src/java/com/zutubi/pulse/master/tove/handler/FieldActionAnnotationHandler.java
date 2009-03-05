@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
+import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.TextUtils;
@@ -40,7 +40,7 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
         }
     }
 
-    private boolean satisfied(Class<Object> filterClass, FieldDescriptor fieldDescriptor, FieldAction fieldAction) throws Exception
+    private boolean satisfied(Class<Object> filterClass, FieldDescriptor fieldDescriptor, FieldAction fieldAction)
     {
         if(!FieldActionPredicate.class.isAssignableFrom(filterClass))
         {

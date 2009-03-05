@@ -87,7 +87,7 @@ public class PrimitiveType extends SimpleType implements Type
         }
     }
 
-    public Object toXmlRpc(Object data) throws TypeException
+    public Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         if(data == null)
         {

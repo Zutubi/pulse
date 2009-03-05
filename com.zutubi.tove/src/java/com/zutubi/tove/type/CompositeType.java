@@ -23,7 +23,7 @@ public class CompositeType extends AbstractType implements ComplexType
 {
     private static final Logger LOG = Logger.getLogger(CompositeType.class);
 
-    private static final String XML_RPC_SYMBOLIC_NAME = "meta.symbolicName";
+    public static final String XML_RPC_SYMBOLIC_NAME = "meta.symbolicName";
 
     private List<Annotation> annotations = new LinkedList<Annotation>();
     /**
@@ -335,21 +335,16 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private void registerSubtype(CompositeType type, boolean internal, boolean direct) throws TypeException
     {
-        if (!isExtendable())
-        {
-            throw new TypeException("Class '" + getClass().getName() + "' is not extendable");
-        }
-
         if (!this.getClazz().isAssignableFrom(type.getClazz()))
         {
             throw new TypeException("Extension class '" + type.getClazz().getName() + "' is not a subtype of '" + getClazz().getName() + "'");
         }
 
         // All of our concrete descendents get registered on the extensions
-        // list.
-        if (!type.isExtendable())
+        // list, but only if we are not concrete.
+        if (isExtendable() && !type.isExtendable())
         {
-            if(internal)
+            if (internal)
             {
                 internalExtensions.add(type);
             }
@@ -496,7 +491,7 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
-    public Hashtable<String, Object> toXmlRpc(Object data) throws TypeException
+    public Hashtable<String, Object> toXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
         if (data == null)
         {
@@ -514,7 +509,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
                 for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
                 {
-                    propertyToXmlRpc(entry, record, result);
+                    propertyToXmlRpc(entry, templateOwnerPath, record, result);
                 }
 
                 return result;
@@ -523,17 +518,17 @@ public class CompositeType extends AbstractType implements ComplexType
             {
                 // Actually a derived type
                 CompositeType actualType = typeRegistry.getType(record.getSymbolicName());
-                return actualType.toXmlRpc(data);
+                return actualType.toXmlRpc(templateOwnerPath, data);
             }
         }
     }
 
-    private void propertyToXmlRpc(Map.Entry<String, TypeProperty> entry, Record record, Hashtable<String, Object> result) throws TypeException
+    private void propertyToXmlRpc(Map.Entry<String, TypeProperty> entry, String templateOwnerPath, Record record, Hashtable<String, Object> result) throws TypeException
     {
         Object propertyValue = record.get(entry.getKey());
         if (propertyValue != null)
         {
-            result.put(entry.getKey(), entry.getValue().getType().toXmlRpc(propertyValue));
+            result.put(entry.getKey(), entry.getValue().getType().toXmlRpc(templateOwnerPath, propertyValue));
         }
     }
 

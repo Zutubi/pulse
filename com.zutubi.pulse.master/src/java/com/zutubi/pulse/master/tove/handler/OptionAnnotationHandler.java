@@ -1,12 +1,11 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.pulse.master.tove.config.EmptyOptionProvider;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.pulse.master.tove.model.Descriptor;
-import com.zutubi.pulse.master.tove.handler.OptionProvider;
-import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.EnumType;
 import com.zutubi.tove.type.TypeProperty;

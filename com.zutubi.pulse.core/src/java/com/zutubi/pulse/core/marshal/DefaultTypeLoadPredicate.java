@@ -1,0 +1,28 @@
+package com.zutubi.pulse.core.marshal;
+
+import nu.xom.Element;
+
+/**
+ */
+public class DefaultTypeLoadPredicate implements TypeLoadPredicate
+{
+    public boolean loadType(Object type, Element element)
+    {
+        return true;
+    }
+
+    public boolean resolveReferences(Object type, Element element)
+    {
+        return true;
+    }
+
+    public boolean allowUnresolved(Object type, Element element)
+    {
+        return false;
+    }
+
+    public boolean validate(Object type, Element element)
+    {
+        return true;
+    }
+}

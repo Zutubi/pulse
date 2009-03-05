@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.resources;
 
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
@@ -17,15 +17,15 @@ public class SimpleBinaryResourceBuilder implements ResourceBuilder
         this.resourceName = resourceName;
     }
 
-    public Resource buildResource(File file)
+    public ResourceConfiguration buildResource(File file)
     {
-        Resource resource = new Resource(resourceName);
-        resource.addProperty(new ResourceProperty(resourceName + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_BINARY, FileSystemUtils.normaliseSeparators(file.getAbsolutePath()), false, false, false));
+        ResourceConfiguration resource = new ResourceConfiguration(resourceName);
+        resource.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_BINARY, FileSystemUtils.normaliseSeparators(file.getAbsolutePath()), false, false, false));
 
         File binaryDir = file.getParentFile();
         if (binaryDir != null)
         {
-            resource.addProperty(new ResourceProperty(resourceName + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_BINARY_DIRECTORY, FileSystemUtils.normaliseSeparators(binaryDir.getAbsolutePath()), false, false, false));
+            resource.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_BINARY_DIRECTORY, FileSystemUtils.normaliseSeparators(binaryDir.getAbsolutePath()), false, false, false));
         }
         return resource;
     }

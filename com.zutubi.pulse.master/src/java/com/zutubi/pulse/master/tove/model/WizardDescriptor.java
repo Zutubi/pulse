@@ -1,15 +1,12 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.pulse.master.tove.model.HiddenFieldDescriptor;
-import com.zutubi.pulse.master.tove.model.Wizard;
-import com.zutubi.tove.type.record.Record;
-import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.pulse.master.tove.model.AbstractParameterised;
+import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 import com.zutubi.pulse.master.tove.wizard.WizardState;
 import com.zutubi.pulse.master.tove.wizard.WizardTransition;
-import com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardInterceptor;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
@@ -47,7 +44,7 @@ public class WizardDescriptor extends AbstractParameterised implements Descripto
         formDescriptor.setAjax(ajax);
         formDescriptor.setNamespace(namespace);
 
-        if (wizardInstance.isTemplate() && record instanceof TemplateRecord)
+        if (record instanceof TemplateRecord)
         {
             TemplateFormDecorator templateDecorator = new TemplateFormDecorator((TemplateRecord) record);
             templateDecorator.decorate(formDescriptor);

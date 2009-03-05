@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.tove.wizard;
 import com.zutubi.tove.type.CompositeType;
 
 /**
- * Interface for all states of an {@link com.zutubi.pulse.master.tove.wizard.webwork.AbstractTypeWizard}.
+ * Interface for all states of an {@link AbstractTypeWizard}.
  */
 public interface TypeWizardState extends WizardState
 {

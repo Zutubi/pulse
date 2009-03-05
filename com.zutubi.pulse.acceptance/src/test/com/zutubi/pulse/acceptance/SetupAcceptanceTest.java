@@ -110,6 +110,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
         SetupDatabaseTypeForm form = new SetupDatabaseTypeForm(selenium);
         assertTrue(form.isFormPresent());
+        assertFalse("Detail fields should be disabled for embedded database", form.isEditable("host"));
         form.nextFormElements("EMBEDDED", null, null, null, null, null, null);
     }
 

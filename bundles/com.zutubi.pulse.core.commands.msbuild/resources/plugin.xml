@@ -2,10 +2,12 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.commands">
-        <command name="msbuild" class="com.zutubi.pulse.core.commands.msbuild.MsBuildCommand"/>
+        <command name="msbuild" class="com.zutubi.pulse.core.commands.msbuild.MsBuildCommandConfiguration">
+            <resource name="msbuild" optional="true"/>
+        </command>
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="msbuild.pp" display-name="msbuild output processor"
-                        default-fragment="true" class="com.zutubi.pulse.core.commands.msbuild.MsBuildPostProcessor"/>
+                        default-processor="true" class="com.zutubi.pulse.core.commands.msbuild.MsBuildPostProcessorConfiguration"/>
     </extension>
 </plugin>

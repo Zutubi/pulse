@@ -56,7 +56,7 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
 
         Hashtable<String,Object> antType = xmlRpcHelper.getAntConfig();
         antType.put(Constants.Project.AntType.ARGUMENTS, getFileArgument(waitFile));
-        xmlRpcHelper.insertProject(childProject, templateProject, false, null, antType);
+        xmlRpcHelper.insertSingleCommandProject(childProject, templateProject, false, null, antType);
 
         try
         {

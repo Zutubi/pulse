@@ -1,8 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.util.RandomUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.RandomUtils;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Vector;
 import java.util.Hashtable;
@@ -17,6 +22,7 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
     public static final String SYMBOLIC_NAME_KEY = XmlRpcHelper.SYMBOLIC_NAME_KEY;
 
     protected XmlRpcHelper xmlRpcHelper;
+    protected String baseUrl;
 
     public BaseXmlRpcAcceptanceTest()
     {
@@ -39,7 +45,8 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
             port = Integer.parseInt(portProperty);
         }
 
-        xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", port, "/xmlrpc"));
+        baseUrl = "http://localhost:" + port + "/";
+        xmlRpcHelper = new XmlRpcHelper(new URL(baseUrl + "xmlrpc"));
     }
 
     protected String randomName()
@@ -124,5 +131,25 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
     {
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
         return (String) build.get("status");
+    }
+
+    protected String downloadAsAdmin(String url) throws IOException
+    {
+        HttpClient client = new HttpClient();
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
+        client.getState().setCredentials(new AuthScope(null, -1), credentials);
+        client.getParams().setAuthenticationPreemptive(true);
+
+        GetMethod get = new GetMethod(url);
+        get.setDoAuthentication(true);
+        try
+        {
+            client.executeMethod(get);
+            return get.getResponseBodyAsString();
+        }
+        finally
+        {
+            get.releaseConnection();
+        }
     }
 }

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.resources;
 
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -17,7 +17,7 @@ public class MsBuildResourceLocator implements ResourceLocator
 {
     private static final Logger LOG = Logger.getLogger(MsBuildResourceLocator.class);
 
-    public List<Resource> locate()
+    public List<ResourceConfiguration> locate()
     {
         if (!SystemUtils.IS_WINDOWS)
         {
@@ -40,15 +40,15 @@ public class MsBuildResourceLocator implements ResourceLocator
 
         FileSystemResourceLocator locator = new FileSystemResourceLocator(fileLocator, new ResourceBuilder()
         {
-            public Resource buildResource(File home)
+            public ResourceConfiguration buildResource(File home)
             {
                 try
                 {
-                    Resource resource = new Resource("msbuild");
-                    ResourceVersion version = new ResourceVersion(home.getName().substring(1));
+                    ResourceConfiguration resource = new ResourceConfiguration("msbuild");
+                    ResourceVersionConfiguration version = new ResourceVersionConfiguration(home.getName().substring(1));
                     resource.add(version);
                     resource.setDefaultVersion(version.getValue());
-                    version.addProperty(new ResourceProperty("msbuild.bin", FileSystemUtils.normaliseSeparators(getMsBuildBinary(home).getCanonicalPath()), false, false, false));
+                    version.addProperty(new ResourcePropertyConfiguration("msbuild.bin", FileSystemUtils.normaliseSeparators(getMsBuildBinary(home).getCanonicalPath()), false, false, false));
                     return resource;
                 }
                 catch (Exception e)

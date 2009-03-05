@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
@@ -43,6 +45,7 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private ScmConfiguration scm;
     @Essential
     private TypeConfiguration type;
+    private Map<String, PostProcessorConfiguration> postProcessors = new HashMap<String, PostProcessorConfiguration>();
 
     private String org;
 
@@ -62,7 +65,6 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
 
     private List<ProjectAclConfiguration> permissions = new LinkedList<ProjectAclConfiguration>();
 
-    @Transient
     private Map<String, Object> extensions = new HashMap<String, Object>();
 
     @Ordered
@@ -186,6 +188,16 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     public void setType(TypeConfiguration type)
     {
         this.type = type;
+    }
+
+    public Map<String, PostProcessorConfiguration> getPostProcessors()
+    {
+        return postProcessors;
+    }
+
+    public void setPostProcessors(Map<String, PostProcessorConfiguration> postProcessors)
+    {
+        this.postProcessors = postProcessors;
     }
 
     public Map<String, BuildHookConfiguration> getBuildHooks()

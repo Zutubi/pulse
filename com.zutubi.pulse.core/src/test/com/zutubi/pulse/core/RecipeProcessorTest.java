@@ -4,15 +4,25 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.commands.DefaultCommandFactory;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
+import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.PersistentFeature;
+import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
@@ -31,14 +41,15 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private File outputDir;
     private RecipePaths paths;
     private RecipeProcessor recipeProcessor;
+    private EventManager eventManager;
+    private WiringObjectFactory objectFactory;
+    private DefaultCommandFactory commandFactory;
+    private DefaultPostProcessorFactory postProcessorFactory;
     private BlockingQueue<Event> events;
     private boolean waitMode = false;
     private Semaphore semaphore = new Semaphore(0);
-    private ResourceRepository resourceRepository = new FileResourceRepository();
-
-    // these two fields can not be made local because they are used by the WiringObjectFactories initProperties
-    private EventManager eventManager;
-    private WiringObjectFactory objectFactory;
+    private ResourceRepository resourceRepository = new InMemoryResourceRepository();
+    private TypeRegistry typeRegistry;
 
     public void setUp() throws Exception
     {
@@ -53,23 +64,42 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         events = new LinkedBlockingQueue<Event>(10);
         eventManager.register(this);
 
+        typeRegistry = new TypeRegistry();
+        typeRegistry.register(ProjectRecipesConfiguration.class);
+        typeRegistry.register(RecipeConfiguration.class);
+        typeRegistry.register(PropertyConfiguration.class);
+        typeRegistry.register(DirectoryOutputConfiguration.class);
+        typeRegistry.register(LinkOutputConfiguration.class);
+        typeRegistry.register(FileOutputConfiguration.class);
+        typeRegistry.register(NoopCommandConfiguration.class);
+        typeRegistry.register(FailureCommandConfiguration.class);
+        typeRegistry.register(ExceptionCommandConfiguration.class);
+        typeRegistry.register(UnexpectedExceptionCommandConfiguration.class);
+
         objectFactory = new WiringObjectFactory();
+        commandFactory = new DefaultCommandFactory();
+        commandFactory.setObjectFactory(objectFactory);
+        postProcessorFactory = new DefaultPostProcessorFactory();
+        postProcessorFactory.setObjectFactory(objectFactory);
         objectFactory.initProperties(this);
-        
+
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
+        fileLoaderFactory.setTypeRegistry(typeRegistry);
         fileLoaderFactory.setObjectFactory(objectFactory);
-        fileLoaderFactory.register("noop", NoopCommand.class);
-        fileLoaderFactory.register("failure", FailureCommand.class);
-        fileLoaderFactory.register("exception", ExceptionCommand.class);
-        fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommand.class);
+        fileLoaderFactory.init();
+        fileLoaderFactory.register("noop", NoopCommandConfiguration.class);
+        fileLoaderFactory.register("failure", FailureCommandConfiguration.class);
+        fileLoaderFactory.register("exception", ExceptionCommandConfiguration.class);
+        fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommandConfiguration.class);
 
         recipeProcessor.setFileLoaderFactory(fileLoaderFactory);
+        recipeProcessor.setObjectFactory(objectFactory);
 
         // we know that we need the dependency commands to be executed, but we do not want to tie into the
         // dependency system during this test, so we replace the default commands with noop commands.
         IvySupport ivySupport = mock(IvySupport.class);
-        stub(ivySupport.getRetrieveCommandWrapper()).toReturn(new NoopCommand("retrieve"));
-        stub(ivySupport.getPublishCommandWrapper((RecipeRequest) anyObject())).toReturn(new NoopCommand("publish"));
+        stub(ivySupport.getRetrieveCommand()).toReturn(new NoopCommandConfiguration("retrieve"));
+        stub(ivySupport.getPublishCommand((RecipeRequest) anyObject())).toReturn(new NoopCommandConfiguration("publish"));
         IvyProvider provider = mock(IvyProvider.class);
         stub(provider.getIvySupport()).toReturn(ivySupport);
         recipeProcessor.setIvyProvider(provider);
@@ -401,7 +431,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
             // We ignore status events as they do not affect behaviour.
             return;
         }
-        
+
         events.add(evt);
 
         if (waitMode)
@@ -424,7 +454,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public class SimpleBootstrapper extends BootstrapperSupport
     {
-        public void bootstrap(PulseExecutionContext context) throws BuildException
+        public void bootstrap(CommandContext context) throws BuildException
         {
             // Do nothing.
         }
@@ -439,7 +469,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
             this.exception = exception;
         }
 
-        public void bootstrap(PulseExecutionContext context) throws BuildException
+        public void bootstrap(CommandContext context) throws BuildException
         {
             throw exception;
         }

@@ -123,14 +123,21 @@ public class DefaultScheduler implements Scheduler
             throw new SchedulingException("Trigger is already scheduled.");
         }
 
-        // assosiate trigger and task so that task can be retrieved when trigger fires.
         trigger.setState(TriggerState.SCHEDULED);
         triggerDao.save(trigger);
 
-        if (started)
+        try
         {
-            SchedulerStrategy impl = getStrategy(trigger);
-            impl.schedule(trigger);
+            if (started)
+            {
+                SchedulerStrategy impl = getStrategy(trigger);
+                impl.schedule(trigger);
+            }
+        }
+        catch (SchedulingException e)
+        {
+            triggerDao.delete(trigger);
+            throw new SchedulingException(e);
         }
     }
 

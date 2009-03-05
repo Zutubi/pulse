@@ -25,7 +25,8 @@ public class RecordUtils
     /**
      * Returns true if the two given simple values are equal.  This handles
      * both nulls and the different types of object which may be present as
-     * simple values.
+     * simple values.  It also treats null and the empty string the same, as
+     * web UIs have no way to specify a null string.
      *
      * @param value      the first value
      * @param otherValue the second value
@@ -35,11 +36,11 @@ public class RecordUtils
     {
         if(value == null)
         {
-            return otherValue == null;
+            return otherValue == null || isEmptyString(otherValue);
         }
         else if(otherValue == null)
         {
-            return false;
+            return isEmptyString(value);
         }
 
         if (value.getClass() != otherValue.getClass())
@@ -55,5 +56,10 @@ public class RecordUtils
         {
             return value.equals(otherValue);
         }
+    }
+
+    private static boolean isEmptyString(Object o)
+    {
+        return (o instanceof String) && ((String) o).length() == 0;
     }
 }

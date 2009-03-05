@@ -17,7 +17,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
 {
     public JUnitReportPostProcessorTest()
     {
-        super(new JUnitReportPostProcessor());
+        super(new JUnitReportPostProcessor(new JUnitReportPostProcessorConfiguration()));
     }
 
     protected File getOutputDir() throws Exception
@@ -63,7 +63,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
 
     public void testCustom() throws Exception
     {
-        JUnitReportPostProcessor pp = (JUnitReportPostProcessor) this.pp;
+        JUnitReportPostProcessorConfiguration pp = (JUnitReportPostProcessorConfiguration) this.pp.getConfig();
         pp.setSuiteElement("customtestsuite");
         pp.setCaseElement("customtestcase");
         pp.setFailureElement("customfailure");
@@ -112,7 +112,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
     {
         CommandResult result = new CommandResult("test");
         result.commence();
-        pp.setFailOnFailure(false);
+        ((JUnitReportPostProcessorConfiguration) pp.getConfig()).setFailOnFailure(false);
         failOnFailureHelper(result);
 
         assertFalse(result.failed());

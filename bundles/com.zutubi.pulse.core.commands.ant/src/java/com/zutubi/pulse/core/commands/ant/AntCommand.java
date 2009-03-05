@@ -1,60 +1,23 @@
 package com.zutubi.pulse.core.commands.ant;
 
-import com.zutubi.pulse.core.ProcessArtifact;
-import com.zutubi.pulse.core.commands.core.ExecutableCommand;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.util.SystemUtils;
+import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  */
-public class AntCommand extends ExecutableCommand
+public class AntCommand extends NamedArgumentCommand
 {
-    private String buildFile;
-    private String targets;
-
-    public AntCommand()
+    public AntCommand(AntCommandConfiguration configuration)
     {
-        super("ant.bin", SystemUtils.IS_WINDOWS ? "ant.bat" : "ant");
+        super(configuration);
     }
 
-    public void execute(ExecutionContext context, CommandResult cmdResult)
+    @Override
+    protected List<Class<? extends PostProcessorConfiguration>> getDefaultPostProcessorTypes()
     {
-        if (buildFile != null)
-        {
-            addArguments("-f", buildFile);
-            cmdResult.getProperties().put("build file", buildFile);
-        }
-
-        if (targets != null)
-        {
-            addArguments(targets.split(" +"));
-            cmdResult.getProperties().put("targets", targets);
-        }
-
-        ProcessArtifact pa = createProcess();
-        pa.setProcessor(new AntPostProcessor("ant.pp"));
-
-        super.execute(context, cmdResult);
-    }
-
-    public String getBuildFile()
-    {
-        return buildFile;
-    }
-
-    public void setBuildFile(String buildFile)
-    {
-        this.buildFile = buildFile;
-    }
-
-    public String getTargets()
-    {
-        return targets;
-    }
-
-    public void setTargets(String targets)
-    {
-        this.targets = targets;
+        return Arrays.<Class<? extends PostProcessorConfiguration>>asList(AntPostProcessorConfiguration.class);
     }
 }

@@ -4,12 +4,11 @@ import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class ReflectionUtilsTest extends ZutubiTestCase
 {
@@ -666,6 +665,236 @@ public class ReflectionUtilsTest extends ZutubiTestCase
         public Object getPublicField()
         {
             return publicField;
+        }
+    }
+
+    public void testGetBeanPropertiesSimple() throws IntrospectionException
+    {
+        beanPropertiesHelper(BeanSimple.class, "simpleProperty");
+    }
+
+    public void testGetBeanPropertiesExtendsSimple() throws IntrospectionException
+    {
+        beanPropertiesHelper(BeanExtendsSimple.class, "extendsSimpleProperty", "simpleProperty");
+    }
+
+    public void testGetBeanPropertiesInterface() throws IntrospectionException
+    {
+        beanPropertiesHelper(BeanInterface.class, "interfaceProperty");
+    }
+
+    public void testGetBeanPropertiesImplements() throws IntrospectionException
+    {
+        beanPropertiesHelper(BeanImplements.class, "implementsProperty", "interfaceProperty");
+    }
+
+    public void testGetBeanPropertiesExtendsImplements() throws IntrospectionException
+    {
+        beanPropertiesHelper(BeanExtendsImplements.class, "extendsImplementsProperty", "implementsProperty", "interfaceProperty");
+    }
+
+    public void testGetBeanPropertiesSubInterface() throws IntrospectionException
+    {
+        beanPropertiesHelper(BeanSubInterface.class, "interfaceProperty", "subInterfaceProperty");
+    }
+
+    public void testGetBeanPropertiesImplementsSub() throws IntrospectionException
+    {
+        beanPropertiesHelper(BeanImplementsSub.class, "implementsSubProperty", "interfaceProperty", "subInterfaceProperty");
+    }
+
+    public void testGetBeanPropertiesExtendsImplementsSub() throws IntrospectionException
+    {
+        beanPropertiesHelper(BeanExtendsImplementsSub.class, "extendsImplementsSubProperty", "implementsSubProperty", "interfaceProperty", "subInterfaceProperty");
+    }
+
+    public void testGetBeanPropertiesExtendsAndImplements() throws IntrospectionException
+    {
+        beanPropertiesHelper(BeanExtendsAndImplements.class, "extendsAndImplementsProperty", "interfaceProperty", "simpleProperty");
+    }
+
+    public void testGetBeanPropertiesDeclaringClassOverrides() throws IntrospectionException
+    {
+        PropertyDescriptor[] properties = ReflectionUtils.getBeanProperties(BeanOverridesGetter.class);
+        assertEquals(1, properties.length);
+        assertEquals(BeanOverridesGetter.class, properties[0].getReadMethod().getDeclaringClass());
+    }
+
+    public void testGetBeanPropertiesDeclaringClassImplements() throws IntrospectionException
+    {
+        PropertyDescriptor[] properties = ReflectionUtils.getBeanProperties(BeanImplementsGetterAndSetter.class);
+        assertEquals(1, properties.length);
+        assertEquals(BeanImplementsGetterAndSetter.class, properties[0].getReadMethod().getDeclaringClass());
+        assertEquals(BeanImplementsGetterAndSetter.class, properties[0].getWriteMethod().getDeclaringClass());
+    }
+
+    private void beanPropertiesHelper(final Class<?> clazz, String... expectedNames) throws IntrospectionException
+    {
+        PropertyDescriptor[] properties = ReflectionUtils.getBeanProperties(clazz);
+        String[] names = CollectionUtils.mapToArray(properties, new Mapping<PropertyDescriptor, String>()
+        {
+            public String map(PropertyDescriptor propertyDescriptor)
+            {
+                return propertyDescriptor.getName();
+            }
+        }, new String[properties.length]);
+
+        assertEquals(expectedNames.length, properties.length);
+
+        Sort.StringComparator stringComparator = new Sort.StringComparator();
+        Arrays.sort(expectedNames, stringComparator);
+        Arrays.sort(names, stringComparator);
+        assertTrue(Arrays.equals(expectedNames, names));
+    }
+
+    public static class PropertyComparator implements Comparator<PropertyDescriptor>
+    {
+        private static final Comparator<String> cmp = new Sort.StringComparator();
+
+        public int compare(PropertyDescriptor o1, PropertyDescriptor o2)
+        {
+            return cmp.compare(o1.getName(), o2.getName());
+        }
+    }
+
+    public static class BeanSimple
+    {
+        private int simpleProperty;
+
+        public int getSimpleProperty()
+        {
+            return simpleProperty;
+        }
+
+        public void setSimpleProperty(int simpleProperty)
+        {
+            this.simpleProperty = simpleProperty;
+        }
+    }
+
+    public static class BeanExtendsSimple extends BeanSimple
+    {
+        private int extendsSimpleProperty;
+
+        public int getExtendsSimpleProperty()
+        {
+            return extendsSimpleProperty;
+        }
+
+        public void setExtendsSimpleProperty(int extendsSimpleProperty)
+        {
+            this.extendsSimpleProperty = extendsSimpleProperty;
+        }
+    }
+
+    public static class BeanOverridesGetter extends BeanSimple
+    {
+        @Override
+        public int getSimpleProperty()
+        {
+            return super.getSimpleProperty();
+        }
+    }
+
+    public static interface BeanInterface
+    {
+        int getInterfaceProperty();
+        void setInterfaceProperty(int i);
+    }
+
+    public static class BeanImplementsGetterAndSetter implements BeanInterface
+    {
+        private int interfaceProperty;
+
+        public int getInterfaceProperty()
+        {
+            return interfaceProperty;
+        }
+
+        public void setInterfaceProperty(int interfaceProperty)
+        {
+            this.interfaceProperty = interfaceProperty;
+        }
+    }
+
+    public abstract static class BeanImplements implements BeanInterface
+    {
+        private int implementsProperty;
+
+        public int getImplementsProperty()
+        {
+            return implementsProperty;
+        }
+
+        public void setImplementsProperty(int implementsProperty)
+        {
+            this.implementsProperty = implementsProperty;
+        }
+    }
+
+    public static abstract class BeanExtendsImplements extends BeanImplements
+    {
+        private int extendsImplementsProperty;
+
+        public int getExtendsImplementsProperty()
+        {
+            return extendsImplementsProperty;
+        }
+
+        public void setExtendsImplementsProperty(int extendsImplementsProperty)
+        {
+            this.extendsImplementsProperty = extendsImplementsProperty;
+        }
+    }
+
+    public static interface BeanSubInterface extends BeanInterface
+    {
+        int getSubInterfaceProperty();
+        void setSubInterfaceProperty(int i);
+    }
+
+    public abstract static class BeanImplementsSub implements BeanSubInterface
+    {
+        private int implementsSubProperty;
+
+        public int getImplementsSubProperty()
+        {
+            return implementsSubProperty;
+        }
+
+        public void setImplementsSubProperty(int implementsSubProperty)
+        {
+            this.implementsSubProperty = implementsSubProperty;
+        }
+    }
+
+    public static abstract class BeanExtendsImplementsSub extends BeanImplementsSub
+    {
+        private int extendsImplementsSubProperty;
+
+        public int getExtendsImplementsSubProperty()
+        {
+            return extendsImplementsSubProperty;
+        }
+
+        public void setExtendsImplementsSubProperty(int extendsImplementsSubProperty)
+        {
+            this.extendsImplementsSubProperty = extendsImplementsSubProperty;
+        }
+    }
+
+    public static abstract class BeanExtendsAndImplements extends BeanSimple implements BeanInterface
+    {
+        private int extendsAndImplementsProperty;
+
+        public int getExtendsAndImplementsProperty()
+        {
+            return extendsAndImplementsProperty;
+        }
+
+        public void setExtendsAndImplementsProperty(int extendsAndImplementsProperty)
+        {
+            this.extendsAndImplementsProperty = extendsAndImplementsProperty;
         }
     }
 }

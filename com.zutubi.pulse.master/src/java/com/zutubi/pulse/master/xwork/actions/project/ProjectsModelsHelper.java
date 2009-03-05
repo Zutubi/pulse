@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.NamedEntityComparator;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
@@ -25,16 +25,16 @@ public class ProjectsModelsHelper
     private BuildManager buildManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration)
+    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, boolean showUngrouped)
     {
-        return createProjectsModels(configuration, new TruePredicate<Project>(), new TruePredicate<ProjectGroup>());
+        return createProjectsModels(configuration, new TruePredicate<Project>(), new TruePredicate<ProjectGroup>(), showUngrouped);
     }
     
-    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, Predicate<Project> projectPredicate, Predicate<ProjectGroup> groupPredicate)
+    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, Predicate<Project> projectPredicate, Predicate<ProjectGroup> groupPredicate, boolean showUngrouped)
     {
         List<Project> projects = CollectionUtils.filter(projectManager.getProjects(false), projectPredicate);
         List<ProjectGroup> groups = CollectionUtils.filter(projectManager.getAllProjectGroups(), groupPredicate);
-        TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(ConfigurationRegistry.PROJECTS_SCOPE);
+        TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(MasterConfigurationRegistry.PROJECTS_SCOPE);
         final Comparator<String> stringComparator = new Sort.StringComparator();
 
         Collections.sort(groups, new Comparator<ProjectGroup>()
@@ -57,7 +57,7 @@ public class ProjectsModelsHelper
             }
         }
 
-        if (projects.size() > 0)
+        if (showUngrouped && projects.size() > 0)
         {
             Collections.sort(projects, new NamedEntityComparator());
 

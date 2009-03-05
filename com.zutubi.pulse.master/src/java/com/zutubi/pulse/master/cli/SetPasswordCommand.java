@@ -1,7 +1,10 @@
 package com.zutubi.pulse.master.cli;
 
 import com.zutubi.pulse.core.cli.HelpCommand;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.servercore.cli.AdminCommand;
+import com.zutubi.tove.type.CompositeType;
+import com.zutubi.tove.type.record.PathUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
@@ -10,6 +13,7 @@ import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
@@ -18,6 +22,8 @@ import java.util.Vector;
  */
 public class SetPasswordCommand extends AdminCommand
 {
+    private static final String ACTION_SET_PASSWORD = "setPassword";
+    
     private String user;
     private String password;
 
@@ -71,15 +77,19 @@ public class SetPasswordCommand extends AdminCommand
         if(args.length < 2)
         {
             HelpCommand helpCommand = new HelpCommand();
-            helpCommand.showHelp("setpassword", this);
+            helpCommand.showHelp(ACTION_SET_PASSWORD, this);
             return 1;
         }
         // process the command.
         setUser(args[0]);
         setPassword(args[1]);
 
-        xmlRpcClient.execute("RemoteApi.setPassword", new Vector<Object>(Arrays.asList(
-                adminToken, user, password)));
+        Hashtable<String, Object> setPassword = new Hashtable<String, Object>();
+        setPassword.put(CompositeType.XML_RPC_SYMBOLIC_NAME, "zutubi.setPasswordConfig");
+        setPassword.put("password", password);
+        setPassword.put("confirmPassword", password);
+        xmlRpcClient.execute("RemoteApi.doConfigActionWithArgument", new Vector<Object>(Arrays.asList(
+                adminToken, PathUtils.getPath(MasterConfigurationRegistry.USERS_SCOPE, user), ACTION_SET_PASSWORD, setPassword)));
         return 0;
     }
 

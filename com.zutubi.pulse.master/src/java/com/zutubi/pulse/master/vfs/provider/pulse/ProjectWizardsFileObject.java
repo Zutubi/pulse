@@ -13,7 +13,7 @@ public class ProjectWizardsFileObject extends AbstractPulseFileObject
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(FileName fileName)
     {
         // the fileName is the name of the parent project
         return objectFactory.buildBean(ProjectWizardFileObject.class,
