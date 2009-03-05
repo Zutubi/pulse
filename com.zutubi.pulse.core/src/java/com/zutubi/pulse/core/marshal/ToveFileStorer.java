@@ -4,7 +4,12 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.engine.api.Addable;
 import static com.zutubi.pulse.core.marshal.ToveFileUtils.*;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.Squeezers;
+import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.*;
@@ -14,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -117,23 +123,28 @@ public class ToveFileStorer
     private void storeCollection(Element element, Configuration configuration, CompositeType type, TypeProperty property)
     {
         Type itemType = property.getType().getTargetType();
-        if (itemType instanceof ReferenceType)
+        if (itemType instanceof SimpleType)
         {
-            ReferenceType referenceType = (ReferenceType) itemType;
-            CompositeType referencedType = referenceType.getReferencedType();
-            TypeProperty nameProperty = getReferenceNameProperty(type, property, referencedType);
-
             Addable addable = property.getAnnotation(Addable.class);
             if (addable == null)
             {
-                throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': reference collections must be annotated with @Addable");
+                throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': simple collections must be annotated with @Addable");
             }
 
-            for (Configuration item: getCollectionItems(configuration, property))
+            List<String> converted;
+            if (itemType instanceof ReferenceType)
+            {
+                converted = convertReferenceCollection(configuration, type, property);
+            }
+            else
+            {
+                converted = squeezeCollection(configuration, property);
+            }
+
+            for (String s: converted)
             {
                 Element itemElement = new Element(addable.value());
-                String referenceName = (String) getPropertyValue(item, nameProperty);
-                applyAddable(itemElement, addable, toReference(referenceName));
+                applyAddable(itemElement, addable, s);
                 element.appendChild(itemElement);
             }
         }
@@ -161,6 +172,49 @@ public class ToveFileStorer
         {
             throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': unsupported collection item type '" + itemType.getClazz().getName() + "'");
         }
+    }
+
+    private List<String> squeezeCollection(final Configuration configuration, final TypeProperty property)
+    {
+        Type itemType = property.getType().getTargetType();
+        final TypeSqueezer squeezer = Squeezers.findSqueezer(itemType.getClazz());
+        if (squeezer == null)
+        {
+            throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': no way to convert type '" + itemType.getClazz().getName() + "' to a string");
+        }
+
+        @SuppressWarnings({"unchecked"})
+        List<Object> items = (List<Object>) getPropertyValue(configuration, property);
+        return CollectionUtils.map(items, new Mapping<Object, String>()
+        {
+            public String map(Object o)
+            {
+                try
+                {
+                    return squeezer.squeeze(o);
+                }
+                catch (SqueezeException e)
+                {
+                    throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': " + e.getMessage(), e);
+                }
+            }
+        });
+    }
+
+    private List<String> convertReferenceCollection(Configuration configuration, CompositeType type, TypeProperty property)
+    {
+        ReferenceType referenceType = (ReferenceType) property.getType().getTargetType();
+        List<String> converted = new LinkedList<String>();
+        CompositeType referencedType = referenceType.getReferencedType();
+        TypeProperty nameProperty = getReferenceNameProperty(type, property, referencedType);
+
+        for (Configuration item: getCollectionItems(configuration, property))
+        {
+            String referenceName = (String) getPropertyValue(item, nameProperty);
+            converted.add(toReference(referenceName));
+        }
+
+        return converted;
     }
 
     private void applyAddable(Element element, Addable addable, String value)

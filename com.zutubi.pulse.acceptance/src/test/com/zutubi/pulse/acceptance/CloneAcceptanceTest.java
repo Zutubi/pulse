@@ -33,6 +33,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
+        xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
     protected void tearDown() throws Exception
