@@ -8,6 +8,25 @@ import java.io.File;
 
 public class ArtifactRepositoryTestUtils
 {
+    public static boolean waitUntilInRepository(String path, int timeout) throws IOException
+    {
+        File artifact = new File(getArtifactRepository(), path);
+        try
+        {
+            long startTime = System.currentTimeMillis();
+            while (!artifact.exists() && System.currentTimeMillis() - startTime < timeout)
+            {
+                Thread.sleep(200);
+            }
+            return artifact.exists();
+        }
+        catch (InterruptedException e)
+        {
+            // noop.            
+        }
+        return artifact.exists();
+    }
+
     public static boolean isInArtifactRepository(String path) throws IOException
     {
         return new File(getArtifactRepository(), path).exists();

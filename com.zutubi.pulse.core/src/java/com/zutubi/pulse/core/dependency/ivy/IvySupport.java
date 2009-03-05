@@ -10,6 +10,7 @@ import org.apache.ivy.core.deliver.DeliverOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.publish.PublishOptions;
 import org.apache.ivy.core.resolve.ResolveOptions;
+import org.apache.ivy.core.resolve.ResolveEngine;
 import org.apache.ivy.core.cache.ResolutionCacheManager;
 import org.apache.ivy.core.settings.IvySettings;
 
@@ -192,6 +193,11 @@ public class IvySupport
         return ivy.getSettings();
     }
 
+    public ResolveEngine getResolveEngine()
+    {
+        return ivy.getResolveEngine();
+    }
+
     public void setMessageLogger(MessageLogger logger)
     {
         ivy.getLoggerEngine().pushLogger(logger);
@@ -202,7 +208,7 @@ public class IvySupport
         return ivy.getResolutionCacheManager();
     }
 
-    private DependencyResolver getArtifactRepositoryResolver()
+    public DependencyResolver getArtifactRepositoryResolver()
     {
         return ivy.getSettings().getDefaultResolver();
     }

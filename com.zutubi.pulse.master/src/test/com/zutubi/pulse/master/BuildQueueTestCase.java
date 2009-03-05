@@ -113,11 +113,12 @@ public class BuildQueueTestCase extends PulseTestCase
         }
     }
 
-    protected Project createProject()
+    protected Project createProject(String projectName)
     {
         Project project = new Project();
         project.setId(nextId.getAndIncrement());
         ProjectConfiguration projectConfiguration = new ProjectConfiguration();
+        projectConfiguration.setName(projectName);
         projectConfiguration.setScm(new MockScmConfiguration());
         projectConfiguration.setProjectId(project.getId());
         project.setConfig(projectConfiguration);

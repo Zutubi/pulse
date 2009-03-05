@@ -11,6 +11,7 @@ import java.util.Vector;
 public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAcceptanceTest
 {
     private static final int BUILD_TIMEOUT = 90000;
+    private static final int AVAILABILITY_TIMEOUT = 5000;
 
     private String random = null;
 
@@ -47,15 +48,15 @@ public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAccepta
 
         // check that the expected artifacts are available.
         String artifact = projectName + "/default/jars/artifact-" + buildNumber + ".jar";
-        assertTrue(isInArtifactRepository(artifact));
-        assertTrue(isInArtifactRepository(artifact + ".md5"));
-        assertTrue(isInArtifactRepository(artifact + ".sha1"));
+        assertTrue(waitUntilInRepository(artifact, AVAILABILITY_TIMEOUT));
+        assertTrue(waitUntilInRepository(artifact + ".md5", AVAILABILITY_TIMEOUT));
+        assertTrue(waitUntilInRepository(artifact + ".sha1", AVAILABILITY_TIMEOUT));
 
         // check that the expected ivy file is available.
         String ivy = projectName + "/ivy-" + buildNumber + ".xml";
-        assertTrue(isInArtifactRepository(ivy));
-        assertTrue(isInArtifactRepository(ivy + ".md5"));
-        assertTrue(isInArtifactRepository(ivy + ".sha1"));
+        assertTrue(waitUntilInRepository(ivy, AVAILABILITY_TIMEOUT));
+        assertTrue(waitUntilInRepository(ivy + ".md5", AVAILABILITY_TIMEOUT));
+        assertTrue(waitUntilInRepository(ivy + ".sha1", AVAILABILITY_TIMEOUT));
     }
 
     public void testBuildFailsIfPublishingFailsToLocateArtifact() throws Exception
@@ -88,13 +89,13 @@ public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAccepta
         int buildNumber = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
 
         // ensure that the build passed.
-        assertTrue(isBuildSuccessful(random, buildNumber));
+        assertTrue(isBuildSuccessful(projectName, buildNumber));
 
         // check that the expected ivy file is available.
         String ivy = projectName + "/ivy-" + buildNumber + ".xml";
-        assertTrue(isInArtifactRepository(ivy));
-        assertTrue(isInArtifactRepository(ivy + ".md5"));
-        assertTrue(isInArtifactRepository(ivy + ".sha1"));
+        assertTrue(waitUntilInRepository(ivy, AVAILABILITY_TIMEOUT));
+        assertTrue(waitUntilInRepository(ivy + ".md5", AVAILABILITY_TIMEOUT));
+        assertTrue(waitUntilInRepository(ivy + ".sha1", AVAILABILITY_TIMEOUT));
     }
 
     private void addPublication(String projectName, String stageName, String name, String ext) throws Exception
@@ -106,6 +107,7 @@ public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAccepta
         {
             stage.put("publications", new Vector<Hashtable<String, Object>>());
         }
+        @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> publications = (Vector<Hashtable<String, Object>>) stage.get("publications");
 
         Hashtable<String, Object> jar = new Hashtable<String, Object>();
@@ -127,10 +129,12 @@ public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAccepta
         {
             projectDependencies.put("dependencies", new Vector<Hashtable<String, Object>>());
         }
+
+        @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> dependencies = (Vector<Hashtable<String, Object>>) projectDependencies.get("dependencies");
 
         Hashtable<String, Object> dependency = new Hashtable<String, Object>();
-        dependency.put("module", dependentProject);
+        dependency.put("project", "projects/"+ dependentProject);
         dependency.put("revision", revision);
         dependency.put("stages", stages);
         dependency.put("meta.symbolicName", "zutubi.dependency");

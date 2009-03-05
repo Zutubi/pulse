@@ -1,8 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Table;
-import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
@@ -11,6 +9,7 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.dependency")
 @Table(columns = {/*"org", */"module", "revision"})
+@Form(fieldOrder = {"project", "revision", "stages", "transitive"})
 public class DependencyConfiguration extends AbstractConfiguration
 {
     /**
@@ -23,8 +22,12 @@ public class DependencyConfiguration extends AbstractConfiguration
     /**
      * The module name of the dependency, a unique within an organisation.
      */
+/*
     @Required
     private String module;
+*/
+    @Required @Reference
+    private ProjectConfiguration project;
 
     /**
      * The revision of this dependency.
@@ -49,14 +52,20 @@ public class DependencyConfiguration extends AbstractConfiguration
         this.org = org;
     }
 
+    @Transient
     public String getModule()
     {
-        return module;
+        return project.getName();
     }
 
-    public void setModule(String module)
+    public ProjectConfiguration getProject()
     {
-        this.module = module;
+        return project;
+    }
+
+    public void setProject(ProjectConfiguration project)
+    {
+        this.project = project;
     }
 
     public String getRevision()

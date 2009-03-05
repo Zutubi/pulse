@@ -31,7 +31,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
     {
         super.setUp();
 
-        owner = createProject();
+        owner = createProject("owner");
         doReturn(owner).when(projectManager).getProject(eq(owner.getId()), anyBoolean());
         
         queue = new EntityBuildQueue(owner, 1);

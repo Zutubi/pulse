@@ -977,12 +977,6 @@ public class BuildController implements EventListener
 
             // publish the ivy file from tmp.
             ivy.publishIvy(descriptor.getModuleRevisionId(), Long.toString(buildResult.getNumber()), new File(tmp, "ivy.xml"));
-
-            // part of the publishing seems to be async?..., we are seeing delays in the ivy file appearing in the
-            // repository after the publish, causing tests that wait for the build to complete to fail due to a missing
-            // ivy file.  Maybe we need to go directly to the repository on the file system?, deliver directly?.  We
-            // have to ensure that the ivy file is in the repository before we can continue.
-            Thread.sleep(2000);
         }
         catch (Exception e)
         {
