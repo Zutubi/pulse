@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.tove.config.cleanup.RecordCleanupTaskSupport;
+import com.zutubi.tove.type.record.RecordManager;
 
 /**
  * Helper base for cleanup tasks that remove state from the DB.  Ensures all
@@ -19,7 +20,7 @@ public abstract class DatabaseStateCleanupTaskSupport extends RecordCleanupTaskS
         this.buildManager = buildManager;
     }
 
-    public void run()
+    public void run(RecordManager recordManager)
     {
         buildManager.executeInTransaction(new Runnable()
         {

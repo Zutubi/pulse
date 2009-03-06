@@ -1,7 +1,7 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.events.AllEventListener;
 import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
 import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.annotations.ReadOnly;
 import com.zutubi.tove.annotations.Reference;
@@ -1501,6 +1501,184 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals("parent", configurationTemplateManager.getRootInstance(SCOPE_TEMPLATED, MockA.class).getName());
     }
 
+    public void testCacheInsertUpdatesParent()
+    {
+        // Inserting a new collection entry should refresh the parent instance.
+        Configuration collection = configurationTemplateManager.getInstance(SCOPE_SAMPLE);
+        configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("bar"));
+        assertNotSame(collection, configurationTemplateManager.getInstance(SCOPE_SAMPLE));
+    }
+
+    public void testCacheUpdateUpdatesParent()
+    {
+        // Updating a collection entry should refresh the parent instance.
+        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
+        Configuration collection = configurationTemplateManager.getInstance(SCOPE_SAMPLE);
+
+        MockA item = configurationTemplateManager.getInstance(path, MockA.class);
+        item = configurationTemplateManager.deepClone(item);
+        item.setB("hooray");
+        configurationTemplateManager.save(item);
+
+        assertNotSame(collection, configurationTemplateManager.getInstance(SCOPE_SAMPLE));
+    }
+
+    public void testCacheDeleteUpdatesParent()
+    {
+        // Deleting a collection entry should refresh the parent instance.
+        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
+        Configuration collection = configurationTemplateManager.getInstance(SCOPE_SAMPLE);
+
+        configurationTemplateManager.delete(path);
+
+        assertNotSame(collection, configurationTemplateManager.getInstance(SCOPE_SAMPLE));
+    }
+
+    public void testCacheInsertLeavesSibling()
+    {
+        // Inserting a new collection entry should not cause existing items in
+        // that collection to refresh.
+        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
+        MockA sibling = configurationTemplateManager.getInstance(path, MockA.class);
+
+        configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("bar"));
+        assertSame(sibling, configurationTemplateManager.getInstance(path, MockA.class));
+    }
+
+    public void testCacheUpdateLeavesSibling()
+    {
+        // Updating a collection entry should not cause other items in that
+        // collection to refresh.
+        String unchangedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
+        String changedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("bar"));
+        MockA unchangedInstance = configurationTemplateManager.getInstance(unchangedPath, MockA.class);
+
+        MockA item = configurationTemplateManager.getInstance(changedPath, MockA.class);
+        item = configurationTemplateManager.deepClone(item);
+        item.setB("hooray");
+        configurationTemplateManager.save(item);
+
+        assertSame(unchangedInstance, configurationTemplateManager.getInstance(unchangedPath, MockA.class));
+    }
+
+    public void testCacheDeleteLeavesSibling()
+    {
+        // Deleting a collection entry should not cause other items in that
+        // collection to refresh.
+        String unchangedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("foo"));
+        String deletedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new MockA("bar"));
+        MockA unchangedInstance = configurationTemplateManager.getInstance(unchangedPath, MockA.class);
+
+        configurationTemplateManager.delete(deletedPath);
+
+        assertSame(unchangedInstance, configurationTemplateManager.getInstance(unchangedPath, MockA.class));
+    }
+
+    public void testCacheUpdateUpdatesReferers()
+    {
+        MockReferee ee = new MockReferee("ee");
+        String refereePath = configurationTemplateManager.insert(SCOPE_REFEREE, ee);
+        ee = configurationTemplateManager.getInstance(refereePath, MockReferee.class);
+
+        MockReferer er = new MockReferer("er");
+        er.setRefToRef(ee);
+
+        String refererPath = configurationTemplateManager.insert(SCOPE_REFERER, er);
+        updateRefereeAndCheck(refereePath, refererPath);
+    }
+
+    public void testCacheUpdateUpdatesReferersCollection()
+    {
+        MockReferee ee = new MockReferee("ee");
+        String refereePath = configurationTemplateManager.insert(SCOPE_REFEREE, ee);
+        ee = configurationTemplateManager.getInstance(refereePath, MockReferee.class);
+
+        MockReferer er = new MockReferer("er");
+        er.getRefToRefs().add(ee);
+
+        String refererPath = configurationTemplateManager.insert(SCOPE_REFERER, er);
+        updateRefereeAndCheck(refereePath, refererPath);
+    }
+
+    private void updateRefereeAndCheck(String refereePath, String refererPath)
+    {
+        Configuration erCollection = configurationTemplateManager.getInstance(SCOPE_REFERER);
+        MockReferer er = configurationTemplateManager.getInstance(refererPath, MockReferer.class);
+
+        MockReferee ee = configurationTemplateManager.getInstance(refereePath, MockReferee.class);
+        ee = configurationTemplateManager.deepClone(ee);
+        ee.setName("new");
+        configurationTemplateManager.save(ee);
+
+        assertNotSame(er, configurationTemplateManager.getInstance(refererPath, MockReferer.class));
+        assertNotSame(erCollection, configurationTemplateManager.getInstance(SCOPE_REFERER));
+    }
+
+    public void testCacheDeleteUpdatesReferers()
+    {
+        MockReferee ee = new MockReferee("ee");
+        String refereePath = configurationTemplateManager.insert(SCOPE_REFEREE, ee);
+        ee = configurationTemplateManager.getInstance(refereePath, MockReferee.class);
+
+        MockReferer er = new MockReferer("er");
+        er.setRefToRef(ee);
+
+        String refererPath = configurationTemplateManager.insert(SCOPE_REFERER, er);
+        Configuration erCollection = configurationTemplateManager.getInstance(SCOPE_REFERER);
+        er = configurationTemplateManager.getInstance(refererPath, MockReferer.class);
+
+        configurationTemplateManager.delete(refereePath);
+        
+        assertNotSame(er, configurationTemplateManager.getInstance(refererPath, MockReferer.class));
+        assertNotSame(erCollection, configurationTemplateManager.getInstance(SCOPE_REFERER));
+    }
+
+    public void testCacheUpdateUpdatesDescendents() throws TypeException
+    {
+        Pair<String, String> paths = insertParentAndChildA(new MockA("parent"), new MockA("child"));
+        MockA child = configurationTemplateManager.getInstance(paths.second, MockA.class);
+
+        MockA parent = configurationTemplateManager.getInstance(paths.first, MockA.class);
+        parent = configurationTemplateManager.deepClone(parent);
+        parent.setB("i haz change it");
+        configurationTemplateManager.save(parent);
+        
+        assertNotSame(child, configurationTemplateManager.getInstance(paths.second, MockA.class));
+    }
+
+    public void testCacheUpdateLeavesAncestors() throws TypeException
+    {
+        Pair<String, String> paths = insertParentAndChildA(new MockA("parent"), new MockA("child"));
+        MockA parent = configurationTemplateManager.getInstance(paths.first, MockA.class);
+
+        MockA child = configurationTemplateManager.getInstance(paths.second, MockA.class);
+        child = configurationTemplateManager.deepClone(child);
+        child.setB("i haz change it");
+        configurationTemplateManager.save(child);
+        
+        assertSame(parent, configurationTemplateManager.getInstance(paths.first, MockA.class));
+    }
+
+    public void testCacheNestedUpdateWithDescendents() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.getCs().put("c1", new MockC("c1"));
+        parent.getCs().put("c2", new MockC("c2"));
+        Pair<String, String> paths = insertParentAndChildA(parent, new MockA("child"));
+        MockA child = configurationTemplateManager.getInstance(paths.second, MockA.class);
+
+        parent = configurationTemplateManager.getInstance(paths.first, MockA.class);
+        parent = configurationTemplateManager.deepClone(parent);
+        parent.getCs().get("c1").setD(new MockD("new"));
+        configurationTemplateManager.save(parent);
+
+        MockA newChild = configurationTemplateManager.getInstance(paths.second, MockA.class);
+        assertNotSame(child, newChild);
+        assertNotSame(child.getCs(), newChild.getCs());
+        assertNotSame(child.getCs().get("c1"), newChild.getCs().get("c1"));
+        assertSame(child.getCs().get("c2"), newChild.getCs().get("c2"));
+    }
+
     private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException
     {
         MutableRecord record = typeA.unstantiate(parent);
@@ -1801,13 +1979,18 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         }
     }
 
-    private class RecordingEventListener extends AllEventListener
+    private class RecordingEventListener implements EventListener
     {
         private List<Event> events = new LinkedList<Event>();
 
         public void handleEvent(Event evt)
         {
             events.add(evt);
+        }
+
+        public Class[] getHandledEvents()
+        {
+            return new Class[]{ConfigurationEvent.class};
         }
 
         public List<Event> getEvents()

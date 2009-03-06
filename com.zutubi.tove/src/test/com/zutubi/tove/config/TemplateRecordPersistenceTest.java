@@ -1067,7 +1067,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         String path = "project/child/stages/default";
         configurationTemplateManager.delete(path);
         configurationTemplateManager.restore(path);
-        Stage stage = configurationTemplateManager.getInstance(path, Stage.class);
+        Stage stage = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(path, Stage.class));
         stage.setRecipe("edited");
 
         Listener listener = registerListener();
@@ -1085,7 +1085,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         String path = "project/child/stages/default";
         configurationTemplateManager.delete(path);
         configurationTemplateManager.restore(path);
-        Stage stage = configurationTemplateManager.getInstance(path, Stage.class);
+        Stage stage = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(path, Stage.class));
         stage.addProperty("new", "value");
 
         Listener listener = registerListener();

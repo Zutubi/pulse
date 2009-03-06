@@ -1,27 +1,34 @@
 package com.zutubi.tove.type.record;
 
+import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventManager;
+import com.zutubi.events.RecordingEventListener;
 import com.zutubi.tove.transaction.AbstractTransactionTestCase;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.UserTransaction;
+import com.zutubi.tove.type.record.events.RecordDeletedEvent;
+import com.zutubi.tove.type.record.events.RecordEvent;
+import com.zutubi.tove.type.record.events.RecordInsertedEvent;
+import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
 import com.zutubi.tove.type.record.store.FileSystemRecordStore;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Sort;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- *
- */
 public class RecordManagerTest extends AbstractTransactionTestCase
 {
     private File tempDir;
     private RecordManager recordManager;
     private TransactionManager transactionManager;
+    private EventManager eventManager;
     private UserTransaction userTransaction;
+    private RecordingEventListener eventListener;
 
     protected void setUp() throws Exception
     {
@@ -29,6 +36,9 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
         tempDir = FileSystemUtils.createTempDir(getName(), "");
         transactionManager = new TransactionManager();
+        eventManager = new DefaultEventManager();
+        eventListener = new RecordingEventListener(RecordEvent.class);
+        eventManager.register(eventListener);
         userTransaction = new UserTransaction(transactionManager);
 
         newRecordManager();
@@ -54,7 +64,10 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
         MutableRecordImpl record = new MutableRecordImpl();
         record.put("key", "value");
+
+        eventListener.reset();
         recordManager.insert("hello/world", record);
+        assertEvents(new RecordInsertedEvent(recordManager, "hello/world"));
 
         assertNotNull(recordManager.select("hello/world"));
         assertNotNull(recordManager.select("hello").get("world"));
@@ -64,12 +77,13 @@ public class RecordManagerTest extends AbstractTransactionTestCase
     {
         try
         {
+            eventListener.reset();
             recordManager.insert("", new MutableRecordImpl());
             fail();
         }
         catch (IllegalArgumentException e)
         {
-            // noop.
+            assertEvents();
         }
     }
 
@@ -77,12 +91,13 @@ public class RecordManagerTest extends AbstractTransactionTestCase
     {
         try
         {
+            eventListener.reset();
             recordManager.insert("path", null);
             fail();
         }
         catch (IllegalArgumentException e)
         {
-            // noop.
+            assertEvents();
         }
     }
 
@@ -156,10 +171,19 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         recordManager.insert("hello", new MutableRecordImpl());
         recordManager.insert("hello/world", record);
 
+        eventListener.reset();
         assertNull(recordManager.delete("hello/moon"));
+        assertEvents();
+
         assertNull(recordManager.delete("hello/world/key"));
+        assertEvents();
+
         assertNotNull(recordManager.delete("hello/world"));
+        assertEvents(new RecordDeletedEvent(recordManager, "hello/world"));
+        eventListener.reset();
+
         assertNull(recordManager.delete("hello/world"));
+        assertEvents();
     }
 
     public void testMetaProperties()
@@ -182,36 +206,6 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         assertNotNull(recordManager.select("/another"));
         assertNotNull(recordManager.select("another"));
         assertNotNull(recordManager.select("another/"));
-    }
-
-    public void testCopy()
-    {
-        MutableRecordImpl record = new MutableRecordImpl();
-        record.put("key", "value");
-        record.put("nested", record.copy(true));
-
-        recordManager.insert("sourcePath", record);
-        Record original = recordManager.select("sourcePath");
-        assertNull(recordManager.select("destinationPath"));
-        recordManager.copy("sourcePath", "destinationPath");
-
-        Record copy = recordManager.select("destinationPath");
-        assertNotNull(copy);
-        assertEquals(original.get("key"), copy.get("key"));
-
-        // ensure that the copies have unique handles.
-        assertTrue(original.getHandle() != RecordManager.UNDEFINED);
-        assertTrue(copy.getHandle() != RecordManager.UNDEFINED);
-        assertTrue(original.getHandle() != copy.getHandle());
-        assertTrue(((Record)original.get("nested")).getHandle() != ((Record)copy.get("nested")).getHandle());
-
-        // ensure that changing the original does not change the copy
-        record.put("anotherKey", "anotherValue");
-        recordManager.update("sourcePath", original);
-
-        copy = recordManager.select("destinationPath");
-        assertFalse(copy.containsKey("anotherKey"));
-
     }
 
     public void testCopyOnInsert()
@@ -312,7 +306,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         record.put("simple", "value");
         recordManager.insert("a", record);
         recordManager.insert("a/nested", new MutableRecordImpl());
-        
+
         assertSelectedRecordCount("a/*", 1);
     }
 
@@ -367,7 +361,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         for (int i = 0; i < 10; i++)
         {
             newRecordManager();
-            
+
             for (int j = 0; j < i; j++)
             {
                 String path = "i" + i + "j" + j;
@@ -377,14 +371,6 @@ public class RecordManagerTest extends AbstractTransactionTestCase
                 handle = nextHandle;
             }
         }
-    }
-
-    public void testCopyDoesNotDuplicateHandles()
-    {
-        recordManager.insert("r1", new MutableRecordImpl());
-        recordManager.copy("r1", "r2");
-
-        assertTrue(recordManager.select("r1").getHandle() != recordManager.select("r2").getHandle());
     }
 
     public void testHandleMap()
@@ -458,7 +444,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         recordManager.move("r1", "r2");
         assertEquals("r2", recordManager.getPathForHandle(handle));
     }
-    
+
     private void assertHandleToPath(String path)
     {
         assertEquals(path, recordManager.getPathForHandle(recordManager.select(path).getHandle()));
@@ -474,8 +460,11 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         MutableRecord record = new MutableRecordImpl();
         record.put("prop", "value");
         recordManager.insert("testpath", record);
-        Record moved = recordManager.move("testpath", "newpath");
 
+        eventListener.reset();
+        Record moved = recordManager.move("testpath", "newpath");
+        assertEvents(new RecordDeletedEvent(recordManager, "testpath"), new RecordInsertedEvent(recordManager, "newpath"));
+        
         // Check returned record has expected property
         assertEquals("value", moved.get("prop"));
 
@@ -515,7 +504,10 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         Record insertedNest = (Record) inserted.get("nested");
         assertTrue(insertedNest.getHandle() > 0);
 
+        eventListener.reset();
         Record moved = recordManager.move("testpath", "newpath");
+        assertEvents(new RecordDeletedEvent(recordManager, "testpath"), new RecordInsertedEvent(recordManager, "newpath"));
+
         assertEquals("val", moved.get("prop"));
         Record movedNest = (Record) moved.get("nested");
         assertEquals(insertedNest.getHandle(), movedNest.getHandle());
@@ -540,7 +532,9 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         record = new MutableRecordImpl();
         record.setHandle(loaded.getHandle());
 
+        eventListener.reset();
         recordManager.update("path", record);
+        assertEvents(new RecordUpdatedEvent(recordManager, "path"));
 
         loaded = recordManager.select("path");
         assertEquals(0, loaded.size());
@@ -559,7 +553,9 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         record = new MutableRecordImpl();
         record.setHandle(loaded.getHandle());
 
+        eventListener.reset();
         recordManager.update("path", record);
+        assertEvents(new RecordUpdatedEvent(recordManager, "path"));
 
         loaded = recordManager.select("path");
         assertEquals(1, loaded.size());
@@ -578,11 +574,13 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         recordManager.insert("y", y);
         try
         {
+            eventListener.reset();
             recordManager.update("x", y);
             fail();
         }
         catch (RuntimeException e)
         {
+            assertEvents();
             assertEquals("Failed to update 'x'. New handle differs from existing handle.", e.getMessage());
         }
     }
@@ -675,6 +673,11 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         });
     }
 
+    private void assertEvents(Event... expectedEvents)
+    {
+        assertEquals(Arrays.asList(expectedEvents), eventListener.getEventsReceived());
+    }
+
     private void newRecordManager() throws Exception
     {
         FileSystemRecordStore recordStore = new FileSystemRecordStore();
@@ -685,7 +688,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
         recordManager = new RecordManager();
         recordManager.setTransactionManager(transactionManager);
         recordManager.setRecordStore(recordStore);
+        recordManager.setEventManager(eventManager);
         recordManager.init();
-
     }
 }

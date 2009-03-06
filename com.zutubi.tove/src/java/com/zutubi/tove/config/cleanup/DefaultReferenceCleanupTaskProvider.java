@@ -3,7 +3,6 @@ package com.zutubi.tove.config.cleanup;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -11,7 +10,6 @@ import com.zutubi.validation.annotations.Required;
 public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTaskProvider
 {
     private ConfigurationTemplateManager configurationTemplateManager;
-    private RecordManager recordManager;
 
     public RecordCleanupTask getTask(String deletedPath, String referencingPath)
     {
@@ -41,22 +39,17 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
             }
             else
             {
-                return new NullifyReferenceCleanupTask(referencingPath, recordManager);
+                return new NullifyReferenceCleanupTask(referencingPath);
             }
         }
         else
         {
-            return new RemoveReferenceCleanupTask(referencingPath, recordManager);
+            return new RemoveReferenceCleanupTask(referencingPath);
         }
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
-    }
-
-    public void setRecordManager(RecordManager recordManager)
-    {
-        this.recordManager = recordManager;
     }
 }

@@ -1,6 +1,7 @@
 package com.zutubi.tove.config.cleanup;
 
 import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -99,7 +100,7 @@ public class ConfigurationCleanupTaskFinderTest extends ZutubiTestCase
             super(path);
         }
 
-        public void run()
+        public void run(RecordManager recordManager)
         {
             // Do nothing
         }

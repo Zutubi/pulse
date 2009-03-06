@@ -11,15 +11,12 @@ import java.util.Set;
  */
 public class CleanupHiddenKeyCleanupTask extends RecordCleanupTaskSupport
 {
-    private RecordManager recordManager;
-
-    public CleanupHiddenKeyCleanupTask(String path, RecordManager recordManager)
+    public CleanupHiddenKeyCleanupTask(String path)
     {
         super(path);
-        this.recordManager = recordManager;
     }
 
-    public void run()
+    public void run(RecordManager recordManager)
     {
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         String baseName = PathUtils.getBaseName(getAffectedPath());

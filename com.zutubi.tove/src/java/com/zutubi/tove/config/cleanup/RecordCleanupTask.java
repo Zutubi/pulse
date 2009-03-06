@@ -1,5 +1,7 @@
 package com.zutubi.tove.config.cleanup;
 
+import com.zutubi.tove.type.record.RecordManager;
+
 import java.util.List;
 import java.util.Set;
 
@@ -9,14 +11,16 @@ import java.util.Set;
  * actions may cascade.  The root action itself is always the deletion of the
  * original record.
  */
-public interface RecordCleanupTask extends Runnable
+public interface RecordCleanupTask
 {
     /**
      * Executes the cleanup task.  Note that tasks <b>must</b> be robust to
      * paths having been deleted by previous tasks.  That is, no task can
      * assume that any record it may intend to change still exists.
+     * 
+     * @param recordManager manager for record access.updates
      */
-    void run();
+    void run(RecordManager recordManager);
 
     /**
      * @return true if this is an internal task that the user need not be

@@ -448,6 +448,7 @@ public class DefaultSetupManager implements SetupManager
 
         handleAllocator.setDelegate(recordManager);
         configurationPersistenceManager.setRecordManager(recordManager);
+
         configurationReferenceManager.setRecordManager(recordManager);
         configurationTemplateManager.setRecordManager(recordManager);
         configurationRefactoringManager.setRecordManager(recordManager);

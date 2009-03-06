@@ -599,6 +599,12 @@ public class ConfigurationRefactoringManager
 
             assert templateParentNode != null;
 
+            // Suspend caching of instances completely, rather than trying to
+            // manage the cache throughout the factoring.  Note that this
+            // means the instance cache should not be touched until the
+            // operation is complete!
+            configurationTemplateManager.suspendInstanceCache();
+
             // Extract and save the new parent.
             MapType parentType = configurationTemplateManager.getType(parentPath, MapType.class);
             MutableRecord common = extractCommon(records, parentPath, parentType.getTargetType());
@@ -626,7 +632,6 @@ public class ConfigurationRefactoringManager
                 // Update the parent reference.
                 configurationTemplateManager.setParentTemplate(copy, newParentTemplateHandle);
                 recordManager.update(path, copy);
-                configurationTemplateManager.refreshCaches();
 
                 // Fix references, scrub and apply updates.
                 copy = ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi().copy(true);
@@ -635,6 +640,7 @@ public class ConfigurationRefactoringManager
                 copy.forEach(new DeepUpdateFunction(path));
             }
 
+            configurationTemplateManager.resumeInstanceCache();
             return newParentTemplatePath;
         }
 

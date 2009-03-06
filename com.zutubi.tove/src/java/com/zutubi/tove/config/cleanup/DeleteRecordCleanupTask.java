@@ -11,16 +11,14 @@ import java.util.Set;
 public class DeleteRecordCleanupTask extends RecordCleanupTaskSupport
 {
     private boolean internal;
-    private RecordManager recordManager;
 
-    public DeleteRecordCleanupTask(String path, boolean internal, RecordManager recordManager)
+    public DeleteRecordCleanupTask(String path, boolean internal)
     {
         super(path);
         this.internal = internal;
-        this.recordManager = recordManager;
     }
 
-    public void run()
+    public void run(RecordManager recordManager)
     {
         recordManager.delete(getAffectedPath());
     }
