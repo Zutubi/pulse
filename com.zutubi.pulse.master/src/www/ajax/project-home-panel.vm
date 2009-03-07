@@ -131,23 +131,22 @@
             #if($project.url && $project.url.length() > 0)
                 #dynamicLinkRow("project.url" "homepage" $project.url)
             #end
-            #set($candidateActions = [["write", "pencil", "$base/admin/projects/#uce($project.name)/", "configure"], ["trigger", "lightning", "$base/triggerBuild.action?projectName=$u_projectName", "trigger"]])
-            #set($actionCount = 0)
-            #foreach($actionSpec in $candidateActions)
-                #if($action.hasPermission($actionSpec.get(0), $project))
-                    #set($actionCount = $actionCount + 1)
-                #end
-            #end
-            #if($actionCount > 0)
-                #foreach($actionSpec in $candidateActions)
+
+            #if($actions.size() > 0)
+                #foreach($act in $actions)
                 <tr>
                     #if($velocityCount == 1)
-                    <th class="content-row" rowspan="$actionCount">#wwtext("name=actions")</th>
+                    <th class="content-row" rowspan="$actions.size()">#wwtext("name=actions")</th>
                     #end
                     <td class="content">
-#auth("resource=project" "action=$actionSpec.get(0)")
-                        <img src="$base/images/${actionSpec.get(1)}.gif"/> <a id="action.$actionSpec.get(0)" href="$actionSpec.get(2)">#wwtext("name=project.$actionSpec.get(3)")</a>
-#end
+                        <img src="$base/images/config/actions/${act.icon}.gif"/>
+                        <a id="action.$act.action"
+                #if($act.action.equals("trigger"))
+                            href="$base/triggerBuild.action?projectName=$u_projectName"
+                #else
+                            href="$urls.projectAction($project, $act.action)"
+                #end
+                        >$act.label</a>
                     </td>
                 </tr>
                 #end

@@ -145,6 +145,7 @@ public class ProjectConfigurationActions
         projectManager.makeStateTransition(projectConfig.getProjectId(), Project.Transition.RESUME);
     }
 
+    @Permission(ACTION_TRIGGER)
     public void doClean(ProjectConfiguration projectConfig)
     {
         Project project = projectManager.getProject(projectConfig.getProjectId(), true);
