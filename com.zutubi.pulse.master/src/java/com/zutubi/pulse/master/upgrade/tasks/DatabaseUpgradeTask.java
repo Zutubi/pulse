@@ -9,7 +9,6 @@ import com.zutubi.util.logging.Logger;
 import javax.sql.DataSource;
 import java.io.*;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -122,16 +121,7 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
 
     protected void runUpdate(Connection con, String sql) throws SQLException
     {
-        PreparedStatement stmt = null;
-        try
-        {
-            stmt = con.prepareStatement(sql);
-            stmt.executeUpdate();
-        }
-        finally
-        {
-            JDBCUtils.close(stmt);
-        }
+        JDBCUtils.executeUpdate(con, sql);
     }
 
     public void setDataSource(DataSource source)

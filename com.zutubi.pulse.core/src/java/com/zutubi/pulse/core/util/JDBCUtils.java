@@ -18,6 +18,33 @@ public class JDBCUtils
 {
     private static final Logger LOG = Logger.getLogger(JDBCUtils.class);
 
+    public enum DbType
+    {
+        HSQL
+        {
+            public MiniDialect createMiniDialect()
+            {
+                return new HSQLMiniDialect();
+            }
+        },
+        MYSQL
+        {
+            public MiniDialect createMiniDialect()
+            {
+                return new MySQLMiniDialect();
+            }
+        },
+        POSTGRESQL
+        {
+            public MiniDialect createMiniDialect()
+            {
+                return new PostgresMiniDialect();
+            }
+        };
+
+        public abstract MiniDialect createMiniDialect();
+    }
+
     /**
      * Execute the given schema script on the given JDBC Connection.
      * Will log unsuccessful statements and continue to execute.
@@ -482,6 +509,20 @@ public class JDBCUtils
         return (Boolean) result;
     }
 
+    public static void executeUpdate(Connection con, String sql) throws SQLException
+    {
+        PreparedStatement ps = null;
+        try
+        {
+            ps = con.prepareStatement(sql);
+            ps.executeUpdate();
+        }
+        finally
+        {
+            JDBCUtils.close(ps);
+        }
+    }
+
     public static void executeUpdate(Connection con, String sql, Object[] args, int[] types) throws SQLException
     {
         PreparedStatement ps = null;
@@ -576,21 +617,26 @@ public class JDBCUtils
         }
     }
 
-    private static MiniDialect getMiniDialect(Connection con) throws SQLException
+    public static DbType getDBType(Connection con) throws SQLException
     {
-        String driverName = con.getMetaData().getURL();
+        String driverName = con.getMetaData().getURL().toLowerCase();
         if (driverName.contains("hsql"))
         {
-            return new HSQLMiniDialect();
+            return DbType.HSQL;
         }
         else if (driverName.contains("ostgre"))
         {
-            return new PostgresMiniDialect();
+            return DbType.POSTGRESQL;
         }
         else
         {
-            return new MySQLMiniDialect();
+            return DbType.MYSQL;
         }
+    }
+
+    private static MiniDialect getMiniDialect(Connection con) throws SQLException
+    {
+        return getDBType(con).createMiniDialect();
     }
 
     /**

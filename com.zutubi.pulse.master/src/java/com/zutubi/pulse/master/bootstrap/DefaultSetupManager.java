@@ -19,9 +19,9 @@ import com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
+import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.*;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
-import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
 import com.zutubi.tove.type.record.RecordManager;
@@ -420,7 +420,7 @@ public class DefaultSetupManager implements SetupManager
 
         if (isUpgradeRequired())
         {
-            printConsoleMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + ", Pulse version " + Version.getVersion().getVersionNumber() + "...");
+            printConsoleMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + "', Pulse version '" + Version.getVersion().getVersionNumber() + "'...");
             state = SetupState.UPGRADE;
             showPrompt();
             return;

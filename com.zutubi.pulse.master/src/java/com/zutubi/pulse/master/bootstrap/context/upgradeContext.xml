@@ -48,6 +48,7 @@
                 <ref local="ensureGlobalConfigPermanent"/>
                 <ref local="dashboardShowUngrouped"/>
                 <ref local="fixPermanentUsers"/>
+                <ref local="revisionStringLimit"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -155,5 +156,9 @@
 
     <bean id="fixPermanentUsers" class="com.zutubi.pulse.master.upgrade.tasks.FixPermanentUsersUpgradeTask">
         <property name="buildNumber" value="200023001"/>
+    </bean>
+
+    <bean id="revisionStringLimit" class="com.zutubi.pulse.master.upgrade.tasks.RevisionStringLimitUpgradeTask">
+        <property name="buildNumber" value="200023002"/>
     </bean>
 </beans>
