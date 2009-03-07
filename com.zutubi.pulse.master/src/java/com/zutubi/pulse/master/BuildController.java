@@ -888,6 +888,11 @@ public class BuildController implements EventListener
         return new Class[]{BuildControllerBootstrapEvent.class, BuildStatusEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
     }
 
+    public Project getProject()
+    {
+        return project;
+    }
+
     public long getBuildId()
     {
         return buildResult.getId();

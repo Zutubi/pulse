@@ -1,16 +1,16 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
+import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.*;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Action to show the build and recipe queues.
@@ -52,24 +52,41 @@ public class ViewServerQueuesAction extends ActionSupport
     public String execute() throws Exception
     {
         recipeQueueSnapshot = recipeQueue.takeSnapshot();
+        Iterator<RecipeAssignmentRequest> it = recipeQueueSnapshot.iterator();
+        while (it.hasNext())
+        {
+            RecipeAssignmentRequest assignmentRequest = it.next();
+            if (!accessManager.hasPermission(ACTION_VIEW, assignmentRequest.getProject()))
+            {
+                it.remove();
+            }
+        }
 
         buildQueue = new LinkedList<AbstractBuildRequestEvent>();
         executingBuilds = new LinkedList<BuildResult>();
 
         BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
-        for (List<AbstractBuildRequestEvent> queuedForEntity: snapshot.getQueuedBuilds().values())
+        for (Map.Entry<Entity,List<AbstractBuildRequestEvent>>  entityQueue: snapshot.getQueuedBuilds().entrySet())
         {
-            buildQueue.addAll(queuedForEntity);
+            Entity owner = entityQueue.getKey();
+            if (owner instanceof User || accessManager.hasPermission(ACTION_VIEW, owner))
+            {
+                buildQueue.addAll( entityQueue.getValue());
+            }
         }
 
         for (List<EntityBuildQueue.ActiveBuild> activeForEntity: snapshot.getActiveBuilds().values())
         {
             for (EntityBuildQueue.ActiveBuild activeBuild: activeForEntity)
             {
-                BuildResult buildResult = buildManager.getBuildResult(activeBuild.getController().getBuildId());
-                if (buildResult != null && !buildResult.completed())
+                BuildController buildController = activeBuild.getController();
+                if (accessManager.hasPermission(ACTION_VIEW, buildController.getProject()))
                 {
-                    executingBuilds.add(buildResult);
+                    BuildResult buildResult = buildManager.getBuildResult(buildController.getBuildId());
+                    if (buildResult != null && !buildResult.completed())
+                    {
+                        executingBuilds.add(buildResult);
+                    }
                 }
             }
         }
