@@ -49,7 +49,11 @@ public class Maven2Command extends ExecutableCommand
         {
             //TODO: use the context's variables to transfer this maven specific information around. 
             PulseExecutionContext pec = (PulseExecutionContext) context;
-            pec.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(context.getWorkingDir()), "pom.xml"), "version"));
+            String version = MavenUtils.extractVersion(new File(getWorkingDir(context.getWorkingDir()), "pom.xml"), "version");
+            if (version != null)
+            {
+                pec.setVersion(version);
+            }
         }
         catch (PulseException e)
         {
