@@ -71,8 +71,8 @@ public class DefaultScheduler implements Scheduler
                 catch (SchedulingException e)
                 {
                     // not the fact that this trigger is invalid but do not prevent the rest of the triggers from
-                    // being initialisd.
-                    LOG.severe("failed to initialise a trigger.", e);
+                    // being initialised.
+                    LOG.severe("Failed to initialise a trigger (" + trigger.getGroup() + ", " + trigger.getName() + ")", e);
                 }
             }
         }
