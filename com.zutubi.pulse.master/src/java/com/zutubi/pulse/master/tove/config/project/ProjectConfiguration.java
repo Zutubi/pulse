@@ -160,6 +160,11 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
         return extensions;
     }
 
+    public void addExtension(String name, Object extension)
+    {
+        getExtensions().put(name, extension);
+    }
+
     public BuildOptionsConfiguration getOptions()
     {
         return options;

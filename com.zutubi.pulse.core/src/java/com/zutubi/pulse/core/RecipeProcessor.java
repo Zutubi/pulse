@@ -5,6 +5,7 @@ import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
+import com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
@@ -45,7 +46,6 @@ public class RecipeProcessor
     private boolean terminating = false;
     private PulseFileLoaderFactory fileLoaderFactory;
     private ObjectFactory objectFactory;
-
     private IvyProvider ivyProvider;
 
     public RecipeProcessor()
@@ -95,6 +95,7 @@ public class RecipeProcessor
                 throw new BuildException("Undefined recipe '" + recipeName + "'");
             }
 
+            IvyProvider ivyProvider = getIvyProvider(context);
             IvySupport ivy = ivyProvider.getIvySupport();
 
             LinkedHashMap<String, CommandConfiguration> commandConfigs = new LinkedHashMap<String, CommandConfiguration>();
@@ -152,6 +153,19 @@ public class RecipeProcessor
             }
             runningLock.unlock();
         }
+    }
+
+    private IvyProvider getIvyProvider(PulseExecutionContext context)
+    {
+        if (ivyProvider != null)
+        {
+            return ivyProvider;
+        }
+
+        String repositoryUrl = context.getString(PROPERTY_MASTER_URL) + "/repository";
+        DefaultIvyProvider ivyProvider = new DefaultIvyProvider();
+        ivyProvider.setRepositoryBase(repositoryUrl);
+        return ivyProvider;
     }
 
     private void compressResults(RecipePaths paths, boolean compressArtifacts, boolean compressWorkingCopy)
@@ -297,13 +311,13 @@ public class RecipeProcessor
         this.fileLoaderFactory = fileLoaderFactory;
     }
 
-    public void setIvyProvider(IvyProvider ivyProvider)
-    {
-        this.ivyProvider = ivyProvider;
-    }
-
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setIvyProvider(IvyProvider provider)
+    {
+        this.ivyProvider = provider;
     }
 }

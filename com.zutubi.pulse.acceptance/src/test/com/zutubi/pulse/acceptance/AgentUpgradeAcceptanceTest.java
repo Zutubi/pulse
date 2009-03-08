@@ -1,9 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
 import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
+import com.zutubi.pulse.acceptance.support.SupportUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.Constants;
 import com.zutubi.util.FileSystemUtils;
@@ -123,12 +124,12 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         }
         finally
         {
-            shutdown(agent);
-            shutdown(master);
+            SupportUtils.shutdown(agent);
+            SupportUtils.shutdown(master);
         }
     }
 
-    private Pulse prepareMaster(Pulse master) throws IOException
+    private Pulse prepareMaster(Pulse master) throws Exception
     {
         // unpack and start master
         // master-port
@@ -168,7 +169,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         }
     }
 
-    private Pulse prepareAgent(Pulse agent) throws IOException
+    private Pulse prepareAgent(Pulse agent) throws Exception
     {
         // get old agent package that we are upgrading from.
         // a) start with a predefined package, later move to a range of older packages that we can test from.
@@ -178,27 +179,12 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         // agent-port
         // tmp/agent-data
         PulsePackage agentPackage = packageFactory.createPackage(oldAgentPackage);
+        agentPackage.setVerbose(true);
         agent = agentPackage.extractTo(new File(tmp, "agent").getCanonicalPath());
         agent.setUserHome(new File(tmp, "user-home").getCanonicalPath());
         agent.setDataDir(new File(tmp, "agent-data").getCanonicalPath());
         agent.setPort(7689);
         agent.start();
         return agent;
-    }
-
-    private void shutdown(Pulse instance)
-    {
-        if (instance != null)
-        {
-            try
-            {
-                instance.stop();
-            }
-            catch (Exception e)
-            {
-                System.out.println("Failed to shutdown pulse instance: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
     }
 }

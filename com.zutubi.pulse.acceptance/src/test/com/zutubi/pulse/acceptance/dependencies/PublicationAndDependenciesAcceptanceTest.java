@@ -154,9 +154,9 @@ public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAccepta
     private void insertProject(String projectName, String target, String args) throws Exception
     {
         Hashtable<String,Object> antConfig = xmlRpcHelper.getAntConfig();
-        antConfig.put("target", target);
+        antConfig.put("targets", target);
         antConfig.put("args", args);
 
-        xmlRpcHelper.insertProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.DEP_ANT_REPOSITORY), antConfig);
+        xmlRpcHelper.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.DEP_ANT_REPOSITORY), antConfig);
     }
 }

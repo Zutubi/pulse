@@ -1,7 +1,9 @@
-package com.zutubi.pulse.acceptance.support;
+package com.zutubi.pulse.acceptance.support.jython;
 
 import com.sun.script.jython.JythonScriptEngine;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.acceptance.support.PackageFactory;
+import com.zutubi.pulse.acceptance.support.PulsePackage;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -13,12 +15,14 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
- *
- *
+ * A jython implementation of the PackageFactory interface that returns handles that
+ * are implemented using the jython scripting system.
  */
 public class JythonPackageFactory implements PackageFactory
 {
     private Invocable invocableEngine;
+
+    private boolean verbose;
 
     public JythonPackageFactory() throws ScriptException, FileNotFoundException
     {
@@ -49,12 +53,17 @@ public class JythonPackageFactory implements PackageFactory
     {
         try
         {
-            return (PulsePackage) invocableEngine.invokeFunction("createPackage", pkg.getCanonicalPath());
+            return (PulsePackage) invocableEngine.invokeFunction("createPackage", pkg.getCanonicalPath(), verbose);
         }
         catch (Exception e)
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setVerbose(boolean verbose)
+    {
+        this.verbose = verbose;
     }
 
     public void close()

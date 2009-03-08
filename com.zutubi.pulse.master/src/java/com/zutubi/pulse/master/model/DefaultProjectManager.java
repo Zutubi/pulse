@@ -222,7 +222,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 cleanupConfiguration.setUnit(CleanupUnit.BUILDS);
                 Map<String, CleanupConfiguration> cleanupMap = new HashMap<String, CleanupConfiguration>();
                 cleanupMap.put("default", cleanupConfiguration);
-                globalProject.getExtensions().put("cleanup", cleanupMap);
+                globalProject.addExtension("cleanup", cleanupMap);
 
                 CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
                 MutableRecord globalTemplate = projectType.unstantiate(globalProject);

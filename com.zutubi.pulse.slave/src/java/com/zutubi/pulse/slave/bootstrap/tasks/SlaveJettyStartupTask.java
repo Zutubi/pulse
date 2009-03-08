@@ -2,6 +2,7 @@ package com.zutubi.pulse.slave.bootstrap.tasks;
 
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 import com.zutubi.pulse.servercore.jetty.PulseWebappConfigurationHandler;
 import com.zutubi.util.logging.Logger;
@@ -25,7 +26,11 @@ public class SlaveJettyStartupTask implements StartupTask
         webapp.setLogDir(configurationManager.getSystemPaths().getLogRoot());
         webapp.setTmpDir(configurationManager.getSystemPaths().getTmpRoot());
 
+        SystemConfiguration config = configurationManager.getSystemConfig();
+
         Server server = jettyServerManager.configureServer(WEBAPP_PULSE, webapp);
+        jettyServerManager.configureContext(WEBAPP_PULSE, config.getContextPath(), webapp);
+
         server.start();
     }
 

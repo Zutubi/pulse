@@ -15,9 +15,9 @@ public class RetrieveDependenciesCommand implements Command
 {
     private IvySupport ivy;
 
-    public RetrieveDependenciesCommand(IvySupport ivy)
+    public RetrieveDependenciesCommand(RetrieveDependenciesCommandConfiguration config)
     {
-        this.ivy = ivy;
+        this.ivy = config.getIvy();
     }
 
     public void execute(CommandContext commandContext)

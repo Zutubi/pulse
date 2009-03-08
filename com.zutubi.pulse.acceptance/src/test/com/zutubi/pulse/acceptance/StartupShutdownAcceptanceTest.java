@@ -4,7 +4,7 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetupDatabaseTypeForm;
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
 import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
@@ -381,7 +381,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         assertTrue(pulse.ping());
     }
 
-    private void assertStartServer(RuntimeContext commandline) throws ParseException
+    private void assertStartServer(RuntimeContext commandline) throws Exception
     {
         if (TextUtils.stringSet(commandline.getPort()))
         {

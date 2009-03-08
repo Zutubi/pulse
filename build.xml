@@ -523,7 +523,6 @@
         </junitreport>
 
         <echo message="Shutdown services."/>
-        
         <exec executable="bash">
             <arg line="scripts/teardown-services.sh"/>
         </exec>

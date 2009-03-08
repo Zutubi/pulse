@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.plugins;
 
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
 import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;

@@ -63,17 +63,12 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // to be completed.
     }
 
-    // The following tests are somewhere between acceptance and unit testes.  They are not end to end, but
-    // to make use of a running artifact repository.
-
-
-
     private int createAndRunIvyAntProject(String target) throws Exception
     {
         Hashtable<String,Object> antConfig = xmlRpcHelper.getAntConfig();
-        antConfig.put("target", target);
+        antConfig.put("targets", target);
         
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.IVY_ANT_REPOSITORY), antConfig);
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.IVY_ANT_REPOSITORY), antConfig);
         return xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
     }
 }

@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
+import com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -95,8 +95,6 @@ public class BuildController implements EventListener
 
     private DefaultBuildLogger buildLogger;
     private RecipeDispatchService recipeDispatchService;
-
-    private IvyProvider ivyProvider;
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -967,6 +965,9 @@ public class BuildController implements EventListener
         File tmp = null;
         try
         {
+            String repositoryUrl = buildContext.getString(PROPERTY_MASTER_URL) + "/repository";
+            DefaultIvyProvider ivyProvider = new DefaultIvyProvider();
+            ivyProvider.setRepositoryBase(repositoryUrl);
             IvySupport ivy = ivyProvider.getIvySupport();
 
             ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
@@ -1113,11 +1114,6 @@ public class BuildController implements EventListener
     public void setRecipeDispatchService(RecipeDispatchService recipeDispatchService)
     {
         this.recipeDispatchService = recipeDispatchService;
-    }
-
-    public void setIvyProvider(IvyProvider ivyProvider)
-    {
-        this.ivyProvider = ivyProvider;
     }
 
     private static interface BootstrapperCreator

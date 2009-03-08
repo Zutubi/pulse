@@ -30,11 +30,6 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
     }
 
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testSetupProcess() throws InterruptedException, IOException, SAXException
     {
         // first we deal with the pulse home property configuration.

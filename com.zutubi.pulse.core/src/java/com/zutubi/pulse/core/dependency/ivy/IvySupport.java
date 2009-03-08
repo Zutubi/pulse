@@ -224,6 +224,7 @@ public class IvySupport
         // to allow the recipe processor tests to 'override' the retrieve command
         // with a noop.
         RetrieveDependenciesCommandConfiguration command = new RetrieveDependenciesCommandConfiguration();
+        command.setName("retrieve");
         command.setIvy(this);
         return command;
     }
@@ -243,6 +244,7 @@ public class IvySupport
         // to allow the recipe processor tests to 'override' the publish command
         // with a noop.
         PublishArtifactsCommandConfiguration command = new PublishArtifactsCommandConfiguration();
+        command.setName("publish");
         command.setRequest(request);
         command.setIvy(this);
         return command;

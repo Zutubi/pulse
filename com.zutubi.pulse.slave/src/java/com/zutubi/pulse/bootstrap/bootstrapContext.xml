@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans default-autowire="byName">
 
-    <bean id="startupManager" class="com.zutubi.pulse.servercore.bootstrap.DefaultStartupManager" autowire="byName">
+    <bean id="startupManager" class="com.zutubi.pulse.servercore.bootstrap.DefaultStartupManager">
         <property name="startupTasks">
             <list>
                 <value>com.zutubi.pulse.slave.bootstrap.tasks.SlaveContextStartupTask</value>
@@ -20,7 +20,7 @@
 
     <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager" init-method="init"/>
 
-    <bean id="pluginPaths" class="com.zutubi.pulse.servercore.bootstrap.ServerPluginPaths" autowire="byName">
+    <bean id="pluginPaths" class="com.zutubi.pulse.servercore.bootstrap.ServerPluginPaths">
         <property name="configurationManager">
             <ref local="configurationManager"/>
         </property>

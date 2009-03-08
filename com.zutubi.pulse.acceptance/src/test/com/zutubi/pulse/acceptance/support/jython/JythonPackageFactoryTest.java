@@ -1,28 +1,25 @@
-package com.zutubi.pulse.acceptance.support;
+package com.zutubi.pulse.acceptance.support.jython;
 
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getAgentPackage;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePackage;
+import com.zutubi.pulse.acceptance.support.Pulse;
+import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
- *
- *
  */
-@Test
 public class JythonPackageFactoryTest extends PulseTestCase
 {
-    private PackageFactory factory;
+    private JythonPackageFactory factory;
 
     private File tmp;
-    private File pkgFile;
+    private File serverPkg;
+    private File agentPkg;
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -31,14 +28,13 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         factory = new JythonPackageFactory();
 
-        pkgFile = AcceptanceTestUtils.getPulsePackage();
+        serverPkg = getPulsePackage();
+        agentPkg = getAgentPackage();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         factory.close();
-        factory = null;
 
         removeDirectory(tmp);
 
@@ -47,14 +43,14 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
     public void testExtractPackage() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(pkgFile);
+        PulsePackage pkg = factory.createPackage(serverPkg);
 
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
         assertNotNull(pulse);
 
         // ensure that pulse is extracted as expected.
 
-        String pkgFileName = pkgFile.getName();
+        String pkgFileName = serverPkg.getName();
         String pkgName;
         if (pkgFileName.endsWith(".tar.gz"))
         {
@@ -62,6 +58,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
         }
         else
         {
+            // we assume a single file extension archive.
             pkgName = pkgFileName.substring(0, pkgFileName.lastIndexOf('.'));
         }
 
@@ -84,9 +81,10 @@ public class JythonPackageFactoryTest extends PulseTestCase
         assertNull(pulse.getAdminToken());
     }
 
-    public void disabledTestStartAndStopPulse() throws IOException
+    public void testStartAndStopPulseServer() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(pkgFile);
+        PulsePackage pkg = factory.createPackage(serverPkg);
+
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
 
         assertFalse(pulse.ping());
@@ -98,9 +96,24 @@ public class JythonPackageFactoryTest extends PulseTestCase
         assertFalse(pulse.ping());
     }
 
-    public void disabledTestSettingAlternateUserHome() throws Exception
+    public void testStartAndStopPulseAgent() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(pkgFile);
+        PulsePackage pkg = factory.createPackage(agentPkg);
+        Pulse agent = pkg.extractTo(tmp.getCanonicalPath());
+        
+        assertFalse(agent.ping());
+
+        agent.start(true);
+        
+        assertTrue(agent.ping());
+
+        agent.stop();
+        assertFalse(agent.ping());
+    }
+
+    public void testSettingAlternateUserHome() throws Exception
+    {
+        PulsePackage pkg = factory.createPackage(serverPkg);
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
 
         File alternateUserHome = new File(tmp, "user_home");

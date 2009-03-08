@@ -22,10 +22,10 @@ public class PublishArtifactsCommand implements Command
     private IvySupport ivy;
     private RecipeRequest request;
 
-    public PublishArtifactsCommand(IvySupport ivy, RecipeRequest request)
+    public PublishArtifactsCommand(PublishArtifactsCommandConfiguration config)
     {
-        this.ivy = ivy;
-        this.request = request;
+        this.ivy = config.getIvy();
+        this.request = config.getRequest();
     }
 
     public void execute(CommandContext commandContext)
