@@ -9,7 +9,6 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.TextUtils;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +37,7 @@ public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguratio
         {
             DirectoryOutputConfiguration output = new DirectoryOutputConfiguration();
             output.setName("test reports");
-            output.setBase(new File("target/surefire-reports"));
+            output.setBase("target/surefire-reports");
             output.getInclusions().add("TEST-*.xml");
             output.getPostProcessors().add(processor);
             getOutputs().put(output.getName(), output);

@@ -6,7 +6,6 @@ import com.zutubi.tove.annotations.StringList;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wizard;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,7 +19,7 @@ import java.util.List;
 @Form(fieldOrder = {"name", "base", "inclusions", "exclusions", "postProcessors", "index", "type", "failIfNotPresent", "ignoreStale", "followSymlinks"})
 public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationSupport
 {
-    private File base;
+    private String base;
     @Wizard.Ignore
     private String index;
     @Addable(value = "include", attribute = "pattern") @StringList
@@ -30,12 +29,12 @@ public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationS
     @Wizard.Ignore
     private boolean followSymlinks;
 
-    public File getBase()
+    public String getBase()
     {
         return base;
     }
 
-    public void setBase(File base)
+    public void setBase(String base)
     {
         this.base = base;
     }
