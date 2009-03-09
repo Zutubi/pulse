@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.util.TextUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
@@ -17,21 +18,26 @@ public class DirectoryOutput extends FileSystemOutputSupport<DirectoryOutputConf
     protected void captureFiles(File toDir, CommandContext context)
     {
         DirectoryOutputConfiguration config = getConfig();
-        File base = config.getBase();
-        if (base == null)
+        String base = config.getBase();
+        File baseDir;
+        if (!TextUtils.stringSet(base))
         {
-            base = context.getExecutionContext().getWorkingDir();
+            baseDir = context.getExecutionContext().getWorkingDir();
         }
-        else if (!base.isAbsolute())
+        else
         {
-            base = new File(context.getExecutionContext().getWorkingDir(), base.getPath());
+            baseDir = new File(base);
+            if (!baseDir.isAbsolute())
+            {
+                baseDir = new File(context.getExecutionContext().getWorkingDir(), baseDir.getPath());
+            }
         }
 
-        if (!base.exists())
+        if (!baseDir.exists())
         {
             if(config.isFailIfNotPresent() && ! context.getResultState().isBroken())
             {
-                throw new BuildException("Capturing artifact '" + config.getName() + "': base directory '" + base.getAbsolutePath() + "' does not exist");
+                throw new BuildException("Capturing artifact '" + config.getName() + "': base directory '" + baseDir.getAbsolutePath() + "' does not exist");
             }
             else
             {
@@ -40,13 +46,13 @@ public class DirectoryOutput extends FileSystemOutputSupport<DirectoryOutputConf
             }
         }
 
-        if (!base.isDirectory())
+        if (!baseDir.isDirectory())
         {
-            throw new BuildException("Directory artifact '" + config.getName() + "': base '" + base.getAbsolutePath() + "' is not a directory");
+            throw new BuildException("Directory artifact '" + config.getName() + "': base '" + baseDir.getAbsolutePath() + "' is not a directory");
         }
 
         DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir(base);
+        scanner.setBasedir(baseDir);
         if (!config.getInclusions().isEmpty())
         {
             scanner.setIncludes(config.getInclusions().toArray(new String[config.getInclusions().size()]));
@@ -63,7 +69,7 @@ public class DirectoryOutput extends FileSystemOutputSupport<DirectoryOutputConf
         context.setOutputIndex(config.getName(), config.getIndex());
         for (String file : scanner.getIncludedFiles())
         {
-            captureFile(new File(toDir, file), new File(base, file), context);
+            captureFile(new File(toDir, file), new File(baseDir, file), context);
         }
     }
 }
