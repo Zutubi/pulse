@@ -467,7 +467,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             proxy.RemoteApi.ping()
             return True
         except Exception, e:
-            if str(e).find('NoSuchMethodException'):
+            if str(e).find('NoSuchMethodException') > 0:
                 return True
             return False
 
