@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.Sort;
@@ -16,6 +17,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
     protected void setUp() throws Exception
     {
+        super.setUp();
         cache = new DefaultInstanceCache();
     }
 
@@ -393,8 +395,13 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         return handler.entries;
     }
 
-    static class TestConfiguration extends AbstractConfiguration
+    @SymbolicName("test")
+    public static class TestConfiguration extends AbstractConfiguration
     {
+        public TestConfiguration()
+        {
+        }
+
         public TestConfiguration(long handle)
         {
             setHandle(handle);

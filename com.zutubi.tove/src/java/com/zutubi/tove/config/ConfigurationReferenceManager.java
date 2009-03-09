@@ -15,7 +15,9 @@ import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * Manages the resolution, maintenance and cleanup of references between
@@ -25,51 +27,12 @@ public class ConfigurationReferenceManager implements ReferenceResolver
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationReferenceManager.class);
 
-    /**
-     * Mapping from a path to all other paths that reference it.  It is safe
-     * to use paths here as this index is completely refreshed when the
-     * instance cache is: i.e. on any change.
-     */
-    private Map<String, List<String>> references = new HashMap<String, List<String>>();
-    private Set<String> dirtyPaths = new HashSet<String>();
-
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ObjectFactory objectFactory;
 
-    /**
-     * Indicates that a path has changed, and should be removed from caches
-     * on a call to {@link #clearDirty()}.
-     *
-     * @param path path that has changed
-     */
-    void markDirty(String path)
-    {
-        dirtyPaths.add(path);
-    }
-
-    /**
-     * Clears internal caches of dirty paths, ready for repopulation.
-     *
-     * @see #markDirty(String)
-     */
-    void clearDirty()
-    {
-        for (List<String> referencingPaths: references.values())
-        {
-            referencingPaths.removeAll(dirtyPaths);
-        }
-
-        dirtyPaths.clear();
-    }
-
-    void clearAll()
-    {
-        references.clear();
-    }
-    
     /**
      * Returns the path that is referenced by the given handle, which may not
      * be the path for that handle directly in a templated scope.  In templated
@@ -157,17 +120,12 @@ public class ConfigurationReferenceManager implements ReferenceResolver
         return resolveReference(templateOwnerPath, toHandle, instantiator, configurationTemplateManager.getState().instances, indexPath);
     }
 
-    public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, InstanceSource cache, String indexPath) throws TypeException
+    public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, InstanceCache cache, String indexPath) throws TypeException
     {
         String toPath = getReferencedPathForHandle(templateOwnerPath, toHandle);
         if (toPath == null)
         {
             throw new TypeException("Broken reference to unknown handle '" + toHandle + "'");
-        }
-
-        if (indexPath != null)
-        {
-            indexReference(indexPath, toPath);
         }
 
         Configuration instance = cache.get(toPath, true);
@@ -188,19 +146,12 @@ public class ConfigurationReferenceManager implements ReferenceResolver
             instance = (Configuration) instantiator.instantiate(toPath, false, type, record);
         }
 
-        return instance;
-    }
-
-    private void indexReference(String fromPath, String toPath)
-    {
-        List<String> index = references.get(toPath);
-        if (index == null)
+        if (indexPath != null)
         {
-            index = new LinkedList<String>();
-            references.put(toPath, index);
+            cache.indexReference(indexPath, toPath);
         }
 
-        index.add(fromPath);
+        return instance;
     }
 
     public Collection<Configuration> getReferencableInstances(CompositeType type, String referencingPath)
@@ -220,26 +171,9 @@ public class ConfigurationReferenceManager implements ReferenceResolver
         return instances;
     }
 
-    /**
-     * Returns a list of all paths that reference a given path.
-     *
-     * @param path the path referred to
-     * @return all paths that reference path
-     */
-    public List<String> getReferencingPaths(String path)
+    public void addReferenceCleanupTasks(String path, InstanceCache instanceCache, RecordCleanupTaskSupport result)
     {
-        List<String> result = references.get(path);
-        if (result == null)
-        {
-            result = Collections.emptyList();
-        }
-        
-        return result;
-    }
-
-    public void addReferenceCleanupTasks(String path, RecordCleanupTaskSupport result)
-    {
-        List<String> index = references.get(path);
+        Set<String> index = instanceCache.getPropertyPathsReferencing(path);
         if (index != null)
         {
             for (String referencingPath : index)

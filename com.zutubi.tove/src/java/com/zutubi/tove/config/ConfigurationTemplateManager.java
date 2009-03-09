@@ -591,7 +591,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         ConfigurationTemplateManager.State state = getState();
         state.instancesEnabled = false;
         state.instances = new DefaultInstanceCache();
-        configurationReferenceManager.clearAll();
     }
 
     /**
@@ -634,7 +633,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         DefaultInstanceCache instances = state.instances;
         instances.clearDirty();
-        configurationReferenceManager.clearDirty();
 
         for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {
@@ -1944,7 +1942,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
 
         configurationCleanupManager.addCustomCleanupTasks(task);
-        configurationReferenceManager.addReferenceCleanupTasks(path, task);
+        configurationReferenceManager.addReferenceCleanupTasks(path, getState().instances, task);
     }
 
     public void delete(final String path)
@@ -2177,27 +2175,21 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         final String path = instance.getConfigurationPath();
         Record record = getRecord(path);
         ComplexType type = getType(path);
-        final DefaultInstanceCache cache = new DefaultInstanceCache();
-        PersistentInstantiator instantiator = new PersistentInstantiator(getTemplateOwnerPath(path), path, cache, new ReferenceResolver()
+        final DefaultInstanceCache cloneSetCache = new DefaultInstanceCache();
+        PersistentInstantiator instantiator = new PersistentInstantiator(getTemplateOwnerPath(path), path, cloneSetCache, new ReferenceResolver()
         {
             public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, String indexPath) throws TypeException
             {
-                InstanceSource source = getState().instances;
+                InstanceCache cache = getState().instances;
                 String targetPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, toHandle);
                 if(targetPath.startsWith(path))
                 {
                     // This reference points within the object tree we are cloning.
                     // We must update it to point to a new clone.
-                    source = new InstanceSource()
-                    {
-                        public Configuration get(String path, boolean allowIncomplete)
-                        {
-                            return cache.get(path, allowIncomplete);
-                        }
-                    };
+                    cache = cloneSetCache;
                 }
 
-                return configurationReferenceManager.resolveReference(templateOwnerPath, toHandle, instantiator, source, path);
+                return configurationReferenceManager.resolveReference(templateOwnerPath, toHandle, instantiator, cache, null);
             }
         }, this);
 
@@ -2615,12 +2607,10 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         DefaultInstanceCache cache = getState().instances;
         if (cache.markDirty(path))
         {
-            for (String referencingPath: configurationReferenceManager.getReferencingPaths(path))
+            for (String referencingPath: cache.getInstancePathsReferencing(path))
             {
                 markDirty(referencingPath);
             }
-
-            configurationReferenceManager.markDirty(path);
 
             for (String descendentPath: getDescendentPaths(path, true, false, true))
             {
