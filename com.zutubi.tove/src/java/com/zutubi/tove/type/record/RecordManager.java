@@ -1,7 +1,11 @@
 package com.zutubi.tove.type.record;
 
+import com.zutubi.events.EventManager;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionalWrapper;
+import com.zutubi.tove.type.record.events.RecordDeletedEvent;
+import com.zutubi.tove.type.record.events.RecordInsertedEvent;
+import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
 import com.zutubi.tove.type.record.store.RecordStore;
 import com.zutubi.util.logging.Logger;
 
@@ -36,6 +40,7 @@ public class RecordManager implements HandleAllocator
     private RecordStore recordStore;
 
     private TransactionManager transactionManager;
+    private EventManager eventManager;
 
     public void init()
     {
@@ -176,6 +181,8 @@ public class RecordManager implements HandleAllocator
                 return null;
             }
         });
+
+        eventManager.publish(new RecordUpdatedEvent(this, path));
     }
 
     /**
@@ -207,26 +214,8 @@ public class RecordManager implements HandleAllocator
                 return null;
             }
         });
-    }
 
-    /**
-     * Stores the given record at the given path.  If a record exists at the
-     * path, it is updated.  If not, a new record is inserted.  In the latter
-     * case the parent record must exist.
-     *
-     * @param path   path to store the record at
-     * @param record record values to store
-     */
-    public synchronized void insertOrUpdate(String path, Record record)
-    {
-        if (containsRecord(path))
-        {
-            update(path, record);
-        }
-        else
-        {
-            insert(path, record);
-        }
+        eventManager.publish(new RecordInsertedEvent(this, path));
     }
 
     /**
@@ -240,7 +229,7 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(path);
 
-        return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+        Record record = (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
         {
             public Object execute(RecordManagerState state)
             {
@@ -252,33 +241,12 @@ public class RecordManager implements HandleAllocator
                 return deletedRecord;
             }
         });
-    }
 
-    /**
-     * Copy the record contents from the source path to the destination path.
-     * A new record with a new handle is created at the destination.
-     *
-     * @param sourcePath      path to copy from
-     * @param destinationPath path to copy to
-     * @return the new record, or null if the source path does not refer to
-     *         an existing record
-     */
-    public synchronized Record copy(String sourcePath, String destinationPath)
-    {
-        checkPath(sourcePath);
-        checkDoesNotExist(destinationPath, "Failed to copy to destination path: '" + destinationPath + "'. An entry already exists at this path.");
-
-        MutableRecord record = (MutableRecord) select(sourcePath);
         if (record != null)
         {
-            MutableRecord copy = record.copy(true);
-            // the copy will copy the handles as well, so lets clear them to ensure reallocation on insert
-            clearHandles(copy);
-            insert(destinationPath, copy);
-            return copy;
+            eventManager.publish(new RecordDeletedEvent(this, path));
         }
-
-        return null;
+        return record;
     }
 
     /**
@@ -307,6 +275,8 @@ public class RecordManager implements HandleAllocator
                     return null;
                 }
             });
+
+            eventManager.publish(new RecordInsertedEvent(this, destinationPath));
             return record;
         }
         return null;
@@ -384,6 +354,11 @@ public class RecordManager implements HandleAllocator
         }
 
         handler.handle(path, record);
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 
     private interface RecordHandler

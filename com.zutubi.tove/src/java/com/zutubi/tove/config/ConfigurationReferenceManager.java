@@ -31,6 +31,7 @@ public class ConfigurationReferenceManager implements ReferenceResolver
      * instance cache is: i.e. on any change.
      */
     private Map<String, List<String>> references = new HashMap<String, List<String>>();
+    private Set<String> dirtyPaths = new HashSet<String>();
 
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
@@ -38,11 +39,37 @@ public class ConfigurationReferenceManager implements ReferenceResolver
     private ConfigurationTemplateManager configurationTemplateManager;
     private ObjectFactory objectFactory;
 
-    public void clear()
+    /**
+     * Indicates that a path has changed, and should be removed from caches
+     * on a call to {@link #clearDirty()}.
+     *
+     * @param path path that has changed
+     */
+    void markDirty(String path)
+    {
+        dirtyPaths.add(path);
+    }
+
+    /**
+     * Clears internal caches of dirty paths, ready for repopulation.
+     *
+     * @see #markDirty(String)
+     */
+    void clearDirty()
+    {
+        for (List<String> referencingPaths: references.values())
+        {
+            referencingPaths.removeAll(dirtyPaths);
+        }
+
+        dirtyPaths.clear();
+    }
+
+    void clearAll()
     {
         references.clear();
     }
-
+    
     /**
      * Returns the path that is referenced by the given handle, which may not
      * be the path for that handle directly in a templated scope.  In templated
@@ -191,6 +218,23 @@ public class ConfigurationReferenceManager implements ReferenceResolver
         }
 
         return instances;
+    }
+
+    /**
+     * Returns a list of all paths that reference a given path.
+     *
+     * @param path the path referred to
+     * @return all paths that reference path
+     */
+    public List<String> getReferencingPaths(String path)
+    {
+        List<String> result = references.get(path);
+        if (result == null)
+        {
+            result = Collections.emptyList();
+        }
+        
+        return result;
     }
 
     public void addReferenceCleanupTasks(String path, RecordCleanupTaskSupport result)

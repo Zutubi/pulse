@@ -8,13 +8,12 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.RecordManager;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- */
 public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystemTestCase
 {
     private String nc1Path;
@@ -76,7 +75,7 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
         assertFalse(cascaded.isComplete());
         assertFalse(casCascaded.isComplete());
 
-        configurationCleanupManager.runCleanupTasks(root);
+        configurationCleanupManager.runCleanupTasks(root, recordManager);
         assertTrue(root.isComplete());
         assertTrue(cascaded.isComplete());
         assertTrue(casCascaded.isComplete());
@@ -205,7 +204,7 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
     {
         public RecordCleanupTask getTask(String deletedPath, String referencingPath)
         {
-            return new NullifyReferenceCleanupTask(referencingPath, null);
+            return new NullifyReferenceCleanupTask(referencingPath);
         }
     }
 
@@ -218,7 +217,7 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
             super(path);
         }
 
-        public void run()
+        public void run(RecordManager recordManager)
         {
             executingThread = Thread.currentThread();
         }

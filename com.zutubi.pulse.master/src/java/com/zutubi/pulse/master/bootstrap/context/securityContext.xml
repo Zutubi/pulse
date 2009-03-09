@@ -102,6 +102,12 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
+<!-- default repository security settings.
+    /,ROLE_ANONYMOUS
+    /,ROLE_USER,GET,HEAD
+    /,ADMINISTER,GET,HEAD,PUT
+-->
+
     <!--
     The AuthenticationProcessingFilter is responsible for handling the login request. It monitors for requests
     sent to 'filterProcessesUrl', and uses the 'authenticationManager' to handle the actual authentication.

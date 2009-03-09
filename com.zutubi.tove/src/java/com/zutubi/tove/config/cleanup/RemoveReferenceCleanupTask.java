@@ -10,15 +10,12 @@ import com.zutubi.tove.type.record.RecordManager;
  */
 public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
 {
-    private RecordManager recordManager;
-
-    public RemoveReferenceCleanupTask(String referencingPath, RecordManager recordManager)
+    public RemoveReferenceCleanupTask(String referencingPath)
     {
         super(referencingPath);
-        this.recordManager = recordManager;
     }
 
-    public void run()
+    public void run(RecordManager recordManager)
     {
         String collectionPath = PathUtils.getParentPath(getAffectedPath());
         String itemName = PathUtils.getBaseName(getAffectedPath());

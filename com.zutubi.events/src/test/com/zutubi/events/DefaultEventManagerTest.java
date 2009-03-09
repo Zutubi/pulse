@@ -2,7 +2,6 @@ package com.zutubi.events;
 
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class DefaultEventManagerTest extends ZutubiTestCase
@@ -50,7 +49,7 @@ public class DefaultEventManagerTest extends ZutubiTestCase
 
     public void testListenerRegisteredInCallbackDoesNotReceiveEvent()
     {
-        eventManager.register(new MockEventListener(new Class[]{Event.class})
+        eventManager.register(new MockEventListener(Event.class)
         {
             public void handleEvent(Event evt)
             {
@@ -383,7 +382,7 @@ public class DefaultEventManagerTest extends ZutubiTestCase
     {
         private final Class[] handledEvents;
 
-        public MockEventListener(Class[] handledEvents)
+        public MockEventListener(Class... handledEvents)
         {
             this.handledEvents = handledEvents;
         }
@@ -396,36 +395,6 @@ public class DefaultEventManagerTest extends ZutubiTestCase
         public void handleEvent(Event evt)
         {
 
-        }
-    }
-
-    private class RecordingEventListener extends MockEventListener
-    {
-        private final List<Event> events = new LinkedList<Event>();
-
-        public RecordingEventListener(Class... handledEvents)
-        {
-            super(handledEvents);
-        }
-
-        public void handleEvent(Event evt)
-        {
-            events.add(evt);
-        }
-
-        public List<Event> getEventsReceived()
-        {
-            return events;
-        }
-
-        public int getReceivedCount()
-        {
-            return getEventsReceived().size();
-        }
-
-        public void reset()
-        {
-            getEventsReceived().clear();
         }
     }
 

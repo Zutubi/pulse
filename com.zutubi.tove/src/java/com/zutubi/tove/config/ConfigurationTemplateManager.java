@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.tove.config.api.Configuration;
@@ -9,6 +10,10 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.transaction.*;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
+import com.zutubi.tove.type.record.events.RecordDeletedEvent;
+import com.zutubi.tove.type.record.events.RecordEvent;
+import com.zutubi.tove.type.record.events.RecordInsertedEvent;
+import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationContext;
@@ -23,7 +28,7 @@ import java.util.*;
 
 /**
  */
-public class ConfigurationTemplateManager
+public class ConfigurationTemplateManager implements com.zutubi.events.EventListener
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
@@ -50,6 +55,8 @@ public class ConfigurationTemplateManager
 
     public void init()
     {
+        eventManager.register(this);
+
         stateWrapper = new StateTransactionalWrapper();
         stateWrapper.setTransactionManager(transactionManager);
 
@@ -573,15 +580,41 @@ public class ConfigurationTemplateManager
         return gotType;
     }
 
+    /**
+     * Suspends operation of the instance cache as a pure performance
+     * optimisation.  Do not use lightly, this requires careful
+     * consideration of the consequences.  When done, you must also call
+     * {@link #resumeInstanceCache()}.
+     */
+    void suspendInstanceCache()
+    {
+        ConfigurationTemplateManager.State state = getState();
+        state.instancesEnabled = false;
+        state.instances = new DefaultInstanceCache();
+        configurationReferenceManager.clearAll();
+    }
+
+    /**
+     * Resumes the instance cache after an earlier call to {@link #suspendInstanceCache()},
+     * immediately repopulating it via a refresh.
+     */
+    void resumeInstanceCache()
+    {
+        getState().instancesEnabled = true;
+        refreshCaches();
+    }
+
     void refreshCaches()
     {
-        configurationReferenceManager.clear();
         stateWrapper.execute(new TransactionalWrapper.Action<State>()
         {
             public Object execute(State state)
             {
                 refreshTemplateHierarchies(state);
-                refreshInstances(state);
+                if (state.instancesEnabled)
+                {
+                    refreshInstances(state);
+                }
                 return null;
             }
         });
@@ -600,7 +633,8 @@ public class ConfigurationTemplateManager
     private void refreshInstances(State state)
     {
         DefaultInstanceCache instances = state.instances;
-        instances.clear();
+        instances.clearDirty();
+        configurationReferenceManager.clearDirty();
 
         for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {
@@ -1823,7 +1857,7 @@ public class ConfigurationTemplateManager
                     if(pathElements.length == 2)
                     {
                         // Deleting an entire templated instance
-                        result = new DeleteRecordCleanupTask(path, false, recordManager);
+                        result = new DeleteRecordCleanupTask(path, false);
                     }
                     else
                     {
@@ -1840,7 +1874,7 @@ public class ConfigurationTemplateManager
                             // This record does not exist in the parent: it
                             // has been added at this level.  It should be
                             // deleted.
-                            result = new DeleteRecordCleanupTask(path, false, recordManager);
+                            result = new DeleteRecordCleanupTask(path, false);
                         }
                         else
                         {
@@ -1848,7 +1882,7 @@ public class ConfigurationTemplateManager
                             // a collection item, and if so hide it.
                             if(parentRecord.isCollection())
                             {
-                                result = new HideRecordCleanupTask(path, false, recordManager);
+                                result = new HideRecordCleanupTask(path, false);
                             }
                             else
                             {
@@ -1872,7 +1906,7 @@ public class ConfigurationTemplateManager
                 {
                     // Much simpler, just delete the record and run custom
                     // and reference cleanup tasks.
-                    DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, false, recordManager);
+                    DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, false);
                     addAdditionalTasks(path, result);
                     return result;
                 }
@@ -1884,7 +1918,7 @@ public class ConfigurationTemplateManager
     {
         if(pathExists(path))
         {
-            DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, isSkeleton(path), recordManager);
+            DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, isSkeleton(path));
             addAdditionalTasks(path, result);
             return result;
         }
@@ -1892,7 +1926,7 @@ public class ConfigurationTemplateManager
         {
             // It must be already hidden in the parent, clean up the hidden
             // key if it exists at this level.
-            return new CleanupHiddenKeyCleanupTask(path, recordManager);
+            return new CleanupHiddenKeyCleanupTask(path);
         }
     }
 
@@ -1905,7 +1939,7 @@ public class ConfigurationTemplateManager
             CollectionType collectionType = getType(parentPath, CollectionType.class);
             if (collectionType.isOrdered())
             {
-                task.addCascaded(new CleanupOrderCleanupTask(path, recordManager));
+                task.addCascaded(new CleanupOrderCleanupTask(path));
             }
         }
 
@@ -1933,7 +1967,7 @@ public class ConfigurationTemplateManager
                 }
 
                 List<ConfigurationEvent> events = prepareDeleteEvents(path);
-                configurationCleanupManager.runCleanupTasks(getCleanupTasks(path));
+                configurationCleanupManager.runCleanupTasks(getCleanupTasks(path), recordManager);
                 refreshCaches();
 
                 State state = getState();
@@ -2576,6 +2610,64 @@ public class ConfigurationTemplateManager
         return refreshCount;
     }
 
+    private void markDirty(String path)
+    {
+        DefaultInstanceCache cache = getState().instances;
+        if (cache.markDirty(path))
+        {
+            for (String referencingPath: configurationReferenceManager.getReferencingPaths(path))
+            {
+                markDirty(referencingPath);
+            }
+
+            configurationReferenceManager.markDirty(path);
+
+            for (String descendentPath: getDescendentPaths(path, true, false, true))
+            {
+                markDirty(descendentPath);
+            }
+        }
+
+        String parentPath = PathUtils.getParentPath(path);
+        if (parentPath != null)
+        {
+            markDirty(parentPath);
+        }
+    }
+
+    public void handleEvent(Event event)
+    {
+        if (event instanceof RecordInsertedEvent)
+        {
+            String parentPath = PathUtils.getParentPath(((RecordInsertedEvent) event).getPath());
+            if (parentPath != null)
+            {
+                markDirty(parentPath);
+            }
+        }
+        else if (event instanceof RecordUpdatedEvent)
+        {
+            markDirty(((RecordUpdatedEvent) event).getPath());
+        }
+        else
+        {
+            DefaultInstanceCache cache = getState().instances;
+            if (cache != null)
+            {
+                Collection<Configuration> descendents = cache.getAllDescendents(((RecordDeletedEvent) event).getPath(), true);
+                for (Configuration c: descendents)
+                {
+                    markDirty(c.getConfigurationPath());
+                }
+            }
+        }
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ RecordEvent.class };
+    }
+
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
@@ -2644,6 +2736,11 @@ public class ConfigurationTemplateManager
     class State
     {
         /**
+         * If true, the instance cache is enabled.  If not, it is ignored (not
+         * updated during refreshes).
+         */
+        boolean instancesEnabled = true;
+        /**
          * Cache of complete instances.
          */
         DefaultInstanceCache instances = new DefaultInstanceCache();
@@ -2664,8 +2761,12 @@ public class ConfigurationTemplateManager
 
         public State copy(State v)
         {
-            // caches are always fully refreshed after a change, so a standard copy is not required.
-            return new State();
+            State copy = new State();
+            copy.instancesEnabled = v.instancesEnabled;
+            // Instances are immutable (we copy on write) so we can reuse the
+            // same instances, wrapped with a new cache.
+            copy.instances = v.instances.copyStructure();
+            return copy;
         }
     }
 }

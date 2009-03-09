@@ -14,15 +14,12 @@ import java.util.List;
  */
 public class CleanupOrderCleanupTask extends RecordCleanupTaskSupport
 {
-    private RecordManager recordManager;
-
-    public CleanupOrderCleanupTask(String path, RecordManager recordManager)
+    public CleanupOrderCleanupTask(String path)
     {
         super(path);
-        this.recordManager = recordManager;
     }
 
-    public void run()
+    public void run(RecordManager recordManager)
     {
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         String baseName = PathUtils.getBaseName(getAffectedPath());

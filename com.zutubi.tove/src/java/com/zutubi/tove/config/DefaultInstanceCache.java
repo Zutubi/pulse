@@ -1,13 +1,10 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.UnaryProcedure;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A cache for configuration instances, supporting addressing by path,
@@ -16,6 +13,13 @@ import java.util.Map;
 class DefaultInstanceCache implements InstanceCache
 {
     private Entry root = new Entry(null, true);
+
+    public DefaultInstanceCache copyStructure()
+    {
+        DefaultInstanceCache copy = new DefaultInstanceCache();
+        copy.root = root.copyStructure();
+        return copy;
+    }
 
     public boolean hasInstancesUnder(String path)
     {
@@ -140,19 +144,31 @@ class DefaultInstanceCache implements InstanceCache
     {
         if (index == elements.length)
         {
-            entry.setInstance(instance);
+            entry.setInstance(instance, complete);
             return;
         }
 
         put(instance, complete, entry.getOrCreateChild(elements[index], complete), elements, index + 1);
     }
 
-    public void clear()
+    public void clearDirty()
     {
-        root = new Entry(null, true);
+        root.prune();
     }
 
-    private class Entry
+    public boolean markDirty(String path)
+    {
+        Entry entry = getEntry(path, true, null);
+        if (entry != null && !entry.isDirty())
+        {
+            entry.markDirty();
+            return true;
+        }
+
+        return false;
+    }
+
+    private static class Entry
     {
         /**
          * Cached instance at this path.
@@ -171,6 +187,11 @@ class DefaultInstanceCache implements InstanceCache
          * True if this entry is complete.
          */
         private boolean complete;
+        /**
+         * True if this entry is dirty - i.e. the record underlying the
+         * instance or some instance it reaches has been modified.
+         */
+        private boolean dirty = false;
 
         public Entry(Configuration instance, boolean complete)
         {
@@ -183,9 +204,10 @@ class DefaultInstanceCache implements InstanceCache
             return instance;
         }
 
-        public void setInstance(Configuration instance)
+        public void setInstance(Configuration instance, boolean complete)
         {
             this.instance = instance;
+            this.complete = complete;
         }
 
         public void addChild(String element, Entry entry)
@@ -264,6 +286,68 @@ class DefaultInstanceCache implements InstanceCache
         public boolean isComplete()
         {
             return complete;
+        }
+
+        public boolean isDirty()
+        {
+            return dirty;
+        }
+
+        public void markDirty()
+        {
+            this.dirty = true;
+        }
+
+        public Entry copyStructure()
+        {
+            Entry copy = new Entry(instance, complete);
+            copy.valid = valid;
+            copy.dirty = dirty;
+            if (children != null)
+            {
+                for (Map.Entry<String,Entry> child: children.entrySet())
+                {
+                    copy.addChild(child.getKey(), child.getValue().copyStructure());
+                }
+            }
+
+            return copy;
+        }
+
+        /**
+         * Processes dirty flags in this subtree, discarding empty entries
+         * and resetting flags.
+         *
+         * @return true if this whole subtree is empty after the prune
+         */
+        public boolean prune()
+        {
+            if (dirty)
+            {
+                instance = null;
+                dirty = false;
+                valid = true;
+            }
+
+            if (children != null)
+            {
+                Iterator<Map.Entry<String,Entry>> it = children.entrySet().iterator();
+                while (it.hasNext())
+                {
+                    if (it.next().getValue().prune())
+                    {
+                        // The child can be ditched.
+                        it.remove();
+                    }
+                }
+
+                if (children.size() == 0)
+                {
+                    children = null;
+                }
+            }
+
+            return children == null && instance == null;
         }
     }
 }

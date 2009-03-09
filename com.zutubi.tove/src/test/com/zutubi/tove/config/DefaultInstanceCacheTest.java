@@ -10,8 +10,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- */
 public class DefaultInstanceCacheTest extends ZutubiTestCase
 {
     private DefaultInstanceCache cache;
@@ -21,10 +19,33 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         cache = new DefaultInstanceCache();
     }
 
-    protected void tearDown() throws Exception
+    public void testCopyStructureEmpty()
     {
-        cache = null;
+        cache = new DefaultInstanceCache();
+        DefaultInstanceCache copy = cache.copyStructure();
+        assertEmpty(copy);
     }
+
+    public void testCopyStructure()
+    {
+        TestConfiguration c1 = new TestConfiguration(1);
+        TestConfiguration c2 = new TestConfiguration(2);
+        TestConfiguration c3 = new TestConfiguration(3);
+
+        cache = new DefaultInstanceCache();
+        cache.put("foo", c1, true);
+        cache.put("foo/bar", c2, true);
+        cache.put("baz", c3, true);
+
+        DefaultInstanceCache copy = cache.copyStructure();
+        assertEquals(3, copy.getAllDescendents("", true).size());
+
+        // The copy should hold the same instances.
+        assertSame(c1, copy.get("foo", true));
+        assertSame(c2, copy.get("foo/bar", true));
+        assertSame(c3, copy.get("baz", true));
+    }
+
 
     public void testHasInstancesUnderEmptyEmptyPath()
     {
@@ -261,6 +282,93 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         cache.put("baz", baz, true);
         cache.put("baz/quux", bazQuux, true);
         forAllHelper(new CollectingHandler.Entry(baz, "baz", null), new CollectingHandler.Entry(bazQuux, "baz/quux", baz), new CollectingHandler.Entry(foo, "foo", null), new CollectingHandler.Entry(fooBar, "foo/bar", foo));
+    }
+
+    public void testClearDirtyEmpty()
+    {
+        cache = new DefaultInstanceCache();
+        cache.clearDirty();
+        assertEmpty(cache);
+    }
+
+    public void testClearDirtySimple()
+    {
+        cache = new DefaultInstanceCache();
+        cache.put("foo", new TestConfiguration(1), true);
+        cache.markDirty("foo");
+        cache.clearDirty();
+        assertEmpty(cache);
+    }
+
+    public void testClearDirtyRetainsUnmarked()
+    {
+        cache = new DefaultInstanceCache();
+        cache.put("foo", new TestConfiguration(1), true);
+        cache.clearDirty();
+        assertSize(1, cache);
+        assertNotNull(cache.get("foo", true));
+    }
+
+    public void testClearDirtyRetainsUnmarkedUnderMarked()
+    {
+        cache = new DefaultInstanceCache();
+        cache.put("foo", new TestConfiguration(1), true);
+        cache.put("foo/bar", new TestConfiguration(2), true);
+        cache.markDirty("foo");
+        cache.clearDirty();
+        assertSize(1, cache);
+        assertNull(cache.get("foo", true));
+        assertNotNull(cache.get("foo/bar", true));
+    }
+
+    public void testClearDirtyInvalidReplacedByValid()
+    {
+        cache = new DefaultInstanceCache();
+        cache.put("foo", new TestConfiguration(1), true);
+        // Put in a nested instance so the cache keeps the entry at foo on
+        // clearDirty
+        cache.put("foo/bar", new TestConfiguration(2), true);
+
+        cache.markInvalid("foo");
+        assertFalse(cache.isValid("foo", true));
+
+        cache.markDirty("foo");
+        cache.clearDirty();
+        
+        cache.put("foo", new TestConfiguration(1), true);
+        assertSize(2, cache);
+        assertNotNull(cache.get("foo", true));
+        assertTrue(cache.isValid("foo", true));
+    }
+
+    public void testClearIncompleteInvalidReplacedByComplete()
+    {
+        cache = new DefaultInstanceCache();
+        cache.put("foo", new TestConfiguration(1), false);
+        // Put in a nested instance so the cache keeps the entry at foo on
+        // clearDirty
+        cache.put("foo/bar", new TestConfiguration(2), true);
+
+        assertNull(cache.get("foo", false));
+        assertNotNull(cache.get("foo", true));
+
+        cache.markDirty("foo");
+        cache.clearDirty();
+        
+        cache.put("foo", new TestConfiguration(1), true);
+        assertSize(2, cache);
+        assertNotNull(cache.get("foo", false));
+        assertNotNull(cache.get("foo", true));
+    }
+
+    private void assertEmpty(DefaultInstanceCache cache)
+    {
+        assertSize(0, cache);
+    }
+
+    private void assertSize(int size, DefaultInstanceCache cache)
+    {
+        assertEquals(size, cache.getAllDescendents("", true).size());
     }
 
     private List<CollectingHandler.Entry> forAllHelper(CollectingHandler.Entry... expected)

@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.events.DefaultEventManager;
 import com.zutubi.tove.config.types.*;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.CompositeType;
@@ -12,8 +13,6 @@ import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
 
-/**
- */
 public class ConfigurationPersistenceManagerTest extends ZutubiTestCase
 {
     private ConfigurationPersistenceManager manager = null;
@@ -38,6 +37,7 @@ public class ConfigurationPersistenceManagerTest extends ZutubiTestCase
         recordManager = new RecordManager();
         recordManager.setTransactionManager(transactionManager);
         recordManager.setRecordStore(inMemory);
+        recordManager.setEventManager(new DefaultEventManager());
         recordManager.init();
 
         manager = new ConfigurationPersistenceManager();

@@ -66,6 +66,7 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
         recordManager = new RecordManager();
         recordManager.setTransactionManager(transactionManager);
         recordManager.setRecordStore(inMemory);
+        recordManager.setEventManager(eventManager);
         recordManager.init();
 
         // emulate administer auths.

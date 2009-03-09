@@ -11,15 +11,12 @@ import com.zutubi.tove.type.record.RecordManager;
  */
 public class NullifyReferenceCleanupTask extends RecordCleanupTaskSupport
 {
-    private RecordManager recordManager;
-
-    public NullifyReferenceCleanupTask(String referencingPath, RecordManager recordManager)
+    public NullifyReferenceCleanupTask(String referencingPath)
     {
         super(referencingPath);
-        this.recordManager = recordManager;
     }
 
-    public void run()
+    public void run(RecordManager recordManager)
     {
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         Record parentRecord = recordManager.select(parentPath);

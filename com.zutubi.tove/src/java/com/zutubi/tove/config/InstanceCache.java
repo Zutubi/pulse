@@ -10,6 +10,15 @@ import java.util.Collection;
  */
 public interface InstanceCache extends InstanceSource
 {
+    /**
+     * Returns a copy of this cache which points to the same instances.  That
+     * is, the cache structure itself is copied, but the same instances are
+     * held in the new cache.
+     *
+     * @return a copy of this cache holding the same instances
+     */
+    DefaultInstanceCache copyStructure();
+
     void markInvalid(String path);
 
     boolean isValid(String path, boolean allowIncomplete);
@@ -23,7 +32,20 @@ public interface InstanceCache extends InstanceSource
 
     void forAllInstances(InstanceHandler handler, boolean allowIncomplete);
 
-    void clear();
+    /**
+     * Marks an instance as dirty: i.e. the instance or something it reaches
+     * has changed and needs refreshing.
+     *
+     * @param path the path to mark dirty
+     * @return if an entry wsa found at the path and was newly-marked as dirty
+     */
+    boolean markDirty(String path);
+
+    /**
+     * Clears all dirty instances from the cache, ready for them to be
+     * refreshed.
+     */
+    void clearDirty();
 
     public static interface InstanceHandler
     {

@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.util.junit.ZutubiTestCase;
-import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.MutableRecordImpl;
-import static org.mockito.Mockito.mock;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.util.junit.ZutubiTestCase;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class PathPatternRecordLocatorTest extends ZutubiTestCase
 {

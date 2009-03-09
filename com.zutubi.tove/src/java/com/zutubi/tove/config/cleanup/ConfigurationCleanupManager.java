@@ -3,10 +3,11 @@ package com.zutubi.tove.config.cleanup;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -47,13 +48,13 @@ public class ConfigurationCleanupManager implements EventListener
         }
     }
 
-    public void runCleanupTasks(RecordCleanupTask task)
+    public void runCleanupTasks(RecordCleanupTask task, RecordManager recordManager)
     {
-        task.run();
+        task.run(recordManager);
 
         for (RecordCleanupTask subTask : task.getCascaded())
         {
-            runCleanupTasks(subTask);
+            runCleanupTasks(subTask, recordManager);
         }
     }
 

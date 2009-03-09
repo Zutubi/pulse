@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.zutubi.events.DefaultEventManager;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -40,6 +41,7 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
         recordManager = new RecordManager();
         recordManager.setRecordStore(new InMemoryRecordStore());
         recordManager.setTransactionManager(new TransactionManager());
+        recordManager.setEventManager(new DefaultEventManager());
         recordManager.init();
         
         // Create an empty scope: just one record
