@@ -1,13 +1,17 @@
-package com.zutubi.pulse.servercore.jetty;
+package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.jetty.SecurityHandler;
+import com.zutubi.pulse.servercore.jetty.ArtifactRepositoryConfigurationHandler;
+import com.zutubi.pulse.servercore.jetty.JettyServerManager;
+import com.zutubi.pulse.servercore.jetty.ServerConfigurationHandler;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.plugins.repository.url.URLRepository;
 import static org.mockito.Mockito.*;
-import org.mortbay.jetty.Server;
 import org.mortbay.http.SocketListener;
+import org.mortbay.jetty.Server;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -17,8 +21,8 @@ import java.util.List;
 // this is somewhere in between a unit test and an acceptance test.  It is not a unit test
 // because it does more than just deal with the ArtifactRepositoryConfigurationHandler, but
 // it is less than an acceptance test because it does not use the repository that is running
-// within the deployed pulse installation.  So where does this test fit?.
-public class ArtifactRepositoryUnitTest extends PulseTestCase
+// within the deployed pulse installation.  
+public class AritfactRepositoryIsolationTest extends PulseTestCase
 {
     private File tmp;
     private File repositoryBase;
@@ -32,7 +36,7 @@ public class ArtifactRepositoryUnitTest extends PulseTestCase
 
         tmp = FileSystemUtils.createTempDir();
         repositoryBase = new File(tmp, "repositoryBase");
-        
+
         serverManager = new JettyServerManager();
 
         ArtifactRepositoryConfigurationHandler repository = new ArtifactRepositoryConfigurationHandler();

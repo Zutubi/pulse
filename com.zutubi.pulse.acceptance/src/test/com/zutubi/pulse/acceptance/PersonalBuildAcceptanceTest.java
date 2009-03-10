@@ -36,14 +36,12 @@ import java.util.Properties;
 /**
  * Simple sanity checks for personal builds.
  */
-@Test(dependsOnGroups = {"init.*"})
 public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 {
     private static final String PROJECT_NAME = "PersonalBuildAcceptanceTest-Project";
 
     private File workingCopyDir;
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -59,7 +57,6 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

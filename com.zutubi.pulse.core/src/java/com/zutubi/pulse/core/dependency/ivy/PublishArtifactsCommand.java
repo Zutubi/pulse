@@ -8,10 +8,14 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.util.url.CredentialsStore;
+import org.apache.ivy.util.Credentials;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  * A command that handles the publishing of build publications to the artifact repository.
@@ -21,6 +25,7 @@ public class PublishArtifactsCommand implements Command
 {
     private IvySupport ivy;
     private RecipeRequest request;
+    private static final String REALM = "Pulse";
 
     public PublishArtifactsCommand(PublishArtifactsCommandConfiguration config)
     {
@@ -31,6 +36,9 @@ public class PublishArtifactsCommand implements Command
     public void execute(CommandContext commandContext)
     {
         ExecutionContext context = commandContext.getExecutionContext();
+
+        updateIvyCredentials(context);
+
         try
         {
             String stageName = request.getStageName();
@@ -46,6 +54,28 @@ public class PublishArtifactsCommand implements Command
         catch (Exception e)
         {
             throw new BuildException("Error publishing artifacts: " + e.getMessage(), e);
+        }
+    }
+
+    private void updateIvyCredentials(ExecutionContext context)
+    {
+        // would like to do this in the IvyCredentialsInitialiser, but it is in servercore along with
+        // the TokenManager.
+        try
+        {
+            URL masterUrl = new URL(context.getString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL));
+            String host = masterUrl.getHost();
+
+            CredentialsStore store = CredentialsStore.INSTANCE;
+            Credentials credentials = store.getCredentials(REALM, null); // lookup the latest username / password.
+            if (credentials != null)
+            {
+                store.addCredentials(REALM, host, credentials.getUserName(), credentials.getPasswd());
+            }
+        }
+        catch (MalformedURLException e)
+        {
+            // noop.
         }
     }
 

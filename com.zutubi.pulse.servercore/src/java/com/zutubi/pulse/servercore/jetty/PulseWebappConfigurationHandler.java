@@ -68,6 +68,12 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
         context.setWAR(configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
         context.setContextPath(config.getContextPath());
         context.setDefaultsDescriptor(null);
+
+        if(!tmpDir.exists() && !tmpDir.mkdirs())
+        {
+            throw new IOException("Failed to create " + tmpDir.getCanonicalPath());
+        }
+
         context.setAttribute("javax.servlet.context.tempdir", tmpDir);
 
         if (isRequestLoggingEnabled())

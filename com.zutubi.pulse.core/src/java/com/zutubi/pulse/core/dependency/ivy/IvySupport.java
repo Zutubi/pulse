@@ -16,6 +16,8 @@ import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.resolver.AbstractPatternsBasedResolver;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
 import org.apache.ivy.util.MessageLogger;
+import org.apache.ivy.util.url.URLHandler;
+import org.apache.ivy.util.url.URLHandlerRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -138,7 +140,17 @@ public class IvySupport
 
         String resolverName = getArtifactRepositoryResolver().getName();
 
-        ivy.publish(mrid, srcArtifactsPatterns, resolverName, options);
+        // annoying but necessary.  See CustomURLHandler for details.
+        URLHandler originalDefault = URLHandlerRegistry.getDefault();
+        try
+        {
+            URLHandlerRegistry.setDefault(new CustomURLHandler());
+            ivy.publish(mrid, srcArtifactsPatterns, resolverName, options);
+        }
+        finally
+        {
+            URLHandlerRegistry.setDefault(originalDefault);
+        }
     }
 
     /**
@@ -167,7 +179,17 @@ public class IvySupport
 
         String resolverName = getArtifactRepositoryResolver().getName();
 
-        return ivy.publish(mrid, Collections.emptySet(), resolverName, options);
+        // annoying but necessary.  See CustomURLHandler for details.
+        URLHandler originalDefault = URLHandlerRegistry.getDefault();
+        try
+        {
+            URLHandlerRegistry.setDefault(new CustomURLHandler());
+            return ivy.publish(mrid, Collections.emptySet(), resolverName, options);
+        }
+        finally
+        {
+            URLHandlerRegistry.setDefault(originalDefault);
+        }
     }
 
     public void resolve(ModuleDescriptor descriptor) throws IOException, ParseException

@@ -12,7 +12,6 @@ public class SupportUtils
             }
             catch (Exception e)
             {
-                System.out.println("Failed to shutdown pulse instance: " + e.getMessage());
                 e.printStackTrace();
             }
         }

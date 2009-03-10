@@ -34,6 +34,7 @@ The beans defined within the security subsystem need not be accessed by other co
             <list>
                 <ref local="customAuthenticationProvider"/>
                 <ref local="rememberMeAuthenticationProvider"/>
+                <ref local="serviceTokenAuthenticationProvider"/>
             </list>
         </property>
     </bean>
@@ -44,6 +45,11 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="ldapManager">
             <ref local="ldapManager"/>
         </property>
+    </bean>
+
+    <bean id="serviceTokenAuthenticationProvider"
+          class="com.zutubi.pulse.master.security.ServiceTokenAuthenticationProvider">
+        <property name="serviceTokenManager" ref="serviceTokenManager"/>
     </bean>
 
     <!--
@@ -89,24 +95,19 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="delegate" ref="securityDelegateHandler"/>
     </bean>
 
-    <bean name="securityDelegateHandler" class="com.zutubi.pulse.servercore.jetty.SecurityHandler">
+    <bean name="securityDelegateHandler" class="com.zutubi.pulse.master.jetty.SecurityHandler">
         <property name="accessManager" ref="accessManager"/>
+        <property name="basicEntryPoint" ref="basicProcessingFilterEntryPoint"/>
     </bean>
 
     <bean name="artifactRepositoryAuthorityProvider" class="com.zutubi.pulse.servercore.jetty.ArtifactRepositoryAuthorityProvider">
         <property name="accessManager" ref="accessManager"/>
-        <property name="definitions">
-            <value>
-                /,ROLE_ANONYMOUS,GET,PUT,HEAD
-            </value>
-        </property>
+        <property name="definitions"><value>
+            /,ROLE_ANONYMOUS
+            /,ROLE_USER,GET,HEAD
+            /,ADMINISTER,GET,HEAD,PUT
+        </value></property>
     </bean>
-
-<!-- default repository security settings.
-    /,ROLE_ANONYMOUS
-    /,ROLE_USER,GET,HEAD
-    /,ADMINISTER,GET,HEAD,PUT
--->
 
     <!--
     The AuthenticationProcessingFilter is responsible for handling the login request. It monitors for requests
@@ -141,7 +142,7 @@ The beans defined within the security subsystem need not be accessed by other co
     </bean>
 
     <bean id="basicProcessingFilterEntryPoint" class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
-        <property name="realmName" value="Pulse Realm"/>
+        <property name="realmName" value="Pulse"/>
     </bean>
 
     <!--

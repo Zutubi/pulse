@@ -38,6 +38,7 @@ import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
+import com.zutubi.pulse.servercore.dependency.ivy.IvyCredentialsInitialiser;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
@@ -53,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
+import java.net.URL;
 
 /**
  * The BuildController is responsible for executing and coordinating a single
@@ -965,7 +967,10 @@ public class BuildController implements EventListener
         File tmp = null;
         try
         {
-            String repositoryUrl = buildContext.getString(PROPERTY_MASTER_URL) + "/repository";
+            String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
+            IvyCredentialsInitialiser.init(new URL(masterUrl).getHost());
+
+            String repositoryUrl = masterUrl + "/repository";
             DefaultIvyProvider ivyProvider = new DefaultIvyProvider();
             ivyProvider.setRepositoryBase(repositoryUrl);
             IvySupport ivy = ivyProvider.getIvySupport();

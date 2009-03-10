@@ -258,7 +258,8 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
     def waitFor(self, timeout=300):
         """Waits for this server to start listening.  If a connection
         can be made to the port before the specified timeout (in seconds) elapses,
-        this function returns True.  Otherwise, False is returned."""
+        and a successful ping is sent, this function returns True.  Otherwise,
+        False is returned."""
 
         endTime = time.time() + timeout
         while time.time() < endTime:
@@ -467,6 +468,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             proxy.RemoteApi.ping()
             return True
         except Exception, e:
+            # If we see a NoSuchMethodException, then the xmlrpc interface must be up, so all is good.
             if str(e).find('NoSuchMethodException') > 0:
                 return True
             return False

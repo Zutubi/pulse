@@ -34,11 +34,16 @@ public class AcegiUser implements Actor, UserDetails
 
     public AcegiUser(User user, List<GroupConfiguration> groups)
     {
-        UserConfiguration config = user.getConfig();
+        this(user.getConfig(), groups);
+        enabled = user.isEnabled();
+    }
+
+    public AcegiUser(UserConfiguration config, List<GroupConfiguration> groups)
+    {
         username = config.getLogin();
         password = config.getPassword();
         initAuthorities(config, groups);
-        enabled = user.isEnabled();
+        enabled = true;
         ldapAuthentication = config.isAuthenticatedViaLdap();
     }
 

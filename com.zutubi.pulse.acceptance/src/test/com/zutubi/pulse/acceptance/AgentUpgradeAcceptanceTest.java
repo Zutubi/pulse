@@ -22,10 +22,15 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 {
     private File tmp = null;
     private PackageFactory packageFactory = null;
+    private Pulse agent;
+    private Pulse master;
 
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        System.setProperty("pulse.package", "pulse-2.1.0-dev.zip");
+        System.setProperty("agent.package", "pulse-agent-2.1.0-dev.zip");
 
         tmp = createTempDir();
         packageFactory = new JythonPackageFactory();
@@ -33,6 +38,9 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        SupportUtils.shutdown(agent);
+        SupportUtils.shutdown(master);
+
         removeDirectory(tmp);
         super.tearDown();
     }
@@ -74,66 +82,52 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
     private void runAgentUpgrade(UnaryProcedure<Pulse> agentCallback) throws Exception
     {
-        Pulse agent = null;
-        Pulse master = null;
+        prepareMaster();
+        prepareAgent();
+        agentCallback.process(agent);
 
-        try
+        // test
+        // a) check that the agent build number is as expected.
+        String agentUrl = agent.getServerUrl();
+        agentUrl = agentUrl + "/xmlrpc";
+
+        XmlRpcHelper agentXmlRpc = new XmlRpcHelper(new URL(agentUrl));
+        Integer agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
+        assertEquals(200000000, agentBuild.intValue());
+
+        // b) add agent to master.
+        Hashtable<String, Object> agentConfig = new Hashtable<String, Object>();
+        agentConfig.put("meta.symbolicName", "zutubi.agentConfig");
+        agentConfig.put("name", "upgrade-agent");
+        agentConfig.put("host", "localhost");
+        agentConfig.put("port", 7689);
+
+        String masterUrl = master.getServerUrl();
+        masterUrl = masterUrl + "/xmlrpc";
+        XmlRpcHelper masterXmlRpc = new XmlRpcHelper(new URL(masterUrl));
+        masterXmlRpc.loginAsAdmin();
+
+        masterXmlRpc.insertTemplatedConfig("agents/global agent template", agentConfig, false);
+
+        long endTime = System.currentTimeMillis() + 5 * Constants.MINUTE;
+        Thread.sleep(5 * Constants.SECOND);
+
+        while (System.currentTimeMillis() < endTime)
         {
-            agent = prepareAgent(agent);
-            agentCallback.process(agent);
-            master = prepareMaster(master);
-
-            // test
-            // a) check that the agent build number is as expected.
-            String agentUrl = agent.getServerUrl();
-            agentUrl = agentUrl + "/xmlrpc";
-
-            XmlRpcHelper agentXmlRpc = new XmlRpcHelper(new URL(agentUrl));
-            Integer agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
-            assertEquals(200000000, agentBuild.intValue());
-
-            // b) add agent to master.
-            Hashtable<String, Object> agentConfig = new Hashtable<String, Object>();
-            agentConfig.put("meta.symbolicName", "zutubi.agentConfig");
-            agentConfig.put("name", "upgrade-agent");
-            agentConfig.put("host", "localhost");
-            agentConfig.put("port", 7689);
-
-            String masterUrl = master.getServerUrl();
-            masterUrl = masterUrl + "/xmlrpc";
-            XmlRpcHelper masterXmlRpc = new XmlRpcHelper(new URL(masterUrl));
-            masterXmlRpc.loginAsAdmin();
-
-            masterXmlRpc.insertTemplatedConfig("agents/global agent template", agentConfig, false);
-
-            long endTime = System.currentTimeMillis() + 5 * Constants.MINUTE;
-            Thread.sleep(5 * Constants.SECOND);
-
-            while (System.currentTimeMillis() < endTime)
+            String status = (String) masterXmlRpc.getAgentStatus("upgrade-agent");
+            if ("idle".equals(status))
             {
-                String status = (String) masterXmlRpc.getAgentStatus("upgrade-agent");
-                if ("idle".equals(status))
-                {
-                    // success.
-                    agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
-                    assertFalse(200000000 == agentBuild);
-                    return;
-                }
+                // success.
+                agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
+                assertFalse(200000000 == agentBuild);
+                return;
             }
-            fail("Failed to upgrade agent.");
         }
-        finally
-        {
-            SupportUtils.shutdown(agent);
-            SupportUtils.shutdown(master);
-        }
+        fail("Failed to upgrade agent.");
     }
 
-    private Pulse prepareMaster(Pulse master) throws Exception
+    private void prepareMaster() throws Exception
     {
-        // unpack and start master
-        // master-port
-        // tmp/master-data
         File pulsePackage = AcceptanceTestUtils.getPulsePackage();
         PulsePackage masterPackage = packageFactory.createPackage(pulsePackage);
         master = masterPackage.extractTo(new File(tmp, "master").getCanonicalPath());
@@ -143,7 +137,6 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         master.start();
 
         setupMaster();
-        return master;
     }
 
     private void setupMaster()
@@ -169,22 +162,17 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         }
     }
 
-    private Pulse prepareAgent(Pulse agent) throws Exception
+    private void prepareAgent() throws Exception
     {
         // get old agent package that we are upgrading from.
         // a) start with a predefined package, later move to a range of older packages that we can test from.
         File oldAgentPackage = copyInputToDirectory("pulse-agent-2.0.0", "zip", tmp);
 
-        // unpack and start old agent.
-        // agent-port
-        // tmp/agent-data
         PulsePackage agentPackage = packageFactory.createPackage(oldAgentPackage);
-        agentPackage.setVerbose(true);
         agent = agentPackage.extractTo(new File(tmp, "agent").getCanonicalPath());
         agent.setUserHome(new File(tmp, "user-home").getCanonicalPath());
         agent.setDataDir(new File(tmp, "agent-data").getCanonicalPath());
         agent.setPort(7689);
         agent.start();
-        return agent;
     }
 }

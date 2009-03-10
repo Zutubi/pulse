@@ -28,6 +28,9 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         factory = new JythonPackageFactory();
 
+        System.setProperty("pulse.package", "pulse-2.1.0-dev.zip");
+        System.setProperty("agent.package", "pulse-agent-2.1.0-dev.zip");
+
         serverPkg = getPulsePackage();
         agentPkg = getAgentPackage();
     }
@@ -83,32 +86,33 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
     public void testStartAndStopPulseServer() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(serverPkg);
-
-        Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
-
-        assertFalse(pulse.ping());
-
-        pulse.start(true);
-        assertTrue(pulse.ping());
-
-        pulse.stop();
-        assertFalse(pulse.ping());
+        assertStartAndStop(serverPkg, 1111);
     }
 
     public void testStartAndStopPulseAgent() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(agentPkg);
-        Pulse agent = pkg.extractTo(tmp.getCanonicalPath());
-        
-        assertFalse(agent.ping());
+        assertStartAndStop(agentPkg, 1112);
+    }
 
-        agent.start(true);
-        
-        assertTrue(agent.ping());
+    private void assertStartAndStop(File pkg, int port) throws IOException
+    {
+        PulsePackage pulsePackage = factory.createPackage(pkg);
+        Pulse pulse = pulsePackage.extractTo(tmp.getCanonicalPath());
+        pulse.setPort(port);
+        assertFalse(pulse.ping());
 
-        agent.stop();
-        assertFalse(agent.ping());
+        // once pulse has started, we do not wait it waiting around, so regardless
+        // of what happens, we make sure we call stop.  Lets just hope it works.
+        try
+        {
+            pulse.start(true);
+            assertTrue(pulse.ping());
+        }
+        finally
+        {
+            pulse.stop();
+        }
+        assertFalse(pulse.ping());
     }
 
     public void testSettingAlternateUserHome() throws Exception
@@ -118,11 +122,18 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         File alternateUserHome = new File(tmp, "user_home");
         pulse.setUserHome(alternateUserHome.getCanonicalPath());
-        pulse.start();
+        pulse.setPort(1113);
+        
+        try
+        {
+            pulse.start();
+        }
+        finally
+        {
+            pulse.stop();
+        }
 
         // by default, the .pulse2 directory will be created in the user home on Pulse startup.
         assertTrue(new File(alternateUserHome, ".pulse2").exists());
-
-        pulse.stop();
     }
 }

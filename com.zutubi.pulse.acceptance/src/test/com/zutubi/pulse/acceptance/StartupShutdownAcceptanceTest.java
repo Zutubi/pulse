@@ -31,6 +31,8 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     protected void setUp() throws Exception
     {
+        super.setUp();
+
         // create a temporary user home.
         tmpDir = FileSystemUtils.createTempDir();
 
@@ -40,8 +42,11 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         defaultDataDir = new File(userHome, ".pulse2/data");
         defaultConfigFile = new File(userHome, FileSystemUtils.join(".pulse2", "config.properties"));
 
+        System.setProperty("pulse.package", "pulse-2.1.0-dev.zip");
+        System.setProperty("agent.package", "pulse-agent-2.1.0-dev.zip");
+
         File pkgFile = AcceptanceTestUtils.getPulsePackage();
-        
+
         PackageFactory factory = new JythonPackageFactory();
         PulsePackage pkg = factory.createPackage(pkgFile);
 
@@ -51,6 +56,35 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        cleanupSelenium();
+        cleanupPulse();
+
+        removeDirectory(tmpDir);
+
+        super.tearDown();
+    }
+
+    private void cleanupPulse()
+    {
+        try
+        {
+            // cleanup the pulse instance if it was used.
+            if (pulse != null)
+            {
+                if (pulse.ping()) // if it is running
+                {
+                    pulse.stop();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void cleanupSelenium()
+    {
         try
         {
             // cleanup selenium if it was used.
@@ -59,28 +93,11 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
                 selenium.stop();
                 selenium = null;
             }
-
-            // cleanup the pulse instance if it was used.
-            if (pulse != null)
-            {
-                if (pulse.ping()) // if it is running
-                {
-                    pulse.stop();
-                }
-                pulse = null;
-            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-
-        removeDirectory(tmpDir);
-
-        tmpDir = null;
-        dataDir = null;
-        defaultDataDir = null;
-        defaultConfigFile = null;
     }
 
     public void testDefaultFirstTimeStartup() throws Exception

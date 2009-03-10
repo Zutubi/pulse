@@ -1,7 +1,6 @@
 package com.zutubi.pulse.servercore.dependency.ivy;
 
 import com.zutubi.pulse.servercore.hessian.CustomSerialiserFactory;
-import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 
 /**
