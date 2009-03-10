@@ -42,9 +42,6 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         defaultDataDir = new File(userHome, ".pulse2/data");
         defaultConfigFile = new File(userHome, FileSystemUtils.join(".pulse2", "config.properties"));
 
-        System.setProperty("pulse.package", "pulse-2.1.0-dev.zip");
-        System.setProperty("agent.package", "pulse-agent-2.1.0-dev.zip");
-
         File pkgFile = AcceptanceTestUtils.getPulsePackage();
 
         PackageFactory factory = new JythonPackageFactory();

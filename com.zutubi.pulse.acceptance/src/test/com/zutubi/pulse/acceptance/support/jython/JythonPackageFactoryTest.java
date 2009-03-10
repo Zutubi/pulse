@@ -28,9 +28,6 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         factory = new JythonPackageFactory();
 
-        System.setProperty("pulse.package", "pulse-2.1.0-dev.zip");
-        System.setProperty("agent.package", "pulse-agent-2.1.0-dev.zip");
-
         serverPkg = getPulsePackage();
         agentPkg = getAgentPackage();
     }
