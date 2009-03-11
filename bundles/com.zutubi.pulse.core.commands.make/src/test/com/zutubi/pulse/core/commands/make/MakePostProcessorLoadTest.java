@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.commands.make;
 
 import com.zutubi.pulse.core.FileLoaderTestBase;
-import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.ImportingNotSupportedFileResolver;
 import com.zutubi.pulse.core.PulseFile;
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Reference;
 
 /**
@@ -19,7 +20,7 @@ public class MakePostProcessorLoadTest extends FileLoaderTestBase
     private MakePostProcessor helper(String ppName) throws PulseException
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("basic", "xml"), bf);
+        loader.load(getInput("basic", "xml"), bf, new ImportingNotSupportedFileResolver());
 
         Reference r = bf.getReference(ppName);
         assertNotNull(r);

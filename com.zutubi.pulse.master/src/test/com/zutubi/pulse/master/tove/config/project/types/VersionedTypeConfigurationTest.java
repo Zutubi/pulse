@@ -37,14 +37,14 @@ public class VersionedTypeConfigurationTest extends PulseTestCase
 
     public void testNoPatch() throws Exception
     {
-        assertEquals(VERSIONED_PULSE_FILE_CONTENT, configuration.getPulseFile(new ProjectConfiguration(), null, null));
+        assertEquals(VERSIONED_PULSE_FILE_CONTENT, configuration.getPulseFile(new ProjectConfiguration(), null, null).getFileContent());
     }
 
     public void testPatchNoChangeToPath() throws Exception
     {
         PatchArchive mockPatch = mock(PatchArchive.class);
         stub(mockPatch.containsPath(VERSIONED_PULSE_FILE_PATH)).toReturn(false);
-        assertEquals(VERSIONED_PULSE_FILE_CONTENT, configuration.getPulseFile(new ProjectConfiguration(), null, mockPatch));
+        assertEquals(VERSIONED_PULSE_FILE_CONTENT, configuration.getPulseFile(new ProjectConfiguration(), null, mockPatch).getFileContent());
     }
 
     public void testPatchWithChangeToPath() throws Exception
@@ -54,6 +54,6 @@ public class VersionedTypeConfigurationTest extends PulseTestCase
         PatchArchive mockPatch = mock(PatchArchive.class);
         stub(mockPatch.containsPath(VERSIONED_PULSE_FILE_PATH)).toReturn(true);
         stub(mockPatch.retrieveFile(VERSIONED_PULSE_FILE_PATH)).toReturn(NEW_CONTENT);
-        assertEquals(NEW_CONTENT, configuration.getPulseFile(new ProjectConfiguration(), null, mockPatch));
+        assertEquals(NEW_CONTENT, configuration.getPulseFile(new ProjectConfiguration(), null, mockPatch).getFileContent());
     }
 }

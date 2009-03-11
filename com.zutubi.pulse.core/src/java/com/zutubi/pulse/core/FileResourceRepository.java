@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,20 +78,7 @@ public class FileResourceRepository implements ResourceRepository
     {
         if (resourceDef.exists())
         {
-            InputStream input = null;
-            try
-            {
-                input = new FileInputStream(resourceDef);
-                ResourceFileLoader.load(input, this);
-            }
-            catch (FileNotFoundException e)
-            {
-                // noop.
-            }
-            finally
-            {
-                IOUtils.close(input);
-            }
+            ResourceFileLoader.load(resourceDef, this);
         }
     }
 

@@ -16,7 +16,7 @@ public class MsBuildCommandLoaderTest extends FileLoaderTestBase
     private MsBuildCommand msbuildCommandHelper(String commandName) throws Exception
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("commands", "xml"), bf);
+        loader.load(getInput("commands", "xml"), bf, new ImportingNotSupportedFileResolver());
 
         List<Recipe> recipes = bf.getRecipes();
         assertEquals(recipes.size(), 1);
@@ -80,7 +80,7 @@ public class MsBuildCommandLoaderTest extends FileLoaderTestBase
         PulseFile bf = new PulseFile();
         try
         {
-            loader.load(getInput("propertyvalidation", "xml"), bf);
+            loader.load(getInput("propertyvalidation", "xml"), bf, new ImportingNotSupportedFileResolver());
             fail("Should not be able to load a build-property with no name");
         }
         catch (PulseException e)

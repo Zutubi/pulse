@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.plugins;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
+import com.zutubi.pulse.core.ImportingNotSupportedFileResolver;
 import com.zutubi.pulse.core.PulseFile;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
@@ -85,7 +86,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         PulseFile pf = new PulseFile();
 
         PulseFileLoader loader = loaderFactory.createLoader();
-        loader.load(getInput("testPostProcessorPlugin", "xml"), pf);
+        loader.load(getInput("testPostProcessorPlugin", "xml"), pf, new ImportingNotSupportedFileResolver());
 
         Reference ref = pf.getReference("sample.pp");
 

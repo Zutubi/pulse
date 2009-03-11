@@ -2,27 +2,28 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.events.RecipeCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeCompletedEvent;
-import com.zutubi.pulse.core.events.RecipeStatusEvent;
+import com.zutubi.pulse.core.engine.api.Scope;
+import com.zutubi.pulse.core.events.*;
+import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Pair;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -35,10 +36,12 @@ public class RecipeProcessor
 {
     private static final Logger LOG = Logger.getLogger(RecipeProcessor.class);
 
+    private static final String LABEL_EXECUTE = "execute";
+
     private EventManager eventManager;
     private Lock runningLock = new ReentrantLock();
     private long runningRecipe = 0;
-    private Recipe runningRecipeInstance = null;
+    private Command runningCommand = null;
     private boolean terminating = false;
     private PulseFileLoaderFactory fileLoaderFactory;
 
@@ -70,33 +73,7 @@ public class RecipeProcessor
         pushRecipeContext(context, request, testResults, recipeStartTime);
         try
         {
-            // Wrap bootstrapper in a command and run it.
-            BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
-
-            // Now we can load the recipe from the pulse file
-            PulseFile pulseFile = loadPulseFile(request, context);
-
-            String recipeName = request.getRecipeName();
-            if (!TextUtils.stringSet(recipeName))
-            {
-                recipeName = pulseFile.getDefaultRecipe();
-                if (!TextUtils.stringSet(recipeName))
-                {
-                    throw new BuildException("Please specify a default recipe for your project.");
-                }
-            }
-
-            Recipe recipe = pulseFile.getRecipe(recipeName);
-            if (recipe == null)
-            {
-                throw new BuildException("Undefined recipe '" + recipeName + "'");
-            }
-
-            recipe.addFirstCommand(bootstrapCommand);
-
-            runningRecipeInstance = recipe;
-
-            recipe.execute(context);
+            execute(request);
         }
         catch (BuildException e)
         {
@@ -131,12 +108,192 @@ public class RecipeProcessor
 
             runningLock.lock();
             runningRecipe = 0;
-            runningRecipeInstance = null;
             if (terminating)
             {
                 terminating = false;
             }
             runningLock.unlock();
+        }
+    }
+
+    private void execute(RecipeRequest request)
+    {
+        PulseExecutionContext context = request.getContext();
+        File outputDir = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
+        Recipe recipe = null;
+
+        context.push();
+        try
+        {
+            // Wrap bootstrapper in a command and run it.
+            BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
+            CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
+            if (pushContextAndExecute(context, bootstrapCommand, outputDir, 0, null, bootstrapResult))
+            {
+                return;
+            }
+
+            // Now we can load the recipe from the pulse file
+            PulseFile pulseFile = loadPulseFile(request, context);
+            String recipeName = request.getRecipeName();
+            if (!TextUtils.stringSet(recipeName))
+            {
+                recipeName = pulseFile.getDefaultRecipe();
+                if (!TextUtils.stringSet(recipeName))
+                {
+                    throw new BuildException("Please specify a default recipe for your project.");
+                }
+            }
+
+            recipe = pulseFile.getRecipe(recipeName);
+            if (recipe == null)
+            {
+                throw new BuildException("Undefined recipe '" + recipeName + "'");
+            }
+
+            boolean success = commandSucceeded(bootstrapResult);
+            LinkedList<Pair<Command, Scope>> commands = recipe.getCommandScopePairs();
+            for (int i = 0; i < commands.size(); i++)
+            {
+                Pair<Command, Scope> pair = commands.get(i);
+                Command command = pair.first;
+                Scope scope = pair.second;
+
+                if (success || command.isForce())
+                {
+                    CommandResult result = new CommandResult(command.getName());
+                    boolean recipeTerminated = pushContextAndExecute(context, command, outputDir, i + 1, scope, result);
+
+                    if(recipeTerminated)
+                    {
+                        return;
+                    }
+
+                    success = success && commandSucceeded(result);
+                }
+            }
+        }
+        finally
+        {
+            context.pop();
+            if (recipe != null && recipe.getVersion() != null)
+            {
+                context.setVersion(recipe.getVersion().getValue());
+            }
+        }
+    }
+
+    private boolean commandSucceeded(CommandResult result)
+    {
+        switch (result.getState())
+        {
+            case FAILURE:
+            case ERROR:
+                return false;
+        }
+        return true;
+    }
+
+    private boolean pushContextAndExecute(PulseExecutionContext context, Command command, File outputDir, int commandIndex, Scope scope, CommandResult result)
+    {
+        File commandOutput = new File(outputDir, Recipe.getCommandDirName(commandIndex, result));
+        if (!commandOutput.mkdirs())
+        {
+            throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
+        }
+
+        context.setLabel(LABEL_EXECUTE);
+        context.push();
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
+
+        if (scope != null)
+        {
+            context.getScope().add((PulseScope) scope);
+        }
+
+        boolean recipeTerminated = !executeCommand(context, commandOutput, result, command);
+        context.popTo(LABEL_EXECUTE);
+        return recipeTerminated;
+    }
+
+    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, Command command)
+    {
+        runningLock.lock();
+        if (terminating)
+        {
+            runningLock.unlock();
+            return false;
+        }
+
+        runningCommand = command;
+        runningLock.unlock();
+
+        commandResult.commence();
+        commandResult.setOutputDir(commandOutput.getPath());
+        long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
+        eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
+
+        try
+        {
+            executeAndProcess(context, commandResult, command);
+        }
+        catch (BuildException e)
+        {
+            commandResult.error(e);
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+            commandResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
+        }
+        finally
+        {
+            runningLock.lock();
+            runningCommand = null;
+            runningLock.unlock();
+
+            flushOutput(context);
+            commandResult.complete();
+            eventManager.publish(new CommandCompletedEvent(this, recipeId, commandResult));
+        }
+
+        return true;
+    }
+
+    public static void executeAndProcess(ExecutionContext context, CommandResult commandResult, Command command)
+    {
+        try
+        {
+            command.execute(context, commandResult);
+        }
+        finally
+        {
+            // still need to process any available artifacts, even in the event of an error.
+            processArtifacts(command, context, commandResult);
+        }
+    }
+
+    static void processArtifacts(Command command, ExecutionContext context, CommandResult result)
+    {
+        for (Artifact artifact : command.getArtifacts())
+        {
+            artifact.capture(result, context);
+        }
+    }
+
+    private void flushOutput(ExecutionContext context)
+    {
+        OutputStream outputStream = context.getOutputStream();
+        if(outputStream != null)
+        {
+            try
+            {
+                outputStream.flush();
+            }
+            catch (IOException e)
+            {
+                LOG.severe(e);
+            }
         }
     }
 
@@ -225,8 +382,8 @@ public class RecipeProcessor
         PulseScope globalScope = new PulseScope(context.getScope());
 
         // CIB-286: special case empty file for better reporting
-        String pulseFileSource = request.getPulseFileSource();
-        if(!TextUtils.stringSet(pulseFileSource))
+        PulseFileSource pulseFileSource = request.getPulseFileSource();
+        if(!TextUtils.stringSet(pulseFileSource.getFileContent()))
         {
             throw new BuildException("Unable to parse pulse file: File is empty");
         }
@@ -235,12 +392,13 @@ public class RecipeProcessor
         InputStream stream = null;
         try
         {
-            stream = new ByteArrayInputStream(pulseFileSource.getBytes());
+            stream = new ByteArrayInputStream(pulseFileSource.getFileContent().getBytes());
 
             ResourceRepository resourceRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
             PulseFile result = new PulseFile();
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-            fileLoader.load(stream, result, globalScope, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
+            FileResolver fileResolver = new RelativeFileResolver(pulseFileSource.getPath(), new LocalFileResolver(context.getWorkingDir()));
+            fileLoader.load(stream, result, globalScope, fileResolver, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
             return result;
         }
         catch (Exception e)
@@ -271,9 +429,9 @@ public class RecipeProcessor
             if (runningRecipe == id)
             {
                 terminating = true;
-                if (runningRecipeInstance != null)
+                if (runningCommand != null)
                 {
-                    runningRecipeInstance.terminate();
+                    runningCommand.terminate();
                 }
             }
         }

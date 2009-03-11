@@ -1,9 +1,6 @@
 package com.zutubi.pulse.core.commands.ant;
 
-import com.zutubi.pulse.core.Command;
-import com.zutubi.pulse.core.FileLoaderTestBase;
-import com.zutubi.pulse.core.PulseFile;
-import com.zutubi.pulse.core.Recipe;
+import com.zutubi.pulse.core.*;
 
 import java.util.List;
 
@@ -22,7 +19,7 @@ public class AntCommandLoaderTest extends FileLoaderTestBase
     private AntCommand antCommandHelper(int commandIndex) throws Exception
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("testAntCommand", "xml"), bf);
+        loader.load(getInput("testAntCommand", "xml"), bf, new ImportingNotSupportedFileResolver());
 
         List<Recipe> recipes = bf.getRecipes();
         assertEquals(recipes.size(), 1);

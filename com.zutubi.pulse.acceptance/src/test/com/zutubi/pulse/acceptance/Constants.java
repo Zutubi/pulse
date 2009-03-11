@@ -33,6 +33,10 @@ public class Constants
      * The ant file has no targets.
      */
     public static final String FAIL_ANT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "failant";
+    /**
+     * Subversion URL for a versioned pulse file project.
+     */
+    public static final String VERSIONED_REPOSITORY = SUBVERSION_ACCEPT_REPO + "testversioned";
 
     /**
      * The constants for the property names in the ProjectConfiguration class.

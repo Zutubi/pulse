@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
@@ -40,7 +41,7 @@ public class VersionedTypeConfiguration extends TypeConfiguration
         this.pulseFileName = pulseFileName;
     }
 
-    public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
+    public PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
     {
         String normalisedPath = FileSystemUtils.normaliseSeparators(pulseFileName);
         if (patch == null || !patch.containsPath(normalisedPath))
@@ -53,7 +54,7 @@ public class VersionedTypeConfiguration extends TypeConfiguration
                 ScmContext context = scmManager.createContext(projectConfig);
                 scmClient = scmManager.createClient(scm);
                 is = scmClient.retrieve(context, pulseFileName, revision);
-                return IOUtils.inputStreamToString(is);
+                return new PulseFileSource(normalisedPath, IOUtils.inputStreamToString(is));
             }
             finally
             {
@@ -63,7 +64,7 @@ public class VersionedTypeConfiguration extends TypeConfiguration
         }
         else
         {
-            return patch.retrieveFile(normalisedPath);
+            return new PulseFileSource(normalisedPath, patch.retrieveFile(normalisedPath));
         }
     }
 

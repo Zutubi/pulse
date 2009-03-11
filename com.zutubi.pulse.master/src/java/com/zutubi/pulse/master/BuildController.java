@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
@@ -375,7 +376,7 @@ public class BuildController implements EventListener
      * @return true iff the revision was updated
      * @throws BuildException if the revision cannot be set due to an error
      */
-    public boolean updateRevisionIfNotFixed(Revision revision, String pulseFile)
+    public boolean updateRevisionIfNotFixed(Revision revision, PulseFileSource pulseFile)
     {
         boolean updated = false;
 
@@ -403,7 +404,7 @@ public class BuildController implements EventListener
         return updated;
     }
 
-    private void updateRevision(BuildRevision buildRevision, Revision revision, String pulseFile)
+    private void updateRevision(BuildRevision buildRevision, Revision revision, PulseFileSource pulseFile)
     {
         if (revision == null)
         {
@@ -439,10 +440,10 @@ public class BuildController implements EventListener
         }
     }
 
-    private String getPulseFileForRevision(Revision revision)
+    private PulseFileSource getPulseFileForRevision(Revision revision)
     {
         TypeConfiguration type = projectConfig.getType();
-        String pulseFile;
+        PulseFileSource pulseFile;
         try
         {
             pulseFile = type.getPulseFile(projectConfig, revision, null);
@@ -676,7 +677,7 @@ public class BuildController implements EventListener
 
         try
         {
-            FileSystemUtils.createFile(new File(buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE), buildRevision.getPulseFile());
+            FileSystemUtils.createFile(new File(buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE), buildRevision.getPulseFile().getFileContent());
         }
         catch (IOException e)
         {

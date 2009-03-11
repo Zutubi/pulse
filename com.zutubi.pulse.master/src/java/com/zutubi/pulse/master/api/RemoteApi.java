@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.api;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.Feature;
@@ -644,6 +645,11 @@ public class RemoteApi
             }
 
             return configurationTemplateManager.insertRecord(insertPath, record);
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+            throw new PulseRuntimeException(e);
         }
         finally
         {

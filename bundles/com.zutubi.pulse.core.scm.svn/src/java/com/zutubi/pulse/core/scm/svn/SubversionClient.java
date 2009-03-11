@@ -58,7 +58,6 @@ public class SubversionClient implements ScmClient
      */
     private ScmException convertException(SVNException e)
     {
-        LOG.error(e);
         return new ScmException(e.getMessage(), e);
     }
 

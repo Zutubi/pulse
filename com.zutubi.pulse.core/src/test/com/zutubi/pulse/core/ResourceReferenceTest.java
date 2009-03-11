@@ -21,7 +21,7 @@ public class ResourceReferenceTest extends PulseTestCase
     {
         PulseScope parent = new PulseScope();
         PulseScope scope = new PulseScope(parent);
-        FileResourceRepository repo = ResourceFileLoader.load(getInput("testResourceReference", "xml"));
+        FileResourceRepository repo = ResourceFileLoader.load(getInputFile("testResourceReference", "xml"));
         ResourceReference ref = new ResourceReference();
         ref.setResourceRepository(repo);
 

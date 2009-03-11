@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -66,7 +67,7 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
         artifacts.put(artifact.getName(), artifact);
     }
 
-    public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
+    public PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
     {
         try
         {
@@ -78,7 +79,7 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
             setupContext(context);
             StringWriter stringWriter = new StringWriter(1024);
             getVelocityEngine().mergeTemplate("pulse-file" + File.separatorChar + getTemplateName(), context, stringWriter);
-            return stringWriter.getBuffer().toString();
+            return new PulseFileSource(stringWriter.getBuffer().toString());
         }
         catch (Exception e)
         {

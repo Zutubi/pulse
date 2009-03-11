@@ -187,7 +187,7 @@ public class PostProcessCommand implements Command
             File f = checkFile(resourcesFile, "Resources");
             try
             {
-                resourceRepository = ResourceFileLoader.load(new FileInputStream(f));
+                resourceRepository = ResourceFileLoader.load(f);
             }
             catch (Exception e)
             {
@@ -213,7 +213,7 @@ public class PostProcessCommand implements Command
         PulseFile result = new PulseFile();
         try
         {
-            loader.load(new FileInputStream(f), result, new PulseScope(), resourceRepository, null);
+            loader.load(new FileInputStream(f), result, new PulseScope(), new LocalFileResolver(f.getParentFile()), resourceRepository, null);
             return result;
         }
         catch (Exception e)

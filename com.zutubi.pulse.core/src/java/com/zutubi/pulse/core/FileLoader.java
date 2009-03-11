@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.engine.api.ScopeAware;
 import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.core.validation.PulseValidationContext;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.ValidationContext;
@@ -55,17 +56,17 @@ public class FileLoader
         this.factory = factory;
     }
 
-    public void load(File file, Object root) throws PulseException, IOException, IllegalAccessException, InvocationTargetException
+    public void load(File file, Object root, FileResolver fileResolver) throws PulseException, IOException
     {
-        load(new FileInputStream(file), root);
+        load(new FileInputStream(file), root, fileResolver);
     }
 
-    public void load(InputStream input, Object root) throws PulseException
+    public void load(InputStream input, Object root, FileResolver fileResolver) throws PulseException
     {
-        load(input, root, null, new FileResourceRepository(), null);
+        load(input, root, null, fileResolver, new FileResourceRepository(), null);
     }
 
-    public void load(InputStream input, Object root, Scope globalScope, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
+    public void load(InputStream input, Object root, Scope globalScope, FileResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
     {
         if (predicate == null)
         {
@@ -112,7 +113,7 @@ public class FileLoader
                 {
                     continue;
                 }
-                loadType((Element) node, root, globalScope, 1, resourceRepository, predicate);
+                loadType((Element) node, root, globalScope, 1, fileResolver, resourceRepository, predicate);
             }
         }
         finally
@@ -121,7 +122,7 @@ public class FileLoader
         }
     }
 
-    private void loadType(Element e, Object parent, Scope scope, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
+    private void loadType(Element e, Object parent, Scope scope, int depth, FileResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
     {
         IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();
@@ -135,7 +136,7 @@ public class FileLoader
                 throw new FileLoadException(String.format("Maximum recursion depth %s exceeded", MAX_RECURSION_DEPTH));
             }
 
-            if (handleInternalElement(e, parent, scope, parentHelper, depth, resourceRepository, predicate))
+            if (handleInternalElement(e, parent, scope, parentHelper, depth, fileResolver, resourceRepository, predicate))
             {
                 return;
             }
@@ -194,7 +195,7 @@ public class FileLoader
                 }
 
                 // initialise sub-elements.
-                loadSubElements(e, type, scope, typeHelper, depth, resourceRepository, predicate);
+                loadSubElements(e, type, scope, typeHelper, depth, fileResolver, resourceRepository, predicate);
             }
 
             // add to container.
@@ -256,7 +257,7 @@ public class FileLoader
         }
     }
 
-    private void loadSubElements(Element e, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate)
+    private void loadSubElements(Element e, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, FileResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate)
             throws Exception
     {
         String text = null;
@@ -269,7 +270,7 @@ public class FileLoader
             {
                 Element element = (Element) node;
                 // process type.
-                loadType(element, type, scope, depth + 1, resourceRepository, predicate);
+                loadType(element, type, scope, depth + 1, fileResolver, resourceRepository, predicate);
             }
             else if (node instanceof Text)
             {
@@ -310,7 +311,7 @@ public class FileLoader
         return resolutionStrategy;
     }
 
-    private boolean handleInternalElement(Element element, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws Exception
+    private boolean handleInternalElement(Element element, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, FileResolver fileResolver, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws Exception
     {
         String localName = element.getLocalName();
         if (localName.equals("macro"))
@@ -361,7 +362,7 @@ public class FileLoader
 
                     try
                     {
-                        loadSubElements(lae, type, scope, typeHelper, depth, resourceRepository, predicate);
+                        loadSubElements(lae, type, scope, typeHelper, depth, fileResolver, resourceRepository, predicate);
                     }
                     catch (Exception e)
                     {
@@ -385,8 +386,74 @@ public class FileLoader
         else if (localName.equals("scope"))
         {
             // Just load children in new scope and redirect to parent
-            loadSubElements(element, type, scope.createChild(), typeHelper, depth, resourceRepository, predicate);
+            loadSubElements(element, type, scope.createChild(), typeHelper, depth, fileResolver, resourceRepository, predicate);
             return true;
+        }
+        else if (localName.equals("import"))
+        {
+            boolean optional = false;
+            String path = null;
+            for (int i = 0; i < element.getAttributeCount(); i++)
+            {
+                Attribute attribute = element.getAttribute(i);
+                if (attribute.getLocalName().equals("path"))
+                {
+                    path = attribute.getValue();
+                }
+                else if (attribute.getLocalName().equals("optional"))
+                {
+                    optional = Boolean.valueOf(attribute.getValue());
+                }
+                else
+                {
+                    throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
+                }
+            }
+
+            if (!TextUtils.stringSet(path))
+            {
+                throw new FileLoadException("Required attribute 'path' not set");
+            }
+
+
+            InputStream input;
+            if (optional)
+            {
+                try
+                {
+                    input = fileResolver.resolve(path);
+                }
+                catch(Exception e)
+                {
+                    // Ignore for optional includes.
+                    return true;
+                }
+            }
+            else
+            {
+                input = fileResolver.resolve(path);
+            }
+            
+            try
+            {
+                Document doc;
+                try
+                {
+                    Builder builder = new Builder(new LocationAwareNodeFactory());
+                    doc = builder.build(input);
+                }
+                finally
+                {
+                    IOUtils.close(input);
+                }
+
+                loadSubElements(doc.getRootElement(), type, scope, typeHelper, depth, new RelativeFileResolver(path, fileResolver), resourceRepository, predicate);
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new FileLoadException("While importing file '" + path + "': " + e.getMessage(), e);
+            }
         }
 
         return false;

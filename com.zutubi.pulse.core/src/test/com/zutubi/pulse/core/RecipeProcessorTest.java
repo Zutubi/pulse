@@ -4,6 +4,7 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -110,6 +111,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("nodefault"), makeContext(1, null)));
         assertRecipeCommenced(1, null);
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
         assertRecipeError(1, "Please specify a default recipe for your project.");
         assertNoMoreEvents();
     }
@@ -353,9 +356,9 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         return re;
     }
 
-    private String getPulseFile(String name) throws IOException
+    private PulseFileSource getPulseFile(String name) throws IOException
     {
-        return IOUtils.inputStreamToString(getInput(name, "xml"));
+        return new PulseFileSource(IOUtils.inputStreamToString(getInput(name, "xml")));
     }
 
     public void handleEvent(Event evt)
@@ -419,10 +422,10 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         private RecipeProcessor recipeProcessor;
         private long id;
         private Bootstrapper bootstrapper;
-        private String source;
+        private PulseFileSource source;
         private String recipe;
 
-        public AsyncRunner(RecipeProcessor recipeProcessor, long id, Bootstrapper bootstrapper, String source, String recipe)
+        public AsyncRunner(RecipeProcessor recipeProcessor, long id, Bootstrapper bootstrapper, PulseFileSource source, String recipe)
         {
             this.recipeProcessor = recipeProcessor;
             this.id = id;

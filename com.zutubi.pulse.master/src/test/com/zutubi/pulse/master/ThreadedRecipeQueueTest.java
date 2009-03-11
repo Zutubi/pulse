@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
@@ -510,7 +511,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
                 {
                     throw new BuildException("test");
                 }
-                return getPulseFileForRevision(number);
+                return getPulseFileForRevision(number).getFileContent();
             }
         };
 
@@ -605,9 +606,9 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
     }
 
-    private String getPulseFileForRevision(long revision)
+    private PulseFileSource getPulseFileForRevision(long revision)
     {
-        return PULSE_FILE + "<!--" + revision + "-->";
+        return new PulseFileSource(PULSE_FILE + "<!--" + revision + "-->");
     }
 
     private void assertRecipeError(long id, String message)

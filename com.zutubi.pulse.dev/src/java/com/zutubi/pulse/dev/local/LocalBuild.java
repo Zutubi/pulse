@@ -3,6 +3,7 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -54,6 +55,10 @@ public class LocalBuild
                 .withType(Number.class)
                 .create('l'));
 
+        options.addOption(OptionBuilder.withLongOpt("base-dir")
+                .hasArg()
+                .create('b'));
+
         LocalBuild b = bootstrap();
 
         try
@@ -86,7 +91,22 @@ public class LocalBuild
                 b.setFailureLimit(((Number) commandLine.getOptionObject('l')).intValue());
             }
 
-            File baseDir = new File(System.getProperty("user.dir"));
+            File baseDir;
+            if(commandLine.hasOption('b'))
+            {
+                String baseName = commandLine.getOptionValue('b');
+                baseDir = new File(baseName);
+                if (!baseDir.isDirectory())
+                {
+                    System.err.println("Base directory specified '" + baseName + "' is not a directory");
+                    System.exit(1);
+                }
+            }
+            else
+            {
+                baseDir = new File(System.getProperty("user.dir"));
+            }
+
             b.runBuild(baseDir, pulseFile, recipe, resourcesFile, outputDir);
         }
         catch (Exception e)
@@ -112,19 +132,13 @@ public class LocalBuild
             return new FileResourceRepository();
         }
 
-        FileInputStream stream = null;
         try
         {
-            stream = new FileInputStream(resourcesFile);
-            return ResourceFileLoader.load(stream);
+            return ResourceFileLoader.load(new File(resourcesFile));
         }
-        catch (FileNotFoundException e)
+        catch (IOException e)
         {
-            throw new PulseException("Unable to open resources file '" + resourcesFile + "'");
-        }
-        finally
-        {
-            IOUtils.close(stream);
+            throw new PulseException("Unable to read resources file '" + resourcesFile + "'");
         }
     }
 
@@ -189,16 +203,16 @@ public class LocalBuild
         printEpilogue(logFile);
     }
 
-    private String loadPulseFile(File baseDir, String pulseFileName) throws PulseException
+    private PulseFileSource loadPulseFile(File baseDir, String pulseFileName) throws PulseException
     {
         File pulseFile = new File(baseDir, pulseFileName);
         FileInputStream pulseFileInputStream = null;
-        String result;
+        String content;
 
         try
         {
             pulseFileInputStream = new FileInputStream(pulseFile);
-            result = IOUtils.inputStreamToString(pulseFileInputStream);
+            content = IOUtils.inputStreamToString(pulseFileInputStream);
         }
         catch (IOException e)
         {
@@ -209,7 +223,7 @@ public class LocalBuild
             IOUtils.close(pulseFileInputStream);
         }
 
-        return result;
+        return new PulseFileSource(pulseFileName, content);
     }
 
     private void printPrologue(String pulseFile, String resourcesFile, String outputDir)

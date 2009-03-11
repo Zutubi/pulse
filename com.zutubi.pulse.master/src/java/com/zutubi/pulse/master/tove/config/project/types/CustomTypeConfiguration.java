@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -29,9 +30,9 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
     @Transient
     private PulseFileLoaderFactory fileLoaderFactory;
 
-    public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
+    public PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
     {
-        return pulseFileString;
+        return new PulseFileSource(pulseFileString);
     }
 
     public String getPulseFileString()
@@ -66,7 +67,7 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
             PulseFileLoader loader = fileLoaderFactory.createLoader();
             loader.setObjectFactory(new DefaultObjectFactory());
 
-            loader.load(new ByteArrayInputStream(pulseFileString.getBytes()), new PulseFile(), new PulseScope(), new EmptyResourceRepository(), new CustomProjectValidationPredicate());
+            loader.load(new ByteArrayInputStream(pulseFileString.getBytes()), new PulseFile(), new PulseScope(), new ImportingNotSupportedFileResolver(), new EmptyResourceRepository(), new CustomProjectValidationPredicate());
         }
         catch(ParseException pe)
         {

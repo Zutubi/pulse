@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.scm.api.Revision;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,7 +20,7 @@ public class BuildRevision
     /**
      * The pulse file corresponding to the revision.
      */
-    private String pulseFile;
+    private PulseFileSource pulseFile;
     /**
      * True if the revision has been determined and should *not* change from
      * now on.
@@ -57,7 +58,7 @@ public class BuildRevision
      *                  opposed to a fixed revision decided on by Pulse
      *                  itself, as happens e.g. when isolating changes).
      */
-    public BuildRevision(Revision revision, String pulseFile, boolean user)
+    public BuildRevision(Revision revision, PulseFileSource pulseFile, boolean user)
     {
         if (revision == null)
         {
@@ -87,7 +88,7 @@ public class BuildRevision
      * @return the pulse file for the project at our current revision, may be
      *         null if this revision has not been initialised
      */
-    public String getPulseFile()
+    public PulseFileSource getPulseFile()
     {
         return pulseFile;
     }
@@ -183,7 +184,7 @@ public class BuildRevision
      * @param revision  the new revision to build
      * @param pulseFile the pulse file corresponding to the revision
      */
-    public void update(Revision revision, String pulseFile)
+    public void update(Revision revision, PulseFileSource pulseFile)
     {
         checkLocked();
 

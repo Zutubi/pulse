@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -348,6 +349,13 @@ public class XmlRpcHelper
         return type;
     }
 
+    public Hashtable<String, Object> createVersionedConfig(String pulseFilePath) throws Exception
+    {
+        Hashtable<String, Object> versionedConfig = createDefaultConfig(VersionedTypeConfiguration.class);
+        versionedConfig.put("pulseFileName", pulseFilePath);
+        return versionedConfig;
+    }
+    
     public void waitForProjectToInitialise(String name) throws Exception
     {
         long startTime = System.currentTimeMillis();

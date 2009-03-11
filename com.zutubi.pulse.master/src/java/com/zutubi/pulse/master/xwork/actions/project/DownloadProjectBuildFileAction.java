@@ -37,7 +37,7 @@ public class DownloadProjectBuildFileAction extends ProjectActionBase
         try
         {
             TypeConfiguration typeConfiguration = projectConfig.getType();
-            String pulseFile = XMLUtils.prettyPrint(typeConfiguration.getPulseFile(projectConfig, null, null));
+            String pulseFile = XMLUtils.prettyPrint(typeConfiguration.getPulseFile(projectConfig, null, null).getFileContent());
             inputStream = new StringInputStream(pulseFile);
             contentLength = pulseFile.length();
         }

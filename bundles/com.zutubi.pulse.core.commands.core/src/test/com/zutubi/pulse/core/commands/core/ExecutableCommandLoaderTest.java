@@ -1,9 +1,6 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.Command;
-import com.zutubi.pulse.core.FileLoaderTestBase;
-import com.zutubi.pulse.core.PulseFile;
-import com.zutubi.pulse.core.Recipe;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Property;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -26,7 +23,7 @@ public class ExecutableCommandLoaderTest extends FileLoaderTestBase
     private List<ExecutableCommand.Arg> executableArgsHelper(int commandIndex) throws Exception
     {
         PulseFile bf = new PulseFile();
-        loader.load(getInput("testExecutableArgs", "xml"), bf);
+        loader.load(getInput("testExecutableArgs", "xml"), bf, new ImportingNotSupportedFileResolver());
 
         List<Recipe> recipes = bf.getRecipes();
         assertEquals(1, recipes.size());
@@ -91,7 +88,7 @@ public class ExecutableCommandLoaderTest extends FileLoaderTestBase
     public void testExecutableStatusMapping() throws PulseException
     {
         PulseFile pf = new PulseFile();
-        loader.load(getInput(getName(), "xml"), pf);
+        loader.load(getInput(getName(), "xml"), pf, new ImportingNotSupportedFileResolver());
 
         Recipe recipe = pf.getRecipe("wow");
         ExecutableCommand command = (ExecutableCommand) recipe.getCommand("test");

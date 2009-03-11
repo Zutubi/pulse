@@ -18,7 +18,7 @@ public class PulseFileLoaderTest extends FileLoaderTestBase
 
     public void testLoaderRequireResources() throws Exception
     {
-        List<ResourceRequirement> requirements = loader.loadRequiredResources(getPulseFile("requiredResources"), null);
+        List<ResourceRequirement> requirements = loader.loadRequiredResources(getPulseFile("requiredResources"), null, new ImportingNotSupportedFileResolver());
 
         assertEquals(3, requirements.size());
         assertEquals("noversion", requirements.get(0).getResource());
@@ -33,7 +33,7 @@ public class PulseFileLoaderTest extends FileLoaderTestBase
     {
         try
         {
-            loader.loadRequiredResources(getPulseFile("requiredResources"), "noname");
+            loader.loadRequiredResources(getPulseFile("requiredResources"), "noname", new ImportingNotSupportedFileResolver());
             fail();
         }
         catch (Exception e)
@@ -44,7 +44,7 @@ public class PulseFileLoaderTest extends FileLoaderTestBase
 
     public void testRecipeListing() throws PulseException, IOException
     {
-        assertEquals(Arrays.asList("default", "two", "three"), loader.loadAvailableRecipes(getPulseFile(getName())));
+        assertEquals(Arrays.asList("default", "two", "three"), loader.loadAvailableRecipes(getPulseFile(getName()), new ImportingNotSupportedFileResolver()));
     }
 
     private String getPulseFile(String name) throws IOException

@@ -1,11 +1,13 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.PulseFileLoader;
-import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.RecipeAssignmentRequest;
+import com.zutubi.pulse.master.scm.ScmFileResolver;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class AnyCapableAgentRequirements implements AgentRequirements
     private static final Logger LOG = Logger.getLogger(AnyCapableAgentRequirements.class);
 
     private PulseFileLoaderFactory fileLoaderFactory;
+    private ScmManager scmManager;
 
     public AnyCapableAgentRequirements()
     {
@@ -43,7 +46,10 @@ public class AnyCapableAgentRequirements implements AgentRequirements
         PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
         try
         {
-            requirements = fileLoader.loadRequiredResources(request.getRevision().getPulseFile(), request.getRequest().getRecipeName());
+            BuildRevision buildRevision = request.getRevision();
+            PulseFileSource pulseFile = buildRevision.getPulseFile();
+            FileResolver fileResolver = new ScmFileResolver(request.getProject().getConfig(), buildRevision.getRevision(), scmManager);
+            requirements = fileLoader.loadRequiredResources(pulseFile.getFileContent(), request.getRequest().getRecipeName(), new RelativeFileResolver(pulseFile.getPath(), fileResolver));
             for(ResourceRequirement requirement: requirements)
             {
                 if(!service.hasResource(requirement))
@@ -64,5 +70,10 @@ public class AnyCapableAgentRequirements implements AgentRequirements
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
         this.fileLoaderFactory = fileLoaderFactory;
+    }
+
+    public void setScmManager(ScmManager scmManager)
+    {
+        this.scmManager = scmManager;
     }
 }

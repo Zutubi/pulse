@@ -483,6 +483,14 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertEquals("pvalue", propertiesPage.getCellContent(0, 1));
     }
 
+    public void testVersionedBuildWithImports() throws Exception
+    {
+        loginAsAdmin();
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
+
+        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+    }
+
     private void enableBuildPrompting(String projectName) throws Exception
     {
         Hashtable<String, Object> config = xmlRpcHelper.getConfig(getOptionsPath(projectName));

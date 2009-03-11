@@ -49,7 +49,7 @@ public abstract class TemplateTypeConfigurationTestBase extends PulseTestCase
 
     protected void createAndVerify(String expectedName) throws Exception
     {
-        String got = getType().getPulseFile(null, null, null);
+        String got = getType().getPulseFile(null, null, null).getFileContent();
 
         if(generateMode)
         {

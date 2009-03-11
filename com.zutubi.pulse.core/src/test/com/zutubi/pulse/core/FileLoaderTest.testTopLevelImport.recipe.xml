@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project>
+    <frecipe name="default">
+        <fant name="build"/>
+        <fant name="test"/>
+    </frecipe>
+</project>

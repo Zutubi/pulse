@@ -1,8 +1,6 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.ProcessArtifact;
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.RegexPattern;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_BUILD_NUMBER;
@@ -61,43 +59,11 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         {
             result = runCommand(command);
             assertTrue(result.errored());
+            fail("cannot run unknown command");
         }
         catch (BuildException e)
         {
-            fail(e.getMessage());      
         }
-
-        // verify that the env output is captured even with the command failing.
-        assertEquals(1, result.getArtifacts().size());
-        StoredArtifact artifact = result.getArtifacts().get(0);
-        assertEquals(1, artifact.getChildren().size());
-        StoredFileArtifact fileArtifact = artifact.getChildren().get(0);
-        assertEquals(ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt", fileArtifact.getPath());
-    }
-
-    public void testPostProcess() throws Exception
-    {
-        ExecutableCommand command = new ExecutableCommand();
-        command.setExe("echo");
-        command.setArgs("error: badness");
-
-        ProcessArtifact processArtifact = command.createProcess();
-        RegexPostProcessor processor = new RegexPostProcessor();
-        RegexPattern regex = new RegexPattern();
-        regex.setCategory("error");
-        regex.setExpression("error:.*");
-        processor.addRegexPattern(regex);
-        processArtifact.setProcessor(processor);
-
-        CommandResult cmdResult = runCommand(command);
-        assertEquals(ResultState.FAILURE, cmdResult.getState());
-
-        StoredArtifact artifact = cmdResult.getArtifact(ExecutableCommand.OUTPUT_ARTIFACT_NAME);
-        List<PersistentFeature> features = artifact.getFeatures(Feature.Level.ERROR);
-        assertEquals(1, features.size());
-        PersistentFeature feature = features.get(0);
-        assertEquals(Feature.Level.ERROR, feature.getLevel());
-        assertEquals("error: badness", feature.getSummary());
     }
 
     public void testWorkingDir() throws Exception

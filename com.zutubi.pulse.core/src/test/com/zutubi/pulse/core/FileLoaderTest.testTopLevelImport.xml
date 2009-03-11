@@ -1,0 +1,4 @@
+<?xml version = "1.0"?>
+<project>
+    <import path="testTopLevelImport.recipe.xml"/>
+</project>

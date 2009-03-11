@@ -23,13 +23,13 @@ public class PulseFileLoader extends FileLoader
     {
     }
 
-    public List<ResourceRequirement> loadRequiredResources(String pulseFile, String recipe) throws PulseException
+    public List<ResourceRequirement> loadRequiredResources(String pulseFile, String recipe, FileResolver fileResolver) throws PulseException
     {
         List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
 
         PulseFile file = new PulseFile();
         ResourceRequirementsPredicate predicate = new ResourceRequirementsPredicate(file, recipe);
-        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), new FileResourceRepository(), predicate);
+        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), fileResolver, new FileResourceRepository(), predicate);
 
         for(ResourceReference reference: predicate.getReferences())
         {
@@ -57,11 +57,11 @@ public class PulseFileLoader extends FileLoader
      * @return a list of all recipe names in the file
      * @throws PulseException if the file cannot be loaded
      */
-    public List<String> loadAvailableRecipes(String pulseFile) throws PulseException
+    public List<String> loadAvailableRecipes(String pulseFile, FileResolver fileResolver) throws PulseException
     {
         PulseFile file = new PulseFile();
         RecipeListingPredicate predicate = new RecipeListingPredicate();
-        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), new FileResourceRepository(), predicate);
+        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), fileResolver, new FileResourceRepository(), predicate);
 
         return CollectionUtils.map(file.getRecipes(), new Mapping<Recipe, String>()
         {
