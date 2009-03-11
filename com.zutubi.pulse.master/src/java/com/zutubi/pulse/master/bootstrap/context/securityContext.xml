@@ -34,7 +34,7 @@ The beans defined within the security subsystem need not be accessed by other co
             <list>
                 <ref local="customAuthenticationProvider"/>
                 <ref local="rememberMeAuthenticationProvider"/>
-                <ref local="serviceTokenAuthenticationProvider"/>
+                <ref local="buildTokenAuthenticationProvider"/>
             </list>
         </property>
     </bean>
@@ -47,9 +47,7 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <bean id="serviceTokenAuthenticationProvider" class="com.zutubi.pulse.master.security.ServiceTokenAuthenticationProvider">
-        <property name="serviceTokenManager" ref="serviceTokenManager"/>
-    </bean>
+    <bean id="buildTokenAuthenticationProvider" class="com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider"/>
 
     <!--
     this filter chain proxy is referenced in web.xml

@@ -210,7 +210,8 @@ public class BuildProperties
      * The dependency descriptor instance for a build.  This is an instance of the ivy ModuleDescriptor.
      */
     public static final String PROPERTY_DEPENDENCY_DESCRIPTOR   = "dependency.descriptor";
-
+    public static final String PROPERTY_HASH                    = "hash";
+    
     /**
      * Internal property used to collect test results for a recipe.
      */

@@ -6,6 +6,10 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
+import org.apache.ivy.util.url.CredentialsStore;
+
+import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  * A command that handles retrieving the dependencies for a build.  This
@@ -23,6 +27,9 @@ public class RetrieveDependenciesCommand implements Command
     public void execute(CommandContext commandContext)
     {
         ExecutionContext context = commandContext.getExecutionContext();
+
+        updateIvyCredentials(context);
+        
         try
         {
             ModuleDescriptor descriptor = context.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
@@ -37,6 +44,21 @@ public class RetrieveDependenciesCommand implements Command
         catch (Exception e)
         {
             throw new BuildException("Error running dependency retrieval: " + e.getMessage(), e);
+        }
+    }
+
+    private void updateIvyCredentials(ExecutionContext context)
+    {
+        try
+        {
+            URL masterUrl = new URL(context.getString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL));
+            String host = masterUrl.getHost();
+
+            CredentialsStore.INSTANCE.addCredentials("Pulse", host, "pulse", context.getString(NAMESPACE_INTERNAL, PROPERTY_HASH));
+        }
+        catch (MalformedURLException e)
+        {
+            // noop.
         }
     }
 

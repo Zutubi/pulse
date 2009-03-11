@@ -9,13 +9,12 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.util.url.CredentialsStore;
-import org.apache.ivy.util.Credentials;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.net.URL;
-import java.net.MalformedURLException;
 
 /**
  * A command that handles the publishing of build publications to the artifact repository.
@@ -59,19 +58,12 @@ public class PublishArtifactsCommand implements Command
 
     private void updateIvyCredentials(ExecutionContext context)
     {
-        // would like to do this in the IvyCredentialsInitialiser, but it is in servercore along with
-        // the TokenManager.
         try
         {
             URL masterUrl = new URL(context.getString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL));
             String host = masterUrl.getHost();
 
-            CredentialsStore store = CredentialsStore.INSTANCE;
-            Credentials credentials = store.getCredentials(REALM, null); // lookup the latest username / password.
-            if (credentials != null)
-            {
-                store.addCredentials(REALM, host, credentials.getUserName(), credentials.getPasswd());
-            }
+            CredentialsStore.INSTANCE.addCredentials("Pulse", host, "pulse", context.getString(NAMESPACE_INTERNAL, PROPERTY_HASH));
         }
         catch (MalformedURLException e)
         {

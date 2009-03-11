@@ -35,16 +35,17 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
+import com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
-import com.zutubi.pulse.servercore.dependency.ivy.IvyCredentialsInitialiser;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.*;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.util.url.CredentialsStore;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -55,6 +56,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 
 /**
  * The BuildController is responsible for executing and coordinating a single
@@ -90,6 +92,7 @@ public class BuildController implements EventListener
     private BuildResult previousSuccessful;
     private PulseExecutionContext buildContext;
     private BuildHookManager buildHookManager;
+    private BuildTokenAuthenticationProvider buildTokenAuthenticationProvider;
 
     private ScmManager scmManager;
     private ThreadFactory threadFactory;
@@ -149,9 +152,38 @@ public class BuildController implements EventListener
         MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig));
 
+        activateBuildAuthenticationToken();
+
         configure(root, buildResult.getRoot());
 
         return tree;
+    }
+
+    /**
+     * To each build context we add a token that can later be used by any of the builds processes to
+     * access the internal pulse artifact repository.  This token will be active for the duration of the
+     * build.
+     */
+    private void activateBuildAuthenticationToken()
+    {
+        String token;
+        try
+        {
+            token = RandomUtils.secureRandomString(15);
+        }
+        catch (GeneralSecurityException e)
+        {
+            token = RandomUtils.randomString(15);
+        }
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_HASH, token);
+
+        buildTokenAuthenticationProvider.activate(token);
+    }
+
+    private void deactivateBuildAuthenticationToken()
+    {
+        String token = buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_HASH);
+        buildTokenAuthenticationProvider.deactivate(token);
     }
 
     private BuildResult getPreviousSuccessfulBuild()
@@ -949,6 +981,8 @@ public class BuildController implements EventListener
             }
         }
 
+        deactivateBuildAuthenticationToken();
+
         eventManager.unregister(asyncListener);
         publishEvent(new BuildCompletedEvent(this, buildResult, buildContext));
 
@@ -968,7 +1002,7 @@ public class BuildController implements EventListener
         try
         {
             String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
-            IvyCredentialsInitialiser.init(new URL(masterUrl).getHost());
+            CredentialsStore.INSTANCE.addCredentials("Pulse", new URL(masterUrl).getHost(), "pulse", buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_HASH));
 
             String repositoryUrl = masterUrl + "/repository";
             DefaultIvyProvider ivyProvider = new DefaultIvyProvider();
@@ -1119,6 +1153,11 @@ public class BuildController implements EventListener
     public void setRecipeDispatchService(RecipeDispatchService recipeDispatchService)
     {
         this.recipeDispatchService = recipeDispatchService;
+    }
+
+    public void setBuildTokenAuthenticationProvider(BuildTokenAuthenticationProvider buildTokenAuthenticationProvider)
+    {
+        this.buildTokenAuthenticationProvider = buildTokenAuthenticationProvider;
     }
 
     private static interface BootstrapperCreator

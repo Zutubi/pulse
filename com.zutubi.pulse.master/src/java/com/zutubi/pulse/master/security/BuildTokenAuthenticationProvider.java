@@ -2,20 +2,23 @@ package com.zutubi.pulse.master.security;
 
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.providers.AuthenticationProvider;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * An authentication provider implementation that uses the service token (a shared token
+ * An authentication provider implementation that uses a token (a shared token
  * between the pulse master and agents) to provide an authentication.
  */
-public class ServiceTokenAuthenticationProvider implements AuthenticationProvider
+public class BuildTokenAuthenticationProvider implements AuthenticationProvider
 {
-    private ServiceTokenManager serviceTokenManager;
     private static final String USERNAME = "pulse";
+
+    private Set<String> activeTokens = new HashSet<String>();
 
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
@@ -31,17 +34,12 @@ public class ServiceTokenAuthenticationProvider implements AuthenticationProvide
 
     private Authentication validateToken(Authentication auth)
     {
-        String token = serviceTokenManager.getToken();
-        if (token == null)
+        //noinspection SuspiciousMethodCalls
+        if (!activeTokens.contains(auth.getCredentials()))
         {
-            // too early, no tokens have been generated (made available).
             return null;
         }
-        if (token.subSequence(0, 12).equals(auth.getCredentials()))
-        {
-            return createAuthentication();
-        }
-        return null;
+        return createAuthentication();
     }
 
     private Authentication createAuthentication()
@@ -61,6 +59,16 @@ public class ServiceTokenAuthenticationProvider implements AuthenticationProvide
         return new UsernamePasswordAuthenticationToken(agentUser, null, agentUser.getAuthorities());
     }
 
+    public void activate(String token)
+    {
+        activeTokens.add(token);
+    }
+
+    public void deactivate(String token)
+    {
+        activeTokens.remove(token);
+    }
+
     private boolean isPulse(String name)
     {
         return name != null && name.compareTo(USERNAME) == 0;
@@ -69,10 +77,5 @@ public class ServiceTokenAuthenticationProvider implements AuthenticationProvide
     public boolean supports(Class authentication)
     {
         return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
-    }
-
-    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
-    {
-        this.serviceTokenManager = serviceTokenManager;
     }
 }

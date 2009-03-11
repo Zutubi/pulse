@@ -209,7 +209,4 @@
         <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
     </bean>
 
-    <bean id="ivyCredentialsInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.IvyCredentialsInitialiser" init-method="init">
-        <property name="tokenManager" ref="serviceTokenManager"/>
-    </bean>
 </beans>
