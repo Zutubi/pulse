@@ -10,8 +10,8 @@ import java.util.Vector;
 
 public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAcceptanceTest
 {
-    private static final int BUILD_TIMEOUT = 10000000;
-    private static final int AVAILABILITY_TIMEOUT = 5000;
+    private static final int BUILD_TIMEOUT = 90000;
+    private static final int AVAILABILITY_TIMEOUT = 10000;
 
     private String random = null;
 

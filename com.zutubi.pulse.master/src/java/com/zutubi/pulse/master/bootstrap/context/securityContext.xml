@@ -47,8 +47,7 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <bean id="serviceTokenAuthenticationProvider"
-          class="com.zutubi.pulse.master.security.ServiceTokenAuthenticationProvider">
+    <bean id="serviceTokenAuthenticationProvider" class="com.zutubi.pulse.master.security.ServiceTokenAuthenticationProvider">
         <property name="serviceTokenManager" ref="serviceTokenManager"/>
     </bean>
 
