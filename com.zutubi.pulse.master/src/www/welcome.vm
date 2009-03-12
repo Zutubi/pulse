@@ -14,8 +14,9 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 2.0!  Pulse is an automated build server that is simple to set up and easy
-        to use while providing advanced features such as distributed and personal builds.
+        Welcome to the Pulse 2.1 <span style="color: red; font-weight: bold">EAP</span>!  Early
+        Access builds give you a chance to play with new Pulse features before they hit the street.
+        It's your best chance to give feedback on these features!
     </p>
     <p>
         You can return to this page at any time by clicking on the "pulse 2" link in the top left
@@ -82,73 +83,34 @@
     
     <h1> :: what's new :: </h1>
     <p>
-        Pulse 2.0 is a major rework, boasting largely new internals that enable important new features.
-        Major changes include:
+        Pulse 2.1 has a couple of major new features.  Be warned that these are very much a work in
+        progress.  In particular, these features are not very user friendly just yet!
     </p>
     <p>
         <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
             <tr>
-                <th class="category" colspan="2">new in 2.0</th>
+                <th class="category" colspan="2">new in 2.1</th>
             </tr>
             <tr>
-                #actionHeader("configuration.ui" "configuration ui" "accept" false)
+                #actionHeader("project.dependecies" "project dependencies" "accept" false)
                 <td>
-                    The configuration UI has been completely redone.  All configuration is now in the one place,
-                    under 'administration'.  We have used AJAX to create a more consistent interface that is also
-                    more responsive.
+                    Pulse now boasts project dependency management, allowing you to declare
+                    dependencies between your projects and deliver built artifacts between them.
+                    Future 2.1 versions will also include smart triggering for dependent projects.
+                    Dependency support is built on Apache Ivy, making it interoperable with Maven
+                    and Ivy repositories, and with projects that already use Ivy.  Pulse can act as
+                    an Ivy repository both for internal projects, and later for external ones.
                 </td>
             </tr>
             <tr>
-                #actionHeader("templated.configuration" "templated configuration" "accept" false)
+                #actionHeader("multi.command.projects" "multi-command projects" "accept" false)
                 <td>
-                    The new configuration system supports templating: a way to share common configuration between
-                    related projects (and agents) by inheritance from ancestor templates.  You will notice that
-                    the configuration system allows you to configure a hierarchy of projects/agents, and shows
-                    the inheritance relationship of fields.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("security.system" "new security system" "accept" false)
-                <td>
-                    User and group management has been updated to allow finer-grained control of security.  It is
-                    now possible to assign more specific privileges to groups using ACLs, controlling access to
-                    both projects and agents.  It is also possible to configure permissions for all users and
-                    anonymous users via two special groups.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("plugin.system" "plugins" "accept" false)
-                <td>
-                    Support for various tools is being extracted into plugins.  Further, the new configuration UI
-                    is generated: so plugin authors do not need to write any UI code!
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("browse.ui" "browse ui" "accept" false)
-                <td>
-                    The browse UI has been revamped to take advantage of the new project hierarchy and labelling
-                    schemes.  The new UI is both cleaner and more functional.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("external.databases" "external databases" "accept" false)
-                <td>
-                    Support for using external databases has been vastly improved.  Both setting up and migrating
-                    to a new database can be done directly via the web UI.
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("auto.backups" "automated backups" "accept" false)
-                <td>
-                    Pulse will now automatically backup your configuration for you.  Coupled with improved
-                    restoration capabilities, your data is safer than ever!
-                </td>
-            </tr>
-            <tr>
-                #actionHeader("predictable.urls" "predictable urls" "accept" false)
-                <td>
-                    The URL scheme used to access Pulses' resources has been reviewed and updated, allowing improved
-                    access to the UI, functionality and resources.
+                    Pulse has always allowed a build to consist of multiple steps, but in previous
+                    versions to access this flexibility you had to write a Pulse file by hand.  Now
+                    there is full UI support for configuring multi-command projects, and the full
+                    flexibility of all the commands has also been exposed in the UI.  You can still
+                    write your Pulse files by hand, and in fact they have been simplified in some
+                    ways.
                 </td>
             </tr>
         </table>
