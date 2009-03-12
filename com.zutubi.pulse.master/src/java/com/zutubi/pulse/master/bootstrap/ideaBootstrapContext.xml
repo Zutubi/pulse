@@ -19,6 +19,7 @@
         </property>
         <property name="postStartupTasks">
             <list>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.DeployArtifactRepositoryStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.DeployMainWebappStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.SystemStartedMessageStartupTask</value>
             </list>

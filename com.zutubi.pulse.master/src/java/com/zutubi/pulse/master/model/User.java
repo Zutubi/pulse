@@ -20,6 +20,15 @@ public class User extends Entity
     private long nextBuildNumber = 1;
     private UserConfiguration config;
 
+    public User()
+    {
+    }
+
+    public User(UserConfiguration config)
+    {
+        this.config = config;
+    }
+
     public boolean isEnabled()
     {
         return enabled;

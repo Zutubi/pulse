@@ -24,8 +24,8 @@ public class BuildQueueTest extends BuildQueueTestCase
     {
         super.setUp();
 
-        project1 = createProject();
-        project2 = createProject();
+        project1 = createProject("project1");
+        project2 = createProject("project2");
 
         doReturn(project1).when(projectManager).getProject(eq(project1.getId()), anyBoolean());
         doReturn(project2).when(projectManager).getProject(eq(project2.getId()), anyBoolean());

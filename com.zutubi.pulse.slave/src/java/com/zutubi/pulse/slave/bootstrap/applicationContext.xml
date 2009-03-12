@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans default-autowire="byName">
+    
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/eventContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml"/>
 
     <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>systemPaths.configRoot</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="systemPaths.configRoot"/>
     </bean>
 
     <bean id="logConfigurationManager" class="com.zutubi.pulse.servercore.util.logging.LogConfigurationManager" init-method="init">
@@ -29,21 +26,13 @@
     </bean>
 
     <bean id="logConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>appConfig</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="appConfig"/>
     </bean>
 
     <bean id="systemPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>systemPaths</value>
-        </property>
+        <property name="targetBeanName" value="configurationManager"/>
+        <property name="propertyPath" value="systemPaths"/>
     </bean>
 
     <bean id="logManager" class="com.zutubi.pulse.core.util.logging.LogManager">
@@ -56,20 +45,7 @@
         </property>
     </bean>
 
-    <bean id="jettyManager" class="com.zutubi.pulse.servercore.jetty.JettyManager">
-        <property name="jettyServer">
-            <ref local="jettyServer"/>
-        </property>
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
-    </bean>
-
-    <bean id="jettyServer" class="com.zutubi.pulse.servercore.jetty.JettyServerFactoryBean" destroy-method="shutdown">
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
-    </bean>
+    <bean name="jettyServerManager" class="com.zutubi.pulse.servercore.jetty.JettyServerManager"/>
 
     <bean id="fileHandlerFactory" class="com.zutubi.pulse.servercore.util.logging.FileHandlerFactory">
         <property name="objectFactory">
@@ -80,39 +56,37 @@
     <bean id="consoleHandlerFactory" class="com.zutubi.pulse.core.util.logging.ConsoleHandlerFactory"/>
     <bean id="memoryHandlerFactory" class="com.zutubi.pulse.core.util.logging.MemoryHandlerFactory"/>
 
-    <bean id="tokenManager" class="com.zutubi.pulse.servercore.api.AdminTokenManager" autowire="byName" init-method="init"/>
+    <bean id="tokenManager" class="com.zutubi.pulse.servercore.api.AdminTokenManager" init-method="init"/>
 
-    <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" autowire="byName"/>
+    <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" />
 
     <bean id="slaveQueue" class="com.zutubi.pulse.slave.SlaveQueue" init-method="start"/>
 
-    <bean id="slaveRecipeProcessor" class="com.zutubi.pulse.slave.SlaveRecipeProcessor" autowire="byName"/>
+    <bean id="slaveRecipeProcessor" class="com.zutubi.pulse.slave.SlaveRecipeProcessor" />
 
-    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName"/>
+    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" />
 
-    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" autowire="byName"/>
+    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" />
 
-    <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" autowire="byName" init-method="init"/>
+    <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" init-method="init"/>
 
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName" init-method="init"/>
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" init-method="init"/>
 
-    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory" autowire="byName"/>
+    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory"/>
 
-    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory" autowire="byName"/>
+    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory"/>
 
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.servercore.hessian.CustomSerialiserFactory"/>
 
-    <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory" autowire="byName"/>
+    <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory"/>
 
-    <bean id="masterProxyFactory" class="com.zutubi.pulse.slave.MasterProxyFactory" autowire="byName"/>
+    <bean id="masterProxyFactory" class="com.zutubi.pulse.slave.MasterProxyFactory"/>
 
-    <bean id="serviceTokenManager" class="com.zutubi.pulse.servercore.services.ServiceTokenManager" autowire="byName" init-method="init">
-        <property name="generate">
-            <value>false</value>
-        </property>
+    <bean id="serviceTokenManager" class="com.zutubi.pulse.servercore.services.ServiceTokenManager" init-method="init">
+        <property name="generate" value="false"/>
     </bean>
 
-    <bean id="serverMessagesHandler" class="com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler" autowire="byName" init-method="init"/>
+    <bean id="serverMessagesHandler" class="com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler" init-method="init"/>
 
     <!-- Needs a user config root -->
     <bean id="resourceRepository" class="com.zutubi.pulse.core.InMemoryResourceRepository"/>
@@ -121,8 +95,13 @@
         <property name="stoppables">
             <list>
                 <ref bean="slaveQueue"/>
-                <ref bean="jettyManager"/>
+                <ref bean="jettyServerManager"/>
             </list>
         </property>
     </bean>
+
+    <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
+        <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
+    </bean>
+
 </beans>

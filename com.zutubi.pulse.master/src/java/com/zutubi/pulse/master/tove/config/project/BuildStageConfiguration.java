@@ -19,6 +19,7 @@ import java.util.Map;
  */
 @SymbolicName("zutubi.stageConfig")
 @Form(fieldOrder = {"name", "recipe", "agent"})
+@Table(columns = {"name", "recipe"})
 @Wire
 public class BuildStageConfiguration extends AbstractNamedConfiguration
 {
@@ -32,6 +33,11 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
 
     @Transient
     private ObjectFactory objectFactory;
+
+    private String publicationPattern = "build/[artifact].[ext]";
+    private String retrievalPattern = "lib/[artifact].[ext]";
+
+    private List<PublicationConfiguration> publications = new LinkedList<PublicationConfiguration>();
 
     public BuildStageConfiguration()
     {
@@ -85,6 +91,36 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     public void setRequirements(List<ResourceRequirementConfiguration> requirements)
     {
         this.requirements = requirements;
+    }
+
+    public String getPublicationPattern()
+    {
+        return publicationPattern;
+    }
+
+    public void setPublicationPattern(String publicationPattern)
+    {
+        this.publicationPattern = publicationPattern;
+    }
+
+    public String getRetrievalPattern()
+    {
+        return retrievalPattern;
+    }
+
+    public void setRetrievalPattern(String retrievalPattern)
+    {
+        this.retrievalPattern = retrievalPattern;
+    }
+
+    public List<PublicationConfiguration> getPublications()
+    {
+        return publications;
+    }
+
+    public void setPublications(List<PublicationConfiguration> publications)
+    {
+        this.publications = publications;
     }
 
     @Transient

@@ -39,4 +39,11 @@ public interface MasterUserPaths extends UserPaths
     File getRecordRoot();
 
     File getDriverRoot();
+
+    /**
+     * The root directory for the embedded Pulse artifact repository.
+     *
+     * @return the base directory of the artifact repository.
+     */
+    File getRepositoryRoot();
 }

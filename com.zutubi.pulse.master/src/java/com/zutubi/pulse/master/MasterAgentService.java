@@ -185,12 +185,6 @@ public class MasterAgentService implements AgentService
 
     private MasterRecipeProcessor getMasterRecipeProcessor()
     {
-/*
-        if (masterRecipeProcessor == null)
-        {
-            masterRecipeProcessor = SpringComponentContext.getBean("masterRecipeProcessor");
-        }
-*/
         return masterRecipeProcessor;
     }
 
@@ -206,12 +200,6 @@ public class MasterAgentService implements AgentService
 
     public ResourceManager getResourceManager()
     {
-/*
-        if (resourceManager == null)
-        {
-            resourceManager = SpringComponentContext.getBean("resourceManager");
-        }
-*/
         return resourceManager;
     }
     

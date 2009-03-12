@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
+import com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
@@ -44,6 +45,7 @@ public class BuildQueueTestCase extends PulseTestCase
     protected File tempDir;
     protected AtomicInteger nextId = new AtomicInteger(1);
     protected AccessManager accessManager;
+    protected BuildTokenAuthenticationProvider buildTokenAuthenticationProvider;
 
     protected void setUp() throws Exception
     {
@@ -67,6 +69,7 @@ public class BuildQueueTestCase extends PulseTestCase
         objectFactory = new WiringObjectFactory();
         testManager = mock(TestManager.class);
         accessManager = mock(AccessManager.class);
+        buildTokenAuthenticationProvider = mock(BuildTokenAuthenticationProvider.class);
     }
 
     protected void tearDown() throws Exception
@@ -113,11 +116,12 @@ public class BuildQueueTestCase extends PulseTestCase
         }
     }
 
-    protected Project createProject()
+    protected Project createProject(String projectName)
     {
         Project project = new Project();
         project.setId(nextId.getAndIncrement());
         ProjectConfiguration projectConfiguration = new ProjectConfiguration();
+        projectConfiguration.setName(projectName);
         projectConfiguration.setScm(new MockScmConfiguration());
         projectConfiguration.setProjectId(project.getId());
         project.setConfig(projectConfiguration);

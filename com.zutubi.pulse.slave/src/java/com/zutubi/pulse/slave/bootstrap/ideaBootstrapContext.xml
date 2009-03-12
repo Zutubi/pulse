@@ -21,21 +21,11 @@
     <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager" init-method="init">
         <property name="systemPaths">
             <bean id="paths" class="com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths">
-                <property name="systemRootString">
-                    <value>com.zutubi.pulse.slave/system</value>
-                </property>
-                <property name="tmpRootString">
-                    <value>com.zutubi.pulse.slave/system/tmp</value>
-                </property>
-                <property name="contentRootString">
-                    <value>com.zutubi.pulse.slave/src/www</value>
-                </property>
-                <property name="configRootString">
-                    <value>com.zutubi.pulse.slave/etc</value>
-                </property>
-                <property name="logRootString">
-                    <value>com.zutubi.pulse.slave/system/logs</value>
-                </property>
+                <property name="systemRootString" value="com.zutubi.pulse.slave/system"/>
+                <property name="tmpRootString" value="com.zutubi.pulse.slave/system/tmp"/>
+                <property name="contentRootString" value="com.zutubi.pulse.slave/src/www"/>
+                <property name="configRootString" value="com.zutubi.pulse.slave/etc"/>
+                <property name="logRootString" value="com.zutubi.pulse.slave/system/logs"/>
             </bean>
         </property>
     </bean>

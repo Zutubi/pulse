@@ -45,9 +45,33 @@ public class RecipeRequest
         this.context = context;
     }
 
+    /**
+     * Get the name of the project associated with this recipe execution request.
+     *
+     * @return the project name.
+     */
     public String getProject()
     {
         return context.getString(NAMESPACE_INTERNAL, PROPERTY_PROJECT);
+    }
+
+    /**
+     * Get the organisation of the project associated with this recipe execution request.
+     *
+     * @return the projects organisation.
+     */
+    public String getProjectOrg()
+    {
+        return context.getString(NAMESPACE_INTERNAL, PROPERTY_ORG);
+    }
+
+    /**
+     * Get the build number of the build that this recipe execution request belongs to.
+     * @return
+     */
+    public String getBuildNumber()
+    {
+        return context.getString(NAMESPACE_INTERNAL,PROPERTY_BUILD_NUMBER);
     }
 
     public long getId()
@@ -68,6 +92,16 @@ public class RecipeRequest
     public String getRecipeName()
     {
         return context.getString(NAMESPACE_INTERNAL, PROPERTY_RECIPE);
+    }
+
+    /**
+     * Get the name of the build stage in which this recipe execution request is being processed.
+     *
+     * @return the name of the build stage.
+     */
+    public String getStageName()
+    {
+        return context.getString(NAMESPACE_INTERNAL, PROPERTY_STAGE);
     }
 
     public String getRecipeNameSafe()

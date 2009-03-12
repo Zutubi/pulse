@@ -10,8 +10,10 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider;
+import com.zutubi.pulse.core.dependency.ivy.IvySupport;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
@@ -33,6 +35,7 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
+import com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
@@ -40,6 +43,9 @@ import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.ivy.core.module.descriptor.*;
+import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.util.url.CredentialsStore;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -49,6 +55,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
+import java.net.URL;
+import java.security.GeneralSecurityException;
 
 /**
  * The BuildController is responsible for executing and coordinating a single
@@ -84,6 +92,7 @@ public class BuildController implements EventListener
     private BuildResult previousSuccessful;
     private PulseExecutionContext buildContext;
     private BuildHookManager buildHookManager;
+    private BuildTokenAuthenticationProvider buildTokenAuthenticationProvider;
 
     private ScmManager scmManager;
     private ThreadFactory threadFactory;
@@ -141,10 +150,40 @@ public class BuildController implements EventListener
         buildContext = new PulseExecutionContext();
         MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
         MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig));
+
+        activateBuildAuthenticationToken();
 
         configure(root, buildResult.getRoot());
 
         return tree;
+    }
+
+    /**
+     * To each build context we add a token that can later be used by any of the builds processes to
+     * access the internal pulse artifact repository.  This token will be active for the duration of the
+     * build.
+     */
+    private void activateBuildAuthenticationToken()
+    {
+        String token;
+        try
+        {
+            token = RandomUtils.secureRandomString(15);
+        }
+        catch (GeneralSecurityException e)
+        {
+            token = RandomUtils.randomString(15);
+        }
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_HASH, token);
+
+        buildTokenAuthenticationProvider.activate(token);
+    }
+
+    private void deactivateBuildAuthenticationToken()
+    {
+        String token = buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_HASH);
+        buildTokenAuthenticationProvider.deactivate(token);
     }
 
     private BuildResult getPreviousSuccessfulBuild()
@@ -173,8 +212,13 @@ public class BuildController implements EventListener
 
             PulseExecutionContext recipeContext = new PulseExecutionContext(buildContext);
             recipeContext.push();
-            recipeContext.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
-            recipeContext.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_RECIPE, stageConfig.getRecipe());
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_ORG, projectConfig.getOrg());
+
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_PUBLICATION_PATTERN, stageConfig.getPublicationPattern());
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, stageConfig.getRetrievalPattern());
 
             RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);
@@ -200,6 +244,61 @@ public class BuildController implements EventListener
             rcNode.add(child);
             pendingRecipes++;
         }
+    }
+
+    private ModuleDescriptor createModuleDescriptor(ProjectConfiguration project)
+    {
+        String org = project.getOrg();
+        if (!TextUtils.stringSet(org))
+        {
+            org = "";
+        }
+        ModuleRevisionId mrid = ModuleRevisionId.newInstance(org, project.getName(), null);
+
+        //TODO: allow the build request to define the status of this descriptor
+        String status = "integration";
+        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, status, null); // the status needs to be configurable - options include 'release'..
+        descriptor.addConfiguration(new Configuration("build"));
+
+        // setup the module dependencies.
+        for (DependencyConfiguration dependency : project.getDependencies().getDependencies())
+        {
+            String projectName = dependency.getModule();
+            // once we support the org field in the dependency, we can replace this project lookup.
+            String projectOrg = projectManager.getProjectConfig(projectName, true).getOrg();
+
+            if (!TextUtils.stringSet(projectOrg))
+            {
+                projectOrg = "";
+            }
+
+            ModuleRevisionId dependencyMrid = ModuleRevisionId.newInstance(projectOrg, projectName, dependency.getRevision());
+            DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(dependencyMrid, true, false);
+            if (TextUtils.stringSet(dependency.getStages()))
+            {
+                depDesc.addDependencyConfiguration("build", "*"); // potentially a list of stages. '*' signals all, empty stage implies default.
+            }
+            descriptor.addDependency(depDesc);
+        }
+
+        // setup the module artifacts.
+        for (BuildStageConfiguration stage : project.getStages().values())
+        {
+            if (stage.getPublications().size() > 0)
+            {
+                descriptor.addConfiguration(new Configuration(stage.getName()));
+                for (PublicationConfiguration artifact : stage.getPublications())
+                {
+                    Map<String, String> extraAttributes = new HashMap<String, String>();
+                    extraAttributes.put("e:stage", stage.getName());
+                    MDArtifact ivyArtifact = new MDArtifact(descriptor, artifact.getName(), artifact.getExt(), artifact.getExt(), null, extraAttributes);
+                    String conf = stage.getName();
+                    ivyArtifact.addConfiguration(conf);
+                    descriptor.addArtifact(conf, ivyArtifact);
+                }
+            }
+        }
+        return descriptor;
     }
 
     private Collection<? extends ResourceProperty> asResourceProperties(Collection<ResourcePropertyConfiguration> resourcePropertyConfigurations)
@@ -324,7 +423,7 @@ public class BuildController implements EventListener
             public Bootstrapper create()
             {
                 Bootstrapper initialBootstrapper;
-                if (buildContext.getBoolean(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, false))
+                if (buildContext.getBoolean(PROPERTY_INCREMENTAL_BOOTSTRAP, false))
                 {
                     initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision());
                 }
@@ -866,6 +965,24 @@ public class BuildController implements EventListener
             LOG.severe("Failed to persist the completed build result. Reason: " + e.getMessage(), e);
         }
 
+        if (buildResult.succeeded())
+        {
+            try
+            {
+                // publish this builds ivy file to the repository, making its artifacts available
+                // to subsequent builds.
+                publishIvyToRepository();
+            }
+            catch (Exception e)
+            {
+                // ensure that any problems publishing ivy do not cause issues with
+                // the rest of the build.  Catch and report the issue.
+                LOG.error(e);
+            }
+        }
+
+        deactivateBuildAuthenticationToken();
+
         eventManager.unregister(asyncListener);
         publishEvent(new BuildCompletedEvent(this, buildResult, buildContext));
 
@@ -874,6 +991,59 @@ public class BuildController implements EventListener
         // this must be last since we are in fact stopping the thread running this method.., we are
         // after all responding to an event on this listener.
         asyncListener.stop(true);
+    }
+
+    /**
+     * Publish an ivy file to the repository.
+     */
+    private void publishIvyToRepository()
+    {
+        File tmp = null;
+        try
+        {
+            String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
+            CredentialsStore.INSTANCE.addCredentials("Pulse", new URL(masterUrl).getHost(), "pulse", buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_HASH));
+
+            String repositoryUrl = masterUrl + "/repository";
+            DefaultIvyProvider ivyProvider = new DefaultIvyProvider();
+            ivyProvider.setRepositoryBase(repositoryUrl);
+            IvySupport ivy = ivyProvider.getIvySupport();
+
+            ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
+            descriptor.getModuleRevisionId().getOrganisation();
+            ivy.resolve(descriptor);
+
+            // deliver the ivy file locally (tmp)
+            tmp = FileSystemUtils.createTempDir();
+            String destIvyPattern = tmp.getCanonicalPath() + "/[artifact].[ext]";
+            ivy.deliver(descriptor.getModuleRevisionId(), Long.toString(buildResult.getNumber()), destIvyPattern);
+
+            // publish the ivy file from tmp.
+            ivy.publishIvy(descriptor.getModuleRevisionId(), Long.toString(buildResult.getNumber()), new File(tmp, "ivy.xml"));
+        }
+        catch (Exception e)
+        {
+            LOG.warning("Failed to publish the builds ivy file to the repository. Cause: " + e.getMessage(), e);
+        }
+        finally
+        {
+            cleanupDirectory(tmp);
+        }
+    }
+
+    private void cleanupDirectory(File dir)
+    {
+        try
+            {
+                if (dir != null && !FileSystemUtils.rmdir(dir))
+            {
+                LOG.warning("Failed to cleanup directory: " + dir.getCanonicalPath());
+            }
+        }
+        catch (IOException e)
+        {
+            // noop.
+        }
     }
 
     private void abortUnfinishedRecipes()
@@ -983,6 +1153,11 @@ public class BuildController implements EventListener
     public void setRecipeDispatchService(RecipeDispatchService recipeDispatchService)
     {
         this.recipeDispatchService = recipeDispatchService;
+    }
+
+    public void setBuildTokenAuthenticationProvider(BuildTokenAuthenticationProvider buildTokenAuthenticationProvider)
+    {
+        this.buildTokenAuthenticationProvider = buildTokenAuthenticationProvider;
     }
 
     private static interface BootstrapperCreator

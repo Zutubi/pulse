@@ -4,7 +4,7 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetupDatabaseTypeForm;
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
 import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
@@ -31,6 +31,8 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     protected void setUp() throws Exception
     {
+        super.setUp();
+
         // create a temporary user home.
         tmpDir = FileSystemUtils.createTempDir();
 
@@ -41,7 +43,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         defaultConfigFile = new File(userHome, FileSystemUtils.join(".pulse2", "config.properties"));
 
         File pkgFile = AcceptanceTestUtils.getPulsePackage();
-        
+
         PackageFactory factory = new JythonPackageFactory();
         PulsePackage pkg = factory.createPackage(pkgFile);
 
@@ -51,6 +53,35 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        cleanupSelenium();
+        cleanupPulse();
+
+        removeDirectory(tmpDir);
+
+        super.tearDown();
+    }
+
+    private void cleanupPulse()
+    {
+        try
+        {
+            // cleanup the pulse instance if it was used.
+            if (pulse != null)
+            {
+                if (pulse.ping()) // if it is running
+                {
+                    pulse.stop();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void cleanupSelenium()
+    {
         try
         {
             // cleanup selenium if it was used.
@@ -59,28 +90,11 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
                 selenium.stop();
                 selenium = null;
             }
-
-            // cleanup the pulse instance if it was used.
-            if (pulse != null)
-            {
-                if (pulse.ping()) // if it is running
-                {
-                    pulse.stop();
-                }
-                pulse = null;
-            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-
-        removeDirectory(tmpDir);
-
-        tmpDir = null;
-        dataDir = null;
-        defaultDataDir = null;
-        defaultConfigFile = null;
     }
 
     public void testDefaultFirstTimeStartup() throws Exception
@@ -381,7 +395,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         assertTrue(pulse.ping());
     }
 
-    private void assertStartServer(RuntimeContext commandline) throws ParseException
+    private void assertStartServer(RuntimeContext commandline) throws Exception
     {
         if (TextUtils.stringSet(commandline.getPort()))
         {

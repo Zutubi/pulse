@@ -24,13 +24,11 @@ import java.util.Hashtable;
  * enforced.
  */
 // the xmlrpc tests create the project/user/agent data we need for these tests to work, so lets depend on them.
-@Test(dependsOnGroups = {"init.*"})
 public class LicenseAcceptanceTest extends SeleniumTestBase
 {
     private static final String LICENSE_PATH = "settings/license";
     private static final int BUILD_TIMEOUT = 90000;
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -38,7 +36,6 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         try

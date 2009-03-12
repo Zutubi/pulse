@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
-import com.zutubi.util.TextUtils;
+import com.zutubi.pulse.acceptance.support.SupportUtils;
 import junit.extensions.TestSetup;
 
 import java.io.File;
@@ -23,64 +23,35 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
     {
         JythonPackageFactory factory = new JythonPackageFactory();
 
-        int port = Integer.getInteger("pulse.port");
-
-        File pulsePackage = AcceptanceTestUtils.getPulsePackage();
+        int pulsePort = Integer.getInteger("pulse.port", 8080);
+        int agentPort = Integer.getInteger("agent.port", 8890);
 
         File dir = AcceptanceTestUtils.getWorkingDirectory();
 
+        File userHome = new File(dir, "user.home");
+        
+        File pulsePackage = AcceptanceTestUtils.getPulsePackage();
         PulsePackage pkg = factory.createPackage(pulsePackage);
         pulse = pkg.extractTo(new File(dir, "master").getCanonicalPath());
-        pulse.setVerbose(true);
-        pulse.setPort(port);
-        pulse.setUserHome(new File(dir, "user.home").getCanonicalPath());
+        pulse.setPort(pulsePort);
+        pulse.setUserHome(userHome.getCanonicalPath());
         pulse.start();
 
         // start up an agent as well.  port 8890
-        File agentPackage = getAgentPackage();
+        File agentPackage = AcceptanceTestUtils.getAgentPackage();
         PulsePackage agentPkg = factory.createPackage(agentPackage);
         agent = agentPkg.extractTo(new File(dir, "agent").getCanonicalPath());
-        agent.setPort(8890);
-        agent.setUserHome(new File(dir, "user.home").getCanonicalPath());
+        agent.setPort(agentPort);
+        agent.setUserHome(userHome.getCanonicalPath());
         agent.start();
     }
 
     public void tearDown() throws IOException
     {
-        shutdown(pulse);
+        SupportUtils.shutdown(pulse);
         pulse = null;
 
-        shutdown(agent);
+        SupportUtils.shutdown(agent);
         agent = null;
-    }
-
-    public static File getAgentPackage()
-    {
-        String agentPackage = System.getProperty("agent.package");
-        if (!TextUtils.stringSet(agentPackage))
-        {
-            return null;
-        }
-        File pkg = new File(agentPackage);
-        if (!pkg.isFile())
-        {
-            throw new IllegalStateException("Unexpected invalid agent.package: " + agentPackage + " does not reference a file.");
-        }
-        return pkg;
-    }
-
-    protected void shutdown(Pulse pulse)
-    {
-        try
-        {
-            if (pulse != null)
-            {
-                pulse.stop();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
     }
 }

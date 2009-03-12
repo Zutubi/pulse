@@ -17,10 +17,8 @@ The beans defined within the security subsystem need not be accessed by other co
      doing so else the FilterToBeanProxy will be unable to locate the defined beans.
      -->
     <bean id="securityManager" class="com.zutubi.pulse.master.security.AcegiSecurityManager">
-        <property name="jettyManager" ref="jettyManager"/>
-        <property name="authenticationManager">
-            <ref local="authenticationManager"/>
-        </property>
+        <property name="jettyServerManager" ref="jettyServerManager"/>
+        <property name="configurationManager" ref="configurationManager"/>
     </bean>
 
     <bean id="ldapManager" class="com.zutubi.pulse.master.security.ldap.AcegiLdapManager">
@@ -36,6 +34,7 @@ The beans defined within the security subsystem need not be accessed by other co
             <list>
                 <ref local="customAuthenticationProvider"/>
                 <ref local="rememberMeAuthenticationProvider"/>
+                <ref local="buildTokenAuthenticationProvider"/>
             </list>
         </property>
     </bean>
@@ -47,6 +46,8 @@ The beans defined within the security subsystem need not be accessed by other co
             <ref local="ldapManager"/>
         </property>
     </bean>
+
+    <bean id="buildTokenAuthenticationProvider" class="com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider"/>
 
     <!--
     this filter chain proxy is referenced in web.xml
@@ -66,6 +67,44 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
+    <!-- is this still necessary? -->
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="com.zutubi.pulse.servercore.jetty.AuthorityDefinitions">
+                    <bean class="com.zutubi.pulse.servercore.jetty.AuthorityDefinitionsEditor"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <!--
+    The security handler for access to the artifact repository.
+    -->
+    <bean name="artifactRepositorySecurityHandler" class="com.zutubi.pulse.servercore.jetty.FilteringHandler">
+        <property name="filters">
+            <list>
+                <ref local="basicProcessingFilter"/>
+                <ref local="rememberMeProcessingFilter"/>
+                <ref local="anonymousProcessingFilter"/>
+            </list>
+        </property>
+        <property name="delegate" ref="securityDelegateHandler"/>
+    </bean>
+
+    <bean name="securityDelegateHandler" class="com.zutubi.pulse.master.jetty.SecurityHandler">
+        <property name="accessManager" ref="accessManager"/>
+        <property name="basicEntryPoint" ref="basicProcessingFilterEntryPoint"/>
+    </bean>
+
+    <bean name="artifactRepositoryAuthorityProvider" class="com.zutubi.pulse.servercore.jetty.ArtifactRepositoryAuthorityProvider">
+        <property name="accessManager" ref="accessManager"/>
+        <property name="definitions"><value>
+            /,ROLE_ANONYMOUS
+            /,ROLE_USER,GET,HEAD
+            /,ADMINISTER,GET,HEAD,PUT
+        </value></property>
+    </bean>
 
     <!--
     The AuthenticationProcessingFilter is responsible for handling the login request. It monitors for requests
@@ -100,7 +139,7 @@ The beans defined within the security subsystem need not be accessed by other co
     </bean>
 
     <bean id="basicProcessingFilterEntryPoint" class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
-        <property name="realmName" value="Pulse Realm"/>
+        <property name="realmName" value="Pulse"/>
     </bean>
 
     <!--

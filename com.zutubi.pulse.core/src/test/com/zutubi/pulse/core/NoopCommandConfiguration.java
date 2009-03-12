@@ -12,4 +12,10 @@ public class NoopCommandConfiguration extends CommandConfigurationSupport
     {
         super(NoopCommand.class);
     }
+
+    public NoopCommandConfiguration(String name)
+    {
+        super(NoopCommand.class);
+        setName(name);
+    }
 }

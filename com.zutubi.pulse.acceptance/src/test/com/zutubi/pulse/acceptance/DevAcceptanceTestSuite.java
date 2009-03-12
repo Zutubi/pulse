@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import junit.framework.TestSuite;
+import com.zutubi.pulse.acceptance.dependencies.DependenciesTestSuite;
 
 public class DevAcceptanceTestSuite
 {
@@ -17,7 +18,6 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ProjectXmlRpcAcceptanceTest.class);
         suite.addTestSuite(ReportingXmlRpcAcceptanceTest.class);
         suite.addTestSuite(ResourceXmlRpcAcceptanceTest.class);
-
         // this test uses the remote api exclusively, but does not test the xmlrpc interface.
         suite.addTestSuite(NotificationAcceptanceTest.class);
         suite.addTestSuite(CustomProjectAcceptanceTest.class);
@@ -46,6 +46,10 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(PerforceAcceptanceTest.class);
         suite.addTestSuite(BuildHookAcceptanceTest.class);
         suite.addTestSuite(PersonalBuildAcceptanceTest.class);
+
+        //--( 2.1: dependency tests)--
+        suite.addTest(DependenciesTestSuite.suite());
+
         return suite;
     }
 }

@@ -13,21 +13,13 @@ This context exports:
 
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.servercore.hessian.CustomSerialiserFactory"/>
 
-    <bean id="jettyManager" class="com.zutubi.pulse.servercore.jetty.JettyManager">
-        <property name="jettyServer">
-            <ref local="jettyServer"/>
-        </property>
-        <property name="configurationManager" ref="configurationManager"/>
-    </bean>
-
-    <bean id="jettyServer" class="com.zutubi.pulse.servercore.jetty.JettyServerFactoryBean" destroy-method="shutdown">
-        <property name="configurationManager" ref="configurationManager"/>
-    </bean>
+    <bean id="jettyServerManager" class="com.zutubi.pulse.servercore.jetty.JettyServerManager"/>
 
     <bean id="webManager" class="com.zutubi.pulse.master.bootstrap.WebManager">
-        <property name="jettyManager">
-            <ref local="jettyManager"/>
+        <property name="jettyServerManager">
+            <ref local="jettyServerManager"/>
         </property>
+        <property name="configurationManager" ref="configurationManager"/>
     </bean>
 
     <bean id="tokenManager" class="com.zutubi.pulse.master.bootstrap.StartupTokenManager">

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans default-autowire="byName">
 
     <bean id="velocityEngine" class="com.zutubi.pulse.master.bootstrap.velocity.VelocityEngineFactoryBean"/>
 
@@ -13,8 +13,7 @@
         </property>
     </bean>
 
-    <bean id="buildManagerTarget" class="com.zutubi.pulse.master.model.DefaultBuildManager" autowire="byName"
-          init-method="init"/>
+    <bean id="buildManagerTarget" class="com.zutubi.pulse.master.model.DefaultBuildManager" init-method="init"/>
     <bean id="buildManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref local="buildManagerTarget"/>
@@ -27,13 +26,13 @@
         </property>
     </bean>
 
-    <bean id="scmManager" class="com.zutubi.pulse.master.scm.DefaultScmManager" autowire="byName" init-method="init"/>
+    <bean id="scmManager" class="com.zutubi.pulse.master.scm.DefaultScmManager" init-method="init"/>
 
-    <bean id="projectInitialisationService" class="com.zutubi.pulse.master.project.ProjectInitialisationService" autowire="byName" init-method="init"/>
+    <bean id="projectInitialisationService" class="com.zutubi.pulse.master.project.ProjectInitialisationService" init-method="init"/>
 
-    <bean id="projectLoggerManager" class="com.zutubi.pulse.master.project.ProjectLoggerManager" autowire="byName"/>
+    <bean id="projectLoggerManager" class="com.zutubi.pulse.master.project.ProjectLoggerManager"/>
 
-    <bean id="projectManagerTarget" class="com.zutubi.pulse.master.model.DefaultProjectManager" autowire="byName"/>
+    <bean id="projectManagerTarget" class="com.zutubi.pulse.master.model.DefaultProjectManager"/>
     <bean id="projectManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <!-- specifying the target this way since using the 'target' property is causing an assertion failure. -->
         <property name="targetName" value="projectManagerTarget"/>
@@ -44,7 +43,7 @@
         </property>
     </bean>
 
-    <bean id="resourceManagerTarget" class="com.zutubi.pulse.master.model.DefaultResourceManager" autowire="byName"/>
+    <bean id="resourceManagerTarget" class="com.zutubi.pulse.master.model.DefaultResourceManager"/>
     <bean id="resourceManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref local="resourceManagerTarget"/>
@@ -56,7 +55,7 @@
         </property>
     </bean>
 
-    <bean id="agentStateManagerTarget" class="com.zutubi.pulse.master.model.DefaultAgentStateManager" autowire="byName"
+    <bean id="agentStateManagerTarget" class="com.zutubi.pulse.master.model.DefaultAgentStateManager"
           init-method="init"/>
     <bean id="agentStateManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
@@ -69,7 +68,7 @@
         </property>
     </bean>
 
-    <bean id="testManagerTarget" class="com.zutubi.pulse.master.model.DefaultTestManager" autowire="byName"/>
+    <bean id="testManagerTarget" class="com.zutubi.pulse.master.model.DefaultTestManager"/>
     <bean id="testManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref local="testManagerTarget"/>
@@ -81,7 +80,7 @@
         </property>
     </bean>
 
-    <bean id="agentManagerTarget" class="com.zutubi.pulse.master.agent.DefaultAgentManager" autowire="byName"/>
+    <bean id="agentManagerTarget" class="com.zutubi.pulse.master.agent.DefaultAgentManager"/>
     <bean id="agentManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref local="agentManagerTarget"/>
@@ -93,25 +92,25 @@
         </property>
     </bean>
 
-    <bean id="masterLocationProvider" class="com.zutubi.pulse.master.agent.DefaultMasterLocationProvider" autowire="byName"/>
+    <bean id="masterLocationProvider" class="com.zutubi.pulse.master.agent.DefaultMasterLocationProvider"/>
 
-    <bean id="agentPingService" class="com.zutubi.pulse.master.agent.AgentPingService" autowire="byName" init-method="init"/>
+    <bean id="agentPingService" class="com.zutubi.pulse.master.agent.AgentPingService" init-method="init"/>
 
-    <bean id="resourceDiscoveryService" class="com.zutubi.pulse.master.agent.ResourceDiscoveryService" autowire="byName" init-method="init"/>
+    <bean id="resourceDiscoveryService" class="com.zutubi.pulse.master.agent.ResourceDiscoveryService" init-method="init"/>
 
-    <bean id="recipeTerminationService" class="com.zutubi.pulse.master.agent.RecipeTerminationService" autowire="byName" init-method="init"/>
+    <bean id="recipeTerminationService" class="com.zutubi.pulse.master.agent.RecipeTerminationService" init-method="init"/>
 
-    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName"/>
+    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor"/>
 
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName" init-method="init"/>
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" init-method="init"/>
 
-    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory" autowire="byName"/>
+    <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory"/>
 
-    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory" autowire="byName"/>
+    <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory"/>
 
-    <bean id="masterRecipeProcessor" class="com.zutubi.pulse.master.MasterRecipeProcessor" autowire="byName"/>
+    <bean id="masterRecipeProcessor" class="com.zutubi.pulse.master.MasterRecipeProcessor"/>
 
-    <bean id="buildResultRenderer" class="com.zutubi.pulse.master.renderer.FreemarkerBuildResultRenderer" autowire="byName"/>
+    <bean id="buildResultRenderer" class="com.zutubi.pulse.master.renderer.FreemarkerBuildResultRenderer"/>
 
     <bean id="masterConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName" value="configurationManager"/>
@@ -133,17 +132,17 @@
         <property name="propertyPath" value="systemPaths.configRoot"/>
     </bean>
 
-    <bean id="slaveProxyFactory" class="com.zutubi.pulse.master.SlaveProxyFactory" autowire="byName"/>
+    <bean id="slaveProxyFactory" class="com.zutubi.pulse.master.SlaveProxyFactory"/>
 
-    <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory" autowire="byName"/>
+    <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory"/>
 
-    <bean id="fatController" class="com.zutubi.pulse.master.FatController" autowire="byName" init-method="init"/>
+    <bean id="fatController" class="com.zutubi.pulse.master.FatController" init-method="init"/>
 
-    <bean id="recipeQueue" class="com.zutubi.pulse.master.ThreadedRecipeQueue" autowire="byName"/>
+    <bean id="recipeQueue" class="com.zutubi.pulse.master.ThreadedRecipeQueue"/>
 
-    <bean id="recipeDispatchService" class="com.zutubi.pulse.master.RecipeDispatchService" autowire="byName" init-method="init"/>
+    <bean id="recipeDispatchService" class="com.zutubi.pulse.master.RecipeDispatchService" init-method="init"/>
 
-    <bean id="resultNotifier" class="com.zutubi.pulse.master.ResultNotifier" autowire="byName" init-method="init"/>
+    <bean id="resultNotifier" class="com.zutubi.pulse.master.ResultNotifier" init-method="init"/>
 
     <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
         <property name="stoppables">
@@ -155,7 +154,7 @@
                 <ref bean="agentPingService"/>
                 <ref bean="agentManager"/>
                 <ref bean="jabberManager"/>
-                <ref bean="jettyManager"/>
+                <ref bean="jettyServerManager"/> 
                 <ref bean="projectInitialisationService"/>
                 <ref bean="projectLoggerManager"/>
                 <ref bean="databaseConsole"/>
@@ -163,23 +162,23 @@
         </property>
     </bean>
 
-    <bean id="tokenManager" class="com.zutubi.pulse.master.api.DefaultTokenManager" autowire="byName" init-method="init"/>
+    <bean id="tokenManager" class="com.zutubi.pulse.master.api.DefaultTokenManager" init-method="init"/>
 
     <bean id="notifyConditionFactory" class="com.zutubi.pulse.master.condition.NotifyConditionFactory">
         <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
-    <bean id="jabberManager" class="com.zutubi.pulse.master.jabber.JabberManager" autowire="byName"/>
+    <bean id="jabberManager" class="com.zutubi.pulse.master.jabber.JabberManager"/>
 
-    <bean id="licenseMonitor" class="com.zutubi.pulse.master.license.LicenseMonitor" autowire="byName" init-method="init"/>
+    <bean id="licenseMonitor" class="com.zutubi.pulse.master.license.LicenseMonitor" init-method="init"/>
 
-    <bean id="postProcessorManager" class="com.zutubi.pulse.master.PostProcessorManager" autowire="byName"/>
+    <bean id="postProcessorManager" class="com.zutubi.pulse.master.PostProcessorManager"/>
 
-    <bean id="guestAccessManager" class="com.zutubi.pulse.master.GuestAccessManager" autowire="byName"/>
+    <bean id="guestAccessManager" class="com.zutubi.pulse.master.GuestAccessManager"/>
 
-    <bean id="queries" class="com.zutubi.pulse.master.search.Queries" autowire="byName"/>
+    <bean id="queries" class="com.zutubi.pulse.master.search.Queries"/>
 
-    <bean id="serviceTokenManager" class="com.zutubi.pulse.servercore.services.ServiceTokenManager" autowire="byName" init-method="init"/>
+    <bean id="serviceTokenManager" class="com.zutubi.pulse.servercore.services.ServiceTokenManager" init-method="init"/>
 
     <!-- re create the file system manager now that the slave details are available. -->
     <bean id="fileSystemManager" class="com.zutubi.pulse.master.vfs.VfsManagerFactoryBean" destroy-method="shutdown">
@@ -189,13 +188,13 @@
         <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
-    <bean id="cleanupManager" class="com.zutubi.pulse.master.cleanup.CleanupManager" autowire="byName" init-method="init"/>
+    <bean id="cleanupManager" class="com.zutubi.pulse.master.cleanup.CleanupManager" init-method="init"/>
 
-    <bean id="triggerManager" class="com.zutubi.pulse.master.tove.config.project.triggers.TriggerManager" autowire="byName"/>
+    <bean id="triggerManager" class="com.zutubi.pulse.master.tove.config.project.triggers.TriggerManager"/>
 
-    <bean id="buildHookManager" class="com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager" autowire="byName"/>
+    <bean id="buildHookManager" class="com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager"/>
 
-    <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider" autowire="byName"/>
+    <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider"/>
 
     <bean id="scmContextFactory" class="com.zutubi.pulse.master.scm.DefaultScmContextFactory">
         <property name="projectsDir">
@@ -204,6 +203,10 @@
                 <property name="propertyPath" value="userPaths.projectRoot"/>
             </bean>
         </property>
+    </bean>
+
+    <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
+        <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
     </bean>
 
 </beans>

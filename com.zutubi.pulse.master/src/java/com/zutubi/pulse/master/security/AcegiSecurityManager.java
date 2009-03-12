@@ -1,17 +1,18 @@
 package com.zutubi.pulse.master.security;
 
 import com.zutubi.pulse.master.spring.web.context.FilterToBeanProxy;
-import com.zutubi.pulse.servercore.jetty.JettyManager;
+import com.zutubi.pulse.master.bootstrap.WebManager;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.providers.ProviderManager;
 import org.acegisecurity.util.FilterChainProxy;
+import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Dispatcher;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.WebApplicationHandler;
 
 /**
  * The security manager is responsible for handling security related functionality.
- *
  */
 public class AcegiSecurityManager implements SecurityManager
 {
@@ -19,27 +20,27 @@ public class AcegiSecurityManager implements SecurityManager
 
     private static final Logger LOG = Logger.getLogger(AcegiSecurityManager.class);
 
-    private ProviderManager authenticationManager;
-    private JettyManager jettyManager;
+    private JettyServerManager jettyServerManager;
 
+    private ConfigurationManager configurationManager;
+
+    /**
+     * Enable security in the Pulse web application.
+     */
     public void secure()
     {
-        deploySecurityFilter();
-        enableWebUISecurity();
-    }
-
-    private void disableWebUISecurity()
-    {
-        FilterHolder filter = jettyManager.getHandler().getFilter(ACEGI_FILTER_NAME);
-        if (filter.isStarted())
+        WebApplicationHandler handler = getHandler();
+        if (handler == null)
         {
-            filter.stop();
+            throw new RuntimeException("Can not enable web security before the web app is fully deployed.");
         }
+        deploySecurityFilter(handler);
+        enableWebUISecurity(handler);
     }
 
-    private void enableWebUISecurity()
+    private void enableWebUISecurity(WebApplicationHandler handler)
     {
-        FilterHolder filter = jettyManager.getHandler().getFilter(ACEGI_FILTER_NAME);
+        FilterHolder filter = handler.getFilter(ACEGI_FILTER_NAME);
         try
         {
             filter.start();
@@ -50,23 +51,32 @@ public class AcegiSecurityManager implements SecurityManager
         }
     }
 
-    private void deploySecurityFilter()
+    private void deploySecurityFilter(WebApplicationHandler handler)
     {
-        WebApplicationHandler handler = jettyManager.getHandler();
-
         FilterHolder filter = new FilterHolder(handler, ACEGI_FILTER_NAME, FilterToBeanProxy.class.getName());
         filter.setInitParameter("targetClass", FilterChainProxy.class.getName());
         handler.addFilterHolder(filter);
         handler.addFilterPathMapping("/*", ACEGI_FILTER_NAME, Dispatcher.__REQUEST | Dispatcher.__FORWARD);
     }
 
-    public void setJettyManager(JettyManager jettyManager)
+    private WebApplicationHandler getHandler()
     {
-        this.jettyManager = jettyManager;
+        Server server = jettyServerManager.getServer(WebManager.WEBAPP_PULSE);
+        if (server.isStarted())
+        {
+            String contextPath = configurationManager.getSystemConfig().getContextPath();
+            return ((WebApplicationHandler) server.getContext(contextPath).getHandlers()[0]);
+        }
+        return null;
     }
 
-    public void setAuthenticationManager(ProviderManager authenticationManager)
+    public void setJettyServerManager(JettyServerManager jettyServerManager)
     {
-        this.authenticationManager = authenticationManager;
+        this.jettyServerManager = jettyServerManager;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

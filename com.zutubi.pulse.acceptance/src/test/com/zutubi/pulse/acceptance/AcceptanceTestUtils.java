@@ -2,8 +2,11 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.util.Condition;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 
 public class AcceptanceTestUtils
 {
@@ -18,12 +21,32 @@ public class AcceptanceTestUtils
         return workingDir;
     }
 
+    public static File getDataDirectory() throws IOException
+    {
+        File configFile = new File(getWorkingDirectory(), "user.home/.pulse2/config.properties");
+        if (configFile.isFile())
+        {
+            Properties configProperties = IOUtils.read(configFile);
+            return new File(configProperties.getProperty("pulse.data"));
+        }
+
+        File userHome = new File(System.getProperty("user.home"));
+        configFile = new File(userHome, ".pulse2/config.properties");
+        if (configFile.isFile())
+        {
+            Properties configProperties = IOUtils.read(configFile);
+            return new File(configProperties.getProperty("pulse.data"));
+        }
+
+        return new File("./data");
+    }
+
     public static void waitForCondition(Condition condition, long timeout, String description)
     {
         long endTime = System.currentTimeMillis() + timeout;
-        while(!condition.satisfied())
+        while (!condition.satisfied())
         {
-            if(System.currentTimeMillis() > endTime)
+            if (System.currentTimeMillis() > endTime)
             {
                 throw new RuntimeException("Timed out waiting for " + description);
             }
@@ -45,19 +68,35 @@ public class AcceptanceTestUtils
      *
      * @return file reference to the pulse package
      * @throws IllegalStateException if pulse.package os not set or does not
-     *         refer to a valid file
+     *                               refer to a valid file
      */
     public static File getPulsePackage()
     {
-        String pulsePackage = System.getProperty("pulse.package");
-        if (!TextUtils.stringSet(pulsePackage))
+        return getPackage("pulse.package");
+    }
+
+    /**
+     * Returns the location of the Pulse agent pacakge, based on the agent.package
+     * system property.
+     *
+     * @return file reference to the pulse agent package.
+     */
+    public static File getAgentPackage()
+    {
+        return getPackage("agent.package");
+    }
+
+    public static File getPackage(String packageProperty)
+    {
+        String pkgProperty = System.getProperty(packageProperty);
+        if (!TextUtils.stringSet(pkgProperty))
         {
-            throw new IllegalStateException("No pulse package specified (use the system property pulse.package)");
+            throw new IllegalStateException("No package specified (use the system property " + packageProperty + ")");
         }
-        File pkg = new File(pulsePackage);
+        File pkg = new File(pkgProperty);
         if (!pkg.isFile())
         {
-            throw new IllegalStateException("Unexpected invalid pulse.package: " + pulsePackage + " does not reference a file.");
+            throw new IllegalStateException("Unexpected invalid " + packageProperty + ": " + pkg + " does not reference a file.");
         }
         return pkg;
     }

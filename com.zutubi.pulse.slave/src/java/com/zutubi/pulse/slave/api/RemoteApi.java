@@ -44,8 +44,18 @@ public class RemoteApi
         {
             throw new AuthenticationException("Invalid token");
         }
-
     }
+
+    /**
+     * A trivial ping method that can be useful for testing connectivity.
+     *
+     * @return the value "pong"
+     */
+    public String ping()
+    {
+        return "pong";
+    }
+
     public void setTokenManager(AdminTokenManager tokenManager)
     {
         this.tokenManager = tokenManager;

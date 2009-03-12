@@ -3,6 +3,8 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 import java.lang.reflect.Method;
 import java.text.DateFormat;
@@ -19,9 +21,10 @@ public class ShutdownManager
     private static final Logger LOG = Logger.getLogger(ShutdownManager.class);
 
     /**
-     * The list of objects that are called during a shutdown.  
+     * The list of callbacks that are notified during shutdown.
      */
-    private List<Stoppable> stoppables;
+    private List<Stoppable> stoppables = new LinkedList<Stoppable>();
+
     private static final int EXIT_REBOOT = 111;
 
     /**
@@ -96,7 +99,14 @@ public class ShutdownManager
     {
         for (Stoppable stoppable : stoppables)
         {
-            stoppable.stop(force);
+            try
+            {
+                stoppable.stop(force);
+            }
+            catch (Exception e)
+            {
+                LOG.warning("Stoppable failed, cause: " + e.getMessage(), e);
+            }
         }
     }
 
@@ -142,14 +152,27 @@ public class ShutdownManager
 
     public void setStoppables(List<Stoppable> stoppables)
     {
-        this.stoppables = stoppables;
+        if (stoppables == null)
+        {
+            this.stoppables = new LinkedList<Stoppable>();
+        }
+        else
+        {
+            this.stoppables = CollectionUtils.filter(stoppables, new Predicate<Stoppable>()
+            {
+                public boolean satisfied(Stoppable stoppable)
+                {
+                    return stoppable != null;
+                }
+            });
+        }
     }
 
     public void addStoppable(Stoppable stoppable)
     {
-        if (stoppables == null)
+        if (stoppable == null)
         {
-            stoppables = new LinkedList<Stoppable>();
+            throw new IllegalArgumentException("Stoppable instance can not be null.");
         }
         stoppables.add(stoppable);
     }

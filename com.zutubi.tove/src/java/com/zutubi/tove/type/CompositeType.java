@@ -468,6 +468,11 @@ public class CompositeType extends AbstractType implements ComplexType
         MutableRecord result;
 
         CompositeType actualType = typeRegistry.getType(instance.getClass());
+        if (actualType == null)
+        {
+            throw new TypeException("Unknown (registered) type: " + instance.getClass());
+        }
+
         if (actualType != this)
         {
             return actualType.unstantiate(instance);

@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.CommandSupport;
 
 /**
+ * A simple command that does no processing.
  */
 public class NoopCommand extends CommandSupport
 {
