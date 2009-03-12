@@ -5,7 +5,8 @@ import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
-import static com.zutubi.util.io.IOUtils.*;
+import static com.zutubi.util.io.IOUtils.fileToString;
+import static com.zutubi.util.io.IOUtils.inputStreamToString;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,18 +32,13 @@ public class ProjectLoggerTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        close(logger);
         removeDirectory(tempDir);
-
         super.tearDown();
     }
 
     public void testWritesToLogFile() throws IOException
     {
         logMessage(TEST_MESSAGE);
-        logger.close();
-        // Null out to prevent second close in tearDown.
-        logger = null;
 
         String written = fileToString(new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0)));
         assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(written));

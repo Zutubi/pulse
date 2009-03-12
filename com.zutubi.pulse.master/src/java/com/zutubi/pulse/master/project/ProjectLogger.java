@@ -23,7 +23,7 @@ import java.util.Date;
  * indefinitely, log files are rotated out when they hit a limit, and only two
  * files (including the current one) are kept.
  */
-public class ProjectLogger implements Closeable
+public class ProjectLogger
 {
     private static final Logger LOG = Logger.getLogger(ProjectLogger.class);
 
@@ -33,10 +33,8 @@ public class ProjectLogger implements Closeable
     static final String NAME_PATTERN = "project.%d.log";
 
     private int sizeLimit;
-    private PrintWriter logWriter;
     private File lastFile;
     private File currentFile;
-    private boolean closed = false;
 
     /**
      * Create a new project logger that will write to the given directory, and
@@ -65,11 +63,6 @@ public class ProjectLogger implements Closeable
      */
     public synchronized void log(ProjectEvent event)
     {
-        if (closed)
-        {
-            throw new IllegalStateException("Attempt to write to a closed log");
-        }
-
         if (event instanceof ProjectInitialisationCommencedEvent)
         {
             write("Project initialisation commenced...");
@@ -108,11 +101,6 @@ public class ProjectLogger implements Closeable
      */
     public synchronized String tail(int maxLines) throws IOException
     {
-        if (closed)
-        {
-            throw new IllegalStateException("Attempt to tail a closed log");
-        }
-
         Tail tail = new Tail(maxLines, lastFile, currentFile);
         return tail.getTail();
     }
@@ -128,11 +116,6 @@ public class ProjectLogger implements Closeable
      */
     public synchronized InputStream getRawInputStream() throws IOException
     {
-        if (closed)
-        {
-            throw new IllegalStateException("The logger is closed.");
-        }
-
         File[] files = CollectionUtils.filterToArray(new File[]{lastFile, currentFile}, new Predicate<File>()
         {
             public boolean satisfied(File file)
@@ -144,57 +127,41 @@ public class ProjectLogger implements Closeable
         return new MultipleFileInputStream(files);
     }
 
-    /**
-     * Close the logger, closing underlying files.  Must be called when
-     * disposing of a logger.  After calling, the logger can no longer be used.
-     */
-    public synchronized void close()
-    {
-        IOUtils.close(logWriter);
-        closed = true;
-    }
-
     private void write(String message)
     {
         rotateIfRequired();
 
-        // On error we have no writer.
-        if (logWriter != null)
+        PrintWriter logWriter = null;
+        try
         {
+            logWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(currentFile, true))), true);
             logWriter.print(DATE_FORMAT.format(new Date()));
             logWriter.print(": ");
             logWriter.println(message);
+        }
+        catch (FileNotFoundException e)
+        {
+            LOG.severe(e);
+        }
+        finally
+        {
+            IOUtils.close(logWriter);
         }
     }
 
     private void rotateIfRequired()
     {
-        try
+        if (currentFile.length() >= sizeLimit)
         {
-            if (currentFile.length() >= sizeLimit)
+            if (lastFile.exists() && !FileSystemUtils.robustDelete(lastFile))
             {
-                IOUtils.close(logWriter);
-                logWriter = null;
-
-                if (lastFile.exists() && !FileSystemUtils.robustDelete(lastFile))
-                {
-                    LOG.warning("Unable to remove old file '" + lastFile.getAbsolutePath() + "'");
-                }
-
-                if (!currentFile.renameTo(lastFile))
-                {
-                    LOG.warning("Unable to rename log file '" + currentFile.getAbsolutePath() + "' to '" + lastFile.getAbsolutePath() + "'");
-                }
+                LOG.warning("Unable to remove old file '" + lastFile.getAbsolutePath() + "'");
             }
 
-            if (logWriter == null)
+            if (!currentFile.renameTo(lastFile))
             {
-                logWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(currentFile, true))), true);
+                LOG.warning("Unable to rename log file '" + currentFile.getAbsolutePath() + "' to '" + lastFile.getAbsolutePath() + "'");
             }
-        }
-        catch (IOException e)
-        {
-            LOG.severe(e);
         }
     }
 }
