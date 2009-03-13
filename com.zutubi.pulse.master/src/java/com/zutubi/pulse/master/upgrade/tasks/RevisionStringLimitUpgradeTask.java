@@ -32,11 +32,11 @@ public class RevisionStringLimitUpgradeTask extends DatabaseUpgradeTask
         switch (dbType)
         {
             case HSQL:
-                return String.format("ALTER TABLE %s ALTER COLUMN %s varchar(4095)", table, column);
+                return String.format("ALTER TABLE %s ALTER COLUMN %s varchar(8191)", table, column);
             case MYSQL:
-                return String.format("ALTER TABLE %s MODIFY %s text(4095)", table, column);
+                return String.format("ALTER TABLE %s MODIFY %s text(8191)", table, column);
             case POSTGRESQL:
-                return String.format("ALTER TABLE %s ALTER COLUMN %s TYPE varchar(4095)", table, column);
+                return String.format("ALTER TABLE %s ALTER COLUMN %s TYPE varchar(8191)", table, column);
         }
 
         throw new RuntimeException("Unknown database type " + dbType);

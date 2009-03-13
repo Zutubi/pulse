@@ -6,7 +6,7 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="revisionString" column="REVISION_STRING" type="string" length="4095"/>
+        <property name="revisionString" column="REVISION_STRING" type="string" length="8191"/>
 
         <property name="time" type="long">
             <column name="TIME" index="idx_changelist_revision_date"/>
