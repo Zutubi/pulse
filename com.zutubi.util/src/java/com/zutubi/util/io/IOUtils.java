@@ -87,7 +87,7 @@ public class IOUtils
 
     public static void joinStreams(InputStream input, OutputStream output) throws IOException
     {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[8192];
         int n;
 
         while (!Thread.interrupted() && (n = input.read(buffer)) > 0)
@@ -108,7 +108,7 @@ public class IOUtils
 
     public static void joinReaderToWriter(Reader reader, Writer writer) throws IOException
     {
-        char[] buffer = new char[1024];
+        char[] buffer = new char[8192];
         int n;
 
         while ((n = reader.read(buffer)) > 0)
@@ -119,8 +119,8 @@ public class IOUtils
 
     public static void copyFile(File fromFile, File toFile) throws IOException
     {
-        FileInputStream inStream = null;
-        FileOutputStream outStream = null;
+        InputStream inStream = null;
+        OutputStream outStream = null;
 
         try
         {

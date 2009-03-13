@@ -21,6 +21,7 @@ public class FileSystemUtils
     private static final Logger LOG = Logger.getLogger(FileSystemUtils.class);
 
     private static final int DELETE_RETRIES = 3;
+    private static final String PROPERTY_USE_EXTERNAL_COPY = "pulse.use.external.copy";
 
     public static final String NORMAL_SEPARATOR = "/";
     public static final char NORMAL_SEPARATOR_CHAR = NORMAL_SEPARATOR.charAt(0);
@@ -954,7 +955,7 @@ public class FileSystemUtils
             return;
         }
 
-        if (CP_AVAILABLE)
+        if (SystemUtils.getBooleanProperty(PROPERTY_USE_EXTERNAL_COPY, CP_AVAILABLE))
         {
             unixCopy(dest, src);
         }
