@@ -105,7 +105,7 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
         String databaseProductName = con.getMetaData().getDatabaseProductName().toLowerCase();
         if (databaseProductName.contains("postgres"))
         {
-            sql = "DROP INDEX IF EXISTS " + indexName;
+            sql = "DROP INDEX " + indexName;
         }
         else if (databaseProductName.contains("mysql"))
         {
