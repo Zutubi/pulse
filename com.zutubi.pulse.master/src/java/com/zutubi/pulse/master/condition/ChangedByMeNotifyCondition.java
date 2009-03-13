@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.util.TransactionContext;
+import com.zutubi.util.NullaryFunction;
 
 import java.util.List;
 
@@ -13,6 +15,7 @@ import java.util.List;
  */
 public class ChangedByMeNotifyCondition implements NotifyCondition
 {
+    private TransactionContext transactionContext;
     private BuildManager buildManager;
 
     /**
@@ -30,25 +33,21 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
         }
 
         // look for a change.
-        final boolean[] response = new boolean[1];
-        buildManager.executeInTransaction(new Runnable()
+        return transactionContext.executeInsideTransaction(new NullaryFunction<Boolean>()
         {
-            public void run()
+            public Boolean process()
             {
                 List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result);
                 for (PersistentChangelist changelist : changelists)
                 {
                     if (byMe(changelist, user) && changelist.getChanges() != null && changelist.getChanges().size() > 0)
                     {
-                        response[0] = true;
-                        return;
+                        return true;
                     }
                 }
-                response[0] = false;
+                return false;
             }
         });
-
-        return response[0];
     }
 
     private boolean byMe(PersistentChangelist changelist, UserConfiguration user)
@@ -73,5 +72,10 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setTransactionContext(TransactionContext transactionContext)
+    {
+        this.transactionContext = transactionContext;
     }
 }

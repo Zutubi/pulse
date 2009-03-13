@@ -1,7 +1,9 @@
 package com.zutubi.pulse.master.bootstrap.tasks;
 
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
+import com.zutubi.util.NullaryFunction;
 
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  */
 public class BuildAborterStartupTask implements StartupTask
 {
+    private TransactionContext transactionContext;
     private ProjectManager projectManager;
     private BuildManager buildManager;
     private UserManager userManager;
@@ -16,9 +19,9 @@ public class BuildAborterStartupTask implements StartupTask
 
     public void execute()
     {
-        buildManager.executeInTransaction(new Runnable()
+        transactionContext.executeInsideTransaction(new NullaryFunction<Object>()
         {
-            public void run()
+            public Object process()
             {
                 List<Project> projects = projectManager.getProjects(true);
                 for (Project project : projects)
@@ -31,6 +34,7 @@ public class BuildAborterStartupTask implements StartupTask
                 {
                     buildManager.abortUnfinishedBuilds(user, ABORT_MESSAGE);
                 }
+                return null;
             }
         });
     }
@@ -53,5 +57,10 @@ public class BuildAborterStartupTask implements StartupTask
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setTransactionContext(TransactionContext transactionContext)
+    {
+        this.transactionContext = transactionContext;
     }
 }

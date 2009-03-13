@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.MockBuildManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.util.TransactionContext;
 
 import java.util.Arrays;
 
@@ -21,6 +22,7 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         condition.setBuildManager(buildManager);
+        condition.setTransactionContext(new TransactionContext());
     }
 
     public void testChangedByMe()

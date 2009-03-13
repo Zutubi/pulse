@@ -216,16 +216,20 @@ public final class License
      */
     public boolean canRunVersion(Version version)
     {
+        // if it has not expired, all is well.
         if(!isExpired())
         {
             return true;
         }
 
+        // if it has expired and its an evaluation version, no more.
         if(isEvaluation())
         {
             return false;
         }
 
+        // if it has expired, and is not an evaluation, then we can run so long as the version
+        // was released before we expired.
         return version.getReleaseDateAsDate().getTime() < expiryDate.getTime();
     }
 

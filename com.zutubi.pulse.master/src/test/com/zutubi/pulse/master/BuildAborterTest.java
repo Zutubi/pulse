@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.mock.MockEntityDao;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.util.TransactionContext;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -30,6 +31,7 @@ public class BuildAborterTest extends PulseTestCase
         aborter = new BuildAborterStartupTask();
         aborter.setProjectManager(projectManager);
         aborter.setBuildManager(buildManager);
+        aborter.setTransactionContext(new TransactionContext());
 
         UserManager userManager = mock(UserManager.class);
         doReturn(Collections.emptyList()).when(userManager).getAllUsers();

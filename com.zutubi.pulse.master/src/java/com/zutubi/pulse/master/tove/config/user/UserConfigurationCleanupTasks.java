@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 
 import java.util.Arrays;
@@ -15,10 +16,11 @@ public class UserConfigurationCleanupTasks
 {
     private UserManager userManager;
     private BuildManager buildManager;
+    private TransactionContext transactionContext;
 
     public List<RecordCleanupTask> getTasks(UserConfiguration instance)
     {
-        return Arrays.<RecordCleanupTask>asList(new UserStateCleanupTask(instance, userManager, buildManager));
+        return Arrays.<RecordCleanupTask>asList(new UserStateCleanupTask(instance, userManager, buildManager, transactionContext));
     }
 
     public void setUserManager(UserManager userManager)
@@ -29,5 +31,10 @@ public class UserConfigurationCleanupTasks
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setTransactionContext(TransactionContext transactionContext)
+    {
+        this.transactionContext = transactionContext;
     }
 }

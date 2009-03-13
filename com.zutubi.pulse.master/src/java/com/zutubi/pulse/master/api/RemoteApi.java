@@ -22,6 +22,7 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
@@ -45,6 +46,7 @@ public class RemoteApi
 {
     private static final Logger LOG = Logger.getLogger(RemoteApi.class);
 
+    private TransactionContext txnContext;
     private TokenManager tokenManager;
     private AccessManager accessManager;
     private EventManager eventManager;
@@ -1952,15 +1954,16 @@ public class RemoteApi
             }
 
             final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
-            buildManager.executeInTransaction(new Runnable()
+            txnContext.executeInsideTransaction(new NullaryFunction<Object>()
             {
-                public void run()
+                public Object process()
                 {
                     List<PersistentChangelist> changelists = buildManager.getChangesForBuild(build);
                     for(PersistentChangelist change: changelists)
                     {
                         result.add(convertChangelist(change));
                     }
+                    return null;
                 }
             });
 
@@ -2041,9 +2044,9 @@ public class RemoteApi
             final Project project = internalGetProject(projectName, true);
             final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
 
-            buildManager.executeInTransaction(new Runnable()
+            txnContext.executeInsideTransaction(new NullaryFunction<Object>()
             {
-                public void run()
+                public Object process()
                 {
                     final BuildResult build = internalGetBuild(project, id);
 
@@ -2066,6 +2069,7 @@ public class RemoteApi
                             }
                         }
                     });
+                    return null;
                 }
             });
 
@@ -2111,9 +2115,9 @@ public class RemoteApi
             final Project project = internalGetProject(projectName, true);
             final Vector<Hashtable<String, String>> result = new Vector<Hashtable<String, String>>();
 
-            buildManager.executeInTransaction(new Runnable()
+            txnContext.executeInsideTransaction(new NullaryFunction<Object>()
             {
-                public void run()
+                public Object process()
                 {
                     final BuildResult build = internalGetBuild(project, id);
                     build.loadFeatures(configurationManager.getDataDirectory());
@@ -2159,6 +2163,7 @@ public class RemoteApi
                             }
                         }
                     });
+                    return null;
                 }
             });
 
@@ -2826,5 +2831,10 @@ public class RemoteApi
     public void setFatController(FatController fatController)
     {
         this.fatController = fatController;
+    }
+
+    public void setTransactionContext(TransactionContext txnContext)
+    {
+        this.txnContext = txnContext;
     }
 }

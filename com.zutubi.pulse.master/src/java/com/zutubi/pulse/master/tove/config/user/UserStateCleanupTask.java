@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.DatabaseStateCleanupTaskSupport;
+import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.tove.config.ToveRuntimeException;
 
 /**
@@ -16,9 +17,9 @@ class UserStateCleanupTask extends DatabaseStateCleanupTaskSupport
     private UserManager userManager;
     private BuildManager buildManager;
 
-    public UserStateCleanupTask(UserConfiguration instance, UserManager userManager, BuildManager buildManager)
+    public UserStateCleanupTask(UserConfiguration instance, UserManager userManager, BuildManager buildManager, TransactionContext transactionContext)
     {
-        super(instance.getConfigurationPath(), buildManager);
+        super(instance.getConfigurationPath(), transactionContext);
         this.instance = instance;
         this.userManager = userManager;
         this.buildManager = buildManager;

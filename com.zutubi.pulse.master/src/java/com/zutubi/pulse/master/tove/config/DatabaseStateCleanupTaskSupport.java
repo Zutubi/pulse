@@ -1,9 +1,10 @@
 package com.zutubi.pulse.master.tove.config;
 
-import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.tove.config.cleanup.RecordCleanupTaskSupport;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.util.NullaryFunction;
 
 /**
  * Helper base for cleanup tasks that remove state from the DB.  Ensures all
@@ -12,19 +13,19 @@ import com.zutubi.tove.type.record.RecordManager;
  */
 public abstract class DatabaseStateCleanupTaskSupport extends RecordCleanupTaskSupport
 {
-    private BuildManager buildManager;
+    private TransactionContext transactionContext;
 
-    public DatabaseStateCleanupTaskSupport(String path, BuildManager buildManager)
+    public DatabaseStateCleanupTaskSupport(String path, TransactionContext transactionContext)
     {
         super(path);
-        this.buildManager = buildManager;
+        this.transactionContext = transactionContext;
     }
 
     public void run(RecordManager recordManager)
     {
-        buildManager.executeInTransaction(new Runnable()
+        transactionContext.executeInsideTransaction(new NullaryFunction<Object>()
         {
-            public void run()
+            public Object process()
             {
                 AcegiUtils.runAsSystem(new Runnable()
                 {
@@ -33,6 +34,7 @@ public abstract class DatabaseStateCleanupTaskSupport extends RecordCleanupTaskS
                         cleanupState();
                     }
                 });
+                return null;
             }
         });
     }

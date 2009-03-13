@@ -39,16 +39,16 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
         if (getProjectConfig() != null)
         {
             // should never be null, but then again, toString must never fail either.
-            buff.append(": ").append(getProjectConfig().getName());
+            buff.append(": name: ").append(getProjectConfig().getName());
         }
         if (getReason() != null)
         {
             // should never be null, but then again, toString must never fail either.
-            buff.append(": ").append(getReason().getSummary());
+            buff.append(": summary: ").append(getReason().getSummary());
         }
         if (getRequestSource() != null)
         {
-            buff.append(": ").append(getRequestSource());
+            buff.append(": source: ").append(getRequestSource());
         }
         if(isReplaceable())
         {

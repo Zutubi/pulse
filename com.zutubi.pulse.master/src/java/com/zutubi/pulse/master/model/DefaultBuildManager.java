@@ -35,7 +35,6 @@ public class DefaultBuildManager implements BuildManager
     private ArtifactDao artifactDao;
     private FileArtifactDao fileArtifactDao;
     private ChangelistDao changelistDao;
-    private ProjectManager projectManager;
     private MasterConfigurationManager configurationManager;
     private PulseThreadFactory threadFactory;
     private DatabaseConsole databaseConsole;
@@ -549,11 +548,6 @@ public class DefaultBuildManager implements BuildManager
         cleanupWorkForNodes(paths, build, build.getRoot().getChildren());
     }
 
-    public void executeInTransaction(Runnable runnable)
-    {
-        runnable.run();
-    }
-
     private void cleanupWorkForNodes(MasterBuildPaths paths, BuildResult build, List<RecipeResultNode> nodes)
     {
         for (RecipeResultNode node : nodes)
@@ -584,11 +578,6 @@ public class DefaultBuildManager implements BuildManager
         {
             LOG.warning(e);
         }
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 
     public void setChangelistDao(ChangelistDao changelistDao)

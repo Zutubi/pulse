@@ -8,7 +8,6 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
-import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -29,7 +28,6 @@ import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.master.project.ProjectInitialisationService;
 import com.zutubi.pulse.master.project.events.ProjectDestructionCompletedEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
-import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
@@ -70,7 +68,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private ProjectDao projectDao;
     private TestCaseIndexDao testCaseIndexDao;
-    private Scheduler scheduler;
     private BuildManager buildManager;
     private EventManager eventManager;
     private ChangelistIsolator changelistIsolator;
@@ -83,7 +80,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private ConfigurationTemplateManager configurationTemplateManager;
     private AccessManager accessManager;
     private ProjectInitialisationService projectInitialisationService;
-    private CommandExtensionManager commandExtensionManager;
 
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
     private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
@@ -706,11 +702,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         projectDao = dao;
     }
 
-    public void setScheduler(Scheduler scheduler)
-    {
-        this.scheduler = scheduler;
-    }
-
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
@@ -989,10 +980,5 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setProjectInitialisationService(ProjectInitialisationService projectInitialisationService)
     {
         this.projectInitialisationService = projectInitialisationService;
-    }
-
-    public void setCommandExtensionManager(CommandExtensionManager commandExtensionManager)
-    {
-        this.commandExtensionManager = commandExtensionManager;
     }
 }
