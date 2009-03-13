@@ -8,8 +8,13 @@ import com.zutubi.util.NullaryFunction;
  */
 public class TransactionContext
 {
-    // Note, if you need to use this method, chances are the code you are trying to run
-    // should be run at a lower level, within one of the managers perhaps.
+    /**
+     * If you need to use this method, chances are the code you are trying to run
+     * should be run at a lower level, within one of the managers perhaps.
+     * 
+     * @param f the function to execute within the transaction.
+     * @return the result of the function execution.
+     */
     public <T> T executeInsideTransaction(NullaryFunction<T> f)
     {
         return f.process();

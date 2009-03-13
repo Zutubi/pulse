@@ -46,7 +46,7 @@ public class RemoteApi
 {
     private static final Logger LOG = Logger.getLogger(RemoteApi.class);
 
-    private TransactionContext txnContext;
+    private TransactionContext transactionContext;
     private TokenManager tokenManager;
     private AccessManager accessManager;
     private EventManager eventManager;
@@ -1954,7 +1954,7 @@ public class RemoteApi
             }
 
             final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
-            txnContext.executeInsideTransaction(new NullaryFunction<Object>()
+            transactionContext.executeInsideTransaction(new NullaryFunction<Object>()
             {
                 public Object process()
                 {
@@ -2044,7 +2044,7 @@ public class RemoteApi
             final Project project = internalGetProject(projectName, true);
             final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
 
-            txnContext.executeInsideTransaction(new NullaryFunction<Object>()
+            transactionContext.executeInsideTransaction(new NullaryFunction<Object>()
             {
                 public Object process()
                 {
@@ -2115,7 +2115,7 @@ public class RemoteApi
             final Project project = internalGetProject(projectName, true);
             final Vector<Hashtable<String, String>> result = new Vector<Hashtable<String, String>>();
 
-            txnContext.executeInsideTransaction(new NullaryFunction<Object>()
+            transactionContext.executeInsideTransaction(new NullaryFunction<Object>()
             {
                 public Object process()
                 {
@@ -2833,8 +2833,8 @@ public class RemoteApi
         this.fatController = fatController;
     }
 
-    public void setTransactionContext(TransactionContext txnContext)
+    public void setTransactionContext(TransactionContext context)
     {
-        this.txnContext = txnContext;
+        this.transactionContext = context;
     }
 }
