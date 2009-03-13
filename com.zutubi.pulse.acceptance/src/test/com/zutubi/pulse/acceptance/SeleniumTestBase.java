@@ -16,9 +16,7 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.ExceptionWrappingRunnable;
-import com.zutubi.util.RandomUtils;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -157,6 +155,16 @@ public class SeleniumTestBase extends PulseTestCase
     protected void waitForStatus(String message)
     {
         SeleniumUtils.refreshUntilElement(selenium, IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
+
+        // now we wait for the element to contain a message.
+        AcceptanceTestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return TextUtils.stringSet(selenium.getText(IDs.STATUS_MESSAGE));
+            }
+        }, STATUS_TIMEOUT, "status message to be set.");
+
         String text = selenium.getText(IDs.STATUS_MESSAGE);
         assertThat(text, containsString(message));        
     }
