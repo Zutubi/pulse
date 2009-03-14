@@ -13,28 +13,33 @@
             #contentHeading("actions" 1)
         </tr>
 #if($buildQueue.size() > 0)
-    #foreach($request in $buildQueue)
+    #foreach($buildRequest in $buildQueue)
         <tr>
-            #ownerCell($request "content")
-        #if($request.personal)
-            #staticCell($request.number)
-        #else
-            #contentCell("build.id.unknown")
-        #end
-            #dynamicLinkCell($request.projectConfig.name "$urls.projectHome($request.project)")
-        #if($request.revision.revision)
-            <td class="content">
-                $request.revision.revision #if($request.replaceable) [replaceable] #end
+        #if($buildRequest)
+                #ownerCell($buildRequest "content")
+            #if($buildRequest.personal)
+                #staticCell($buildRequest.number)
+            #else
+                #contentCell("build.id.unknown")
+            #end
+                #dynamicLinkCell($buildRequest.projectConfig.name "$urls.projectHome($buildRequest.project)")
+            #if($buildRequest.revision.revision)
+            <td class="content"> $buildRequest
+                $buildRequest.revision.revision #if($buildRequest.replaceable) [replaceable] #end
             </td>
+            #else
+                #contentCell("queue.revision.floating")
+            #end
+                #contentCell($buildRequest.prettyQueueTime)
+                #staticCell($buildRequest.reason.summary)
+            #if($action.canCancel($buildRequest))
+                #actionCellId("cancel" "$base/cancelQueuedBuild.action?id=$buildRequest.id" "cancel.gif" "cancel.queued.${request.id}" false)
+            #else
+                #contentCell("empty.cell")
+            #end
+            #set($buildRequest = false)
         #else
-            #contentCell("queue.revision.floating")
-        #end
-            #contentCell($request.prettyQueueTime)
-            #staticCell($request.reason.summary)
-        #if($action.canCancel($request))
-            #actionCellId("cancel" "$base/cancelQueuedBuild.action?id=$request.id" "cancel.gif" "cancel.queued.${request.id}" false)
-        #else
-            #contentCell("empty.cell")
+            <td class="content understated" colspan="7">#wwtext("name=queue.entry.not.viewable")</td>
         #end
         </tr>
     #end
@@ -61,10 +66,11 @@
         </tr>
 #if($executingBuilds.size() > 0)
     #foreach($buildResult in $executingBuilds)
-        #set($cssClass = $buildResult.state.string)
-        #set($project = $buildResult.project)
-
         <tr>
+        #if($buildResult)
+            #set($cssClass = $buildResult.state.string)
+            #set($project = $buildResult.project)
+
             #ownerCell($buildResult "content")
             #dynamicRightLinkCell($buildResult.number "$urls.build($buildResult)")
             <td class="content"><a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a></td>
@@ -73,11 +79,15 @@
             #staticCell($buildResult.reason.summary)
             #elapsedCell($buildResult)
 
-        #if($action.canCancel($buildResult))
-            #set($cancelStr = "cancel.active.${buildResult.owner.name}.${buildResult.number}")
-            #actionCellId("cancel" "$base/cancelBuild.action?buildId=$buildResult.id" "cancel.gif" "#id($cancelStr)" false)
+            #if($action.canCancel($buildResult))
+                #set($cancelStr = "cancel.active.${buildResult.owner.name}.${buildResult.number}")
+                #actionCellId("cancel" "$base/cancelBuild.action?buildId=$buildResult.id" "cancel.gif" "#id($cancelStr)" false)
+            #else
+                #contentCell("empty.cell")
+            #end
+            #set($buildResult = false)
         #else
-            #contentCell("empty.cell")
+            <td class="content understated" colspan="9">#wwtext("name=queue.entry.not.viewable")</td>
         #end
         </tr>
     #end
@@ -108,15 +118,20 @@
         </tr>
 #if($recipeQueueSnapshot.size() > 0)
     #foreach($assignmentRequest in $recipeQueueSnapshot)
-        #set($build = $assignmentRequest.build)
-        #set($project = $build.project)
         <tr>
+        #if($assignmentRequest)
+            #set($build = $assignmentRequest.build)
+            #set($project = $build.project)
             #ownerCell($build "content")
             #rightCell($build.number)
             #dynamicLinkCell($project.name "$urls.projectHome($project)")
             #dynamicCell($assignmentRequest.request.recipeNameSafe)
             #dynamicCell($assignmentRequest.hostRequirements.summary)
             #contentCell($assignmentRequest.prettyQueueTime)
+            #set($assignmentRequest = false)
+        #else
+            <td class="content understated" colspan="6">#wwtext("name=queue.entry.not.viewable")</td>
+        #end
         </tr>
     #end
 #else

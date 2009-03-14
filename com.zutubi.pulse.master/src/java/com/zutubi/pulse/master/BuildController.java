@@ -32,10 +32,10 @@ import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
-import com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
@@ -53,10 +53,10 @@ import org.quartz.Trigger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ThreadFactory;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.util.*;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * The BuildController is responsible for executing and coordinating a single
@@ -1058,6 +1058,11 @@ public class BuildController implements EventListener
     public Class[] getHandledEvents()
     {
         return new Class[]{BuildControllerBootstrapEvent.class, BuildStatusEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
+    }
+
+    public Project getProject()
+    {
+        return project;
     }
 
     public long getBuildId()
