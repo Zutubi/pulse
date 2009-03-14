@@ -420,7 +420,7 @@ public class DefaultSetupManager implements SetupManager
 
         if (isUpgradeRequired())
         {
-            printConsoleMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + ", Pulse version " + Version.getVersion().getVersionNumber() + "...");
+            printConsoleMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + "', Pulse version '" + Version.getVersion().getVersionNumber() + "'...");
             state = SetupState.UPGRADE;
             showPrompt();
             return;
