@@ -1242,6 +1242,38 @@ public class RemoteApi
     }
 
     /**
+     * Gets the name of a project by its database id, if such a project exists.
+     *
+     * @param token authentication token, see {@link #login}.
+     * @param id    id of the project's row in the database
+     * @return the name of the project with the given id, or the empty string if there is no such
+     *         project
+     * @throws IllegalArgumentException if the id cannot be parsed as a 64-bit integer
+     * @access available to all users
+     */
+    public String getProjectNameById(String token, String id)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long lId = Long.parseLong(id);
+            Project project = projectManager.getProject(lId, true);
+            if (project == null)
+            {
+                return "";
+            }
+            else
+            {
+                return project.getName();
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Invalid id '" + id + "'");
+        }
+    }
+
+    /**
      * Returns the names of all project groups configured on this server that are visible to the
      * calling user.  Groups are defined by adding <em>labels</em> to projects.  Thus this method
      * effectively returns the set of all labels assigned to concrete projects visible to the
