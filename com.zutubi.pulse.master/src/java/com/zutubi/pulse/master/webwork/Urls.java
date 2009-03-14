@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.StringUtils.uriComponentEncode;
 
@@ -184,7 +185,14 @@ public class Urls
 
     public String projectAction(Object project, String action)
     {
-        return projectActions(project) + action + "/";
+        if (action.equals(AccessManager.ACTION_WRITE))
+        {
+            return adminProject(project);
+        }
+        else
+        {
+            return projectActions(project) + action + "/";
+        }
     }
     
     public String build(BuildResult build)
@@ -441,7 +449,14 @@ public class Urls
 
     public String agentAction(Object agent, String action)
     {
-        return agentActions(agent) + action + "/";
+        if (action.equals(AccessManager.ACTION_WRITE))
+        {
+            return adminAgent(agent);
+        }
+        else
+        {
+            return agentActions(agent) + action + "/";
+        }
     }
 
     public String agentStatus(Object agent)

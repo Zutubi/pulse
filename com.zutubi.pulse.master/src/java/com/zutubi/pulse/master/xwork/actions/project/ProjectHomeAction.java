@@ -1,16 +1,31 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.master.tove.model.ActionLink;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
+import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.actions.ConfigurationAction;
+import com.zutubi.tove.actions.ConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.TypeRegistry;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Action to display project home page - the latest project status.
  */
 public class ProjectHomeAction extends ProjectActionBase
 {
@@ -25,6 +40,11 @@ public class ProjectHomeAction extends ProjectActionBase
     private List<BuildResult> recentBuilds;
     private BuildColumns summaryColumns;
     private BuildColumns recentColumns;
+    private List<ActionLink> actions = new LinkedList<ActionLink>();
+
+    private ActionManager actionManager;
+    private SystemPaths systemPaths;
+    private TypeRegistry typeRegistry;
 
     public int getTotalBuilds()
     {
@@ -124,6 +144,11 @@ public class ProjectHomeAction extends ProjectActionBase
         return recentColumns;
     }
 
+    public List<ActionLink> getActions()
+    {
+        return actions;
+    }
+
     public String execute()
     {
         Project project = getRequiredProject();
@@ -147,7 +172,38 @@ public class ProjectHomeAction extends ProjectActionBase
         summaryColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectSummaryColumns(), projectManager);
         recentColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectRecentColumns(), projectManager);
 
+        File contentRoot = systemPaths.getContentRoot();
+        ConfigurationActions configurationActions = actionManager.getConfigurationActions(typeRegistry.getType(ProjectConfiguration.class));
+        for (String candidateAction: Arrays.asList(AccessManager.ACTION_WRITE, ProjectConfigurationActions.ACTION_MARK_CLEAN, ProjectConfigurationActions.ACTION_TRIGGER))
+        {
+            String permission = candidateAction;
+            ConfigurationAction configurationAction = configurationActions.getAction(candidateAction);
+            if (configurationAction != null)
+            {
+                permission = configurationAction.getPermissionName();
+            }
+            
+            if (accessManager.hasPermission(permission,  project))
+            {
+                actions.add(ToveUtils.getActionLink(candidateAction, Messages.getInstance(ProjectConfiguration.class), contentRoot));
+            }
+        }
+
         return SUCCESS;
     }
 
+    public void setActionManager(ActionManager actionManager)
+    {
+        this.actionManager = actionManager;
+    }
+
+    public void setSystemPaths(SystemPaths systemPaths)
+    {
+        this.systemPaths = systemPaths;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
+    }
 }

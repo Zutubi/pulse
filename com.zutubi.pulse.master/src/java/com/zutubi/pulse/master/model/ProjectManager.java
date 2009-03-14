@@ -154,7 +154,7 @@ public interface ProjectManager extends EntityManager<Project>
 
     void removeReferencesToAgent(long agentStateId);
 
-    @SecureParameter(action = AccessManager.ACTION_WRITE)
+    @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER)
     void markForCleanBuild(Project project);
 
     /**
