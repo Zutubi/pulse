@@ -278,13 +278,7 @@ public class CollectionUtils
 
     public static <T> Vector<T> asVector(T... ts)
     {
-        Vector<T> result = new Vector<T>(ts.length);
-        for(T t: ts)
-        {
-            result.add(t);
-        }
-        
-        return result;
+        return new Vector<T>(Arrays.asList(ts));
     }
 
     public static <T, U> Map<T, U> retainAll(Map<T, U> m, Map<T, U> n)
@@ -350,13 +344,7 @@ public class CollectionUtils
      */
     public static <T> List<T> times(T value, int count)
     {
-        List<T> result = new LinkedList<T>();
-        while (count-- > 0)
-        {
-            result.add(value);
-        }
-
-        return result;
+        return new LinkedList<T>(Collections.nCopies(count, value));
     }
 
     /**
@@ -381,5 +369,17 @@ public class CollectionUtils
         }
 
         return count;
+    }
+
+    /**
+     * Creates a new set containing the given items.
+     *
+     * @param ts  items to add to the set
+     * @param <T> type of item
+     * @return a new set populated with the given items
+     */
+    public static <T> Set<T> asSet(T... ts)
+    {
+        return new HashSet<T>(Arrays.asList(ts));
     }
 }

@@ -284,44 +284,6 @@ class DefaultInstanceCache implements InstanceCache
         {
             this.instance = instance;
             this.complete = complete;
-
-//            if (type instanceof CompositeType)
-//            {
-//                CompositeType compositeType = (CompositeType) type;
-//                for (TypeProperty property: compositeType.getProperties())
-//                {
-//                    try
-//                    {
-//                        Type propertyType = property.getType();
-//                        if (propertyType instanceof ReferenceType)
-//                        {
-//                            Configuration referee = (Configuration) property.getValue(instance);
-//                            if (referee != null)
-//                            {
-//                                addReference(property.getName(), referee.getConfigurationPath());
-//                            }
-//                        }
-//                        else if (propertyType instanceof ListType && propertyType.getTargetType() instanceof ReferenceType)
-//                        {
-//                            @SuppressWarnings({"unchecked"})
-//                            List<Configuration> referees = (List<Configuration>) property.getValue(instance);
-//                            if (referees != null)
-//                            {
-//                                int i = 0;
-//                                for (Configuration referee: referees)
-//                                {
-//                                    addReference(PathUtils.getPath(property.getName(), Integer.toString(i)), referee.getConfigurationPath());
-//                                    i++;
-//                                }
-//                            }
-//                        }
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        LOG.severe(e);
-//                    }
-//                }
-//            }
         }
 
         public void addChild(String element, Entry entry)

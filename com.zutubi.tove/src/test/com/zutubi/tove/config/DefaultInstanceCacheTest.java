@@ -3,6 +3,7 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.Configuration;
+import static com.zutubi.util.CollectionUtils.asSet;
 import com.zutubi.util.Sort;
 import com.zutubi.util.junit.ZutubiTestCase;
 
@@ -23,7 +24,6 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
     public void testCopyStructureEmpty()
     {
-        cache = new DefaultInstanceCache();
         DefaultInstanceCache copy = cache.copyStructure();
         assertEmpty(copy);
     }
@@ -34,7 +34,6 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         TestConfiguration c2 = new TestConfiguration(2);
         TestConfiguration c3 = new TestConfiguration(3);
 
-        cache = new DefaultInstanceCache();
         cache.put("foo", c1, true);
         cache.put("foo/bar", c2, true);
         cache.put("baz", c3, true);
@@ -288,14 +287,12 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
     public void testClearDirtyEmpty()
     {
-        cache = new DefaultInstanceCache();
         cache.clearDirty();
         assertEmpty(cache);
     }
 
     public void testClearDirtySimple()
     {
-        cache = new DefaultInstanceCache();
         cache.put("foo", new TestConfiguration(1), true);
         cache.markDirty("foo");
         cache.clearDirty();
@@ -313,7 +310,6 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
     public void testClearDirtyRetainsUnmarkedUnderMarked()
     {
-        cache = new DefaultInstanceCache();
         cache.put("foo", new TestConfiguration(1), true);
         cache.put("foo/bar", new TestConfiguration(2), true);
         cache.markDirty("foo");
@@ -325,7 +321,6 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
     public void testClearDirtyInvalidReplacedByValid()
     {
-        cache = new DefaultInstanceCache();
         cache.put("foo", new TestConfiguration(1), true);
         // Put in a nested instance so the cache keeps the entry at foo on
         // clearDirty
@@ -345,7 +340,6 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
     public void testClearIncompleteInvalidReplacedByComplete()
     {
-        cache = new DefaultInstanceCache();
         cache.put("foo", new TestConfiguration(1), false);
         // Put in a nested instance so the cache keeps the entry at foo on
         // clearDirty
@@ -361,6 +355,63 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         assertSize(2, cache);
         assertNotNull(cache.get("foo", false));
         assertNotNull(cache.get("foo", true));
+    }
+    
+    public void testIndexReference()
+    {
+        addInstance("foo");
+        addInstance("bar");
+
+        assertTrue(cache.getInstancePathsReferencing("foo").isEmpty());
+        assertTrue(cache.getPropertyPathsReferencing("foo").isEmpty());
+        assertTrue(cache.getInstancePathsReferencing("bar").isEmpty());
+        assertTrue(cache.getPropertyPathsReferencing("bar").isEmpty());
+
+        cache.indexReference("foo/ref", "bar");
+
+        assertTrue(cache.getInstancePathsReferencing("foo").isEmpty());
+        assertTrue(cache.getPropertyPathsReferencing("foo").isEmpty());
+        assertEquals(asSet("foo"), cache.getInstancePathsReferencing("bar"));
+        assertEquals(asSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
+    }
+
+    public void testIndexReferenceClearedOnSourceDirty()
+    {
+        addInstance("foo");
+        addInstance("bar");
+        cache.indexReference("foo/ref", "bar");
+
+        assertEquals(asSet("foo"), cache.getInstancePathsReferencing("bar"));
+        assertEquals(asSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
+
+        cache.markDirty("foo");
+        cache.clearDirty();
+        
+        assertTrue(cache.getInstancePathsReferencing("bar").isEmpty());
+        assertTrue(cache.getPropertyPathsReferencing("bar").isEmpty());
+    }
+
+    public void testIndexReferenceNotClearedOnDestDirty()
+    {
+        addInstance("foo");
+        addInstance("bar");
+        cache.indexReference("foo/ref", "bar");
+
+        assertEquals(asSet("foo"), cache.getInstancePathsReferencing("bar"));
+        assertEquals(asSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
+
+        cache.markDirty("bar");
+        cache.clearDirty();
+        
+        assertEquals(asSet("foo"), cache.getInstancePathsReferencing("bar"));
+        assertEquals(asSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
+    }
+
+    private void addInstance(String path)
+    {
+        TestConfiguration instance = new TestConfiguration(1);
+        instance.setConfigurationPath(path);
+        cache.put(path, instance, true);
     }
 
     private void assertEmpty(DefaultInstanceCache cache)

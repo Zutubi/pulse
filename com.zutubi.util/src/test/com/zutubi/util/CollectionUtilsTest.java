@@ -2,10 +2,7 @@ package com.zutubi.util;
 
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class CollectionUtilsTest extends ZutubiTestCase
 {
@@ -149,5 +146,10 @@ public class CollectionUtilsTest extends ZutubiTestCase
     public void testCountSomeMatch()
     {
         assertEquals(1, CollectionUtils.count(Arrays.asList(1, 2, 3), new EqualsPredicate<Integer>(2)));
+    }
+
+    public void testAsSet()
+    {
+        assertEquals(new HashSet<String>(Arrays.asList("foo", "bar", "baz")), CollectionUtils.asSet("bar", "foo", "baz", "bar"));
     }
 }
