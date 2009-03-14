@@ -41,7 +41,11 @@ public class MavenCommand extends NamedArgumentCommand
             //TODO: use the context's variables to transfer this maven specific information around.
             PulseExecutionContext pec = (PulseExecutionContext) commandContext.getExecutionContext();
             String projectFile = getProjectFile();
-            pec.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(pec.getWorkingDir()), projectFile), "currentVersion"));
+            String version = MavenUtils.extractVersion(new File(getWorkingDir(pec.getWorkingDir()), projectFile), "currentVersion");
+            if (version != null)
+            {
+                pec.setVersion(version);
+            }
         }
         catch (PulseException e)
         {

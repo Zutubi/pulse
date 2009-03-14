@@ -1,11 +1,12 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.util.io.IOUtils;
 import nu.xom.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -40,12 +41,16 @@ public class MavenUtils
         }
         catch (ParsingException pex)
         {
-            String message = "Unable to parse extract Maven POM file '" + pom.getAbsolutePath() + "' to extract version";
+            String message = "Unable to parse Maven POM file '" + pom.getAbsolutePath() + "' to extract version";
             if(pex.getMessage() != null)
             {
                 message += ": " + pex.getMessage();
             }
             throw new PulseException(message);
+        }
+        catch (FileNotFoundException e)
+        {
+            return null;
         }
         catch (IOException e)
         {
