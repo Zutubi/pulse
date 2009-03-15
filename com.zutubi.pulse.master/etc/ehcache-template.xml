@@ -1,5 +1,5 @@
+<?xml version="1.0"?>
 <ehcache>
-
     <!-- Sets the path to the directory where cache .data files are created.
 
          If the path is a Java System Property it is replaced by
@@ -9,7 +9,7 @@
          user.data - User's data directory
          user.dir - User's current working directory
          java.io.tmpdir - Default temp file path -->
-    <diskStore path="java.io.tmpdir"/>
+    <diskStore path="pulse.system.temp.dir"/>
 
 
     <!--Default Cache configuration. These will applied to caches programmatically created through

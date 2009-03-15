@@ -18,8 +18,8 @@
             <list>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/databaseContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/recordContext.xml</value>
-                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/cacheContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml</value>
             </list>
         </property>
