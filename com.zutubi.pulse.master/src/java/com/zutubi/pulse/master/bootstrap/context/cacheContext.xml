@@ -8,8 +8,6 @@ This context exports:
     cacheManager: the systems cache manager.
 
 -->
-<beans>
-
-    <bean id="cacheManager" class="com.zutubi.pulse.master.cache.ehcache.EhCacheManager"/>
-
+<beans default-autowire="byName">
+    <bean id="cacheManager" class="com.zutubi.pulse.master.cache.ehcache.EhCacheManager" init-method="init"/>
 </beans>
