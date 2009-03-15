@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.marshal.ImportingNotSupportedFileResolver;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -97,6 +98,6 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         ProjectRecipesConfiguration prc = new ProjectRecipesConfiguration();
 
         PulseFileLoader loader = loaderFactory.createLoader();
-        loader.load(getInput("xml"), prc);
+        loader.load(getInput("xml"), prc, new ImportingNotSupportedFileResolver());
     }
 }

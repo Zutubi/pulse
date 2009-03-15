@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.marshal.ImportingNotSupportedFileResolver;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.tove.type.TypeRegistry;
@@ -44,7 +45,7 @@ public abstract class FileLoaderTestBase extends PulseTestCase
     protected ProjectRecipesConfiguration load(String name) throws PulseException
     {
         ProjectRecipesConfiguration prc = new ProjectRecipesConfiguration();
-        loader.load(getInput(name, "xml"), prc);
+        loader.load(getInput(name, "xml"), prc, new ImportingNotSupportedFileResolver());
         return prc;
     }
 

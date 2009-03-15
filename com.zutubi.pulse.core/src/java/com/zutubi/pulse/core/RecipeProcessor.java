@@ -2,32 +2,37 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
-import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.core.commands.api.*;
+import com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
-import com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.events.RecipeCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeCompletedEvent;
-import com.zutubi.pulse.core.events.RecipeStatusEvent;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.events.*;
+import com.zutubi.pulse.core.marshal.FileResolver;
+import com.zutubi.pulse.core.marshal.LocalFileResolver;
+import com.zutubi.pulse.core.marshal.RelativeFileResolver;
+import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -39,23 +44,17 @@ public class RecipeProcessor
 {
     private static final Logger LOG = Logger.getLogger(RecipeProcessor.class);
 
+    private static final String LABEL_EXECUTE = "execute";
+
     private EventManager eventManager;
     private Lock runningLock = new ReentrantLock();
     private long runningRecipe = 0;
-    private Recipe runningRecipeInstance = null;
+    private Command runningCommand = null;
     private boolean terminating = false;
     private PulseFileLoaderFactory fileLoaderFactory;
-    private ObjectFactory objectFactory;
+    private CommandFactory commandFactory;
+    private PostProcessorFactory postProcessorFactory;
     private IvyProvider ivyProvider;
-
-    public RecipeProcessor()
-    {
-    }
-
-    public void init()
-    {
-        
-    }
 
     public void build(RecipeRequest request)
     {
@@ -76,42 +75,7 @@ public class RecipeProcessor
         pushRecipeContext(context, request, testResults, recipeStartTime);
         try
         {
-            // Now we can load the recipe from the pulse file
-            ProjectRecipesConfiguration recipesConfiguration = loadPulseFile(request, context);
-
-            String recipeName = request.getRecipeName();
-            if (!TextUtils.stringSet(recipeName))
-            {
-                recipeName = recipesConfiguration.getDefaultRecipe();
-                if (!TextUtils.stringSet(recipeName))
-                {
-                    throw new BuildException("Please specify a default recipe for your project.");
-                }
-            }
-
-            RecipeConfiguration recipeConfiguration = recipesConfiguration.getRecipes().get(recipeName);
-            if (recipeConfiguration == null)
-            {
-                throw new BuildException("Undefined recipe '" + recipeName + "'");
-            }
-
-            IvyProvider ivyProvider = getIvyProvider(context);
-            IvySupport ivy = ivyProvider.getIvySupport();
-
-            LinkedHashMap<String, CommandConfiguration> commandConfigs = new LinkedHashMap<String, CommandConfiguration>();
-            BootstrapCommandConfiguration bootstrapConfig = new BootstrapCommandConfiguration(request.getBootstrapper());
-            commandConfigs.put(bootstrapConfig.getName(), bootstrapConfig);
-            CommandConfiguration retrieveCommandConfig = ivy.getRetrieveCommand();
-            commandConfigs.put(retrieveCommandConfig.getName(), retrieveCommandConfig);
-            commandConfigs.putAll(recipeConfiguration.getCommands());
-            CommandConfiguration publishCommandConfig = ivy.getPublishCommand(request);
-            commandConfigs.put(publishCommandConfig.getName(), publishCommandConfig);
-            recipeConfiguration.setCommands(commandConfigs);
-
-            Recipe recipe = objectFactory.buildBean(Recipe.class, new Class[] { RecipeConfiguration.class }, new Object[] { recipeConfiguration });
-            runningRecipeInstance = recipe;
-
-            recipe.execute(context);
+            executeRequest(request);
         }
         catch (BuildException e)
         {
@@ -146,12 +110,58 @@ public class RecipeProcessor
 
             runningLock.lock();
             runningRecipe = 0;
-            runningRecipeInstance = null;
             if (terminating)
             {
                 terminating = false;
             }
             runningLock.unlock();
+        }
+    }
+
+    private void executeRequest(RecipeRequest request) throws Exception
+    {
+        PulseExecutionContext context = request.getContext();
+        File outputDir = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
+
+        RecipeStatus status = new RecipeStatus();
+        BootstrapCommandConfiguration bootstrapConfig = new BootstrapCommandConfiguration(request.getBootstrapper());
+        if (pushContextAndExecute(context, bootstrapConfig, outputDir, status) || !status.isSuccess())
+        {
+            return;
+        }
+
+        IvyProvider ivyProvider = getIvyProvider(context);
+        IvySupport ivy = ivyProvider.getIvySupport();
+        CommandConfiguration retrieveCommandConfig = ivy.getRetrieveCommand();
+        if (pushContextAndExecute(context, retrieveCommandConfig, outputDir, status) || !status.isSuccess())
+        {
+            return;
+        }
+
+        // Now we can load the recipe from the pulse file
+        ProjectRecipesConfiguration recipesConfiguration = loadPulseFile(request, context);
+        String recipeName = request.getRecipeName();
+        if (!TextUtils.stringSet(recipeName))
+        {
+            recipeName = recipesConfiguration.getDefaultRecipe();
+            if (!TextUtils.stringSet(recipeName))
+            {
+                throw new BuildException("Please specify a default recipe for your project.");
+            }
+        }
+
+        RecipeConfiguration recipeConfiguration = recipesConfiguration.getRecipes().get(recipeName);
+        if (recipeConfiguration == null)
+        {
+            throw new BuildException("Undefined recipe '" + recipeName + "'");
+        }
+
+        executeRecipe(recipeConfiguration, status, context, outputDir);
+
+        if (status.isSuccess())
+        {
+            CommandConfiguration publishCommandConfig = ivy.getPublishCommand(request);
+            pushContextAndExecute(context, publishCommandConfig, outputDir, status);
         }
     }
 
@@ -253,8 +263,8 @@ public class RecipeProcessor
         PulseScope globalScope = new PulseScope(context.getScope());
 
         // CIB-286: special case empty file for better reporting
-        String pulseFileSource = request.getPulseFileSource();
-        if(!TextUtils.stringSet(pulseFileSource))
+        PulseFileSource pulseFileSource = request.getPulseFileSource();
+        if(!TextUtils.stringSet(pulseFileSource.getFileContent()))
         {
             throw new BuildException("Unable to parse pulse file: File is empty");
         }
@@ -263,11 +273,154 @@ public class RecipeProcessor
         try
         {
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-            return fileLoader.loadRecipe(pulseFileSource, request.getRecipeName(), globalScope);
+            FileResolver fileResolver = new RelativeFileResolver(pulseFileSource.getPath(), new LocalFileResolver(context.getWorkingDir()));
+            return fileLoader.loadRecipe(pulseFileSource.getFileContent(), request.getRecipeName(), globalScope, fileResolver);
         }
         catch (Exception e)
         {
             throw new BuildException("Unable to parse pulse file: " + e.getMessage(), e);
+        }
+    }
+
+    public void executeRecipe(RecipeConfiguration config, RecipeStatus status, PulseExecutionContext context, File outputDir)
+    {
+        context.push();
+        try
+        {
+            for (CommandConfiguration commandConfig: config.getCommands().values())
+            {
+                if (status.isSuccess() || commandConfig.isForce())
+                {
+                    boolean recipeTerminated = pushContextAndExecute(context, commandConfig, outputDir, status);
+                    if(recipeTerminated)
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            context.pop();
+            RecipeVersionConfiguration version = config.getVersion();
+            if (version != null)
+            {
+                context.setVersion(version.getValue());
+            }
+        }
+    }
+
+    public static String getCommandDirName(int i, CommandResult result)
+    {
+        // Use the command name because:
+        // a) we do not have an id for the command model
+        // b) for local builds, this is a lot friendlier for the developer
+        return String.format("%08d-%s", i, result.getCommandName());
+    }
+
+    private boolean pushContextAndExecute(PulseExecutionContext context, CommandConfiguration commandConfig, File outputDir, RecipeStatus status)
+    {
+        CommandResult result = new CommandResult(commandConfig.getName());
+        File commandOutput = new File(outputDir, getCommandDirName(status.getCommandIndex(), result));
+        if (!commandOutput.mkdirs())
+        {
+            throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
+        }
+
+        context.setLabel(LABEL_EXECUTE);
+        context.push();
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
+
+        boolean recipeTerminated = !executeCommand(context, commandOutput, result, commandConfig);
+        status.commandCompleted(result.getState());
+        context.popTo(LABEL_EXECUTE);
+        return recipeTerminated;
+    }
+
+    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, CommandConfiguration commandConfig)
+    {
+        runningLock.lock();
+        if (terminating)
+        {
+            runningLock.unlock();
+            return false;
+        }
+
+        Command command = commandFactory.create(commandConfig);
+        runningCommand = command;
+        runningLock.unlock();
+
+        commandResult.commence();
+        commandResult.setOutputDir(commandOutput.getPath());
+        long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
+        eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
+
+        DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult, postProcessorFactory);
+        try
+        {
+            executeAndProcess(commandContext, command, commandConfig);
+        }
+        catch (BuildException e)
+        {
+            commandResult.error(e);
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+            commandResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
+        }
+        finally
+        {
+            commandContext.addArtifactsToResult();
+
+            runningLock.lock();
+            runningCommand = null;
+            runningLock.unlock();
+
+            flushOutput(context);
+            commandResult.complete();
+            eventManager.publish(new CommandCompletedEvent(this, recipeId, commandResult));
+        }
+
+        return true;
+    }
+
+    private void executeAndProcess(DefaultCommandContext commandContext, Command command, CommandConfiguration commandConfig)
+    {
+        try
+        {
+            command.execute(commandContext);
+        }
+        finally
+        {
+            // still need to process any available artifacts, even in the event of an error.
+            captureOutputs(commandConfig, commandContext);
+            commandContext.processOutputs();
+        }
+    }
+
+    private void flushOutput(ExecutionContext context)
+    {
+        OutputStream outputStream = context.getOutputStream();
+        if(outputStream != null)
+        {
+            try
+            {
+                outputStream.flush();
+            }
+            catch (IOException e)
+            {
+                LOG.severe(e);
+            }
+        }
+    }
+
+    private void captureOutputs(CommandConfiguration commandConfig, CommandContext context)
+    {
+        for (OutputConfiguration outputConfiguration: commandConfig.getOutputs().values())
+        {
+            Output output = outputConfiguration.createOutput();
+            output.capture(context);
         }
     }
 
@@ -289,9 +442,9 @@ public class RecipeProcessor
             if (runningRecipe == id)
             {
                 terminating = true;
-                if (runningRecipeInstance != null)
+                if (runningCommand != null)
                 {
-                    runningRecipeInstance.terminate();
+                    runningCommand.terminate();
                 }
             }
         }
@@ -311,13 +464,44 @@ public class RecipeProcessor
         this.fileLoaderFactory = fileLoaderFactory;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
-    }
-
     public void setIvyProvider(IvyProvider provider)
     {
         this.ivyProvider = provider;
+    }
+
+    public void setCommandFactory(CommandFactory commandFactory)
+    {
+        this.commandFactory = commandFactory;
+    }
+
+    public void setPostProcessorFactory(PostProcessorFactory postProcessorFactory)
+    {
+        this.postProcessorFactory = postProcessorFactory;
+    }
+
+    private static class RecipeStatus
+    {
+        private boolean success = true;
+        private int commandIndex = 0;
+
+        public boolean isSuccess()
+        {
+            return success;
+        }
+
+        public int getCommandIndex()
+        {
+            return commandIndex;
+        }
+
+        public void commandCompleted(ResultState state)
+        {
+            switch (state)
+            {
+                case FAILURE:
+                case ERROR:
+                    success = false;
+            }
+        }
     }
 }

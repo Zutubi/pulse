@@ -160,7 +160,7 @@ public class ProjectConfigurationActions
         CustomTypeConfiguration result = new CustomTypeConfiguration();
         try
         {
-            result.setPulseFileString(projectConfiguration.getType().getPulseFile(projectConfiguration, null, null));
+            result.setPulseFileString(projectConfiguration.getType().getPulseFile(projectConfiguration, null, null).getFileContent());
         }
         catch (Exception e)
         {

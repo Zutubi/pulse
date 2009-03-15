@@ -1,0 +1,12 @@
+<?xml version = "1.0"?>
+<project>
+    <frecipe name="alongside">
+        <import path="testImportRelativeToImportingFile.alongside.xml"/>
+    </frecipe>
+    <frecipe name="above">
+        <import path="../testImportRelativeToImportingFile.above.xml"/>
+    </frecipe>
+    <frecipe name="nested">
+        <import path="nested/testImportRelativeToImportingFile.nested.xml"/>
+    </frecipe>
+</project>

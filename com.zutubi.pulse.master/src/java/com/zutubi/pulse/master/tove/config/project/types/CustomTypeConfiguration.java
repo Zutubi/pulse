@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
+import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.marshal.ImportingNotSupportedFileResolver;
 import com.zutubi.pulse.core.marshal.ParseException;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -33,9 +35,9 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
     @Transient
     private PulseFileLoaderFactory fileLoaderFactory;
 
-    public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
+    public PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
     {
-        return pulseFileString;
+        return new PulseFileSource(pulseFileString);
     }
 
     public String getPulseFileString()
@@ -70,7 +72,7 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
             PulseFileLoader loader = fileLoaderFactory.createLoader();
             loader.setObjectFactory(new DefaultObjectFactory());
 
-            loader.load(new ByteArrayInputStream(pulseFileString.getBytes()), new ProjectRecipesConfiguration(), new PulseScope(), new CustomProjectValidationPredicate());
+            loader.load(new ByteArrayInputStream(pulseFileString.getBytes()), new ProjectRecipesConfiguration(), new PulseScope(), new ImportingNotSupportedFileResolver(), new CustomProjectValidationPredicate());
         }
         catch(ParseException pe)
         {

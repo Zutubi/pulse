@@ -1,0 +1,6 @@
+<?xml version = "1.0"?>
+<project>
+    <frecipe name="default">
+        <import path="thisfiledoesnotexist.xml" optional="true"/>
+    </frecipe>
+</project>

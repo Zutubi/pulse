@@ -9,15 +9,14 @@ import com.zutubi.pulse.dev.personal.PersonalBuildClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 import org.tmatesoft.svn.core.SVNDepth;
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
@@ -51,8 +50,6 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
-        SVNUpdateClient client = new SVNUpdateClient(SVNWCUtil.createDefaultAuthenticationManager(), null);
-        client.doCheckout(SVNURL.parseURIDecoded(Constants.TRIVIAL_ANT_REPOSITORY), workingCopyDir, SVNRevision.HEAD, SVNRevision.HEAD, SVNDepth.INFINITY, false);
 
         xmlRpcHelper.loginAsAdmin();
     }
@@ -67,12 +64,14 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     public void testPersonalBuild() throws Exception
     {
-        makeChange();
-        createConfigFile();
+        checkout(Constants.TRIVIAL_ANT_REPOSITORY);
+        makeChangeToBuildFile();
+        createConfigFile(PROJECT_NAME);
+
         loginAsAdmin();
         ensureProject(PROJECT_NAME);
-        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME);
-        long buildNumber = runPersonalBuild();
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
+        long buildNumber = runPersonalBuild("failure");
         verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
 
         PersonalEnvironmentArtifactPage envPage = new PersonalEnvironmentArtifactPage(selenium, urls, PROJECT_NAME, buildNumber, "default", "build");
@@ -84,19 +83,42 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTextNotPresent("logout");
     }
 
+    public void testPersonalBuildChangesImportedFile() throws Exception
+    {
+        checkout(Constants.VERSIONED_REPOSITORY);
+        makeChangeToImportedFile();
+        createConfigFile(random);
+        loginAsAdmin();
+
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
+        long buildNumber = runPersonalBuild("error");
+        PersonalBuildSummaryPage summaryPage = new PersonalBuildSummaryPage(selenium, urls, buildNumber);
+        summaryPage.goTo();
+        assertTextPresent("Unknown child element 'notrecognised'");
+    }
+
     public void testPersonalBuildOnAgent() throws Exception
     {
-        makeChange();
-        createConfigFile();
+        checkout(Constants.TRIVIAL_ANT_REPOSITORY);
+        makeChangeToBuildFile();
+        createConfigFile(PROJECT_NAME);
+
         loginAsAdmin();
         ensureAgent(AGENT_NAME);
         ensureProject(PROJECT_NAME);
-        editStageToRunOnAgent(AGENT_NAME);
-        long buildNumber = runPersonalBuild();
+        editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
+        long buildNumber = runPersonalBuild("failure");
         verifyPersonalBuildTabs(buildNumber, AGENT_NAME);
     }
 
-    private void makeChange() throws IOException
+    private void checkout(String url) throws SVNException
+    {
+        SVNUpdateClient client = new SVNUpdateClient(SVNWCUtil.createDefaultAuthenticationManager(), null);
+        client.doCheckout(SVNURL.parseURIDecoded(url), workingCopyDir, SVNRevision.HEAD, SVNRevision.HEAD, SVNDepth.INFINITY, false);
+    }
+
+    private void makeChangeToBuildFile() throws IOException
     {
         // Edit the build.xml file so we have an outstanding change
         File buildFile = new File(workingCopyDir, "build.xml");
@@ -108,15 +130,22 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
                 "</project>");
     }
 
-    private void editStageToRunOnAgent(String agent) throws Exception
+    private void makeChangeToImportedFile() throws IOException
     {
-        String stagePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PROJECT_NAME, "stages", "default");
+        File includedFile = new File(workingCopyDir, "properties.xml");
+        FileSystemUtils.createFile(includedFile, "<?xml version=\"1.0\"?>\n" +
+                "<project><notrecognised/></project>\n");
+    }
+
+    private void editStageToRunOnAgent(String agent, String projectName) throws Exception
+    {
+        String stagePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "stages", "default");
         Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
         stage.put("agent", PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
         xmlRpcHelper.saveConfig(stagePath, stage, false);
     }
 
-    private long runPersonalBuild()
+    private long runPersonalBuild(String expectedStatus)
     {
         // Request the build and wait for it to complete
         TestPersonalBuildUI ui = requestPersonalBuild();
@@ -135,18 +164,18 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         myBuildsPage.goTo();
         SeleniumUtils.refreshUntilElement(selenium, MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
-        SeleniumUtils.refreshUntilText(selenium, MyBuildsPage.getBuildStatusId(buildNumber), "failure");
+        SeleniumUtils.refreshUntilText(selenium, MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus);
         return buildNumber;
     }
 
-    private void createConfigFile() throws IOException
+    private void createConfigFile(String projectName) throws IOException
     {
         File configFile = new File(workingCopyDir, PersonalBuildConfig.PROPERTIES_FILENAME);
         Properties config = new Properties();
         config.put(PersonalBuildConfig.PROPERTY_PULSE_URL, baseUrl);
         config.put(PersonalBuildConfig.PROPERTY_PULSE_USER, "admin");
         config.put(PersonalBuildConfig.PROPERTY_PULSE_PASSWORD, "admin");
-        config.put(PersonalBuildConfig.PROPERTY_PROJECT, PROJECT_NAME);
+        config.put(PersonalBuildConfig.PROPERTY_PROJECT, projectName);
 
         FileOutputStream os = null;
         try

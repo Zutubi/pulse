@@ -3,6 +3,7 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -113,19 +114,13 @@ public class LocalBuild
             return new InMemoryResourceRepository();
         }
 
-        FileInputStream stream = null;
         try
         {
-            stream = new FileInputStream(resourcesFile);
-            return resourceFileLoader.load(stream);
+            return resourceFileLoader.load(new File(resourcesFile));
         }
-        catch (FileNotFoundException e)
+        catch (IOException e)
         {
-            throw new PulseException("Unable to open resources file '" + resourcesFile + "'");
-        }
-        finally
-        {
-            IOUtils.close(stream);
+            throw new PulseException("Unable to read resources file '" + resourcesFile + "'");
         }
     }
 
@@ -190,16 +185,16 @@ public class LocalBuild
         printEpilogue(logFile);
     }
 
-    private String loadPulseFile(File baseDir, String pulseFileName) throws PulseException
+    private PulseFileSource loadPulseFile(File baseDir, String pulseFileName) throws PulseException
     {
         File pulseFile = new File(baseDir, pulseFileName);
         FileInputStream pulseFileInputStream = null;
-        String result;
+        String content;
 
         try
         {
             pulseFileInputStream = new FileInputStream(pulseFile);
-            result = IOUtils.inputStreamToString(pulseFileInputStream);
+            content = IOUtils.inputStreamToString(pulseFileInputStream);
         }
         catch (IOException e)
         {
@@ -210,7 +205,7 @@ public class LocalBuild
             IOUtils.close(pulseFileInputStream);
         }
 
-        return result;
+        return new PulseFileSource(pulseFileName, content);
     }
 
     private void printPrologue(String pulseFile, String resourcesFile, String outputDir)

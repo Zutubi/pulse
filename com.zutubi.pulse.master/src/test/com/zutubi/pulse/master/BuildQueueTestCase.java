@@ -3,6 +3,7 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
@@ -11,8 +12,8 @@ import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider;
+import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
@@ -130,7 +131,7 @@ public class BuildQueueTestCase extends PulseTestCase
 
     protected AbstractBuildRequestEvent createRequest(final Project owner, final long buildId, String source, boolean replaceable, Revision revision)
     {
-        BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, "pulse file", false);
+        BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, new PulseFileSource("pulse file"), false);
         return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), null, source, replaceable)
         {
             public Entity getOwner()

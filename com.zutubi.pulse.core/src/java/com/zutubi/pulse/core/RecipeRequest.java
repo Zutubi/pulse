@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
@@ -23,7 +24,7 @@ public class RecipeRequest
      * The pulse file, potentially set lazily as it is determined (when
      * revision is determined).
      */
-    private String pulseFileSource;
+    private PulseFileSource pulseFileSource;
     /**
      * Context for the recipe.
      */
@@ -38,7 +39,7 @@ public class RecipeRequest
         this(null, null, context);
     }
 
-    public RecipeRequest(Bootstrapper bootstrapper, String pulseFileSource, PulseExecutionContext context)
+    public RecipeRequest(Bootstrapper bootstrapper, PulseFileSource pulseFileSource, PulseExecutionContext context)
     {
         this.bootstrapper = bootstrapper;
         this.pulseFileSource = pulseFileSource;
@@ -84,7 +85,7 @@ public class RecipeRequest
         return bootstrapper;
     }
 
-    public String getPulseFileSource()
+    public PulseFileSource getPulseFileSource()
     {
         return pulseFileSource;
     }
@@ -122,7 +123,7 @@ public class RecipeRequest
         this.bootstrapper = bootstrapper;
     }
 
-    public void setPulseFileSource(String pulseFileSource)
+    public void setPulseFileSource(PulseFileSource pulseFileSource)
     {
         this.pulseFileSource = pulseFileSource;
     }

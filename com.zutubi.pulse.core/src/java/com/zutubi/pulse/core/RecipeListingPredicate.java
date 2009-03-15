@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.marshal.TypeLoadPredicate;
+import com.zutubi.tove.config.api.Configuration;
 import nu.xom.Element;
 
 /**
@@ -8,22 +10,22 @@ import nu.xom.Element;
  */
 public class RecipeListingPredicate implements TypeLoadPredicate
 {
-    public boolean loadType(Object type, Element element)
+    public boolean loadType(Configuration type, Element element)
     {
-        return !(type instanceof Recipe);
+        return !(type instanceof RecipeConfiguration);
     }
 
-    public boolean resolveReferences(Object type, Element element)
-    {
-        return true;
-    }
-
-    public boolean allowUnresolved(Object type, Element element)
+    public boolean resolveReferences(Configuration type, Element element)
     {
         return true;
     }
 
-    public boolean validate(Object type, Element element)
+    public boolean allowUnresolved(Configuration type, Element element)
+    {
+        return true;
+    }
+
+    public boolean validate(Configuration type, Element element)
     {
         return loadType(type, element);
     }

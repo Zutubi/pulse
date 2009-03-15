@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.Referenceable;
+import com.zutubi.pulse.core.marshal.types.*;
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
@@ -13,16 +14,20 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class ToveFileLoaderTest extends PulseTestCase
 {
-    private static final String EXTENSION = "xml";
+    private static final String EXTENSION_XML = "xml";
 
     private TypeRegistry registry;
     private ToveFileLoader loader;
@@ -45,7 +50,12 @@ public class ToveFileLoaderTest extends PulseTestCase
         definitions.register("validateable", registry.register(SimpleValidateable.class));
         definitions.register("enumerator", registry.register(Enumerator.class));
         definitions.register("string-list", registry.register(StringList.class));
-        
+
+        registry.register(FakePulseFile.class);
+        definitions.register("frecipe", registry.register(FakeRecipe.class));
+        definitions.register("fant", registry.register(FakeAntCommand.class));
+        definitions.register("fmake", registry.register(FakeMakeCommand.class));
+
         loader = new ToveFileLoader();
         loader.setTypeRegistry(registry);
         loader.setObjectFactory(new DefaultObjectFactory());
@@ -55,9 +65,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testSimpleReference() throws Exception
     {
-        SimpleRoot root = new SimpleRoot();
-        loader.load(getInput(EXTENSION), root);
-
+        SimpleRoot root = load();
         SimpleReference t = root.getReferences().get("a");
         assertNotNull(t);
         assertEquals("a", t.getName());
@@ -65,9 +73,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testResolveReference() throws Exception
     {
-        SimpleRoot root = new SimpleRoot();
-        loader.load(getInput(EXTENSION), root);
-
+        SimpleRoot root = load();
         Referrer er = root.getReferrers().get("er");
         assertNotNull(er);
 
@@ -78,9 +84,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testCollectionReference() throws Exception
     {
-        SimpleRoot root = new SimpleRoot();
-        loader.load(getInput(EXTENSION), root);
-
+        SimpleRoot root = load();
         CollectionReferrer er = root.getCollectionReferrers().get("er");
         assertNotNull(er);
 
@@ -91,9 +95,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testContentProperty() throws Exception
     {
-        SimpleRoot root = new SimpleRoot();
-        loader.load(getInput(EXTENSION), root);
-
+        SimpleRoot root = load();
         Textual textual = root.getTextual();
         assertNotNull(textual);
         assertEquals("text content v", textual.getX());
@@ -101,9 +103,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testMacroEmpty() throws Exception
     {
-        SimpleRoot root = new SimpleRoot();
-        loader.load(getInput("testMacroEmpty", "xml"), root);
-
+        SimpleRoot root = load();
         Recipe recipe = root.getRecipes().get("r1");
         assertNotNull(recipe);
         assertEquals(0, recipe.getCommands().size());
@@ -159,9 +159,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testScopeTopLevel() throws Exception
     {
-        SimpleRoot root = new SimpleRoot();
-        loader.load(getInput("xml"), root);
-
+        SimpleRoot root = load();
         assertNotNull(root.getRecipes().get("first"));
         assertNotNull(root.getRecipes().get("second"));
     }
@@ -170,8 +168,7 @@ public class ToveFileLoaderTest extends PulseTestCase
     {
         try
         {
-            SimpleRoot root = new SimpleRoot();
-            loader.load(getInput("xml"), root);
+            load();
             fail();
         }
         catch (ParseException e)
@@ -227,10 +224,185 @@ public class ToveFileLoaderTest extends PulseTestCase
         assertEquals("val2", list.get(1));
     }
 
+    public void testBasicImport() throws IOException, PulseException
+    {
+        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        try
+        {
+            copyInputToDirectory(EXTENSION_XML, tempDir);
+            copyInputToDirectory(getName() + ".commands", EXTENSION_XML, tempDir);
+
+            loadAndAssertImportedCommands(tempDir);
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
+    }
+
+    public void testTopLevelImport() throws IOException, PulseException
+    {
+        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        try
+        {
+            copyInputToDirectory(EXTENSION_XML, tempDir);
+            copyInputToDirectory(getName() + ".recipe", EXTENSION_XML, tempDir);
+
+            loadAndAssertImportedCommands(tempDir);
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
+    }
+
+    public void testSelfImport() throws IOException, PulseException
+    {
+        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        try
+        {
+            copyInputToDirectory(EXTENSION_XML, tempDir);
+
+            loader.load(getInput(EXTENSION_XML), new FakePulseFile(), new LocalFileResolver(tempDir));
+            fail("Cannot process self-including file.");
+        }
+        catch (ParseException e)
+        {
+            assertThat(e.getMessage(), containsString("Maximum recursion depth 128 exceeded"));
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
+    }
+
+    public void testImportUnknownFile() throws IOException, PulseException
+    {
+        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        try
+        {
+            copyInputToDirectory(EXTENSION_XML, tempDir);
+
+            loader.load(getInput(EXTENSION_XML), new FakePulseFile(), new LocalFileResolver(tempDir));
+            fail("Cannot import non-existant file.");
+        }
+        catch (ParseException e)
+        {
+            assertThat(e.getMessage(), containsString("nosuchfile"));
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
+    }
+
+    public void testOptionalImportUnknownFile() throws IOException, PulseException
+    {
+        FakePulseFile pf = new FakePulseFile();
+        loader.load(getInput(EXTENSION_XML), pf, new ImportingNotSupportedFileResolver());
+        FakeRecipe recipe = pf.getRecipe("default");
+        assertNotNull(recipe);
+        assertEquals(0, recipe.getCommands().size());
+    }
+
+    public void testImportFromNestedDirectory() throws IOException, PulseException
+    {
+        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        try
+        {
+            copyInputToDirectory(EXTENSION_XML, tempDir);
+
+            File nestedDir = new File(tempDir, "nested");
+            assertTrue(nestedDir.mkdir());
+            copyInputToDirectory(getName() + ".commands", EXTENSION_XML, nestedDir);
+
+            loadAndAssertImportedCommands(tempDir);
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
+    }
+
+    public void testImportRelativeToImportingFile() throws IOException, PulseException
+    {
+        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        try
+        {
+            File importDir = new File(tempDir, "import");
+            File nestedDir = new File(importDir, "nested");
+            assertTrue(nestedDir.mkdirs());
+
+            copyInputToDirectory(EXTENSION_XML, tempDir);
+
+            copyInputToDirectory(getName() + ".recipes", EXTENSION_XML, importDir);
+            copyInputToDirectory(getName() + ".alongside", EXTENSION_XML, importDir);
+            copyInputToDirectory(getName() + ".above", EXTENSION_XML, tempDir);
+            copyInputToDirectory(getName() + ".nested", EXTENSION_XML, nestedDir);
+
+            FakePulseFile pf = new FakePulseFile();
+            loader.load(getInput(EXTENSION_XML), pf, new LocalFileResolver(tempDir));
+            assertSingleCommandRecipe(pf, "alongside");
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
+    }
+
+    public void testImportUnknownAttribute()
+    {
+        FakePulseFile pf = new FakePulseFile();
+        try
+        {
+            loader.load(getInput(EXTENSION_XML), pf, new ImportingNotSupportedFileResolver());
+            fail("Should not load with bad attribute on import tag");
+        }
+        catch (PulseException e)
+        {
+            assertThat(e.getMessage(), containsString("Unrecognised attribute 'pith'"));
+        }
+    }
+
+    public void testImportNoPath()
+    {
+        FakePulseFile pf = new FakePulseFile();
+        try
+        {
+            loader.load(getInput(EXTENSION_XML), pf, new ImportingNotSupportedFileResolver());
+            fail("Should not load with no path specified on import tag");
+        }
+        catch (PulseException e)
+        {
+            assertThat(e.getMessage(), containsString("Required attribute 'path' not set"));
+        }
+    }
+
+    private void assertSingleCommandRecipe(FakePulseFile pf, String name)
+    {
+        FakeRecipe recipe = pf.getRecipe(name);
+        assertNotNull(recipe);
+        Map<String, FakeCommand> commands = recipe.getCommands();
+        assertEquals(1, commands.size());
+        assertTrue(commands.containsKey(name));
+    }
+
+    private void loadAndAssertImportedCommands(File tempDir) throws PulseException
+    {
+        FakePulseFile pf = new FakePulseFile();
+        loader.load(getInput(EXTENSION_XML), pf, new LocalFileResolver(tempDir));
+        FakeRecipe recipe = pf.getRecipe("default");
+        assertNotNull(recipe);
+        Map<String, FakeCommand> commands = recipe.getCommands();
+        assertEquals(2, commands.size());
+        assertTrue(commands.containsKey("build"));
+        assertTrue(commands.containsKey("test"));
+    }
+
     private SimpleRoot load() throws PulseException
     {
         SimpleRoot root = new SimpleRoot();
-        loader.load(getInput("xml"), root);
+        loader.load(getInput(EXTENSION_XML), root, new ImportingNotSupportedFileResolver());
         return root;
     }
 

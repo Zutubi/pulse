@@ -2,6 +2,12 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
+import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.marshal.FileResolver;
+import com.zutubi.pulse.core.marshal.RelativeFileResolver;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.scm.ScmFileResolver;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
@@ -26,6 +32,7 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
     
     private ConfigurationProvider configurationProvider;
     private PulseFileLoaderFactory fileLoaderFactory;
+    private ScmManager scmManager;
 
     public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
@@ -47,9 +54,10 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
                     ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(stages, ProjectConfiguration.class);
                     if (projectConfig != null)
                     {
-                        String pulseFileString = projectConfig.getType().getPulseFile(projectConfig, null, null);
+                        PulseFileSource pulseFileSource = projectConfig.getType().getPulseFile(projectConfig, null, null);
                         PulseFileLoader pulseFileLoader = fileLoaderFactory.createLoader();
-                        return pulseFileLoader.loadAvailableRecipes(pulseFileString);
+                        FileResolver fileResolver = new RelativeFileResolver(pulseFileSource.getPath(), new ScmFileResolver(projectConfig, Revision.HEAD, scmManager));
+                        return pulseFileLoader.loadAvailableRecipes(pulseFileSource.getFileContent(), fileResolver);
                     }
 
                     return Collections.emptyList();
@@ -77,5 +85,10 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
         this.fileLoaderFactory = fileLoaderFactory;
+    }
+
+    public void setScmManager(ScmManager scmManager)
+    {
+        this.scmManager = scmManager;
     }
 }

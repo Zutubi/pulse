@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RESULTS;
 import com.zutubi.pulse.core.marshal.DefaultTypeLoadPredicate;
+import com.zutubi.pulse.core.marshal.LocalFileResolver;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
@@ -195,7 +196,7 @@ public class PostProcessCommand implements Command
             try
             {
                 ResourceFileLoader resourceFileLoader = SpringComponentContext.getBean("resourceFileLoader");
-                resourceRepository = resourceFileLoader.load(new FileInputStream(f));
+                resourceRepository = resourceFileLoader.load(f);
             }
             catch (Exception e)
             {
@@ -223,7 +224,7 @@ public class PostProcessCommand implements Command
         {
             PulseScope pulseScope = new PulseScope();
             pulseScope.add(new GenericReference<ResourceRepository>(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository));
-            loader.load(new FileInputStream(f), result, pulseScope, new DefaultTypeLoadPredicate());
+            loader.load(new FileInputStream(f), result, pulseScope, new LocalFileResolver(f.getParentFile()), new DefaultTypeLoadPredicate());
             return result;
         }
         catch (Exception e)

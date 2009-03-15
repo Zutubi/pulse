@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
@@ -73,7 +74,7 @@ public class RecipeControllerTest extends PulseTestCase
         ProjectConfiguration projectConfig = new ProjectConfiguration();
         project.setConfig(projectConfig);
         BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), project, 1, false);
-        assignmentRequest = new RecipeAssignmentRequest(project, new AnyCapableAgentRequirements(), null, new BuildRevision(new Revision("0"), "dummy", false), recipeRequest, null);
+        assignmentRequest = new RecipeAssignmentRequest(project, new AnyCapableAgentRequirements(), null, new BuildRevision(new Revision("0"), new PulseFileSource("dummy"), false), recipeRequest, null);
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
         {
             public File getDataDirectory()

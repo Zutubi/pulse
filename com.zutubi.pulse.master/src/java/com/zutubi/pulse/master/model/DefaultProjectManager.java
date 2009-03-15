@@ -6,6 +6,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -586,7 +587,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         Revision revision = archive.getMetadata().getRevision();
         try
         {
-            String pulseFile = getPulseFile(projectConfig, revision, archive);
+            PulseFileSource pulseFile = getPulseFile(projectConfig, revision, archive);
             eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig));
         }
         catch (Exception e)
@@ -621,7 +622,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         try
         {
-            String pulseFile = getPulseFile(project.getConfig(), revision, null);
+            PulseFileSource pulseFile = getPulseFile(project.getConfig(), revision, null);
             eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(revision, pulseFile, reason.isUser()), source, replaceable));
         }
         catch (Exception e)
@@ -630,7 +631,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
+    private PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
     {
         TypeConfiguration type = projectConfig.getType();
         return type.getPulseFile(projectConfig, revision, patch);

@@ -1,27 +1,28 @@
 package com.zutubi.pulse.core.marshal;
 
+import com.zutubi.tove.config.api.Configuration;
 import nu.xom.Element;
 
 /**
  */
 public class DefaultTypeLoadPredicate implements TypeLoadPredicate
 {
-    public boolean loadType(Object type, Element element)
+    public boolean loadType(Configuration type, Element element)
     {
         return true;
     }
 
-    public boolean resolveReferences(Object type, Element element)
+    public boolean resolveReferences(Configuration type, Element element)
     {
         return true;
     }
 
-    public boolean allowUnresolved(Object type, Element element)
+    public boolean allowUnresolved(Configuration type, Element element)
     {
         return false;
     }
 
-    public boolean validate(Object type, Element element)
+    public boolean validate(Configuration type, Element element)
     {
         return true;
     }

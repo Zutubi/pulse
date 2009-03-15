@@ -29,10 +29,7 @@ import com.zutubi.validation.ValidationManager;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import nu.xom.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
@@ -65,17 +62,17 @@ public class ToveFileLoader
         return type;
     }
 
-    public void load(File file, Configuration root) throws PulseException, IOException, IllegalAccessException, InvocationTargetException
+    public void load(File file, Configuration root, FileResolver fileResolver) throws PulseException, FileNotFoundException
     {
-        load(new FileInputStream(file), root);
+        load(new FileInputStream(file), root, fileResolver);
     }
 
-    public void load(InputStream input, Configuration root) throws PulseException
+    public void load(InputStream input, Configuration root, FileResolver fileResolver) throws PulseException
     {
-        load(input, root, null, null);
+        load(input, root, null, fileResolver, null);
     }
 
-    public void load(InputStream input, Configuration root, Scope globalScope, TypeLoadPredicate predicate) throws PulseException
+    public void load(InputStream input, Configuration root, Scope globalScope, FileResolver fileResolver, TypeLoadPredicate predicate) throws PulseException
     {
         if (predicate == null)
         {
@@ -118,7 +115,7 @@ public class ToveFileLoader
                 {
                     continue;
                 }
-                loadType((Element) node, root, type, globalScope, 1, predicate);
+                loadType((Element) node, root, type, globalScope, 1, fileResolver, predicate);
             }
         }
         finally
@@ -127,7 +124,7 @@ public class ToveFileLoader
         }
     }
 
-    private void loadType(Element e, Configuration parent, CompositeType parentType, Scope scope, int depth, TypeLoadPredicate predicate) throws PulseException
+    private void loadType(Element e, Configuration parent, CompositeType parentType, Scope scope, int depth, FileResolver fileResolver, TypeLoadPredicate predicate) throws PulseException
     {
         String name = e.getLocalName();
         Object instance;
@@ -139,7 +136,7 @@ public class ToveFileLoader
                 throw new FileLoadException(String.format("Maximum recursion depth %s exceeded", MAX_RECURSION_DEPTH));
             }
 
-            if (handleInternalElement(e, parent, parentType, scope, depth, predicate))
+            if (handleInternalElement(e, parent, parentType, scope, depth, fileResolver, predicate))
             {
                 return;
             }
@@ -178,7 +175,7 @@ public class ToveFileLoader
                     scope = scope.createChild();
 
                     // initialise sub-elements.
-                    loadSubElements(e, configuration, type, scope, depth, predicate);
+                    loadSubElements(e, configuration, type, scope, depth, fileResolver, predicate);
                 }
 
                 binder.set(parent, configuration);
@@ -652,7 +649,7 @@ public class ToveFileLoader
         }
     }
 
-    private void loadSubElements(Element e, Configuration instance, CompositeType type, Scope scope, int depth, TypeLoadPredicate predicate)
+    private void loadSubElements(Element e, Configuration instance, CompositeType type, Scope scope, int depth, FileResolver fileResolver, TypeLoadPredicate predicate)
             throws Exception
     {
         String text = null;
@@ -665,7 +662,7 @@ public class ToveFileLoader
             {
                 Element element = (Element) node;
                 // process type.
-                loadType(element, instance, type, scope, depth + 1, predicate);
+                loadType(element, instance, type, scope, depth + 1, fileResolver, predicate);
             }
             else if (node instanceof Text)
             {
@@ -685,7 +682,7 @@ public class ToveFileLoader
             TypeProperty contentProperty = findContentProperty(type);
             if (contentProperty != null)
             {
-                text = ReferenceResolver.resolveReferences(text, scope, getResolutionStrategy(predicate, type, e));
+                text = ReferenceResolver.resolveReferences(text, scope, getResolutionStrategy(predicate, instance, e));
                 contentProperty.setValue(instance, text);
             }
         }
@@ -702,7 +699,7 @@ public class ToveFileLoader
         });
     }
 
-    private ReferenceResolver.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Object type, Element e)
+    private ReferenceResolver.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Configuration type, Element e)
     {
         ReferenceResolver.ResolutionStrategy resolutionStrategy = RESOLVE_NONE;
         if (predicate.resolveReferences(type, e))
@@ -719,7 +716,7 @@ public class ToveFileLoader
         return resolutionStrategy;
     }
 
-    private boolean handleInternalElement(Element element, Configuration instance, CompositeType type, Scope scope, int depth, TypeLoadPredicate predicate) throws Exception
+    private boolean handleInternalElement(Element element, Configuration instance, CompositeType type, Scope scope, int depth, FileResolver fileResolver, TypeLoadPredicate predicate) throws Exception
     {
         String localName = element.getLocalName();
         if (localName.equals("macro"))
@@ -770,7 +767,7 @@ public class ToveFileLoader
 
                     try
                     {
-                        loadSubElements(lae, instance, type, scope, depth, predicate);
+                        loadSubElements(lae, instance, type, scope, depth, fileResolver, predicate);
                     }
                     catch (Exception e)
                     {
@@ -794,8 +791,74 @@ public class ToveFileLoader
         else if (localName.equals("scope"))
         {
             // Just load children in new scope and redirect to parent
-            loadSubElements(element, instance, type, scope.createChild(), depth, predicate);
+            loadSubElements(element, instance, type, scope.createChild(), depth, fileResolver, predicate);
             return true;
+        }
+        else if (localName.equals("import"))
+        {
+            boolean optional = false;
+            String path = null;
+            for (int i = 0; i < element.getAttributeCount(); i++)
+            {
+                Attribute attribute = element.getAttribute(i);
+                if (attribute.getLocalName().equals("path"))
+                {
+                    path = attribute.getValue();
+                }
+                else if (attribute.getLocalName().equals("optional"))
+                {
+                    optional = Boolean.valueOf(attribute.getValue());
+                }
+                else
+                {
+                    throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
+                }
+            }
+
+            if (!TextUtils.stringSet(path))
+            {
+                throw new FileLoadException("Required attribute 'path' not set");
+            }
+
+
+            InputStream input;
+            if (optional)
+            {
+                try
+                {
+                    input = fileResolver.resolve(path);
+                }
+                catch(Exception e)
+                {
+                    // Ignore for optional includes.
+                    return true;
+                }
+            }
+            else
+            {
+                input = fileResolver.resolve(path);
+            }
+
+            try
+            {
+                Document doc;
+                try
+                {
+                    Builder builder = new Builder(new LocationAwareNodeFactory());
+                    doc = builder.build(input);
+                }
+                finally
+                {
+                    IOUtils.close(input);
+                }
+
+                loadSubElements(doc.getRootElement(), instance, type, scope, depth, new RelativeFileResolver(path, fileResolver), predicate);
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new FileLoadException("While importing file '" + path + "': " + e.getMessage(), e);
+            }
         }
 
         return false;
