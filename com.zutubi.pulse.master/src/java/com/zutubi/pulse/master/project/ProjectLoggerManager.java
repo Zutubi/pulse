@@ -6,7 +6,6 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.project.events.ProjectEvent;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.util.HashMap;
@@ -72,11 +71,6 @@ public class ProjectLoggerManager implements EventListener, Stoppable
     {
         stopped = true;
         eventManager.unregister(this);
-
-        for (ProjectLogger logger: idToLogger.values())
-        {
-            IOUtils.close(logger);
-        }
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
