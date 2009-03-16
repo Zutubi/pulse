@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
@@ -37,6 +38,14 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         for (int i = 1; i < nextBuild; i++)
         {
             waitForBuildToComplete(i);
+        }
+
+        for (File f: waitFiles.values())
+        {
+            if (!f.delete())
+            {
+                f.deleteOnExit();
+            }
         }
         
         xmlRpcHelper.logout();
@@ -85,10 +94,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         assertEquals("in progress", activeBuildsTable.getStatus());
 
         waitForBuildToComplete(1);
-
-        // force page refresh.
-        page.goTo();
-        assertEquals(0, activeBuildsTable.getRowCount());
+        waitForQueueCount(activeBuildsTable, 0);
     }
 
     public void testCancelBuild() throws Exception
@@ -126,9 +132,9 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         page.goTo();
 
         ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
-        assertEquals(1, activeBuildsTable.getRowCount());
+        waitForQueueCount(activeBuildsTable, 1);
 
-        BuildQueueTable buildQueueTable = new BuildQueueTable();
+        final BuildQueueTable buildQueueTable = new BuildQueueTable();
         assertEquals(1, buildQueueTable.getRowCount());
         assertEquals("trigger via remote api by admin", buildQueueTable.getReason());
         assertEquals(random, buildQueueTable.getOwner());
@@ -137,10 +143,8 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
         waitForBuildToComplete(1);
 
-        // force refresh
-        page.goTo();
-        assertEquals(0, buildQueueTable.getRowCount());
-        assertEquals(1, activeBuildsTable.getRowCount());
+        waitForQueueCount(buildQueueTable, 0);
+        waitForQueueCount(activeBuildsTable, 1);
 
         waitForBuildToComplete(2);
     }
@@ -164,11 +168,22 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     private void triggerProjectBuild() throws Exception
     {
         int thisBuild = nextBuild++;
-        
+
         File waitFile = new File(FileSystemUtils.getSystemTempDir(), random + nextBuild);
         waitFiles.put(thisBuild, waitFile);
 
         xmlRpcHelper.triggerBuild(random);
+    }
+
+    private void waitForQueueCount(final Table queueTable, final int count)
+    {
+        SeleniumUtils.refreshUntil(selenium, TIMEOUT, new Condition()
+        {
+            public boolean satisfied()
+            {
+                return queueTable.getRowCount() == count;
+            }
+        }, "queue to have " + count + " entries");
     }
 
     private void waitForBuildToComplete(int buildId) throws Exception
