@@ -47,7 +47,7 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private TypeConfiguration type;
     private Map<String, PostProcessorConfiguration> postProcessors = new HashMap<String, PostProcessorConfiguration>();
 
-    private String org;
+    private String organisation;
 
     private DependenciesConfiguration dependencies = new LocalDependenciesConfiguration();
 
@@ -270,13 +270,13 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
         this.dependencies = dependencies;
     }
 
-    public String getOrg()
+    public String getOrganisation()
     {
-        return org;
+        return organisation;
     }
 
-    public void setOrg(String org)
+    public void setOrganisation(String organisation)
     {
-        this.org = org;
+        this.organisation = organisation;
     }
 }

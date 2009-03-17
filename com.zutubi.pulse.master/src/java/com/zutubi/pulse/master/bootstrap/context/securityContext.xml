@@ -67,17 +67,6 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
     </bean>
 
-    <!-- is this still necessary? -->
-    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-        <property name="customEditors">
-            <map>
-                <entry key="com.zutubi.pulse.servercore.jetty.AuthorityDefinitions">
-                    <bean class="com.zutubi.pulse.servercore.jetty.AuthorityDefinitionsEditor"/>
-                </entry>
-            </map>
-        </property>
-    </bean>
-
     <!--
     The security handler for access to the artifact repository.
     -->

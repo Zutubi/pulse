@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.transfer.TransferAPI;
 import com.zutubi.pulse.master.transfer.TransferException;
 import com.zutubi.pulse.master.transfer.TransferListener;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.FileSystemUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -70,7 +71,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
                 {
                     throw new ArchiveException("Failed to create new file: " + file.getCanonicalPath());
                 }
-                IOUtils.writeToFile(file, resource.getInputStream());
+                FileSystemUtils.createFile(file, resource.getInputStream());
             }
 
             File export = new File(base, EXPORT_FILENAME);

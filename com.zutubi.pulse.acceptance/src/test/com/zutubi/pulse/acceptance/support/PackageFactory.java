@@ -1,11 +1,12 @@
 package com.zutubi.pulse.acceptance.support;
 
 import java.io.File;
+import java.io.Closeable;
 
 /**
  * A factory for PulsePackage instances.
  */
-public interface PackageFactory
+public interface PackageFactory extends Closeable
 {
     /**
      * Create a new PulsePackage instance from the pulse distribution file.
@@ -14,9 +15,4 @@ public interface PackageFactory
      * @return  a handle to a Pulse package implementation.
      */
     public PulsePackage createPackage(File pkg);
-
-    /**
-     * Free up the resources held by this factory.
-     */
-    void close();
 }

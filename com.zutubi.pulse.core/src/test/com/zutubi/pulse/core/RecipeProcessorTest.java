@@ -27,7 +27,16 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
-import static org.mockito.Mockito.*;
+import org.apache.ivy.Ivy;
+import org.apache.ivy.core.module.descriptor.Configuration;
+import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
+import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
+import org.apache.ivy.core.module.descriptor.MDArtifact;
+import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.core.settings.IvySettings;
+import org.apache.ivy.plugins.resolver.DependencyResolver;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +73,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         commandFactory.setObjectFactory(objectFactory);
         postProcessorFactory = new DefaultPostProcessorFactory();
         postProcessorFactory.setObjectFactory(objectFactory);
-        
+
         recipeProcessor = new RecipeProcessor();
         eventManager = new DefaultEventManager();
         recipeProcessor.setEventManager(eventManager);
@@ -98,14 +107,20 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
         recipeProcessor.setFileLoaderFactory(fileLoaderFactory);
 
-        // we know that we need the dependency commands to be executed, but we do not want to tie into the
-        // dependency system during this test, so we replace the default commands with noop commands.
-        IvySupport ivySupport = mock(IvySupport.class);
-        stub(ivySupport.getRetrieveCommand()).toReturn(new NoopCommandConfiguration("retrieve"));
-        stub(ivySupport.getPublishCommand((RecipeRequest) anyObject())).toReturn(new NoopCommandConfiguration("publish"));
-        IvyProvider provider = mock(IvyProvider.class);
-        stub(provider.getIvySupport()).toReturn(ivySupport);
-        recipeProcessor.setIvyProvider(provider);
+        // setup the default dependency resolver.  All we need is a name.
+        DependencyResolver resolver = mock(DependencyResolver.class);
+        stub(resolver.getName()).toReturn("pulse");
+        IvySettings settings = mock(IvySettings.class);
+        stub(settings.getDefaultResolver()).toReturn(resolver);
+        final Ivy ivy = mock(Ivy.class);
+        stub(ivy.getSettings()).toReturn(settings);
+        recipeProcessor.setIvyProvider(new IvyProvider()
+        {
+            public IvySupport getIvySupport(String repositoryBase) throws Exception
+            {
+                return new IvySupport(ivy);
+            }
+        });
     }
 
     protected void tearDown() throws Exception
@@ -116,18 +131,70 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         super.tearDown();
     }
 
+    public void testPublish() throws IOException
+    {
+        PulseExecutionContext context = makeContext(1, "default");
+
+        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(ModuleRevisionId.newInstance("org", "module", null), "integration", null);
+
+        addArtifact(descriptor, "build", "artifact", "jar");
+        addArtifact(descriptor, "build", "artifact", "txt");
+
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE, "build");
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, descriptor);
+        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
+
+        assertRecipeCommenced(1, "default");
+        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "greeting", "publish");
+        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertNoMoreEvents();
+    }
+
+    public void testRetrieve() throws IOException
+    {
+        PulseExecutionContext context = makeContext(1, "default");
+
+        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(ModuleRevisionId.newInstance("org", "module", null), "integration", null);
+
+        addDependency(descriptor, "org", "projectA", "1.0");
+        addDependency(descriptor, "org", "projectB", "1.0");
+
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE, "build");
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, descriptor);
+        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
+
+        assertRecipeCommenced(1, "default");
+        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "retrieve", "greeting");
+        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertNoMoreEvents();
+    }
+
+    private void addDependency(DefaultModuleDescriptor descriptor, String org, String module, String revision)
+    {
+        ModuleRevisionId dependencyMrid = ModuleRevisionId.newInstance(org, module, revision);
+        DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(dependencyMrid, true, false);
+        depDesc.addDependencyConfiguration("build", "*");
+        descriptor.addDependency(depDesc);
+    }
+
+    private void addArtifact(DefaultModuleDescriptor descriptor, String configName, String artifactName, String artifactType)
+    {
+        Configuration config = descriptor.getConfiguration(configName);
+        if (config == null)
+        {
+            descriptor.addConfiguration(new Configuration(configName));
+        }
+
+        MDArtifact ivyArtifact = new MDArtifact(descriptor, artifactName, artifactType, artifactType, null, null);
+        ivyArtifact.addConfiguration(configName);
+        descriptor.addArtifact(configName, ivyArtifact);
+    }
+
     public void testBasicRecipe() throws Exception
     {
         runBasicRecipe("default");
         assertRecipeCommenced(1, "default");
-        assertCommandCommenced(1, "bootstrap");
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "retrieve");
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "greeting");
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "publish");
-        assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "greeting");
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
     }
@@ -136,12 +203,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         PulseExecutionContext context = runBasicRecipe("version");
         assertRecipeCommenced(1, "version");
-        assertCommandCommenced(1, "bootstrap");
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "retrieve");
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "publish");
-        assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap");
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
         assertEquals("test version", context.getVersion());
@@ -167,8 +229,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, null);
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "retrieve");
-        assertCommandCompleted(1, ResultState.SUCCESS);
         assertRecipeError(1, "Please specify a default recipe for your project.");
         assertNoMoreEvents();
     }
@@ -178,8 +238,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         runBasicRecipe("failure");
         assertRecipeCommenced(1, "failure");
         assertCommandCommenced(1, "bootstrap");
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "retrieve");
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "born to fail");
         assertCommandFailure(1, "failure command");
@@ -195,8 +253,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, "exception");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "retrieve");
-        assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "predictable");
         assertCommandError(1, "exception command");
         // Counter intuitive perhaps: the state is maintained by
@@ -210,8 +266,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         runBasicRecipe("unexpected exception");
         assertRecipeCommenced(1, "unexpected exception");
         assertCommandCommenced(1, "bootstrap");
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "retrieve");
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertCommandCommenced(1, "oops");
         assertCommandError(1, "Unexpected error: unexpected exception command");
@@ -236,6 +290,9 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeName);
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_PROJECT, "project");
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_ORGANISATION, "org");
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL, "http://localhost:8080");
         return context;
     }
 
@@ -269,10 +326,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, "default");
         semaphore.release();
         assertCommandCommenced(1, "bootstrap");
-        semaphore.release();
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        semaphore.release();
-        assertCommandCommenced(1, "retrieve");
         semaphore.release();
         assertCommandCompleted(1, ResultState.SUCCESS);
         semaphore.release();
@@ -313,10 +366,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertRecipeCommenced(1, "default");
         semaphore.release();
         assertCommandCommenced(1, "bootstrap");
-        semaphore.release();
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        semaphore.release();
-        assertCommandCommenced(1, "retrieve");
         semaphore.release();
         assertCommandCompleted(1, ResultState.SUCCESS);
         semaphore.release();
@@ -387,6 +436,15 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertEquals(message, feature.getSummary());
     }
 
+    private void assertCommandsCompleted(ResultState result, String... commandNames)
+    {
+        for (String commandName : commandNames)
+        {
+            assertCommandCommenced(1, commandName);
+            assertCommandCompleted(1, result);
+        }
+    }
+
     private RecipeCompletedEvent assertRecipeCompleted(long id, ResultState state)
     {
         Event e = assertEvent(id);
@@ -433,7 +491,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void handleEvent(Event evt)
     {
-        if(evt instanceof RecipeStatusEvent)
+        if (evt instanceof RecipeStatusEvent)
         {
             // We ignore status events as they do not affect behaviour.
             return;

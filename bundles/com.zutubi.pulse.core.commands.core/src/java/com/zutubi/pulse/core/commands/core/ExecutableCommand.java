@@ -4,10 +4,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
-import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Reference;
-import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.util.process.ProcessControl;
 import com.zutubi.util.Constants;
 import com.zutubi.util.SystemUtils;
@@ -426,6 +423,13 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         PulseScope scope = ((PulseExecutionContext) context).getScope();
         for(Reference reference: scope.getReferences(String.class))
         {
+            // do not add this property to the environment to make it at least somewhat
+            // cumbersome to access the hash.
+            if (reference.getName().compareTo(BuildProperties.PROPERTY_SECURITY_HASH) == 0)
+            {
+                continue;
+            }
+
             if(acceptableName(reference.getName()))
             {
                 childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());

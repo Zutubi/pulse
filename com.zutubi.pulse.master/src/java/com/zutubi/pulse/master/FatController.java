@@ -41,7 +41,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class FatController implements EventListener, Stoppable
 {
-    public static final String PARAM_EVENT_MANAGER = "eventManager";
     public static final String TIMEOUT_JOB_NAME = "build";
     public static final String TIMEOUT_JOB_GROUP = "timeout";
 
@@ -78,7 +77,6 @@ public class FatController implements EventListener, Stoppable
         eventManager.register(asyncListener);
 
         JobDetail detail = new JobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP, TimeoutRecipeJob.class);
-        detail.getJobDataMap().put(PARAM_EVENT_MANAGER, eventManager);
         detail.setDurability(true); // will stay around after the trigger has gone.
         quartzScheduler.addJob(detail, true);
     }

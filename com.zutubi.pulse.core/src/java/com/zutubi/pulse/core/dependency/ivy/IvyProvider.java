@@ -8,8 +8,11 @@ public interface IvyProvider
     /**
      * Get a configured instance of support ivy.
      *
-     * @return the configured ivy instance
-     * @throws Exception is thrown if there is a problem configuring ivy.
+     * @param repositoryBase    defines the base path to the internal pulse repository.  The
+     * format of this field must be a valid url.
+     * @return  a new configured ivy support instance.
+     *
+     * @throws Exception on error.
      */
-    IvySupport getIvySupport() throws Exception;
+    IvySupport getIvySupport(String repositoryBase) throws Exception;
 }

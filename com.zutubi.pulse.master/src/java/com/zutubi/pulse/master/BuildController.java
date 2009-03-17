@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider;
+import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
@@ -55,7 +55,6 @@ import org.quartz.Trigger;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 
@@ -101,6 +100,8 @@ public class BuildController implements EventListener
 
     private DefaultBuildLogger buildLogger;
     private RecipeDispatchService recipeDispatchService;
+
+    private IvyProvider ivyProvider;
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -162,28 +163,23 @@ public class BuildController implements EventListener
 
     /**
      * To each build context we add a token that can later be used by any of the builds processes to
-     * access the internal pulse artifact repository.  This token will be active for the duration of the
+     * access the internal pulse artifact repository.  This token will be valid for the duration of the
      * build.
      */
     private void activateBuildAuthenticationToken()
     {
-        String token;
-        try
-        {
-            token = RandomUtils.secureRandomString(15);
-        }
-        catch (GeneralSecurityException e)
-        {
-            token = RandomUtils.randomString(15);
-        }
-        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_HASH, token);
-
+        String token = RandomUtils.randomToken(15);
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SECURITY_HASH, token);
         buildTokenAuthenticationProvider.activate(token);
     }
 
+    /**
+     * Deactivate / invalidate the authentication token in the current build context.  This must
+     * be done at the end of the build.
+     */
     private void deactivateBuildAuthenticationToken()
     {
-        String token = buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_HASH);
+        String token = buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_SECURITY_HASH);
         buildTokenAuthenticationProvider.deactivate(token);
     }
 
@@ -216,7 +212,6 @@ public class BuildController implements EventListener
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
-            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_ORG, projectConfig.getOrg());
 
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_PUBLICATION_PATTERN, stageConfig.getPublicationPattern());
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, stageConfig.getRetrievalPattern());
@@ -249,14 +244,11 @@ public class BuildController implements EventListener
 
     private ModuleDescriptor createModuleDescriptor(ProjectConfiguration project)
     {
-        String org = project.getOrg();
-        if (!TextUtils.stringSet(org))
-        {
-            org = "";
-        }
+        String org = project.getOrganisation();
+        org = (org == null) ? "" : org.trim();
+
         ModuleRevisionId mrid = ModuleRevisionId.newInstance(org, project.getName(), null);
 
-        //TODO: allow the build request to define the status of this descriptor
         String status = "integration";
         DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, status, null); // the status needs to be configurable - options include 'release'..
         descriptor.addConfiguration(new Configuration("build"));
@@ -265,13 +257,9 @@ public class BuildController implements EventListener
         for (DependencyConfiguration dependency : project.getDependencies().getDependencies())
         {
             String projectName = dependency.getModule();
-            // once we support the org field in the dependency, we can replace this project lookup.
-            String projectOrg = projectManager.getProjectConfig(projectName, true).getOrg();
 
-            if (!TextUtils.stringSet(projectOrg))
-            {
-                projectOrg = "";
-            }
+            String projectOrg = projectManager.getProjectConfig(projectName, true).getOrganisation();
+            projectOrg = (projectOrg == null) ? "" : projectOrg.trim();
 
             ModuleRevisionId dependencyMrid = ModuleRevisionId.newInstance(projectOrg, projectName, dependency.getRevision());
             DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(dependencyMrid, true, false);
@@ -934,6 +922,20 @@ public class BuildController implements EventListener
         // Unfortunately, if we can not write to the db, then we are a little stuffed.
         try
         {
+            if (buildResult.getRoot().getWorstState(null) == ResultState.SUCCESS)
+            {
+                try
+                {
+                    // publish this builds ivy file to the repository, making its artifacts available
+                    // to subsequent builds.
+                    publishIvyToRepository();
+                }
+                catch (Exception e)
+                {
+                    buildResult.error(new BuildException(e));
+                }
+            }
+
             buildResult.setHasWorkDir(projectConfig.getOptions().getRetainWorkingCopy());
             buildResult.complete();
             buildLogger.completed(buildResult);
@@ -966,22 +968,6 @@ public class BuildController implements EventListener
             LOG.severe("Failed to persist the completed build result. Reason: " + e.getMessage(), e);
         }
 
-        if (buildResult.succeeded())
-        {
-            try
-            {
-                // publish this builds ivy file to the repository, making its artifacts available
-                // to subsequent builds.
-                publishIvyToRepository();
-            }
-            catch (Exception e)
-            {
-                // ensure that any problems publishing ivy do not cause issues with
-                // the rest of the build.  Catch and report the issue.
-                LOG.error(e);
-            }
-        }
-
         deactivateBuildAuthenticationToken();
 
         eventManager.unregister(asyncListener);
@@ -999,51 +985,23 @@ public class BuildController implements EventListener
      */
     private void publishIvyToRepository()
     {
-        File tmp = null;
         try
         {
             String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
-            CredentialsStore.INSTANCE.addCredentials("Pulse", new URL(masterUrl).getHost(), "pulse", buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_HASH));
+            CredentialsStore.INSTANCE.addCredentials("Pulse", new URL(masterUrl).getHost(), "pulse", buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_SECURITY_HASH));
 
             String repositoryUrl = masterUrl + "/repository";
-            DefaultIvyProvider ivyProvider = new DefaultIvyProvider();
-            ivyProvider.setRepositoryBase(repositoryUrl);
-            IvySupport ivy = ivyProvider.getIvySupport();
+            IvySupport ivy = ivyProvider.getIvySupport(repositoryUrl);
 
             ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
             descriptor.getModuleRevisionId().getOrganisation();
             ivy.resolve(descriptor);
 
-            // deliver the ivy file locally (tmp)
-            tmp = FileSystemUtils.createTempDir();
-            String destIvyPattern = tmp.getCanonicalPath() + "/[artifact].[ext]";
-            ivy.deliver(descriptor.getModuleRevisionId(), Long.toString(buildResult.getNumber()), destIvyPattern);
-
-            // publish the ivy file from tmp.
-            ivy.publishIvy(descriptor.getModuleRevisionId(), Long.toString(buildResult.getNumber()), new File(tmp, "ivy.xml"));
+            ivy.publishIvy(descriptor, Long.toString(buildResult.getNumber()));
         }
         catch (Exception e)
         {
-            LOG.warning("Failed to publish the builds ivy file to the repository. Cause: " + e.getMessage(), e);
-        }
-        finally
-        {
-            cleanupDirectory(tmp);
-        }
-    }
-
-    private void cleanupDirectory(File dir)
-    {
-        try
-            {
-                if (dir != null && !FileSystemUtils.rmdir(dir))
-            {
-                LOG.warning("Failed to cleanup directory: " + dir.getCanonicalPath());
-            }
-        }
-        catch (IOException e)
-        {
-            // noop.
+            throw new BuildException("Failed to publish the builds ivy file to the repository. Cause: " + e.getMessage(), e);
         }
     }
 
@@ -1164,6 +1122,11 @@ public class BuildController implements EventListener
     public void setBuildTokenAuthenticationProvider(BuildTokenAuthenticationProvider buildTokenAuthenticationProvider)
     {
         this.buildTokenAuthenticationProvider = buildTokenAuthenticationProvider;
+    }
+
+    public void setIvyProvider(IvyProvider ivyProvider)
+    {
+        this.ivyProvider = ivyProvider;
     }
 
     private static interface BootstrapperCreator

@@ -55,6 +55,13 @@ public class IvySupportTest extends PulseTestCase
         core = new IvySupport(ivy);
     }
 
+    protected void tearDown() throws Exception
+    {
+        removeDirectory(tmp);
+        
+        super.tearDown();
+    }
+
     public void testPublishSingleArtifact() throws IOException, ParseException
     {
         Project project = new Project("zutubi", "project");
@@ -320,7 +327,7 @@ public class IvySupportTest extends PulseTestCase
 
     private void assertIsNotFile(String filePath)
     {
-        assertTrue(!isFile(filePath));
+        assertFalse(isFile(filePath));
     }
 
     private boolean isFile(String filePath)

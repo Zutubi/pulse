@@ -1,7 +1,5 @@
 package com.zutubi.pulse.master.security;
 
-import com.zutubi.pulse.master.tove.config.group.ServerPermission;
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.providers.AuthenticationProvider;
@@ -18,7 +16,7 @@ public class BuildTokenAuthenticationProvider implements AuthenticationProvider
 {
     private static final String USERNAME = "pulse";
 
-    private Set<String> activeTokens = new HashSet<String>();
+    private Set<Object> activeTokens = new HashSet<Object>();
 
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
@@ -34,7 +32,6 @@ public class BuildTokenAuthenticationProvider implements AuthenticationProvider
 
     private Authentication validateToken(Authentication auth)
     {
-        //noinspection SuspiciousMethodCalls
         if (!activeTokens.contains(auth.getCredentials()))
         {
             return null;
@@ -44,19 +41,8 @@ public class BuildTokenAuthenticationProvider implements AuthenticationProvider
 
     private Authentication createAuthentication()
     {
-        // Provide administer authentication since it will be Pulse making
-        // the request.
-
-        // IMPLEMENTATION NOTE:  It would be better to use the 'AcegiUtils.systemUser' but it has a
-        // null name which causes problems further on.  Should we give the system user a name?
-        
-        UserConfiguration config = new UserConfiguration();
-        config.setName(USERNAME);
-        config.setLogin(USERNAME);
-        config.addDirectAuthority(ServerPermission.ADMINISTER.toString());
-        AcegiUser agentUser = new AcegiUser(config, null);
-
-        return new UsernamePasswordAuthenticationToken(agentUser, null, agentUser.getAuthorities());
+        AcegiUser repositoryUser = AcegiUtils.getRepositoryUser();
+        return new UsernamePasswordAuthenticationToken(repositoryUser, null, repositoryUser.getAuthorities());
     }
 
     public void activate(String token)

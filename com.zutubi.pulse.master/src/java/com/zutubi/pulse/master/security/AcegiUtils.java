@@ -16,18 +16,30 @@ import org.acegisecurity.userdetails.UserDetails;
 public class AcegiUtils
 {
     private static final AcegiUser systemUser;
+    private static final AcegiUser repositoryUser;
     static
     {
-        UserConfiguration config = new UserConfiguration();
-        config.addDirectAuthority(ServerPermission.ADMINISTER.toString());
+        UserConfiguration systemUserConfig = new UserConfiguration();
+        systemUserConfig.addDirectAuthority(ServerPermission.ADMINISTER.toString());
         User user = new User();
-        user.setConfig(config);
+        user.setConfig(systemUserConfig);
         systemUser = new AcegiUser(user, null);
+
+        UserConfiguration repositoryUserConfig = new UserConfiguration();
+        repositoryUserConfig.setName("pulse");
+        repositoryUserConfig.setLogin("pulse");
+        repositoryUserConfig.addDirectAuthority(ServerPermission.ADMINISTER.toString());
+        repositoryUser = new AcegiUser(repositoryUserConfig, null);
     }
 
     public static AcegiUser getSystemUser()
     {
         return systemUser;
+    }
+
+    public static AcegiUser getRepositoryUser()
+    {
+        return repositoryUser;
     }
 
     /**

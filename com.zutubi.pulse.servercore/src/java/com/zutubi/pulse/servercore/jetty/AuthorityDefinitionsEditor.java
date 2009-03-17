@@ -26,13 +26,13 @@ public class AuthorityDefinitionsEditor  extends PropertyEditorSupport
             String line;
             while (TextUtils.stringSet(line = reader.readLine()))
             {
-                StringTokenizer tokens = new StringTokenizer(line, ", ", false);
-                String path = tokens.nextToken();
-                String role = tokens.nextToken();
+                StringTokenizer tokens = new StringTokenizer(line, ",", false);
+                String path = tokens.nextToken().trim();
+                String role = tokens.nextToken().trim();
                 List<String> methods = new LinkedList<String>();
                 while (tokens.hasMoreTokens())
                 {
-                    methods.add(tokens.nextToken());
+                    methods.add(tokens.nextToken().trim());
                 }
                 instance.addPrivilege(path, role, methods.toArray(new String[methods.size()]));
             }

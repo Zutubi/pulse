@@ -10,6 +10,7 @@ import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.config.Config;
@@ -40,7 +41,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
         File userHome = new File(tmpDir, "user_home");
         defaultDataDir = new File(userHome, ".pulse2/data");
-        defaultConfigFile = new File(userHome, FileSystemUtils.join(".pulse2", "config.properties"));
+        defaultConfigFile = new File(userHome, FileSystemUtils.join(MasterConfigurationManager.CONFIG_DIR, "config.properties"));
 
         File pkgFile = AcceptanceTestUtils.getPulsePackage();
 

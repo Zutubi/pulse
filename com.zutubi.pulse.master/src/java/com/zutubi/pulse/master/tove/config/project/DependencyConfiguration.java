@@ -5,27 +5,23 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
 /**
- *
+ * A dependency defines a project and the artifacts built by that project that this project requires
+ * for building. 
  */
 @SymbolicName("zutubi.dependency")
-@Table(columns = {/*"org", */"module", "revision"})
+@Table(columns = {"module", "revision"})
 @Form(fieldOrder = {"project", "revision", "stages", "transitive"})
 public class DependencyConfiguration extends AbstractConfiguration
 {
     /**
      * The organisation name of the dependency.
      */
-//    @Required
     @Transient // not implemented as a separate concept yet.
     private String org;
 
     /**
-     * The module name of the dependency, a unique within an organisation.
+     * The project being depended upon.
      */
-/*
-    @Required
-    private String module;
-*/
     @Required @Reference
     private ProjectConfiguration project;
 

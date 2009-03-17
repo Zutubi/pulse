@@ -49,28 +49,31 @@ public class AritfactRepositoryIsolationTest extends PulseTestCase
         security.setAccessManager(accessManager);
         repository.setSecurityHandler(security);
 
-        baseRepoUrl = "http://localhost:8765/repository";
+        final int port = 8765;
+        final String host = "localhost";
+
+        baseRepoUrl = "http://"+host+":"+port+"/repository";
 
         Server server = serverManager.configureServer("test", new ServerConfigurationHandler()
         {
             public void configure(Server server) throws IOException
             {
                 SocketListener listener = new SocketListener();
-                listener.setHost("localhost");
-                listener.setPort(8765);
+                listener.setHost(host);
+                listener.setPort(port);
                 server.addListener(listener);
             }
         });
 
         serverManager.configureContext("test", "/repository", repository);
 
-        startServer(server);
+        server.start();
     }
 
     protected void tearDown() throws Exception
     {
-        removeDirectory(tmp);
         serverManager.stop(true);
+        removeDirectory(tmp);
 
         super.tearDown();
     }
@@ -138,31 +141,6 @@ public class AritfactRepositoryIsolationTest extends PulseTestCase
         assertEquals(content, IOUtils.fileToString(dest));
     }
 
-    private void startServer(final Server server) throws InterruptedException
-    {
-        Thread t = new Thread(new Runnable()
-        {
-            public void run()
-            {
-
-                try
-                {
-                    server.start();
-                    while (server.isStarted())
-                    {
-                        Thread.yield();
-                    }
-                }
-                catch (Exception e)
-                {
-                    // noop.
-                }
-            }
-        });
-        t.start();
-        Thread.sleep(1000);
-    }
-
     private File createFile(File base, String path, String content) throws IOException
     {
         File newFile = new File(base, path);
@@ -175,7 +153,7 @@ public class AritfactRepositoryIsolationTest extends PulseTestCase
         {
             assertTrue(newFile.createNewFile());
         }
-        IOUtils.writeToFile(newFile, new ByteArrayInputStream(content.getBytes()));
+        FileSystemUtils.createFile(newFile, content);
 
         return newFile;
     }

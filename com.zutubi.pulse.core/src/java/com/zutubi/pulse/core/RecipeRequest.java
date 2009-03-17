@@ -63,7 +63,7 @@ public class RecipeRequest
      */
     public String getProjectOrg()
     {
-        return context.getString(NAMESPACE_INTERNAL, PROPERTY_ORG);
+        return context.getString(NAMESPACE_INTERNAL, PROPERTY_ORGANISATION);
     }
 
     /**

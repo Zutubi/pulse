@@ -10,8 +10,6 @@ import com.zutubi.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 
-/**
- */
 public class JythonPackageFactoryTest extends PulseTestCase
 {
     private JythonPackageFactory factory;

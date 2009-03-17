@@ -1,20 +1,19 @@
 package com.zutubi.pulse.servercore.hessian;
 
-import com.caucho.hessian.io.*;
+import com.caucho.hessian.io.AbstractSerializerFactory;
+import com.caucho.hessian.io.Deserializer;
+import com.caucho.hessian.io.HessianProtocolException;
+import com.caucho.hessian.io.Serializer;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.ReflectionUtils;
-import com.zutubi.util.Pair;
-import com.zutubi.pulse.servercore.dependency.ivy.ModuleDescriptorSerialiser;
-import com.zutubi.pulse.servercore.dependency.ivy.ModuleDescriptorDeserialiser;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-
-import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 
 /**
  * A serialiser factory that handles Java 5 enums.

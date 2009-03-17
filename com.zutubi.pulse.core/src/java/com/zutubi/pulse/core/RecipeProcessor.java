@@ -3,7 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.commands.api.*;
-import com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
@@ -37,6 +36,10 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
+import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
+import org.apache.ivy.core.module.descriptor.Artifact;
+
 /**
  * The recipe processor, as the name suggests, is responsible for running recipies.
  */
@@ -64,7 +67,7 @@ public class RecipeProcessor
         RecipeResult recipeResult = new RecipeResult(request.getRecipeName());
         recipeResult.setId(request.getId());
         recipeResult.commence();
-        
+
         PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
 
         runningRecipe = recipeResult.getId();
@@ -99,7 +102,7 @@ public class RecipeProcessor
 
             recipeResult.complete();
             RecipeCompletedEvent completedEvent = new RecipeCompletedEvent(this, recipeResult);
-            if(context.getVersion() != null)
+            if (context.getVersion() != null)
             {
                 completedEvent.setBuildVersion(context.getVersion());
             }
@@ -130,13 +133,18 @@ public class RecipeProcessor
             return;
         }
 
-        IvyProvider ivyProvider = getIvyProvider(context);
-        IvySupport ivy = ivyProvider.getIvySupport();
-        CommandConfiguration retrieveCommandConfig = ivy.getRetrieveCommand();
-        if (pushContextAndExecute(context, retrieveCommandConfig, outputDir, status) || !status.isSuccess())
+
+        IvySupport ivy = ivyProvider.getIvySupport(context.getString(PROPERTY_MASTER_URL) + "/repository");
+        ModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
+        if (ivy.hasDependencies(descriptor))
         {
-            return;
+            CommandConfiguration retrieveCommandConfig = ivy.getRetrieveCommand();
+            if (pushContextAndExecute(context, retrieveCommandConfig, outputDir, status) || !status.isSuccess())
+            {
+                return;
+            }
         }
+
 
         // Now we can load the recipe from the pulse file
         ProjectRecipesConfiguration recipesConfiguration = loadPulseFile(request, context);
@@ -160,22 +168,12 @@ public class RecipeProcessor
 
         if (status.isSuccess())
         {
-            CommandConfiguration publishCommandConfig = ivy.getPublishCommand(request);
-            pushContextAndExecute(context, publishCommandConfig, outputDir, status);
+            if (ivy.hasArtifacts(descriptor, request.getStageName()))
+            {
+                CommandConfiguration publishCommandConfig = ivy.getPublishCommand(request);
+                pushContextAndExecute(context, publishCommandConfig, outputDir, status);
+            }
         }
-    }
-
-    private IvyProvider getIvyProvider(PulseExecutionContext context)
-    {
-        if (ivyProvider != null)
-        {
-            return ivyProvider;
-        }
-
-        String repositoryUrl = context.getString(PROPERTY_MASTER_URL) + "/repository";
-        DefaultIvyProvider ivyProvider = new DefaultIvyProvider();
-        ivyProvider.setRepositoryBase(repositoryUrl);
-        return ivyProvider;
     }
 
     private void compressResults(RecipePaths paths, boolean compressArtifacts, boolean compressWorkingCopy)
@@ -183,16 +181,16 @@ public class RecipeProcessor
         if (compressArtifacts)
         {
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compressing recipe artifacts..."));
-            if(zipDir(paths.getOutputDir()))
+            if (zipDir(paths.getOutputDir()))
             {
                 eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Artifacts compressed."));
             }
         }
 
-        if(compressWorkingCopy)
+        if (compressWorkingCopy)
         {
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compressing working copy snapshot..."));
-            if(zipDir(paths.getBaseDir()))
+            if (zipDir(paths.getBaseDir()))
             {
                 eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Working copy snapshot compressed."));
             }
@@ -238,20 +236,20 @@ public class RecipeProcessor
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
 
-        if(context.getString(NAMESPACE_INTERNAL, PROPERTY_RECIPE) == null)
+        if (context.getString(NAMESPACE_INTERNAL, PROPERTY_RECIPE) == null)
         {
             context.addString(PROPERTY_RECIPE, "[default]");
         }
 
         PulseScope scope = context.getScope();
         Map<String, String> env = System.getenv();
-        for(Map.Entry<String, String> var: env.entrySet())
+        for (Map.Entry<String, String> var : env.entrySet())
         {
             scope.addEnvironmentProperty(var.getKey(), var.getValue());
         }
 
         addResourceProperties(context, request.getResourceRequirements(), context.getValue(PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class));
-        for(ResourceProperty property: request.getProperties())
+        for (ResourceProperty property : request.getProperties())
         {
             context.add(property);
         }
@@ -264,7 +262,7 @@ public class RecipeProcessor
 
         // CIB-286: special case empty file for better reporting
         PulseFileSource pulseFileSource = request.getPulseFileSource();
-        if(!TextUtils.stringSet(pulseFileSource.getFileContent()))
+        if (!TextUtils.stringSet(pulseFileSource.getFileContent()))
         {
             throw new BuildException("Unable to parse pulse file: File is empty");
         }
@@ -287,12 +285,12 @@ public class RecipeProcessor
         context.push();
         try
         {
-            for (CommandConfiguration commandConfig: config.getCommands().values())
+            for (CommandConfiguration commandConfig : config.getCommands().values())
             {
                 if (status.isSuccess() || commandConfig.isForce())
                 {
                     boolean recipeTerminated = pushContextAndExecute(context, commandConfig, outputDir, status);
-                    if(recipeTerminated)
+                    if (recipeTerminated)
                     {
                         return;
                     }
@@ -402,7 +400,7 @@ public class RecipeProcessor
     private void flushOutput(ExecutionContext context)
     {
         OutputStream outputStream = context.getOutputStream();
-        if(outputStream != null)
+        if (outputStream != null)
         {
             try
             {
@@ -417,7 +415,7 @@ public class RecipeProcessor
 
     private void captureOutputs(CommandConfiguration commandConfig, CommandContext context)
     {
-        for (OutputConfiguration outputConfiguration: commandConfig.getOutputs().values())
+        for (OutputConfiguration outputConfiguration : commandConfig.getOutputs().values())
         {
             Output output = outputConfiguration.createOutput();
             output.capture(context);

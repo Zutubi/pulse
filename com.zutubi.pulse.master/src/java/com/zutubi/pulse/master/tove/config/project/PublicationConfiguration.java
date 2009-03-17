@@ -6,6 +6,11 @@ import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
+/**
+ * A publication defined a build artifact that is to be published to the internal
+ * artifact repository.  These artifacts can later be retrieved and used by other builds
+ * via build dependencies.
+ */
 @SymbolicName("zutubi.publication")
 @Form(fieldOrder={"name", "ext"})
 @Table(columns = {"name", "ext"})

@@ -2,7 +2,12 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.util.Condition;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.config.Config;
+import com.zutubi.util.config.FileConfig;
+import com.zutubi.util.config.ReadOnlyConfig;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +15,20 @@ import java.util.Properties;
 
 public class AcceptanceTestUtils
 {
+    /**
+     * The acceptance test system property for the built pulse package.
+     */
+    protected static final String PROPERTY_PULSE_PACKAGE = "pulse.package";
+
+    /**
+     * The acceptance test system property for the built agent package.
+     */
+    protected static final String PROPERTY_AGENT_PACKAGE = "agent.package";
+
     public static File getWorkingDirectory()
     {
-        File workingDir = new File("./working"); // from IDEA, the working directory is located in the same directory as where the projects are run.
+        // from IDEA, the working directory is located in the same directory as where the projects are run.
+        File workingDir = new File("./working");
         if (System.getProperties().contains("work.dir"))
         {
             // from the acceptance test suite, the work.dir system property is specified
@@ -23,24 +39,62 @@ public class AcceptanceTestUtils
 
     public static File getDataDirectory() throws IOException
     {
-        File configFile = new File(getWorkingDirectory(), "user.home/.pulse2/config.properties");
-        if (configFile.isFile())
+        // Acceptance tests should all be using the user.home directory in the /working directory.
+        File userHome = new File(getWorkingDirectory(), "user.home");
+        Config config = loadConfigFromHome(userHome);
+        if (config != null)
         {
-            Properties configProperties = IOUtils.read(configFile);
-            return new File(configProperties.getProperty("pulse.data"));
+            return new File(config.getProperty(SystemConfiguration.PULSE_DATA));
         }
 
-        File userHome = new File(System.getProperty("user.home"));
-        configFile = new File(userHome, ".pulse2/config.properties");
-        if (configFile.isFile())
+        // Guess at the ./data directory in the current working directory.
+        File data = new File("./data");
+        if (data.exists())
         {
-            Properties configProperties = IOUtils.read(configFile);
-            return new File(configProperties.getProperty("pulse.data"));
+            return data;
         }
 
-        return new File("./data");
+        // chances are that if we pick up the systems user.home we may or may not
+        // be picking up the right config so we try it last.
+        userHome = new File(System.getProperty("user.home"));
+        config = loadConfigFromHome(userHome);
+        if (config != null)
+        {
+            return new File(config.getProperty(SystemConfiguration.PULSE_DATA));
+        }
+
+        return null;
     }
 
+    /**
+     * Load the config.properties instance from the specified user home directory.
+     *
+     * @param userHome  the user home directory being used by Pulse.
+     * @return  the config instance of null if the config.properties file was not located.
+     */
+    private static Config loadConfigFromHome(File userHome)
+    {
+        File configFile = new File(userHome, MasterConfigurationManager.CONFIG_DIR + "/config.properties");
+        if (configFile.exists())
+        {
+            return new ReadOnlyConfig(new FileConfig(configFile));
+        }
+        return null;
+    }
+
+    /**
+     * Wait for the condition to be true before returning.  If the condition does not return true with
+     * the given timeout, a runtime exception is generated with a message based on the description.  Note
+     * that the wait will last at least as long as the timeout period, and maybe a little longer.
+     *
+     * @param condition     the condition which needs to be satisfied before returning
+     * @param timeout       the amount of time given for the condition to return true before
+     * generating a runtime exception
+     * @param description   a human readable description of what the condition is waiting for which will be
+     * used in the message of the generated timeout exception
+     *
+     * @throws RuntimeException if the timeout is reached or if this thread is interrupted.
+     */
     public static void waitForCondition(Condition condition, long timeout, String description)
     {
         long endTime = System.currentTimeMillis() + timeout;
@@ -72,7 +126,7 @@ public class AcceptanceTestUtils
      */
     public static File getPulsePackage()
     {
-        return getPackage("pulse.package");
+        return getPackage(PROPERTY_PULSE_PACKAGE);
     }
 
     /**
@@ -83,10 +137,10 @@ public class AcceptanceTestUtils
      */
     public static File getAgentPackage()
     {
-        return getPackage("agent.package");
+        return getPackage(PROPERTY_AGENT_PACKAGE);
     }
 
-    public static File getPackage(String packageProperty)
+    private static File getPackage(String packageProperty)
     {
         String pkgProperty = System.getProperty(packageProperty);
         if (!TextUtils.stringSet(pkgProperty))
@@ -94,9 +148,9 @@ public class AcceptanceTestUtils
             throw new IllegalStateException("No package specified (use the system property " + packageProperty + ")");
         }
         File pkg = new File(pkgProperty);
-        if (!pkg.isFile())
+        if (!pkg.exists())
         {
-            throw new IllegalStateException("Unexpected invalid " + packageProperty + ": " + pkg + " does not reference a file.");
+            throw new IllegalStateException("Unexpected invalid " + packageProperty + ": " + pkg + " does not exist.");
         }
         return pkg;
     }

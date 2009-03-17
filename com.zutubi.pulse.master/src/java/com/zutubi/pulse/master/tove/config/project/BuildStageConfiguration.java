@@ -30,12 +30,11 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     @Ordered
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
     private List<ResourceRequirementConfiguration> requirements = new LinkedList<ResourceRequirementConfiguration>();
+    private String publicationPattern = "build/[artifact].[ext]";
+    private String retrievalPattern = "lib/[artifact].[ext]";
 
     @Transient
     private ObjectFactory objectFactory;
-
-    private String publicationPattern = "build/[artifact].[ext]";
-    private String retrievalPattern = "lib/[artifact].[ext]";
 
     private List<PublicationConfiguration> publications = new LinkedList<PublicationConfiguration>();
 

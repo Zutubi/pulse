@@ -7,6 +7,7 @@ import com.zutubi.pulse.acceptance.Constants;
 
 import java.util.Hashtable;
 import java.util.Vector;
+import java.io.IOException;
 
 public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAcceptanceTest
 {
@@ -37,40 +38,34 @@ public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAccepta
     {
         String projectName = random + "A";
 
-        insertProject(projectName, "artifacts", "-Dartifact.list=build/artifact.jar");
+        int buildNumber = createAndBuildProject(projectName, "artifacts", "-Dartifact.list=build/artifact.jar", "artifact", "jar");
 
-        addPublication(projectName, "default", "artifact", "jar");
-
-        int buildNumber = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-
-        // ensure that the build passed.
         assertTrue(isBuildSuccessful(projectName, buildNumber));
 
         // check that the expected artifacts are available.
         String artifact = projectName + "/default/jars/artifact-" + buildNumber + ".jar";
-        assertTrue(waitUntilInRepository(artifact, AVAILABILITY_TIMEOUT));
-        assertTrue(waitUntilInRepository(artifact + ".md5", AVAILABILITY_TIMEOUT));
-        assertTrue(waitUntilInRepository(artifact + ".sha1", AVAILABILITY_TIMEOUT));
+        assertArtifact(artifact);
 
         // check that the expected ivy file is available.
         String ivy = projectName + "/ivy-" + buildNumber + ".xml";
-        assertTrue(waitUntilInRepository(ivy, AVAILABILITY_TIMEOUT));
-        assertTrue(waitUntilInRepository(ivy + ".md5", AVAILABILITY_TIMEOUT));
-        assertTrue(waitUntilInRepository(ivy + ".sha1", AVAILABILITY_TIMEOUT));
+        assertArtifact(ivy);
+    }
+
+    private int createAndBuildProject(String projectName, String target, String args, String artifactName, String artifactExt) throws Exception
+    {
+        insertProject(projectName, target, args);
+
+        addPublication(projectName, "default", artifactName, artifactExt);
+
+        return xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
     }
 
     public void testBuildFailsIfPublishingFailsToLocateArtifact() throws Exception
     {
         String projectName = random + "A";
 
-        insertProject(projectName, "artifacts", "-Dartifact.list=build/artifact.jar");
+        int buildNumber = createAndBuildProject(projectName, "artifacts", "-Dartifact.list=build/artifact.jar", "artifact", "txt");
 
-        // configure the default stage.
-        addPublication(projectName, "default", "artifact", "txt");
-
-        int buildNumber = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-
-        // ensure that the build passed.
         assertTrue(isBuildErrored(projectName, buildNumber));
     }
 
@@ -79,7 +74,7 @@ public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAccepta
         String projectName = random + "B";
 
         // part a) run a build to create the dependencies:
-        testInternalPublishingOfProjectArtifactToRepository();
+        createAndBuildProject(random + "A", "artifacts", "-Dartifact.list=build/artifact.jar", "artifact", "jar");
 
         insertProject(projectName, "dependencies", "-Ddependency.list=lib/artifact.jar");
 
@@ -88,14 +83,11 @@ public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAccepta
 
         int buildNumber = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
 
-        // ensure that the build passed.
         assertTrue(isBuildSuccessful(projectName, buildNumber));
 
         // check that the expected ivy file is available.
         String ivy = projectName + "/ivy-" + buildNumber + ".xml";
-        assertTrue(waitUntilInRepository(ivy, AVAILABILITY_TIMEOUT));
-        assertTrue(waitUntilInRepository(ivy + ".md5", AVAILABILITY_TIMEOUT));
-        assertTrue(waitUntilInRepository(ivy + ".sha1", AVAILABILITY_TIMEOUT));
+        assertArtifact(ivy);
     }
 
     private void addPublication(String projectName, String stageName, String name, String ext) throws Exception
@@ -143,12 +135,11 @@ public class PublicationAndDependenciesAcceptanceTest  extends BaseXmlRpcAccepta
         xmlRpcHelper.saveConfig(projectDependenciesPath, projectDependencies, true);
     }
 
-    private void setPublicationPattern(String stageName, String pattern) throws Exception
+    private void assertArtifact(String ivy) throws IOException
     {
-        String stagePath = "projects/" + random + "/stages/" + stageName;
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
-        stage.put("publicationPattern", pattern);
-        xmlRpcHelper.saveConfig(stagePath, stage, true);
+        assertTrue(waitUntilInRepository(ivy, AVAILABILITY_TIMEOUT));
+        assertTrue(waitUntilInRepository(ivy + ".md5", AVAILABILITY_TIMEOUT));
+        assertTrue(waitUntilInRepository(ivy + ".sha1", AVAILABILITY_TIMEOUT));
     }
 
     private void insertProject(String projectName, String target, String args) throws Exception

@@ -120,6 +120,7 @@ public class EntityBuildQueue
 
         if (found && !queuedBuilds.isEmpty())
         {
+            // IMPLEMENTATION NOTE: any events activated while the queue is stopped are lost.
             activate(queuedBuilds.remove(queuedBuilds.size() - 1));
         }
     }

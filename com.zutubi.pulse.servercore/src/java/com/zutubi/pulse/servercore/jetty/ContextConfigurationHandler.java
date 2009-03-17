@@ -5,7 +5,7 @@ import org.mortbay.http.HttpContext;
 import java.io.IOException;
 
 /**
- * The context configuration handler is holds the jetty context configuration
+ * The context configuration handler holds the jetty context configuration
  * logic.
  */
 public interface ContextConfigurationHandler

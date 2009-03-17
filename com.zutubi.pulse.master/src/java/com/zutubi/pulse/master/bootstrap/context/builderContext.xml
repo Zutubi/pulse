@@ -113,6 +113,7 @@
     <bean id="recipeTerminationService" class="com.zutubi.pulse.master.agent.RecipeTerminationService" init-method="init"/>
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor"/>
+    <bean id="ivyProvider" class="com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider"/>
 
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" init-method="init"/>
 

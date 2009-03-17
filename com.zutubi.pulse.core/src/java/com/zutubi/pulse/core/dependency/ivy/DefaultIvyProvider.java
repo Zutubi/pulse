@@ -20,7 +20,7 @@ public class DefaultIvyProvider implements IvyProvider
     /**
      * The artifact pattern used by the internal pulse repository.
      */
-    private static final String PATTERN_ARTIFACT = "${repository.base}/([organisation]/)[module]/([stage]/)[type]s/[artifact]-[revision].[type]";
+    private static final String PATTERN_ARTIFACT = "${repository.base}/([organisation]/)[module]/([stage]/)[type]s/[artifact]-[revision].[ext]";
 
     /**
      * The ivy pattern used by the internal pulse repository.
@@ -28,13 +28,7 @@ public class DefaultIvyProvider implements IvyProvider
     private static final String PATTERN_IVY = "${repository.base}/([organisation]/)[module]/([stage]/)ivy-[revision].xml";
 
 
-    /**
-     * Defines the base path to the internal pulse repository.  The format of
-     * this field much be a valid URL.
-     */
-    private String repositoryBase;
-
-    public IvySupport getIvySupport() throws Exception
+    public IvySupport getIvySupport(String repositoryBase) throws Exception
     {
         IvyVariableContainer variables = new IvyVariableContainerImpl();
         variables.setVariable(VARIABLE_REPOSITORY_BASE, repositoryBase, true);
@@ -63,10 +57,5 @@ public class DefaultIvyProvider implements IvyProvider
         settings.setDefaultResolver(urlResolver.getName());
 
         return new IvySupport(Ivy.newInstance(settings));
-    }
-
-    public void setRepositoryBase(String repositoryBase)
-    {
-        this.repositoryBase = repositoryBase;
     }
 }

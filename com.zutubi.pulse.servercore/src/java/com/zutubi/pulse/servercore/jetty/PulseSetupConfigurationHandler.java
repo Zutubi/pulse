@@ -9,6 +9,6 @@ public class PulseSetupConfigurationHandler implements ContextConfigurationHandl
 {
     public void configure(HttpContext context) throws IOException
     {
-        // CIB-something.  Place holder for a later implementation.
+        // CIB-1467	.  Place holder for a later implementation.
     }
 }

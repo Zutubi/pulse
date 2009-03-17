@@ -12,8 +12,6 @@ import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.providers.dao.DaoAuthenticationProvider;
 import org.acegisecurity.userdetails.UserDetails;
 
-import java.security.GeneralSecurityException;
-
 /**
  * A custom implementation of {@link DaoAuthenticationProvider}.
  * <p/>
@@ -103,15 +101,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 
     private void setRandomPassword(UserConfiguration user)
     {
-        try
-        {
-            userManager.setPassword(user, RandomUtils.secureRandomString(10));
-        }
-        catch (GeneralSecurityException e)
-        {
-            // fall back to something semi random.
-            userManager.setPassword(user, RandomUtils.randomString(10));
-        }
+        userManager.setPassword(user, RandomUtils.randomToken(10));
     }
 
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException

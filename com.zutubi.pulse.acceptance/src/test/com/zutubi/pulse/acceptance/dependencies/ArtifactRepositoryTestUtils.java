@@ -11,7 +11,6 @@ public class ArtifactRepositoryTestUtils
     public static boolean waitUntilInRepository(String path, int timeout) throws IOException
     {
         File artifact = new File(getArtifactRepository(), path);
-        System.out.println("Waiting for: " + artifact.getCanonicalPath());
         try
         {
             long startTime = System.currentTimeMillis();
@@ -24,24 +23,7 @@ public class ArtifactRepositoryTestUtils
         {
             // noop.            
         }
-        System.out.println("Artifact located: " + artifact.exists());
-        if (!artifact.exists())
-        {
-            list(getArtifactRepository());
-        }
         return artifact.exists();
-    }
-
-    private static void list(File file) throws IOException
-    {
-        System.out.println(file.getCanonicalPath() + ": " + file.exists());
-        if (file.isDirectory())
-        {
-            for (File listing : file.listFiles())
-            {
-                list(listing);
-            }
-        }
     }
 
     public static boolean isInArtifactRepository(String path) throws IOException

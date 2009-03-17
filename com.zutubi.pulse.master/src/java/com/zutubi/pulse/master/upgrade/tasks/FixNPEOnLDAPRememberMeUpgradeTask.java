@@ -7,7 +7,6 @@ import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.RandomUtils;
 import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
 
-import java.security.GeneralSecurityException;
 import java.util.Map;
 
 public class FixNPEOnLDAPRememberMeUpgradeTask extends AbstractUpgradeTask
@@ -47,17 +46,8 @@ public class FixNPEOnLDAPRememberMeUpgradeTask extends AbstractUpgradeTask
                 {
                     String path = entry.getKey();
 
-                    String randomPassword = null;
+                    String randomPassword = RandomUtils.randomToken(10);
                     
-                    try
-                    {
-                        randomPassword = RandomUtils.secureRandomString(10);
-                    }
-                    catch (GeneralSecurityException e)
-                    {
-                        randomPassword = RandomUtils.randomString(10);
-                    }
-
                     String encodedPassword = encoder.encodePassword(randomPassword, null);
 
                     MutableRecord updatedUser = user.copy(true);

@@ -65,6 +65,7 @@
     <bean id="slaveRecipeProcessor" class="com.zutubi.pulse.slave.SlaveRecipeProcessor" />
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" />
+    <bean id="ivyProvider" class="com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider"/>
 
     <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" />
 

@@ -41,7 +41,7 @@ public class CreateRepositoryDirectoryHandler extends AbstractHttpHandler
             File dir = resource.getFile().getParentFile();
             if (!dir.isDirectory() && !dir.mkdirs())
             {
-                response.sendError(HttpResponse.__403_Forbidden, "Directories could not be created");
+                response.sendError(HttpResponse.__500_Internal_Server_Error, "Directories could not be created");
                 request.setHandled(true);
                 response.commit();
             }

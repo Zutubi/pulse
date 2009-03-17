@@ -58,11 +58,6 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(isBuildSuccessful(random, buildNumber));
     }
 
-    public void testMavenCanPublishToRepository()
-    {
-        // to be completed.
-    }
-
     private int createAndRunIvyAntProject(String target) throws Exception
     {
         Hashtable<String,Object> antConfig = xmlRpcHelper.getAntConfig();

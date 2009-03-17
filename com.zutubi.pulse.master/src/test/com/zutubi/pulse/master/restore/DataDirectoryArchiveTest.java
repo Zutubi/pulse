@@ -67,11 +67,11 @@ public class DataDirectoryArchiveTest extends PulseTestCase
         File restoreData = new File(tmp, "data-restore");
 
         File databaseProperties = new File(data, "config/database.properties");
-        IOUtils.writeToFile(databaseProperties, new ByteArrayInputStream("backup".getBytes()));
+        FileSystemUtils.createFile(databaseProperties, "backup");
 
         File newDatabaseProperties = new File(restoreData, "config/database.properties");
         assertTrue(newDatabaseProperties.getParentFile().mkdirs());
-        IOUtils.writeToFile(newDatabaseProperties, new ByteArrayInputStream("new".getBytes()));
+        FileSystemUtils.createFile(newDatabaseProperties, "new");
 
         backupAndRestore(restoreData);
 

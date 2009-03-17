@@ -9,9 +9,6 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.List;
-import java.util.LinkedList;
 
 /**
  */
@@ -32,8 +29,6 @@ public class ServiceTokenManager implements TokenManager
     private UserPaths paths;
     private String token;
 
-    private final List<TokenManagerListener> listeners = new LinkedList<TokenManagerListener>();
-
     public void init()
     {
         File tokenFile = getTokenFile();
@@ -50,14 +45,7 @@ public class ServiceTokenManager implements TokenManager
         }
         else if(generate)
         {
-            try
-            {
-                token = RandomUtils.secureRandomString(TOKEN_LENGTH);
-            }
-            catch (GeneralSecurityException e)
-            {
-                token = RandomUtils.randomString(TOKEN_LENGTH);
-            }
+            token = RandomUtils.randomToken(TOKEN_LENGTH);
 
             writeToken();
         }
@@ -109,8 +97,6 @@ public class ServiceTokenManager implements TokenManager
         try
         {
             FileSystemUtils.createFile(tokenFile, token);
-
-            notifyListeners();
         }
         catch (IOException e)
         {
@@ -128,44 +114,8 @@ public class ServiceTokenManager implements TokenManager
         this.generate = generate;
     }
 
-    private void notifyListeners()
-    {
-        // Just in case the callback is going to take a while, we make a copy so that
-        // we reduce any distruption to other threads.
-        List<TokenManagerListener> listeners;
-        synchronized (this.listeners)
-        {
-            listeners = new LinkedList<TokenManagerListener>(this.listeners);
-        }
-
-        for (TokenManagerListener listener : listeners)
-        {
-            listener.tokenUpdated(token);
-        }
-    }
-
-    public void register(TokenManagerListener listener)
-    {
-        synchronized (listeners)
-        {
-            if (!listeners.contains(listener))
-            {
-                listeners.add(listener);
-            }
-        }
-    }
-
-    public void unregister(TokenManagerListener listener)
-    {
-        synchronized (listeners)
-        {
-            listeners.remove(listener);
-        }
-    }
-
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.paths = configurationManager.getUserPaths();
     }
-
 }
