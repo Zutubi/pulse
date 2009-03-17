@@ -1,0 +1,189 @@
+<h1>Pulse Files</h1>
+<p>
+    Pulse files define a set of recipes which each describe how to run a build.  They are a
+    text-based format equivalent to defining the recipes in the Pulse web UI; just more convenient
+    in some circumstances.
+</p>
+
+<h2>Syntax</h2>
+<p>
+    Pulse files are written in XML syntax, and thus must be written in well-formed XML.  No DTD or
+    schema validation is used during the parsing process, validation is left to the semantic
+    requirements of each element.  For completeness, you should include an XML prologue in your
+    pulse files:
+</p>
+<div class="code">&lt;?xml version="1.0"?&gt;
+...
+</div>
+
+<h3>References</h3>
+<p>
+    In addition to regular XML syntax, pulse files can also contain references to named values
+    within XML attributes and text between tags.  A reference is denoted with the syntax
+    ${&lt;name&gt;} where &lt;name&gt; is the name of the entity being referred to.  Such entities
+    may be simple <a href="#" onclick="selectNode('$path/project/property'); return false">property</a>
+    values:
+</p>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;project&gt;
+    &lt;property name="my.dir" value="bin/scripts"/&gt;
+
+    &lt;recipe name="my-recipe"&gt;
+        &lt;executable exe="${my.dir}/doit.sh"/&gt;
+    &lt;/recipe&gt;
+&lt;/project&gt;
+</div>
+<p>
+    In this case the attribute value "${my.dir}/doit.sh" becomes "bin/scripts/doit.sh".  In other
+    cases, the entity referred to may itself be a complex object, for example a post-processor:
+</p>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;project&gt;
+    &lt;post-processor name="my.pp"&gt;
+        ...
+    &lt;/post-processor&gt;
+
+    &lt;recipe name="my-recipe"&gt;
+        &lt;executable exe="ls"&gt;
+            &lt;process processor="${my.pp}"/&gt;
+        &lt;/executable&gt;
+    &lt;/recipe&gt;
+&lt;/project&gt;
+</div>
+<p>
+    In this case ${my.pp} is used to refer to the post-processor defined earlier.  When the value
+    referred to is a complex entity, only a single reference is allowed, with no surrounding string
+    content in the attribute value.
+</p>
+<div class="highlight">
+    <h4>Escaping</h4>
+    <p>
+        If you need to insert a literal dollar sign ($) in a Pulse file, you must escape it with a
+        backslash (\).  As backslash has this special meaning, to insert a literal backslash you
+        must also preceed it with a backslash.
+    </p>
+</div>
+
+<h3>Scopes</h3>
+<p>
+    References are evaluated at the point they appear in the pulse file.  Thus an entity (property,
+    post-processor, etc) must be defined before it may be referenced.  References exist within a
+    <b>scope</b>, and must have a unique name within that scope.  Each pulse file defines a global
+    scope in which top-level references may be defined.  In addition, each tag in the file defines
+    its own scope, nested within scope of the enclosing tag.  Thus it is possible to override the
+    value of a reference within a nested tag:
+</p>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;project&gt;
+    &lt;property name="cc" value="gcc"/&gt;
+
+    &lt;recipe name="default-cc"&gt;
+        &lt;make args="CC=${cc}"/&gt;
+    &lt;/recipe&gt;
+
+    &lt;recipe name="new-cc"&gt;
+        &lt;property name="cc" value="gcc4"/&gt;
+        &lt;make args="CC=${cc}"/&gt;
+    &lt;/recipe&gt;
+&lt;/project&gt;
+</div>
+<p>
+    In this case, recipe "default" will make with "gcc", whereas recipe "new-cc" will make with
+    "gcc4".  The special element "scope" may be used to literally introduce a new scope at any
+    point in the pulse file.  This makes it possible to reuse a property in what would otherwise by
+    the same scope:
+</p>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;project&gt;
+    &lt;macro name="make"&gt;
+        &lt;make name="make-${make.target}" makefile="GNUmakefile" targets="${make.target}"/&gt;
+    &lt;/macro&gt;
+
+    &lt;recipe name="default"&gt;
+        &lt;scope&gt;
+            &lt;property name="make.target" value="install"/&gt;
+            &lt;macro-ref macro="${make}"/&gt;
+        &lt;/scope&gt;
+        &lt;scope&gt;
+            &lt;property name="make.target" value="cppunit"/&gt;
+            &lt;macro-ref macro="${make}"/&gt;
+        &lt;/scope&gt;
+    &lt;/recipe&gt;
+&lt;/project&gt;
+</div>
+<p>
+    The scope element has no affect other than to introduce a new scope.  In particular, children
+    of the scope element are added to the scope element's parent.
+</p>
+
+<h3>Macros</h3>
+<p>
+    To reduce repetition in your pulse files, you can use <b>macros</b>.  Macros allow you to define
+    a fragment of XML which can be reused throughput the rest of the file.  To define a macro, use
+    the <a href="#" onclick="selectNode('$path/project/macro'); return false">macro</a> element.
+    You can reference a macro with the <a href="#" onclick="selectNode('$path/project/macro'); return false">macro-ref</a>
+    element.  A simple example is show below:
+</p>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;project&gt;
+    &lt;macro name="common-commands"&gt;
+        &lt;make name="build" makefile="GNUmakefile" targets="build"/&gt;
+        &lt;make name="test" makefile="GNUmakefile" targets="test"/&gt;
+    &lt;/macro&gt;
+
+    &lt;recipe name="default"&gt;
+        &lt;macro-ref macro="${common-commands}"/&gt;
+    &lt;/recipe&gt;
+&lt;/project&gt;
+</div>
+
+<h3>Imports</h3>
+<p>
+    You can also tackle repetition by splitting XML fragments out into multiple files and including
+    them using imports.  An imported file has all children of its root node evaluated in the context
+    where the import is made.  Consider this partitioning of the above macros example:
+</p>
+<h4>import/macros.xml</h4>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;root&gt;
+    &lt;macro name="common-commands"&gt;
+        &lt;make name="build" makefile="GNUmakefile" targets="build"/&gt;
+        &lt;make name="test" makefile="GNUmakefile" targets="test"/&gt;
+    &lt;/macro&gt;
+&lt;/root&gt;
+</div>
+<h4>pulse.xml</h4>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;project&gt;
+    &lt;import path="import/macros.xml"/&gt;
+
+    &lt;recipe name="default"&gt;
+        &lt;macro-ref macro="${common-commands}"/&gt;
+    &lt;/recipe&gt;
+&lt;/project&gt;
+</div>
+
+<h3>Example</h3>
+<p>
+    At a high level, your Pulse file will usually define recipes for different build scenarios, for
+    example:
+</p>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;project default-recipe="default"&gt;
+    &lt;property name="script.dir" value="bin/scripts"/&gt;
+
+    &lt;regex.pp name="my.pp"&gt;
+       ...
+    &lt;/regex&gt;
+
+    &lt;recipe name="default"&gt;
+        <span class="code-comment">&lt;!-- continuous build and test --&gt;
+        ...
+    &lt;/recipe&gt;
+
+    &lt;recipe name="overnight"&gt;
+        <span class="code-comment">&lt;!-- overnight stress test --&gt;
+        ...
+    &lt;/recipe&gt;
+&lt;/project&gt;
+</div>

@@ -1452,20 +1452,20 @@ ul.config-links li.invalid-property a:hover {
     padding: 4px;
 }
 
-#config-help ol, #config-help ul {
+#config-help ol, #config-help ul, .reference ol, .reference ul {
     margin-left: 10px;
     padding-left: 15px;
 }
 
-#config-help ol {
+#config-help ol, .reference ol {
     list-style: decimal outside;
 }
 
-#config-help ul {
+#config-help ul, .reference ul {
     list-style: disc outside;
 }
 
-#config-help li {
+#config-help li, .reference li {
     margin: 5px 0 5px 0;
 }
 
@@ -1477,4 +1477,86 @@ ul.config-links li.invalid-property a:hover {
 .docs th {
     background-color: #eee;
     font-size: 100%;
+}
+
+/*
+ * Pulse file reference window.
+ */
+
+.x-tree-node-collapsed .reference-icon, .x-tree-node-expanded .reference-icon, .x-tree-node-leaf .reference-icon
+{
+	background-image: url(../images/manual.gif);
+    width: 18px;
+}
+
+.x-tree-node-collapsed .reference-filetype-icon, .x-tree-node-expanded .reference-filetype-icon, .x-tree-node-leaf .reference-filetype-icon
+{
+	background-image: url(../images/page_code.gif);
+    width: 18px;
+}
+
+.x-tree-node-collapsed .reference-element-icon, .x-tree-node-expanded .reference-element-icon, .x-tree-node-leaf .reference-element-icon
+{
+	background-image: url(../images/tag.gif);
+    width: 18px;
+}
+
+.x-tree-node-collapsed .reference-builtin-icon, .x-tree-node-expanded .reference-builtin-icon, .x-tree-node-leaf .reference-builtin-icon
+{
+	background-image: url(../images/tag-builtin.gif);
+    width: 18px;
+}
+
+.x-tree-node-collapsed .reference-extensible-icon, .x-tree-node-expanded .reference-extensible-icon, .x-tree-node-leaf .reference-extensible-icon
+{
+	background-image: url(../images/pluggable.gif);
+    width: 18px;
+}
+
+div.reference {
+    padding: 10px;
+}
+
+.reference .extensible {
+    font-style: italic;
+}
+
+.reference h1, .reference h2, .reference h3 {
+    color: #333;
+    background-color: #f2f2ff;
+    border-top: dotted 1px #aaa;
+    border-bottom: dotted 1px #aaa;
+    padding: 4px;
+}
+
+.reference h1 {
+    font-size: 140%;
+}
+
+.reference h2 {
+    font-size: 120%;
+}
+
+.reference h3 {
+    font-size: 110%;
+}
+
+.preference p {
+    margin: 20px 0 20px 0;
+}
+
+.reference .code {
+    white-space: pre;
+    font-family: monospace;
+    background-color: #f8f8f8;
+    border: dotted 1px #ddd;
+    margin: 20px 30px 20px 30px;
+    padding: 4px;
+}
+
+.reference .highlight {
+    border: solid 1px #f0c000;
+    background-color: #ffffce;
+    margin: 20px 30px 20px 30px;
+    padding: 5px;
 }

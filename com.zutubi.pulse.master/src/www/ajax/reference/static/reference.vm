@@ -1,0 +1,81 @@
+#macro(externalLink $url $text)
+    <a href="$url" class="unadorned"><img alt="external link" src="$base/images/link_go.gif"/></a>
+    <a href="$url">$text</a>
+#end
+
+#macro(manualLink $page $text)
+    #externalLink("$helpUrl/$page" $text)
+#end
+
+<h1>:: pulse reference ::</h1>
+<p>
+    Welcome to the Pulse reference documentation.  This documentation consists of links to external
+    learning resources and built-in reference information for your Pulse version.
+</p>
+
+<h2>:: external documentation ::</h2>
+<p>
+    High-level Pulse documentation is available online at the #manualLink("Home" "Pulse Documentation Home Page").
+    This is the best place to go for an introduction to Pulse and its key concepts and features.
+    Pulse manuals are broken down into a few sections:
+</p>
+<p>
+    <table class="content">
+        <tr>
+            <th>document</th>
+            <th>description</th>
+        </tr>
+        <tr>
+            <td class="nowrap">#manualLink("Manual" "Main Manual")</td>
+            <td>Primary documentation for Pulse, focused on using the Pulse master and agents.</td>
+        </tr>
+        <tr>
+            <td class="nowrap">#manualLink("Developer+Tools+Manual" "Developer Tools Manual")</td>
+            <td>Documentation for the developer tools, used on your local machine to submit personal
+                builds or run local builds.</td>
+        </tr>
+        <tr>
+            <td class="nowrap">#manualLink("Cookbook" "Cookbook")</td>
+            <td>Recipes for working with Pulse, presented in like a detailed FAQ.</td>
+        </tr>
+        <tr>
+            <td class="nowrap">#manualLink("Stethoscope+Manual" "Stethoscope Manual")</td>
+            <td>Documentation for the Windows system tray monitor application Stethoscope.</td>
+        </tr>
+    </table>
+</p>
+
+<h2>:: built in documentation ::</h2>
+<p>
+    Some reference documentation is built directly in to Pulse.  Currently this documentation covers
+    both pulse files and resource definition files.  You can navigate the details for these files
+    using the tree to the left.  In additional, all forms have built-in documentation available in a
+    side pane when filling in the form.
+</p>
+
+<h2>:: support resources ::</h2>
+<p>
+    Can't find the answer you're looking for?  Try one of our support resources:
+</p>
+<p>
+    <table class="content">
+        <tr>
+            <th>resource</th>
+            <th>details</th>
+        </tr>
+        <tr>
+            <td class="nowrap"><img alt="email" src="$base/images/email.gif"/>
+                <a href="mailto:support@zutubi.com">support@zutubi.com</a></td>
+            <td>Email support for urgent enquiries.</td>
+        </tr>
+        <tr>
+            <td class="nowrap">#externalLink("http://forums.zutubi.com/" "Online Forums")</td>
+            <td>Consider searching existing threads, or adding a new discussion that all users can
+                benefit from.</td>
+        </tr>
+        <tr>
+            <td class="nowrap">#externalLink("http://jira.zutubi.com/" "Issue Tracker")</td>
+            <td>For feature requests and bug reports.</td>
+        </tr>
+    </table>
+</p>

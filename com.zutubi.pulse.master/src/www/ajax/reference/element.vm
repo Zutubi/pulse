@@ -1,0 +1,62 @@
+<h1>$baseName</h1>
+<p>$docs.verbose</p>
+
+<h2>attributes</h2>
+<p>
+#if($docs.attributes.size() > 0)
+    <table class="content">
+        <tr>
+            <th>name</th>
+            <th>description</th>
+            <th>required</th>
+            <th>default</th>
+        </tr>
+    #foreach($attribute in $docs.attributes)
+        <tr>
+            <td class="nowrap">$attribute.name</td>
+            <td>$attribute.description</td>
+            <td>$attribute.required</td>
+            <td>$attribute.defaultValue</td>
+        </tr>
+    #end
+    </table>
+#else
+    None.
+#end
+</p>
+
+<h2>child elements</h2>
+<p>
+#if($docs.children.size() > 0)
+    #macro(childLink)<a href='#' onclick='selectNode("$path/$child.name"); return false;'>$child.name</a>#end
+    <table class="content">
+        <tr>
+            <th>name</th>
+            <th>description</th>
+            <th>arity</th>
+        </tr>
+    #foreach($child in $docs.children)
+        <tr>
+            <td class="nowrap">
+        #if($child.nodeDocs.element)
+                &lt;#childLink()&gt;
+        #else
+                <span class="extensible">#childLink()</span>
+        #end
+            </td>
+            <td>$child.nodeDocs.brief</td>
+            <td>$child.arity.shortForm()</td>
+        </tr>
+    #end
+    </table>
+#else
+    None.
+#end
+</p>
+
+#if($docs.contentDocs)
+<h2>element text content</h2>
+<p>
+    $docs.contentDocs.verbose
+</p>
+#end

@@ -14,8 +14,9 @@ import java.util.Map;
 
 public class ResourceFileLoaderTest extends PulseTestCase
 {
-    private ResourceFileLoader loader;
     private static final String EXTENSION_XML = "xml";
+
+    private ResourceFileLoader loader;
 
     protected void setUp() throws Exception
     {
@@ -26,6 +27,7 @@ public class ResourceFileLoaderTest extends PulseTestCase
         loader = new ResourceFileLoader();
         loader.setTypeRegistry(registry);
         loader.setObjectFactory(new DefaultObjectFactory());
+        loader.init();
     }
 
     public void testEmptyRepo() throws Exception

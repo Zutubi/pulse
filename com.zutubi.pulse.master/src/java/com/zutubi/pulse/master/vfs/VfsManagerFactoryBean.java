@@ -15,6 +15,11 @@ import org.springframework.beans.factory.FactoryBean;
 
 public class VfsManagerFactoryBean implements FactoryBean
 {
+    public static final String FS_AGENT = "agent";
+    public static final String FS_LOCAL = "local";
+    public static final String FS_PULSE = "pulse";
+    public static final String FS_RAM = "ram";
+
     private ObjectFactory objectFactory;
 
     private AgentManager agentManager;
@@ -31,17 +36,17 @@ public class VfsManagerFactoryBean implements FactoryBean
             {
                 instance = new DefaultFileSystemManager();
                 instance.setFilesCache(new NullFilesCache());
-                instance.addProvider("local", new DefaultLocalFileProvider());
-                instance.addProvider("ram", new RamFileProvider());
+                instance.addProvider(FS_LOCAL, new DefaultLocalFileProvider());
+                instance.addProvider(FS_RAM, new RamFileProvider());
                 
                 AgentFileProvider agentFileProviderfileProvider = new AgentFileProvider();
                 agentFileProviderfileProvider.setAgentManager(agentManager);
                 agentFileProviderfileProvider.setSlaveProxyFactory(proxyFactory);
                 agentFileProviderfileProvider.setServiceTokenManager(serviceTokenManager);
-                instance.addProvider("agent", agentFileProviderfileProvider);
+                instance.addProvider(FS_AGENT, agentFileProviderfileProvider);
 
                 PulseFileProvider pulseFileProvider = objectFactory.buildBean(PulseFileProvider.class);
-                instance.addProvider("pulse", pulseFileProvider);
+                instance.addProvider(FS_PULSE, pulseFileProvider);
 
                 instance.init();
             }

@@ -1,0 +1,71 @@
+<h1>macro</h1>
+<p>
+    Macros provide a way to avoid repetition in your pulse files.  Macros define named fragments of
+    XML which can be referenced multiple times later in the pulse file.  The body of the macro
+    itself can be an arbitrary fragment well-formed XML.  The fragment is parsed for syntatic
+    correctness but is not evaluated until the macro is referenced.  When a reference to the macro
+    is made (using the <a href="#" onclick="selectNode('$parentPath/macro-ref'); return false">macro-ref</a>
+    element), the reference is effectively replaced by the body of the macro.  It is at this point
+    (within the scope of the reference) that the macro body is evaluated.  Macro evaluations are
+    completely independent, i.e. references are not effected in any way by earlier references.
+</p>
+<p>
+    It is possible for a macro body to reference another macro.  As the body of a macro is not
+    evaluated until the macro is referenced, the macro body may include references to named entities
+    (properties, post-processors etc) before they are defined.  All such entities must be defined at
+    the point that the macro is referenced.
+</p>
+<p>
+    Macros obey the same scoping rules as all other named entities.  This means, for example, that
+    macro names must not clash with other named entities within the same scope.  See the
+    documentation for the <a href="#" onclick="selectNode('$parentPath/scope'); return false">scope</a>
+    element for more details on scoping.
+</p>
+
+<h2>attributes</h2>
+<p>
+    <table class="content">
+        <tr>
+            <th>name</th>
+            <th>description</th>
+            <th>required</th>
+            <th>default</th>
+        </tr>
+        <tr>
+            <td class="nowrap">name</td>
+            <td>The name of the macro, used to reference the macro at a later point.</td>
+            <td>true</td>
+            <td> </td>
+        </tr>
+    </table>
+</p>
+
+<h2>child elements</h2>
+<p>
+    The macro body is an arbitrary fragment of XML.  The fragment must be valid at the points where
+    the macro is referenced.
+</p>
+
+<h2>examples</h2>
+<p>
+    A basic macro for a commonly-used command.  Note that the <tt>mode</tt> property is defined
+    differently in each recipe:
+</p>
+<div class="code">&lt;macro name="build-command"&gt;
+    &lt;command name="build"&gt;
+        &lt;executable exe="build-it.sh" args="MODE=${mode}"/&gt;
+        &lt;artifact name="binary" file="bin/foo"/&gt;
+    &lt;/command&gt;
+&lt;/macro&gt;
+
+&lt;recipe name="debug"&gt;
+    &lt;property name="mode" value="DEBUG"/&gt;
+    &lt;macro-ref macro="${build-command}"/&gt;
+&lt;/recipe&gt;
+
+&lt;recipe name="release"&gt;
+    &lt;property name="mode" value="RELEASE"/&gt;
+    &lt;macro-ref macro="${build-command}"/&gt;
+&lt;/recipe&gt;
+</div>
+                          

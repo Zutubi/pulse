@@ -10,12 +10,14 @@ import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.*;
+import static com.zutubi.util.CollectionUtils.map;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
 
-import java.util.HashMap;
-import java.util.Map;
+import static java.util.Arrays.asList;
+import java.util.*;
 
 /**
  * Analyses types and creates data structures representing tove file
@@ -26,15 +28,27 @@ import java.util.Map;
 public class ToveFileDocManager
 {
     private static final Logger LOG = Logger.getLogger(ToveFileDocManager.class);
+    private static final Messages I18N = Messages.getInstance(ToveFileDocManager.class);
 
     private static final String KEY_SUFFIX_ADDABLE_ATTRIBUTE = "addable.attribute";
     private static final String KEY_SUFFIX_ADDABLE_BRIEF     = "addable.brief";
     private static final String KEY_SUFFIX_ADDABLE_CONTENT   = "addable.content";
     private static final String KEY_SUFFIX_ADDABLE_VERBOSE   = "addable.verbose";
+    private static final String KEY_SUFFIX_BUILTIN           = "builtin";
     private static final String KEY_SUFFIX_CONTENT           = "content";
 
+    private static final List<ChildNodeDocs> BUILTINS = map(asList("import", "macro", "macro-ref", "scope"), new Mapping<String, ChildNodeDocs>()
+    {
+        public ChildNodeDocs map(String name)
+        {
+            String doc = I18N.format(name + "." + KEY_SUFFIX_BUILTIN);
+            return new ChildNodeDocs(name, new BuiltinElementDocs(doc, doc), Arity.ZERO_OR_MORE);
+        }
+    });
+
     private Map<String, ElementDocs> rootElements = new HashMap<String, ElementDocs>();
-    private Map<CompositeType, ElementDocs> cache = new HashMap<CompositeType, ElementDocs>();
+    private Map<CompositeType, ElementDocs> concreteCache = new HashMap<CompositeType, ElementDocs>();
+    private Map<CompositeType, ExtensibleDocs> extensibleCache = new HashMap<CompositeType, ExtensibleDocs>();
     private ConfigurationDocsManager configurationDocsManager;
 
     /**
@@ -54,8 +68,24 @@ public class ToveFileDocManager
     public synchronized ElementDocs registerRoot(String rootName, CompositeType rootType, TypeDefinitions typeDefinitions)
     {
         ElementDocs docs = getDocs(rootType, typeDefinitions);
+        for (ChildNodeDocs builtin: BUILTINS)
+        {
+            docs.addChild(builtin);
+        }
         rootElements.put(rootName, docs);
         return docs;
+    }
+
+    /**
+     * Returns the set of all registered roots.  The set may not be modified.
+     *
+     * @return the names of all roots registered with this manager
+     *
+     * @see #registerRoot(String, com.zutubi.tove.type.CompositeType, com.zutubi.pulse.core.marshal.TypeDefinitions)
+     */
+    public synchronized Set<String> getRoots()
+    {
+        return Collections.unmodifiableSet(rootElements.keySet());
     }
 
     /**
@@ -71,15 +101,89 @@ public class ToveFileDocManager
     {
         return rootElements.get(rootName);
     }
-    
+
+    /**
+     * Dynamically registers a given type by hooking it in as an extension to
+     * any already-registered super types.  Useful for pluggable extensions.
+     *
+     * @param name            the name under which the type is registered with
+     *                        the file loader/storer
+     * @param type            the type to register
+     * @param typeDefinitions all top-level type definitions for the type of
+     *                        file the type appears within
+     */
+    public synchronized void registerType(String name, CompositeType type, TypeDefinitions typeDefinitions)
+    {
+        ElementDocs elementDocs = getDocs(type, typeDefinitions);
+        for (ExtensibleDocs extensibleDocs: getExtensibleParents(type))
+        {
+            extensibleDocs.addExtension(name, elementDocs);
+        }
+    }
+
+    /**
+     * Dynamically unregisters a type by unhooking it as an extension from any
+     * super types.  Useful for removal of plugabble extensions.
+     *
+     * @param name name under which the type was registered
+     * @param type the type to unregister
+     */
+    public synchronized void unregisterType(String name, CompositeType type)
+    {
+        for (ExtensibleDocs extensibleDocs: getExtensibleParents(type))
+        {
+            extensibleDocs.removeExtension(name);
+        }
+    }
+
+    private List<ExtensibleDocs> getExtensibleParents(CompositeType type)
+    {
+        List<ExtensibleDocs> result = new LinkedList<ExtensibleDocs>();
+
+        Set<CompositeType> superTypeSet = new HashSet<CompositeType>();
+        collectSuperTypes(type, superTypeSet);
+        for (CompositeType superType: superTypeSet)
+        {
+            ExtensibleDocs extensibleDocs = extensibleCache.get(superType);
+            if (extensibleDocs != null)
+            {
+                result.add(extensibleDocs);
+            }
+        }
+
+        return result;
+    }
+
+    private void collectSuperTypes(CompositeType type, Set<CompositeType> superTypeSet)
+    {
+        for (CompositeType superType: type.getSuperTypes())
+        {
+            if (superTypeSet.add(superType))
+            {
+                collectSuperTypes(superType, superTypeSet);
+            }
+        }
+    }
+
     private ElementDocs getDocs(CompositeType type, TypeDefinitions typeDefinitions)
     {
-        ElementDocs docs = cache.get(type);
+        ElementDocs docs = concreteCache.get(type);
         if (docs == null)
         {
             TypeDocs typeDocs = configurationDocsManager.getDocs(type);
+            if (!TextUtils.stringSet(typeDocs.getBrief()))
+            {
+                LOG.warning("Documentation for type '" + type.getClazz().getName() + "' is missing 'introduction'");
+            }
+
+            if (!TextUtils.stringSet(typeDocs.getVerbose()))
+            {
+                LOG.warning("Documentation for type '" + type.getClazz().getName() + "' is missing 'verbose'");
+            }
+
             Messages messages = Messages.getInstance(type.getClazz());
             docs = new ElementDocs(typeDocs.getBrief(), typeDocs.getVerbose());
+            concreteCache.put(type, docs);
 
             try
             {
@@ -92,11 +196,11 @@ public class ToveFileDocManager
                     }
                     else if (property.getAnnotation(Content.class) != null)
                     {
-                        docs.setContent(new ContentDocs(formatProperty(messages, property, KEY_SUFFIX_CONTENT)));
+                        docs.setContentDocs(new ContentDocs(formatProperty(messages, type, property, KEY_SUFFIX_CONTENT)));
                     }
                     else
                     {
-                        addChildElements(docs, property, typeDefinitions, messages);
+                        addChildElements(docs, type, property, typeDefinitions, messages);
                     }
                 }
             }
@@ -108,8 +212,6 @@ public class ToveFileDocManager
             {
                 LOG.warning(e);
             }
-
-            cache.put(type, docs);
         }
 
         return docs;
@@ -120,7 +222,7 @@ public class ToveFileDocManager
         PropertyDocs propertyDocs = typeDocs.getPropertyDocs(property.getName());
         try
         {
-            element.addAttribute(new AttributeDocs(property.getName(), propertyDocs.getVerbose(), isRequired(property), getDefaultValue(type, property, defaultInstance)));
+            element.addAttribute(new AttributeDocs(nameify(property.getName()), propertyDocs.getVerbose(), isRequired(property), getDefaultValue(type, property, defaultInstance)));
         }
         catch (Exception e)
         {
@@ -144,7 +246,7 @@ public class ToveFileDocManager
         return value;
     }
 
-    private void addChildElements(ElementDocs element, TypeProperty property, TypeDefinitions typeDefinitions, Messages messages)
+    private void addChildElements(ElementDocs element, CompositeType parentType, TypeProperty property, TypeDefinitions typeDefinitions, Messages messages)
     {
         Type type = property.getType();
         if (type instanceof CompositeType)
@@ -152,11 +254,11 @@ public class ToveFileDocManager
             CompositeType compositeType = (CompositeType) type;
             if (compositeType.isExtendable())
             {
-                addExtensions(element, compositeType, typeDefinitions, Arity.ZERO_OR_ONE);
+                addExtensions(element, property.getName(), compositeType, typeDefinitions, Arity.ZERO_OR_ONE);
             }
             else
             {
-                element.addChild(new ChildElementDocs(getChildName(property, typeDefinitions), getDocs((CompositeType) type, typeDefinitions), isRequired(property) ? Arity.EXACTLY_ONE : Arity.ZERO_OR_ONE));
+                element.addChild(new ChildNodeDocs(getChildName(property, typeDefinitions), getDocs((CompositeType) type, typeDefinitions), isRequired(property) ? Arity.EXACTLY_ONE : Arity.ZERO_OR_ONE));
             }
         }
         else if (type instanceof CollectionType)
@@ -167,7 +269,7 @@ public class ToveFileDocManager
                 Addable addable = property.getAnnotation(Addable.class);
                 if (addable != null)
                 {
-                    element.addChild(new ChildElementDocs(addable.value(), getAddableDocs(property, addable, messages), Arity.ZERO_OR_MORE));
+                    element.addChild(new ChildNodeDocs(addable.value(), getAddableDocs(parentType, property, addable, messages), Arity.ZERO_OR_MORE));
                 }
             }
             else if (itemType instanceof CompositeType)
@@ -175,44 +277,70 @@ public class ToveFileDocManager
                 CompositeType compositeType = (CompositeType) itemType;
                 if (compositeType.isExtendable())
                 {
-                    addExtensions(element, compositeType, typeDefinitions, Arity.ZERO_OR_MORE);
+                    addExtensions(element, property.getName(), compositeType, typeDefinitions,  Arity.ZERO_OR_MORE);
                 }
                 else
                 {
+                    String name;
                     Addable addable = property.getAnnotation(Addable.class);
-                    if (addable != null)
+                    if (addable == null)
                     {
-                        element.addChild(new ChildElementDocs(addable.value(), getDocs(compositeType, typeDefinitions), Arity.ZERO_OR_MORE));
+                        name = nameify(typeDefinitions.getName(compositeType));
+                    }
+                    else
+                    {
+                        name = addable.value();
+                    }
+
+                    if (name != null)
+                    {
+                        element.addChild(new ChildNodeDocs(name, getDocs(compositeType, typeDefinitions), Arity.ZERO_OR_MORE));
                     }
                 }
             }
         }
     }
 
-    private void addExtensions(ElementDocs element, CompositeType compositeType, TypeDefinitions typeDefinitions, Arity arity)
+    private void addExtensions(ElementDocs element, String name, CompositeType compositeType, TypeDefinitions typeDefinitions, Arity arity)
     {
-        for (CompositeType childType: compositeType.getExtensions())
-        {
-            String name = typeDefinitions.getName(childType);
-            if (name != null)
-            {
-                element.addChild(new ChildElementDocs(name, getDocs(childType, typeDefinitions), arity));
-            }
-        }
+        element.addChild(new ChildNodeDocs(nameify(name), getExtensibleDocs(compositeType, typeDefinitions), arity));
     }
 
-    private ElementDocs getAddableDocs(TypeProperty property, Addable addable, Messages messages)
+    private ExtensibleDocs getExtensibleDocs(CompositeType compositeType, TypeDefinitions typeDefinitions)
     {
-        ElementDocs elementDocs = new ElementDocs(formatProperty(messages, property, KEY_SUFFIX_ADDABLE_BRIEF), formatProperty(messages, property, KEY_SUFFIX_ADDABLE_VERBOSE));
+        ExtensibleDocs extensibleDocs = extensibleCache.get(compositeType);
+        if (extensibleDocs == null)
+        {
+            TypeDocs typeDocs = configurationDocsManager.getDocs(compositeType);
+            extensibleDocs = new ExtensibleDocs(typeDocs.getBrief(), typeDocs.getVerbose());
+            extensibleCache.put(compositeType, extensibleDocs);
+
+            for (CompositeType childType: compositeType.getExtensions())
+            {
+                String extensionName = typeDefinitions.getName(childType);
+                if (extensionName != null)
+                {
+                    extensibleDocs.addExtension(extensionName, getDocs(childType, typeDefinitions));
+                }
+            }
+
+        }
+
+        return extensibleDocs;
+    }
+
+    private ElementDocs getAddableDocs(CompositeType type, TypeProperty property, Addable addable, Messages messages)
+    {
+        ElementDocs elementDocs = new ElementDocs(formatProperty(messages, type, property, KEY_SUFFIX_ADDABLE_BRIEF), formatProperty(messages, type, property, KEY_SUFFIX_ADDABLE_VERBOSE));
 
         String attribute = addable.attribute();
         if (TextUtils.stringSet(attribute))
         {
-            elementDocs.addAttribute(new AttributeDocs(attribute, formatProperty(messages, property, KEY_SUFFIX_ADDABLE_ATTRIBUTE), true, ""));
+            elementDocs.addAttribute(new AttributeDocs(nameify(attribute), formatProperty(messages, type, property, KEY_SUFFIX_ADDABLE_ATTRIBUTE), true, ""));
         }
         else
         {
-            elementDocs.setContent(new ContentDocs(formatProperty(messages, property, KEY_SUFFIX_ADDABLE_CONTENT)));
+            elementDocs.setContentDocs(new ContentDocs(formatProperty(messages, type, property, KEY_SUFFIX_ADDABLE_CONTENT)));
         }
 
         return elementDocs;
@@ -226,12 +354,41 @@ public class ToveFileDocManager
             name = property.getName();
         }
         
-        return name;
+        return nameify(name);
     }
 
-    private String formatProperty(Messages messages, TypeProperty property, String suffix)
+    private String formatProperty(Messages messages, CompositeType type, TypeProperty property, String suffix)
     {
-        return messages.format(property.getName() + "." + suffix);
+        String key = property.getName() + "." + suffix;
+        if (messages.isKeyDefined(key))
+        {
+            return messages.format(key);
+        }
+        else
+        {
+            LOG.warning("Expected i18n key '" + key + "' not defined to document property '" + property.getName() + "' of type '" + type.getClazz().getName() + "'");
+            return "No details";
+        }
+    }
+
+    private String nameify(String name)
+    {
+        StringBuilder result = new StringBuilder(name.length() + 5);
+        for (int i = 0; i < name.length(); i++)
+        {
+            char c = name.charAt(i);
+            if (Character.isUpperCase(c))
+            {
+                result.append('-');
+                result.append(Character.toLowerCase(c));
+            }
+            else
+            {
+                result.append(c);
+            }
+        }
+
+        return result.toString();
     }
 
     public void setConfigurationDocsManager(ConfigurationDocsManager configurationDocsManager)

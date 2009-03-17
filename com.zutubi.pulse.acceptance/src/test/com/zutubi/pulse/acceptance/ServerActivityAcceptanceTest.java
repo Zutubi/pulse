@@ -20,7 +20,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     private static final String ID_ACTIVITY_TABLE = "server.activity.active.builds";
     private static final String ID_RECIPE_QUEUE_TABLE = "server.activity.recipe.queue";
 
-    private static final int TIMEOUT = 30000;
+    private static final int TIMEOUT = 90000;
 
     private Map<Integer, File> waitFiles = new HashMap<Integer, File>();
     private int nextBuild = 1;

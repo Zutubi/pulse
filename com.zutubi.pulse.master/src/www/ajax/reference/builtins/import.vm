@@ -1,0 +1,72 @@
+<h1>import</h1>
+<p>
+    Imports provide a way to split your pulse file among multiple physical files, which can be
+    useful both for logical separation and sharing.  Imported files, similar to
+    <a href="#" onclick="selectNode('$parentPath/macro'); return false">macros</a>, are treated as
+    fragments of XML which are evaluated in the context where they are imported.
+</p>
+<p>
+    A file designed for importing can have an arbitrary root element - it is only used as a
+    container.  The imported fragment consists of the child nodes of the root.  This fragment can
+    be an arbitrary chunk of XML, but it must be valid when evaluated at the point of import.  An
+    imported file may import other files and so on arbitrarily (more properly, until a depth limit
+    is hit, although this should not happen in practice).
+</p>
+
+<h2>attributes</h2>
+<p>
+    <table class="content">
+        <tr>
+            <th>name</th>
+            <th>description</th>
+            <th>required</th>
+            <th>default</th>
+        </tr>
+        <tr>
+            <td class="nowrap">path</td>
+            <td>The path of the file to include, with elements separated always by forward slashes.
+                The path is relative to the including file unless it begins with a slash, in which
+                case it is relative to the base directory.</td>
+            <td>true</td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td class="nowrap">optional</td>
+            <td>If specified and true, the import is considered as optional and any error locating
+                the file to import is ignored.</td>
+            <td>false</td>
+            <td>false</td>
+        </tr>
+    </table>
+</p>
+
+<h2>child elements</h2>
+<p>
+    None.
+</p>
+
+<h2>examples</h2>
+<p>
+    In this example, we import a recipe's commands from another file nested in an "import"\
+    subdirectory.  This allows the repeated commands to be captured once:
+</p>
+<h4>import/commands.xml</h4>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;root&gt;
+    &lt;make name="build" targets="all" args="-Dmode=${mode}"/&gt;
+    &lt;make name="test" targets="test" args="-Dmode=${mode}"/&gt;
+&lt;/root&gt;</div>
+
+<h4>pulse.xml</h4>
+<div class="code">&lt;?xml version="1.0"?&gt;
+&lt;project default-recipe="debug"&gt;
+    &lt;recipe name="debug"&gt;
+        &lt;property name="mode" value="DEBUG"/&gt;
+        &lt;import path="import/commands.xml"/&gt;
+    &lt;/recipe&gt;
+
+    &lt;recipe name="release"&gt;
+        &lt;property name="mode" value="RELEASE"/&gt;
+        &lt;import path="import/commands.xml"/&gt;
+    &lt;/recipe&gt;
+&lt;/project&gt;</div>

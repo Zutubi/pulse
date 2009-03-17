@@ -19,13 +19,15 @@ public class TypeDefinitions
         typeToName.put(type, name);
     }
 
-    public void unregister(String name)
+    public CompositeType unregister(String name)
     {
         CompositeType type = nameToType.remove(name);
         if (type != null)
         {
             typeToName.remove(type);
         }
+        
+        return type;
     }
 
     public boolean hasType(String name)

@@ -386,7 +386,7 @@ ZUTUBI.ConfigTree = function(config)
 {
     ZUTUBI.ConfigTree.superclass.constructor.call(this, config);
     this.dead = false;
-}
+};
 
 Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
     configPathToTreePath: function(configPath)
@@ -566,7 +566,7 @@ ZUTUBI.TemplateTree = function(scope, config)
     this.scope = scope;
     this.dead = false;
     ZUTUBI.TemplateTree.superclass.constructor.call(this, config);
-}
+};
 
 Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
     handleResponse: function(response)
@@ -639,6 +639,31 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
         return null;
     }
 });
+
+ZUTUBI.FSTreeLoader = function(base)
+{
+    ZUTUBI.FSTreeLoader.superclass.constructor.call(this, {
+        dataUrl: base + '/ajax/xls.action'
+    });
+};
+
+Ext.extend(ZUTUBI.FSTreeLoader, Ext.tree.TreeLoader, {
+    getParams : function(node)
+    {
+        var buf = [];
+        var bp = this.baseParams;
+        for (var key in bp)
+        {
+            if (typeof bp[key] != "function")
+            {
+                buf.push(encodeURIComponent(key), "=", encodeURIComponent(bp[key]), "&");
+            }
+        }
+        buf.push("path=", encodeURIComponent(node.getPath("baseName")));
+        return buf.join("");
+    }
+});
+
 
 ZUTUBI.Form = function(config)
 {
@@ -1712,7 +1737,7 @@ Ext.reg('xzhelppanel', ZUTUBI.HelpPanel);
 Ext.form.Checkbox.prototype.onResize = function()
 {
     Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
-}
+};
 
 // Bug fix lifted directly from:
 // http://extjs.com/forum/showthread.php?t=45982
@@ -1798,7 +1823,7 @@ ZUTUBI.ProjectModel = function(key) {
     this.hidden = false;
     this.children = [];
     this.rowCount = 1;
-}
+};
 
 ZUTUBI.ProjectModel.prototype = {
     addChild: function(child) {
@@ -1890,4 +1915,4 @@ ZUTUBI.ProjectModel.prototype = {
             child.show();
         }
     }
-}
+};

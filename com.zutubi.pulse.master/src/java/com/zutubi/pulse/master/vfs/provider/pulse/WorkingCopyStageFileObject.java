@@ -75,7 +75,7 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
 
     protected File getWorkingCopyBase() throws FileSystemException
     {
-        BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        BuildResultProvider provider = getAncestor(BuildResultProvider.class);
         if (provider == null)
         {
             return null;

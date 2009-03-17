@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-/**
- */
 public class StringUtilsTest extends ZutubiTestCase
 {
     public void testTrimStringShort()
@@ -1035,6 +1033,31 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals("abc", StringUtils.stripLeadingWhitespace("  abc"));
         assertEquals("abc  ", StringUtils.stripLeadingWhitespace("  abc  "));
         assertEquals("", StringUtils.stripLeadingWhitespace("  \n   "));
+    }
+
+    public void testStripPrefixEmptyEmpty()
+    {
+        assertEquals("", StringUtils.stripPrefix("", ""));
+    }
+
+    public void testStripPrefixEmptyNonEmpty()
+    {
+        assertEquals("", StringUtils.stripPrefix("", "non"));
+    }
+
+    public void testStripPrefixNonEmptyEmpty()
+    {
+        assertEquals("non", StringUtils.stripPrefix("non", ""));
+    }
+
+    public void testStripPrefixNonMatching()
+    {
+        assertEquals("nomatch", StringUtils.stripPrefix("nomatch", "non"));
+    }
+
+    public void testStripPrefixMatching()
+    {
+        assertEquals("atch", StringUtils.stripPrefix("nomatch", "nom"));
     }
 
     private <T> T[] a(T... a)

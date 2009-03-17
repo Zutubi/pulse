@@ -19,7 +19,7 @@
 
     <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
-    <bean id="resourceFileLoader" class="com.zutubi.pulse.core.ResourceFileLoader"/>
+    <bean id="resourceFileLoader" class="com.zutubi.pulse.core.ResourceFileLoader" init-method="init"/>
 
     <bean id="localBuild" class="com.zutubi.pulse.dev.local.LocalBuild"/>
 </beans>

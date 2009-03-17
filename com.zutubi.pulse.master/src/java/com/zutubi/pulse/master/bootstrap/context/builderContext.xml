@@ -117,6 +117,8 @@
 
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" init-method="init"/>
 
+    <bean id="resourceFileLoader" class="com.zutubi.pulse.core.ResourceFileLoader" init-method="init"/>
+
     <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory"/>
 
     <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory"/>
@@ -222,4 +224,5 @@
         <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
     </bean>
 
+    <bean id="toveFileDocManager" class="com.zutubi.pulse.core.marshal.doc.ToveFileDocManager"/>
 </beans>

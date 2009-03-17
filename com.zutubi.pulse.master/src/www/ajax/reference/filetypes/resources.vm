@@ -1,0 +1,42 @@
+<h1>Resource Files</h1>
+<p>
+    As the local build script does not have access to the resources configured on your pulse server,
+    you may need to provide this information via an XML configuration file. Note that in many cases
+    the local build script will discover the resources for you, so you should try running a local
+    build first and only create a resources XML file if you need to.
+</p>
+
+<h2>Syntax</h2>
+<p>
+    Resource files follow the same basic syntax rules and support the same built in elements as
+    <a href="#" onclick="selectNode('/reference/project'); return false">pulse files</a>.  Refer to
+    the pulse file documentation for a syntax overview.
+</p>
+
+<h2>Example</h2>
+<div class="code">
+&lt;?xml version="1.0"?&gt;
+&lt;resources&gt;
+    &lt;resource name="automake"&gt;
+        <span class="code-comment">&lt;!-- Properties for version 1.4 --&gt;
+        &lt;version value="1.4"&gt;
+            &lt;property name="automake.home.dir" value="/usr/local/automake-1.4"/&gt;
+            &lt;property name="automake.bin" value="/usr/local/automake-1.4/bin/automake"/&gt;
+        &lt;/version&gt;
+    &lt;/resource&gt;
+
+    &lt;resource name="my-tool"&gt;
+        <span class="code-comment">&lt;!-- Properties when no version is specified --&gt;
+        &lt;property name="my.tool.bin" value="/usr/bin/my-tool2"/&gt;
+
+        <span class="code-comment">&lt;!-- Properties for version 1.0 --&gt;
+        &lt;version value="1.0"&gt;
+            &lt;property name="my.tool.bin" value="/usr/bin/my-tool1"/&gt;
+        &lt;/version&gt;
+
+        <span class="code-comment">&lt;!-- Properties for version 2.0 --&gt;
+        &lt;version value="2.0"&gt;
+            &lt;property name="my.tool.bin" value="/usr/bin/my-tool2"/&gt;
+        &lt;/version&gt;
+    &lt;/resource&gt;
+&lt;/resources&gt;</div>

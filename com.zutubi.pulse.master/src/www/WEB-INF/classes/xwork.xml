@@ -462,6 +462,11 @@
             <result name="error" type="json">error.xml</result>
         </action>
 
+        <action name="xls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
+            <result name="success" type="flexjson">listing</result>
+            <result name="error" type="json">error.xml</result>
+        </action>
+
         <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MkdirAction">
             <result name="success" type="json">mkdir.xml</result>
             <result name="error" type="json">error.xml</result>
@@ -483,6 +488,14 @@
 
         <action name="triggerBuildHook" class="com.zutubi.pulse.master.xwork.actions.ajax.TriggerBuildHookAction">
             <result name="success" type="flexjson">result</result>
+        </action>
+        
+        <action name="reference" class="com.zutubi.pulse.master.tove.webwork.help.ReferenceAction">
+            <result name="builtin" type="velocity">reference/builtins/${baseName}.vm</result>
+            <result name="element" type="velocity">reference/element.vm</result>
+            <result name="extensible" type="velocity">reference/extensible.vm</result>
+            <result name="filetype" type="velocity">reference/filetypes/${baseName}.vm</result>
+            <result name="static" type="velocity">reference/static/${baseName}.vm</result>
         </action>
     </package>
 
@@ -675,6 +688,9 @@
         <action name="scmFileDialog" class="com.zutubi.pulse.master.xwork.actions.admin.ScmFileDialogAction">
             <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
-    </package>
 
+        <action name="reference" class="com.zutubi.pulse.master.xwork.actions.ReferencePopupAction">
+            <result name="success" type="velocity">reference.vm</result>
+        </action>
+    </package>
 </xwork>

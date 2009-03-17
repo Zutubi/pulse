@@ -36,6 +36,7 @@ public class MixedConfiguration extends AbstractNamedConfiguration
     @Addable("compositeMapItem")
     private Map<String, TrivialConfiguration> compositeMap = new HashMap<String, TrivialConfiguration>();
     private Map<String, ExtendableConfiguration> extendableMap = new HashMap<String, ExtendableConfiguration>();
+    private Map<String, TopLevelConfiguration> topLevelTypeMap = new HashMap<String, TopLevelConfiguration>();
 
     public int getIntProperty()
     {
@@ -165,5 +166,15 @@ public class MixedConfiguration extends AbstractNamedConfiguration
     public void setExtendableMap(Map<String, ExtendableConfiguration> extendableMap)
     {
         this.extendableMap = extendableMap;
+    }
+
+    public Map<String, TopLevelConfiguration> getTopLevelTypeMap()
+    {
+        return topLevelTypeMap;
+    }
+
+    public void setTopLevelTypeMap(Map<String, TopLevelConfiguration> topLevelTypeMap)
+    {
+        this.topLevelTypeMap = topLevelTypeMap;
     }
 }

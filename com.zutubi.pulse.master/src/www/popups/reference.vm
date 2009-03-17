@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <title>:: pulse :: #if ($title) $title #end</title>
+    <link rel="shortcut icon" href="$base/favicon.ico">
+    <link rel="icon" type="image/png" href="$base/favicon.png">
+    <link rel="stylesheet" type="text/css" href="$base/css/ext-all.css"></link>
+    <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"></link>
+    <script type="text/javascript" src="$base/js/ext-base.js"></script>
+    <script type="text/javascript" src="$base/js/ext-all.js"></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
+    <script type="text/javascript" src="$base/js/zutubi.js"></script>
+    <script type="text/javascript">
+        Ext.BLANK_IMAGE_URL = '$base/images/default/s.gif';
+        window.baseUrl = '$base';
+
+        var tree;
+
+        function onResponse(el, success, response, options)
+        {
+            if (!success)
+            {
+                var message = '<h1>:: error ::</h1><ul class="error"><li class="error">Server returned status: ' + response.status;
+                if (response.statusText)
+                {
+                    message += ' (' + decodeURIComponent(response.statusText) + ')';
+                }
+
+                message += '</li></ul><p>Check the server logs for details.</p>'
+                el.update(message);
+            }
+        }
+        
+        function onSelect(selectionModel, node)
+        {
+            Ext.get('content').load({
+                url: '$base/ajax/reference.action',
+                params: { 'path': node.getPath('baseName') },
+                method: 'GET',
+                callback: onResponse
+            });
+        }
+
+        function selectNode(path)
+        {
+            tree.selectPath(path, 'baseName');
+        }
+
+        var Layout = function() {
+            return {
+                init : function() {
+                    var loader = new ZUTUBI.FSTreeLoader('$base');
+                    tree = new Ext.tree.TreePanel({
+                        loader: loader,
+                        layout: 'fit',
+                        border: false,
+                        animate: false,
+                        autoScroll: true,
+                        bodyStyle: 'padding: 10px'
+                    });
+
+                    var root = new Ext.tree.AsyncTreeNode({
+                        baseName: 'reference',
+                        iconCls: 'reference-icon',
+                        text: 'pulse reference',
+                        allowDrag: false,
+                        allowDrop: false
+                    });
+
+                    tree.setRootNode(root);
+                    tree.getSelectionModel().on('selectionchange', onSelect);
+
+                    var viewport = new Ext.Viewport({
+                        layout: 'border',
+                        defaults: {
+                            layout: 'fit',
+                            border: false
+                        },
+                        items: [{
+                            region: 'south',
+                            contentEl: 'south',
+                            split: false
+                        }, {
+                            region: 'center',
+                            contentEl: 'content',
+                            autoScroll: true,
+                            split: false
+                        }, {
+                            region: 'west',
+                            split: true,
+                            collapsible: true,
+                            collapseMode:'mini',
+                            width: 250,
+                            items: [tree]
+                        }]
+                    });
+
+                    root.expand(false, false, function() {
+#if($path)
+                        selectNode('$path');
+#else
+                        selectNode('reference');
+#end
+                    });
+                }
+            };
+        }();
+        
+        Ext.EventManager.onDocumentReady(Layout.init, Layout, true);
+    </script>
+</head>
+<html>
+    <body>
+        <div id="content" class="reference">
+        </div>
+        <div id="south">
+            <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number)
+            <b>::</b> copyright &copy; 2005-2009 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
+            <a href="http://jira.zutubi.com/">report bug/request feature</a>
+        </div>
+    </body>
+</html>

@@ -1,11 +1,9 @@
 package com.zutubi.pulse.core.marshal.doc;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-
+import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Documentation for an element in a tove file, including all child attributes
@@ -13,28 +11,15 @@ import java.util.List;
  * externally, as the same element type may appear in multiple contexts under
  * different names.
  */
-public class ElementDocs
+public class ElementDocs extends NodeDocs
 {
-    private String brief;
-    private String verbose;
     private ContentDocs contentDocs;
-    private List<AttributeDocs> attributes = new LinkedList<AttributeDocs>();
-    private List<ChildElementDocs> children = new LinkedList<ChildElementDocs>();
+    private SortedMap<String, AttributeDocs> attributes = new TreeMap<String, AttributeDocs>();
+    private SortedMap<String, ChildNodeDocs> children = new TreeMap<String, ChildNodeDocs>();
 
     public ElementDocs(String brief, String verbose)
     {
-        this.brief = brief;
-        this.verbose = verbose;
-    }
-
-    public String getBrief()
-    {
-        return brief;
-    }
-
-    public String getVerbose()
-    {
-        return verbose;
+        super(brief, verbose);
     }
 
     public ContentDocs getContentDocs()
@@ -42,50 +27,51 @@ public class ElementDocs
         return contentDocs;
     }
 
-    public void setContent(ContentDocs contentDocs)
+    public void setContentDocs(ContentDocs contentDocs)
     {
         this.contentDocs = contentDocs;
     }
 
-    public List<AttributeDocs> getAttributes()
+    public Collection<AttributeDocs> getAttributes()
     {
-        return Collections.unmodifiableList(attributes);
+        return Collections.unmodifiableCollection(attributes.values());
     }
 
-    public AttributeDocs getAttribute(final String name)
+    public AttributeDocs getAttribute(String name)
     {
-        return CollectionUtils.find(attributes, new Predicate<AttributeDocs>()
-        {
-            public boolean satisfied(AttributeDocs attributeDocs)
-            {
-                return attributeDocs.getName().equals(name);
-            }
-        });
+        return attributes.get(name);
     }
 
     public void addAttribute(AttributeDocs attributeDocs)
     {
-        attributes.add(attributeDocs);
+        attributes.put(attributeDocs.getName(), attributeDocs);
     }
 
-    public List<ChildElementDocs> getChildren()
+    public Collection<ChildNodeDocs> getChildren()
     {
-        return Collections.unmodifiableList(children);
+        return Collections.unmodifiableCollection(children.values());
     }
 
-    public ChildElementDocs getChild(final String name)
+    public ChildNodeDocs getChild(String name)
     {
-        return CollectionUtils.find(children, new Predicate<ChildElementDocs>()
-        {
-            public boolean satisfied(ChildElementDocs childElementDocs)
-            {
-                return childElementDocs.getName().equals(name);
-            }
-        });
+        return children.get(name);
     }
 
-    public void addChild(ChildElementDocs childElementDocs)
+    public void addChild(ChildNodeDocs childNodeDocs)
     {
-        children.add(childElementDocs);
+        children.put(childNodeDocs.getName(), childNodeDocs);
+    }
+
+    @Override
+    public NodeDocs getNode(final String name)
+    {
+        ChildNodeDocs childNodeDocs = getChild(name);
+        return childNodeDocs == null ? null : childNodeDocs.getNodeDocs();
+    }
+
+    @Override
+    public boolean isElement()
+    {
+        return true;
     }
 }

@@ -1,9 +1,11 @@
 package com.zutubi.pulse.core.engine;
 
+import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,6 +17,7 @@ public class ProjectRecipesConfiguration extends AbstractConfiguration
     private String defaultRecipe;
     private Map<String, RecipeConfiguration> recipes = new LinkedHashMap<String, RecipeConfiguration>();
     private Map<String, PostProcessorConfiguration> postProcessors = new LinkedHashMap<String, PostProcessorConfiguration>();
+    private Map<String, PropertyConfiguration> properties = new HashMap<String, PropertyConfiguration>();
 
     public String getDefaultRecipe()
     {
@@ -44,5 +47,15 @@ public class ProjectRecipesConfiguration extends AbstractConfiguration
     public void setPostProcessors(Map<String, PostProcessorConfiguration> postProcessors)
     {
         this.postProcessors = postProcessors;
+    }
+
+    public Map<String, PropertyConfiguration> getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map<String, PropertyConfiguration> properties)
+    {
+        this.properties = properties;
     }
 }

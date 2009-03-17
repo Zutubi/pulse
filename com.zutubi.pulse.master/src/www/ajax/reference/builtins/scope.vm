@@ -1,0 +1,40 @@
+<h1>scope</h1>
+<p>
+    The scope tag is used to explicitly introduce a scope.  This is necessary in some cases to avoid
+    property name clashes, particularly when properties are used to parameterise macros.  See the
+    documentation for the <a href="#" onclick="selectNode('/reference/project'); return false">pulse files</a>
+    for more details on scoping.
+</p>
+
+<h2>attributes</h2>
+<p>
+    None.
+</p>
+
+<h2>child elements</h2>
+<p>
+    Any.
+</p>
+
+<h2>examples</h2>
+<p>
+    A basic macro for a commonly-used command.  Note that the <tt>mode</tt> property is defined
+    differently in each recipe:
+</p>
+<div class="code">&lt;macro name="build-command"&gt;
+    &lt;command name="build"&gt;
+        &lt;executable exe="build-it.sh" args="TARGET=${target}"/&gt;
+        &lt;artifact name="${target}" file="bin/${target}"/&gt;
+    &lt;/command&gt;
+&lt;/macro&gt;
+
+&lt;recipe name="two targets"&gt;
+    &lt;scope&gt;
+        &lt;property name="target" value="t1"/&gt;
+        &lt;macro-ref macro="${build-command}"/&gt;
+    &lt;/scope&gt;
+    &lt;scope&gt;
+        &lt;property name="target" value="t2"/&gt;
+        &lt;macro-ref macro="${build-command}"/&gt;
+    &lt;/scope&gt;
+&lt;/recipe&gt;</div>

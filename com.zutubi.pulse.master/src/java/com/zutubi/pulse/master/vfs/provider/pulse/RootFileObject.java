@@ -1,60 +1,40 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.master.vfs.provider.pulse.reference.ReferenceFileObject;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The root file object of the pulse file system. This file object defines the root
  * 'directories/folders' available within the file system.
- *
  */
-public class RootFileObject extends AbstractPulseFileObject
+public class RootFileObject extends StaticMappingFileObject
 {
-    private static final Map<String, Class<? extends AbstractPulseFileObject>> nodesDefinitions = new HashMap<String, Class<? extends AbstractPulseFileObject>>();
+    public static final String NODE_ARTIFACTS       = "artifacts";
+    public static final String NODE_BUILDS          = "builds";
+    public static final String NODE_CONFIG          = "config";
+    public static final String NODE_PLUGINS         = "plugins";
+    public static final String NODE_PROJECTS        = "projects";
+    public static final String NODE_PROJECT_CONFIGS = "cprojects";
+    public static final String NODE_REFERENCE       = "reference";
+    public static final String NODE_TEMPLATES       = "templates";
+    public static final String NODE_WIZARDS         = "wizards";
+
     {
         // setup the default root node definitions.
-        nodesDefinitions.put("artifacts", ArtifactsFileObject.class);
-        nodesDefinitions.put("builds", BuildsFileObject.class);
-        nodesDefinitions.put("config", ConfigFileObject.class);
-        nodesDefinitions.put("plugins", PluginsFileObject.class);
-        nodesDefinitions.put("projects", ProjectsFileObject.class);
-        nodesDefinitions.put("cprojects", ProjectConfigsFileObject.class);
-        nodesDefinitions.put("templates", TemplateScopesFileObject.class);
-        nodesDefinitions.put("wizards", WizardsFileObject.class);
+        nodesDefinitions.put(NODE_ARTIFACTS, ArtifactsFileObject.class);
+        nodesDefinitions.put(NODE_BUILDS, BuildsFileObject.class);
+        nodesDefinitions.put(NODE_CONFIG, ConfigFileObject.class);
+        nodesDefinitions.put(NODE_PLUGINS, PluginsFileObject.class);
+        nodesDefinitions.put(NODE_PROJECTS, ProjectsFileObject.class);
+        nodesDefinitions.put(NODE_PROJECT_CONFIGS, ProjectConfigsFileObject.class);
+        nodesDefinitions.put(NODE_REFERENCE, ReferenceFileObject.class);
+        nodesDefinitions.put(NODE_TEMPLATES, TemplateScopesFileObject.class);
+        nodesDefinitions.put(NODE_WIZARDS, WizardsFileObject.class);
     }
 
     public RootFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
-    }
-
-    protected FileType doGetType() throws Exception
-    {
-        return FileType.FOLDER;
-    }
-
-    protected String[] doListChildren() throws Exception
-    {
-        Set<String> rootPaths = nodesDefinitions.keySet();
-        return rootPaths.toArray(new String[rootPaths.size()]);
-    }
-
-    public AbstractPulseFileObject createFile(final FileName fileName)
-    {
-        String name = fileName.getBaseName();
-        if (nodesDefinitions.containsKey(name))
-        {
-            Class<? extends AbstractPulseFileObject> clazz = nodesDefinitions.get(name);
-            return objectFactory.buildBean(clazz,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
-            );
-        }
-        return null;
     }
 }

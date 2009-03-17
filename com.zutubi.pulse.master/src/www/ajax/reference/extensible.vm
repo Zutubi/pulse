@@ -1,0 +1,22 @@
+<h1>$baseName</h1>
+<p>$docs.verbose</p>
+
+<h2>available implementations</h2>
+<p>
+#if($docs.extensions.size() > 0)
+    <table class="content">
+        <tr>
+            <th>name</th>
+            <th>description</th>
+        </tr>
+    #foreach($entry in $docs.extensions.entrySet())
+        <tr>
+            <td>&lt;<a href='#' onclick='selectNode("$path/$entry.key"); return false;'>$entry.key</a>&gt;</td>
+            <td>$entry.value.brief</td>
+        </tr>
+    #end
+    </table>
+#else
+    None.
+#end
+</p>

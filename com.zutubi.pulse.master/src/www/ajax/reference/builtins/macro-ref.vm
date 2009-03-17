@@ -1,0 +1,50 @@
+<h1>macro-ref</h1>
+<p>
+    A macro reference is used to evaluate the body of a <a href="#" onclick="selectNode('$parentPath/macro'); return false">macro</a>
+    at an arbitraty point in a pulse file.  The macro reference is effectively replaced with the
+    body of the macro.  To illustrate:
+</p>
+<div class="code">&lt;macro name="mack"&gt;
+    &lt;property name="foo" value="bar"/&gt;
+&lt;/macro&gt;
+
+&lt;macro-ref macro="${mack}"/&gt;</div>
+
+<p>
+    is equivalent to:
+</p>
+
+<div class="code">&lt;property name="foo" value="bar"/&gt;</div>
+
+<p>
+    The body of the macro, including references to named entities, is evaluated at the point (and
+    within the scope) of the macro reference.
+</p>
+
+<h2>attributes</h2>
+<p>
+    <table class="content">
+        <tr>
+            <th>name</th>
+            <th>description</th>
+            <th>required</th>
+            <th>default</th>
+        </tr>
+        <tr>
+            <td class="nowrap">macro</td>
+            <td>The macro to be referenced (e.g. ${my.macro}).</td>
+            <td>true</td>
+            <td> </td>
+        </tr>
+    </table>
+</p>
+
+<h2>child elements</h2>
+<p>
+    None.
+</p>
+
+<h2>examples</h2>
+<p>
+    See <a href="#" onclick="selectNode('$parentPath/macro'); return false">macro</a>.
+</p>

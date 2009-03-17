@@ -242,7 +242,7 @@
 #else
     #set($helpPage = "Home")
 #end
-                  <a class="unadorned" href="$helpUrl/$helpPage" target="_pulsemanual">
+                  <a class="unadorned" href="$base/popups/reference.action" onclick="var popup = window.open('$base/popups/reference.action', '_pulsereference', 'status=yes,resizable=yes,top=100,left=100,width=900,height=600,scrollbars=yes'); popup.focus(); return false;">
                       <img alt="help" src="$base/images/manual.gif"/>
                   </a>
               </td>
