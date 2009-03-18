@@ -135,7 +135,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         waitForQueueCount(activeBuildsTable, 1);
 
         final BuildQueueTable buildQueueTable = new BuildQueueTable();
-        assertEquals(1, buildQueueTable.getRowCount());
+        waitForQueueCount(buildQueueTable, 1);
         assertEquals("trigger via remote api by admin", buildQueueTable.getReason());
         assertEquals(random, buildQueueTable.getOwner());
         assertEquals("[pending]", buildQueueTable.getBuildId());
