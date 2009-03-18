@@ -126,7 +126,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         // build 1 becomes active.
         createAndTriggerProjectBuild();
         // build 2 goes into the build queue.
-        triggerProjectBuild();
+        triggerBuild(false);
 
         ServerActivityPage page = new ServerActivityPage(selenium, urls);
         page.goTo();
@@ -151,28 +151,33 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
     private void createAndTriggerProjectBuild() throws Exception
     {
-        int thisBuild = nextBuild++;
-
-        File waitFile = new File(FileSystemUtils.getSystemTempDir(), random + nextBuild);
-        waitFiles.put(thisBuild, waitFile);
-
         Hashtable<String, Object> svn = xmlRpcHelper.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
         Hashtable<String,Object> ant = xmlRpcHelper.getAntConfig();
-        ant.put(Constants.Project.AntType.ARGUMENTS, getFileArgument(waitFile));
+        ant.put(Constants.Project.AntType.ARGUMENTS, getFileArgument());
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svn, ant);
 
-        xmlRpcHelper.triggerBuild(random);
-        xmlRpcHelper.waitForBuildInProgress(random, thisBuild, TIMEOUT);
+        triggerBuild(true);
     }
 
-    private void triggerProjectBuild() throws Exception
+    private void triggerBuild(boolean waitForInProgress) throws Exception
     {
         int thisBuild = nextBuild++;
 
         File waitFile = new File(FileSystemUtils.getSystemTempDir(), random + nextBuild);
+        if (waitFile.exists() && !waitFile.delete())
+        {
+            throw new RuntimeException("Wait file '" + waitFile.getAbsolutePath() + "' already exists and can't be removed");
+        }
         waitFiles.put(thisBuild, waitFile);
 
-        xmlRpcHelper.triggerBuild(random);
+        Hashtable<String, String> properties = new Hashtable<String, String>();
+        properties.put("wait.file", waitFile.getAbsolutePath().replace("\\", "/"));
+        xmlRpcHelper.triggerBuild(random, "", properties);
+
+        if (waitForInProgress)
+        {
+            xmlRpcHelper.waitForBuildInProgress(random, thisBuild, TIMEOUT);
+        }
     }
 
     private void waitForQueueCount(final Table queueTable, final int count)
@@ -197,9 +202,9 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.waitForBuildToComplete(random, buildId, TIMEOUT);
     }
 
-    private String getFileArgument(File waitFile1)
+    private String getFileArgument()
     {
-        return "-Dfile=" + waitFile1.getAbsolutePath().replace("\\", "/");
+        return "-Dfile=${wait.file}";
     }
 
     public class Table
