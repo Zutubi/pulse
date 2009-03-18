@@ -4,6 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.marshal.ToveFileUtils;
+import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.docs.ConfigurationDocsManager;
@@ -222,7 +223,7 @@ public class ToveFileDocManager
         PropertyDocs propertyDocs = typeDocs.getPropertyDocs(property.getName());
         try
         {
-            element.addAttribute(new AttributeDocs(nameify(property.getName()), propertyDocs.getVerbose(), isRequired(property), getDefaultValue(type, property, defaultInstance)));
+            element.addAttribute(new AttributeDocs(convertPropertyNameToLocalName(property.getName()), propertyDocs.getVerbose(), isRequired(property), getDefaultValue(type, property, defaultInstance)));
         }
         catch (Exception e)
         {
@@ -285,7 +286,7 @@ public class ToveFileDocManager
                     Addable addable = property.getAnnotation(Addable.class);
                     if (addable == null)
                     {
-                        name = nameify(typeDefinitions.getName(compositeType));
+                        name = convertPropertyNameToLocalName(typeDefinitions.getName(compositeType));
                     }
                     else
                     {
@@ -303,7 +304,7 @@ public class ToveFileDocManager
 
     private void addExtensions(ElementDocs element, String name, CompositeType compositeType, TypeDefinitions typeDefinitions, Arity arity)
     {
-        element.addChild(new ChildNodeDocs(nameify(name), getExtensibleDocs(compositeType, typeDefinitions), arity));
+        element.addChild(new ChildNodeDocs(convertPropertyNameToLocalName(name), getExtensibleDocs(compositeType, typeDefinitions), arity));
     }
 
     private ExtensibleDocs getExtensibleDocs(CompositeType compositeType, TypeDefinitions typeDefinitions)
@@ -336,7 +337,7 @@ public class ToveFileDocManager
         String attribute = addable.attribute();
         if (TextUtils.stringSet(attribute))
         {
-            elementDocs.addAttribute(new AttributeDocs(nameify(attribute), formatProperty(messages, type, property, KEY_SUFFIX_ADDABLE_ATTRIBUTE), true, ""));
+            elementDocs.addAttribute(new AttributeDocs(convertPropertyNameToLocalName(attribute), formatProperty(messages, type, property, KEY_SUFFIX_ADDABLE_ATTRIBUTE), true, ""));
         }
         else
         {
@@ -353,8 +354,8 @@ public class ToveFileDocManager
         {
             name = property.getName();
         }
-        
-        return nameify(name);
+
+        return convertPropertyNameToLocalName(name);
     }
 
     private String formatProperty(Messages messages, CompositeType type, TypeProperty property, String suffix)
@@ -369,26 +370,6 @@ public class ToveFileDocManager
             LOG.warning("Expected i18n key '" + key + "' not defined to document property '" + property.getName() + "' of type '" + type.getClazz().getName() + "'");
             return "No details";
         }
-    }
-
-    private String nameify(String name)
-    {
-        StringBuilder result = new StringBuilder(name.length() + 5);
-        for (int i = 0; i < name.length(); i++)
-        {
-            char c = name.charAt(i);
-            if (Character.isUpperCase(c))
-            {
-                result.append('-');
-                result.append(Character.toLowerCase(c));
-            }
-            else
-            {
-                result.append(c);
-            }
-        }
-
-        return result.toString();
     }
 
     public void setConfigurationDocsManager(ConfigurationDocsManager configurationDocsManager)

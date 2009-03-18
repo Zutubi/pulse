@@ -86,6 +86,40 @@ public class ToveFileUtils
     }
 
     /**
+     * Converts a type property name to the local name to use for a
+     * corresponding attribute or element in the Pulse file.  Although
+     * the file can contain camel case we use hyphen-separation by
+     * convention.
+     *
+     * @param name the property name to convert (camel case)
+     * @return the converted name (words separated by hypens)
+     */
+    public static String convertPropertyNameToLocalName(String name)
+    {
+        StringBuilder result = new StringBuilder(name.length() + 5);
+        boolean previousLower = false;
+        for (int i = 0; i < name.length(); i++)
+        {
+            char c = name.charAt(i);
+            boolean isUpper = Character.isUpperCase(c);
+            if (i != 0 && isUpper && (previousLower || isNextLower(name, i)))
+            {
+                result.append('-');
+            }
+
+            previousLower = !isUpper;
+            result.append(Character.toLowerCase(c));
+        }
+
+        return result.toString();
+    }
+
+    private static boolean isNextLower(String name, int i)
+    {
+        return i < name.length() - 1 && Character.isLowerCase(name.charAt(i + 1));
+    }
+
+    /**
      * Indicates if the given property can be stored as a simple attribute in a
      * tove file.  This applies to properties that can be converted to a string
      * such as primitives and simple lists.

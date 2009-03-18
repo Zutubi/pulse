@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.marshal;
 
 import com.zutubi.pulse.core.api.PulseRuntimeException;
+import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import com.zutubi.pulse.core.marshal.types.*;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
 import com.zutubi.tove.type.CompositeType;
@@ -251,5 +252,50 @@ public class ToveFileUtilsTest extends AbstractConfigurationSystemTestCase
         configuration.getEnumList().add(TestEnum.C_2);
         configuration.getEnumList().add(TestEnum.C3);
         assertEquals("c1 \"c 2\" c3", ToveFileUtils.convertAttribute(configuration, mixedType, mixedType.getProperty("enumList")));
+    }
+
+    public void testConvertPropertyNameEmpty()
+    {
+        assertEquals("", convertPropertyNameToLocalName(""));
+    }
+
+    public void testConvertPropertyAllLower()
+    {
+        assertEquals("nochange", convertPropertyNameToLocalName("nochange"));
+    }
+
+    public void testConvertPropertyStartsWithUpper()
+    {
+        assertEquals("capped", convertPropertyNameToLocalName("Capped"));
+    }
+
+    public void testConvertPropertyStartsWithMultipleUpper()
+    {
+        assertEquals("shou-tout", convertPropertyNameToLocalName("SHOUTout"));
+    }
+
+    public void testConvertPropertyEndsWithUpper()
+    {
+        assertEquals("cappe-d", convertPropertyNameToLocalName("cappeD"));
+    }
+
+    public void testConvertPropertyEndsWithMultipleUpper()
+    {
+        assertEquals("shout-out", convertPropertyNameToLocalName("shoutOUT"));
+    }
+
+    public void testConvertPropertyMiddleMultipleUpper()
+    {
+        assertEquals("sho-ut-out", convertPropertyNameToLocalName("shoUTOut"));
+    }
+    
+    public void testConvertPropertyAllUpper()
+    {
+        assertEquals("shout", convertPropertyNameToLocalName("SHOUT"));
+    }
+
+    public void testConvertPropertyCamel()
+    {
+        assertEquals("camel-case-words", convertPropertyNameToLocalName("camelCaseWords"));
     }
 }

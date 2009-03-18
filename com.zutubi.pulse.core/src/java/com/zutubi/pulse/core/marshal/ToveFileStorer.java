@@ -10,6 +10,7 @@ import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.Sort;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.*;
@@ -18,10 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Stores configuration objects to XML files in a human-readable way.  Uses
@@ -31,6 +29,9 @@ import java.util.Map;
  */
 public class ToveFileStorer
 {
+    private static final Sort.StringComparator STRING_COMPARATOR = new Sort.StringComparator();
+    private static final String PROPERTY_NAME = "name";
+
     private TypeDefinitions typeDefinitions;
     private TypeRegistry typeRegistry;
 
@@ -65,9 +66,20 @@ public class ToveFileStorer
     private Element fillElement(Configuration configuration, Element element)
     {
         CompositeType type = getType(configuration);
-        for (TypeProperty property: type.getProperties())
+
+        // Try to give a human-friendly sorting by processing properties
+        // alphabetically with the exception of "name" which will always be
+        // moved to the front if present.
+        List<String> propertyNames = type.getPropertyNames();
+        Collections.sort(propertyNames, STRING_COMPARATOR);
+        if (propertyNames.remove(PROPERTY_NAME))
         {
-            storeProperty(configuration, type, property, element);
+            propertyNames.add(0, PROPERTY_NAME);
+        }
+
+        for (String propertyName: propertyNames)
+        {
+            storeProperty(configuration, type, type.getProperty(propertyName), element);
         }
 
         return element;
@@ -91,7 +103,7 @@ public class ToveFileStorer
             String attributeValue = convertAttribute(configuration, type, property);
             if (attributeValue != null)
             {
-                element.addAttribute(new Attribute(property.getName(), attributeValue));
+                element.addAttribute(new Attribute(convertPropertyNameToLocalName(property.getName()), attributeValue));
             }
         }
         else if (propertyType instanceof CompositeType)
@@ -103,7 +115,7 @@ public class ToveFileStorer
                 String childName = typeDefinitions.getName(compositeType);
                 if (childName == null)
                 {
-                    childName = property.getName();
+                    childName = convertPropertyNameToLocalName(property.getName());
                 }
 
                 element.appendChild(buildElement(childName, childConfiguration));

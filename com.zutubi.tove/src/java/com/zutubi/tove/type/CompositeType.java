@@ -169,7 +169,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public List<String> getPropertyNames()
     {
-        return Collections.unmodifiableList(new LinkedList<String>(properties.keySet()));
+        return new LinkedList<String>(properties.keySet());
     }
 
     /**
