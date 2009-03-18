@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 /**
- * THe build was requested by a trigger (cron, scm...)
+ * The build was requested by a trigger (cron, scm...)
  */
 public class TriggerBuildReason extends AbstractBuildReason
 {

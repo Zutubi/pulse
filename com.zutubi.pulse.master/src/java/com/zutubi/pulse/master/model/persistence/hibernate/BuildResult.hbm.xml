@@ -73,6 +73,10 @@
             <property name="triggerName" type="string" column="DETAILS" length="255"/>
         </subclass>
 
+        <subclass name="com.zutubi.pulse.master.model.DependencyBuildReason" discriminator-value="DEPENDENCY" lazy="false">
+            <property name="dependencyName" type="string" column="DETAILS" length="255"/>
+        </subclass>
+
         <subclass name="com.zutubi.pulse.master.model.UnknownBuildReason" discriminator-value="UNKNOWN" lazy="false"/>
     </class>
 

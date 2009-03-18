@@ -221,7 +221,13 @@
     </bean>
 
     <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
-        <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
+        <property name="customSerialiserFactory" ref="customSerialiserFactory"/>
+    </bean>
+
+    <bean id="dependentBuildController" class="com.zutubi.pulse.master.DependentBuildController" init-method="init">
+        <property name="configurationProvider" ref="configurationProvider"/>
+        <property name="eventManager" ref="eventManager"/>
+        <property name="projectManager" ref="projectManager"/>
     </bean>
 
     <bean id="toveFileDocManager" class="com.zutubi.pulse.core.marshal.doc.ToveFileDocManager"/>

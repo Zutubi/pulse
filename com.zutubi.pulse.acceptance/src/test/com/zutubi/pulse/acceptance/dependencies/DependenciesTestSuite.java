@@ -18,7 +18,7 @@ public class DependenciesTestSuite
     public static Test suite()
     {
         TestSuite dependencySuite = new TestSuite();
-        dependencySuite.addTestSuite(PublicationAndDependenciesAcceptanceTest.class);
+        dependencySuite.addTestSuite(DependenciesAcceptanceTest.class);
         dependencySuite.addTestSuite(AritfactRepositoryIsolationTest.class);
 
         // cleanup the artifact repository before continueing on.

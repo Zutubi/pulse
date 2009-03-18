@@ -117,9 +117,9 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
         return "success".compareTo(getBuildStatus(projectName, buildNumber)) == 0;
     }
 
-    protected boolean isBuildFailed(String projectName, int buildNumber) throws Exception
+    protected boolean isBuildFailure(String projectName, int buildNumber) throws Exception
     {
-        return "failed".compareTo(getBuildStatus(projectName, buildNumber)) == 0;
+        return "failure".compareTo(getBuildStatus(projectName, buildNumber)) == 0;
     }
 
     protected boolean isBuildErrored(String projectName, int buildNumber) throws Exception
