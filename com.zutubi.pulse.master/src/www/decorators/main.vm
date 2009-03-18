@@ -145,14 +145,23 @@
                                 }]
                             }]
                         });
-                        
+
                         statusAreaEl = Ext.get('status-area');
                         statusMessageEl = Ext.get('status-message');
+
+                        ## By default, focus on the centermost panel so that
+                        ## the user can scroll using the keyboard only.
+                        var centerScrollable = Ext.get('nested-center').child('.x-panel-body');
+                        if (centerScrollable)
+                        {
+                            centerScrollable.focus();
+                        }
                     }
                 }
             }();
 
             Ext.onReady(PageLayout.init, PageLayout, true);
+            Ext.onReady(function(){});
 
             function hideStatus(animate)
             {
