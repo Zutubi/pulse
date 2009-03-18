@@ -11,4 +11,12 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 @Referenceable
 public class TrivialConfiguration extends AbstractNamedConfiguration
 {
+    public TrivialConfiguration()
+    {
+    }
+
+    public TrivialConfiguration(String name)
+    {
+        super(name);
+    }
 }

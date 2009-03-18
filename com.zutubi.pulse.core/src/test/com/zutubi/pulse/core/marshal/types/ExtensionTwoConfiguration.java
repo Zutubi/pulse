@@ -8,4 +8,12 @@ import com.zutubi.tove.annotations.SymbolicName;
 @SymbolicName("extensionTwo")
 public class ExtensionTwoConfiguration extends ExtendableConfiguration
 {
+    public ExtensionTwoConfiguration()
+    {
+    }
+
+    public ExtensionTwoConfiguration(String name)
+    {
+        super(name);
+    }
 }

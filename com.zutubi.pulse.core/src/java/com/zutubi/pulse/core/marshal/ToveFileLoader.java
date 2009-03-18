@@ -227,7 +227,7 @@ public class ToveFileLoader
     private Binder getBinder(CompositeType parentType, String elementName) throws FileLoadException
     {
         String propertyName = convertLocalNameToPropertyName(elementName);
-        Binder binder = getAdderByName(parentType, propertyName);
+        Binder binder = getBinderByName(parentType, propertyName);
         if (binder == null)
         {
             CompositeType type = typeDefinitions.getType(elementName);
@@ -251,8 +251,16 @@ public class ToveFileLoader
         return binder;
     }
 
-    private Binder getAdderByName(CompositeType parentType, String propertyName) throws FileLoadException
+    private Binder getBinderByName(CompositeType parentType, String propertyName) throws FileLoadException
     {
+        for (TypeProperty property: parentType.getProperties(CompositeType.class))
+        {
+            if (property.getName().equals(propertyName))
+            {
+                return new Setter(property);
+            }
+        }
+
         for (TypeProperty property: parentType.getProperties(CollectionType.class))
         {
             Addable annotation = property.getAnnotation(Addable.class);
@@ -1004,6 +1012,11 @@ public class ToveFileLoader
 
     private Object resolveReference(String rawReference, Class<? extends Configuration> expectedType, Scope scope) throws ResolutionException
     {
+        if (!TextUtils.stringSet(rawReference))
+        {
+            return null;
+        }
+        
         Object obj = ReferenceResolver.resolveReference(rawReference, scope);
         if (!expectedType.isInstance(obj))
         {

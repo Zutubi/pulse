@@ -9,4 +9,12 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 @SymbolicName("extendable")
 public abstract class ExtendableConfiguration extends AbstractNamedConfiguration
 {
+    protected ExtendableConfiguration()
+    {
+    }
+
+    public ExtendableConfiguration(String name)
+    {
+        super(name);
+    }
 }

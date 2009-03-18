@@ -6,4 +6,12 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 @SymbolicName("fakeCommand")
 public abstract class FakeCommand extends AbstractNamedConfiguration
 {
+    protected FakeCommand()
+    {
+    }
+
+    public FakeCommand(String name)
+    {
+        super(name);
+    }
 }

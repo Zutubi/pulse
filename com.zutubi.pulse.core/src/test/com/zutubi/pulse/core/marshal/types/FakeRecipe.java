@@ -13,6 +13,15 @@ public class FakeRecipe extends AbstractNamedConfiguration
     @Ordered
     private Map<String, FakeCommand> commands = new LinkedHashMap<String, FakeCommand>();
 
+    public FakeRecipe()
+    {
+    }
+
+    public FakeRecipe(String name)
+    {
+        super(name);
+    }
+
     public Map<String, FakeCommand> getCommands()
     {
         return commands;
@@ -21,5 +30,10 @@ public class FakeRecipe extends AbstractNamedConfiguration
     public void setCommands(Map<String, FakeCommand> commands)
     {
         this.commands = commands;
+    }
+
+    public void addCommand(FakeCommand command)
+    {
+        commands.put(command.getName(), command);
     }
 }
