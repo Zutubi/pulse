@@ -46,6 +46,7 @@ public class DependentBuildControllerTest extends PulseTestCase
 
         configurationProvider = mock(ConfigurationProvider.class);
         projectManager = mock(ProjectManager.class);
+        stub(projectManager.isProjectValid((Project) anyObject())).toReturn(true);
 
         controller = new DependentBuildController();
         controller.setEventManager(eventManager);
