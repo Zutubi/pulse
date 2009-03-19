@@ -61,7 +61,7 @@ public class DependentBuildController implements EventListener
             public boolean satisfied(DependencyConfiguration dependency)
             {
                 ProjectConfiguration config = dependency.getProject();
-                return config.isValid() && config.equals(builtProjectConfig);
+                return config.equals(builtProjectConfig);
             }
         });
 
@@ -84,13 +84,16 @@ public class DependentBuildController implements EventListener
     private void requestBuild(ProjectConfiguration builtProjectConfig, ProjectConfiguration dependentProject)
     {
         // trigger build request for this dependent project.
-        Project proj = projectManager.getProject(dependentProject.getProjectId(), false);
+        Project project = projectManager.getProject(dependentProject.getProjectId(), false);
 
-        BuildReason reason = new DependencyBuildReason(builtProjectConfig.getName());
-        BuildRevision revision = new BuildRevision();
-        BuildRequestEvent requestEvent = new BuildRequestEvent(this, reason, proj, revision, "dependency", true);
+        if (projectManager.isProjectValid(project))
+        {
+            BuildReason reason = new DependencyBuildReason(builtProjectConfig.getName());
+            BuildRevision revision = new BuildRevision();
+            BuildRequestEvent requestEvent = new BuildRequestEvent(this, reason, project, revision, "dependency", true);
 
-        eventManager.publish(requestEvent);
+            eventManager.publish(requestEvent);
+        }
     }
 
     private <T extends Configuration> Filter<T> findAll(Class<T> config)

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 /**
- *
+ * Indicates that the build was triggered by a project dependency relationship.
  */
 public class DependencyBuildReason extends AbstractBuildReason
 {

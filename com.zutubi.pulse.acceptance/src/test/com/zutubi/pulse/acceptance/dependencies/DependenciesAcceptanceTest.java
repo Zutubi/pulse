@@ -2,32 +2,30 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.waitUntilInRepository;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.clearArtifactRepository;
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
+import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.waitUntilInRepository;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.Mapping;
+import com.zutubi.util.*;
 
-import java.util.*;
 import java.io.IOException;
-import java.io.File;
+import java.util.*;
 
-/**
- * 
- */
 public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
+    /**
+     * Timeout waiting for a build to reach the expected state.
+     */
     private static final int BUILD_TIMEOUT = 90000;
+    /**
+     * Timeout waiting for an artifact to appear in the repository.
+     */
     private static final int AVAILABILITY_TIMEOUT = 5000;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        
+
         loginAsAdmin();
 
         clearArtifactRepository();
@@ -42,7 +40,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = triggerSuccessfulBuild(project);
 
         // verify existance of expected artifacts.
-        assertInRepository(project.name + "/ivy-" + buildNumber + ".xml");
+        assertIvyInRepository(project.name, buildNumber);
     }
 
     public void testPublish_SingleArtifact() throws Exception
@@ -54,8 +52,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = triggerSuccessfulBuild(project);
 
         // ensure that we have the expected artifact in the repository.
-        assertInRepository(project.name + "/ivy-" + buildNumber + ".xml");
-        assertInRepository(project.name + "/"+project.defaultStage.name+"/jars/artifact-" + buildNumber + ".jar");
+        assertIvyInRepository(project.name, buildNumber);
+        assertJarInRepository(project.name, project.defaultStage.name, "artifact", buildNumber);
     }
 
     public void testPublish_MultipleArtifacts() throws Exception
@@ -68,9 +66,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = triggerSuccessfulBuild(project);
 
         // ensure that we have the expected artifact in the repository.
-        assertInRepository(project.name + "/ivy-" + buildNumber + ".xml");
-        assertInRepository(project.name + "/"+project.defaultStage.name+"/jars/artifact-" + buildNumber + ".jar");
-        assertInRepository(project.name + "/"+project.defaultStage.name+"/jars/another-artifact-" + buildNumber + ".jar");
+        assertIvyInRepository(project.name, buildNumber);
+        assertJarInRepository(project.name, project.defaultStage.name, "artifact", buildNumber);
+        assertJarInRepository(project.name, project.defaultStage.name, "another-artifact", buildNumber);
     }
 
     public void testPublish_MultipleStages() throws Exception
@@ -82,9 +80,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         int buildNumber = triggerSuccessfulBuild(project);
 
-        assertInRepository(project.name + "/ivy-" + buildNumber + ".xml");
-        assertInRepository(project.name + "/default/jars/artifact-" + buildNumber + ".jar");
-        assertInRepository(project.name + "/stage/jars/artifact-" + buildNumber + ".jar");
+        assertIvyInRepository(project.name, buildNumber);
+        assertJarInRepository(project.name, "default", "artifact", buildNumber);
+        assertJarInRepository(project.name, "stage", "artifact", buildNumber);
     }
 
     public void testPublish_CustomPublicationPattern() throws Exception
@@ -97,8 +95,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = triggerSuccessfulBuild(project);
 
         // ensure that we have the expected artifact in the repository.
-        assertInRepository(project.name + "/ivy-" + buildNumber + ".xml");
-        assertInRepository(project.name + "/"+project.defaultStage.name +"/jars/artifact-" + buildNumber + ".jar");
+        assertIvyInRepository(project.name, buildNumber);
+        assertJarInRepository(project.name, project.defaultStage.name, "artifact", buildNumber);
     }
 
     public void testPublishFails_MissingArtifacts() throws Exception
@@ -114,8 +112,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(isBuildErrored(project.name, buildNumber));
 
         // ensure that we have the expected artifact in the repository.
-        assertNotInRepository(project.name + "/ivy-" + buildNumber + ".xml");
-        assertNotInRepository(project.name + "/"+project.defaultStage.name+"/jars/artifact-" + buildNumber + ".jar");
+        assertIvyNotInRepository(project.name, buildNumber);
+        assertJarNotInRepository(project.name, project.defaultStage.name, "artifact", buildNumber);
     }
 
     public void testRetrieve_SingleArtifact() throws Exception
@@ -128,7 +126,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         int buildNumber = triggerSuccessfulBuild(projectB);
 
-        assertInRepository(projectB.name + "/ivy-" + buildNumber + ".xml");
+        assertIvyInRepository(projectB.name, buildNumber);
     }
 
     public void testRetrieve_MultipleArtifacts() throws Exception
@@ -141,7 +139,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         int buildNumber = triggerSuccessfulBuild(projectB);
 
-        assertInRepository(projectB.name + "/ivy-" + buildNumber + ".xml");
+        assertIvyInRepository(projectB.name, buildNumber);
     }
 
     public void testRetrieve_MultipleProjects() throws Exception
@@ -155,7 +153,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         createProject(projectC);
 
         int buildNumber = triggerSuccessfulBuild(projectC);
-        assertInRepository(projectB.name + "/ivy-" + buildNumber + ".xml");
+        assertIvyInRepository(projectB.name, buildNumber);
     }
 
     public void testRetrieve_TransitiveDependencies() throws Exception
@@ -172,7 +170,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         createProject(projectC);
 
         int buildNumber = triggerSuccessfulBuild(projectC);
-        assertInRepository(projectB.name + "/ivy-" + buildNumber + ".xml");
+        assertIvyInRepository(projectB.name, buildNumber);
     }
 
     public void testRetrieveFails_MissingDependencies() throws Exception
@@ -184,14 +182,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         createProject(projectB);
 
         // change the retrieval pattern so that the artifacts are delivered to somewhere other than expected by the build.
-        setRetrievalPattern(projectB.name, projectB.defaultStage.name,  "some/other/path/[artifact].[ext]");
+        setRetrievalPattern(projectB.name, projectB.defaultStage.name, "some/other/path/[artifact].[ext]");
 
         int buildNumber = triggerBuild(projectB);
         assertTrue(isBuildFailure(projectB.name, buildNumber));
 
         // ensure that we have the expected artifact in the repository.
-        assertNotInRepository(projectB.name + "/ivy-" + buildNumber + ".xml");
-        assertNotInRepository(projectB.name + "/"+projectB.defaultStage.name+"/jars/artifact-" + buildNumber + ".jar");
+        assertIvyNotInRepository(projectB.name, buildNumber);
+        assertJarNotInRepository(projectB.name, projectB.defaultStage.name, "artifact", buildNumber);
     }
 
     public void testDependentBuild_TriggeredOnSuccess() throws Exception
@@ -207,6 +205,17 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         triggerSuccessfulBuild(projectA);
 
         xmlRpcHelper.waitForBuildToComplete(projectB.name, 1, BUILD_TIMEOUT);
+    }
+
+    public void testRepositoryFormat_OrgSpecified() throws Exception
+    {
+        Project project = new Project(randomName(), "org");
+        project.addArtifact("artifact.jar");
+        createProject(project);
+
+        int buildNumber = triggerSuccessfulBuild(project);
+
+        assertInRepository(project.org + "/" + project.name + "/ivy-" + buildNumber + ".xml");
     }
 
     private Project createAndTriggerProject(String... artifacts) throws Exception
@@ -258,7 +267,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             List<String> artifacts = applyIvyPattern(p.defaultStage.publicationPattern, p.getAllArtifacts());
             args = args + " -Dartifact.list=\"" + StringUtils.join(",", artifacts) + "\"";
         }
-        
+
         if (p.dependencies.size() > 0)
         {
             // get the list of expected dependent artifacts.
@@ -266,18 +275,23 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             args = args + " -Ddependency.list=\"" + StringUtils.join(",", dependencies) + "\"";
         }
 
-        Hashtable<String,Object> antConfig = xmlRpcHelper.getAntConfig();
+        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
         antConfig.put("targets", target);
         antConfig.put("args", args);
 
         xmlRpcHelper.insertSingleCommandProject(p.name, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.DEP_ANT_REPOSITORY), antConfig);
+
+        if (TextUtils.stringSet(p.org))
+        {
+            setProjectOrganisation(p);
+        }
 
         for (Stage stage : p.stages)
         {
             // create stage.
             ensureStageExists(p.name, stage.name);
 
-            for (String artifact: stage.artifacts)
+            for (String artifact : stage.artifacts)
             {
                 addPublication(p.name, stage.name, artifact);
             }
@@ -288,6 +302,15 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             addDependency(p.name, dependency.name, "*", "latest.integration");
         }
+    }
+
+    private void setProjectOrganisation(Project p) throws Exception
+    {
+        String path = "projects/" + p.name;
+        Hashtable<String, Object> projectConfig = xmlRpcHelper.getConfig(path);
+        projectConfig.put("organisation", p.org);
+
+        xmlRpcHelper.saveConfig(path, projectConfig, true);
     }
 
     private List<String> applyIvyPattern(final String pattern, final List<String> artifacts)
@@ -372,13 +395,33 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Vector<Hashtable<String, Object>> dependencies = (Vector<Hashtable<String, Object>>) projectDependencies.get("dependencies");
 
         Hashtable<String, Object> dependency = new Hashtable<String, Object>();
-        dependency.put("project", "projects/"+ dependentProject);
+        dependency.put("project", "projects/" + dependentProject);
         dependency.put("revision", revision);
         dependency.put("stages", stages);
         dependency.put("meta.symbolicName", "zutubi.dependency");
         dependencies.add(dependency);
 
         xmlRpcHelper.saveConfig(projectDependenciesPath, projectDependencies, true);
+    }
+
+    private void assertIvyInRepository(String projectName, int buildNumber) throws IOException
+    {
+        assertInRepository(projectName + "/ivy-" + buildNumber + ".xml");
+    }
+
+    private void assertIvyNotInRepository(String projectName, int buildNumber) throws IOException
+    {
+        assertNotInRepository(projectName + "/ivy-" + buildNumber + ".xml");
+    }
+
+    private void assertJarInRepository(String projectName, String stageName, String artifactName, int buildNumber) throws IOException
+    {
+        assertInRepository(projectName + "/" + stageName + "/jars/" + artifactName + "-" + buildNumber + ".jar");
+    }
+
+    private void assertJarNotInRepository(String projectName, String stageName, String artifactName, int buildNumber) throws IOException
+    {
+        assertNotInRepository(projectName + "/" + stageName + "/jars/" + artifactName + "-" + buildNumber + ".jar");
     }
 
     private void assertInRepository(String baseArtifactName) throws IOException
@@ -392,12 +435,6 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void assertNotInRepository(String baseArtifactName) throws IOException
     {
         assertFalse(waitUntilInRepository(baseArtifactName, AVAILABILITY_TIMEOUT));
-    }
-
-    private void assertRepositoryEmpty() throws IOException
-    {
-        File repo = getArtifactRepository();
-        assertTrue(repo.listFiles().length == 0);
     }
 
     private class Project
