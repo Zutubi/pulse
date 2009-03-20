@@ -25,6 +25,10 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public static final String XML_RPC_SYMBOLIC_NAME = "meta.symbolicName";
 
+    /**
+     * An instance of this type created via the default constructor.
+     */
+    private Configuration defaultInstance;
     private List<Annotation> annotations = new LinkedList<Annotation>();
     /**
      * If this type extends another, the type it extends (else null).
@@ -57,7 +61,7 @@ public class CompositeType extends AbstractType implements ComplexType
         {
             try
             {
-                type.newInstance();
+                defaultInstance = type.newInstance();
             }
             catch (Exception e)
             {
@@ -70,6 +74,11 @@ public class CompositeType extends AbstractType implements ComplexType
     public Class<? extends Configuration> getClazz()
     {
         return (Class<? extends Configuration>) super.getClazz();
+    }
+
+    public Configuration getDefaultInstance()
+    {
+        return defaultInstance;
     }
 
     public void addProperty(TypeProperty property) throws TypeException

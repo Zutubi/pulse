@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <frecipe name="default">
     <fant name="eatit" build-file="build.xml" targets="build test"/>
-    <fmake name="makeit" makefile="" targets="all test"/>
+    <fmake name="makeit" targets="all test"/>
 </frecipe>

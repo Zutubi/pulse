@@ -101,7 +101,7 @@ public class ToveFileStorer
         if (convertsToAttribute(property))
         {
             String attributeValue = convertAttribute(configuration, type, property);
-            if (attributeValue != null)
+            if (attributeValue != null && !attributeValue.equals(convertAttribute(type.getDefaultInstance(), type, property)))
             {
                 element.addAttribute(new Attribute(convertPropertyNameToLocalName(property.getName()), attributeValue));
             }

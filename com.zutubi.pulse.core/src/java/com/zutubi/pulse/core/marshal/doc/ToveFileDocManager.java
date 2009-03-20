@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.marshal.ToveFileUtils;
 import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
@@ -186,44 +185,32 @@ public class ToveFileDocManager
             docs = new ElementDocs(typeDocs.getBrief(), typeDocs.getVerbose());
             concreteCache.put(type, docs);
 
-            try
+            for (TypeProperty property: type.getProperties())
             {
-                Configuration defaultInstance = type.getClazz().newInstance();
-                for (TypeProperty property: type.getProperties())
+                if (ToveFileUtils.convertsToAttribute(property))
                 {
-                    if (ToveFileUtils.convertsToAttribute(property))
-                    {
-                        addAttribute(docs, type, property, defaultInstance, typeDocs);
-                    }
-                    else if (property.getAnnotation(Content.class) != null)
-                    {
-                        docs.setContentDocs(new ContentDocs(formatProperty(messages, type, property, KEY_SUFFIX_CONTENT)));
-                    }
-                    else
-                    {
-                        addChildElements(docs, type, property, typeDefinitions, messages);
-                    }
+                    addAttribute(docs, type, property, typeDocs);
                 }
-            }
-            catch (InstantiationException e)
-            {
-                LOG.warning(e);
-            }
-            catch (IllegalAccessException e)
-            {
-                LOG.warning(e);
+                else if (property.getAnnotation(Content.class) != null)
+                {
+                    docs.setContentDocs(new ContentDocs(formatProperty(messages, type, property, KEY_SUFFIX_CONTENT)));
+                }
+                else
+                {
+                    addChildElements(docs, type, property, typeDefinitions, messages);
+                }
             }
         }
 
         return docs;
     }
 
-    private void addAttribute(ElementDocs element, CompositeType type, TypeProperty property, Configuration defaultInstance, TypeDocs typeDocs)
+    private void addAttribute(ElementDocs element, CompositeType type, TypeProperty property, TypeDocs typeDocs)
     {
         PropertyDocs propertyDocs = typeDocs.getPropertyDocs(property.getName());
         try
         {
-            element.addAttribute(new AttributeDocs(convertPropertyNameToLocalName(property.getName()), propertyDocs.getVerbose(), isRequired(property), getDefaultValue(type, property, defaultInstance)));
+            element.addAttribute(new AttributeDocs(convertPropertyNameToLocalName(property.getName()), propertyDocs.getVerbose(), isRequired(property), getDefaultValue(type, property)));
         }
         catch (Exception e)
         {
@@ -236,9 +223,9 @@ public class ToveFileDocManager
         return property.getAnnotation(Required.class) != null;
     }
 
-    private String getDefaultValue(CompositeType type, TypeProperty property, Configuration defaultInstance) throws Exception
+    private String getDefaultValue(CompositeType type, TypeProperty property) throws Exception
     {
-        String value = ToveFileUtils.convertAttribute(defaultInstance, type, property);
+        String value = ToveFileUtils.convertAttribute(type.getDefaultInstance(), type, property);
         if (value == null)
         {
             value = "";

@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.marshal.types.*;
 import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import static java.util.Arrays.asList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +42,7 @@ public class ToveFileStorerTest extends PulseTestCase
 
         TypeDefinitions typeDefinitions = new TypeDefinitions();
         typeDefinitions.register("mixed", typeRegistry.getType(MixedConfiguration.class));
+        typeDefinitions.register("defaults", typeRegistry.register(DefaultValuesConfiguration.class));
         typeDefinitions.register("e1", typeRegistry.register(ExtensionOneConfiguration.class));
         typeDefinitions.register("e2", typeRegistry.register(ExtensionTwoConfiguration.class));
         typeDefinitions.register("frecipe", typeRegistry.register(FakeRecipe.class));
@@ -211,20 +214,220 @@ public class ToveFileStorerTest extends PulseTestCase
 
     public void testFakeRecipeFile() throws IOException
     {
+        FakeRecipe recipe = new FakeRecipe("default");
+        FakeAntCommand ant = new FakeAntCommand("eatit");
+        ant.setBuildFile("build.xml");
+        ant.setTargets("build test");
+        recipe.addCommand(ant);
+        FakeMakeCommand make = new FakeMakeCommand("makeit");
+        make.setTargets(Arrays.asList("all", "test"));
+        recipe.addCommand(make);
+
+        expectedOutputHelper(recipe, new Element("frecipe"));
+    }
+
+    public void testDefaultValuesAllDefaults() throws IOException
+    {
+        expectedOutputHelper(new DefaultValuesConfiguration(), new Element("defaults"));
+    }
+
+    public void testDefaultValuesStringNullSetEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringNull("");
+        expectedOutputHelper(config, new Element("defaults"));
+
+        // Null and empty are the same, so we get our default on the other end.
+        config = roundTrip(config);
+        assertNull(config.getStringNull());
+    }
+
+    public void testDefaultValuesStringNullSetNonEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringNull("something");
+        config = roundTrip(config);
+        assertEquals("something", config.getStringNull());
+    }
+
+    public void testDefaultValuesStringEmptySetNull() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringEmpty(null);
+        expectedOutputHelper(config, new Element("defaults"));
+
+        // Null and empty are the same, so we get our default on the other end.
+        config = roundTrip(config);
+        assertEquals("", config.getStringEmpty());
+    }
+
+    public void testDefaultValuesStringEmptySetNonEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringEmpty("something");
+        config = roundTrip(config);
+        assertEquals("something", config.getStringEmpty());
+    }
+
+    public void testDefaultValuesStringNonEmptySetNull() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringNonEmpty(null);
+        config = roundTrip(config);
+        assertEquals("", config.getStringNonEmpty());
+    }
+
+    public void testDefaultValuesStringNonEmptySetEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringNonEmpty("");
+        config = roundTrip(config);
+        assertEquals("", config.getStringNonEmpty());
+    }
+
+    public void testDefaultValuesStringNonEmptyChanged() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringNonEmpty("new&shiny");
+        config = roundTrip(config);
+        assertEquals("new&shiny", config.getStringNonEmpty());
+    }
+
+    public void testDefaultValuesIntZeroSetNonZero() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setIntZero(198);
+        config = roundTrip(config);
+        assertEquals(198, config.getIntZero());
+    }
+
+    public void testDefaultValuesIntNonZeroSetZero() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setIntNonZero(0);
+        config = roundTrip(config);
+        assertEquals(0, config.getIntNonZero());
+    }
+
+    public void testDefaultValuesEnumNullSetNonNull() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setEnumNull(TestEnum.C_2);
+        config = roundTrip(config);
+        assertEquals(TestEnum.C_2, config.getEnumNull());
+    }
+
+    public void testDefaultValuesEnumNonNullSetNull() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setEnumNonNull(null);
+        config = roundTrip(config);
+        assertNull(config.getEnumNonNull());
+    }
+
+    public void testDefaultValuesStringListNullSetEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringListNull(Collections.<String>emptyList());
+        config = roundTrip(config);
+        assertNull(config.getStringListNull());
+    }
+
+    public void testDefaultValuesStringListNullSetNonEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringListNull(Arrays.asList("hehe"));
+        config = roundTrip(config);
+        assertEquals(Arrays.asList("hehe"), config.getStringListNull());
+    }
+
+    public void testDefaultValuesStringListEmptySetNull() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringListEmpty(null);
+        config = roundTrip(config);
+        assertEquals(Collections.<String>emptyList(), config.getStringListEmpty());
+    }
+
+    public void testDefaultValuesStringListEmptySetNonEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringListEmpty(Arrays.asList("fee", "fie"));
+        config = roundTrip(config);
+        assertEquals(Arrays.asList("fee", "fie"), config.getStringListEmpty());
+    }
+
+    public void testDefaultValuesStringListNonEmptySetNull() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringListNonEmpty(null);
+        config = roundTrip(config);
+        assertEquals(Collections.<String>emptyList(), config.getStringListNonEmpty());
+    }
+
+    public void testDefaultValuesStringListNonEmptySetEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setStringListNonEmpty(Collections.<String>emptyList());
+        config = roundTrip(config);
+        assertEquals(Collections.<String>emptyList(), config.getStringListNonEmpty());
+    }
+
+    public void testDefaultValuesEnumListNullSetEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setEnumListNull(Collections.<TestEnum>emptyList());
+        config = roundTrip(config);
+        assertNull(config.getEnumListNull());
+    }
+
+    public void testDefaultValuesEnumListNullSetNonEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setEnumListNull(Arrays.asList(TestEnum.C1));
+        config = roundTrip(config);
+        assertEquals(Arrays.asList(TestEnum.C1), config.getEnumListNull());
+    }
+
+    public void testDefaultValuesEnumListEmptySetNull() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setEnumListEmpty(null);
+        config = roundTrip(config);
+        assertEquals(Collections.<TestEnum>emptyList(), config.getEnumListEmpty());
+    }
+
+    public void testDefaultValuesTestEnumListEmptySetNonEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setEnumListEmpty(Arrays.asList(TestEnum.C3));
+        config = roundTrip(config);
+        assertEquals(Arrays.asList(TestEnum.C3), config.getEnumListEmpty());
+    }
+
+    public void testDefaultValuesEnumListNonEmptySetNull() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setEnumListNonEmpty(null);
+        config = roundTrip(config);
+        assertEquals(Collections.<TestEnum>emptyList(), config.getEnumListNonEmpty());
+    }
+
+    public void testDefaultValuesEnumListNonEmptySetEmpty() throws IOException, PulseException
+    {
+        DefaultValuesConfiguration config = new DefaultValuesConfiguration();
+        config.setEnumListNonEmpty(Collections.<TestEnum>emptyList());
+        config = roundTrip(config);
+        assertEquals(Collections.<TestEnum>emptyList(), config.getEnumListNonEmpty());
+    }
+    
+    private void expectedOutputHelper(Configuration root, Element element) throws IOException
+    {
         File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
         try
         {
-            FakeRecipe recipe = new FakeRecipe("default");
-            FakeAntCommand ant = new FakeAntCommand("eatit");
-            ant.setBuildFile("build.xml");
-            ant.setTargets("build test");
-            recipe.addCommand(ant);
-            FakeMakeCommand make = new FakeMakeCommand("makeit");
-            make.setTargets(Arrays.asList("all", "test"));
-            recipe.addCommand(make);
-            
             File out = new File(tempDir, "pulse.xml");
-            storer.store(out, recipe, new Element("frecipe"));
+            storer.store(out, root, element);
             IOAssertions.assertFilesEqual(copyInputToDirectory("xml", tempDir), out);
         }
         finally
@@ -233,13 +436,22 @@ public class ToveFileStorerTest extends PulseTestCase
         }
     }
 
-    private MixedConfiguration roundTrip(MixedConfiguration mixed) throws IOException, PulseException
+    private MixedConfiguration roundTrip(MixedConfiguration in) throws IOException, PulseException
+    {
+        return roundTrip(in, new MixedConfiguration());
+    }
+
+    private DefaultValuesConfiguration roundTrip(DefaultValuesConfiguration in) throws IOException, PulseException
+    {
+        return roundTrip(in, new DefaultValuesConfiguration());
+    }
+
+    private <T extends Configuration> T roundTrip(T in, T out) throws IOException, PulseException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        storer.store(os, mixed, new Element("root"));
+        storer.store(os, in, new Element("root"));
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-        mixed = new MixedConfiguration();
-        loader.load(is, mixed, scope, new ImportingNotSupportedFileResolver(), new DefaultTypeLoadPredicate());
-        return mixed;
+        loader.load(is, out, scope, new ImportingNotSupportedFileResolver(), new DefaultTypeLoadPredicate());
+        return out;
     }
 }
