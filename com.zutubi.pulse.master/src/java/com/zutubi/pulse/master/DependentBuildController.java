@@ -90,7 +90,8 @@ public class DependentBuildController implements EventListener
         {
             BuildReason reason = new DependencyBuildReason(builtProjectConfig.getName());
             BuildRevision revision = new BuildRevision();
-            BuildRequestEvent requestEvent = new BuildRequestEvent(this, reason, project, revision, "dependency", true);
+            String source = "dependency of " + dependentProject.getName();
+            BuildRequestEvent requestEvent = new BuildRequestEvent(this, reason, project, revision, source, true);
 
             eventManager.publish(requestEvent);
         }
