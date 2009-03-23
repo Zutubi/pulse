@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 
 /**
@@ -25,7 +26,7 @@ public class RetrieveDependenciesCommand extends BaseIvyCommand
         {
             ExecutionContext context = commandContext.getExecutionContext();
 
-            updateIvyCredentials(context);
+            updateIvyCredentials((PulseExecutionContext)context);
 
             ModuleDescriptor descriptor = context.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
             ivy.resolve(descriptor);

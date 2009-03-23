@@ -3,8 +3,6 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.lang.reflect.Method;
 import java.text.DateFormat;
@@ -23,7 +21,7 @@ public class ShutdownManager
     /**
      * The list of callbacks that are notified during shutdown.
      */
-    private List<Stoppable> stoppables = new LinkedList<Stoppable>();
+    private final List<Stoppable> stoppables = new LinkedList<Stoppable>();
 
     private static final int EXIT_REBOOT = 111;
 
@@ -97,6 +95,12 @@ public class ShutdownManager
 
     public void stop(boolean force)
     {
+        List<Stoppable> stoppables = new LinkedList<Stoppable>();
+        synchronized (this.stoppables)
+        {
+            stoppables.addAll(this.stoppables);
+        }
+        
         for (Stoppable stoppable : stoppables)
         {
             try
@@ -154,17 +158,21 @@ public class ShutdownManager
     {
         if (stoppables == null)
         {
-            this.stoppables = new LinkedList<Stoppable>();
+            stoppables = new LinkedList<Stoppable>();
         }
-        else
+
+        for (Stoppable stoppable : stoppables)
         {
-            this.stoppables = CollectionUtils.filter(stoppables, new Predicate<Stoppable>()
+            if (stoppable == null)
             {
-                public boolean satisfied(Stoppable stoppable)
-                {
-                    return stoppable != null;
-                }
-            });
+                throw new IllegalArgumentException("Stoppable instance can not be null.");
+            }
+        }
+
+        synchronized (this.stoppables)
+        {
+            this.stoppables.clear();
+            this.stoppables.addAll(stoppables);
         }
     }
 
@@ -174,7 +182,10 @@ public class ShutdownManager
         {
             throw new IllegalArgumentException("Stoppable instance can not be null.");
         }
-        stoppables.add(stoppable);
+        synchronized (stoppables)
+        {
+            stoppables.add(stoppable);
+        }
     }
 
     public void reboot()

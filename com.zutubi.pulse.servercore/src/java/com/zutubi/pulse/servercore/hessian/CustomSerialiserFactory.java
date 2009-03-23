@@ -44,23 +44,23 @@ public class CustomSerialiserFactory extends AbstractSerializerFactory
         return lookup(cl, deserialisers);
     }
 
-    private <T> T lookup(Class cl, final Map<Class, T> map)
+    private <T> T lookup(final Class cl, final Map<Class, T> map)
     {
-        // note, since the getAssignableTo returns a set of an unspecified order,
-        // if a class has multiple possible de/serialisers registered, the first
-        // one encountered will be used.  This is not necessarily the best output
-        // but is sufficient at the time of writing.
-        Class closestAssignable = CollectionUtils.find(getAssignableTo(cl), new Predicate<Class>()
+        if (map.containsKey(cl))
         {
-            public boolean satisfied(Class aClass)
+            return map.get(cl);
+        }
+
+        Map.Entry<Class, T> e = CollectionUtils.find(map.entrySet(), new Predicate<Map.Entry<Class, T>>()
+        {
+            public boolean satisfied(Map.Entry<Class, T> entry)
             {
-                return map.containsKey(aClass);
+                return entry.getKey().isAssignableFrom(cl);
             }
         });
-
-        if (closestAssignable != null)
+        if (e != null)
         {
-            return map.get(closestAssignable);
+            return e.getValue();
         }
         return null;
     }

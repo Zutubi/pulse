@@ -119,7 +119,7 @@ public class BuildProperties
     /**
      * The name of the organisation of the project being built.
      */
-    public static final String PROPERTY_ORGANISATION            = "org";
+    public static final String PROPERTY_ORGANISATION            = "organisation";
     /**
      * The name of the project being built.
      */
@@ -211,13 +211,6 @@ public class BuildProperties
      */
     public static final String PROPERTY_DEPENDENCY_DESCRIPTOR   = "dependency.descriptor";
 
-    /**
-     * A hash string unique to this build that can be used to authenticate a process running in the
-     * context of the build.  For instance, an ivy publish from an agent can authenticate itself with
-     * the artifact repository using this hash.
-     */
-    public static final String PROPERTY_SECURITY_HASH           = "hash";
-    
     /**
      * Internal property used to collect test results for a recipe.
      */

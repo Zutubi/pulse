@@ -423,13 +423,6 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         PulseScope scope = ((PulseExecutionContext) context).getScope();
         for(Reference reference: scope.getReferences(String.class))
         {
-            // do not add this property to the environment to make it at least somewhat
-            // cumbersome to access the hash.
-            if (reference.getName().compareTo(BuildProperties.PROPERTY_SECURITY_HASH) == 0)
-            {
-                continue;
-            }
-
             if(acceptableName(reference.getName()))
             {
                 childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());

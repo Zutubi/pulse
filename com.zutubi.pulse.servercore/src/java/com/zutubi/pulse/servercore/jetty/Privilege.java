@@ -5,6 +5,8 @@ import com.zutubi.util.Predicate;
 
 import java.util.List;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * A simple holder for the path, role, methods tuple.  The represented data is defined as follows:
@@ -18,13 +20,14 @@ public class Privilege
 {
     private String path;
     private String role;
-    private List<String> methods;
+    private Set<String> methods;
 
     protected Privilege(String path, String role, String... methods)
     {
         this.path = path;
         this.role = role;
-        this.methods = Arrays.asList(methods);
+        this.methods = new HashSet<String>();
+        this.methods.addAll(Arrays.asList(methods));
     }
 
     public String getPath()
@@ -37,19 +40,13 @@ public class Privilege
         return role;
     }
 
-    public List<String> getMethods()
+    public Set<String> getMethods()
     {
         return methods;
     }
 
     public boolean containsMethod(final String method)
     {
-        return contains(methods, new Predicate<String>()
-        {
-            public boolean satisfied(String s)
-            {
-                return  method.compareTo(s) == 0;
-            }
-        });
+        return methods.contains(method);
     }
 }

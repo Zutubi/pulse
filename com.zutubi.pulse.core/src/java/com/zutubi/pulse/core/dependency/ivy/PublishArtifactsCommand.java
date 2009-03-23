@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
@@ -35,7 +36,7 @@ public class PublishArtifactsCommand extends BaseIvyCommand
         {
             ExecutionContext context = commandContext.getExecutionContext();
 
-            updateIvyCredentials(context);
+            updateIvyCredentials((PulseExecutionContext)context);
 
             ModuleDescriptor descriptor = context.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
             ivy.resolve(descriptor);

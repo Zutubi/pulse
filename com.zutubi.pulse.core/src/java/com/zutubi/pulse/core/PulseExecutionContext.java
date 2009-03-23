@@ -37,6 +37,12 @@ public class PulseExecutionContext implements ExecutionContext
     // pass this value around as a user(?) property rather than directly implemented as a field.
     private String version = null;
 
+    /**
+     * A security token that can be used to authenticate processes that run during the build that
+     * need access to the artifact repository.
+     */
+    private String securityHash = null;
+
     public PulseExecutionContext()
     {
         scopeStack = new MultiScopeStack(NAMESPACE_INTERNAL, NAMESPACE_USER);
@@ -284,5 +290,15 @@ public class PulseExecutionContext implements ExecutionContext
     public void setVersion(String version)
     {
         this.version = version;
+    }
+
+    public String getSecurityHash()
+    {
+        return securityHash;
+    }
+
+    public void setSecurityHash(String securityHash)
+    {
+        this.securityHash = securityHash;
     }
 }

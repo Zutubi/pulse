@@ -169,7 +169,7 @@ public class BuildController implements EventListener
     private void activateBuildAuthenticationToken()
     {
         String token = RandomUtils.randomToken(15);
-        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SECURITY_HASH, token);
+        buildContext.setSecurityHash(token);
         buildTokenAuthenticationProvider.activate(token);
     }
 
@@ -179,7 +179,7 @@ public class BuildController implements EventListener
      */
     private void deactivateBuildAuthenticationToken()
     {
-        String token = buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_SECURITY_HASH);
+        String token = buildContext.getSecurityHash();
         buildTokenAuthenticationProvider.deactivate(token);
     }
 
@@ -252,6 +252,7 @@ public class BuildController implements EventListener
         String status = "integration";
         DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, status, null); // the status needs to be configurable - options include 'release'..
         descriptor.addConfiguration(new Configuration("build"));
+        descriptor.addExtraAttributeNamespace("e", "http://ant.apache.org/ivy/extra");
 
         // setup the module dependencies.
         for (DependencyConfiguration dependency : project.getDependencies().getDependencies())
@@ -988,7 +989,7 @@ public class BuildController implements EventListener
         try
         {
             String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
-            CredentialsStore.INSTANCE.addCredentials("Pulse", new URL(masterUrl).getHost(), "pulse", buildContext.getString(NAMESPACE_INTERNAL, PROPERTY_SECURITY_HASH));
+            CredentialsStore.INSTANCE.addCredentials("Pulse", new URL(masterUrl).getHost(), "pulse", buildContext.getSecurityHash());
 
             String repositoryUrl = masterUrl + "/repository";
             IvySupport ivy = ivyProvider.getIvySupport(repositoryUrl);
