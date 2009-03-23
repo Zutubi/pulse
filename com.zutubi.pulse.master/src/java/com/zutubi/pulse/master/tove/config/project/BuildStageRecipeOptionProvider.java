@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.PulseFileLoader;
-import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
+import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.marshal.RelativeFileResolver;
 import com.zutubi.pulse.core.scm.api.Revision;

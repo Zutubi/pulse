@@ -1,15 +1,14 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.engine.marshal;
 
+import com.zutubi.pulse.core.RecipeVersionConfiguration;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
-import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.marshal.ToveFileStorer;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
-import com.zutubi.pulse.core.marshal.doc.ToveFileDocManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.ObjectFactory;
@@ -22,10 +21,9 @@ public class PulseFileLoaderFactory
 {
     public static final String ROOT_ELEMENT = "project";
 
-    private TypeDefinitions typeDefinitions = new TypeDefinitions();
-    private ObjectFactory objectFactory;
-    private TypeRegistry typeRegistry;
-    private ToveFileDocManager toveFileDocManager;
+    protected TypeDefinitions typeDefinitions = new TypeDefinitions();
+    protected ObjectFactory objectFactory;
+    protected TypeRegistry typeRegistry;
 
     public void init()
     {
@@ -35,11 +33,6 @@ public class PulseFileLoaderFactory
         register("link-artifact", LinkOutputConfiguration.class);
         register("artifact", FileOutputConfiguration.class);
         register("version", RecipeVersionConfiguration.class);
-
-        if (toveFileDocManager != null)
-        {
-            toveFileDocManager.registerRoot(ROOT_ELEMENT, typeRegistry.getType(ProjectRecipesConfiguration.class), typeDefinitions);
-        }
     }
 
     public PulseFileLoader createLoader()
@@ -61,7 +54,7 @@ public class PulseFileLoaderFactory
         return typeDefinitions;
     }
 
-    public void register(String name, Class clazz)
+    public CompositeType register(String name, Class clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if (type == null)
@@ -70,19 +63,12 @@ public class PulseFileLoaderFactory
         }
 
         typeDefinitions.register(name, type);
-        if (toveFileDocManager != null)
-        {
-            toveFileDocManager.registerType(name, type, typeDefinitions);
-        }
+        return type;
     }
 
-    public void unregister(String name)
+    public CompositeType unregister(String name)
     {
-        CompositeType type = typeDefinitions.unregister(name);
-        if (type != null && toveFileDocManager != null)
-        {
-            toveFileDocManager.unregisterType(name, type);
-        }
+        return typeDefinitions.unregister(name);
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)
@@ -93,10 +79,5 @@ public class PulseFileLoaderFactory
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
-    }
-
-    public void setToveFileDocManager(ToveFileDocManager toveFileDocManager)
-    {
-        this.toveFileDocManager = toveFileDocManager;
     }
 }

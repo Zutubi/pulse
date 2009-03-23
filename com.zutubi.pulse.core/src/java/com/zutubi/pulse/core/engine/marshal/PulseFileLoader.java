@@ -1,5 +1,8 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.engine.marshal;
 
+import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.RecipeListingPredicate;
+import com.zutubi.pulse.core.RecipeLoadPredicate;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;

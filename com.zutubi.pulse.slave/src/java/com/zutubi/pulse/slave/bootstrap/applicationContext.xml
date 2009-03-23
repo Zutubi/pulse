@@ -71,7 +71,7 @@
 
     <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" init-method="init"/>
 
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" init-method="init"/>
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory" init-method="init"/>
 
     <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory"/>
 

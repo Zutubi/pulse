@@ -115,9 +115,9 @@
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor"/>
     <bean id="ivyProvider" class="com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider"/>
 
-    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" init-method="init"/>
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.master.engine.marshal.MasterPulseFileLoaderFactory" init-method="init"/>
 
-    <bean id="resourceFileLoader" class="com.zutubi.pulse.core.ResourceFileLoader" init-method="init"/>
+    <bean id="resourceFileLoader" class="com.zutubi.pulse.master.engine.marshal.MasterResourceFileLoader" init-method="init"/>
 
     <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory"/>
 

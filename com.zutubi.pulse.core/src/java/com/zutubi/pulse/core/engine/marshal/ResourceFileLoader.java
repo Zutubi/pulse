@@ -1,11 +1,12 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.engine.marshal;
 
+import com.zutubi.pulse.core.InMemoryResourceRepository;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.engine.ResourcesConfiguration;
 import com.zutubi.pulse.core.marshal.LocalFileResolver;
 import com.zutubi.pulse.core.marshal.ToveFileLoader;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
-import com.zutubi.pulse.core.marshal.doc.ToveFileDocManager;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.ObjectFactory;
@@ -22,26 +23,22 @@ public class ResourceFileLoader
 
     private static final String ELEMENT_RESOURCE = "resource";
 
-    private ToveFileLoader loader;
-    private TypeRegistry typeRegistry;
-    private ObjectFactory objectFactory;
-    private ToveFileDocManager toveFileDocManager;
+    protected TypeDefinitions typeDefinitions;
+
+    protected ToveFileLoader loader;
+    protected TypeRegistry typeRegistry;
+    protected ObjectFactory objectFactory;
 
     public void init()
     {
-        TypeDefinitions definitions = new TypeDefinitions();
-        definitions.register(ELEMENT_RESOURCE, typeRegistry.getType(ResourceConfiguration.class));
+        typeDefinitions = new TypeDefinitions();
+        typeDefinitions.register(ELEMENT_RESOURCE, typeRegistry.getType(ResourceConfiguration.class));
 
         loader = new ToveFileLoader();
         loader.setObjectFactory(objectFactory);
         loader.setValidationManager(new PulseValidationManager());
         loader.setTypeRegistry(typeRegistry);
-        loader.setTypeDefinitions(definitions);
-
-        if(toveFileDocManager != null)
-        {
-            toveFileDocManager.registerRoot(ROOT_ELEMENT, typeRegistry.getType(ResourcesConfiguration.class), definitions);
-        }
+        loader.setTypeDefinitions(typeDefinitions);
     }
 
     public InMemoryResourceRepository load(File input) throws PulseException, IOException
@@ -68,10 +65,5 @@ public class ResourceFileLoader
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
-    }
-
-    public void setToveFileDocManager(ToveFileDocManager toveFileDocManager)
-    {
-        this.toveFileDocManager = toveFileDocManager;
     }
 }

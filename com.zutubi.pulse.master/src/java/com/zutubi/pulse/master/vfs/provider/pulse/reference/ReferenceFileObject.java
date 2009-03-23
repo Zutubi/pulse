@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.reference;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.zutubi.pulse.core.ResourceFileLoader;
+import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
+import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ComparatorProvider;
 import org.apache.commons.vfs.FileName;

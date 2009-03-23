@@ -1,5 +1,6 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.engine.marshal;
 
+import com.zutubi.pulse.core.FileLoaderTestBase;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.marshal.ImportingNotSupportedFileResolver;
 import com.zutubi.util.io.IOUtils;

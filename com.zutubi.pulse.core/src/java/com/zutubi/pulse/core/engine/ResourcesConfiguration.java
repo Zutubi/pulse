@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.engine;
 
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;

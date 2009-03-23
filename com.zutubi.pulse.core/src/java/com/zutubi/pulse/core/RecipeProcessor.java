@@ -13,6 +13,8 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
+import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.marshal.LocalFileResolver;
@@ -26,6 +28,7 @@ import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,10 +38,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
-import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.core.module.descriptor.Artifact;
 
 /**
  * The recipe processor, as the name suggests, is responsible for running recipies.
