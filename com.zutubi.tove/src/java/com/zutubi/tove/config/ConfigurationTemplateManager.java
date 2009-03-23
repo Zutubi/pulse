@@ -568,7 +568,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         CompositeType gotType = typeRegistry.getType(symbolicName);
         if (gotType == null)
         {
-            throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "'");
+            throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "' when expecting type '" + expectedType.getClazz() + "'");
         }
 
         if (!allowedTypes.contains(gotType))

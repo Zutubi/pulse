@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <recipe name="foo">
+        <command>
+            <executable name="jim"/>
+            <artifact name="foo" file="foo.txt"/>
+            <dir-artifact name="bar" base="bar.dir">
+                <process processor="${jim}"/>
+            </dir-artifact>
+        </command>
+    </recipe>
+</project>

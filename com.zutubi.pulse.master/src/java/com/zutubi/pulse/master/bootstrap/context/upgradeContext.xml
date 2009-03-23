@@ -50,6 +50,10 @@
                 <ref local="fixPermanentUsers"/>
                 <ref local="revisionStringLimit"/>
                 <ref local="resourceRequirementOptional"/>
+                <ref local="globalPostProcessors"/>
+                <ref local="multiRecipeProjectType"/>
+                <ref local="skeletonPostProcessors"/>
+                <ref local="toveFile"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -165,5 +169,21 @@
 
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">
         <property name="buildNumber" value="200999001"/>
+    </bean>
+
+    <bean id="globalPostProcessors" class="com.zutubi.pulse.master.upgrade.tasks.GlobalPostProcessorsUpgradeTask">
+        <property name="buildNumber" value="200999002"/>
+    </bean>
+
+    <bean id="multiRecipeProjectType" class="com.zutubi.pulse.master.upgrade.tasks.MultiRecipeProjectTypeUpgradeTask">
+        <property name="buildNumber" value="200999003"/>
+    </bean>
+
+    <bean id="skeletonPostProcessors" class="com.zutubi.pulse.master.upgrade.tasks.SkeletonPostProcessorsUpgradeTask">
+        <property name="buildNumber" value="200999004"/>
+    </bean>
+
+    <bean id="toveFile" class="com.zutubi.pulse.master.upgrade.tasks.ToveFileUpgradeTask">
+        <property name="buildNumber" value="200999005"/>
     </bean>
 </beans>

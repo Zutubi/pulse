@@ -33,6 +33,10 @@ public class MutableRecordImpl extends AbstractMutableRecord
 
     public void putMeta(String key, String value)
     {
+        if (value == null)
+        {
+            throw new NullPointerException();
+        }
         getMeta().put(key, value);
     }
 
@@ -48,6 +52,10 @@ public class MutableRecordImpl extends AbstractMutableRecord
 
     public Object put(String key, Object value)
     {
+        if (value == null)
+        {
+            throw new NullPointerException();
+        }
         return getData().put(key, value);
     }
 
