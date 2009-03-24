@@ -4,11 +4,9 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
@@ -71,12 +69,6 @@ public class DependentBuildController implements EventListener
         {
             ProjectConfiguration dependentProject = configurationProvider.getAncestorOfType(dependency, ProjectConfiguration.class);
 
-            // Optional(?) optimisation: are any of this projects dependencies currently being built? If so,
-            // we can hold off on building it just yet since we will need to rebuild it again shortly anyway.
-
-            // list the projects dependencies.
-            // - check if any of them are being built.
-
             requestBuild(builtProjectConfig, dependentProject);
         }
     }
@@ -89,11 +81,8 @@ public class DependentBuildController implements EventListener
         if (projectManager.isProjectValid(project))
         {
             BuildReason reason = new DependencyBuildReason(builtProjectConfig.getName());
-            BuildRevision revision = new BuildRevision();
             String source = "dependency of " + dependentProject.getName();
-            BuildRequestEvent requestEvent = new BuildRequestEvent(this, reason, project, revision, source, true);
-
-            eventManager.publish(requestEvent);
+            projectManager.triggerBuild(dependentProject, reason, null, source, true, false);
         }
     }
 
