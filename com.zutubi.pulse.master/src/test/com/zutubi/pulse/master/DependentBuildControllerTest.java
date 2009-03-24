@@ -2,29 +2,24 @@ package com.zutubi.pulse.master;
 
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
-import com.zutubi.events.EventListener;
-import com.zutubi.events.Event;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.events.build.BuildRequestEvent;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.UnknownBuildReason;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
 import static org.mockito.Mockito.*;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 public class DependentBuildControllerTest extends PulseTestCase
 {
     private EventManager eventManager;
-    private EventLogger logger;
-    private DependentBuildController controller;
     private ConfigurationProvider configurationProvider;
     private ProjectManager projectManager;
 
@@ -35,20 +30,26 @@ public class DependentBuildControllerTest extends PulseTestCase
     private Project projectC;
 
     private List<DependencyConfiguration> dependencies;
+    private List<ProjectConfiguration> triggeredProjects = new LinkedList<ProjectConfiguration>();
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        logger = new EventLogger();
         eventManager = new DefaultEventManager();
-        eventManager.register(logger);
-
         configurationProvider = mock(ConfigurationProvider.class);
         projectManager = mock(ProjectManager.class);
         stub(projectManager.isProjectValid((Project) anyObject())).toReturn(true);
+        doAnswer(new Answer<Object>()
+        {
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                triggeredProjects.add((ProjectConfiguration) invocationOnMock.getArguments()[0]);
+                return null;
+            }
+        }).when(projectManager).triggerBuild((ProjectConfiguration)anyObject(), (BuildReason)anyObject(), (Revision) anyObject(), anyString(), anyBoolean(), anyBoolean());
 
-        controller = new DependentBuildController();
+        DependentBuildController controller = new DependentBuildController();
         controller.setEventManager(eventManager);
         controller.setConfigurationProvider(configurationProvider);
         controller.setProjectManager(projectManager);
@@ -70,7 +71,7 @@ public class DependentBuildControllerTest extends PulseTestCase
         triggerBuild(projectA, true);
 
         // expect the build controller to generate build requests.
-        assertBuildRequestsFor();
+        assertTriggersFor();
     }
 
     public void testTriggerOnSuccessfulDependentBuild_SingleDependent()
@@ -80,7 +81,7 @@ public class DependentBuildControllerTest extends PulseTestCase
         triggerBuild(projectA, true);
 
         // expect the build controller to generate build requests.
-        assertBuildRequestsFor(projectB);
+        assertTriggersFor(projectB);
     }
 
     public void testTriggerOnSuccessfulDependentBuild_MultipleDependents()
@@ -91,7 +92,7 @@ public class DependentBuildControllerTest extends PulseTestCase
         triggerBuild(projectA, true);
 
         // expect the build controller to generate build requests.
-        assertBuildRequestsFor(projectB, projectC);
+        assertTriggersFor(projectB, projectC);
     }
 
     public void testNoTriggerOnUnsuccessfulDependentBuild()
@@ -101,7 +102,7 @@ public class DependentBuildControllerTest extends PulseTestCase
         triggerBuild(projectA, false);
 
         // expect the build controller to generate build requests.
-        assertBuildRequestsFor();
+        assertTriggersFor();
     }
 
     private void triggerBuild(Project project, boolean successful)
@@ -119,30 +120,16 @@ public class DependentBuildControllerTest extends PulseTestCase
         eventManager.publish(evt);
     }
 
-    private void assertBuildRequestsFor(Project... projects)
+    private void assertTriggersFor(Project... projects)
     {
-        List<Event> requests = new LinkedList<Event>(logger.getLog());
-        assertEquals(projects.length, requests.size());
+        assertEquals(projects.length, triggeredProjects.size());
 
         for (Project project : projects)
         {
-            BuildRequestEvent found = null;
-            for (Event event: requests)
-            {
-                BuildRequestEvent request = (BuildRequestEvent) event;
-                if (request.getOwner().equals(project))
-                {
-                    found = request;
-                    break;
-                }
-            }
-            if (found != null)
-            {
-                requests.remove(found);
-            }
+            assertTrue(triggeredProjects.remove(project.getConfig()));
         }
 
-        assertEquals(0, requests.size());
+        assertEquals(0, triggeredProjects.size());
     }
 
     private Project newProject(String name)
@@ -188,26 +175,6 @@ public class DependentBuildControllerTest extends PulseTestCase
         catch (Exception e)
         {
             throw new RuntimeException(e);
-        }
-    }
-
-    private class EventLogger implements EventListener
-    {
-        private List<Event> log = new LinkedList<Event>();
-
-        public void handleEvent(Event event)
-        {
-            log.add(event);
-        }
-
-        public List<Event> getLog()
-        {
-            return log;
-        }
-
-        public Class[] getHandledEvents()
-        {
-            return new Class[]{BuildRequestEvent.class};
         }
     }
 }
