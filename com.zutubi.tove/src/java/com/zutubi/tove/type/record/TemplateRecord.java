@@ -202,12 +202,15 @@ public class TemplateRecord extends AbstractRecord
         for (String key : keySet())
         {
             Object value = get(key);
-            if (value instanceof TemplateRecord)
+            if (value != null)
             {
-                value = ((TemplateRecord) value).flatten();
-            }
+                if (value instanceof TemplateRecord)
+                {
+                    value = ((TemplateRecord) value).flatten();
+                }
 
-            record.put(key, value);
+                record.put(key, value);
+            }
         }
 
         return record;
