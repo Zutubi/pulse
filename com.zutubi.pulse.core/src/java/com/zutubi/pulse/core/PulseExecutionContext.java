@@ -54,6 +54,7 @@ public class PulseExecutionContext implements ExecutionContext
         this.workingDir = other.workingDir;
         this.outputStream = other.outputStream;
         this.version = other.version;
+        this.securityHash = other.securityHash;
     }
 
     public String getString(String namespace, String name)
