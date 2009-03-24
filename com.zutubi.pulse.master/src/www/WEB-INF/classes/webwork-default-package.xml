@@ -11,6 +11,7 @@
             <result-type name="xslt" class="com.opensymphony.webwork.views.xslt.XSLTResult"/>
             <result-type name="jasper" class="com.opensymphony.webwork.views.jasperreports.JasperReportsResult"/>
             <result-type name="freemarker" class="com.opensymphony.webwork.views.freemarker.FreemarkerResult"/>
+            <result-type name="customFreemarker" class="com.zutubi.pulse.master.tove.freemarker.CustomFreemarkerResult"/>
             <result-type name="httpheader" class="com.opensymphony.webwork.dispatcher.HttpHeaderResult"/>
             <result-type name="stream" class="com.opensymphony.webwork.dispatcher.StreamResult"/>
             <result-type name="velocity-xml" class="com.zutubi.pulse.master.webwork.dispatcher.VelocityXmlResult"/>

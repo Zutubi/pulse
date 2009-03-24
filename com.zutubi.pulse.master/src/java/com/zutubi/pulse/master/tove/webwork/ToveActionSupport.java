@@ -153,7 +153,12 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
     {
         prepare();
 
-        // TODO: collapse into a single result vm that handles the various types.
+        // a) do we have a custom template for rendering this type / instance?.
+        if (isCustomTemplateAvailable())
+        {
+            return "custom";
+        }
+
         if (type instanceof CompositeType)
         {
             return "composite";
@@ -165,6 +170,27 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
 
         // unknown type.
         return ERROR;
+    }
+
+    /**
+     * Indicates whether or not the specified type has a custom template that should be
+     * used inplace of the default template for rendering.
+     *
+     * @return  true if a custom template is available for rendering the type, false otherwise.
+     */
+    private boolean isCustomTemplateAvailable()
+    {
+        if (type instanceof CompositeType)
+        {
+            String templateName = getCustomLocation();
+            return type.getClazz().getResourceAsStream(templateName) != null;
+        }
+        return false;
+    }
+
+    public String getCustomLocation()
+    {
+        return ((CompositeType)type).getClazz().getSimpleName() + ".template.ftl";
     }
 
     public Messages getMessages()

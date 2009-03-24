@@ -507,6 +507,7 @@
         </global-results>
 
         <action name="display" class="com.zutubi.pulse.master.tove.webwork.DisplayAction">
+            <result name="custom" type="customFreemarker">${customLocation}</result>
             <result name="composite" type="velocity">composite.vm</result>
             <result name="map" type="velocity">map.vm</result>
             <result name="error" type="velocity">/ajax/generic-error-panel.vm</result>

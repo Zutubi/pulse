@@ -33,7 +33,18 @@ public class CustomFreemarkerManager extends FreemarkerManager
         }
     }
 
-    public TemplateLoader[] getLoaders(TemplateLoader superLoader)
+    /**
+     * Get the set of template loaders used to pick up freemarker templates from the
+     * systems custom template roots.
+     *
+     * @param superLoader   an existing template loader that will be appended to the end
+     * of the list so that if the custom template loaders are not able to locate the requested
+     * resource then the 'superLoader' will be used.
+     *
+     * @return an array of configured template loaders that define where and in what order
+     * template loaders are queried for resources. 
+     */
+    private TemplateLoader[] getLoaders(TemplateLoader superLoader)
     {
         SystemPaths paths = configManager.getSystemPaths();
 
