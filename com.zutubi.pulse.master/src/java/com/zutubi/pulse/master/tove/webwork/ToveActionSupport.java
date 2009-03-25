@@ -3,6 +3,8 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.template.Templates;
+import com.zutubi.pulse.master.tove.template.Template;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -15,13 +17,28 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.bean.ObjectFactory;
 
 /**
+ * Base class for tove webwork actions.
  *
+ * This class provides a lot of the functionality shared across the various
+ * generated pages. 
  *
  */
 public class ToveActionSupport extends ActionSupport implements MessagesProvider
 {
-    public static final String CANCEL = "cancel";
-    
+    // These constants are used in numerous locations throughout the code base.
+    // Where is the best place to define them?.  Most of the references are in master,
+    // with some in the annotations package.
+    public static final String ACTION_CANCEL = "cancel";
+    public static final String ACTION_RESET = "reset";
+    public static final String ACTION_SAVE = "save";
+    public static final String ACTION_APPLY = "apply";
+    public static final String ACTION_CONFIRM = "confirm";
+    public static final String ACTION_PREVIOUS = "previous";
+    public static final String ACTION_DELETE = "delete";
+    public static final String ACTION_INPUT = "input";
+    public static final String ACTION_NEXT = "next";
+    public static final String ACTION_FINISH = "finish";
+
     protected String path;
     protected ConfigurationResponse response;
     protected ConfigurationUIModel configuration;
@@ -38,6 +55,7 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
 
     private String submitField;
 
+    private Template template;
 
     public boolean isCancelled()
     {
@@ -46,42 +64,42 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
 
     public boolean isCancelSelected()
     {
-        return isSelected("cancel") || isSelected("reset");
+        return isSelected(ACTION_CANCEL) || isSelected(ACTION_RESET);
     }
 
     public boolean isSaveSelected()
     {
-        return "save".equals(submitField) || "apply".equals(submitField);
+        return isSelected(ACTION_SAVE) || isSelected(ACTION_APPLY);
     }
 
     public boolean isConfirmSelected()
     {
-        return isSelected("confirm");
+        return isSelected(ACTION_CONFIRM);
     }
 
     public boolean isDeleteSelected()
     {
-        return isSelected("delete");
+        return isSelected(ACTION_DELETE);
     }
 
     public boolean isInputSelected()
     {
-        return isSelected("input");
+        return isSelected(ACTION_INPUT);
     }
 
     public boolean isPreviousSelected()
     {
-        return isSelected("previous");
+        return isSelected(ACTION_PREVIOUS);
     }
 
     public boolean isNextSelected()
     {
-        return isSelected("next");
+        return isSelected(ACTION_NEXT);
     }
 
     public boolean isFinishSelected()
     {
-        return isSelected("finish");
+        return isSelected(ACTION_FINISH);
     }
 
     private boolean isSelected(String s)
@@ -154,17 +172,20 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
         prepare();
 
         // a) do we have a custom template for rendering this type / instance?.
-        if (isCustomTemplateAvailable())
-        {
-            return "custom";
-        }
-
         if (type instanceof CompositeType)
         {
+            template = Templates.lookup(((CompositeType)type).getClazz());
+            if (template != null)
+            {
+                return "custom";
+            }
+
+            // default.
             return "composite";
         }
         if (type instanceof CollectionType)
         {
+            // default for collections.
             return "map";
         }
 
@@ -172,25 +193,9 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
         return ERROR;
     }
 
-    /**
-     * Indicates whether or not the specified type has a custom template that should be
-     * used inplace of the default template for rendering.
-     *
-     * @return  true if a custom template is available for rendering the type, false otherwise.
-     */
-    private boolean isCustomTemplateAvailable()
+    public Template getTemplate()
     {
-        if (type instanceof CompositeType)
-        {
-            String templateName = getCustomLocation();
-            return type.getClazz().getResourceAsStream(templateName) != null;
-        }
-        return false;
-    }
-
-    public String getCustomLocation()
-    {
-        return ((CompositeType)type).getClazz().getSimpleName() + ".template.ftl";
+        return template;
     }
 
     public Messages getMessages()

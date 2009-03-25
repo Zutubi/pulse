@@ -5,6 +5,8 @@ import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogSystem;
 
 /**
+ * Implementation of the velocity log system interface that maps velocity log events
+ * to the Pulse logging system.
  */
 public class CustomLogSystem implements LogSystem
 {
