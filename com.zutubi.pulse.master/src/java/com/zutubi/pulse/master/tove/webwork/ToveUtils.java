@@ -42,6 +42,7 @@ public class ToveUtils
     private static final String KEY_TABLE_HEADING = "table.heading";
 
     private static final String[] EMPTY_ARRAY = {};
+    private static final Sort.StringComparator STRING_COMPARATOR = new Sort.StringComparator();
 
     public static String getConfigURL(String path, String action, String submitField)
     {
@@ -147,30 +148,39 @@ public class ToveUtils
 
         if (path.length() == 0)
         {
-            listing = configurationTemplateManager.getRootListing();
-            Collections.sort(listing, new Sort.StringComparator());
+            listing = sortAndFilter(path, configurationTemplateManager.getRootListing(), configurationSecurityManager);
         }
         else if (type instanceof MapType)
         {
             Record record = configurationTemplateManager.getRecord(path);
             if (record != null)
             {
-                listing = new LinkedList<String>(((CollectionType) type).getOrder(record));
-                Collections.sort(listing, new Sort.StringComparator());
+                listing = sortAndFilter(path, new LinkedList<String>(((CollectionType) type).getOrder(record)), configurationSecurityManager);
             }
         }
         else if (type instanceof CompositeType)
         {
-            listing = getSortedNestedProperties(path, (CompositeType) type, configurationTemplateManager);
+            CompositeType compositeType = (CompositeType) type;
+            String collapsedCollection = getCollapsedCollection(path, compositeType, configurationSecurityManager);
+            if (collapsedCollection == null)
+            {
+                listing = getSortedNestedProperties(path, compositeType, configurationTemplateManager, configurationSecurityManager);
+            }
+            else
+            {
+                Type collapsedType = compositeType.getPropertyType(collapsedCollection);
+                listing = getPathListing(PathUtils.getPath(path, collapsedCollection), collapsedType, configurationTemplateManager, configurationSecurityManager);
+            }
         }
 
-        return configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
+        return listing;
     }
 
-    public static List<String> getSortedNestedProperties(final String path, final CompositeType type, final ConfigurationTemplateManager configurationTemplateManager)
+    private static List<String> getSortedNestedProperties(final String path, final CompositeType type, final ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
     {
         List<String> result = new LinkedList<String>();
         List<String> nestedProperties = type.getNestedPropertyNames();
+        nestedProperties = configurationSecurityManager.filterPaths(path, nestedProperties, AccessManager.ACTION_VIEW);
 
         // First process the order defined in @Listing (if any)
         Listing annotation = type.getAnnotation(Listing.class, true);
@@ -203,12 +213,11 @@ public class ToveUtils
             });
 
             // Sort by display name
-            final Sort.StringComparator comp = new Sort.StringComparator();
             Collections.sort(propertyDisplayPairs, new Comparator<Pair<String, String>>()
             {
                 public int compare(Pair<String, String> o1, Pair<String, String> o2)
                 {
-                    return comp.compare(o1.second, o2.second);
+                    return STRING_COMPARATOR.compare(o1.second, o2.second);
                 }
             });
 
@@ -223,6 +232,34 @@ public class ToveUtils
         }
 
         return result;
+    }
+
+    private static List<String> sortAndFilter(String path, List<String> listing, ConfigurationSecurityManager configurationSecurityManager)
+    {
+        Collections.sort(listing, STRING_COMPARATOR);
+        return configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
+    }
+
+    public static String getCollapsedCollection(String path, Type type, ConfigurationSecurityManager configurationSecurityManager)
+    {
+        if (type instanceof CompositeType)
+        {
+            CompositeType compositeType = (CompositeType) type;
+            List<String> nestedProperties = compositeType.getNestedPropertyNames();
+            nestedProperties = configurationSecurityManager.filterPaths(path, nestedProperties, AccessManager.ACTION_VIEW);
+
+            if (nestedProperties.size() == 1)
+            {
+                String property = nestedProperties.get(0);
+                Type propertyType = compositeType.getProperty(property).getType();
+                if (propertyType instanceof CollectionType)
+                {
+                    return property;
+                }
+            }
+        }
+
+        return null;
     }
 
     public static List<String> getEmbeddedCollections(CompositeType ctype)

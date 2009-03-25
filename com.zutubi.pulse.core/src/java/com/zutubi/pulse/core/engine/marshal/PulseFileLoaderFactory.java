@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.engine.marshal;
 
-import com.zutubi.pulse.core.RecipeVersionConfiguration;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
@@ -32,7 +31,6 @@ public class PulseFileLoaderFactory
         register("dir-artifact", DirectoryOutputConfiguration.class);
         register("link-artifact", LinkOutputConfiguration.class);
         register("artifact", FileOutputConfiguration.class);
-        register("version", RecipeVersionConfiguration.class);
     }
 
     public PulseFileLoader createLoader()

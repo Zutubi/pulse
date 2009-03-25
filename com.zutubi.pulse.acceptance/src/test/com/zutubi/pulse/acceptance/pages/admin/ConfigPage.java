@@ -1,10 +1,10 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.IDs;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import junit.framework.Assert;
 
 /**
  * Base for config pages that appear when the "configuration" tab is selected
@@ -38,8 +38,9 @@ public abstract class ConfigPage extends ConfigurationPanePage
 
     public void expandTreeNode(String path)
     {
-        selenium.getEval("var window = selenium.browserbot.currentWindow; window.nodeExpanded = false; var node = window.configTree.getNodeByConfigPath('" + path + "'); node.expand(false, true, function() { window.nodeExpanded = true; })");
-        SeleniumUtils.waitForVariable(selenium, "nodeExpanded", SeleniumUtils.DEFAULT_TIMEOUT);
+        String nodeExpression = "selenium.browserbot.getCurrentWindow().configTree.getNodeByConfigPath('" + path + "')";
+        selenium.getEval(nodeExpression + ".expand(false, false);");
+        SeleniumUtils.waitForCondition(selenium, nodeExpression + ".isExpanded();", SeleniumUtils.DEFAULT_TIMEOUT);
     }
 
     public String getTreeLinkLocator(String displayName)
@@ -55,5 +56,15 @@ public abstract class ConfigPage extends ConfigurationPanePage
     protected String getHierarchyLocator()
     {
         return "//span[text()='hierarchy']";
+    }
+
+    public boolean isCollapsedCollectionPresent()
+    {
+        return selenium.isElementPresent(IDs.COLLECTION_TABLE);
+    }
+
+    public boolean isLinksBoxPresent()
+    {
+        return selenium.isElementPresent(IDs.LINKS_BOX);
     }
 }

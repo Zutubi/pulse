@@ -13,10 +13,7 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeProperty;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  */
@@ -106,7 +103,17 @@ public abstract class AbstractTypeWizardState extends AbstractChainableState
 
     public boolean hasFields()
     {
-        return getType().getSimplePropertyNames().size() > 0;
+        CompositeType type = getType();
+        List<String> simpleProperties = type.getSimplePropertyNames();
+        for (String property: simpleProperties)
+        {
+            if (includesField(type, property))
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     public boolean hasConfigurationCheck()

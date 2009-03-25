@@ -57,6 +57,7 @@ public class ConfigurationUIModel
 
     private List<String> simpleProperties;
     private List<String> nestedProperties;
+    private String collapsedCollection;
     private List<Pair<String, String>> nestedPropertyErrors = new LinkedList<Pair<String, String>>();
 
     private List<String> extensions = new LinkedList<String>();
@@ -133,7 +134,15 @@ public class ConfigurationUIModel
 
         targetType = type.getTargetType();
 
-        nestedProperties = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
+        collapsedCollection = ToveUtils.getCollapsedCollection(path, type, configurationSecurityManager);
+        if (collapsedCollection == null)
+        {
+            nestedProperties = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
+        }
+        else
+        {
+            nestedProperties = Collections.emptyList();
+        }
 
         if (targetType instanceof CompositeType)
         {
@@ -300,9 +309,23 @@ public class ConfigurationUIModel
         return nestedProperties;
     }
 
+    public String getCollapsedCollection()
+    {
+        return collapsedCollection;
+    }
+
     public boolean isPropertyInvalid(String property)
     {
-        String propertyPath = PathUtils.getPath(path, property);
+        String propertyPath;
+        if (collapsedCollection == null)
+        {
+            propertyPath = PathUtils.getPath(path, property);
+        }
+        else
+        {
+            propertyPath = PathUtils.getPath(path, collapsedCollection, property);
+        }
+        
         return configurationTemplateManager.pathExists(propertyPath) && !configurationTemplateManager.isDeeplyValid(propertyPath);
     }
 

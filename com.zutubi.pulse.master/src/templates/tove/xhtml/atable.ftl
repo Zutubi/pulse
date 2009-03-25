@@ -7,16 +7,16 @@
     </script>
 </#macro>
 
-<table id="config.table" width="60%">
+<table id="config-table" width="100%">
     <tr>
-        <th class="heading" colspan="${table.width?c}">${table.heading?html}</th>
+        <th class="header" colspan="${table.width?c}">${table.heading?html}</th>
     </tr>
     <tr>
 <#list table.headers as header>
-        <th class="content">${header?html}</th>
+        <th>${header?html}</th>
 </#list>
 <#if table.orderable>
-        <th class="content">
+        <th>
            ${"order.label"?i18n}
 <#if table.parameters.orderInheritedFrom?exists>
             <img id="order-inherited" src="${base}/images/inherited.gif" alt="order inherited"/>
@@ -32,11 +32,11 @@
 </#if>
        </th>
 </#if>
-        <th class="content" colspan="2">${"actions.label"?i18n}</th>
+        <th colspan="2">${"actions.label"?i18n}</th>
     </tr>
 <#if table.rows?size == 0>
     <tr id="no.data">
-        <td class="content" colspan="${table.width}">${"no.data.available"?i18n}</td>
+        <td colspan="${table.width}">${"no.data.available"?i18n}</td>
     </tr>
 </#if>
 <#list table.rows as row>
@@ -45,12 +45,12 @@
     ><#t/>
     <#-- Data cells. -->
     <#list row.cells as cell>
-        <td class="content ${row.parameters.cls?default('')}" colspan="${cell.span?c}">${cell.content?html}</td>
+        <td class="${row.parameters.cls?default('')}" colspan="${cell.span?c}">${cell.content?html}</td>
     </#list>
 
     <#-- Up/down ordering arrows -->
     <#if table.orderable>
-        <td class="content" width="1%">
+        <td width="1%">
         <#if table.visibleRowCount == 1 || row.parameters.hiddenFrom?exists>
             &nbsp;
         <#else>
@@ -67,7 +67,7 @@
     </#if>
 
     <#-- Annotations, e.g. template decoration. -->
-        <td class="content" width="1%">
+        <td width="1%">
     <#assign annotationCount = 0/>
     <#if row.parameters.inheritedFrom?exists>
         <@annotation id="inherited" baseName=row.baseName qtip="inherited from ${row.parameters.inheritedFrom}"/>
@@ -85,7 +85,7 @@
         </td>
 
     <#-- Action links. -->
-        <td class="content" width="1%">
+        <td width="1%">
     <#if row.actions?size &gt; 0>
         <#assign first = true/>
         <#list row.actions as actionLink>
@@ -121,7 +121,7 @@
 </#list>
 <#if table.addAllowed>
     <tr>
-        <td class="content" colspan="${table.width}">
+        <td colspan="${table.width}">
             <a id="map:add" class="unadorned" href="#" onclick="addToPath('${path}'); return false;">
                 <img alt="add" src="${base}/images/config/actions/add.gif"/>
                 ${"add.label"?i18n}

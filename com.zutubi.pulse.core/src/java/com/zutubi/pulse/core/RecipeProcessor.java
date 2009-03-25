@@ -299,10 +299,10 @@ public class RecipeProcessor
         finally
         {
             context.pop();
-            RecipeVersionConfiguration version = config.getVersion();
-            if (version != null)
+            String version = config.getVersion();
+            if (TextUtils.stringSet(version))
             {
-                context.setVersion(version.getValue());
+                context.setVersion(version);
             }
         }
     }

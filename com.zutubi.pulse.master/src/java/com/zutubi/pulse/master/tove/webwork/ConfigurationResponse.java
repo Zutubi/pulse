@@ -91,11 +91,12 @@ public class ConfigurationResponse
     public void registerNewPathAdded(ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
     {
         String displayName = ToveUtils.getDisplayName(newPath, configurationTemplateManager);
+        String collapsedCollection = ToveUtils.getCollapsedCollection(newPath, configurationTemplateManager.getType(newPath), configurationSecurityManager);
         String iconCls = ToveUtils.getIconCls(newPath, configurationTemplateManager);
         boolean leaf = ToveUtils.isLeaf(newPath, configurationTemplateManager, configurationSecurityManager);
         TemplateNode templateNode = configurationTemplateManager.getTemplateNode(newPath);
         boolean templateLeaf = !(templateNode != null && templateNode.getChildren().size() > 0);
-        addAddedFile(new Addition(newPath, displayName, newTemplatePath, iconCls, leaf, templateLeaf));
+        addAddedFile(new Addition(newPath, displayName, newTemplatePath, collapsedCollection, iconCls, leaf, templateLeaf));
     }
 
     public void addAddedFile(Addition addition)
@@ -218,11 +219,12 @@ public class ConfigurationResponse
         private String parentTemplatePath;
         private String baseName;
         private String displayName;
+        private String collapsedCollection;
         private String iconCls;
         private boolean leaf;
         private boolean templateLeaf;
 
-        public Addition(String path, String displayName, String templatePath, String iconCls, boolean leaf, boolean templateLeaf)
+        public Addition(String path, String displayName, String templatePath, String collapsedCollection, String iconCls, boolean leaf, boolean templateLeaf)
         {
             this.parentPath = PathUtils.getParentPath(path);
             if (templatePath != null)
@@ -231,6 +233,7 @@ public class ConfigurationResponse
             }
             this.baseName = PathUtils.getBaseName(path);
             this.displayName = displayName;
+            this.collapsedCollection = collapsedCollection;
             this.iconCls = iconCls;
             this.leaf = leaf;
             this.templateLeaf = templateLeaf;
@@ -256,6 +259,11 @@ public class ConfigurationResponse
             return displayName;
         }
 
+        public String getCollapsedCollection()
+        {
+            return collapsedCollection;
+        }
+
         public String getIconCls()
         {
             return iconCls;
@@ -277,10 +285,12 @@ public class ConfigurationResponse
         private String oldPath;
         private String newName;
         private String newDisplayName;
+        private String collapsedCollection;
 
-        public Rename(String oldPath, String newPath, String newDisplayName)
+        public Rename(String oldPath, String newPath, String newDisplayName, String collapsedCollection)
         {
             this.oldPath = oldPath;
+            this.collapsedCollection = collapsedCollection;
             this.newName = PathUtils.getBaseName(newPath);
             this.newDisplayName = newDisplayName;
         }
@@ -298,6 +308,11 @@ public class ConfigurationResponse
         public String getNewDisplayName()
         {
             return newDisplayName;
+        }
+
+        public String getCollapsedCollection()
+        {
+            return collapsedCollection;
         }
     }
 }

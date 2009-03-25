@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.vfs;
 
-import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.AddressableFileObject;
+import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.pulse.master.vfs.provider.pulse.FileTypeConstants;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileObject;
@@ -12,6 +12,7 @@ import org.apache.commons.vfs.FileType;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <class comment/>
@@ -161,6 +162,15 @@ public class FileObjectWrapper
         if (fo instanceof AbstractPulseFileObject)
         {
             return ((AbstractPulseFileObject)fo).getIconCls();
+        }
+        return null;
+    }
+
+    public Map<String, String> getExtraAttributes()
+    {
+        if (fo instanceof AbstractPulseFileObject)
+        {
+            return ((AbstractPulseFileObject)fo).getExtraAttributes();
         }
         return null;
     }

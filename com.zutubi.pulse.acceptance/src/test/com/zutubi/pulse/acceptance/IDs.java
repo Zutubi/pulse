@@ -4,7 +4,8 @@ package com.zutubi.pulse.acceptance;
  */
 public class IDs
 {
-    public static String COLLECTION_TABLE = "config.table";
+    public static String COLLECTION_TABLE = "config-table";
+    public static String LINKS_BOX = "config-links";
     public static String STATUS_MESSAGE = "status-message";
 
     private static String buildTab(String name)

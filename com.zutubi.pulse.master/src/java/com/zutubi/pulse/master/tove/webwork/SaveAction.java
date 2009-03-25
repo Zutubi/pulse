@@ -99,7 +99,8 @@ public class SaveAction extends ToveActionSupport
             if(!newPath.equals(path))
             {
                 String newDisplayName = ToveUtils.getDisplayName(newPath, configurationTemplateManager);
-                response.addRenamedPath(new ConfigurationResponse.Rename(path, newPath, newDisplayName));
+                String collapsedCollection = ToveUtils.getCollapsedCollection(newPath, type, configurationSecurityManager);
+                response.addRenamedPath(new ConfigurationResponse.Rename(path, newPath, newDisplayName, collapsedCollection));
             }
 
             path = newPath;

@@ -30,6 +30,11 @@ public class PulseFileToToveFileTest extends PulseTestCase
         expectedOutputHelper();
     }
 
+    public void testRecipeVersion() throws IOException, ParsingException
+    {
+        expectedOutputHelper();
+    }
+
     private void expectedOutputHelper() throws IOException, ParsingException
     {
         String in = IOUtils.inputStreamToString(getInput(getName() + ".in", EXTENSION_XML));

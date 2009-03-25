@@ -14,7 +14,9 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A file to represent the root of the server configuration.  Descendents of
@@ -25,7 +27,9 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationSecurityManager configurationSecurityManager;
     /**
-     * This is the path into the configuration subsystem.
+     * This is the path into the configuration subsystem, which is *not*
+     * necessarily the same as the filesystem path due to collapsed
+     * collections.
      */
     private String path;
     private ComplexType parentType;
@@ -52,9 +56,19 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
-        String childPath = PathUtils.getPath(path, fileName.getBaseName());
+        String collapsedCollection = ToveUtils.getCollapsedCollection(path, type, configurationSecurityManager);
+        String childPath;
+        if (collapsedCollection == null)
+        {
+            childPath = PathUtils.getPath(path, fileName.getBaseName());
+        }
+        else
+        {
+            childPath = PathUtils.getPath(path, collapsedCollection, fileName.getBaseName());
+        }
+
         Type childType = configurationTemplateManager.getType(childPath);
-        if(!(childType instanceof ComplexType))
+        if (!(childType instanceof ComplexType))
         {
             if (childType == null)
             {
@@ -68,19 +82,31 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
             throw new FileSystemException("Illegal path '" + childPath + "': does not refer to a valid type");
         }
 
-        Record childValue;
-        if(value == null)
+        Type childParentType = collapsedCollection == null ? type : configurationTemplateManager.getType(PathUtils.getParentPath(childPath));
+        Record childValue = null;
+        if (value == null)
         {
             childValue = configurationTemplateManager.getRecord(childPath);
         }
         else
         {
-            childValue = (Record) value.get(fileName.getBaseName());
+            if (collapsedCollection == null)
+            {
+                childValue = (Record) value.get(fileName.getBaseName());
+            }
+            else
+            {
+                Record collection = (Record) value.get(collapsedCollection);
+                if (collection != null)
+                {
+                    childValue = (Record) collection.get(fileName.getBaseName());
+                }
+            }
         }
 
         return objectFactory.buildBean(ConfigFileObject.class,
                 new Class[]{FileName.class, AbstractFileSystem.class, String.class, ComplexType.class, ComplexType.class, Record.class},
-                new Object[]{fileName, pfs, childPath, type, (ComplexType) childType, childValue}
+                new Object[]{fileName, pfs, childPath, childParentType, (ComplexType) childType, childValue}
         );
     }
 
@@ -128,6 +154,19 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
     {
         // Indicates pre-sorted children.
         return null;
+    }
+
+    @Override
+    public Map<String, String> getExtraAttributes()
+    {
+        Map<String, String> result = new HashMap<String, String>();
+        String collapsedCollection = ToveUtils.getCollapsedCollection(path, type, configurationSecurityManager);
+        if (collapsedCollection != null)
+        {
+            result.put("collapsedCollection", collapsedCollection);
+        }
+
+        return result;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

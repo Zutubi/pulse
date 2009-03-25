@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.tove.config.ConfigurationRefactoringManager;
-import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.pulse.master.tove.model.ControllingCheckboxFieldDescriptor;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.tove.model.SubmitFieldDescriptor;
+import com.zutubi.tove.annotations.FieldType;
+import com.zutubi.tove.config.ConfigurationRefactoringManager;
+import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
@@ -134,7 +134,8 @@ public class CloneAction extends ToveActionSupport
         if (smart)
         {
             String newParent = PathUtils.getPath(parentPath, parentKey);
-            response.addAddedFile(new ConfigurationResponse.Addition(newParent, parentKey, configurationTemplateManager.getTemplatePath(newParent), ToveUtils.getIconCls(newParent, configurationTemplateManager), false, false));
+            String collapsedCollection = ToveUtils.getCollapsedCollection(newParent, configurationTemplateManager.getType(newParent), configurationSecurityManager);
+            response.addAddedFile(new ConfigurationResponse.Addition(newParent, parentKey, configurationTemplateManager.getTemplatePath(newParent), collapsedCollection, ToveUtils.getIconCls(newParent, configurationTemplateManager), false, false));
             response.addRemovedPath(path);
         }
         return SUCCESS;

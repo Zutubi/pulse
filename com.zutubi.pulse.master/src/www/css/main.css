@@ -1209,23 +1209,15 @@ table.template-actions
 
 .config-panel
 {
-    border-bottom-style:dotted;
-    border-right-style:dotted;
-    border-left-style:dotted;
-    border-bottom-color:gray;
-    border-left-color:gray;
-    border-right-color:gray;
-    border-bottom-width:1px;
-    border-right-width:1px;
-    border-left-width:1px;
+    border: dotted 1px gray;
+    border-top: none;
     margin-bottom:1.8em;
 }
 
 .config-header, .config-error-header {
-    padding:8px;
-    border-top-width:1px;
-    border-top-style:dotted;
-    border-top-color:gray;
+    padding:6px;
+    border-top: dotted 1px gray;
+    border-bottom: dotted 1px gray;
 }
 
 .config-header {
@@ -1301,6 +1293,21 @@ h3.config-header-small {
 .config-state-table .value {
     font-weight:normal;
     padding:5px;
+}
+
+#config-table td, #config-table th {
+    padding: 4px;
+    white-space: nowrap;
+    text-align: left;
+    vertical-align: top;
+    border: 1px dotted gray;
+}
+
+#config-table th.header {
+    padding: 6px;
+    background-color:#E0E6F0;
+    font-size: 120%;
+    border-bottom: none;
 }
 
 .config-container {

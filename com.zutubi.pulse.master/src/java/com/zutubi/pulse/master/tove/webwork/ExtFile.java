@@ -1,6 +1,9 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
+import flexjson.JSON;
+
+import java.util.Map;
 
 /**
  * Data structure used to send the details of a single file to the Ext tree
@@ -13,6 +16,7 @@ public class ExtFile
     private boolean leaf;
     private String cls;
     private String iconCls;
+    private Map<String, String> extraAttributes;
 
     public ExtFile(FileObjectWrapper fo)
     {
@@ -21,6 +25,7 @@ public class ExtFile
         leaf = !fo.isContainer();
         cls = fo.getCls();
         iconCls = fo.getIconCls();
+        extraAttributes = fo.getExtraAttributes();
     }
 
     public String getBaseName()
@@ -46,5 +51,11 @@ public class ExtFile
     public String getIconCls()
     {
         return iconCls;
+    }
+
+    @JSON
+    public Map<String, String> getExtraAttributes()
+    {
+        return extraAttributes;
     }
 }

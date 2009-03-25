@@ -528,7 +528,7 @@ function onConfigSelect(sm, node)
     if(treesInitialised && node)
     {
         detailPanel.load({
-            url: configTree.loader.getNodeURL(node),
+            url: configTree.loader.dataUrl + '/' + encodeURIPath(configTree.getNodeConfigPath(node)),
             scripts: true,
             callback: function(element, success, response) {
                 if(!success)

@@ -5,7 +5,6 @@ var ZUTUBI = window.ZUTUBI || {};
 ZUTUBI.widget = ZUTUBI.widget || {};
 
 ZUTUBI.FloatManager = function() {
-    var listener = false;
     var idByCategory = {};
     var displayedCategories = 0;
     var showTime = new Date();
@@ -118,7 +117,7 @@ ZUTUBI.FloatManager = function() {
                 windowEl.anchorTo(linkEl, align);
             }
         }
-    }
+    };
 }();
 
 /**
@@ -352,7 +351,8 @@ Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
     getNodeURL : function(node)
     {
         var tree = node.getOwnerTree();
-        return this.dataUrl + '/' + encodeURIPath(tree.getNodeConfigPath(node));
+        var path = tree.toConfigPathPrefix(node.getPath('baseName'));
+        return this.dataUrl + '/' + encodeURIPath(path);
     },
 
     requestData : function(node, callback)
@@ -389,7 +389,7 @@ ZUTUBI.ConfigTree = function(config)
 };
 
 Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
-    configPathToTreePath: function(configPath)
+    toTreePathPrefix: function(configPath)
     {
         var treePath = configPath;
 
@@ -408,9 +408,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
             treePath = this.pathSeparator + this.root.attributes.baseName + treePath;
         }
 
-        // Workaround odd Ext behaviour: selecting needs a leading slash
-        // except when selecting the root.
-        if (treePath.lastIndexOf('/') == 0)
+        if (treePath.substring(0, 1) == '/')
         {
             treePath = treePath.substring(1);
         }
@@ -418,7 +416,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
         return treePath;
     },
 
-    treePathToConfigPath: function(treePath)
+    toConfigPathPrefix: function(treePath)
     {
         var configPath = treePath;
         
@@ -443,46 +441,109 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
     selectConfigPath: function(configPath)
     {
         this.getSelectionModel().clearSelections();
-        this.selectPath(this.configPathToTreePath(configPath), 'baseName');
+        this.expandToPath(configPath, function(found, node) {
+            if (found)
+            {
+                node.select();
+            }
+        });
     },
 
-    expandToPath: function(path, callback)
+    expandToPath : function(path, callback)
     {
-        this.expandPath(this.configPathToTreePath(path), 'baseName', callback);
+        path = this.toTreePathPrefix(path);
+        var keys = path.split(this.pathSeparator);
+        var current = this.root;
+        if (current.attributes['baseName'] != keys[0])
+        {
+            if(callback)
+            {
+                callback(false, null);
+            }
+            return;
+        }
+
+        var index = 0;
+        var skippedLast = false;
+        var f = function() {
+            if (++index == keys.length)
+            {
+                if (callback)
+                {
+                    callback(true, current);
+                }
+                return;
+            }
+
+            if (!skippedLast && current.attributes.extraAttributes && current.attributes.extraAttributes.collapsedCollection)
+            {
+                skippedLast = true;
+                f();
+            }
+            else
+            {
+                skippedLast = false;
+                current.expand(false, false, function() {
+                    var c = current.findChild('baseName', keys[index]);
+                    if (!c)
+                    {
+                        if(callback)
+                        {
+                            callback(false, current);
+                        }
+                        return;
+                    }
+
+                    current = c;
+                    f();
+                });
+            }
+        };
+
+        f();
     },
 
     getNodeConfigPath: function(node)
     {
-        return this.treePathToConfigPath(node.getPath('baseName'));
-    },
-
-    getNodeByTreePath: function(treePath)
-    {
-        var keys = treePath.split(this.pathSeparator);
-
-        if (keys[0] != this.root.attributes.baseName)
+        var p = node.parentNode;
+        var b = [node.attributes['baseName']];
+        while (p)
         {
-            return null;
+            if (p.attributes.extraAttributes && p.attributes.extraAttributes.collapsedCollection)
+            {
+                b.unshift(p.attributes.extraAttributes.collapsedCollection);
+            }
+            b.unshift(p.attributes['baseName']);
+            p = p.parentNode;
         }
 
-        var node = this.root;
-        for(var i = 1; node && i < keys.length; i++)
-        {
-            node = node.findChild('baseName', keys[i]);
-        }
-
-        return node;
+        return this.toConfigPathPrefix('/' + b.join('/'));
     },
 
     getNodeByConfigPath: function(configPath)
     {
-        var treePath = this.configPathToTreePath(configPath);
-        if(treePath.substring(0, 1) == '/')
+        var path = this.toTreePathPrefix(configPath);
+        var keys = path.split(this.pathSeparator);
+        var current = this.root;
+        if (current.attributes['baseName'] != keys[0])
         {
-            treePath = treePath.substring(1);
+            return null;
         }
 
-        return this.getNodeByTreePath(treePath);
+        var skippedLast = false;
+        for(var i = 1; current && i < keys.length; i++)
+        {
+            if (!skippedLast && current.attributes.extraAttributes && current.attributes.extraAttributes.collapsedCollection)
+            {
+                skippedLast = true;
+            }
+            else
+            {
+                skippedLast = false;
+                current = current.findChild('baseName', keys[i]);
+            }
+        }
+        return current;
     },
 
     handleResponse: function(response)
@@ -491,17 +552,17 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
 
         if(response.addedFiles)
         {
-            each(response.addedFiles, function(addition) { tree.addNode(addition.parentPath, {baseName: addition.baseName, text: addition.displayName, iconCls: addition.iconCls, leaf: addition.leaf}); });
+            each(response.addedFiles, function(addition) { tree.addNode(addition.parentPath, {baseName: addition.baseName, text: addition.displayName, iconCls: addition.iconCls, leaf: addition.leaf, extraAttributes: {collapsedCollection: addition.collapsedCollection}}); });
         }
 
         if(response.renamedPaths)
         {
-            each(response.renamedPaths, function(rename) { tree.renameNode(rename.oldPath, rename.newName, rename.newDisplayName); });
+            each(response.renamedPaths, function(rename) { tree.renameNode(rename.oldPath, rename.newName, rename.newDisplayName, rename.collapsedCollection); });
         }
 
         if(response.removedPaths)
         {
-            each(response.removedPaths, function(path) { tree.removeNode(path) });
+            each(response.removedPaths, function(path) { tree.removeNode(path); });
         }
     },
 
@@ -527,7 +588,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
         }
     },
 
-    renameNode: function(oldPath, newName, newDisplayName)
+    renameNode: function(oldPath, newName, newDisplayName, collapsedCollection)
     {
         if(oldPath)
         {
@@ -536,6 +597,12 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
             {
                 node.attributes.baseName = newName;
                 node.setText(newDisplayName);
+                if (!node.attributes.extraAttributes)
+                {
+                    node.attributes.extraAttributes = {};
+                }
+
+                node.attributes.extraAttributes.collapsedCollection = collapsedCollection;
             }
         }
     },
@@ -735,7 +802,7 @@ Ext.extend(ZUTUBI.FormLayout, Ext.layout.FormLayout, {
 
 ZUTUBI.FormPanel = function(config)
 {
-    config.layout = new ZUTUBI.FormLayout({})
+    config.layout = new ZUTUBI.FormLayout({});
     ZUTUBI.FormPanel.superclass.constructor.call(this, config);
 };
 
@@ -1423,13 +1490,14 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         }
 
         this.store.removeAll();
-        for(var i = 0; i < this.hiddenFields.length; i++)
+        var i;
+        for(i = 0; i < this.hiddenFields.length; i++)
         {
             this.hiddenFields[i].remove();
         }
         this.hiddenFields = [];
         
-        for(var i = 0; i < value.length; i++)
+        for(i = 0; i < value.length; i++)
         {
             var text = this.getTextForValue(value[i]);
             if(text)

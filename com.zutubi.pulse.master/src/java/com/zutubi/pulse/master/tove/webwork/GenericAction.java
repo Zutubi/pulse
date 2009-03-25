@@ -195,7 +195,9 @@ public class GenericAction extends ToveActionSupport
 
         for(String invalidatedPath: actionResult.getInvalidatedPaths())
         {
-            response.addRenamedPath(new ConfigurationResponse.Rename(invalidatedPath, invalidatedPath, ToveUtils.getDisplayName(invalidatedPath, configurationTemplateManager)));
+            String newDisplayName = ToveUtils.getDisplayName(invalidatedPath, configurationTemplateManager);
+            String collapsedCollection = ToveUtils.getCollapsedCollection(invalidatedPath, configurationTemplateManager.getType(invalidatedPath), configurationSecurityManager);
+            response.addRenamedPath(new ConfigurationResponse.Rename(invalidatedPath, invalidatedPath, newDisplayName, collapsedCollection));
         }
         
         return SUCCESS;

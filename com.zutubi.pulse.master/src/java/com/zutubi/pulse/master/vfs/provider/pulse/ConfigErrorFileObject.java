@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -17,7 +17,7 @@ public class ConfigErrorFileObject extends AbstractPulseFileObject
     /**
      * This is the path into the configuration subsystem.
      */
-    private String path;
+    private String configPath;
     private ComplexType parentType;
     private ComplexType type;
     private Record value;
@@ -26,17 +26,17 @@ public class ConfigErrorFileObject extends AbstractPulseFileObject
     public ConfigErrorFileObject(FileName name, AbstractFileSystem fs)
     {
         super(name, fs);
-        path = "";
+        configPath = "";
         parentType = null;
         type = null;
         value = null;
         error = null;
     }
 
-    public ConfigErrorFileObject(FileName name, AbstractFileSystem fs, String path, ComplexType parentType, ComplexType type, Record value, String error)
+    public ConfigErrorFileObject(FileName name, AbstractFileSystem fs, String configPath, ComplexType parentType, ComplexType type, Record value, String error)
     {
         super(name, fs);
-        this.path = path;
+        this.configPath = configPath;
         this.parentType = parentType;
         this.type = type;
         this.value = value;
@@ -53,11 +53,11 @@ public class ConfigErrorFileObject extends AbstractPulseFileObject
         if (type == null || value == null)
         {
             // Sometimes we have little to go on...
-            return PathUtils.getBaseName(path);
+            return PathUtils.getBaseName(configPath);
         }
         else
         {
-            return ToveUtils.getDisplayName(path, type, parentType, value);
+            return ToveUtils.getDisplayName(configPath, type, parentType, value);
         }
     }
 

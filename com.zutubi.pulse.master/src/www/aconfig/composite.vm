@@ -69,6 +69,9 @@
     #if( $config.simpleProperties.size() > 0)
                 #renderform()
     #end
+    #if ($config.collapsedCollection)
+        #table("path=$config.path/$config.collapsedCollection" "ajax=true")
+    #end
         </td>
         
         <td id="right-column">
@@ -96,7 +99,7 @@
     #end
 
     #if( $config.nestedProperties.size() > 0)
-            <div class="config-panel">
+            <div id="config-links" class="config-panel">
             <h3 class="config-header">links</h3>
             <div class="config-container">
             <ul class="config-links">

@@ -83,7 +83,7 @@ public class DeleteAction extends ToveActionSupport
                     String newDisplayName = ToveUtils.getDisplayName(path, configurationTemplateManager);
                     if(!newDisplayName.equals(originalDisplayName))
                     {
-                        response.addRenamedPath(new ConfigurationResponse.Rename(path, path, newDisplayName));
+                        response.addRenamedPath(new ConfigurationResponse.Rename(path, path, newDisplayName, null));
                     }
                 }
 

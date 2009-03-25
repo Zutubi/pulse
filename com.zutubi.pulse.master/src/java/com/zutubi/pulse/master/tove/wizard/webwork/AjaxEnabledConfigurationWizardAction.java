@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.wizard.webwork;
 
-import com.zutubi.tove.config.ConfigurationSecurityManager;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationErrors;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationPanel;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationResponse;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.type.record.PathUtils;
 
 /**
  *
@@ -58,7 +58,9 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
                 if(originalPath.equals(newPath))
                 {
                     // We configured a singleton, and may have relabelled.
-                    configurationResponse.addRenamedPath(new ConfigurationResponse.Rename(originalPath, newPath, ToveUtils.getDisplayName(newPath, configurationTemplateManager)));
+                    String newDisplayName = ToveUtils.getDisplayName(newPath, configurationTemplateManager);
+                    String collapsedCollection = ToveUtils.getCollapsedCollection(newPath, configurationTemplateManager.getType(newPath), configurationSecurityManager);
+                    configurationResponse.addRenamedPath(new ConfigurationResponse.Rename(originalPath, newPath, newDisplayName, collapsedCollection));
                 }
                 else
                 {

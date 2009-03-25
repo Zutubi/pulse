@@ -13,11 +13,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The Pulse File Object is the base class for all the file objects handled by the Pulse File System.
- *
- *
  */
 public abstract class AbstractPulseFileObject extends AbstractFileObject
 {
@@ -170,6 +169,20 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
             return FileTypeConstants.FILE;
         }
         return FileTypeConstants.UNKNOWN;
+    }
+
+    /**
+     * Returns an arbitrary set of extra name-value pairs for this file object.
+     * Allows custom fields to be added for specific types of files.  By
+     * default, null is returned (i.e. no attributes).  Override to customise
+     * this in a subclass.
+     *
+     * @return a mapping of name-value pairs containing extra attributes, may
+     *         be null if there are no such attributes
+     */
+    public Map<String, String> getExtraAttributes()
+    {
+        return null;
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

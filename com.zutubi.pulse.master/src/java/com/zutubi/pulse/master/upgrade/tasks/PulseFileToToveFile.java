@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.TextUtils;
 import nu.xom.*;
 
 import java.io.ByteArrayOutputStream;
@@ -16,7 +17,10 @@ public class PulseFileToToveFile
 {
     private static final String ELEMENT_COMMAND = "command";
     private static final String ELEMENT_RESOURCE = "resource";
+    private static final String ELEMENT_VERSION = "version";
     private static final String ATTRIBUTE_NAME = "name";
+    private static final String ATTRIBUTE_VALUE = "value";
+    private static final String ATTRIBUTE_VERSION = "version";
 
     private static final Set<String> COMMAND_ELEMENTS = CollectionUtils.asSet(
             "ant",
@@ -84,6 +88,15 @@ public class PulseFileToToveFile
                 System.out.println("WARNING: Removing <resource> tag as importing resources in the pulse file is no longer supported.");
                 System.out.println("WARNING: Use resource requirements in the project/build stage configuration instead.");
                 warningIssued[0] = true;
+            }
+            parentElement.removeChild(element);
+        }
+        else if (localName.equals(ELEMENT_VERSION))
+        {
+            String value = element.getAttributeValue(ATTRIBUTE_VALUE);
+            if (TextUtils.stringSet(value))
+            {
+                parentElement.addAttribute(new Attribute(ATTRIBUTE_VERSION, value));
             }
             parentElement.removeChild(element);
         }

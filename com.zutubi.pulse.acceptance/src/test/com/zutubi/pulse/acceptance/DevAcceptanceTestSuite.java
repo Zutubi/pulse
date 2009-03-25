@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import junit.framework.TestSuite;
 import com.zutubi.pulse.acceptance.dependencies.DependenciesTestSuite;
+import junit.framework.TestSuite;
 
 public class DevAcceptanceTestSuite
 {
@@ -26,6 +26,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ConfigUIAcceptanceTest.class);
         suite.addTestSuite(DeleteAcceptanceTest.class);
         suite.addTestSuite(CloneAcceptanceTest.class);
+        suite.addTestSuite(CollapsedCollectionAcceptanceTest.class);
         suite.addTestSuite(ConfigActionsAcceptanceTest.class);
         suite.addTestSuite(PluginUIAcceptanceTest.class);
         suite.addTestSuite(GroupAcceptanceTest.class);

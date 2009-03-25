@@ -16,9 +16,10 @@ public class RestoreAction extends ToveActionSupport
         response = new ConfigurationResponse(parentPath, null);
         String displayName = ToveUtils.getDisplayName(path, configurationTemplateManager);
  	    ComplexType type = configurationTemplateManager.getType(path, ComplexType.class);
- 	    boolean leaf = ToveUtils.isLeaf(path, configurationTemplateManager, configurationSecurityManager);
- 	    String iconCls = ToveUtils.getIconCls(type);
- 	    response.addAddedFile(new ConfigurationResponse.Addition(path, displayName, null, iconCls, leaf, false));
+        String collapsedCollection = ToveUtils.getCollapsedCollection(path, type, configurationSecurityManager);
+        boolean leaf = ToveUtils.isLeaf(path, configurationTemplateManager, configurationSecurityManager);
+        String iconCls = ToveUtils.getIconCls(type);
+ 	    response.addAddedFile(new ConfigurationResponse.Addition(path, displayName, null, collapsedCollection, iconCls, leaf, false));
         path = response.getNewPath();
         return SUCCESS;
     }

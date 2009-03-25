@@ -42,6 +42,11 @@ public class CompositePage extends ConfigPage
         return selenium.isElementPresent(StringUtils.toValidHtmlName("cd-" + descendent));
     }
 
+    public void clickConfigure()
+    {
+        selenium.click(CONFIGURE_LINK);
+    }
+
     public String getActionId(String action)
     {
         return "action." + action;
@@ -51,7 +56,7 @@ public class CompositePage extends ConfigPage
     {
         return selenium.isElementPresent(getActionId(action));
     }
-    
+
     public void clickAction(String action)
     {
         selenium.click(getActionId(action));
