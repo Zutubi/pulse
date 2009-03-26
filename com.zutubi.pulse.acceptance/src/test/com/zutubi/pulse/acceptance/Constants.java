@@ -54,6 +54,7 @@ public class Constants
         public static class AntType
         {
             public static final String ARGUMENTS = "args";
+            public static final String TARGETS = "target";
         }
 
         /**

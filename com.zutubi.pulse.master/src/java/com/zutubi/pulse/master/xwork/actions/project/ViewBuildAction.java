@@ -146,20 +146,15 @@ public class ViewBuildAction extends CommandActionBase
         return SUCCESS;
     }
 
-    public String appendSuitePath(String path, PersistentTestSuiteResult suite)
-    {
-        return path + "/" + urlEncode(suite.getName());
-    }
-
     public String pushSuite(PersistentTestSuiteResult suite)
     {
         if(pathStack.empty())
         {
-            return pathStack.push(urlEncode(suite.getName()));
+            return pathStack.push(uriComponentEncode(suite.getName()));
         }
         else
         {
-            return pathStack.push(appendSuitePath(pathStack.peek(), suite));
+            return pathStack.push(pathStack.peek() + "/" + uriComponentEncode(suite.getName()));
         }
     }
 

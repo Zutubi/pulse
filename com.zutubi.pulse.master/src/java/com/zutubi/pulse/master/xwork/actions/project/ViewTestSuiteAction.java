@@ -5,8 +5,7 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -46,6 +45,27 @@ public class ViewTestSuiteAction extends StageActionBase
         return paths;
     }
 
+    public String getChildUriPath(String childName)
+    {
+        String uriChildName = StringUtils.uriComponentEncode(childName);
+        if (paths == null)
+        {
+            return uriChildName;
+        }
+        else
+        {
+            String uriPath = StringUtils.join("/", CollectionUtils.map(paths, new Mapping<String, String>()
+            {
+                public String map(String s)
+                {
+                    return StringUtils.uriComponentEncode(s);
+                }
+            }));
+
+            return uriPath + "/" + uriChildName;
+        }
+    }
+
     public void validate()
     {
 
@@ -70,7 +90,15 @@ public class ViewTestSuiteAction extends StageActionBase
         {
             String[] elements = path.split("/");
             paths = Arrays.asList(elements);
-            testDir = new File(testDir, FileSystemUtils.composeFilename(elements));
+
+            String[] encodedElements = CollectionUtils.mapToArray(elements, new Mapping<String, String>()
+            {
+                public String map(String s)
+                {
+                    return urlEncode(s);
+                }
+            }, new String[elements.length]);
+            testDir = new File(testDir, FileSystemUtils.composeFilename(encodedElements));
         }
 
         TestSuitePersister persister = new TestSuitePersister();
