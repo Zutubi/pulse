@@ -117,7 +117,7 @@ public abstract class CommandTestCase extends PulseTestCase
      *             captured in
      * @param path the path of the file under the output directory to test for
      */
-    protected void assertFile(String name, String path)
+    protected void assertFileExists(String name, String path)
     {
         File file = getFile(name, path);
         assertTrue("File '" + file.getPath() + "' does not exist", file.exists());   
@@ -140,7 +140,8 @@ public abstract class CommandTestCase extends PulseTestCase
 
     /**
      * Asserts that the file captured in the given output with the given path
-     * contains all of the given strings.
+     * contains all of the given strings.  The order of the strings is not
+     * important.
      *
      * @param name     the name of the registered output the file should have
      *                 been captured in
@@ -155,7 +156,8 @@ public abstract class CommandTestCase extends PulseTestCase
 
     /**
      * Asserts that the file captured in the given output with the given path
-     * contains all of the given strings, possibly case-insensitively.
+     * contains all of the given strings, possibly case-insensitively.  The
+     * order of the strings is not important.
      *
      * @param name          the name of the registered output the file should
      *                      have been captured in
@@ -185,7 +187,7 @@ public abstract class CommandTestCase extends PulseTestCase
 
     /**
      * Asserts the given output string contains each of the given content
-     * strings.
+     * strings.  The order of the strings is not important.
      *
      * @param output   the output string to search within
      * @param contents the strings to search for
@@ -197,7 +199,8 @@ public abstract class CommandTestCase extends PulseTestCase
 
     /**
      * Asserts the given output string contains each of the given content
-     * strings, possibly case-insensitively.
+     * strings, possibly case-insensitively.  The order of the strings is
+     * not important.
      *
      * @param output        the output string to search within
      * @param caseSensitive if true, the search is case-insensitive

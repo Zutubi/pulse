@@ -72,7 +72,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
 
         // verify that the env output is captured even with the command failing.
         assertOutputRegistered(new TestCommandContext.Output(ENV_ARTIFACT_NAME), context);
-        assertFile(ENV_ARTIFACT_NAME, ENV_FILENAME);
+        assertFileExists(ENV_ARTIFACT_NAME, ENV_FILENAME);
     }
 
     public void testWorkingDir() throws Exception
@@ -144,7 +144,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         assertEnvironment(context, "Command Line:", "Process Environment:", "Resources:");
 
         assertOutputRegistered(new TestCommandContext.Output(OUTPUT_NAME), context);
-        assertFile(OUTPUT_NAME, OUTPUT_FILE);
+        assertFileExists(OUTPUT_NAME, OUTPUT_FILE);
     }
 
     public void testBuildNumberAddedToEnvironment() throws IOException
@@ -376,7 +376,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
     private void assertEnvironment(TestCommandContext context, String... contents) throws IOException
     {
         assertOutputRegistered(new TestCommandContext.Output(ENV_ARTIFACT_NAME), context);
-        assertFile(ENV_ARTIFACT_NAME, ENV_FILENAME);
+        assertFileExists(ENV_ARTIFACT_NAME, ENV_FILENAME);
         assertFileContains(ENV_ARTIFACT_NAME, ENV_FILENAME, false, contents);
     }
 }

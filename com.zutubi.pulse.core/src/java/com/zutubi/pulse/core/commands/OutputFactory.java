@@ -10,7 +10,7 @@ public interface OutputFactory
 {
     /**
      * Create a new output from the given configuration.  The configuration
-     * identifies the type of ouotput to create, and that type should have a
+     * identifies the type of output to create, and that type should have a
      * single-parameter constructor which will accept the configuration as an
      * argument.
      *

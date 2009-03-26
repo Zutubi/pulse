@@ -49,9 +49,10 @@ public class FeatureMatchers
     }
 
     /**
-     * Creates a matches an iterable of features against the levels and
-     * summaries of the given features.  Feature line numbers are ignored.
-     * The iterable must contain same number of features in the same order.
+     * Returns a matcher that matches an iterable of features against the
+     * levels and summaries of the given features.  Feature line numbers are
+     * ignored.  The iterable must contain same number of features in the same
+     * order.
      *
      * @see #hasOrderedMessages(com.zutubi.pulse.core.engine.api.Feature.Level, String[])
      *
