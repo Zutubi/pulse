@@ -1,18 +1,33 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.CAPTURES;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryOutput.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Output.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static com.zutubi.pulse.acceptance.Constants.TEST_ANT_REPOSITORY;
+import static com.zutubi.pulse.acceptance.Constants.VERSIONED_REPOSITORY;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.SpecifyBuildPropertiesForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
+import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
@@ -37,6 +52,7 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -64,7 +80,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         Vector<String> agents = xmlRpcHelper.getConfigListing(MasterConfigurationRegistry.AGENTS_SCOPE);
         for (String agent : agents)
         {
-            if (!agent.equals(AgentManager.GLOBAL_AGENT_NAME) && !agent.equals(AgentManager.MASTER_AGENT_NAME))
+            if (!agent.equals(AgentManager.GLOBAL_AGENT_NAME) && !agent.equals(MASTER_AGENT_NAME))
             {
                 xmlRpcHelper.deleteConfig(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
             }
@@ -82,7 +98,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         addProject(random, true);
 
-        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
 
         // Check some properties
         EnvironmentArtifactPage envPage = new EnvironmentArtifactPage(selenium, urls, random, 1, "default", "build");
@@ -228,7 +244,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         addProject(random, true);
 
         loginAsAdmin();
-        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
 
         BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, random, 1);
         detailedViewPage.goTo();
@@ -254,14 +270,14 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
 
-        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
         assertEnvironment(random, 1, "pname=pvalue", "PULSE_PNAME=pvalue", "PULSE_BUILD_NUMBER=1");
     }
 
     public void testImportedResources() throws Exception
     {
         String resourceName = random + "-resource";
-        String resourcePath = addResource(AgentManager.MASTER_AGENT_NAME, resourceName);
+        String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
         xmlRpcHelper.insertConfig(getPath(resourcePath, "properties"), xmlRpcHelper.createProperty("test-property", "test-value", false, false, false));
 
         String projectName = random + "-project";
@@ -269,14 +285,14 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         loginAsAdmin();
-        triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
         assertEnvironment(projectName, 1, "PULSE_TEST-PROPERTY=test-value");
     }
 
     public void testProjectPropertyReferencesResourceProperty() throws Exception
     {
         String resourceName = random + "-resource";
-        String resourcePath = addResource(AgentManager.MASTER_AGENT_NAME, resourceName);
+        String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
         xmlRpcHelper.insertConfig(getPath(resourcePath, "properties"), xmlRpcHelper.createProperty("rp", "rv", false, false, false));
 
         String projectName = random + "-project";
@@ -286,14 +302,14 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(projectPath, "properties"), xmlRpcHelper.createProperty("pp", "ref ${rp}", true, true, false));
 
         loginAsAdmin();
-        triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
         assertEnvironment(projectName, 1, "pp=ref rv");
     }
 
     public void testResourcePropertyReferencesEarlierProperty() throws Exception
     {
         String resourceName = random + "-resource";
-        String resourcePath = addResource(AgentManager.MASTER_AGENT_NAME, resourceName);
+        String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
         String propertiesPath = getPath(resourcePath, "properties");
         xmlRpcHelper.insertConfig(propertiesPath, xmlRpcHelper.createProperty("referee", "ee", false, false, false));
         xmlRpcHelper.insertConfig(propertiesPath, xmlRpcHelper.createProperty("referer", "ref ${referee}", true, true, false));
@@ -303,7 +319,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         loginAsAdmin();
-        triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
         assertEnvironment(projectName, 1, "referer=ref ee");
     }
 
@@ -313,19 +329,19 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         ensureProject(projectName);
         String stagePath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "stages", "default");
         Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
-        defaultStage.put("agent", getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
+        defaultStage.put("agent", getPath(MasterConfigurationRegistry.AGENTS_SCOPE, MASTER_AGENT_NAME));
         xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
         xmlRpcHelper.insertProjectProperty(projectName, "pp", "ref ${agent}", true, true, false);
 
         loginAsAdmin();
-        triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
-        assertEnvironment(projectName, 1, "pp=ref " + AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
+        assertEnvironment(projectName, 1, "pp=ref " + MASTER_AGENT_NAME);
     }
 
     public void testResourcePropertyReferencesAgentName() throws Exception
     {
         String resourceName = random + "-resource";
-        String resourcePath = addResource(AgentManager.MASTER_AGENT_NAME, resourceName);
+        String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
         xmlRpcHelper.insertConfig(getPath(resourcePath, "properties"), xmlRpcHelper.createProperty("rp", "ref ${agent}", true, true, false));
 
         String projectName = random + "-project";
@@ -333,8 +349,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         loginAsAdmin();
-        triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
-        assertEnvironment(projectName, 1, "rp=ref " + AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
+        assertEnvironment(projectName, 1, "rp=ref " + MASTER_AGENT_NAME);
     }
 
     public void testSuppressedProperty() throws Exception
@@ -343,14 +359,14 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         ensureProject(projectName);
         String stagePath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "stages", "default");
         Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
-        defaultStage.put("agent", getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
+        defaultStage.put("agent", getPath(MasterConfigurationRegistry.AGENTS_SCOPE, MASTER_AGENT_NAME));
         xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
         String suppressedName = "PULSE_TEST_SUPPRESSED";
         String suppressedValue = random + "-suppress";
         xmlRpcHelper.insertProjectProperty(projectName, suppressedName, suppressedValue, false, true, false);
 
         loginAsAdmin();
-        triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(projectName, MASTER_AGENT_NAME);
         goToEnv(projectName, 1);
         assertTextPresent(suppressedName);
         assertTextNotPresent(suppressedValue);
@@ -361,7 +377,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig(CustomTypeConfiguration.class);
         type.put("pulseFileString", "<?xml version=\"1.0\"?>\n" +
                 "<project default-recipe=\"default\"><recipe name=\"default\"><print name=\"mess\" message=\"${svn.url}\"/></recipe></project>");
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), type);
+        xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), type);
         xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
         loginAsAdmin();
@@ -374,7 +390,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         addProject(random, true);
 
         loginAsAdmin();
-        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
 
         BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, random, 1);
         detailedViewPage.goTo();
@@ -440,7 +456,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         sbpf.triggerFormElements("");
 
         // next page is the project homepage.
-        waitForBuildOnProjectHomePage(random, AgentManager.MASTER_AGENT_NAME);
+        waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
     }
 
     /**
@@ -472,7 +488,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         sbpf.triggerFormElements("", "qvalue");
 
         // next page is the project homepage.
-        waitForBuildOnProjectHomePage(random, AgentManager.MASTER_AGENT_NAME);
+        waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
 
         // verify that the correct property value was used in the build.
         assertEnvironment(random, 1, "pname=qvalue", "PULSE_PNAME=qvalue");
@@ -488,9 +504,86 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     public void testVersionedBuildWithImports() throws Exception
     {
         loginAsAdmin();
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
+        xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
 
-        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+        triggerSuccessfulBuild(random, MASTER_AGENT_NAME);
+    }
+
+    public void testTestResults() throws Exception
+    {
+        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        antConfig.put(Constants.Project.AntCommand.TARGETS, "test");
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TEST_ANT_REPOSITORY), antConfig);
+        insertTestCapture(projectPath, "junit xml report processor");
+        
+        int buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        loginAsAdmin();
+
+        BuildTestsPage testsPage = new BuildTestsPage(selenium, urls, random, buildId);
+        testsPage.goTo();
+
+        TestResultSummary expectedSummary = new TestResultSummary(0, 1, 0, 2);
+
+        assertTrue(testsPage.hasTests());
+        assertEquals(expectedSummary, testsPage.getTestSummary());
+
+        StageTestsPage stageTestsPage = testsPage.clickStageAndWait("default");
+        assertEquals(expectedSummary, stageTestsPage.getTestSummary());
+
+        TestSuitePage suitePage = stageTestsPage.clickSuiteAndWait("com.zutubi.testant.UnitTest");
+        assertEquals(expectedSummary, suitePage.getTestSummary());
+        
+        suitePage.clickStageCrumb();
+        stageTestsPage.waitFor();
+        stageTestsPage.clickAllCrumb();
+        testsPage.waitFor();
+    }
+
+    public void testTestResultsNestedSuites() throws Exception
+    {
+        final String PROCESSOR_NAME = "nesty";
+        final String PROCESSOR_SUITE = "sweety has spaces & special % ch@r@cter$!";
+
+        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        antConfig.put(Constants.Project.AntCommand.TARGETS, "test");
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TEST_ANT_REPOSITORY), antConfig);
+
+        Hashtable<String, Object> junitProcessor = xmlRpcHelper.createDefaultConfig(JUnitReportPostProcessorConfiguration.class);
+        junitProcessor.put(NAME, PROCESSOR_NAME);
+        junitProcessor.put("suite", PROCESSOR_SUITE);
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, POSTPROCESSORS), junitProcessor);
+
+        insertTestCapture(projectPath, PROCESSOR_NAME);
+
+        int buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        loginAsAdmin();
+
+        // Test we can drill all the way down then back up again.
+        BuildTestsPage testsPage = new BuildTestsPage(selenium, urls, random, buildId);
+        testsPage.goTo();
+
+        assertTrue(testsPage.hasTests());
+        StageTestsPage stageTestsPage = testsPage.clickStageAndWait("default");
+        TestSuitePage topSuitePage = stageTestsPage.clickSuiteAndWait(PROCESSOR_SUITE);
+        TestSuitePage nestedSuitePath = topSuitePage.clickSuiteAndWait("com.zutubi.testant.UnitTest");
+
+        nestedSuitePath.clickSuiteCrumb(PROCESSOR_SUITE);
+        topSuitePage.waitFor();
+        topSuitePage.clickStageCrumb();
+        stageTestsPage.waitFor();
+        stageTestsPage.clickAllCrumb();
+        testsPage.waitFor();
+    }
+
+    private void insertTestCapture(String projectPath, String processorName) throws Exception
+    {
+        Hashtable<String, Object> dirOutputConfig = xmlRpcHelper.createDefaultConfig(DirectoryOutputConfiguration.class);
+        dirOutputConfig.put(NAME, "xml reports");
+        dirOutputConfig.put(BASE, "build/reports/xml");
+        dirOutputConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, CAPTURES), dirOutputConfig);
     }
 
     private void enableBuildPrompting(String projectName) throws Exception

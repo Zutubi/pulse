@@ -27,7 +27,7 @@
         #foreach($node in $result.root.children)
             #set($summary = $node.result.testSummary)
         <tr>
-            #dynamicLinkCell($node.stageName "$urls.stageTests($result, $node)")
+            <td class="content"><a id='#id("stage-${node.stageName}")' href="$urls.stageTests($result, $node)">#html($node.stageName)</a></td>
             #testStatusCell($summary)
             #rightCell($summary.total)
             #rightCell($summary.failures)

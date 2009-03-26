@@ -300,6 +300,11 @@ public class Urls
         return buildTests(build) + getStageComponent(node);
     }
 
+    public String stageTests(Object project, String number, String stage)
+    {
+        return buildTests(project, number) + uriComponentEncode(stage) + "/";
+    }
+
     public String buildFile(BuildResult build)
     {
         return build(build) + "file/";

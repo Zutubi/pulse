@@ -1,5 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryOutput.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryOutput.INCLUSIONS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Output.POSTPROCESSORS;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildArtifactsPage;
@@ -95,15 +98,15 @@ public class MavenAcceptanceTest extends SeleniumTestBase
     @SuppressWarnings({ "unchecked" })
     private void assertCaptureConfiguration(Hashtable<String, Object> capture, String expectedName, String expectedBase, String expectedIncludes, String... expectedPostProcessors)
     {
-        Vector<String> postprocessors = (Vector<String>) capture.get(Constants.DirectoryOutput.POSTPROCESSORS);
+        Vector<String> postprocessors = (Vector<String>) capture.get(POSTPROCESSORS);
         assertEquals(expectedPostProcessors.length, postprocessors.size());
         for (int i = 0; i < expectedPostProcessors.length; i++)
         {
             assertEquals(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "postProcessors", expectedPostProcessors[i]), postprocessors.get(i));
         }
-        assertEquals(expectedName, capture.get(Constants.DirectoryOutput.NAME));
-        assertEquals(expectedBase, FileSystemUtils.normaliseSeparators((String) capture.get(Constants.DirectoryOutput.BASE)));
-        assertEquals(expectedIncludes, ((Vector) capture.get(Constants.DirectoryOutput.INCLUSIONS)).get(0));
+        assertEquals(expectedName, capture.get(Constants.Project.NAME));
+        assertEquals(expectedBase, FileSystemUtils.normaliseSeparators((String) capture.get(BASE)));
+        assertEquals(expectedIncludes, ((Vector) capture.get(INCLUSIONS)).get(0));
     }
 
     private void createMavenProject() throws Exception

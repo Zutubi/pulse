@@ -1638,7 +1638,7 @@
 
     <tr>
         <td class="test-failure content-nowrap">
-             ${indent}<a href='$urls.stageTests($build, $recipe)$action.urlEncode($path)'>$!webwork.htmlEncode($test.name)</a>
+             ${indent}<a href='$urls.stageTests($build, $recipe)${path}/'>$!webwork.htmlEncode($test.name)</a>
          </td>
         #contentCell("empty.cell")
         #contentCell("empty.cell")
@@ -1741,9 +1741,7 @@
 ## Shows a test summary table for a result
 ##
 #macro(testSummaryTable $summary)
-##    <h2 class="section">#wwtext("name=test.summary")</h2>
-
-    <table class="fill-content">
+    <table id="test.summary" class="fill-content">
         #headingRow("test.summary" 7)
         <tr>
             #contentHeading("test.status" 2)

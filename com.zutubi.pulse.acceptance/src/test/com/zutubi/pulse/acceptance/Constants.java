@@ -52,6 +52,7 @@ public class Constants
      */
     public static class Project
     {
+        public static final String NAME = "name";
         public static final String HOOKS = "buildHooks";
         public static final String REQUIREMENTS = "requirements";
         public static final String STAGES = "stages";
@@ -59,11 +60,20 @@ public class Constants
         public static final String TYPE = "type";
 
         /**
-         * Property names in the ant type class.
+         * Property names in the multi recipe type class.
          */
-        public static class AntType
+        public static class MultiRecipeType
         {
-            public static final String ARGUMENTS = "args";
+            public static final String DEFAULT_RECIPE  = "default";
+
+            public static final String RECIPES = "recipes";
+
+            public static class Recipe
+            {
+                public static final String DEFAULT_COMMAND = "build";
+
+                public static final String COMMANDS = "commands";
+            }
         }
 
         /**
@@ -75,19 +85,47 @@ public class Constants
         }
 
         /**
+         * The constants for the property names in the command config class.
+         */
+        public static class Command
+        {
+            public static final String CAPTURES = "outputs";
+
+            /**
+             * The constants for the property names in the ArtifactConfiguration class.
+             */
+            public static class Output
+            {
+                public static final String POSTPROCESSORS = "postProcessors";
+            }
+
+            /**
+             * The constants for the property names in the DirectoryArtifactConfiguration class.
+             */
+            public static class DirectoryOutput extends Output
+            {
+                public static final String BASE = "base";
+                public static final String INCLUSIONS = "inclusions";
+                public static final String EXCLUSIONS = "exclusions";
+                public static final String MIME_TYPE = "type";
+            }
+        }
+
+        /**
+         * Property names in the ant command class.
+         */
+        public static class AntCommand extends Command
+        {
+            public static final String ARGUMENTS = "args";
+            public static final String TARGETS = "targets";
+        }
+
+        /**
          * Properties shared by all SCMs.
          */
         public static class Scm
         {
             public static final String QUIET_PERIOD_ENABLED = "quietPeriodEnabled";
-        }
-
-        /**
-         * The constants for the property names in the project template type class.
-         */
-        public static class Command
-        {
-            public static final String CAPTURES = "outputs";
         }
 
         /**
@@ -97,25 +135,5 @@ public class Constants
         {
             public static final String RECIPE = "recipe";
         }
-    }
-
-    /**
-     * The constants for the property names in the ArtifactConfiguration class.
-     */
-    public static class Output
-    {
-        public static final String NAME = "name";
-        public static final String POSTPROCESSORS = "postProcessors";
-    }
-
-    /**
-     * The constants for the property names in the DirectoryArtifactConfiguration class.
-     */
-    public static class DirectoryOutput extends Output
-    {
-        public static final String BASE = "base";
-        public static final String INCLUSIONS = "inclusions";
-        public static final String EXCLUSIONS = "exclusions";
-        public static final String MIME_TYPE = "type";
     }
 }

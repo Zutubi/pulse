@@ -153,7 +153,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     {
         Hashtable<String, Object> svn = xmlRpcHelper.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
         Hashtable<String,Object> ant = xmlRpcHelper.getAntConfig();
-        ant.put(Constants.Project.AntType.ARGUMENTS, getFileArgument());
+        ant.put(Constants.Project.AntCommand.ARGUMENTS, getFileArgument());
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svn, ant);
 
         triggerBuild(true);

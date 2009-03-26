@@ -32,15 +32,26 @@
 </head>
 <body>
     #buildTabs($buildResult "tests")
-
-    <p>
-        <a href="$urls.buildTests($buildResult)">#wwtext("name=tests.all")</a>
-        :: <a href="$urls.stageTests($buildResult, $recipeResultNode)">#wwtext("name=build.stage") $h_stageName</a>
+#if($path)
+    #set($pathComponent = "-$path")
+#else
+    #set($pathComponent = "")
+#end
+    <p id='#id("${buildResult.ownerName}-build-${buildResult.number}-tests-${stageName}${pathComponent}")'>
+        <a id="allcrumb" href="$urls.buildTests($buildResult)">#wwtext("name=tests.all")</a>
+        :: <a id="stagecrumb" href="$urls.stageTests($buildResult, $recipeResultNode)">#wwtext("name=build.stage") $h_stageName</a>
 #set($suitePath="")
+#set($rawSuitePath="")
 #foreach($element in $paths)
     #if($element.length() > 0)
-        #set($suitePath = "$suitePath/$element")
-        :: <a href="$urls.stageTests($buildResult, $recipeResultNode)$action.urlEncode($suitePath)">#wwtext("name=test.suite") $!webwork.htmlEncode($action.urlDecode($element))</a>
+        #if($suitePath.length() > 0)
+            #set($suitePath = "$suitePath/$action.uriComponentEncode($element)")
+            #set($rawSuitePath = "$rawSuitePath/$element")
+        #else
+            #set($suitePath = "$action.uriComponentEncode($element)")
+            #set($rawSuitePath = "$element")
+        #end
+        :: <a id='#id("suitecrumb-${rawSuitePath}")' href="$urls.stageTests($buildResult, $recipeResultNode)${suitePath}/">#wwtext("name=test.suite") #html($element)</a>
     #end
 #end
     </p>
@@ -67,18 +78,13 @@
             #contentHeading("test.duration" 1)
         </tr>
     #foreach($childSuite in $suite.suites)
-        #if($path.length() > 0)
-            #set($childPath = "$path/$action.urlEncode($childSuite.name)")
-        #else
-            #set($childPath = "$action.urlEncode($childSuite.name)")
-        #end
         #if($childSuite.hasBrokenTests())
             #set($cssClass = "failed")
         #else
             #set($cssClass = "successful")
         #end
         <tr class="$cssClass">
-            #dynamicLinkCell($childSuite.name "$urls.stageTests($buildResult, $recipeResultNode)$action.urlEncode($childPath)")
+            <td class="content"><a id='#id("suite-${childSuite.name}")' href="$urls.stageTests($buildResult, $recipeResultNode)$action.getChildUriPath($childSuite.name)/">#html($childSuite.name)</a></td>
             #testStatusCell($childSuite)
             #rightCell($childSuite.total)
             #rightCell($childSuite.failures)
