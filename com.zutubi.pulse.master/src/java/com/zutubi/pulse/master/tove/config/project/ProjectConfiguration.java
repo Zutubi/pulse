@@ -49,7 +49,7 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
 
     private String organisation;
 
-    private DependenciesConfiguration dependencies = new LocalDependenciesConfiguration();
+    private DependenciesConfiguration dependencies = new DependenciesConfiguration();
 
     @Ordered
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();

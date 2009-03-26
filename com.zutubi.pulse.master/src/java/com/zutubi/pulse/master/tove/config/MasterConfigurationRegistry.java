@@ -12,7 +12,7 @@ import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
 import com.zutubi.pulse.master.tove.config.misc.TransientConfiguration;
-import com.zutubi.pulse.master.tove.config.project.LocalDependenciesConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependenciesConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.*;
@@ -126,7 +126,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             // generated dynamically as new components are registered.
             CompositeType projectConfig = registerConfigurationType(ProjectConfiguration.class);
 
-            registerConfigurationType(LocalDependenciesConfiguration.class);
+            registerConfigurationType(DependenciesConfiguration.class);
 
             // scm configuration - registration of extensions occurs via plugins.
             registerConfigurationType(PollableScmConfiguration.class);

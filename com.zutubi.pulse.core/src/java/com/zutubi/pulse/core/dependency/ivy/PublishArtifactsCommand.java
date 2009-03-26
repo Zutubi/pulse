@@ -46,6 +46,7 @@ public class PublishArtifactsCommand extends BaseIvyCommand
             extraAttributes.put("e:stage", stageName);
             ModuleRevisionId mrid = ModuleRevisionId.newInstance(request.getProjectOrg(), request.getProject(), null, extraAttributes);
             String artifactPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_PUBLICATION_PATTERN);
+            artifactPattern = context.resolveReferences(artifactPattern);
 
             File baseDir = context.getWorkingDir();
 

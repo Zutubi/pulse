@@ -1,18 +1,49 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 
 import java.util.List;
+import java.util.LinkedList;
 
 /**
- * The base configuration instance that defines the source of the projects dependencies.
- * This class to be extended by implementations that know where the dependency information
- * is defined. 
+ * The manually configured dependencies.
  */
-@SymbolicName("zutubi.dependencies")
-public abstract class DependenciesConfiguration extends AbstractConfiguration
+@SymbolicName("zutubi.dependenciesConfiguration")
+public class DependenciesConfiguration extends AbstractConfiguration
 {
-    public abstract List<DependencyConfiguration> getDependencies();
+    private List<DependencyConfiguration> dependencies = new LinkedList<DependencyConfiguration>();
+
+    private String publicationPattern = "build/[artifact].[ext]";
+    private String retrievalPattern = "lib/[artifact].[ext]";
+
+    public List<DependencyConfiguration> getDependencies()
+    {
+        return dependencies;
+    }
+
+    public void setDependencies(List<DependencyConfiguration> dependencies)
+    {
+        this.dependencies = dependencies;
+    }
+
+    public String getPublicationPattern()
+    {
+        return publicationPattern;
+    }
+
+    public void setPublicationPattern(String publicationPattern)
+    {
+        this.publicationPattern = publicationPattern;
+    }
+
+    public String getRetrievalPattern()
+    {
+        return retrievalPattern;
+    }
+
+    public void setRetrievalPattern(String retrievalPattern)
+    {
+        this.retrievalPattern = retrievalPattern;
+    }
 }

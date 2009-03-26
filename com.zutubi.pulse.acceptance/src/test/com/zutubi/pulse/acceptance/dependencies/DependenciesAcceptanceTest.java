@@ -106,7 +106,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         createProject(project);
 
         // change the publication pattern so that the artifacts are searched for in the wrong location.
-        setPublicationPattern(project.name, project.defaultStage.name, "invalid/path/[artifact].[ext]");
+        setPublicationPattern(project.name, "invalid/path/[artifact].[ext]");
 
         int buildNumber = triggerBuild(project);
         assertTrue(isBuildErrored(project.name, buildNumber));
@@ -182,7 +182,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         createProject(projectB);
 
         // change the retrieval pattern so that the artifacts are delivered to somewhere other than expected by the build.
-        setRetrievalPattern(projectB.name, projectB.defaultStage.name, "some/other/path/[artifact].[ext]");
+        setRetrievalPattern(projectB.name, "some/other/path/[artifact].[ext]");
 
         int buildNumber = triggerBuild(projectB);
         assertTrue(isBuildFailure(projectB.name, buildNumber));
@@ -264,14 +264,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             // when working with patterns, we always use the default stages patterns.  Any tests that
             // vary this should be aware of this.
-            List<String> artifacts = applyIvyPattern(p.defaultStage.publicationPattern, p.getAllArtifacts());
+            List<String> artifacts = applyIvyPattern(p.publicationPattern, p.getAllArtifacts());
             args = args + " -Dartifact.list=\"" + StringUtils.join(",", artifacts) + "\"";
         }
 
         if (p.dependencies.size() > 0)
         {
             // get the list of expected dependent artifacts.
-            List<String> dependencies = applyIvyPattern(p.defaultStage.retrievalPattern, p.getTransitiveDependencies());
+            List<String> dependencies = applyIvyPattern(p.retrievalPattern, p.getTransitiveDependencies());
             args = args + " -Ddependency.list=\"" + StringUtils.join(",", dependencies) + "\"";
         }
 
@@ -286,6 +286,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             setProjectOrganisation(p);
         }
 
+        setPublicationPattern(p.name, p.publicationPattern);
+
         for (Stage stage : p.stages)
         {
             // create stage.
@@ -295,7 +297,6 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             {
                 addPublication(p.name, stage.name, artifact);
             }
-            setPublicationPattern(p.name, stage.name, stage.publicationPattern);
         }
 
         for (Project dependency : p.dependencies)
@@ -339,24 +340,24 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
     }
 
-    public void setPublicationPattern(String projectName, String stageName, String publicationPattern) throws Exception
+    public void setPublicationPattern(String projectName, String publicationPattern) throws Exception
     {
         // configure the default stage.
-        String stagePath = "projects/" + projectName + "/stages/" + stageName;
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
-        stage.put("publicationPattern", publicationPattern);
+        String dependenciesPath = "projects/" + projectName + "/dependencies";
+        Hashtable<String, Object> dependencies = xmlRpcHelper.getConfig(dependenciesPath);
+        dependencies.put("publicationPattern", publicationPattern);
 
-        xmlRpcHelper.saveConfig(stagePath, stage, true);
+        xmlRpcHelper.saveConfig(dependenciesPath, dependencies, true);
     }
 
-    public void setRetrievalPattern(String projectName, String stageName, String retrievalPattern) throws Exception
+    public void setRetrievalPattern(String projectName, String retrievalPattern) throws Exception
     {
         // configure the default stage.
-        String stagePath = "projects/" + projectName + "/stages/" + stageName;
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
-        stage.put("retrievalPattern", retrievalPattern);
+        String dependenciesPath = "projects/" + projectName + "/dependencies";
+        Hashtable<String, Object> dependencies = xmlRpcHelper.getConfig(dependenciesPath);
+        dependencies.put("retrievalPattern", retrievalPattern);
 
-        xmlRpcHelper.saveConfig(stagePath, stage, true);
+        xmlRpcHelper.saveConfig(dependenciesPath, dependencies, true);
     }
 
     private void addPublication(String projectName, String stageName, String artifact) throws Exception
@@ -446,6 +447,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private List<Stage> stages = new LinkedList<Stage>();
         private Stage defaultStage = new Stage("default");
 
+        private String publicationPattern = "build/[artifact].[ext]";
+        private String retrievalPattern = "lib/[artifact].[ext]";
+
         private Project(String name)
         {
             this.name = name;
@@ -495,9 +499,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             });
         }
 
+        public void setRetrievalPattern(String retrievalPattern)
+        {
+            this.retrievalPattern = retrievalPattern;
+        }
+
         public void setPublicationPattern(String publicationPattern)
         {
-            defaultStage.setPublicationPattern(publicationPattern);
+            this.publicationPattern = publicationPattern;
         }
 
         public List<String> getAllArtifacts()
@@ -531,8 +540,6 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private class Stage
     {
         private String name;
-        private String publicationPattern = "build/[artifact].[ext]";
-        private String retrievalPattern = "lib/[artifact].[ext]";
 
         private List<String> artifacts = new LinkedList<String>();
 
@@ -544,11 +551,6 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private void addArtifact(String name)
         {
             artifacts.add(name);
-        }
-
-        public void setPublicationPattern(String publicationPattern)
-        {
-            this.publicationPattern = publicationPattern;
         }
 
         public void addArtifacts(String[] names)

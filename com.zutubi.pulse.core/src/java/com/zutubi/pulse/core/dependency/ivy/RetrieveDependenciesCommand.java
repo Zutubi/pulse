@@ -32,6 +32,8 @@ public class RetrieveDependenciesCommand extends BaseIvyCommand
             ivy.resolve(descriptor);
 
             String retrievalPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN);
+            retrievalPattern = context.resolveReferences(retrievalPattern);
+            
             ivy.retrieve(descriptor.getModuleRevisionId(), context.getWorkingDir().getAbsolutePath() + "/" + retrievalPattern);
         }
         catch (Exception e)

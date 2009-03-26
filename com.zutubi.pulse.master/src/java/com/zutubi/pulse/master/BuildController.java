@@ -213,8 +213,10 @@ public class BuildController implements EventListener
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
 
-            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_PUBLICATION_PATTERN, stageConfig.getPublicationPattern());
-            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, stageConfig.getRetrievalPattern());
+            String publicationPattern = projectConfig.getDependencies().getPublicationPattern();
+            String retrievalPattern = projectConfig.getDependencies().getRetrievalPattern();
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_PUBLICATION_PATTERN, publicationPattern);
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, retrievalPattern);
 
             RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);

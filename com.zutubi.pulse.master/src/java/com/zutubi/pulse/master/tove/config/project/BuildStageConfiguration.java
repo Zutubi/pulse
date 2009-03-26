@@ -30,8 +30,6 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     @Ordered
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
     private List<ResourceRequirementConfiguration> requirements = new LinkedList<ResourceRequirementConfiguration>();
-    private String publicationPattern = "build/[artifact].[ext]";
-    private String retrievalPattern = "lib/[artifact].[ext]";
 
     @Transient
     private ObjectFactory objectFactory;
@@ -90,26 +88,6 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     public void setRequirements(List<ResourceRequirementConfiguration> requirements)
     {
         this.requirements = requirements;
-    }
-
-    public String getPublicationPattern()
-    {
-        return publicationPattern;
-    }
-
-    public void setPublicationPattern(String publicationPattern)
-    {
-        this.publicationPattern = publicationPattern;
-    }
-
-    public String getRetrievalPattern()
-    {
-        return retrievalPattern;
-    }
-
-    public void setRetrievalPattern(String retrievalPattern)
-    {
-        this.retrievalPattern = retrievalPattern;
     }
 
     public List<PublicationConfiguration> getPublications()
