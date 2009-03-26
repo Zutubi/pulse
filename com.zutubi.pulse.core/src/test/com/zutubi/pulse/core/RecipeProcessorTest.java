@@ -146,6 +146,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         addArtifact(descriptor, "build", "artifact", "jar");
         addArtifact(descriptor, "build", "artifact", "txt");
 
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_PUBLICATION_PATTERN, "");
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE, "build");
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, descriptor);
         recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
@@ -165,6 +166,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         addDependency(descriptor, "org", "projectA", "1.0");
         addDependency(descriptor, "org", "projectB", "1.0");
 
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, "");
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE, "build");
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, descriptor);
         recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
