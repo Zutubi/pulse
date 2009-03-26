@@ -1,6 +1,4 @@
-package com.zutubi.pulse.core;
-
-import com.zutubi.pulse.core.commands.api.CommandContext;
+package com.zutubi.pulse.core.commands.api;
 
 /**
  * Basic interface for commands.  Commands are single units of work in a

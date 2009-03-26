@@ -5,12 +5,12 @@ import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.model.PersistentPlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.io.File;

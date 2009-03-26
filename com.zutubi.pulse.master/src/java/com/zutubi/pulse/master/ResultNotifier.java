@@ -4,7 +4,7 @@ import com.zutubi.events.AsynchronousDelegatingListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.condition.UnsuccessfulCountBuildsValue;
 import com.zutubi.pulse.master.condition.UnsuccessfulCountDaysValue;

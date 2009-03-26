@@ -31,6 +31,12 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
 
     private PostProcessorExtensionManager postProcessorExtensionManager;
 
+    /**
+     * Constructor that stores the configuration.
+     *
+     * @param config configuration for this command
+     * @see #getConfig() 
+     */
     protected OutputProducingCommandSupport(OutputProducingCommandConfigurationSupport config)
     {
         super(config);

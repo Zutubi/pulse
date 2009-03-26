@@ -2,9 +2,9 @@ package com.zutubi.pulse.dev.local;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.io.ForkOutputStream;
 

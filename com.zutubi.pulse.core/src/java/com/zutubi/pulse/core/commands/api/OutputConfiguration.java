@@ -9,5 +9,12 @@ import com.zutubi.tove.config.api.NamedConfiguration;
 @SymbolicName("zutubi.outputConfig")
 public interface OutputConfiguration extends NamedConfiguration
 {
-    Output createOutput();
+    /**
+     * Indicates the type of output to create for this configuration.  This
+     * output type must have single-argument constructor which will accept
+     * this configuration.
+     *
+     * @return the type of output to create for this configuration
+     */
+    Class<? extends Output> outputType();
 }

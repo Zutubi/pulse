@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.api;
 
-import com.zutubi.pulse.core.Command;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -11,8 +10,8 @@ import java.util.Map;
 
 /**
  * Base interface for all command configuration types.  Defines common
- * properties, and a factory method used to build
- * {@link com.zutubi.pulse.core.Command} instances from the configuration.
+ * properties, and a method returning the type of {@link Command} instances
+ * to build from the configuration.
  */
 @SymbolicName("zutubi.commandConfig")
 public interface CommandConfiguration extends NamedConfiguration
@@ -54,10 +53,28 @@ public interface CommandConfiguration extends NamedConfiguration
      */
     void setForce(boolean force);
 
+    /**
+     * The outputs that should be captured when this command completes.  These
+     * are typically files or reports created by running the command.
+     *
+     * @return outputs to capture when the command completes
+     */
     @Ordered
     Map<String, OutputConfiguration> getOutputs();
 
+    /**
+     * Sets the outputs to be captured when this command completes.
+     *
+     * @param outputs outputs to capture when the command completes
+     */
     void setOutputs(Map<String, OutputConfiguration> outputs);
 
+    /**
+     * Indicates the type of command to build from this configuration.  The
+     * command type must have a single-argument constructor that accepts this
+     * configuration as an argument.
+     * 
+     * @return the type of command to build for this configuration
+     */
     Class<? extends Command> commandType();
 }

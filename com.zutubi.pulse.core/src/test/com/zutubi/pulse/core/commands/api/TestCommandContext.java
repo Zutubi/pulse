@@ -1,10 +1,6 @@
 package com.zutubi.pulse.core.commands.api;
 
-import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
@@ -16,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * An implementation of {@link com.zutubi.pulse.core.commands.api.CommandContext}
+ * useful for testing.  Records what the command does to the context for later
+ * inspection.
  */
 public class TestCommandContext implements CommandContext
 {
@@ -26,6 +25,12 @@ public class TestCommandContext implements CommandContext
     private Map<String, String> links = new HashMap<String, String>();
     private Map<String, Output> outputs = new HashMap<String, Output>();
 
+    /**
+     * Create a new context that will return the given execution context from
+     * {@link #getExecutionContext()}.
+     *
+     * @param executionContext the context in which the command executes
+     */
     public TestCommandContext(ExecutionContext executionContext)
     {
         this.executionContext = executionContext;
@@ -41,11 +46,22 @@ public class TestCommandContext implements CommandContext
         return resultState;
     }
 
+    /**
+     * Returns the features registered against this context.
+     *
+     * @return all features added to this context
+     */
     public List<Feature> getFeatures()
     {
         return features;
     }
 
+    /**
+     * Returns the features of the given level registered against this context.
+     *
+     * @param level the level of feature to retrieve
+     * @return all features of the given level added to this context
+     */
     public List<Feature> getFeatures(final Feature.Level level)
     {
         return CollectionUtils.filter(features, new Predicate<Feature>()
@@ -57,16 +73,34 @@ public class TestCommandContext implements CommandContext
         });
     }
 
+    /**
+     * Returns all properties registered via {@link #addCommandProperty(String, String)}.
+     *
+     * @return all registered properties
+     */
     public Map<String, String> getProperties()
     {
         return properties;
     }
 
+    /**
+     * Returns all links registered via {@link #registerLink(String, String)}.
+     *
+     * @return all registered link outputs
+     */
     public Map<String, String> getLinks()
     {
         return links;
     }
 
+    /**
+     * Returns all outputs registered via {@link #registerOutput(String, String)}.
+     * These output instances in turn include details of processors etc
+     * registered against them.
+     *
+     * @return all registered outputs
+     * @see Output
+     */
     public Map<String, Output> getOutputs()
     {
         return outputs;
@@ -131,6 +165,9 @@ public class TestCommandContext implements CommandContext
         }
     }
 
+    /**
+     * Called when the command completes, updating the state if necessary.
+     */
     public void complete()
     {
         if (resultState == ResultState.IN_PROGRESS)
@@ -139,37 +176,78 @@ public class TestCommandContext implements CommandContext
         }
     }
 
+    /**
+     * Records information about a registered output.
+     *
+     * @see TestCommandContext#registerOutput(String, String)
+     */
     public static class Output
     {
         private String name;
         private String index;
         private List<PostProcessorConfiguration> appliedProcessors = new LinkedList<PostProcessorConfiguration>();
 
+        /**
+         * Creates an output of the given name.
+         *
+         * @param name the name of the output
+         */
         public Output(String name)
         {
             this.name = name;
         }
 
+        /**
+         * Returns this output's name.
+         *
+         * @return the name of the output
+         */
         public String getName()
         {
             return name;
         }
 
+        /**
+         * Returns the index, which will only be set if a call to
+         * {@link TestCommandContext#setOutputIndex(String, String)} was made
+         * for this output.
+         *
+         * @return the index set for this output (may be null)
+         */
         public String getIndex()
         {
             return index;
         }
 
+        /**
+         * Sets the index file path for this output.  Used for setting up
+         * expected outputs.
+         *
+         * @param index the index for this output
+         * @see #getIndex()
+         */
         public void setIndex(String index)
         {
             this.index = index;
         }
 
+        /**
+         * Returns all processors registered against this output via
+         * {@link TestCommandContext#registerProcessors(String, java.util.List)}.
+         *
+         * @return all processors registered against this output
+         */
         public List<PostProcessorConfiguration> getAppliedProcessors()
         {
             return appliedProcessors;
         }
 
+        /**
+         * Adds registered processors to this output.  Used for setting up
+         * expected outputs.
+         *
+         * @param processors the processors to register
+         */
         public void applyProcessors(List<PostProcessorConfiguration> processors)
         {
             appliedProcessors.addAll(processors);

@@ -79,8 +79,8 @@ public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationS
         this.followSymlinks = followSymlinks;
     }
 
-    public Output createOutput()
+    public Class<? extends Output> outputType()
     {
-        return buildOutput(DirectoryOutput.class);
+        return DirectoryOutput.class;
     }
 }

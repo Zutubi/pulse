@@ -26,8 +26,8 @@ public class FileOutputConfiguration extends FileSystemOutputConfigurationSuppor
         this.file = file;
     }
 
-    public Output createOutput()
+    public Class<? extends Output> outputType()
     {
-        return buildOutput(FileOutput.class);
+        return FileOutput.class;
     }
 }

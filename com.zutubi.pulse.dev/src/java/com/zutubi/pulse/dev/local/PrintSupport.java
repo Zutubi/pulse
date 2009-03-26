@@ -1,8 +1,8 @@
 package com.zutubi.pulse.dev.local;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
 
 import java.util.List;
 

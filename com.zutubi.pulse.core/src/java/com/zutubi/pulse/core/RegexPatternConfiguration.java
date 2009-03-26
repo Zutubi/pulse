@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.engine.api.Addable;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.StringList;
 import com.zutubi.tove.annotations.SymbolicName;

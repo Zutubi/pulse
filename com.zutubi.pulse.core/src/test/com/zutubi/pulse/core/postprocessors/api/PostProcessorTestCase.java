@@ -24,14 +24,14 @@ import java.io.IOException;
  * Assuming the test class was named CompilerPostProcessorTest the input file
  * used in this case would be call CompilerPostProcessorTest.testErrors.txt,
  * located in the same package as the test class on the classpath.  This case
- * makes use of {@link com.zutubi.pulse.core.postprocessors.api.FeatureMatchers}
+ * makes use of {@link com.zutubi.pulse.core.engine.api.FeatureMatchers}
  * to create a Hamcrest matcher for verifying features.
  * <p/>
  * For testing post-processors that extract test results, consider using a more
  * targetted subclass such as {@link com.zutubi.pulse.core.postprocessors.api.TestPostProcessorTestCase}.
  *
  * @see com.zutubi.pulse.core.postprocessors.api.TestPostProcessorTestCase
- * @see com.zutubi.pulse.core.postprocessors.api.FeatureMatchers
+ * @see com.zutubi.pulse.core.engine.api.FeatureMatchers
  */
 public class PostProcessorTestCase extends PulseTestCase
 {

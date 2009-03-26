@@ -2,6 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import com.zutubi.pulse.core.commands.CommandFactory;
+import com.zutubi.pulse.core.commands.DefaultCommandContext;
+import com.zutubi.pulse.core.commands.OutputFactory;
 import com.zutubi.pulse.core.commands.api.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
@@ -55,6 +58,7 @@ public class RecipeProcessor
     private boolean terminating = false;
     private PulseFileLoaderFactory fileLoaderFactory;
     private CommandFactory commandFactory;
+    private OutputFactory outputFactory;
     private PostProcessorFactory postProcessorFactory;
     private IvyProvider ivyProvider;
 
@@ -416,7 +420,7 @@ public class RecipeProcessor
     {
         for (OutputConfiguration outputConfiguration : commandConfig.getOutputs().values())
         {
-            Output output = outputConfiguration.createOutput();
+            Output output = outputFactory.create(outputConfiguration);
             output.capture(context);
         }
     }
@@ -474,6 +478,11 @@ public class RecipeProcessor
     public void setPostProcessorFactory(PostProcessorFactory postProcessorFactory)
     {
         this.postProcessorFactory = postProcessorFactory;
+    }
+
+    public void setOutputFactory(OutputFactory outputFactory)
+    {
+        this.outputFactory = outputFactory;
     }
 
     private static class RecipeStatus

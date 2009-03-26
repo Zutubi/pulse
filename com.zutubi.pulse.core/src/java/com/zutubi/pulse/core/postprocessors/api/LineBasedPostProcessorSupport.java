@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.util.CircularBuffer;
 
 import java.io.BufferedReader;

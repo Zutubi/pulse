@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.api;
 
-import com.zutubi.pulse.core.Command;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Reference;

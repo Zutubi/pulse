@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessorConfiguratio
 import com.zutubi.pulse.core.commands.core.PostProcessorGroupConfiguration;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.pulse.core.engine.api.Addable;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Form;

@@ -7,9 +7,18 @@ import org.apache.tools.ant.DirectoryScanner;
 import java.io.File;
 
 /**
+ * An output capture that captures a set of files under a base directory.
+ *
+ * @see com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration
  */
-public class DirectoryOutput extends FileSystemOutputSupport<DirectoryOutputConfiguration>
+public class DirectoryOutput extends FileSystemOutputSupport
 {
+    /**
+     * Constructor that stores the configuration.
+     *
+     * @param config configuration for this output
+     * @see #getConfig() 
+     */
     public DirectoryOutput(DirectoryOutputConfiguration config)
     {
         super(config);
@@ -17,7 +26,7 @@ public class DirectoryOutput extends FileSystemOutputSupport<DirectoryOutputConf
 
     protected void captureFiles(File toDir, CommandContext context)
     {
-        DirectoryOutputConfiguration config = getConfig();
+        DirectoryOutputConfiguration config = (DirectoryOutputConfiguration) getConfig();
         String base = config.getBase();
         File baseDir;
         if (!TextUtils.stringSet(base))

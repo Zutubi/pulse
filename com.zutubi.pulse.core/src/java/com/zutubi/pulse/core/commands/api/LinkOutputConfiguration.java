@@ -26,8 +26,8 @@ public class LinkOutputConfiguration extends OutputConfigurationSupport
         this.url = url;
     }
 
-    public LinkOutput createOutput()
+    public Class<? extends Output> outputType()
     {
-        return buildOutput(LinkOutput.class);
+        return LinkOutput.class;
     }
 }

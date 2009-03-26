@@ -1,6 +1,7 @@
-package com.zutubi.pulse.core.commands.api;
+package com.zutubi.pulse.core.commands;
 
-import com.zutubi.pulse.core.Command;
+import com.zutubi.pulse.core.commands.api.Command;
+import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 
 /**
  * Factory for creating commands from configuration.

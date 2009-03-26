@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 
 /**
@@ -48,7 +49,7 @@ public interface PostProcessorContext
      * @see LineBasedPostProcessorSupport
      * @see #failCommand(String)
      * @see #errorCommand(String)
-     * @see #addFeatureToCommand(com.zutubi.pulse.core.postprocessors.api.Feature)
+     * @see #addFeatureToCommand(com.zutubi.pulse.core.engine.api.Feature)
      *
      * @param feature the discovered feature to add
      */
@@ -58,7 +59,7 @@ public interface PostProcessorContext
      * Fails the command and adds the given message as an error feature.  Use
      * when an error is found that should fail the build.
      *
-     * @see #addFeature(com.zutubi.pulse.core.postprocessors.api.Feature)
+     * @see #addFeature(com.zutubi.pulse.core.engine.api.Feature)
      * @see #errorCommand(String)
      *
      * @param message the error message discovered
@@ -70,7 +71,7 @@ public interface PostProcessorContext
      * error feature.  Use when an error is found that should mark the build
      * as an error.
      *
-     * @see #addFeature(com.zutubi.pulse.core.postprocessors.api.Feature)
+     * @see #addFeature(com.zutubi.pulse.core.engine.api.Feature)
      * @see #failCommand(String)
      *
      * @param message the error message discovered
@@ -83,7 +84,7 @@ public interface PostProcessorContext
      * the artifact - for example when there is an error trying to read the
      * artifact file.
      *
-     * @see #addFeature(com.zutubi.pulse.core.postprocessors.api.Feature)
+     * @see #addFeature(com.zutubi.pulse.core.engine.api.Feature)
      * 
      * @param feature feature to add to the command result
      */

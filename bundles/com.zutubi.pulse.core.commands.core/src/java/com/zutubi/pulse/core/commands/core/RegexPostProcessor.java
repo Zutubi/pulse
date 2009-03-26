@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.RegexPatternConfiguration;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.LineBasedPostProcessorSupport;
 import com.zutubi.util.TextUtils;
 

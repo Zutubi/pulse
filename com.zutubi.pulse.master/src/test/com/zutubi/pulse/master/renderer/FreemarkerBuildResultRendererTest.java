@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.renderer;
 
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
 import com.zutubi.pulse.core.scm.api.Revision;

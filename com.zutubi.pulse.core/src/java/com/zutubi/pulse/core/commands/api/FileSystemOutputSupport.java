@@ -12,16 +12,22 @@ import java.io.IOException;
  * Support base class for output that captures files from the base directory
  * into the output directory.
  */
-public abstract class FileSystemOutputSupport<T extends FileSystemOutputConfigurationSupport> extends OutputSupport<T>
+public abstract class FileSystemOutputSupport extends OutputSupport
 {
-    protected FileSystemOutputSupport(T config)
+    /**
+     * Constructor that stores the configuration.
+     *
+     * @param config configuration for this output
+     * @see #getConfig()
+     */
+    protected FileSystemOutputSupport(FileSystemOutputConfigurationSupport config)
     {
         super(config);
     }
 
     public void capture(CommandContext context)
     {
-        FileSystemOutputConfigurationSupport config = getConfig();
+        FileSystemOutputConfigurationSupport config = (FileSystemOutputConfigurationSupport) getConfig();
         File file = context.registerOutput(config.getName(), config.getType());
         captureFiles(file, context);
         context.registerProcessors(config.getName(), config.getPostProcessors());
@@ -38,8 +44,9 @@ public abstract class FileSystemOutputSupport<T extends FileSystemOutputConfigur
      */
     protected boolean captureFile(File toFile, File fromFile, CommandContext context)
     {
+        FileSystemOutputConfigurationSupport config = (FileSystemOutputConfigurationSupport) getConfig();
         long recipeTimestamp = context.getExecutionContext().getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, 0);
-        if (getConfig().isIgnoreStale() && fromFile.lastModified() < recipeTimestamp)
+        if (config.isIgnoreStale() && fromFile.lastModified() < recipeTimestamp)
         {
             return false;
         }

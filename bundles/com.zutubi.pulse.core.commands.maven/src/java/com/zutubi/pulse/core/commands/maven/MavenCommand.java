@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.util.TextUtils;
 

@@ -1,12 +1,13 @@
-package com.zutubi.pulse.core.commands.api;
+package com.zutubi.pulse.core.commands;
 
-import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.commands.api.CommandContext;
+import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
-import com.zutubi.pulse.core.postprocessors.api.*;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import org.apache.tools.ant.DirectoryScanner;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Default implementation of {@link com.zutubi.pulse.core.commands.api.CommandContext}.
  */
 public class DefaultCommandContext implements CommandContext
 {

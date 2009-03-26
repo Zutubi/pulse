@@ -5,6 +5,7 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.commands.DefaultCommandFactory;
+import com.zutubi.pulse.core.commands.DefaultOutputFactory;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
@@ -16,13 +17,13 @@ import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.PersistentFeature;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.FileSystemUtils;
@@ -55,6 +56,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private EventManager eventManager;
     private WiringObjectFactory objectFactory;
     private DefaultCommandFactory commandFactory;
+    private DefaultOutputFactory outputFactory;
     private DefaultPostProcessorFactory postProcessorFactory;
     private BlockingQueue<Event> events;
     private boolean waitMode = false;
@@ -72,6 +74,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         objectFactory = new WiringObjectFactory();
         commandFactory = new DefaultCommandFactory();
         commandFactory.setObjectFactory(objectFactory);
+        outputFactory = new DefaultOutputFactory();
+        outputFactory.setObjectFactory(objectFactory);
         postProcessorFactory = new DefaultPostProcessorFactory();
         postProcessorFactory.setObjectFactory(objectFactory);
 
@@ -79,6 +83,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         eventManager = new DefaultEventManager();
         recipeProcessor.setEventManager(eventManager);
         recipeProcessor.setCommandFactory(commandFactory);
+        recipeProcessor.setOutputFactory(outputFactory);
         recipeProcessor.setPostProcessorFactory(postProcessorFactory);
         events = new LinkedBlockingQueue<Event>(10);
         eventManager.register(this);

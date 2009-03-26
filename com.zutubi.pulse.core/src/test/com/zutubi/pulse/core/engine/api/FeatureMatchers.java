@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.postprocessors.api;
+package com.zutubi.pulse.core.engine.api;
 
 import com.zutubi.pulse.core.test.api.IsOrderedIterable;
 import static com.zutubi.pulse.core.test.api.Matchers.hasOrderedItems;
@@ -38,7 +38,7 @@ public class FeatureMatchers
      * Returns a matcher that asserts a feature has the same level and summary
      * as the given feature.  Line numbers are ignored by this matcher
      *
-     * @see #hasLevelAndSummary(com.zutubi.pulse.core.postprocessors.api.Feature.Level, String)
+     * @see #hasLevelAndSummary(com.zutubi.pulse.core.engine.api.Feature.Level, String)
      *
      * @param feature feature to match against
      * @return a feature matcher that compares to the given feature
@@ -53,7 +53,7 @@ public class FeatureMatchers
      * summaries of the given features.  Feature line numbers are ignored.
      * The iterable must contain same number of features in the same order.
      *
-     * @see #hasOrderedMessages(com.zutubi.pulse.core.postprocessors.api.Feature.Level, String[])
+     * @see #hasOrderedMessages(com.zutubi.pulse.core.engine.api.Feature.Level, String[])
      *
      * @param features features to match against (levels and summaries only)
      * @return a matcher that tests an iterable of features
@@ -101,7 +101,7 @@ public class FeatureMatchers
      * when all features are errors.  Instead of creating many features, just
      * specify each individual summary.
      *
-     * @see #hasOrderedMessages(com.zutubi.pulse.core.postprocessors.api.Feature.Level, String[])
+     * @see #hasOrderedMessages(com.zutubi.pulse.core.engine.api.Feature.Level, String[])
      * @see #hasOrderedWarnings(String[])
      * @see #hasOrderedInfos(String[])
      *
@@ -119,7 +119,7 @@ public class FeatureMatchers
      * when all features are warnings.  Instead of creating many features, just
      * specify each individual summary.
      *
-     * @see #hasOrderedMessages(com.zutubi.pulse.core.postprocessors.api.Feature.Level, String[])
+     * @see #hasOrderedMessages(com.zutubi.pulse.core.engine.api.Feature.Level, String[])
      * @see #hasOrderedErrors(String[])
      * @see #hasOrderedInfos(String[])
      *
@@ -137,7 +137,7 @@ public class FeatureMatchers
      * when all features are informative.  Instead of creating many features,
      * just specify each individual summary.
      *
-     * @see #hasOrderedMessages(com.zutubi.pulse.core.postprocessors.api.Feature.Level, String[])
+     * @see #hasOrderedMessages(com.zutubi.pulse.core.engine.api.Feature.Level, String[])
      * @see #hasOrderedErrors(String[])
      * @see #hasOrderedWarnings(String[])
      *

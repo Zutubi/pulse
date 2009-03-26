@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import com.zutubi.pulse.core.Command;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_MASTER_URL;

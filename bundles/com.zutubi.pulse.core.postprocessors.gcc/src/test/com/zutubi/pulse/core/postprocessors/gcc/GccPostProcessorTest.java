@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.postprocessors.gcc;
 
 import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
-import static com.zutubi.pulse.core.postprocessors.api.FeatureMatchers.hasOrderedErrors;
-import static com.zutubi.pulse.core.postprocessors.api.FeatureMatchers.hasOrderedWarnings;
+import static com.zutubi.pulse.core.engine.api.FeatureMatchers.hasOrderedErrors;
+import static com.zutubi.pulse.core.engine.api.FeatureMatchers.hasOrderedWarnings;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorTestCase;
 import com.zutubi.pulse.core.postprocessors.api.TestPostProcessorContext;
 import static org.hamcrest.MatcherAssert.assertThat;

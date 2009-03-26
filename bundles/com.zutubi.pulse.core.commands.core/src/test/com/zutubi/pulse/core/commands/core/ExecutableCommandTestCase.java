@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.Command;
+import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandTestCase;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.engine.api.ResultState;

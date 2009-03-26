@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.postprocessors.api;
+package com.zutubi.pulse.core.engine.api;
 
 /**
  * A feature is a useful piece of information attached to a result.  Features

@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.engine.api.Addable;
-import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.LineBasedPostProcessorConfigurationSupport;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;

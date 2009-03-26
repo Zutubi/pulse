@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.postprocessors.api;
+package com.zutubi.pulse.core.engine.api;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;

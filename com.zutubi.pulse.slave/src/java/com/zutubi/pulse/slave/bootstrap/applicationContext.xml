@@ -75,6 +75,8 @@
 
     <bean id="commandFactory" class="com.zutubi.pulse.core.commands.DefaultCommandFactory"/>
 
+    <bean id="outputFactory" class="com.zutubi.pulse.core.commands.DefaultOutputFactory"/>
+
     <bean id="postProcessorFactory" class="com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory"/>
 
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.servercore.hessian.CustomSerialiserFactory"/>

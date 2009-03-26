@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.api;
 
-import com.zutubi.pulse.core.Command;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -26,11 +25,21 @@ public abstract class CommandConfigurationSupport extends AbstractNamedConfigura
     @Transient
     private PostProcessorExtensionManager postProcessorExtensionManager;
 
+    /**
+     * Constructor taking the command type to return from the default
+     * implementation of {@link #commandType()}.
+     *
+     * @param commandType the type to return from {@link #commandType()}
+     */
     protected CommandConfigurationSupport(Class<? extends Command> commandType)
     {
         this.commandType = commandType;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see #getDefaultPostProcessorName(Class)
+     */
     public void initialiseSingleCommandProject(Map<String, PostProcessorConfiguration> availableProcessors)
     {
         // Nothing to do by default.

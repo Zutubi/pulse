@@ -6,9 +6,18 @@ import org.apache.tools.ant.DirectoryScanner;
 import java.io.File;
 
 /**
+ * An output capture that captures a single file.
+ *
+ * @see com.zutubi.pulse.core.commands.api.FileOutputConfiguration
  */
-public class FileOutput extends FileSystemOutputSupport<FileOutputConfiguration>
+public class FileOutput extends FileSystemOutputSupport
 {
+    /**
+     * Constructor which stores the configuration.
+     *
+     * @param config configuration for this output
+     * @see #getConfig() 
+     */
     public FileOutput(FileOutputConfiguration config)
     {
         super(config);
@@ -16,7 +25,7 @@ public class FileOutput extends FileSystemOutputSupport<FileOutputConfiguration>
 
     protected void captureFiles(File toDir, CommandContext context)
     {
-        FileOutputConfiguration config = getConfig();
+        FileOutputConfiguration config = (FileOutputConfiguration) getConfig();
         String file = config.getFile();
         File captureFile = new File(file);
 
@@ -87,7 +96,8 @@ public class FileOutput extends FileSystemOutputSupport<FileOutputConfiguration>
             }
         }
 
-        if (!fileCaptured && getConfig().isFailIfNotPresent() && !context.getResultState().isBroken())
+        FileOutputConfiguration config = (FileOutputConfiguration) getConfig();
+        if (!fileCaptured && config.isFailIfNotPresent() && !context.getResultState().isBroken())
         {
             throw new BuildException("Capturing artifact '" + getConfig().getName() + "': no file matching '" + file + "' exists");
         }
