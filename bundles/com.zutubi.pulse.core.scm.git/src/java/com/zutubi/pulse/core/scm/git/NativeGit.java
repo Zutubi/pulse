@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
@@ -25,6 +24,12 @@ public class NativeGit
 {
     private static final Logger LOG = Logger.getLogger(NativeGit.class);
 
+    /**
+     * Sentinal value used to detect separate parts of log entries.  A hash is
+     * chosen as it is difficult to have one in a commit comment (it is a
+     * comment character).
+     */
+    private static final String LOG_SENTINAL = "#";
     /**
      * The date format used to read the 'date' field on git log output.
      */
@@ -105,7 +110,8 @@ public class NativeGit
         command.add(getGitCommand());
         command.add(COMMAND_LOG);
         command.add(FLAG_NAME_STATUS);
-        command.add(FLAG_PRETTY + "=format:%H%n%cn%n%cd%n%s%n.");
+        command.add(FLAG_SHOW_MERGE_FILES);
+        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%cn%n%cd%n%s%n%b" + LOG_SENTINAL);
         command.add(FLAG_REVERSE);
         if (changes != -1)
         {
@@ -361,14 +367,15 @@ public class NativeGit
     /**
      * Read the output from the git log command, interpretting the output.
      * <p/>
+     *        #
      *        e34da05e88de03a4aa5b10b338382f09bbe65d4b
      *        Daniel Ostermeier
      *        Sun Sep 28 15:06:49 2008 +1000
      *        removed content from a.txt
-     *
+     *        #
      *        M       a.txt
      *
-     * This format is generated using --pretty=format:%H%n%cn%n%cd%n%s%n.
+     * This format is generated using --pretty=format:... (see {@link NativeGit#log})
      */
     private class LogOutputHandler extends OutputHandlerAdapter
     {
@@ -404,6 +411,13 @@ public class NativeGit
                     entries = new LinkedList<GitLogEntry>();
 
                     Iterator<String> i = lines.iterator();
+
+                    // Skip initial sentinal
+                    if (i.hasNext())
+                    {
+                        i.next();
+                    }
+                    
                     while (i.hasNext())
                     {
                         GitLogEntry logEntry = new GitLogEntry();
@@ -425,18 +439,29 @@ public class NativeGit
                         }
 
                         String comment = "";
-                        while (!(str = i.next()).equals("."))
+                        while (i.hasNext() && !(str = i.next()).equals(LOG_SENTINAL))
                         {
+                            if (comment.length() > 0)
+                            {
+                                comment += "\n";
+                            }
                             comment += str;
                             raw.add(str);
                         }
                         logEntry.setComment(comment);
-                        raw.add(str); // dot.
+                        raw.add(str); // blank line
 
-                        // until newline or until end.
-                        while (i.hasNext() && TextUtils.stringSet(str = i.next()))
+                        // Until sentinal or until the end.  Note that most of
+                        // the time a blank line appears at the end of the
+                        // files, but we use the sentinal as a more reliable
+                        // way to detect termination.
+                        while (i.hasNext() && !(str = i.next()).equals(LOG_SENTINAL))
                         {
-                            logEntry.addFileChange(str.substring(1).trim(), str.substring(0, 1).trim());
+                            String[] parts = str.split("\\s+", 2);
+                            if (parts.length == 2)
+                            {
+                                logEntry.addFileChange(parts[1], parts[0]);
+                            }
                             raw.add(str);
                         }
 
@@ -451,11 +476,7 @@ public class NativeGit
                 // print some debugging output.
                 LOG.severe("A problem has occured whilst parsing the git log output.");
                 LOG.severe(e);
-                LOG.severe("The log output received was:");
-                for (String line : lines)
-                {
-                    LOG.severe(line);
-                }
+                LOG.severe("The log output received was:\n" + StringUtils.join("\n", lines));
 
                 throw new GitException(e);
             }
