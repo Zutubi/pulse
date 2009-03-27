@@ -99,6 +99,24 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertJarInRepository(project.name, project.defaultStage.name, "artifact", buildNumber);
     }
 
+    public void testPublish_CustomPublicationPatternViaProperty() throws Exception
+    {
+        Project project = new Project(randomName());
+        project.addArtifact("artifact.jar");
+        createProject(project);
+
+        // Need to set this separately so that the artifacts are configured correctly
+        // via createProject
+        setPublicationPattern(project.name, "${publicationPattern}");
+        xmlRpcHelper.insertStageProperty(project.name, project.defaultStage.name, "publicationPattern", "build/[artifact].[ext]");
+
+        int buildNumber = triggerSuccessfulBuild(project);
+
+        // ensure that we have the expected artifact in the repository.
+        assertIvyInRepository(project.name, buildNumber);
+        assertJarInRepository(project.name, project.defaultStage.name, "artifact", buildNumber);
+    }
+
     public void testPublishFails_MissingArtifacts() throws Exception
     {
         Project project = new Project(randomName());
@@ -255,18 +273,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             target = "dependencies artifacts";
         }
 
-        // cheat a little: create all of the stages artifacts on all of the stages.  This is more
-        // that is needed but so long as care is taken with the test data, it will work fine.  The
-        // proper way to do this would be to set properties on each stage and reference them in the
-        // ant command.
-        String args = "";
-        if (p.getAllArtifacts().size() > 0)
-        {
-            // when working with patterns, we always use the default stages patterns.  Any tests that
-            // vary this should be aware of this.
-            List<String> artifacts = applyIvyPattern(p.publicationPattern, p.getAllArtifacts());
-            args = args + " -Dartifact.list=\"" + StringUtils.join(",", artifacts) + "\"";
-        }
+        String args = "-Dartifact.list=\"${artifact.list}\"";
 
         if (p.dependencies.size() > 0)
         {
@@ -297,6 +304,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             {
                 addPublication(p.name, stage.name, artifact);
             }
+
+            List<String> artifacts = applyIvyPattern(p.publicationPattern, stage.artifacts);
+            xmlRpcHelper.insertStageProperty(p.name, stage.name, "artifact.list", StringUtils.join(",", artifacts));
         }
 
         for (Project dependency : p.dependencies)
@@ -453,12 +463,12 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private Project(String name)
         {
             this.name = name;
-            stages.add(defaultStage);
+            this.stages.add(defaultStage);
         }
 
         private Project(String name, String org)
         {
-            this.name = name;
+            this(name);
             this.org = org;
         }
 

@@ -452,6 +452,13 @@ public class XmlRpcHelper
         return insertConfig(propertiesPath, property);
     }
 
+    public String insertStageProperty(String project, String stage, String name, String value) throws Exception
+    {
+        String propertiesPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, "stages", stage, "properties");
+        Hashtable<String, Object> property = createProperty(name, value, false, false, false);
+        return insertConfig(propertiesPath, property);
+    }
+
     public Hashtable<String, Object> createProperty(String name, String value)
     {
         return createProperty(name, value, false, false, false);
