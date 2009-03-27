@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.CollectionUtils;
@@ -274,9 +275,11 @@ public class GitClientTest extends PulseTestCase
         List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_INITIAL), new Revision(REVISION_HEAD));
 
         Changelist changelist = assertChangelist(changes, REVISION_MULTILINE_COMMENT);
-        assertEquals("This is a\n" +
-                "multi-line\n" +
-                "commit comment", changelist.getComment());
+        // Some versions of git are more aggressive at collapsing the "subject"
+        // or initial part of a commit comment than others, so be a bit
+        // permissive.  Just ensure that the whole comment makes it, with some
+        // kind of separating whitespace.
+        assertThat(changelist.getComment(), matchesRegex("This is a\\smulti-line\\scommit comment"));
         assertEquals(TEST_AUTHOR, changelist.getAuthor());
         assertEquals(1, changelist.getChanges().size());
 
