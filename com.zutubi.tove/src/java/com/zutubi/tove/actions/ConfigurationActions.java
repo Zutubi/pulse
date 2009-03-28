@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Describes a bunch of available actions for a configuration type.
  */
-public class    ConfigurationActions
+public class ConfigurationActions
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationActions.class);
 

@@ -26,6 +26,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ConfigUIAcceptanceTest.class);
         suite.addTestSuite(DeleteAcceptanceTest.class);
         suite.addTestSuite(CloneAcceptanceTest.class);
+        suite.addTestSuite(ConfigLinksAcceptanceTest.class);
         suite.addTestSuite(ConfigActionsAcceptanceTest.class);
         suite.addTestSuite(PluginUIAcceptanceTest.class);
         suite.addTestSuite(GroupAcceptanceTest.class);

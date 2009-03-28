@@ -11,6 +11,8 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.links.ConfigurationLink;
+import com.zutubi.tove.links.LinkManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
@@ -37,6 +39,7 @@ public class ConfigurationUIModel
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationProvider configurationProvider;
     private ConfigurationRegistry configurationRegistry;
+    private LinkManager linkManager;
     private ActionManager actionManager;
     private StateDisplayManager stateDisplayManager;
     private SystemPaths systemPaths;
@@ -61,6 +64,7 @@ public class ConfigurationUIModel
 
     private List<String> extensions = new LinkedList<String>();
 
+    private List<ConfigurationLink> links = new LinkedList<ConfigurationLink>();
     private List<ActionLink> actions = new LinkedList<ActionLink>();
 
     private List<String> displayFields = new LinkedList<String>();
@@ -188,6 +192,10 @@ public class ConfigurationUIModel
                         return PathUtils.getPathElements(s)[1];
                     }
                 });
+            }
+            else
+            {
+                links = linkManager.getLinks(instance);
             }
         }
 
@@ -321,6 +329,11 @@ public class ConfigurationUIModel
         return targetSymbolicName;
     }
 
+    public List<ConfigurationLink> getLinks()
+    {
+        return links;
+    }
+
     public List<ActionLink> getActions()
     {
         return actions;
@@ -364,6 +377,11 @@ public class ConfigurationUIModel
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setLinkManager(LinkManager linkManager)
+    {
+        this.linkManager = linkManager;
     }
 
     public void setActionManager(ActionManager actionManager)

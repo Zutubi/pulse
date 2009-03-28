@@ -72,6 +72,23 @@
         </td>
         
         <td id="right-column">
+    #if ($config.links.size() > 0)
+            <div id="config.links" class="config-panel">
+            <h3 class="config-header">links</h3>
+            <div class="config-container">
+            <ul class="config-actions">
+        #foreach($link in $config.links)
+                    <li>
+                        <a href="${base}/${link.url}" id='#id("link.${link.name}")' class="unadorned">
+                            <img src="${base}/images/${link.icon}"/> ${link.label}
+                        </a>
+                    </li>
+        #end
+            </ul>
+            </div>
+            </div>
+    #end
+
     #if ($config.actions.size() > 0)
             <div class="config-panel">
             <h3 class="config-header">actions</h3>
@@ -97,7 +114,7 @@
 
     #if( $config.nestedProperties.size() > 0)
             <div class="config-panel">
-            <h3 class="config-header">links</h3>
+            <h3 class="config-header">navigate</h3>
             <div class="config-container">
             <ul class="config-links">
         #foreach($prop in $config.nestedProperties)
