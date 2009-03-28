@@ -58,6 +58,8 @@ public class ConfigurationRegistry
     public static final String USERS_SCOPE = "users";
     public static final String GROUPS_SCOPE = "groups";
 
+    public static final String EXTENSION_PROJECT_TRIGGERS = "triggers";
+
     private CompositeType transientConfig;
     private Map<CompositeType, CompositeType> checkTypeMapping = new HashMap<CompositeType, CompositeType>();
 
@@ -136,7 +138,7 @@ public class ConfigurationRegistry
             registerConfigurationType(ScmBuildTriggerConfiguration.class);
 
             MapType triggers = new MapType(triggerConfig, typeRegistry);
-            projectConfig.addProperty(new ExtensionTypeProperty("triggers", triggers));
+            projectConfig.addProperty(new ExtensionTypeProperty(EXTENSION_PROJECT_TRIGGERS, triggers));
 
             // Artifacts.
             registerConfigurationType(ArtifactConfiguration.class);

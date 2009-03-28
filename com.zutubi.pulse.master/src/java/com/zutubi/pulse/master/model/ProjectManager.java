@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.security.SecureParameter;
 import com.zutubi.pulse.master.security.SecureResult;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.tove.security.AccessManager;
 
 import java.util.Collection;
@@ -124,6 +125,8 @@ public interface ProjectManager extends EntityManager<Project>
      * isolation.
      *
      * @param project       the project to trigger a build of
+     * @param properties    additional properties introduced into the build
+     *                      context just after the project properties
      * @param reason        the reason the build was triggered
      * @param revision      the revision to build, or null if the revision is
      *                      not fixed (in which case changelist isolation may
@@ -137,7 +140,7 @@ public interface ProjectManager extends EntityManager<Project>
      *                      latest has been built
      */
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = ProjectConfiguration.class)
-    void triggerBuild(ProjectConfiguration project, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force);
+    void triggerBuild(ProjectConfiguration project, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force);
 
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = Project.class)
     void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;

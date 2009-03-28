@@ -6,8 +6,15 @@ import com.zutubi.pulse.master.model.TriggerBuildReason;
 import com.zutubi.pulse.master.scheduling.Task;
 import com.zutubi.pulse.master.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.util.logging.Logger;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * A trigger task which triggers a project build.
@@ -42,8 +49,21 @@ public class BuildProjectTask implements Task
         ProjectConfiguration project = projectManager.getProjectConfig(projectId, false);
         if (project != null)
         {
+            @SuppressWarnings({"unchecked"})
+            Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) project.getExtensions().get(ConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS);
+            TriggerConfiguration triggerConfig = triggers.get(trigger.getName());
+            Collection<ResourcePropertyConfiguration> properties;
+            if (triggerConfig == null)
+            {
+                properties = Collections.emptyList();
+            }
+            else
+            {
+                properties = triggerConfig.getProperties().values();
+            }
+
             // generate build request.
-            projectManager.triggerBuild(project, new TriggerBuildReason(trigger.getName()), revision, getSource(trigger), replaceable, false);
+            projectManager.triggerBuild(project, properties, new TriggerBuildReason(trigger.getName()), revision, getSource(trigger), replaceable, false);
         }
         else
         {

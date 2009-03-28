@@ -39,6 +39,7 @@ import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
@@ -527,7 +528,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
     }
 
-    public void triggerBuild(ProjectConfiguration projectConfig, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force)
+    public void triggerBuild(ProjectConfiguration projectConfig, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force)
     {
         Project project = getProject(projectConfig.getProjectId(), false);
 
@@ -550,14 +551,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                             for(Revision r: revisions)
                             {
                                 // Note when isolating changelists we never replace existing requests
-                                requestBuildOfRevision(reason, project, r, source, false);
+                                requestBuildOfRevision(reason, project, properties, r, source, false);
                             }
                     }
                     else
                     {
                         LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() +
                                 "' as the SCM does not support revisions");
-                        requestBuildFloating(reason, project, source, replaceable);
+                        requestBuildFloating(reason, project, properties, source, replaceable);
                     }
                 }
                 catch (ScmException e)
@@ -567,13 +568,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
             else
             {
-                requestBuildFloating(reason, project, source, replaceable);
+                requestBuildFloating(reason, project, properties, source, replaceable);
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, project, revision, source, replaceable);
+            requestBuildOfRevision(reason, project, properties, revision, source, replaceable);
         }
     }
 
@@ -614,18 +615,18 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private void requestBuildFloating(BuildReason reason, Project project, String category, boolean replaceable)
+    private void requestBuildFloating(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, String category, boolean replaceable)
     {
-        eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(), category, replaceable));
+        eventManager.publish(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(), category, replaceable));
     }
 
-    private void requestBuildOfRevision(BuildReason reason, Project project, Revision revision, String source, boolean replaceable)
+    private void requestBuildOfRevision(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, Revision revision, String source, boolean replaceable)
     {
         try
         {
             ProjectConfiguration projectConfig = project.getConfig();
             PulseFileSource pulseFile = projectConfig.getType().getPulseFile(projectConfig, revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(revision, pulseFile, reason.isUser()), source, replaceable));
+            eventManager.publish(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(revision, pulseFile, reason.isUser()), source, replaceable));
         }
         catch (Exception e)
         {

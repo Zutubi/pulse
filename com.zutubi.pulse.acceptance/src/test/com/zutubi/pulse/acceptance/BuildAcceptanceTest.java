@@ -21,6 +21,7 @@ import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.DirectoryArtifactConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
@@ -489,6 +490,31 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         assertEquals("pname", propertiesPage.getCellContent(0, 0));
         assertEquals("pvalue", propertiesPage.getCellContent(0, 1));
+    }
+
+    public void testTriggerProperties() throws Exception
+    {
+        String manualProject = random + "-manual";
+        String buildCompletedProject = random + "-completed";
+
+        ensureProject(manualProject);
+        ensureProject(buildCompletedProject);
+
+        Hashtable<String, Object> buildCompletedTrigger = xmlRpcHelper.createEmptyConfig(BuildCompletedTriggerConfiguration.class);
+        buildCompletedTrigger.put("name", "cascade");
+        buildCompletedTrigger.put("project", PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, manualProject));
+
+        Hashtable<String, Object> property = xmlRpcHelper.createProperty("tp", "tpv");
+        Hashtable<String, Hashtable<String, Object>> properties = new Hashtable<String, Hashtable<String, Object>>();
+        properties.put("trigger property", property);
+        buildCompletedTrigger.put("properties", properties);
+
+        xmlRpcHelper.insertConfig(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, buildCompletedProject, "triggers"), buildCompletedTrigger);
+        xmlRpcHelper.runBuild(manualProject, BUILD_TIMEOUT);
+        xmlRpcHelper.waitForBuildToComplete(buildCompletedProject, 1, BUILD_TIMEOUT);
+
+        loginAsAdmin();
+        assertEnvironment(buildCompletedProject, 1, "PULSE_TP=tpv");
     }
 
     public void testVersionedBuildWithImports() throws Exception

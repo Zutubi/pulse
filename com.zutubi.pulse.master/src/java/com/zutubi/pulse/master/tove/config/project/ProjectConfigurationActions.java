@@ -15,10 +15,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Action links for the project config page.
@@ -129,7 +126,7 @@ public class ProjectConfigurationActions
         String user = AcegiUtils.getLoggedInUsername();
         if (user != null)
         {
-            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason(user), null, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
+            projectManager.triggerBuild(projectConfig, Collections.<ResourcePropertyConfiguration>emptyList(), new ManualTriggerBuildReason(user), null, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
         }
     }
 

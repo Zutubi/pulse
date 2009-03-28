@@ -2400,25 +2400,16 @@ public class RemoteApi
                 }
             }
 
-            ProjectConfiguration projectConfig = project.getConfig();
+            List<ResourcePropertyConfiguration> resourceProperties = new LinkedList<ResourcePropertyConfiguration>();
             if (properties != null)
             {
-                projectConfig = configurationProvider.deepClone(projectConfig);
                 for (Map.Entry<String, String> property: properties.entrySet())
                 {
-                    ResourcePropertyConfiguration existingProperty = projectConfig.getProperty(property.getKey());
-                    if (existingProperty == null)
-                    {
-                        projectConfig.getProperties().put(property.getKey(), new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
-                    }
-                    else
-                    {
-                        existingProperty.setValue(property.getValue());
-                    }
+                    resourceProperties.add(new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
                 }
             }
 
-            projectManager.triggerBuild(projectConfig, new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
+            projectManager.triggerBuild(project.getConfig(), resourceProperties, new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
             return true;
         }
         finally
