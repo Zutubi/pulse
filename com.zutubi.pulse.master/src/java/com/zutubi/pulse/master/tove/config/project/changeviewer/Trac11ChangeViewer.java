@@ -11,18 +11,19 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 /**
- * A change viwer implementation for linking to a Trac instance.
+ * A change viwer implementation for linking to a Trac instance, version 0.11
+ * onwards (the diff URL format changed in this version).
  */
 @Form(fieldOrder = {"baseURL", "projectPath"})
-@SymbolicName("zutubi.tracChangeViewerConfig")
-public class TracChangeViewer extends AbstractTracChangeViewer
+@SymbolicName("zutubi.trac11ChangeViewerConfig")
+public class Trac11ChangeViewer extends AbstractTracChangeViewer
 {
-    public TracChangeViewer()
+    public Trac11ChangeViewer()
     {
         super(null, null);
     }
 
-    public TracChangeViewer(String baseURL, String projectPath)
+    public Trac11ChangeViewer(String baseURL, String projectPath)
     {
         super(baseURL, projectPath);
     }
@@ -35,25 +36,24 @@ public class TracChangeViewer extends AbstractTracChangeViewer
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), "changeset?new=" + getDiffPath(fileChange.getPath(), fileChange.getRevision()) + "&old=" + getDiffPath(fileChange.getPath(), previous));
+        return StringUtils.join("/", true, true, getBaseURL(), "changeset?new_path=" + getDiffPath(fileChange.getPath()) + "&new=" + fileChange.getRevision() + "&old_path=" + getDiffPath(fileChange.getPath()) + "&old=" + previous);
     }
 
-    private String getDiffPath(String path, Revision revision)
+    private String getDiffPath(String path)
     {
-        String result = StringUtils.join("/", path + "@" + revision);
-        if(result.startsWith("/"))
+        if(path.startsWith("/"))
         {
-            result = result.substring(1);
+            path = path.substring(1);
         }
-        
+
         try
         {
-            return URLEncoder.encode(result, "UTF-8");
+            return URLEncoder.encode(path, "UTF-8");
         }
         catch (UnsupportedEncodingException e)
         {
             // Programmer error!
-            return result;
+            return path;
         }
     }
 }
