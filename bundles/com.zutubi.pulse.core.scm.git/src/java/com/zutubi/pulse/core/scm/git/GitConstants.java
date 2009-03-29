@@ -33,6 +33,7 @@ public class GitConstants
     public static final String FLAG_NO_CHECKOUT = "--no-checkout";
     public static final String FLAG_REVERSE = "--reverse";
     public static final String FLAG_DELETE = "-D";
+    public static final String FLAG_SHOW_MERGE_FILES = "-c";
 
     public static final String REVISION_HEAD = "HEAD";
 

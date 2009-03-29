@@ -419,7 +419,14 @@ public class GitClient implements ScmClient
                 for (GitLogEntry.FileChangeEntry file : entry.getFiles())
                 {
                     FileChange.Action action = FileChange.Action.UNKNOWN;
-                    if (LOG_ACTION_MAPPINGS.containsKey(file.getAction()))
+                    String actionString = file.getAction();
+                    if (actionString.length() > 1)
+                    {
+                        // On merge the action has a character for each parent
+                        // revision, and there are at least two of them.
+                        action = FileChange.Action.MERGE;
+                    }
+                    else if (LOG_ACTION_MAPPINGS.containsKey(actionString))
                     {
                         action = LOG_ACTION_MAPPINGS.get(file.getAction());
                     }
