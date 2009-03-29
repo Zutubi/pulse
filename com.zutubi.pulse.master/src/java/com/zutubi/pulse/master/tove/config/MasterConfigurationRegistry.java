@@ -122,7 +122,9 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(FisheyeConfiguration.class);
             registerConfigurationType(CustomChangeViewerConfiguration.class);
             registerConfigurationType(P4WebChangeViewer.class);
+            registerConfigurationType(AbstractTracChangeViewer.class);
             registerConfigurationType(TracChangeViewer.class);
+            registerConfigurationType(Trac11ChangeViewer.class);
             registerConfigurationType(ViewVCChangeViewer.class);
 
             // generated dynamically as new components are registered.
