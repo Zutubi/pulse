@@ -47,7 +47,7 @@ public class DependentBuildControllerTest extends PulseTestCase
                 triggeredProjects.add((ProjectConfiguration) invocationOnMock.getArguments()[0]);
                 return null;
             }
-        }).when(projectManager).triggerBuild((ProjectConfiguration)anyObject(), (BuildReason)anyObject(), (Revision) anyObject(), anyString(), anyBoolean(), anyBoolean());
+        }).when(projectManager).triggerBuild((ProjectConfiguration)anyObject(), anyList(), (BuildReason)anyObject(), (Revision) anyObject(), anyString(), anyBoolean(), anyBoolean());
 
         DependentBuildController controller = new DependentBuildController();
         controller.setEventManager(eventManager);

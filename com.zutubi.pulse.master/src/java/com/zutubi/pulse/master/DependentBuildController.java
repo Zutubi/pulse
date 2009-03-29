@@ -3,6 +3,7 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
@@ -13,6 +14,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -82,7 +84,7 @@ public class DependentBuildController implements EventListener
         {
             BuildReason reason = new DependencyBuildReason(builtProjectConfig.getName());
             String source = "dependency of " + dependentProject.getName();
-            projectManager.triggerBuild(dependentProject, reason, null, source, true, false);
+            projectManager.triggerBuild(dependentProject, Collections.<ResourcePropertyConfiguration>emptyList(), reason, null, source, true, false);
         }
     }
 
