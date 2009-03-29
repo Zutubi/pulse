@@ -3,6 +3,6 @@
 <plugin>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="boost-test.pp" display-name="boost.test XML report processor"
-                        default-processor="true" class="com.zutubi.pulse.core.postprocessors.boosttest.BoostTestReportPostProcessor"/>
+                        default-processor="true" class="com.zutubi.pulse.core.postprocessors.boosttest.BoostTestReportPostProcessorConfiguration"/>
     </extension>
 </plugin>
