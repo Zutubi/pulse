@@ -1,10 +1,13 @@
 package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+
+import java.util.Collections;
 
 /**
  * A request for a personal build.
@@ -17,7 +20,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
 
     public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, ProjectConfiguration projectConfig)
     {
-        super(source, revision, projectConfig, new PersonalBuildReason(user.getLogin()), null, false);
+        super(source, revision, projectConfig, Collections.<ResourcePropertyConfiguration>emptyList(), new PersonalBuildReason(user.getLogin()), null, false);
         this.number = number;
         this.user = user;
         this.patch = patch;

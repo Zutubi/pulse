@@ -64,6 +64,8 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
     public static final String USERS_SCOPE = "users";
     public static final String GROUPS_SCOPE = "groups";
 
+    public static final String EXTENSION_PROJECT_TRIGGERS = "triggers";
+
     private CompositeType transientConfig;
     private Map<CompositeType, CompositeType> checkTypeMapping = new HashMap<CompositeType, CompositeType>();
 
@@ -138,7 +140,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(ScmBuildTriggerConfiguration.class);
 
             MapType triggers = new MapType(triggerConfig, typeRegistry);
-            projectConfig.addProperty(new ExtensionTypeProperty("triggers", triggers));
+            projectConfig.addProperty(new ExtensionTypeProperty(EXTENSION_PROJECT_TRIGGERS, triggers));
 
             // commit message processors.
             registerConfigurationType(CustomTransformerConfiguration.class);

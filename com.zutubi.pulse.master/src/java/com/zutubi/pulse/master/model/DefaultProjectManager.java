@@ -6,6 +6,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
@@ -526,7 +527,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
     }
 
-    public void triggerBuild(ProjectConfiguration projectConfig, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force)
+    public void triggerBuild(ProjectConfiguration projectConfig, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force)
     {
         Project project = getProject(projectConfig.getProjectId(), false);
 
@@ -549,14 +550,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                             for(Revision r: revisions)
                             {
                                 // Note when isolating changelists we never replace existing requests
-                                requestBuildOfRevision(reason, project, r, source, false);
+                                requestBuildOfRevision(reason, project, properties, r, source, false);
                             }
                     }
                     else
                     {
                         LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() +
                                 "' as the SCM does not support revisions");
-                        requestBuildFloating(reason, project, source, replaceable);
+                        requestBuildFloating(reason, project, properties, source, replaceable);
                     }
                 }
                 catch (ScmException e)
@@ -566,13 +567,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
             else
             {
-                requestBuildFloating(reason, project, source, replaceable);
+                requestBuildFloating(reason, project, properties, source, replaceable);
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, project, revision, source, replaceable);
+            requestBuildOfRevision(reason, project, properties, revision, source, replaceable);
         }
     }
 
@@ -613,17 +614,17 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private void requestBuildFloating(BuildReason reason, Project project, String category, boolean replaceable)
+    private void requestBuildFloating(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, String category, boolean replaceable)
     {
-        eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(), category, replaceable));
+        eventManager.publish(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(), category, replaceable));
     }
 
-    private void requestBuildOfRevision(BuildReason reason, Project project, Revision revision, String source, boolean replaceable)
+    private void requestBuildOfRevision(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, Revision revision, String source, boolean replaceable)
     {
         try
         {
             PulseFileSource pulseFile = getPulseFile(project.getConfig(), revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(revision, pulseFile, reason.isUser()), source, replaceable));
+            eventManager.publish(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(revision, pulseFile, reason.isUser()), source, replaceable));
         }
         catch (Exception e)
         {

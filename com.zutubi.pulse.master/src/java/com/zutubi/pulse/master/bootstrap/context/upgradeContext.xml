@@ -50,11 +50,12 @@
                 <ref local="fixPermanentUsers"/>
                 <ref local="revisionStringLimit"/>
                 <ref local="resourceRequirementOptional"/>
+                <ref local="triggerProperties"/>
                 <ref local="globalPostProcessors"/>
                 <ref local="multiRecipeProjectType"/>
                 <ref local="skeletonPostProcessors"/>
                 <ref local="toveFile"/>
-            </list>
+             </list>
         </property>
         <property name="systemTasks">
             <list>
@@ -165,6 +166,10 @@
 
     <bean id="revisionStringLimit" class="com.zutubi.pulse.master.upgrade.tasks.RevisionStringLimitUpgradeTask">
         <property name="buildNumber" value="200023002"/>
+    </bean>
+
+    <bean id="triggerProperties" class="com.zutubi.pulse.master.upgrade.tasks.TriggerPropertiesUpgradeTask">
+        <property name="buildNumber" value="200025001"/>
     </bean>
 
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">

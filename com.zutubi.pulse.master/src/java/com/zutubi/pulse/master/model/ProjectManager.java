@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.security.SecureParameter;
@@ -124,6 +125,8 @@ public interface ProjectManager extends EntityManager<Project>
      * isolation.
      *
      * @param project       the project to trigger a build of
+     * @param properties    additional properties introduced into the build
+     *                      context just after the project properties
      * @param reason        the reason the build was triggered
      * @param revision      the revision to build, or null if the revision is
      *                      not fixed (in which case changelist isolation may
@@ -137,7 +140,7 @@ public interface ProjectManager extends EntityManager<Project>
      *                      latest has been built
      */
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = ProjectConfiguration.class)
-    void triggerBuild(ProjectConfiguration project, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force);
+    void triggerBuild(ProjectConfiguration project, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force);
 
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = Project.class)
     void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;

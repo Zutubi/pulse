@@ -203,7 +203,9 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     {
         Project project = getRequiredProject();
 
-        // Ensure we are allowed to change the project configuration.
+        // We add the properties to the project configuration rather than pass
+        // them in the trigger call below as we want them to pick up the extra
+        // flags set on the project configuration.
         ProjectConfiguration projectConfig = configurationProvider.deepClone(project.getConfig());
         mapProperties(projectConfig);
 
@@ -245,7 +247,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         try
         {
-            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason(getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
+            projectManager.triggerBuild(projectConfig, Collections.<ResourcePropertyConfiguration>emptyList(), new ManualTriggerBuildReason(getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
         }
         catch (Exception e)
         {

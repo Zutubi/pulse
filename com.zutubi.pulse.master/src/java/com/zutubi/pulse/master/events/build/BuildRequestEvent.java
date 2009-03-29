@@ -1,8 +1,11 @@
 package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.model.*;
+
+import java.util.Collection;
 
 /**
  * A request for a project build.
@@ -11,9 +14,9 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
     private Project owner;
 
-    public BuildRequestEvent(Object source, BuildReason reason, Project project, BuildRevision revision, String requestSource, boolean replaceable)
+    public BuildRequestEvent(Object source, BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, BuildRevision revision, String requestSource, boolean replaceable)
     {
-        super(source, revision, project.getConfig(), reason, requestSource, replaceable);
+        super(source, revision, project.getConfig(), properties, reason, requestSource, replaceable);
         this.owner = project;
     }
 

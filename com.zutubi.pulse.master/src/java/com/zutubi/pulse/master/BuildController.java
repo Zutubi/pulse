@@ -222,6 +222,7 @@ public class BuildController implements EventListener
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);
             recipeRequest.addAllResourceRequirements(resourceRequirements);
             recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
+            recipeRequest.addAllProperties(asResourceProperties(request.getProperties()));
             recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
 
             RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);

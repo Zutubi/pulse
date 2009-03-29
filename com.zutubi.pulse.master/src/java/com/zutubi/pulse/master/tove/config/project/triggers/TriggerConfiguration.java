@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.ExternalState;
@@ -7,6 +8,9 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 
@@ -17,6 +21,7 @@ public abstract class TriggerConfiguration extends AbstractNamedConfiguration
 {
     @ExternalState
     private long triggerId;
+    private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
 
     public long getTriggerId()
     {
@@ -26,6 +31,16 @@ public abstract class TriggerConfiguration extends AbstractNamedConfiguration
     public void setTriggerId(long triggerId)
     {
         this.triggerId = triggerId;
+    }
+
+    public Map<String, ResourcePropertyConfiguration> getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map<String, ResourcePropertyConfiguration> properties)
+    {
+        this.properties = properties;
     }
 
     public abstract Trigger newTrigger();
