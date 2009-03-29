@@ -103,4 +103,24 @@ public class CompositePage extends ConfigPage
     {
         return selenium.isElementPresent(getErrorsId());
     }
+
+    public boolean isLinksBoxPresent()
+    {
+        return selenium.isElementPresent("config.links");
+    }
+
+    public boolean isLinkPresent(String name)
+    {
+        return selenium.isElementPresent(getLinkId(name));
+    }
+
+    public void clickLink(String name)
+    {
+        selenium.click(getLinkId(name));
+    }
+
+    private String getLinkId(String name)
+    {
+        return "link." + name;
+    }
 }

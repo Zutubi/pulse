@@ -19,6 +19,11 @@ public class ConventionSupport
         return loadClass(clazz, "Actions");
     }
 
+    public static Class getLinks(Class<? extends Configuration> clazz)
+    {
+        return loadClass(clazz, "Links");
+    }
+
     public static Class getCleanupTasks(Class<? extends Configuration> clazz)
     {
         return loadClass(clazz, "CleanupTasks");

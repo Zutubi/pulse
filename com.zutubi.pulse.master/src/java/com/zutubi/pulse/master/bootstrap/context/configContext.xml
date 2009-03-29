@@ -40,6 +40,7 @@
         <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>
     <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager" autowire="byName"/>
+    <bean id="linkManager" class="com.zutubi.tove.links.LinkManager" autowire="byName"/>
     <bean id="stateDisplayManager" class="com.zutubi.pulse.master.tove.format.StateDisplayManager" autowire="byName"/>
 
     <bean id="formDescriptorFactory" class="com.zutubi.pulse.master.tove.model.FormDescriptorFactory" autowire="byName" init-method="init"/>
