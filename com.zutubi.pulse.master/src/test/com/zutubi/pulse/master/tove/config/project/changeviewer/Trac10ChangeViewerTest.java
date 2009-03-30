@@ -8,7 +8,7 @@ import static org.mockito.Mockito.stub;
 
 import java.util.Collections;
 
-public class TracChangeViewerTest extends PulseTestCase
+public class Trac10ChangeViewerTest extends PulseTestCase
 {
     private static final String BASE = "http://trac.edgewall.org";
     private static final String PATH = "";
@@ -19,7 +19,7 @@ public class TracChangeViewerTest extends PulseTestCase
     private static final Revision PREVIOUS_CHANGE_REVISION = new Revision("12344");
 
     private ScmClient mockScmClient;
-    private TracChangeViewer viewer;
+    private Trac10ChangeViewer viewer;
 
     protected void setUp() throws Exception
     {
@@ -29,7 +29,7 @@ public class TracChangeViewerTest extends PulseTestCase
         stub(mockScmClient.getPreviousRevision((ScmContext) anyObject(), same(CHANGE_REVISION), eq(false))).toReturn(PREVIOUS_CHANGE_REVISION);
         stub(mockScmClient.getPreviousRevision((ScmContext) anyObject(), same(FILE_REVISION), eq(true))).toReturn(PREVIOUS_FILE_REVISION);
 
-        viewer = new TracChangeViewer(BASE, PATH);
+        viewer = new Trac10ChangeViewer(BASE, PATH);
     }
 
     public void testGetChangesetURL()

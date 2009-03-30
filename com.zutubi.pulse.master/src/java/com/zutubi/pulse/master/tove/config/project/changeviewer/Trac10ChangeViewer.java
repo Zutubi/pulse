@@ -15,14 +15,14 @@ import java.net.URLEncoder;
  */
 @Form(fieldOrder = {"baseURL", "projectPath"})
 @SymbolicName("zutubi.tracChangeViewerConfig")
-public class TracChangeViewer extends AbstractTracChangeViewer
+public class Trac10ChangeViewer extends AbstractTracChangeViewer
 {
-    public TracChangeViewer()
+    public Trac10ChangeViewer()
     {
         super(null, null);
     }
 
-    public TracChangeViewer(String baseURL, String projectPath)
+    public Trac10ChangeViewer(String baseURL, String projectPath)
     {
         super(baseURL, projectPath);
     }

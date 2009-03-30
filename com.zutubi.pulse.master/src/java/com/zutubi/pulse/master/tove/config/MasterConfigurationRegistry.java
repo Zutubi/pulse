@@ -123,7 +123,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(CustomChangeViewerConfiguration.class);
             registerConfigurationType(P4WebChangeViewer.class);
             registerConfigurationType(AbstractTracChangeViewer.class);
-            registerConfigurationType(TracChangeViewer.class);
+            registerConfigurationType(Trac10ChangeViewer.class);
             registerConfigurationType(Trac11ChangeViewer.class);
             registerConfigurationType(ViewVCChangeViewer.class);
 
