@@ -1,10 +1,7 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.tove.annotations.Classification;
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Select;
-import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 /**
@@ -13,6 +10,7 @@ import com.zutubi.tove.config.ConfigurationProvider;
 @SymbolicName("zutubi.personalSubscriptionConfig")
 @Form(fieldOrder = {"name", "contact", "template"})
 @Classification(single = "favourite")
+@Wire
 public class PersonalSubscriptionConfiguration extends SubscriptionConfiguration
 {
     @Select(optionProvider = "SubscriptionTemplateOptionProvider")
