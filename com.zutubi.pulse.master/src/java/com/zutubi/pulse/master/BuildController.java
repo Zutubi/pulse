@@ -252,13 +252,15 @@ public class BuildController implements EventListener
 
         ModuleRevisionId mrid = ModuleRevisionId.newInstance(org, project.getName(), null);
 
+        DependenciesConfiguration dependenciesConfiguration = project.getDependencies();
+
         String status = "integration";
         DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, status, null); // the status needs to be configurable - options include 'release'..
         descriptor.addConfiguration(new Configuration("build"));
         descriptor.addExtraAttributeNamespace("e", "http://ant.apache.org/ivy/extra");
 
         // setup the module dependencies.
-        for (DependencyConfiguration dependency : project.getDependencies().getDependencies())
+        for (DependencyConfiguration dependency : dependenciesConfiguration.getDependencies())
         {
             String projectName = dependency.getModule();
 
@@ -266,7 +268,7 @@ public class BuildController implements EventListener
             projectOrg = (projectOrg == null) ? "" : projectOrg.trim();
 
             ModuleRevisionId dependencyMrid = ModuleRevisionId.newInstance(projectOrg, projectName, dependency.getRevision());
-            DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(dependencyMrid, true, false);
+            DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(descriptor, dependencyMrid, true, false, dependency.isTransitive());
             if (TextUtils.stringSet(dependency.getStages()))
             {
                 depDesc.addDependencyConfiguration("build", "*"); // potentially a list of stages. '*' signals all, empty stage implies default.

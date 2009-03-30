@@ -34,7 +34,7 @@ public class DependencyConfiguration extends AbstractConfiguration
     /**
      * Indicates whether or not to resolve this dependencies dependencies.
      */
-    private boolean transitive = false;
+    private boolean transitive = true;
 
     private String stages = "*";
 

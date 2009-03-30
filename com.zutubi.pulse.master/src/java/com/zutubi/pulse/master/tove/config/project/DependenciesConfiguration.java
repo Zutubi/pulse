@@ -15,6 +15,7 @@ public class DependenciesConfiguration extends AbstractConfiguration
     private List<DependencyConfiguration> dependencies = new LinkedList<DependencyConfiguration>();
 
     private String publicationPattern = "build/[artifact].[ext]";
+    
     private String retrievalPattern = "lib/[artifact].[ext]";
 
     public List<DependencyConfiguration> getDependencies()
