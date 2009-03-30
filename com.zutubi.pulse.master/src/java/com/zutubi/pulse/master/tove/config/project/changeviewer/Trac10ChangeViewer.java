@@ -11,18 +11,19 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 /**
- * A change viwer implementation for linking to a Trac instance.
+ * A change viwer implementation for linking to a Trac instance, version 0.10
+ * and possibly (untested) earlier.
  */
 @Form(fieldOrder = {"baseURL", "projectPath"})
 @SymbolicName("zutubi.tracChangeViewerConfig")
-public class TracChangeViewer extends AbstractTracChangeViewer
+public class Trac10ChangeViewer extends AbstractTracChangeViewer
 {
-    public TracChangeViewer()
+    public Trac10ChangeViewer()
     {
         super(null, null);
     }
 
-    public TracChangeViewer(String baseURL, String projectPath)
+    public Trac10ChangeViewer(String baseURL, String projectPath)
     {
         super(baseURL, projectPath);
     }
