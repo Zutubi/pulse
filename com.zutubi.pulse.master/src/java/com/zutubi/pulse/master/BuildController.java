@@ -271,8 +271,13 @@ public class BuildController implements EventListener
             DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(descriptor, dependencyMrid, true, false, dependency.isTransitive());
             if (TextUtils.stringSet(dependency.getStages()))
             {
-                depDesc.addDependencyConfiguration("build", "*"); // potentially a list of stages. '*' signals all, empty stage implies default.
+                depDesc.addDependencyConfiguration("build", dependency.getStages());
             }
+            else
+            {
+                depDesc.addDependencyConfiguration("build", "*");
+            }
+
             descriptor.addDependency(depDesc);
         }
 

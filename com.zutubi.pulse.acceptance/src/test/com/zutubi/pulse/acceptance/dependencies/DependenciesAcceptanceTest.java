@@ -228,6 +228,28 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertIvyInRepository(projectB.name, buildNumber);
     }
 
+    public void testRetrieve_SpecificStage() throws Exception
+    {
+        Project projectA = new Project(randomName());
+        projectA.addArtifact("default", "default-artifact.jar");
+        projectA.addArtifact("stage", "stage-artifact.jar");
+        createProject(projectA);
+
+        Build buildA = new Build();
+        buildA.addArtifact("build/default-artifact.jar");
+        buildA.addArtifact("build/stage-artifact.jar");
+        triggerSuccessfulBuild(projectA, buildA);
+
+        Project projectB = new Project(randomName());
+        projectB.addDependency(projectA, true, "stage");
+        createProject(projectB);
+
+        Build buildB = new Build();
+        buildB.addNotExpected("lib/default-artifact.jar");
+        buildB.addDependencies("lib/stage-artifact.jar");
+        triggerSuccessfulBuild(projectB, buildB);
+    }
+
     public void testRetrieve_MultipleProjects() throws Exception
     {
         Project projectA = new Project(randomName());
@@ -529,7 +551,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> dependency = new Hashtable<String, Object>();
         dependency.put("project", "projects/" + projectDependency.project.name);
         dependency.put("revision", "latest.integration");
-        dependency.put("stages", "*");
+        dependency.put("stages", projectDependency.stage);
         dependency.put("transitive", projectDependency.transitive);
         dependency.put("meta.symbolicName", "zutubi.dependency");
         dependencies.add(dependency);
@@ -610,6 +632,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             dependencies.add(new Dependency(dependency, transitive));
         }
 
+        private void addDependency(Project dependency, boolean transitive, String stage)
+        {
+            dependencies.add(new Dependency(dependency, transitive, stage));
+        }
+
         public Stage getDefaultStage()
         {
             return defaultStage;
@@ -664,6 +691,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private Project project;
 
         private boolean transitive = true;
+
+        private String stage = "*";
+
+        private Dependency(Project project, boolean transitive, String stage)
+        {
+            this(project, transitive);
+            this.stage = stage;
+        }
 
         private Dependency(Project project, boolean transitive)
         {
