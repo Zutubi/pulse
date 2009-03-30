@@ -18,6 +18,8 @@ public class DependenciesConfiguration extends AbstractConfiguration
     
     private String retrievalPattern = "lib/[artifact].[ext]";
 
+    private List<PublicationConfiguration> publications = new LinkedList<PublicationConfiguration>();
+
     public List<DependencyConfiguration> getDependencies()
     {
         return dependencies;
@@ -46,5 +48,15 @@ public class DependenciesConfiguration extends AbstractConfiguration
     public void setRetrievalPattern(String retrievalPattern)
     {
         this.retrievalPattern = retrievalPattern;
+    }
+
+    public List<PublicationConfiguration> getPublications()
+    {
+        return publications;
+    }
+
+    public void setPublications(List<PublicationConfiguration> publications)
+    {
+        this.publications = publications;
     }
 }

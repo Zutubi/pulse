@@ -279,10 +279,13 @@ public class BuildController implements EventListener
         // setup the module artifacts.
         for (BuildStageConfiguration stage : project.getStages().values())
         {
-            if (stage.getPublications().size() > 0)
+            List<PublicationConfiguration> publications = new LinkedList<PublicationConfiguration>();
+            publications.addAll(project.getDependencies().getPublications());
+            publications.addAll(stage.getPublications());
+            if (publications.size() > 0)
             {
                 descriptor.addConfiguration(new Configuration(stage.getName()));
-                for (PublicationConfiguration artifact : stage.getPublications())
+                for (PublicationConfiguration artifact : publications)
                 {
                     Map<String, String> extraAttributes = new HashMap<String, String>();
                     extraAttributes.put("e:stage", stage.getName());

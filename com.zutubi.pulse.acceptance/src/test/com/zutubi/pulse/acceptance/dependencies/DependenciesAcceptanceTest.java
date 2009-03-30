@@ -48,7 +48,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublish_SingleArtifact() throws Exception
     {
         Project project = new Project(randomName());
-        project.addArtifact("artifact.jar");
+        project.getDefaultStage().addArtifact("artifact.jar");
         createProject(project);
 
         Build build = new Build();
@@ -64,8 +64,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublish_MultipleArtifacts() throws Exception
     {
         Project project = new Project(randomName());
-        project.addArtifact("artifact.jar");
-        project.addArtifact("another-artifact.jar");
+        project.getDefaultStage().addArtifacts("artifact.jar", "another-artifact.jar");
         createProject(project);
 
         Build build = new Build();
@@ -101,7 +100,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         Project project = new Project(randomName());
         project.setPublicationPattern("my/build/[artifact].[ext]");
-        project.addArtifact("artifact.jar");
+        project.getDefaultStage().addArtifact("artifact.jar");
         createProject(project);
 
         Build build = new Build();
@@ -118,7 +117,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         Project project = new Project(randomName());
         project.setPublicationPattern("${publicationPattern}");
-        project.addArtifact("artifact.jar");
+        project.getDefaultStage().addArtifact("artifact.jar");
         project.defaultStage.addProperty("publicationPattern", "custom/build/[artifact].[ext]");
         createProject(project);
 
@@ -135,7 +134,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublishFails_MissingArtifacts() throws Exception
     {
         Project project = new Project(randomName());
-        project.addArtifact("artifact.jar");
+        project.getDefaultStage().addArtifact("artifact.jar");
         createProject(project);
 
         Build build = new Build();
@@ -149,10 +148,46 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertJarNotInRepository(project.name, project.defaultStage.name, "artifact", buildNumber);
     }
 
+    public void testPublish_ConfigurationAtProjectLevel() throws Exception
+    {
+        Project project = new Project(randomName());
+        project.addArtifacts("artifact.jar");
+        createProject(project);
+
+        Build build = new Build();
+        build.addArtifact("build/artifact.jar");
+
+        int buildNumber = triggerSuccessfulBuild(project, build);
+
+        // ensure that we have the expected artifact in the repository.
+        assertIvyInRepository(project.name, buildNumber);
+        assertJarInRepository(project.name, project.defaultStage.name, "artifact", buildNumber);
+    }
+
+    public void testPublish_ConfigurationAtProjectLevelAdditive() throws Exception
+    {
+        Project project = new Project(randomName());
+        project.addArtifacts("artifact.jar");
+        project.getDefaultStage().addArtifacts("another-artifact.jar");
+        createProject(project);
+
+        Build build = new Build();
+        build.addArtifact("build/artifact.jar");
+        build.addArtifact("build/another-artifact.jar");
+
+        int buildNumber = triggerSuccessfulBuild(project, build);
+
+        // ensure that we have the expected artifact in the repository.
+        assertIvyInRepository(project.name, buildNumber);
+        assertJarInRepository(project.name, project.defaultStage.name, "artifact", buildNumber);
+        assertJarInRepository(project.name, project.defaultStage.name, "another-artifact", buildNumber);
+
+    }
+
     public void testRetrieve_SingleArtifact() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.addArtifacts("artifact.jar");
+        projectA.getDefaultStage().addArtifact("artifact.jar");
         createProject(projectA);
 
         Build buildA = new Build();
@@ -174,8 +209,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_MultipleArtifacts() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.addArtifacts("artifact.jar");
-        projectA.addArtifacts("another-artifact.jar");
+        projectA.getDefaultStage().addArtifacts("artifact.jar", "another-artifact.jar");
         createProject(projectA);
 
         Build buildA = new Build();
@@ -194,15 +228,10 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertIvyInRepository(projectB.name, buildNumber);
     }
 
-    public void testRetrieve_SpecificStage()
-    {
-        fail("nyi");
-    }
-
     public void testRetrieve_MultipleProjects() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.addArtifacts("projectA-artifact.jar");
+        projectA.getDefaultStage().addArtifacts("projectA-artifact.jar");
         createProject(projectA);
 
         Build buildA = new Build();
@@ -210,7 +239,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         triggerSuccessfulBuild(projectA, buildA);
 
         Project projectB = new Project(randomName());
-        projectB.addArtifacts("projectB-artifact.jar");
+        projectB.getDefaultStage().addArtifacts("projectB-artifact.jar");
         createProject(projectB);
 
         Build buildB = new Build();
@@ -232,7 +261,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_TransitiveDependencies() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.addArtifacts("projectA-artifact.jar");
+        projectA.getDefaultStage().addArtifacts("projectA-artifact.jar");
         createProject(projectA);
 
         Build buildA = new Build();
@@ -240,7 +269,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         triggerSuccessfulBuild(projectA, buildA);
 
         Project projectB = new Project(randomName());
-        projectB.addArtifact("projectB-artifact.jar");
+        projectB.getDefaultStage().addArtifact("projectB-artifact.jar");
         projectB.addDependency(projectA, true);
         createProject(projectB);
 
@@ -263,7 +292,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_TransitiveDependenciesDisabled() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.addArtifacts("projectA-artifact.jar");
+        projectA.getDefaultStage().addArtifacts("projectA-artifact.jar");
         createProject(projectA);
 
         Build buildA = new Build();
@@ -271,7 +300,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         triggerSuccessfulBuild(projectA, buildA);
 
         Project projectB = new Project(randomName());
-        projectB.addArtifact("projectB-artifact.jar");
+        projectB.getDefaultStage().addArtifact("projectB-artifact.jar");
         projectB.addDependency(projectA);
         createProject(projectB);
 
@@ -295,7 +324,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieveFails_MissingDependencies() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.addArtifacts("artifact.jar");
+        projectA.getDefaultStage().addArtifacts("artifact.jar");
         createProject(projectA);
 
         // do not build project a simulating dependency not available.
@@ -317,7 +346,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testDependentBuild_TriggeredOnSuccess() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.addArtifact("artifact.jar");
+        projectA.getDefaultStage().addArtifact("artifact.jar");
         createProject(projectA);
 
         Project projectB = new Project(randomName());
@@ -334,7 +363,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRepositoryFormat_OrgSpecified() throws Exception
     {
         Project project = new Project(randomName(), "org");
-        project.addArtifact("artifact.jar");
+        project.getDefaultStage().addArtifact("artifact.jar");
         createProject(project);
 
         Build build = new Build();
@@ -382,6 +411,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
 
         configureDependencies(project);
+
+        for (String artifact : project.artifacts)
+        {
+            addPublication(project.name, artifact);
+        }
 
         for (Stage stage : project.stages)
         {
@@ -446,21 +480,36 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void addPublication(String projectName, String stageName, String artifact) throws Exception
     {
         String stagePath = "projects/" + projectName + "/stages/" + stageName;
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
-        if (!stage.containsKey("publications"))
+        addPublicationToPath(stagePath, artifact);
+    }
+
+    private void addPublication(String projectName, String artifact) throws Exception
+    {
+        String dependenciesPath = "projects/" + projectName + "/dependencies";
+        addPublicationToPath(dependenciesPath, artifact);
+    }
+
+    private void addPublicationToPath(String path, String artifact) throws Exception
+    {
+        Hashtable<String, Object> publicationContainer = xmlRpcHelper.getConfig(path);
+        if (!publicationContainer.containsKey("publications"))
         {
-            stage.put("publications", new Vector<Hashtable<String, Object>>());
+            publicationContainer.put("publications", new Vector<Hashtable<String, Object>>());
         }
         @SuppressWarnings("unchecked")
-        Vector<Hashtable<String, Object>> publications = (Vector<Hashtable<String, Object>>) stage.get("publications");
+        Vector<Hashtable<String, Object>> publications = (Vector<Hashtable<String, Object>>) publicationContainer.get("publications");
+        publications.add(createPublication(artifact));
 
+        xmlRpcHelper.saveConfig(path, publicationContainer, true);
+    }
+
+    private Hashtable<String, Object> createPublication(String artifact)
+    {
         Hashtable<String, Object> jar = new Hashtable<String, Object>();
         jar.put("name", artifact.substring(0, artifact.lastIndexOf(".")));
         jar.put("ext", artifact.substring(artifact.lastIndexOf(".") + 1));
         jar.put("meta.symbolicName", "zutubi.publication");
-        publications.add(jar);
-
-        xmlRpcHelper.saveConfig(stagePath, stage, true);
+        return jar;
     }
 
     private void addDependency(String projectName, Dependency projectDependency) throws Exception
@@ -531,6 +580,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private String name;
         private String org;
         private List<Dependency> dependencies = new LinkedList<Dependency>();
+        private List<String> artifacts = new LinkedList<String>();
         private List<Stage> stages = new LinkedList<Stage>();
         private Stage defaultStage = new Stage("default");
 
@@ -560,14 +610,19 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             dependencies.add(new Dependency(dependency, transitive));
         }
 
-        private void addArtifact(String name)
+        public Stage getDefaultStage()
         {
-            defaultStage.addArtifact(name);
+            return defaultStage;
         }
 
-        private void addArtifacts(String... names)
+        private void addArtifact(String artifact)
         {
-            defaultStage.addArtifacts(names);
+            artifacts.add(artifact);
+        }
+
+        private void addArtifacts(String... artifacts)
+        {
+            this.artifacts.addAll(Arrays.asList(artifacts));
         }
 
         private void addArtifact(String stageName, String artifactName)
@@ -650,7 +705,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             artifacts.add(name);
         }
 
-        public void addArtifacts(String[] names)
+        public void addArtifacts(String... names)
         {
             artifacts.addAll(Arrays.asList(names));
         }
