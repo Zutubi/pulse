@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessorConfiguration;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.util.SystemUtils;
 
 /**
  * A pre-canned regular expression post-processor configuration for ant output.
@@ -51,15 +50,6 @@ public class AntPostProcessorConfiguration extends RegexPostProcessorConfigurati
         pattern.setCategory(Feature.Level.WARNING);
         pattern.setExpression(WARNING_PATTERN);
         getPatterns().add(pattern);
-
-        // Unfortunately the ant.bat file on windows does not exit with
-        // a non-zero code on failure.  Thus, we need to rely on the output
-        // to see if ant is reporting failure.
-        if (!SystemUtils.IS_WINDOWS)
-        {
-            // By default, prefer the exit code!
-            setFailOnError(false);
-        }
 
         setLeadingContext(5);
         setTrailingContext(5);

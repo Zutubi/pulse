@@ -68,7 +68,7 @@ public class Maven2PostProcessorConfiguration extends AbstractNamedConfiguration
 
         // Life is a little complicated.  It is possible to get [ERROR]
         // reports in a successful Maven build (CIB-616), so we don't just
-        // realy on this to detect failure.  Rather, the specific:
+        // rely on this to detect failure.  Rather, the specific:
         //
         // [ERROR] BUILD FAILURE
         //
