@@ -21,7 +21,6 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
 import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
@@ -50,7 +49,6 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String submitField;
 
     private ScmManager scmManager;
-    private ConfigurationProvider configurationProvider;
     private Configuration configuration;
 
     public boolean isCancelled()
@@ -203,18 +201,12 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     {
         Project project = getRequiredProject();
 
-        // We add the properties to the project configuration rather than pass
-        // them in the trigger call below as we want them to pick up the extra
-        // flags set on the project configuration.
-        ProjectConfiguration projectConfig = configurationProvider.deepClone(project.getConfig());
-        mapProperties(projectConfig);
-
         Revision r = null;
         if(TextUtils.stringSet(revision))
         {
             try
             {
-                r = withScmClient(projectConfig, scmManager, new ScmContextualAction<Revision>()
+                r = withScmClient(project.getConfig(), scmManager, new ScmContextualAction<Revision>()
                 {
                     public Revision process(ScmClient client, ScmContext context) throws ScmException
                     {
@@ -233,8 +225,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             // CIB-1162: Make sure we can get a pulse file at this revision
             try
             {
-                TypeConfiguration projectType = projectConfig.getType();
-                projectType.getPulseFile(projectConfig, r, null);
+                TypeConfiguration projectType = project.getConfig().getType();
+                projectType.getPulseFile(project.getConfig(), r, null);
             }
             catch (Exception e)
             {
@@ -247,7 +239,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         try
         {
-            projectManager.triggerBuild(projectConfig, Collections.<ResourcePropertyConfiguration>emptyList(), new ManualTriggerBuildReason(getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
+            projectManager.triggerBuild(project.getConfig(), mapProperties(project.getConfig()), new ManualTriggerBuildReason(getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
         }
         catch (Exception e)
         {
@@ -269,8 +261,9 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         return SUCCESS;
     }
 
-    private void mapProperties(ProjectConfiguration projectConfig)
+    private List<ResourcePropertyConfiguration> mapProperties(ProjectConfiguration projectConfig)
     {
+        List<ResourcePropertyConfiguration> properties = new LinkedList<ResourcePropertyConfiguration>();
         Map parameters = ActionContext.getContext().getParameters();
         for(Object n: parameters.keySet())
         {
@@ -281,6 +274,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
                 ResourcePropertyConfiguration property = projectConfig.getProperty(propertyName);
                 if(property != null)
                 {
+                    property = property.copy();
                     Object value = parameters.get(name);
                     if(value instanceof String)
                     {
@@ -290,19 +284,18 @@ public class EditBuildPropertiesAction extends ProjectActionBase
                     {
                         property.setValue(((String[])value)[0]);
                     }
+
+                    properties.add(property);
                 }
             }
         }
+
+        return properties;
     }
 
     public void setScmManager(ScmManager scmManager)
     {
         this.scmManager = scmManager;
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
     }
 
     public void setFreemarkerConfiguration(Configuration configuration)
