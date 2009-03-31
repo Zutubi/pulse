@@ -13,6 +13,9 @@ import com.zutubi.validation.annotations.Required;
 @Form(fieldOrder = {"project", "revision", "stages", "transitive"})
 public class DependencyConfiguration extends AbstractConfiguration
 {
+    public static final String ALL_STAGES = "*";
+    public static final String LATEST_INTEGRATION = "latest.integration";
+
     /**
      * The organisation name of the dependency.
      */
@@ -29,14 +32,15 @@ public class DependencyConfiguration extends AbstractConfiguration
      * The revision of this dependency.
      */
     @Required
-    private String revision = "latest.integration";
+    private String revision = LATEST_INTEGRATION;
 
     /**
      * Indicates whether or not to resolve this dependencies dependencies.
      */
     private boolean transitive = true;
 
-    private String stages = "*";
+    @Select(optionProvider = "DependencyStagesOptionProvider")
+    private String stages = ALL_STAGES;
 
     public String getOrg()
     {

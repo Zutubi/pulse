@@ -6,6 +6,7 @@ import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUti
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.waitUntilInRepository;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.util.*;
 
 import java.io.IOException;
@@ -729,9 +730,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         private boolean transitive = true;
 
-        private String stage = "*";
+        private String stage = DependencyConfiguration.ALL_STAGES;
 
-        private String revision = "latest.integration";
+        private String revision = DependencyConfiguration.LATEST_INTEGRATION;
 
         private Dependency(Project project, boolean transitive, String stage, String revision)
         {

@@ -275,7 +275,7 @@ public class BuildController implements EventListener
             }
             else
             {
-                depDesc.addDependencyConfiguration("build", "*");
+                depDesc.addDependencyConfiguration("build", DependencyConfiguration.ALL_STAGES);
             }
 
             descriptor.addDependency(depDesc);
