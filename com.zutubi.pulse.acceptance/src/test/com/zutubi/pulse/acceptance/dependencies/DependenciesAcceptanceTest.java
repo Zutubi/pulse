@@ -250,6 +250,29 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         triggerSuccessfulBuild(projectB, buildB);
     }
 
+    public void testRetrieve_SpeicificRevision() throws Exception
+    {
+        Project projectA = new Project(randomName());
+        projectA.addArtifact("default", "default-artifact.jar");
+        createProject(projectA);
+
+        Build buildA = new Build();
+        buildA.addArtifact("build/default-artifact.jar");
+        
+        // build twice and then depend on the first.
+        int buildNumber = triggerSuccessfulBuild(projectA, buildA);
+        triggerSuccessfulBuild(projectA, buildA);
+
+        Project projectB = new Project(randomName());
+        projectB.setRetrievalPattern("lib/[artifact]-[revision].[ext]");
+        projectB.addDependency(new Dependency(projectA, true, "default", "" + buildNumber));
+        createProject(projectB);
+
+        Build buildB = new Build();
+        buildB.addDependencies("lib/default-artifact-" + buildNumber + ".jar");
+        triggerSuccessfulBuild(projectB, buildB);
+    }
+
     public void testRetrieve_MultipleProjects() throws Exception
     {
         Project projectA = new Project(randomName());
@@ -400,6 +423,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         int buildNumber = triggerBuild(project, build);
         assertTrue(isBuildSuccessful(project.name, buildNumber));
+        build.setBuildNumber(buildNumber);
         return buildNumber;
     }
 
@@ -550,7 +574,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> dependency = new Hashtable<String, Object>();
         dependency.put("project", "projects/" + projectDependency.project.name);
-        dependency.put("revision", "latest.integration");
+        dependency.put("revision", projectDependency.revision);
         dependency.put("stages", projectDependency.stage);
         dependency.put("transitive", projectDependency.transitive);
         dependency.put("meta.symbolicName", "zutubi.dependency");
@@ -637,6 +661,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             dependencies.add(new Dependency(dependency, transitive, stage));
         }
 
+        private void addDependency(Dependency dependnecy)
+        {
+            dependencies.add(dependnecy);
+        }
+
         public Stage getDefaultStage()
         {
             return defaultStage;
@@ -693,6 +722,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private boolean transitive = true;
 
         private String stage = "*";
+
+        private String revision = "latest.integration";
+
+        private Dependency(Project project, boolean transitive, String stage, String revision)
+        {
+            this(project, transitive, stage);
+            this.revision = revision;
+        }
 
         private Dependency(Project project, boolean transitive, String stage)
         {
@@ -757,6 +794,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private List<String> dependencies = new LinkedList<String>();
         private List<String> notExpected = new LinkedList<String>();
 
+        private int buildNumber;
+
         public void addArtifact(String artifact)
         {
             artifacts.add(artifact);
@@ -795,6 +834,16 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         public String getNotExpectedList()
         {
             return StringUtils.join(",", notExpected);
+        }
+
+        public int getBuildNumber()
+        {
+            return buildNumber;
+        }
+
+        public void setBuildNumber(int buildNumber)
+        {
+            this.buildNumber = buildNumber;
         }
     }
 }

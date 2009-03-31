@@ -9,14 +9,14 @@ import com.zutubi.validation.annotations.Required;
  * for building. 
  */
 @SymbolicName("zutubi.dependency")
-@Table(columns = {"module", "revision"})
+@Table(columns = {"module", "revision", "stages", "transitive"})
 @Form(fieldOrder = {"project", "revision", "stages", "transitive"})
 public class DependencyConfiguration extends AbstractConfiguration
 {
     /**
      * The organisation name of the dependency.
      */
-    @Transient // not implemented as a separate concept yet.
+    @Transient // not implemented as a separate concept at this stage.
     private String org;
 
     /**
