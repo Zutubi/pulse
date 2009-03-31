@@ -19,10 +19,10 @@ public class ProjectConfigurationLinks
             Urls urls = new Urls("");
             String name = projectConfiguration.getName();
             return Arrays.asList(
-                    new ConfigurationLink("home", urls.projectHome(name), "house.gif"),
-                    new ConfigurationLink("reports", urls.projectReports(name), "chart_bar.gif"),
-                    new ConfigurationLink("history", urls.projectHistory(name), "time.gif"),
-                    new ConfigurationLink("log", urls.projectLog(name), "script.gif")
+                    new ConfigurationLink("home", urls.projectHome(name)),
+                    new ConfigurationLink("reports", urls.projectReports(name)),
+                    new ConfigurationLink("history", urls.projectHistory(name)),
+                    new ConfigurationLink("log", urls.projectLog(name))
             );
         }
         else

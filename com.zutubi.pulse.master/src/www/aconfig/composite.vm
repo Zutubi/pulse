@@ -80,7 +80,7 @@
         #foreach($link in $config.links)
                     <li>
                         <a href="${base}/${link.url}" id='#id("link.${link.name}")' class="unadorned">
-                            <img src="${base}/images/${link.icon}"/> ${link.label}
+                            <img src='${base}/$config.getIconPath("links", ${link.name})'/> ${link.label}
                         </a>
                     </li>
         #end

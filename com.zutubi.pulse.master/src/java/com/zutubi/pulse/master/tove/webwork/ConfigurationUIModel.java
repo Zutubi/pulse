@@ -18,11 +18,9 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.*;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +31,8 @@ import java.util.List;
  */
 public class ConfigurationUIModel
 {
+    private static final String DEFAULT_ICON = "generic";
+
     private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -332,6 +332,25 @@ public class ConfigurationUIModel
     public List<ConfigurationLink> getLinks()
     {
         return links;
+    }
+
+    public String getIconPath(String type, String name)
+    {
+        String path = composeIconPath(type, name);
+        File iconFile = new File(systemPaths.getContentRoot(), path);
+        if (iconFile.exists())
+        {
+            return path;
+        }
+        else
+        {
+            return composeIconPath(type, DEFAULT_ICON);
+        }
+    }
+
+    private String composeIconPath(String type, String name)
+    {
+        return FileSystemUtils.composeFilename("images", "config", type, name + ".gif");
     }
 
     public List<ActionLink> getActions()
