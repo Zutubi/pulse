@@ -13,16 +13,6 @@ public class CvsRootValidatorTest extends FieldValidatorTestCase
         super(testName);
     }
 
-    public void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     protected FieldValidator createValidator()
     {
         return new CvsRootValidator();

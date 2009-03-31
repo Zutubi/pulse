@@ -2,9 +2,11 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.validation.annotations.Constraint;
+import com.zutubi.validation.annotations.Required;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The manually configured dependencies.
@@ -14,8 +16,12 @@ public class DependenciesConfiguration extends AbstractConfiguration
 {
     private List<DependencyConfiguration> dependencies = new LinkedList<DependencyConfiguration>();
 
+    @Required
+    @Constraint("com.zutubi.pulse.core.dependency.ivy.IvyPatternValidator")
     private String publicationPattern = "build/[artifact].[ext]";
     
+    @Required
+    @Constraint("com.zutubi.pulse.core.dependency.ivy.IvyPatternValidator")
     private String retrievalPattern = "lib/[artifact].[ext]";
 
     private List<PublicationConfiguration> publications = new LinkedList<PublicationConfiguration>();
