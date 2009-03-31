@@ -2,6 +2,7 @@ package com.zutubi.tove.links;
 
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
@@ -14,7 +15,7 @@ public class ConfigurationLinksTest extends ZutubiTestCase
 
     public void testLinks()
     {
-        ConfigurationLinks configurationLinks = new ConfigurationLinks(SubjectConfiguration.class);
+        ConfigurationLinks configurationLinks = new ConfigurationLinks(SubjectConfiguration.class, new DefaultObjectFactory());
         List<ConfigurationLink> links = configurationLinks.getLinks(new SubjectConfiguration());
         assertEquals(1, links.size());
         assertEquals(TEST_NAME, links.get(0).getName());
@@ -38,7 +39,7 @@ public class ConfigurationLinksTest extends ZutubiTestCase
 
     private void noLinksHelper(Class<? extends Configuration> configurationClass)
     {
-        ConfigurationLinks configurationLinks = new ConfigurationLinks(configurationClass);
+        ConfigurationLinks configurationLinks = new ConfigurationLinks(configurationClass, new DefaultObjectFactory());
         assertTrue(configurationLinks.getLinks(new SubjectConfiguration()).isEmpty());
     }
 

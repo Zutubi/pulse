@@ -19,9 +19,9 @@ public class AgentConfigurationLinks
             Urls urls = new Urls("");
             String name = agentConfiguration.getName();
             return Arrays.asList(
-                    new ConfigurationLink("status", urls.agentStatus(name), "cog.gif"),
-                    new ConfigurationLink("messages", urls.agentMessages(name), "script.gif"),
-                    new ConfigurationLink("info", urls.agentInfo(name), "information.gif")
+                    new ConfigurationLink("status", urls.agentStatus(name)),
+                    new ConfigurationLink("messages", urls.agentMessages(name)),
+                    new ConfigurationLink("info", urls.agentInfo(name))
             );
         }
         else

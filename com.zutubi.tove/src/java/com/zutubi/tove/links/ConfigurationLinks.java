@@ -8,6 +8,7 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.ReflectionUtils;
 import static com.zutubi.util.ReflectionUtils.acceptsParameters;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.lang.reflect.Method;
@@ -32,16 +33,18 @@ public class ConfigurationLinks
      * Create a links instance for the given configuration type.
      *
      * @param configurationClass class for the composite type of interest
+     * @param objectFactory      used to build an instance of the *Links clas
+     *                           if one exists
      */
-    public ConfigurationLinks(Class<? extends Configuration> configurationClass)
+    public ConfigurationLinks(Class<? extends Configuration> configurationClass, ObjectFactory objectFactory)
     {
         this.configurationClass = configurationClass;
-        Class linksClass = ConventionSupport.getLinks(configurationClass);
+        Class<?> linksClass = ConventionSupport.getLinks(configurationClass);
         if (linksClass != null)
         {
             try
             {
-                linksInstance = linksClass.newInstance();
+                linksInstance = objectFactory.buildBean(linksClass);
             }
             catch (Exception e)
             {

@@ -3,6 +3,7 @@ package com.zutubi.tove.links;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,8 @@ public class LinkManager
     private Map<CompositeType, ConfigurationLinks> linksByType = new HashMap<CompositeType, ConfigurationLinks>();
 
     private TypeRegistry typeRegistry;
-
+    private ObjectFactory objectFactory;
+    
     /**
      * Gets all links to display for the given configuration instance.  The
      * instance must be of a registered configuration type.
@@ -40,7 +42,7 @@ public class LinkManager
         ConfigurationLinks links = linksByType.get(type);
         if (links == null)
         {
-            links = new ConfigurationLinks(type.getClazz());
+            links = new ConfigurationLinks(type.getClazz(), objectFactory);
             linksByType.put(type, links);
         }
         return links;
@@ -49,5 +51,10 @@ public class LinkManager
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }
