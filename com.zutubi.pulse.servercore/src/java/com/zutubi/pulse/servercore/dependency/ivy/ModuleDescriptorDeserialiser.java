@@ -4,6 +4,8 @@ import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.pulse.core.dependency.ivy.IvyLogUtils;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
@@ -29,10 +31,24 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
         try
         {
             // we need some ivy settings to tell the descriptor parser how to behave.  The defaults
-            // should be fine for this.  
-            ivySettings = new IvySettings();
-            ivySettings.loadDefault();
-            ivySettings.setValidate(false);
+            // should be fine for this.
+            ivySettings = IvyLogUtils.runQuietly(new NullaryFunction<IvySettings>()
+            {
+                public IvySettings process()
+                {
+                    try
+                    {
+                        IvySettings settings = new IvySettings();
+                        settings.loadDefault();
+                        settings.setValidate(false);
+                        return settings;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
         }
         catch (Exception e)
         {

@@ -1005,6 +1005,7 @@ public class BuildController implements EventListener
      */
     private void publishIvyToRepository()
     {
+        buildLogger.preIvyPublish();
         try
         {
             String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
@@ -1012,7 +1013,8 @@ public class BuildController implements EventListener
 
             String repositoryUrl = masterUrl + "/repository";
             IvySupport ivy = ivyProvider.getIvySupport(repositoryUrl);
-
+            ivy.setMessageLogger(buildLogger.getMessageLogger());
+            
             ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
             descriptor.getModuleRevisionId().getOrganisation();
             ivy.resolve(descriptor);
@@ -1022,6 +1024,10 @@ public class BuildController implements EventListener
         catch (Exception e)
         {
             throw new BuildException("Failed to publish the builds ivy file to the repository. Cause: " + e.getMessage(), e);
+        }
+        finally
+        {
+            buildLogger.postIvyPublish();
         }
     }
 

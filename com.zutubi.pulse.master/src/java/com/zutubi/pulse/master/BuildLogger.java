@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.master.model.BuildResult;
+import org.apache.ivy.util.MessageLogger;
 
 public interface BuildLogger extends HookLogger
 {
@@ -16,5 +17,8 @@ public interface BuildLogger extends HookLogger
     void postBuild();
     void postBuildCompleted();
 
+    void preIvyPublish();
+    void postIvyPublish();
 
+    MessageLogger getMessageLogger();
 }

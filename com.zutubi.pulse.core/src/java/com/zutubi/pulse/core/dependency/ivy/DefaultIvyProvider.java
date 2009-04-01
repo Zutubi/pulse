@@ -1,10 +1,11 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.zutubi.util.NullaryFunction;
 import org.apache.ivy.Ivy;
+import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.core.settings.IvyVariableContainer;
 import org.apache.ivy.core.settings.IvyVariableContainerImpl;
-import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.plugins.resolver.URLResolver;
 
 /**
@@ -30,11 +31,26 @@ public class DefaultIvyProvider implements IvyProvider
 
     public IvySupport getIvySupport(String repositoryBase) throws Exception
     {
-        IvyVariableContainer variables = new IvyVariableContainerImpl();
+        final IvyVariableContainer variables = new IvyVariableContainerImpl();
         variables.setVariable(VARIABLE_REPOSITORY_BASE, repositoryBase, true);
 
-        IvySettings settings = new IvySettings(variables);
-        settings.load(getClass().getResource("ivysettings.xml"));
+        // Load the ivy settings, disabling the default ivy logging whilst doing so.
+        IvySettings settings = IvyLogUtils.runQuietly(new NullaryFunction<IvySettings>()
+        {
+            public IvySettings process()
+            {
+                try
+                {
+                    IvySettings settings = new IvySettings(variables);
+                    settings.load(getClass().getResource("ivysettings.xml"));
+                    return settings;
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
 /*
         This xml is the equivalent of the programmatically configured resolver. 
