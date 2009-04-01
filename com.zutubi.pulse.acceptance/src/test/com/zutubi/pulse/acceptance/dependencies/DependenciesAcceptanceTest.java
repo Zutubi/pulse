@@ -579,12 +579,23 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> dependency = new Hashtable<String, Object>();
         dependency.put("project", "projects/" + projectDependency.project.getName());
         dependency.put("revision", projectDependency.revision);
-        dependency.put("stages", projectDependency.stage);
+        dependency.put("allStages", (projectDependency.stage == null));
+        dependency.put("stages", asStagePaths(projectDependency));
         dependency.put("transitive", projectDependency.transitive);
         dependency.put("meta.symbolicName", "zutubi.dependency");
         dependencies.add(dependency);
 
         xmlRpcHelper.saveConfig(projectDependenciesPath, projectDependencies, true);
+    }
+
+    private Vector<String> asStagePaths(Dependency dependency)
+    {
+        Vector<String> v = new Vector<String>();
+        if (dependency.stage != null)
+        {
+            v.add("projects/" + dependency.project.name + "/stages/" + dependency.stage);
+        }
+        return v;
     }
 
     private void assertIvyInRepository(String projectName, int buildNumber) throws IOException
@@ -730,7 +741,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         private boolean transitive = true;
 
-        private String stage = DependencyConfiguration.ALL_STAGES;
+        private String stage = null;
 
         private String revision = DependencyConfiguration.LATEST_INTEGRATION;
 

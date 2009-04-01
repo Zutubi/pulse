@@ -4,13 +4,15 @@ import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
+import java.util.List;
+
 /**
  * A dependency defines a project and the artifacts built by that project that this project requires
  * for building. 
  */
 @SymbolicName("zutubi.dependency")
 @Table(columns = {"module", "revision", "stages", "transitive"})
-@Form(fieldOrder = {"project", "revision", "stages", "transitive"})
+@Form(fieldOrder = {"project", "revision", "transitive", "allStages", "stages"})
 public class DependencyConfiguration extends AbstractConfiguration
 {
     public static final String ALL_STAGES = "*";
@@ -39,8 +41,11 @@ public class DependencyConfiguration extends AbstractConfiguration
      */
     private boolean transitive = true;
 
-    @Select(optionProvider = "DependencyStagesOptionProvider")
-    private String stages = ALL_STAGES;
+    @ControllingCheckbox(invert = true, dependentFields = {"stages"})
+    private boolean allStages = true;
+
+    @Reference @Select(optionProvider = "DependencyStagesOptionProvider") 
+    private List<BuildStageConfiguration> stages = null;
 
     public String getOrg()
     {
@@ -88,13 +93,23 @@ public class DependencyConfiguration extends AbstractConfiguration
         this.transitive = transitive;
     }
 
-    public String getStages()
+    public List<BuildStageConfiguration> getStages()
     {
         return stages;
     }
 
-    public void setStages(String stages)
+    public void setStages(List<BuildStageConfiguration> stages)
     {
         this.stages = stages;
+    }
+
+    public boolean isAllStages()
+    {
+        return allStages;
+    }
+
+    public void setAllStages(boolean allStages)
+    {
+        this.allStages = allStages;
     }
 }

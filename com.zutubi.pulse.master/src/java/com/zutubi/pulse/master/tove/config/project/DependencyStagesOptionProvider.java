@@ -15,8 +15,6 @@ import java.util.Map;
  */
 public class DependencyStagesOptionProvider extends MapOptionProvider
 {
-    private static final Messages I18N = Messages.getInstance(DependencyStagesOptionProvider.class);
-
     private ConfigurationProvider configurationProvider;
 
     protected Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
@@ -25,12 +23,11 @@ public class DependencyStagesOptionProvider extends MapOptionProvider
         ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(c, ProjectConfiguration.class);
 
         Map<String, String> options = new LinkedHashMap<String, String>();
-        options.put(DependencyConfiguration.ALL_STAGES, allStages());
 
         Map<String, BuildStageConfiguration> stages = projectConfig.getStages();
         for (BuildStageConfiguration stage : stages.values())
         {
-            options.put(stage.getName(), stage.getName());
+            options.put(stage.getName(), stage.getConfigurationPath());
         }
 
         return options;
@@ -39,11 +36,6 @@ public class DependencyStagesOptionProvider extends MapOptionProvider
     public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
         return null;
-    }
-
-    private String allStages()
-    {
-        return "["+I18N.format("all.stages")+"]";
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)

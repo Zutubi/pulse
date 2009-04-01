@@ -269,14 +269,20 @@ public class BuildController implements EventListener
 
             ModuleRevisionId dependencyMrid = ModuleRevisionId.newInstance(projectOrg, projectName, dependency.getRevision());
             DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(descriptor, dependencyMrid, true, false, dependency.isTransitive());
-            if (TextUtils.stringSet(dependency.getStages()))
+
+            String stages = DependencyConfiguration.ALL_STAGES;
+            if (!dependency.isAllStages())
             {
-                depDesc.addDependencyConfiguration("build", dependency.getStages());
+                List<String> stageNames = CollectionUtils.map(dependency.getStages(), new Mapping<BuildStageConfiguration, String>()
+                {
+                    public String map(BuildStageConfiguration stage)
+                    {
+                        return stage.getName();
+                    }
+                });
+                stages = StringUtils.join(",", stageNames);
             }
-            else
-            {
-                depDesc.addDependencyConfiguration("build", DependencyConfiguration.ALL_STAGES);
-            }
+            depDesc.addDependencyConfiguration("build", stages);
 
             descriptor.addDependency(depDesc);
         }
