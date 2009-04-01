@@ -30,6 +30,7 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.Ivy;
+import org.apache.ivy.util.MessageLoggerEngine;
 import org.apache.ivy.core.module.descriptor.Configuration;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
@@ -114,6 +115,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         recipeProcessor.setFileLoaderFactory(fileLoaderFactory);
 
         // setup the default dependency resolver.  All we need is a name.
+        MessageLoggerEngine loggerEngine = mock(MessageLoggerEngine.class);
         DependencyResolver resolver = mock(DependencyResolver.class);
         stub(resolver.getName()).toReturn("pulse");
         IvySettings settings = mock(IvySettings.class);
@@ -127,6 +129,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
                 return new IvySupport(ivy);
             }
         });
+        stub(ivy.getLoggerEngine()).toReturn(loggerEngine);
     }
 
     protected void tearDown() throws Exception
