@@ -22,7 +22,7 @@ import java.util.*;
  * be represented by many projects in Pulse.  For example, there may be one
  * Pulse project for a nightly build and another for a continuous build.
  */
-@Form(fieldOrder = {"name", "org", "url", "description"})
+@Form(fieldOrder = {"name", "organization", "url", "description"})
 @Listing(order = {"type", "requirements", "properties", "stages", "options", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "permissions"})
 @Table(columns = {"name"})
 @SymbolicName("zutubi.projectConfig")
@@ -47,6 +47,7 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private TypeConfiguration type;
     private Map<String, PostProcessorConfiguration> postProcessors = new HashMap<String, PostProcessorConfiguration>();
 
+    @Wizard.Ignore
     private String organisation;
 
     private DependenciesConfiguration dependencies = new DependenciesConfiguration();
