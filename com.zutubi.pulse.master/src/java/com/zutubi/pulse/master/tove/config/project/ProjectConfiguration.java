@@ -22,7 +22,7 @@ import java.util.*;
  * be represented by many projects in Pulse.  For example, there may be one
  * Pulse project for a nightly build and another for a continuous build.
  */
-@Form(fieldOrder = {"name", "organization", "url", "description"})
+@Form(fieldOrder = {"name", "organisation", "url", "description"})
 @Listing(order = {"type", "requirements", "properties", "stages", "options", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "permissions"})
 @Table(columns = {"name"})
 @SymbolicName("zutubi.projectConfig")
