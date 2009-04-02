@@ -34,7 +34,7 @@ public class MyBuildsAction extends ActionSupport
     {
         if (columns == null)
         {
-            columns = new BuildColumns(user.getPreferences().getMyBuildsColumns(), projectManager);
+            columns = new BuildColumns(user.getPreferences().getMyBuildsColumns(), accessManager);
         }
         return columns;
     }

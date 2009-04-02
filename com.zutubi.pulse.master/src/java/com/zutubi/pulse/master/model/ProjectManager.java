@@ -115,9 +115,6 @@ public interface ProjectManager extends EntityManager<Project>
 
     void save(Project project);
 
-    @SecureParameter(action = AccessManager.ACTION_WRITE)
-    void checkWrite(Project project);
-
     /**
      * Triggers a build of the given project by raising appropriate build
      * request events.  Multiple events may be raised depending on

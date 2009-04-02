@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.tove.security.AccessManager;
 
 /**
  * Used to manually delete a build result from the web UI.
@@ -16,7 +17,7 @@ public class DeleteBuildAction extends BuildActionBase
             return ERROR;
         }
 
-        projectManager.checkWrite(result.getProject());
+        accessManager.ensurePermission(AccessManager.ACTION_WRITE, result.getProject());
         buildManager.delete(result);
 
         if(isPersonal())

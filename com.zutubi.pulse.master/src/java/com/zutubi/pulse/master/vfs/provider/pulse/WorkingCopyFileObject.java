@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
@@ -20,6 +22,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
     private static final Logger LOG = Logger.getLogger(WorkingCopyFileObject.class);
 
     private final File base;
+    private AccessManager accessManager;
 
     public WorkingCopyFileObject(final FileName name, final File base, final AbstractFileSystem fs)
     {
@@ -114,7 +117,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
         {
             ProjectProvider node = getAncestor(ProjectProvider.class);
             Project project = node.getProject();
-            projectManager.checkWrite(project);
+            accessManager.ensurePermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, project);
             return true;
         }
         catch (FileSystemException e)
@@ -126,5 +129,10 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
             LOG.warning(e);
             return false;
         }
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

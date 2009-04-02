@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -22,12 +24,12 @@ public class BuildColumns
     public static final String KEY_ERRORS = "errors";
 
     private String[] columns;
-    private ProjectManager projectManager;
+    private AccessManager accessManager;
 
-    public BuildColumns(String columns, ProjectManager projectManager)
+    public BuildColumns(String columns, AccessManager accessManager)
     {
         this.columns = columns.split(",");
-        this.projectManager = projectManager;
+        this.accessManager = accessManager;
     }
 
     public int getCount()
@@ -59,12 +61,11 @@ public class BuildColumns
             }
             else
             {
-                try
+                if (accessManager.hasPermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, project))
                 {
-                    projectManager.checkWrite(project);
                     return 6;
                 }
-                catch (Exception e)
+                else
                 {
                     return 5;
                 }
