@@ -1,36 +1,26 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.master.tove.config.DefaultReferenceOptionProvider;
 import com.zutubi.pulse.master.tove.handler.MapOption;
-import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
-import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.i18n.Messages;
+import com.zutubi.tove.type.TypeProperty;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * An option provider that gives a list of stage names along with the option to select [all stages].
  */
-public class DependencyStagesOptionProvider extends MapOptionProvider
+public class DependencyStagesOptionProvider extends DefaultReferenceOptionProvider
 {
     private ConfigurationProvider configurationProvider;
 
-    protected Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
+    public Map<String, String> getMap(Object instance, String path, TypeProperty property)
     {
-        Configuration c = configurationProvider.get(parentPath, Configuration.class);
+        Configuration c = configurationProvider.get(path, Configuration.class);
         ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(c, ProjectConfiguration.class);
 
-        Map<String, String> options = new LinkedHashMap<String, String>();
-
-        Map<String, BuildStageConfiguration> stages = projectConfig.getStages();
-        for (BuildStageConfiguration stage : stages.values())
-        {
-            options.put(stage.getName(), stage.getConfigurationPath());
-        }
-
-        return options;
+        return super.getMap(instance, projectConfig.getConfigurationPath(), property);
     }
 
     public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
