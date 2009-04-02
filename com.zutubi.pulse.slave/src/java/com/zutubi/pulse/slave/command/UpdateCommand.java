@@ -2,7 +2,7 @@ package com.zutubi.pulse.slave.command;
 
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.services.MasterService;
@@ -151,7 +151,7 @@ public class UpdateCommand implements Runnable
             IOUtils.downloadFile(packageUrl, packageFile);
 
             sendMessage(masterService, UpgradeState.APPLYING);
-            ZipUtils.extractZip(packageFile, unpackDir);
+            PulseZipUtils.extractZip(packageFile, unpackDir);
 
             // There will be a single directory under unpackDir (e.g. pulse-agent-1.1.1)
             File[] children = unpackDir.listFiles();

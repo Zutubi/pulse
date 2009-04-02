@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.vfs;
 
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.util.RandomUtils;
@@ -87,7 +87,7 @@ public class ZipAction extends VFSActionSupport
 
         try
         {
-            ZipUtils.createZip(temp, base.getParentFile(), base.getName());
+            PulseZipUtils.createZip(temp, base.getParentFile(), base.getName());
             contentLength = temp.length();
             filename = base.getName() + ".zip";
             inputStream = new TempFileInputStream(temp);

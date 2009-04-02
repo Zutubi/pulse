@@ -1,8 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.master.license.LicenseException;
 import com.zutubi.pulse.master.license.LicenseHelper;
@@ -11,6 +10,7 @@ import com.zutubi.pulse.master.transfer.TransferAPI;
 import com.zutubi.pulse.master.transfer.TransferException;
 import com.zutubi.pulse.servercore.cli.ShutdownCommand;
 import com.zutubi.pulse.servercore.cli.StartCommand;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.ParseException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -229,7 +229,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
         // extract zip file.
         File data = new File(dataArea, "pulse-1.1.0-data.zip");
-        ZipUtils.extractZip(data, tmpDir);
+        PulseZipUtils.extractZip(data, tmpDir);
 
         runUpgrade("0101000000");
     }

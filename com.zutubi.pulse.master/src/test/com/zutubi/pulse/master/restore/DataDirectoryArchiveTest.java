@@ -9,7 +9,6 @@ import com.zutubi.util.io.IOUtils;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 

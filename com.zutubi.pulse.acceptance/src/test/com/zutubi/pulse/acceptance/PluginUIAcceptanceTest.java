@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.admin.PluginPage;
 import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
 import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -160,7 +160,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         File testPlugin = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.acceptance", "src", "test", "misc", ID_TEST + ".jar"));
         tmpDir = FileSystemUtils.createTempDir("PluginUIAcceptanceTest", "");
         File unzipDir = new File(tmpDir, "unzip");
-        ZipUtils.extractZip(testPlugin, unzipDir);
+        PulseZipUtils.extractZip(testPlugin, unzipDir);
 
         File manifestFile = new File(unzipDir, FileSystemUtils.composeFilename("META-INF", "MANIFEST.MF"));
         String manifest = IOUtils.fileToString(manifestFile);
@@ -169,7 +169,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         FileSystemUtils.createFile(manifestFile, manifest);
 
         File pluginFile = new File(tmpDir, id + ".jar");
-        ZipUtils.createZip(pluginFile, unzipDir, null);
+        PulseZipUtils.createZip(pluginFile, unzipDir, null);
         return pluginFile;
     }
 }

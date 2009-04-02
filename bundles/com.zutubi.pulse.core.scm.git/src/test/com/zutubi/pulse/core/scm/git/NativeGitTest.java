@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,7 +31,7 @@ public class NativeGitTest extends PulseTestCase
         git = new NativeGit();
 
         URL url = getClass().getResource("NativeGitTest.zip");
-        ZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
+        PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
 
         repositoryBase = new File(tmp, "repo");
 

@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.scm.ExpectedTestResults;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackAdapter;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
         revisions.add(new Revision("cd7a1b08850329faa7fd8b2102523187f9047955"));
 
         URL url = getClass().getResource("GitClientIntegrationTest.git.zip");
-        ZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
+        PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
 
         this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master");
         this.testData = new ExpectedTestResults(revisions);

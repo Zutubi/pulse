@@ -24,6 +24,7 @@
 
     <dependencies>
         <!-- Project module dependencies -->
+        <dependency org="zutubi" name="com.zutubi.diff" rev="latest.integration" conf="release,external,build,src->@"/>
         <dependency org="zutubi" name="com.zutubi.tove" rev="latest.integration" conf="release,external,build,src->@"/>
         <dependency org="zutubi" name="com.zutubi.events" rev="latest.integration" conf="release,external,build,src->@"/>
         <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="release,external,build,src->@"/>
@@ -49,7 +50,6 @@
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external,build->default"/>
         <dependency org="mockito" name="mockito" rev="1.5" conf="external,build->default"/>
-
     </dependencies>
 </ivy-module>
 

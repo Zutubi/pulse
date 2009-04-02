@@ -1,16 +1,11 @@
 package com.zutubi.pulse.core.test.api;
 
-import com.zutubi.pulse.core.util.ZipUtils;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.zip.ZipInputStream;
 
 /**

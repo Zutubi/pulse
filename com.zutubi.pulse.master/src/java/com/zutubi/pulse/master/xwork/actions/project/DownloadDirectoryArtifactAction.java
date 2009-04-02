@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.TempFileInputStream;
@@ -88,7 +88,7 @@ public class DownloadDirectoryArtifactAction extends ProjectActionSupport
 
         try
         {
-            ZipUtils.createZip(temp, outputDir, artifact.getName());
+            PulseZipUtils.createZip(temp, outputDir, artifact.getName());
             contentLength = temp.length();
             filename = artifact.getName() + ".zip";
             inputStream = new TempFileInputStream(temp);

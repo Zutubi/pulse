@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
@@ -53,7 +53,7 @@ public class GitClientTest extends PulseTestCase
         tmp = FileSystemUtils.createTempDir();
 
         URL url = getClass().getResource("GitClientTest.zip");
-        ZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
+        PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
 
         File repositoryBase = new File(tmp, "repo");
 

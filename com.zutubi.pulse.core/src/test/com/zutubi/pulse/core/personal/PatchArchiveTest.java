@@ -1,15 +1,14 @@
 package com.zutubi.pulse.core.personal;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.scm.api.FileStatus;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.core.util.ZipUtils;
-import com.zutubi.pulse.core.commands.api.TestCommandContext;
-import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,7 +63,7 @@ public class PatchArchiveTest extends PulseTestCase
 
         new PatchArchive(new Revision("1"), wcs, archiveFile, null);
         assertTrue(archiveFile.exists());
-        ZipUtils.extractZip(archiveFile, targetDir);
+        PulseZipUtils.extractZip(archiveFile, targetDir);
 
         PatchArchive archive = new PatchArchive(archiveFile);
         fs = archive.getMetadata().getFileStatus(TEST_FILENAME);

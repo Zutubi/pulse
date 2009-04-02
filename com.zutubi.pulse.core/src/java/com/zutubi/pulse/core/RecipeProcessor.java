@@ -28,7 +28,7 @@ import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
@@ -207,7 +207,7 @@ public class RecipeProcessor
         try
         {
             File zipFile = new File(dir.getAbsolutePath() + ".zip");
-            ZipUtils.createZip(zipFile, dir, null);
+            PulseZipUtils.createZip(zipFile, dir, null);
             return true;
         }
         catch (IOException e)

@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -139,7 +139,7 @@ public class SlaveAgentService implements AgentService
             fos = null;
 
             // now unzip the file
-            ZipUtils.extractZip(zipFile, tempDir);
+            PulseZipUtils.extractZip(zipFile, tempDir);
 
             zipFile.delete();
 

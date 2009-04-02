@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.type.record.DefaultRecordSerialiser;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

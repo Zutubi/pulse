@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.util;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
 import com.zutubi.util.logging.Logger;
@@ -19,11 +20,11 @@ import java.util.zip.ZipOutputStream;
 /**
  * Utility functions for working with zip archives.
  */
-public class ZipUtils
+public class PulseZipUtils
 {
     public static final char ZIP_SEPARATOR = '/';
 
-    private static final Logger LOG = Logger.getLogger(ZipUtils.class);
+    private static final Logger LOG = Logger.getLogger(PulseZipUtils.class);
 
     static final String PROPERTY_USE_EXTERNAL_ARCHIVING = "pulse.use.external.archiving";
     static final String PROPERTY_ARCHIVE_COMMAND = "pulse.archive.command";
@@ -54,17 +55,17 @@ public class ZipUtils
 
     static void setUseExternalArchiving(boolean useExternalArchiving)
     {
-        ZipUtils.useExternalArchiving = useExternalArchiving;
+        PulseZipUtils.useExternalArchiving = useExternalArchiving;
     }
 
     static void setArchiveCommand(String archiveCommand)
     {
-        ZipUtils.archiveCommand = archiveCommand;
+        PulseZipUtils.archiveCommand = archiveCommand;
     }
 
     static void setUnarchiveCommand(String unarchiveCommand)
     {
-        ZipUtils.unarchiveCommand = unarchiveCommand;
+        PulseZipUtils.unarchiveCommand = unarchiveCommand;
     }
 
     public static void createZip(File zipFile, File source, String file) throws IOException
@@ -187,7 +188,7 @@ public class ZipUtils
                 // Do a simple test run of zipping.
                 try
                 {
-                    tmpDir = FileSystemUtils.createTempDir(ZipUtils.class.getName(), ".tmp");
+                    tmpDir = FileSystemUtils.createTempDir(PulseZipUtils.class.getName(), ".tmp");
                     File testDir = new File(tmpDir, "test");
                     testDir.mkdir();
                     File testFile = new File(testDir, "afile");
@@ -447,7 +448,7 @@ public class ZipUtils
                 // Do a simple test run of unzipping.
                 try
                 {
-                    tmpDir = FileSystemUtils.createTempDir(ZipUtils.class.getName(), ".tmp");
+                    tmpDir = FileSystemUtils.createTempDir(PulseZipUtils.class.getName(), ".tmp");
                     File testDir = new File(tmpDir, "test");
                     testDir.mkdir();
                     File testFile = new File(testDir, "afile");
@@ -517,56 +518,11 @@ public class ZipUtils
         try
         {
             zin = new ZipInputStream(new FileInputStream(zipFile));
-            extractZip(zin, dir);
+            ZipUtils.extractZip(zin, dir);
         }
         finally
         {
             IOUtils.close(zin);
-        }
-    }
-
-    public static void extractZip(ZipInputStream zin, File dir) throws IOException
-    {
-        ZipEntry entry;
-        while ((entry = zin.getNextEntry()) != null)
-        {
-            File file = new File(dir, entry.getName());
-
-            if (entry.isDirectory())
-            {
-                file.mkdirs();
-            }
-            else
-            {
-                // ensure that the files parents already exist.
-                if (!file.getParentFile().isDirectory())
-                {
-                    file.getParentFile().mkdirs();
-                }
-                unzip(zin, file);
-            }
-
-            file.setLastModified(entry.getTime());
-        }
-    }
-
-    private static void unzip(InputStream zin, File file) throws IOException
-    {
-        FileOutputStream out = null;
-
-        try
-        {
-            out = new FileOutputStream(file);
-            byte[] b = new byte[512];
-            int len;
-            while ((len = zin.read(b)) != -1)
-            {
-                out.write(b, 0, len);
-            }
-        }
-        finally
-        {
-            IOUtils.close(out);
         }
     }
 }

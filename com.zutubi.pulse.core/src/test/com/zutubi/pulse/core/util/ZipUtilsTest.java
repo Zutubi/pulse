@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
@@ -27,7 +28,7 @@ public class ZipUtilsTest extends PulseTestCase
     {
         super.setUp();
 
-        ZipUtils.setDefaults();
+        PulseZipUtils.setDefaults();
         // Create a temporary working directory
         tmpDir = FileSystemUtils.createTempDir(ZipUtilsTest.class.getName(), "");
         inDir = new File(tmpDir, "in");
@@ -53,7 +54,7 @@ public class ZipUtilsTest extends PulseTestCase
 
         try
         {
-            ZipUtils.createZipInternal(getZipName(), new File(BASE_NAME), new File(DIR_NAME));
+            PulseZipUtils.createZipInternal(getZipName(), new File(BASE_NAME), new File(DIR_NAME));
             fail();
         }
         catch (FileNotFoundException e)
@@ -66,7 +67,7 @@ public class ZipUtilsTest extends PulseTestCase
     {
         try
         {
-            ZipUtils.createZipInternal(getZipName(), new File("random base"), new File("."));
+            PulseZipUtils.createZipInternal(getZipName(), new File("random base"), new File("."));
             fail();
         }
         catch (IOException e)
@@ -252,7 +253,7 @@ public class ZipUtilsTest extends PulseTestCase
     private void createAndVerifyZip(Map<String, String> files, String path) throws IOException
     {
         File zip = getZipName();
-        ZipUtils.createZipInternal(zip, inDir, new File(inDir, path));
+        PulseZipUtils.createZipInternal(zip, inDir, new File(inDir, path));
 
         ZipFile zipFile = null;
         ZipInputStream zipIn = null;
@@ -458,7 +459,7 @@ public class ZipUtilsTest extends PulseTestCase
         if(FileSystemUtils.LN_AVAILABLE)
         {
             createBrokenSymlink();
-            ZipUtils.createZipInternal(getZipName(), inDir, inDir);
+            PulseZipUtils.createZipInternal(getZipName(), inDir, inDir);
         }
     }
 
@@ -467,8 +468,8 @@ public class ZipUtilsTest extends PulseTestCase
         if(FileSystemUtils.LN_AVAILABLE && FileSystemUtils.ZIP_AVAILABLE)
         {
             createBrokenSymlink();
-            ZipUtils.createZip(getZipName(), inDir, null);
-            ZipUtils.extractZip(getZipName(), unzipDir);
+            PulseZipUtils.createZip(getZipName(), inDir, null);
+            PulseZipUtils.extractZip(getZipName(), unzipDir);
         }
     }
 
@@ -487,8 +488,8 @@ public class ZipUtilsTest extends PulseTestCase
         File f = new File(inDir, "f");
         FileSystemUtils.createFile(f, "content");
 
-        ZipUtils.setUseExternalArchiving(true);
-        ZipUtils.setArchiveCommand("nonexistant");
+        PulseZipUtils.setUseExternalArchiving(true);
+        PulseZipUtils.setArchiveCommand("nonexistant");
 
         simpleTest();
     }
@@ -500,8 +501,8 @@ public class ZipUtilsTest extends PulseTestCase
             File f = new File(inDir, "f");
             FileSystemUtils.createFile(f, "content");
 
-            ZipUtils.setUseExternalArchiving(true);
-            ZipUtils.setArchiveCommand("zip -G ${zipfile} ${files}");
+            PulseZipUtils.setUseExternalArchiving(true);
+            PulseZipUtils.setArchiveCommand("zip -G ${zipfile} ${files}");
 
             simpleTest();
         }
@@ -512,8 +513,8 @@ public class ZipUtilsTest extends PulseTestCase
         File f = new File(inDir, "f");
         FileSystemUtils.createFile(f, "content");
 
-        ZipUtils.setUseExternalArchiving(true);
-        ZipUtils.setUnarchiveCommand("nonexistant");
+        PulseZipUtils.setUseExternalArchiving(true);
+        PulseZipUtils.setUnarchiveCommand("nonexistant");
 
         simpleTest();
     }
@@ -525,8 +526,8 @@ public class ZipUtilsTest extends PulseTestCase
             File f = new File(inDir, "f");
             FileSystemUtils.createFile(f, "content");
 
-            ZipUtils.setUseExternalArchiving(true);
-            ZipUtils.setUnarchiveCommand("unzip -G ${zipfile}");
+            PulseZipUtils.setUseExternalArchiving(true);
+            PulseZipUtils.setUnarchiveCommand("unzip -G ${zipfile}");
 
             simpleTest();
         }
@@ -543,7 +544,7 @@ public class ZipUtilsTest extends PulseTestCase
             Process p = pb.start();
             assertEquals(0, p.waitFor());
 
-            ZipUtils.setUseExternalArchiving(true);
+            PulseZipUtils.setUseExternalArchiving(true);
             simpleTest();
 
             assertTrue(FileSystemUtils.isRelativeSymlink(new File(unzipDir, "l")));
@@ -561,8 +562,8 @@ public class ZipUtilsTest extends PulseTestCase
             Process p = pb.start();
             assertEquals(0, p.waitFor());
 
-            ZipUtils.createZipExternal(getZipName(), inDir, null);
-            ZipUtils.extractZipInternal(getZipName(), unzipDir);
+            PulseZipUtils.createZipExternal(getZipName(), inDir, null);
+            PulseZipUtils.extractZipInternal(getZipName(), unzipDir);
 
             // The symlink becomes a file with the path it was linking to
             File l = new File(unzipDir, "l");
@@ -573,8 +574,8 @@ public class ZipUtilsTest extends PulseTestCase
 
     private void simpleTest() throws IOException
     {
-        ZipUtils.createZip(getZipName(), inDir, null);
-        ZipUtils.extractZip(getZipName(), unzipDir);
+        PulseZipUtils.createZip(getZipName(), inDir, null);
+        PulseZipUtils.extractZip(getZipName(), unzipDir);
         IOAssertions.assertDirectoriesEqual(inDir, unzipDir);
     }
 
@@ -583,28 +584,28 @@ public class ZipUtilsTest extends PulseTestCase
         File zip = getZipName();
         if(externalZip == null)
         {
-            ZipUtils.createZip(zip, inDir, null);
+            PulseZipUtils.createZip(zip, inDir, null);
         }
         else if(externalZip)
         {
-            ZipUtils.createZipExternal(zip, inDir, null);
+            PulseZipUtils.createZipExternal(zip, inDir, null);
         }
         else
         {
-            ZipUtils.createZipInternal(zip, inDir, inDir);
+            PulseZipUtils.createZipInternal(zip, inDir, inDir);
         }
 
         if(externalUnzip == null)
         {
-            ZipUtils.extractZip(zip, unzipDir);
+            PulseZipUtils.extractZip(zip, unzipDir);
         }
         else if(externalUnzip)
         {
-            ZipUtils.extractZipExternal(zip, unzipDir);
+            PulseZipUtils.extractZipExternal(zip, unzipDir);
         }
         else
         {
-            ZipUtils.extractZipInternal(zip, unzipDir);
+            PulseZipUtils.extractZipInternal(zip, unzipDir);
         }
     }
 
@@ -617,7 +618,7 @@ public class ZipUtilsTest extends PulseTestCase
     private void createAndExtract(String path) throws IOException
     {
         File zip = getZipName();
-        ZipUtils.createZipInternal(zip, inDir, new File(inDir, path));
+        PulseZipUtils.createZipInternal(zip, inDir, new File(inDir, path));
 
         ZipInputStream zin = null;
         try

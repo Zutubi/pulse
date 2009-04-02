@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.restore;
 
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.RandomUtils;
 
 import java.io.File;
@@ -84,7 +84,7 @@ public class ArchiveFactory
 
             exportZipFile = new File(exportDir, archiveName);
 
-            ZipUtils.createZip(exportZipFile, archive.getBase(), null);
+            PulseZipUtils.createZip(exportZipFile, archive.getBase(), null);
 
             return exportZipFile;
         }
@@ -104,7 +104,7 @@ public class ArchiveFactory
             // if the archive is a zip file, then unzip it into our base directory.
             if (archive.isFile() && archive.getName().endsWith(".zip"))
             {
-                ZipUtils.extractZip(archive, archiveBase);
+                PulseZipUtils.extractZip(archive, archiveBase);
             }
             // if the arhive is a directory, then copy the contents into our base directory (expanded archive).
             else if (archive.isDirectory())

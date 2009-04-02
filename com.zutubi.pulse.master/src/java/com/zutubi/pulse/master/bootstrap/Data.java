@@ -2,15 +2,15 @@ package com.zutubi.pulse.master.bootstrap;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.config.Config;
-import com.zutubi.pulse.core.util.ZipUtils;
-import com.zutubi.util.config.FileConfig;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.HSQLDBUtils;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.StartupException;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.config.Config;
+import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -139,7 +139,7 @@ public class Data implements MasterUserPaths
         }
 
         FileSystemUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
-        ZipUtils.createZip(backup, tmpBackup, null);
+        PulseZipUtils.createZip(backup, tmpBackup, null);
         FileSystemUtils.rmdir(tmpBackup);
         // - done.
     }

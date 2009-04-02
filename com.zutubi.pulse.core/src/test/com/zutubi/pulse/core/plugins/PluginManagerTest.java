@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.plugins;
 
-import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.ZipUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 

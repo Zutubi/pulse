@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.plugins.BasePluginSystemTestCase;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -184,7 +184,7 @@ public class LocalBuildTest extends PulseTestCase
         if (generateMode)
         {
             File zipFile = new File(getClass().getSimpleName() + "." + expectedName + ".zip");
-            ZipUtils.createZip(zipFile, baseDir, null);
+            PulseZipUtils.createZip(zipFile, baseDir, null);
             System.out.println("Expected output archive generated at '" + zipFile.getAbsolutePath() + "'");
         }
         else

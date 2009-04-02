@@ -55,9 +55,22 @@ public class SystemUtils
         return findInPath(name, null);
     }
 
-    public static String runCommandWithInput(String input, String... command) throws IOException
+    /**
+     * Runs a command started by the given process builder, reading all
+     * standard output into a string.
+     *
+     * @param expectedExitCode if non-negative, specifies the expected exit
+     *                         code from the child process.  If the actual exit
+     *                         code differs an exception is thrown.
+     * @param input            if not null, input to feed to the standard in
+     *                         of the child process
+     * @param processBuilder   builder used to start the child process
+     * @return the standard output of the process
+     * @throws IOException on an error running the process
+     */
+    public static String runCommandWithInput(int expectedExitCode, String input, ProcessBuilder processBuilder) throws IOException
     {
-        Process process = Runtime.getRuntime().exec(command);
+        Process process = processBuilder.start();
 
         try
         {
@@ -90,13 +103,13 @@ public class SystemUtils
                 LOG.warning(e);
             }
 
-            if (exitCode == 0)
+            if (expectedExitCode < 0 || exitCode == expectedExitCode)
             {
                 return stdoutWriter.getBuffer().toString();
             }
             else
             {
-                throw new IOException(String.format("Command '%s' exited with code %d", command[0], exitCode));
+                throw new IOException(String.format("Command '%s' exited with code %d", processBuilder.command().get(0), exitCode));
             }
         }
         finally
@@ -105,9 +118,41 @@ public class SystemUtils
         }
     }
 
-    public static String runCommand(String... command) throws IOException
+    /**
+     * Runs a command specified by the given strings, reading all standard
+     * output into a string.
+     *
+     * @param expectedExitCode if non-negative, specifies the expected exit
+     *                         code from the child process.  If the actual exit
+     *                         code differs an exception is thrown.
+     * @param input            if not null, input to feed to the standard in
+     *                         of the child process
+     * @param command          the command to run, followed by the arguments to
+     *                         pass to the command
+     * @return the standard output of the process
+     * @throws IOException on an error running the process
+     */
+    public static String runCommandWithInput(int expectedExitCode, String input, String... command) throws IOException
     {
-        return runCommandWithInput(null, command);
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        return runCommandWithInput(expectedExitCode, input, processBuilder);
+    }
+
+    /**
+     * Runs a command specified by the given strings, reading all standard
+     * output into a string.
+     *
+     * @param expectedExitCode if non-negative, specifies the expected exit
+     *                         code from the child process.  If the actual exit
+     *                         code differs an exception is thrown.
+     * @param command          the command to run, followed by the arguments to
+     *                         pass to the command
+     * @return the standard output of the process
+     * @throws IOException on an error running the process
+     */
+    public static String runCommand(int expectedExitCode, String... command) throws IOException
+    {
+        return runCommandWithInput(expectedExitCode,  null, command);
     }
 
     /**
