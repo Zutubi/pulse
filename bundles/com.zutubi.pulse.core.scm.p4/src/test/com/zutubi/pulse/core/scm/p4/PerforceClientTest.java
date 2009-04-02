@@ -500,15 +500,15 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testLockedTemplate() throws ScmException, IOException
     {
-        String spec = SystemUtils.runCommand(0, "p4", "-p", "6666", "client", "-o", TEST_WORKSPACE);
+        String spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_WORKSPACE);
         spec = spec.replaceAll("(\nOptions:.*)unlocked", "$1locked");
-        SystemUtils.runCommandWithInput(0, spec, "p4", "-p", "6666", "client", "-i");
+        SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
 
         PerforceCore core = getClient();
         core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", getTempDir().getAbsolutePath());
-        spec = SystemUtils.runCommand(0, "p4", "-p", "6666", "client", "-o", TEST_WORKSPACE);
+        spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_WORKSPACE);
         assertTrue(spec.contains(" locked"));
-        spec = SystemUtils.runCommand(0, "p4", "-p", "6666", "client", "-o", "unlocked-client");
+        spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "unlocked-client");
         assertFalse(spec.contains(" locked"));
     }
 

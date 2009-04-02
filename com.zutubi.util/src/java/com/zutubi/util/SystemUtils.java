@@ -119,6 +119,22 @@ public class SystemUtils
     }
 
     /**
+     * Runs a command started by the given process builder, reading all
+     * standard output into a string.  The command must return exit status zero
+     * or an exception is thrown.
+     *
+     * @param input          if not null, input to feed to the standard in of
+     *                       the child process
+     * @param processBuilder builder used to start the child process
+     * @return the standard output of the process
+     * @throws IOException on an error running the process
+     */
+    public static String runCommandWithInput(String input, ProcessBuilder processBuilder) throws IOException
+    {
+        return runCommandWithInput(0, input, processBuilder);
+    }
+
+    /**
      * Runs a command specified by the given strings, reading all standard
      * output into a string.
      *
@@ -138,6 +154,23 @@ public class SystemUtils
         return runCommandWithInput(expectedExitCode, input, processBuilder);
     }
 
+   /**
+    * Runs a command specified by the given strings, reading all standard
+    * output into a string.  The command must return exit status zero or an
+     * exception is thrown.
+    *
+    * @param input   if not null, input to feed to the standard in of the child
+    *                process
+    * @param command the command to run, followed by the arguments to pass to
+    *                the command
+    * @return the standard output of the process
+    * @throws IOException on an error running the process
+    */
+   public static String runCommandWithInput(String input, String... command) throws IOException
+   {
+       return runCommandWithInput(0, input, command);
+   }
+
     /**
      * Runs a command specified by the given strings, reading all standard
      * output into a string.
@@ -153,6 +186,21 @@ public class SystemUtils
     public static String runCommand(int expectedExitCode, String... command) throws IOException
     {
         return runCommandWithInput(expectedExitCode,  null, command);
+    }
+
+    /**
+     * Runs a command specified by the given strings, reading all standard
+     * output into a string.  The command must return exit status zero or an
+     * exception is thrown.
+     *
+     * @param command the command to run, followed by the arguments to pass to
+     *        the command
+     * @return the standard output of the process
+     * @throws IOException on an error running the process
+     */
+    public static String runCommand(String... command) throws IOException
+    {
+        return runCommand(0, command);
     }
 
     /**

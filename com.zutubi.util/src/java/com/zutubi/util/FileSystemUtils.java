@@ -442,7 +442,7 @@ public class FileSystemUtils
             {
                 try
                 {
-                    SystemUtils.runCommand(0, "attrib", "-R", file.getAbsolutePath());
+                    SystemUtils.runCommand("attrib", "-R", file.getAbsolutePath());
                     return true;
                 }
                 catch (IOException e)
@@ -630,7 +630,7 @@ public class FileSystemUtils
     {
         if (LN_AVAILABLE)
         {
-            SystemUtils.runCommand(0, "ln", "-s", destination.getAbsolutePath(), symlink.getAbsolutePath());
+            SystemUtils.runCommand("ln", "-s", destination.getAbsolutePath(), symlink.getAbsolutePath());
             return true;
         }
 
