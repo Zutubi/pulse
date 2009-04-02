@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import static com.zutubi.pulse.core.dependency.ivy.IvyLogUtils.toLevel;
+import static com.zutubi.pulse.core.dependency.ivy.IvyLogUtils.PROGRESS_CHARACTER;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.Constants;
 
@@ -30,12 +31,26 @@ public class IvyMessageOutputStreamAdapter extends org.apache.ivy.util.AbstractM
 
     protected void doProgress()
     {
-        // noop.
+        try
+        {
+            output.write(PROGRESS_CHARACTER);
+        }
+        catch (IOException e)
+        {
+            LOG.error(e);
+        }
     }
 
     protected void doEndProgress(String msg)
     {
-        // noop.
+        try
+        {
+            output.write(msg.getBytes());
+        }
+        catch (IOException e)
+        {
+            LOG.error(e);
+        }
     }
 
     public void rawlog(String msg, int level)

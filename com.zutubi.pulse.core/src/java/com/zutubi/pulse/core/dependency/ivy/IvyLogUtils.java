@@ -1,12 +1,8 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import org.apache.ivy.util.Message;
-import org.apache.ivy.util.MessageLogger;
-import org.apache.ivy.core.settings.IvySettings;
 
 import java.util.logging.Level;
-
-import com.zutubi.util.NullaryFunction;
 
 /**
  * A set of utility methods to help with adapting the ivy logging system to
@@ -14,6 +10,11 @@ import com.zutubi.util.NullaryFunction;
  */
 public class IvyLogUtils
 {
+    /**
+     * The character used to indicate that an ivy action has made some sort of progress.
+     */
+    public static final byte[] PROGRESS_CHARACTER = ".".getBytes();
+
     /**
      * Convert an ivy message level to a comparable java logging level.
      *
@@ -44,19 +45,4 @@ public class IvyLogUtils
         }
         throw new RuntimeException("Unknown logging level: " + level);
     }
-
-    public static <T> T runQuietly(NullaryFunction<T> function)
-    {
-        MessageLogger defaultLogger = Message.getDefaultLogger();
-        Message.setDefaultLogger(new NullMessageLogger());
-        try
-        {
-            return function.process();
-        }
-        finally
-        {
-            Message.setDefaultLogger(defaultLogger);
-        }
-    }
-
 }

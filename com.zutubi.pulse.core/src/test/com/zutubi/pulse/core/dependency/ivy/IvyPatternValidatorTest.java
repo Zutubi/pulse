@@ -40,4 +40,12 @@ public class IvyPatternValidatorTest extends FieldValidatorTestCase
         assertFalse(validationAware.hasErrors());
     }
 
+    public void testPulsePropertyReferenceAndPattern() throws ValidationException
+    {
+        validator.validate(new FieldProvider("[${something}]"));
+        assertFalse(validationAware.hasErrors());
+        validator.validate(new FieldProvider("${s[omethi]ng}"));
+        assertFalse(validationAware.hasErrors());
+    }
+
 }

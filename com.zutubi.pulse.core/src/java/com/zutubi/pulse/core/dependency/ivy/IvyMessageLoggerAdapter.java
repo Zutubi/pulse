@@ -9,21 +9,18 @@ import org.apache.ivy.util.Message;
  */
 public class IvyMessageLoggerAdapter extends org.apache.ivy.util.AbstractMessageLogger
 {
-    private Logger delegate = null;
-
-    public IvyMessageLoggerAdapter(Logger delegate)
-    {
-        this.delegate = delegate;
-    }
+    private static final Logger LOG = Logger.getLogger(IvyMessageLoggerAdapter.class);
 
     protected void doProgress()
     {
-        // we do not show progress at the moment.
+        // This is just the default logger.  This logger will not be used for actions that
+        // provide progress feedback.
     }
 
     protected void doEndProgress(String msg)
     {
-        // we do not show progress at the moment.
+        // This is just the default logger.  This logger will not be used for actions that
+        // provide progress feedback.
     }
 
     public void log(String msg, int level)
@@ -32,19 +29,19 @@ public class IvyMessageLoggerAdapter extends org.apache.ivy.util.AbstractMessage
         switch (level)
         {
             case Message.MSG_DEBUG:
-                delegate.debug(msg);
+                LOG.debug(msg);
                 break;
             case Message.MSG_ERR:
-                delegate.error(msg);
+                LOG.error(msg);
                 break;
             case Message.MSG_INFO:
-                delegate.info(msg);
+                LOG.info(msg);
                 break;
             case Message.MSG_VERBOSE:
-                delegate.finest(msg);
+                LOG.finest(msg);
                 break;
             case Message.MSG_WARN:
-                delegate.warning(msg);
+                LOG.warning(msg);
                 break;
         }
     }

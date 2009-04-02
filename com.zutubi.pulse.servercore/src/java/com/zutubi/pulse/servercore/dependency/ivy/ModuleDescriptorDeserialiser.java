@@ -4,13 +4,13 @@ import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
-import com.zutubi.util.NullaryFunction;
-import com.zutubi.pulse.core.dependency.ivy.IvyLogUtils;
+import com.zutubi.pulse.core.dependency.ivy.IvyMessageLoggerAdapter;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
 import org.apache.ivy.plugins.repository.Resource;
+import org.apache.ivy.util.Message;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,27 +28,16 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
 
     public ModuleDescriptorDeserialiser()
     {
+        // redirect the default logging to our own logging system.
+        Message.setDefaultLogger(new IvyMessageLoggerAdapter());
+
         try
         {
             // we need some ivy settings to tell the descriptor parser how to behave.  The defaults
             // should be fine for this.
-            ivySettings = IvyLogUtils.runQuietly(new NullaryFunction<IvySettings>()
-            {
-                public IvySettings process()
-                {
-                    try
-                    {
-                        IvySettings settings = new IvySettings();
-                        settings.loadDefault();
-                        settings.setValidate(false);
-                        return settings;
-                    }
-                    catch (Exception e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+            ivySettings = new IvySettings();
+            ivySettings.loadDefault();
+            ivySettings.setValidate(false);
         }
         catch (Exception e)
         {
@@ -66,7 +55,7 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
         {
             String key = input.readString();
             String value = input.readString();
-            
+
             if (key.equals(FIELD_VALUE))
             {
                 descriptor = value;
