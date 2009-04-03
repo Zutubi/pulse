@@ -523,10 +523,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         licenseManager.refreshAuthorisations();
     }
 
-    public void checkWrite(Project project)
-    {
-    }
-
     public void triggerBuild(ProjectConfiguration projectConfig, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force)
     {
         Project project = getProject(projectConfig.getProjectId(), false);

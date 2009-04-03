@@ -63,7 +63,7 @@ public class ViewBuildAction extends CommandActionBase
         if(summaryColumns == null)
         {
             User u = getLoggedInUser();
-            summaryColumns = new BuildColumns(u == null ? UserPreferencesConfiguration.defaultProjectColumns() : u.getPreferences().getProjectSummaryColumns(), projectManager);
+            summaryColumns = new BuildColumns(u == null ? UserPreferencesConfiguration.defaultProjectColumns() : u.getPreferences().getProjectSummaryColumns(), accessManager);
         }
         return summaryColumns;
     }

@@ -1474,7 +1474,7 @@ public class RemoteApi
         try
         {
             Project project = internalGetProject(projectName, true);
-            projectManager.checkWrite(project);
+            accessManager.ensurePermission(AccessManager.ACTION_WRITE, project);
             BuildResult build = buildManager.getByProjectAndNumber(project, id);
             if (build == null)
             {
