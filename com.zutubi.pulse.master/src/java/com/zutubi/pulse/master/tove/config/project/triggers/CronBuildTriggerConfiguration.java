@@ -48,12 +48,6 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
         cronTrigger.setCron(cron);
     }
 
-    public String getType()
-    {
-        // TODO: I18N.
-        return "cron";
-    }
-
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;

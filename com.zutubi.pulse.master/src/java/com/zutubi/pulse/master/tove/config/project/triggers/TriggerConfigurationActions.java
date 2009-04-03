@@ -8,13 +8,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * The actions class for triggers.
  */
 public class TriggerConfigurationActions
 {
+    private static final String ACTION_RESUME = "resume";
+
+    private static final String ACTION_PAUSE = "pause";
+
     private Scheduler scheduler;
 
+    /**
+     * Determine the list of actions that can be applied to the specified trigger.
+     * 
+     * @param config    trigger in question
+     * @return  the list of actions available to the trigger.
+     */
     public List<String> getActions(TriggerConfiguration config)
     {
         List<String> actions = new LinkedList<String>();
@@ -23,11 +32,11 @@ public class TriggerConfigurationActions
         {
             if (trigger.isPaused())
             {
-                actions.add("resume");
+                actions.add(ACTION_RESUME);
             }
             else
             {
-                actions.add("pause");
+                actions.add(ACTION_PAUSE);
             }
         }
         return actions;

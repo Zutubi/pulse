@@ -123,6 +123,8 @@ public class EventSchedulerStrategy implements SchedulerStrategy
             {
                 boolean accept = true;
                 TaskExecutionContext context = new TaskExecutionContext();
+                context.setTrigger(trigger);
+
                 Class<? extends EventTriggerFilter> filterClass = eventTrigger.getFilterClass();
 
                 if(filterClass != null)

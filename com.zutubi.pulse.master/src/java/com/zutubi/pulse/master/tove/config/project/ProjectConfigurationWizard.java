@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
@@ -176,17 +177,8 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             record.put("stages", stagesRecord);
         }
 
-        if (!hasScmTrigger(templateParentProject))
-        {
-            // Add a default SCM trigger
-            CollectionType triggersType = (CollectionType) projectType.getProperty("triggers").getType();
-            CompositeType scmTriggerType = typeRegistry.getType(ScmBuildTriggerConfiguration.class);
-            MutableRecord triggersRecord = triggersType.createNewRecord(true);
-            MutableRecord triggerRecord = scmTriggerType.createNewRecord(true);
-            triggerRecord.put("name", "scm trigger");
-            triggersRecord.put("scm trigger", triggerRecord);
-            record.put("triggers", triggersRecord);
-        }
+        ensureTrigger(record, templateParentProject, ScmBuildTriggerConfiguration.class, "scm trigger");
+        ensureTrigger(record, templateParentProject, DependentBuildTriggerConfiguration.class, "dependency trigger");
 
         MutableRecord typeRecord = null;
 
@@ -303,18 +295,37 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         return typeRegistry.getType(MultiRecipeTypeConfiguration.class).createNewRecord(true);
     }
 
-    private boolean hasScmTrigger(ProjectConfiguration templateParentProject)
+    private <T extends TriggerConfiguration> void ensureTrigger(MutableRecord record, ProjectConfiguration project, Class<T> triggerType, String name)
+    {
+        if (!hasTrigger(project, triggerType))
+        {
+            CollectionType triggersType = (CollectionType) projectType.getProperty("triggers").getType();
+            if (!record.containsKey("triggers"))
+            {
+                MutableRecord triggersRecord = triggersType.createNewRecord(true);
+                record.put("triggers", triggersRecord);
+            }
+            MutableRecord triggersRecord = (MutableRecord) record.get("triggers");
+
+            CompositeType triggerCompositeType = typeRegistry.getType(triggerType);
+
+            MutableRecord triggerRecord = triggerCompositeType.createNewRecord(true);
+            triggerRecord.put("name", name);
+            triggersRecord.put(name, triggerRecord);
+        }
+    }
+
+    private <T extends TriggerConfiguration> boolean hasTrigger(ProjectConfiguration project, Class<T> triggerType)
     {
         @SuppressWarnings("unchecked")
-        Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) templateParentProject.getExtensions().get("triggers");
+        Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) project.getExtensions().get("triggers");
         for (TriggerConfiguration trigger : triggers.values())
         {
-            if (trigger instanceof ScmBuildTriggerConfiguration)
+            if (trigger.getClass() == triggerType)
             {
                 return true;
             }
         }
-
         return false;
     }
 

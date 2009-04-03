@@ -8,6 +8,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.i18n.Messages;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -46,7 +47,10 @@ public abstract class TriggerConfiguration extends AbstractNamedConfiguration
     public abstract Trigger newTrigger();
 
     @Transient
-    public abstract String getType();
+    public String getType()
+    {
+        return Messages.getInstance(this).format("type.label");
+    }
 
     public void update(Trigger trigger)
     {

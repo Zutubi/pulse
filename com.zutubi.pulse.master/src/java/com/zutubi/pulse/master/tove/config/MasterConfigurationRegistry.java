@@ -19,10 +19,7 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.*;
 import com.zutubi.pulse.master.tove.config.project.commit.CustomTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
-import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.project.triggers.CronBuildTriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.*;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
@@ -140,6 +137,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(BuildCompletedTriggerConfiguration.class);
             registerConfigurationType(CronBuildTriggerConfiguration.class);
             registerConfigurationType(ScmBuildTriggerConfiguration.class);
+            registerConfigurationType(DependentBuildTriggerConfiguration.class);
 
             MapType triggers = new MapType(triggerConfig, typeRegistry);
             projectConfig.addProperty(new ExtensionTypeProperty(EXTENSION_PROJECT_TRIGGERS, triggers));

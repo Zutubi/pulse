@@ -5,9 +5,15 @@ import com.zutubi.pulse.acceptance.Constants;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.clearArtifactRepository;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.waitUntilInRepository;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.util.*;
+import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -493,6 +499,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             addDependency(project.getName(), dependency);
         }
+
+        String triggersPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project.name, "triggers");
+        Hashtable<String, Object> trigger = xmlRpcHelper.createEmptyConfig(DependentBuildTriggerConfiguration.class);
+        trigger.put("name", "dependency trigger");
+        xmlRpcHelper.insertConfig(triggersPath, trigger);
     }
 
     private void setProjectOrganisation(Project p) throws Exception
