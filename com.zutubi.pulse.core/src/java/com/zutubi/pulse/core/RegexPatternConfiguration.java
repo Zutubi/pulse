@@ -84,6 +84,11 @@ public class RegexPatternConfiguration extends AbstractConfiguration implements 
         this.exclusions = exclusions;
     }
 
+    public void addExclusion(String expression)
+    {
+        exclusions.add(expression);
+    }
+
     public void validate(ValidationContext context)
     {
         for (String expression: exclusions)

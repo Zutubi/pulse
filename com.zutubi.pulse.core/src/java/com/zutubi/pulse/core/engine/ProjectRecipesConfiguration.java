@@ -39,6 +39,11 @@ public class ProjectRecipesConfiguration extends AbstractConfiguration
         this.recipes = recipes;
     }
 
+    public void addRecipe(RecipeConfiguration recipe)
+    {
+        recipes.put(recipe.getName(), recipe);
+    }
+    
     public Map<String, PostProcessorConfiguration> getPostProcessors()
     {
         return postProcessors;
@@ -49,6 +54,11 @@ public class ProjectRecipesConfiguration extends AbstractConfiguration
         this.postProcessors = postProcessors;
     }
 
+    public void addPostProcessor(PostProcessorConfiguration postProcessor)
+    {
+        postProcessors.put(postProcessor.getName(), postProcessor);
+    }
+
     public Map<String, PropertyConfiguration> getProperties()
     {
         return properties;
@@ -57,5 +67,10 @@ public class ProjectRecipesConfiguration extends AbstractConfiguration
     public void setProperties(Map<String, PropertyConfiguration> properties)
     {
         this.properties = properties;
+    }
+
+    public void addProperty(PropertyConfiguration property)
+    {
+        properties.put(property.getName(), property);
     }
 }

@@ -51,14 +51,14 @@
     subdirectory.  This allows the repeated commands to be captured once:
 </p>
 <h4>import/commands.xml</h4>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;root&gt;
     &lt;make name="build" targets="all" args="-Dmode=${mode}"/&gt;
     &lt;make name="test" targets="test" args="-Dmode=${mode}"/&gt;
 &lt;/root&gt;</div>
 
 <h4>pulse.xml</h4>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project default-recipe="debug"&gt;
     &lt;recipe name="debug"&gt;
         &lt;property name="mode" value="DEBUG"/&gt;

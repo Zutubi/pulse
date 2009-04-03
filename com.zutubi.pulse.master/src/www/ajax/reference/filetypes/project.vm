@@ -12,7 +12,7 @@
     requirements of each element.  For completeness, you should include an XML prologue in your
     pulse files:
 </p>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 ...
 </div>
 
@@ -24,7 +24,7 @@
     may be simple <a href="#" onclick="selectNode('$path/project/property'); return false">property</a>
     values:
 </p>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project&gt;
     &lt;property name="my.dir" value="bin/scripts"/&gt;
 
@@ -37,7 +37,7 @@
     In this case the attribute value "${my.dir}/doit.sh" becomes "bin/scripts/doit.sh".  In other
     cases, the entity referred to may itself be a complex object, for example a post-processor:
 </p>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project&gt;
     &lt;post-processor name="my.pp"&gt;
         ...
@@ -73,7 +73,7 @@
     its own scope, nested within scope of the enclosing tag.  Thus it is possible to override the
     value of a reference within a nested tag:
 </p>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project&gt;
     &lt;property name="cc" value="gcc"/&gt;
 
@@ -93,7 +93,7 @@
     point in the pulse file.  This makes it possible to reuse a property in what would otherwise by
     the same scope:
 </p>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project&gt;
     &lt;macro name="make"&gt;
         &lt;make name="make-${make.target}" makefile="GNUmakefile" targets="${make.target}"/&gt;
@@ -124,7 +124,7 @@
     You can reference a macro with the <a href="#" onclick="selectNode('$path/project/macro'); return false">macro-ref</a>
     element.  A simple example is show below:
 </p>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project&gt;
     &lt;macro name="common-commands"&gt;
         &lt;make name="build" makefile="GNUmakefile" targets="build"/&gt;
@@ -144,7 +144,7 @@
     where the import is made.  Consider this partitioning of the above macros example:
 </p>
 <h4>import/macros.xml</h4>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;root&gt;
     &lt;macro name="common-commands"&gt;
         &lt;make name="build" makefile="GNUmakefile" targets="build"/&gt;
@@ -153,7 +153,7 @@
 &lt;/root&gt;
 </div>
 <h4>pulse.xml</h4>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project&gt;
     &lt;import path="import/macros.xml"/&gt;
 
@@ -168,7 +168,7 @@
     At a high level, your Pulse file will usually define recipes for different build scenarios, for
     example:
 </p>
-<div class="code">&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project default-recipe="default"&gt;
     &lt;property name="script.dir" value="bin/scripts"/&gt;
 

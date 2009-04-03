@@ -79,6 +79,11 @@ public abstract class CommandConfigurationSupport extends AbstractNamedConfigura
         this.outputs = outputs;
     }
 
+    public void addOutput(OutputConfiguration output)
+    {
+        outputs.put(output.getName(), output);
+    }
+
     public Class<? extends Command> commandType()
     {
         return commandType;

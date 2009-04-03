@@ -38,6 +38,12 @@ public class RegexTestPostProcessorConfiguration extends TestReportPostProcessor
         this(RegexTestPostProcessor.class);
     }
 
+    public RegexTestPostProcessorConfiguration(String name)
+    {
+        this();
+        setName(name);
+    }
+
     public RegexTestPostProcessorConfiguration(Class<? extends RegexTestPostProcessor> postProcessorType)
     {
         super(postProcessorType);

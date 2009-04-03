@@ -27,6 +27,12 @@ public class PrintCommandConfiguration extends OutputProducingCommandConfigurati
         super(PrintCommand.class);
     }
 
+    public PrintCommandConfiguration(String name)
+    {
+        this();
+        setName(name);
+    }
+
     public String getMessage()
     {
         return message;

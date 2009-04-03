@@ -21,7 +21,7 @@
     A basic macro for a commonly-used command.  Note that the <tt>mode</tt> property is defined
     differently in each recipe:
 </p>
-<div class="code">&lt;macro name="build-command"&gt;
+<div class="example-snippet">&lt;macro name="build-command"&gt;
     &lt;command name="build"&gt;
         &lt;executable exe="build-it.sh" args="TARGET=${target}"/&gt;
         &lt;artifact name="${target}" file="bin/${target}"/&gt;

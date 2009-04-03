@@ -66,4 +66,9 @@ public abstract class FileSystemOutputConfigurationSupport extends OutputConfigu
     {
         this.postProcessors = postProcessors;
     }
+
+    public void addPostProcessor(PostProcessorConfiguration postProcessor)
+    {
+        postProcessors.add(postProcessor);
+    }
 }

@@ -22,9 +22,9 @@ public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationS
     private String base;
     @Wizard.Ignore
     private String index;
-    @Addable(value = "include", attribute = "pattern") @StringList
-    private List<String> exclusions = new LinkedList<String>();
     @Addable(value = "exclude", attribute = "pattern") @StringList
+    private List<String> exclusions = new LinkedList<String>();
+    @Addable(value = "include", attribute = "pattern") @StringList
     private List<String> inclusions = new LinkedList<String>();
     @Wizard.Ignore
     private boolean followSymlinks;

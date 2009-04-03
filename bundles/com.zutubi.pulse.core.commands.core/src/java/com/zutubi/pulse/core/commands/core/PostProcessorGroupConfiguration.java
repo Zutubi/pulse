@@ -37,4 +37,9 @@ public class PostProcessorGroupConfiguration extends PostProcessorConfigurationS
     {
         this.processors = processors;
     }
+
+    public void addPostProcessor(PostProcessorConfiguration postProcessor)
+    {
+        processors.put(postProcessor.getName(), postProcessor);
+    }
 }

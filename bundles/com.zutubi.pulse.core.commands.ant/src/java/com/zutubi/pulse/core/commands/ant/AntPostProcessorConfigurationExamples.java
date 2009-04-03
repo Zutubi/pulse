@@ -7,11 +7,11 @@ import com.zutubi.tove.config.api.ConfigurationExample;
  */
 public class AntPostProcessorConfigurationExamples
 {
-    private static final String ELEMENT = "ant.pp";
+    private static final String NAME = "ant.pp";
 
     public ConfigurationExample getTrivial()
     {
-        return new ConfigurationExample(ELEMENT, createEmpty());
+        return new ConfigurationExample(NAME, createEmpty());
     }
 
     public ConfigurationExample getContextNoFailOnError()
@@ -19,12 +19,12 @@ public class AntPostProcessorConfigurationExamples
         AntPostProcessorConfiguration pp = createEmpty();
         pp.setLeadingContext(10);
         pp.setFailOnError(false);
-        return new ConfigurationExample(ELEMENT, pp);
+        return new ConfigurationExample(NAME, pp);
     }
 
     private AntPostProcessorConfiguration createEmpty()
     {
-        AntPostProcessorConfiguration pp = new AntPostProcessorConfiguration("ant.pp");
+        AntPostProcessorConfiguration pp = new AntPostProcessorConfiguration(NAME);
         pp.getPatterns().clear();
         return pp;
     }

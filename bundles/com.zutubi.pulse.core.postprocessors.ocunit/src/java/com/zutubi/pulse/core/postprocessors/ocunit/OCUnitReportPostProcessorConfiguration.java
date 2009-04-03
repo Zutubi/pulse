@@ -13,4 +13,10 @@ public class OCUnitReportPostProcessorConfiguration extends TestReportPostProces
     {
         super(OCUnitReportPostProcessor.class);
     }
+
+    public OCUnitReportPostProcessorConfiguration(String name)
+    {
+        super(OCUnitReportPostProcessor.class);
+        setName(name);
+    }
 }

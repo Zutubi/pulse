@@ -48,4 +48,9 @@ public class RecipeConfiguration extends AbstractNamedConfiguration
     {
         this.commands = commands;
     }
+
+    public void addCommand(CommandConfiguration command)
+    {
+        commands.put(command.getName(), command);
+    }
 }

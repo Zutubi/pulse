@@ -19,6 +19,12 @@ public class BuildPropertyConfiguration extends AbstractNamedConfiguration
     {
     }
 
+    public BuildPropertyConfiguration(String name, String value)
+    {
+        setName(name);
+        setValue(value);
+    }
+
     public String getValue()
     {
         return value;

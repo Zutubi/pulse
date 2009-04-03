@@ -20,6 +20,12 @@ public class SleepCommandConfiguration extends CommandConfigurationSupport
         super(SleepCommand.class);
     }
 
+    public SleepCommandConfiguration(String name)
+    {
+        this();
+        setName(name);
+    }
+
     public int getInterval()
     {
         return interval;

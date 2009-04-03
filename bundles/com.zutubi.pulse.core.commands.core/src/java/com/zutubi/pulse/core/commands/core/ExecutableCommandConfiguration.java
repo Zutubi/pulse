@@ -39,12 +39,18 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
     private String inputFile;
     @Addable("environment")
     private List<EnvironmentConfiguration> environments = new LinkedList<EnvironmentConfiguration>();
-    @Addable("statusMapping")
+    @Addable("status-mapping")
     private List<StatusMappingConfiguration> statusMappings = new LinkedList<StatusMappingConfiguration>();
 
     public ExecutableCommandConfiguration()
     {
         super(ExecutableCommand.class);
+    }
+
+    public ExecutableCommandConfiguration(String name)
+    {
+        this();
+        setName(name);
     }
 
     protected ExecutableCommandConfiguration(Class<? extends ExecutableCommand> clazz)
@@ -148,6 +154,11 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
         this.environments = environments;
     }
 
+    public void addEnvironment(EnvironmentConfiguration environmentConfiguration)
+    {
+        environments.add(environmentConfiguration);
+    }
+
     public List<StatusMappingConfiguration> getStatusMappings()
     {
         return statusMappings;
@@ -165,5 +176,4 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
             context.addFieldError("exe", "exe is required");
         }
     }
-
 }

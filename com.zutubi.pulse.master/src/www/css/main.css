@@ -1552,15 +1552,6 @@ div.reference {
     margin: 20px 0 20px 0;
 }
 
-.reference .code {
-    white-space: pre;
-    font-family: monospace;
-    background-color: #f8f8f8;
-    border: dotted 1px #ddd;
-    margin: 20px 30px 20px 30px;
-    padding: 4px;
-}
-
 .reference .highlight {
     border: solid 1px #f0c000;
     background-color: #ffffce;
@@ -1573,6 +1564,6 @@ div.reference {
     font-family: monospace;
     background: #ffffe8;
     border: 1px dashed #ccc;
-    margin: 4px;
+    margin: 20px 30px 20px 30px;
     padding: 4px;
 }

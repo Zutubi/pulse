@@ -121,4 +121,8 @@ public class MsBuildCommandConfiguration extends NamedArgumentCommandConfigurati
         this.buildProperties = buildProperties;
     }
 
+    public void addBuildProperty(BuildPropertyConfiguration property)
+    {
+        buildProperties.put(property.getName(), property);
+    }
 }

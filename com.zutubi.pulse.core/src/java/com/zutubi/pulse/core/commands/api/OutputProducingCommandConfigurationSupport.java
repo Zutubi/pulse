@@ -47,4 +47,9 @@ public abstract class OutputProducingCommandConfigurationSupport extends Command
     {
         this.postProcessors = postProcessors;
     }
+
+    public void addPostProcessor(PostProcessorConfiguration postProcessor)
+    {
+        postProcessors.add(postProcessor);
+    }
 }

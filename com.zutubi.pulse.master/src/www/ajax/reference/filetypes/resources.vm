@@ -14,8 +14,7 @@
 </p>
 
 <h2>Example</h2>
-<div class="code">
-&lt;?xml version="1.0"?&gt;
+<div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;resources&gt;
     &lt;resource name="automake"&gt;
         <span class="code-comment">&lt;!-- Properties for version 1.4 --&gt;
