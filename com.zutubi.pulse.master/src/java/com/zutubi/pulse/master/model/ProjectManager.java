@@ -139,7 +139,8 @@ public interface ProjectManager extends EntityManager<Project>
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = ProjectConfiguration.class)
     void triggerBuild(ProjectConfiguration project, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force);
 
-    @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = Project.class)
+    // Personal builds are shielded by their own permission, not the trigger
+    // authority.
     void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;
 
     @SecureParameter(action = AccessManager.ACTION_VIEW)
