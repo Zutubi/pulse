@@ -1,9 +1,6 @@
 package com.zutubi.pulse.core.marshal.doc;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Documentation for an element in a tove file, including all child attributes
@@ -16,6 +13,7 @@ public class ElementDocs extends NodeDocs
     private ContentDocs contentDocs;
     private SortedMap<String, AttributeDocs> attributes = new TreeMap<String, AttributeDocs>();
     private SortedMap<String, ChildNodeDocs> children = new TreeMap<String, ChildNodeDocs>();
+    private List<ExampleDocs> examples = new LinkedList<ExampleDocs>();
 
     public ElementDocs(String brief, String verbose)
     {
@@ -60,6 +58,16 @@ public class ElementDocs extends NodeDocs
     public void addChild(ChildNodeDocs childNodeDocs)
     {
         children.put(childNodeDocs.getName(), childNodeDocs);
+    }
+
+    public List<ExampleDocs> getExamples()
+    {
+        return examples;
+    }
+
+    public void addExample(ExampleDocs exampleDocs)
+    {
+        examples.add(exampleDocs);
     }
 
     @Override

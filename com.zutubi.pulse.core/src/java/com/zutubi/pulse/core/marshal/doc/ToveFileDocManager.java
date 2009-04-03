@@ -3,19 +3,28 @@ package com.zutubi.pulse.core.marshal.doc;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Content;
+import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
+import com.zutubi.pulse.core.marshal.ToveFileStorer;
 import com.zutubi.pulse.core.marshal.ToveFileUtils;
 import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
+import com.zutubi.tove.ConventionSupport;
+import com.zutubi.tove.config.api.ConfigurationExample;
 import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.*;
+import com.zutubi.util.*;
 import static com.zutubi.util.CollectionUtils.map;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
+import nu.xom.Element;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Method;
 import static java.util.Arrays.asList;
 import java.util.*;
 
@@ -36,6 +45,10 @@ public class ToveFileDocManager
     private static final String KEY_SUFFIX_ADDABLE_VERBOSE   = "addable.verbose";
     private static final String KEY_SUFFIX_BUILTIN           = "builtin";
     private static final String KEY_SUFFIX_CONTENT           = "content";
+    private static final String KEY_PREFIX_EXAMPLE           = "example";
+    private static final String KEY_SUFFIX_EXAMPLE_BLURB     = "blurb";
+
+    private static final String EXAMPLE_METHOD_PREFIX = "get";
 
     private static final List<ChildNodeDocs> BUILTINS = map(asList("import", "macro", "macro-ref", "scope"), new Mapping<String, ChildNodeDocs>()
     {
@@ -50,6 +63,8 @@ public class ToveFileDocManager
     private Map<CompositeType, ElementDocs> concreteCache = new HashMap<CompositeType, ElementDocs>();
     private Map<CompositeType, ExtensibleDocs> extensibleCache = new HashMap<CompositeType, ExtensibleDocs>();
     private ConfigurationDocsManager configurationDocsManager;
+    private ObjectFactory objectFactory;
+    private PulseFileLoaderFactory fileLoaderFactory;
 
     /**
      * Registers a root element for a specific type of file.  The root will be
@@ -200,9 +215,79 @@ public class ToveFileDocManager
                     addChildElements(docs, type, property, typeDefinitions, messages);
                 }
             }
+
+            getExamples(docs, type, messages);
         }
 
         return docs;
+    }
+
+    private void getExamples(ElementDocs docs, CompositeType type, Messages messages)
+    {
+        Class<?> examplesClass = ConventionSupport.getExamples(type.getClazz());
+        if (examplesClass != null)
+        {
+            List<Method> exampleMethods = CollectionUtils.filter(examplesClass.getMethods(), new Predicate<Method>()
+            {
+                public boolean satisfied(Method method)
+                {
+                    String name = method.getName();
+                    return name.length() > EXAMPLE_METHOD_PREFIX.length() &&
+                            name.startsWith(EXAMPLE_METHOD_PREFIX) &&
+                            method.getParameterTypes().length == 0 &&
+                            ConfigurationExample.class.isAssignableFrom(method.getReturnType());
+                }
+            });
+
+            try
+            {
+                Object examplesInstance = objectFactory.buildBean(examplesClass);
+                for (Method exampleMethod: exampleMethods)
+                {
+                    ConfigurationExample example = (ConfigurationExample) exampleMethod.invoke(examplesInstance);
+                    if (example != null)
+                    {
+                        addExample(docs, example, getExampleName(exampleMethod), messages);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LOG.warning("Cannot get examples for type '" + type.getClazz().getName() + "': " + e.getMessage(), e);
+            }
+        }
+    }
+
+    private String getExampleName(Method exampleMethod)
+    {
+        String namePart = exampleMethod.getName().substring(EXAMPLE_METHOD_PREFIX.length());
+        return Character.toLowerCase(namePart.charAt(0)) + namePart.substring(1);
+    }
+
+    private void addExample(ElementDocs docs, ConfigurationExample example, String name, Messages messages) throws IOException
+    {
+        ToveFileStorer toveFileStorer = fileLoaderFactory.createStorer();
+        ByteArrayOutputStream baos = null;
+        try
+        {
+            baos = new ByteArrayOutputStream();
+            Element root = new Element(example.getElement());
+            toveFileStorer.store(baos, example.getConfiguration(), root);
+
+            String exampleString = new String(baos.toByteArray());
+            // Strip the <?xml ... ?> header line
+            String[] split = StringUtils.getNextToken(exampleString, '\n', true);
+            if (split != null)
+            {
+                exampleString = split[1].trim();
+                String blurb = messages.format(StringUtils.join(".", KEY_PREFIX_EXAMPLE, name, KEY_SUFFIX_EXAMPLE_BLURB));
+                docs.addExample(new ExampleDocs(name, blurb, exampleString));
+            }
+        }
+        finally
+        {
+            IOUtils.close(baos);
+        }
     }
 
     private void addAttribute(ElementDocs element, CompositeType type, TypeProperty property, TypeDocs typeDocs)
@@ -362,5 +447,15 @@ public class ToveFileDocManager
     public void setConfigurationDocsManager(ConfigurationDocsManager configurationDocsManager)
     {
         this.configurationDocsManager = configurationDocsManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
+
+    public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
+    {
+        this.fileLoaderFactory = fileLoaderFactory;
     }
 }

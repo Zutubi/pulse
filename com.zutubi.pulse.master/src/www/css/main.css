@@ -1567,3 +1567,12 @@ div.reference {
     margin: 20px 30px 20px 30px;
     padding: 5px;
 }
+
+.reference .example-snippet {
+    white-space: pre;
+    font-family: monospace;
+    background: #ffffe8;
+    border: 1px dashed #ccc;
+    margin: 4px;
+    padding: 4px;
+}

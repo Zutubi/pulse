@@ -60,3 +60,13 @@
     $docs.contentDocs.verbose
 </p>
 #end
+
+#if($docs.examples.size() > 0)
+<h2>examples</h2>
+    #foreach($example in $docs.examples)
+<div id='#id("example.${example.name}")'>
+    <p>${example.blurb}:</p>
+    <div class="example-snippet">#html(${example.xmlSnippet})</div>
+</div>
+    #end
+#end

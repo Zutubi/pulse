@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.marshal.doc;
 
+import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
 import com.zutubi.pulse.core.marshal.types.*;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
@@ -27,11 +28,18 @@ public class ToveFileDocManagerTest extends AbstractConfigurationSystemTestCase
     {
         super.setUp();
 
+        PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
+        fileLoaderFactory.setObjectFactory(objectFactory);
+        fileLoaderFactory.setTypeRegistry(typeRegistry);
+
         ConfigurationDocsManager configurationDocsManager = new ConfigurationDocsManager();
         toveFileDocManager = new ToveFileDocManager();
         toveFileDocManager.setConfigurationDocsManager(configurationDocsManager);
+        toveFileDocManager.setObjectFactory(objectFactory);
+        toveFileDocManager.setFileLoaderFactory(fileLoaderFactory);
 
         typeRegistry.register(RootConfiguration.class);
+        fileLoaderFactory.register("root", RootConfiguration.class);
 
         typeDefinitions = new TypeDefinitions();
         typeDefinitions.register(ELEMENT_EXTENSION_ONE, typeRegistry.register(ExtensionOneConfiguration.class));
@@ -177,6 +185,17 @@ public class ToveFileDocManagerTest extends AbstractConfigurationSystemTestCase
         ChildNodeDocs child = rootDocs.getChild("macro");
         assertNotNull(child);
         assertTrue(child.getNodeDocs() instanceof BuiltinElementDocs);
+    }
+
+    public void testExamples()
+    {
+        assertEquals(1, mixedDocs.getExamples().size());
+        ExampleDocs exampleDocs = mixedDocs.getExamples().get(0);
+        assertEquals("simple", exampleDocs.getName());
+        assertEquals("simple blurb", exampleDocs.getBlurb());
+        assertEquals("<mixed name=\"simple-example\">\r\n" +
+                "    <compositeMapItem name=\"foo\"/>\r\n" +
+                "</mixed>", exampleDocs.getXmlSnippet());
     }
 
     private ChildNodeDocs assertChild(ElementDocs docs, String name, String brief, String verbose, Arity arity)
