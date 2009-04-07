@@ -43,6 +43,11 @@ public class DependentBuildEventFilter implements EventTriggerFilter
         BuildCompletedEvent buildCompletedEvent = (BuildCompletedEvent) event;
         BuildResult result = buildCompletedEvent.getBuildResult();
 
+        if (!result.succeeded())
+        {
+            return false;
+        }
+
         final Project builtProject = result.getProject();
 
         // Return true iif the triggers project contains a dependency to the built project.
