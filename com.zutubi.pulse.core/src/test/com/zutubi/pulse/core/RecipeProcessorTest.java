@@ -30,7 +30,6 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.Ivy;
-import org.apache.ivy.util.MessageLoggerEngine;
 import org.apache.ivy.core.module.descriptor.Configuration;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
@@ -38,6 +37,7 @@ import org.apache.ivy.core.module.descriptor.MDArtifact;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
+import org.apache.ivy.util.MessageLoggerEngine;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
@@ -302,6 +302,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeName);
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_PROJECT, "project");
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE, "stage");
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_ORGANISATION, "org");
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL, "http://localhost:8080");
         return context;
