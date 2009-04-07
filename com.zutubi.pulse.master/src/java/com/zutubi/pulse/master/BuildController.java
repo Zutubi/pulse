@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
+import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -277,7 +278,7 @@ public class BuildController implements EventListener
                 {
                     public String map(BuildStageConfiguration stage)
                     {
-                        return stage.getName();
+                        return IvyUtils.ivyEncodeStageName(stage.getName());
                     }
                 });
                 stages = StringUtils.join(",", stageNames);
@@ -295,15 +296,15 @@ public class BuildController implements EventListener
             publications.addAll(stage.getPublications());
             if (publications.size() > 0)
             {
-                descriptor.addConfiguration(new Configuration(stage.getName()));
+                String confName = IvyUtils.ivyEncodeStageName(stage.getName());
+                descriptor.addConfiguration(new Configuration(confName));
                 for (PublicationConfiguration artifact : publications)
                 {
                     Map<String, String> extraAttributes = new HashMap<String, String>();
-                    extraAttributes.put("e:stage", stage.getName());
+                    extraAttributes.put("e:stage", IvyUtils.ivyEncodeStageName(stage.getName()));
                     MDArtifact ivyArtifact = new MDArtifact(descriptor, artifact.getName(), artifact.getExt(), artifact.getExt(), null, extraAttributes);
-                    String conf = stage.getName();
-                    ivyArtifact.addConfiguration(conf);
-                    descriptor.addArtifact(conf, ivyArtifact);
+                    ivyArtifact.addConfiguration(confName);
+                    descriptor.addArtifact(confName, ivyArtifact);
                 }
             }
         }

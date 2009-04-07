@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyLogUtils.PROGRESS_CHARACTER;
-import static com.zutubi.pulse.core.dependency.ivy.IvyLogUtils.toLevel;
+import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.PROGRESS_CHARACTER;
+import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
 import org.apache.ivy.util.AbstractMessageLogger;
 
 import java.util.logging.Level;

@@ -2,7 +2,7 @@ package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
-import static com.zutubi.pulse.core.dependency.ivy.IvyLogUtils.toLevel;
+import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

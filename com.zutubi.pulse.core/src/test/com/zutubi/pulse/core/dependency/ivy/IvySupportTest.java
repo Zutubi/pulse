@@ -256,16 +256,16 @@ public class IvySupportTest extends PulseTestCase
             File lib = new File(tmp, PathUtils.getPath(project.getName(), stage.getName(), "lib"));
             core.retrieve(descriptor.getModuleRevisionId(), lib.getAbsolutePath() + "/[artifact]-[revision].[ext]");
 
-            Map<String, String> extraAttributes = new HashMap<String, String>();
-            extraAttributes.put("e:stage", stage.getName());
-            ModuleRevisionId mrid = ModuleRevisionId.newInstance(project.getOrg(), project.getName(), null, extraAttributes);
-
             // 'run the build'
             File baseDir = new File(tmp, PathUtils.getPath(project.getOrg(), project.getName(), stage.getName(), "build"));
             for (Artifact artifact : stage.getArtifacts())
             {
                 createArtifact(baseDir, artifact);
             }
+
+            Map<String, String> extraAttributes = new HashMap<String, String>();
+            extraAttributes.put("e:stage", stage.getName());
+            ModuleRevisionId mrid = ModuleRevisionId.newInstance(project.getOrg(), project.getName(), null, extraAttributes);
 
             // publish the artifacts from each stage.
             for (Artifact artifact : stage.getArtifacts())

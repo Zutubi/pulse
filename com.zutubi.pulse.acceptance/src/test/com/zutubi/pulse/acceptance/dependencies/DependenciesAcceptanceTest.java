@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
@@ -430,6 +431,75 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertInRepository(project.getOrg() + "/" + project.getName() + "/ivy-" + buildNumber + ".xml");
     }
 
+    public void testContent_StageNamesWithSpaces() throws Exception
+    {
+        assertNamesHandledCorrectly("stage name with space");
+    }
+
+    public void testContent_StageNamesWithComma() throws Exception
+    {
+        assertNamesHandledCorrectly("stage,name");
+    }
+
+    public void testContent_StageNamesWithPercentageSign() throws Exception
+    {
+        assertNamesHandledCorrectly("stage%name");
+    }
+
+    public void testContent_StageNamesWithSemiColon() throws Exception
+    {
+        assertNamesHandledCorrectly("stage;name");
+    }
+
+    public void testContent_StageNamesWithHash() throws Exception
+    {
+        assertNamesHandledCorrectly("stage#name");
+    }
+
+    public void testContent_StageNamesWithStar() throws Exception
+    {
+        assertNamesHandledCorrectly("stage*name");
+    }
+
+    public void testContent_StageNamesWithEquals() throws Exception
+    {
+        assertNamesHandledCorrectly("stage=name");
+    }
+
+    private void assertNamesHandledCorrectly(String stageName) throws Exception
+    {
+        Project projectA = new Project(randomName());
+        projectA.getDefaultStage().addArtifacts("projectA-artifact.jar");
+        createProject(projectA);
+
+        AntBuildConfiguration buildA = new AntBuildConfiguration();
+        buildA.addFileToCreate("build/projectA-artifact.jar");
+        triggerSuccessfulBuild(projectA, buildA);
+
+        Project projectB = new Project(randomName());
+        projectB.addArtifact(stageName, "projectB-artifact.jar");
+        projectB.addDependency(new Dependency(projectA, true));
+        createProject(projectB);
+
+        AntBuildConfiguration buildB = new AntBuildConfiguration();
+        buildB.addFileToCreate("build/projectB-artifact.jar");
+        buildB.addExpectedFile("lib/projectA-artifact.jar");
+        int buildNumber = triggerSuccessfulBuild(projectB, buildB);
+
+        assertIvyInRepository(projectB.getName(), buildNumber);
+        assertJarInRepository(projectB.getName(), stageName, "projectB-artifact", buildNumber);
+
+        Project projectC = new Project(randomName());
+        projectC.addDependency(projectB);
+        createProject(projectC);
+
+        AntBuildConfiguration buildC = new AntBuildConfiguration();
+        buildC.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
+
+        buildNumber = triggerSuccessfulBuild(projectC, buildC);
+        assertIvyInRepository(projectC.getName(), buildNumber);
+    }
+
     private int triggerSuccessfulBuild(Project project, AntBuildConfiguration build) throws Exception
     {
         int buildNumber = triggerBuild(project, build);
@@ -621,12 +691,12 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private void assertJarInRepository(String projectName, String stageName, String artifactName, int buildNumber) throws IOException
     {
-        assertInRepository(projectName + "/" + stageName + "/jars/" + artifactName + "-" + buildNumber + ".jar");
+        assertInRepository(projectName + "/" + IvyUtils.ivyEncodeStageName(stageName) + "/jars/" + artifactName + "-" + buildNumber + ".jar");
     }
 
     private void assertJarNotInRepository(String projectName, String stageName, String artifactName, int buildNumber) throws IOException
     {
-        assertNotInRepository(projectName + "/" + stageName + "/jars/" + artifactName + "-" + buildNumber + ".jar");
+        assertNotInRepository(projectName + "/" + IvyUtils.ivyEncodeStageName(stageName) + "/jars/" + artifactName + "-" + buildNumber + ".jar");
     }
 
     private void assertInRepository(String baseArtifactName) throws IOException

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyLogUtils.toLevel;
-import static com.zutubi.pulse.core.dependency.ivy.IvyLogUtils.PROGRESS_CHARACTER;
+import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
+import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.PROGRESS_CHARACTER;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.Constants;
 

@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.commands.api.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
 import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
+import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
@@ -173,7 +174,8 @@ public class RecipeProcessor
 
         if (status.isSuccess())
         {
-            if (ivy.hasArtifacts(descriptor, request.getStageName()))
+            String confName = IvyUtils.ivyEncodeStageName(request.getStageName());
+            if (ivy.hasArtifacts(descriptor, confName))
             {
                 CommandConfiguration publishCommandConfig = ivy.getPublishCommand(request);
                 pushContextAndExecute(context, publishCommandConfig, outputDir, status);

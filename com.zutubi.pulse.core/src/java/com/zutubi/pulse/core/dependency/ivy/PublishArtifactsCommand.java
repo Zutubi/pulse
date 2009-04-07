@@ -41,16 +41,16 @@ public class PublishArtifactsCommand extends BaseIvyCommand
             ModuleDescriptor descriptor = context.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
             ivy.resolve(descriptor);
 
-            String stageName = request.getStageName();
             Map<String, String> extraAttributes = new HashMap<String, String>();
-            extraAttributes.put("e:stage", stageName);
+            extraAttributes.put("e:stage", IvyUtils.ivyEncodeStageName(request.getStageName()));
             ModuleRevisionId mrid = ModuleRevisionId.newInstance(request.getProjectOrg(), request.getProject(), null, extraAttributes);
             String artifactPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_PUBLICATION_PATTERN);
             artifactPattern = context.resolveReferences(artifactPattern);
 
             File baseDir = context.getWorkingDir();
 
-            ivy.publish(mrid, request.getBuildNumber(), stageName, baseDir.getAbsolutePath() + "/" + artifactPattern);
+            String configName = IvyUtils.ivyEncodeStageName(request.getStageName());
+            ivy.publish(mrid, request.getBuildNumber(), configName, baseDir.getAbsolutePath() + "/" + artifactPattern);
         }
         catch (Exception e)
         {
