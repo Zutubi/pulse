@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.scm.api.PersonalBuildUIAwareSupport;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.util.TextUtils;
@@ -15,11 +14,11 @@ import static org.netbeans.lib.cvsclient.file.FileStatus.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
+import java.io.OutputStream;
 
 /**
  */
-public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements WorkingCopy
+public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
 {
     public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException
     {
@@ -38,18 +37,6 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
         return loadLocalWorkingModule(context.getBase()).equals(pieces[1]);
     }
 
-    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... paths) throws ScmException
-    {
-        File workingDir = context.getBase();
-        File[] files = pathsToFiles(workingDir, paths);
-        WorkingCopyStatus status = new WorkingCopyStatus(workingDir);
-        StatusHandler statusHandler = new StatusHandler(workingDir, loadLocalWorkingModule(workingDir), status);
-
-        getCore(context).status(workingDir, files, statusHandler);
-
-        return status;
-    }
-
     public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
     {
         // updating to the latest repository version for the current configurations branch (or head).
@@ -60,11 +47,38 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
             branch = null;
         }
 
-        UpdateHandler updateHandler = new UpdateHandler();
+        UpdateHandler updateHandler = new UpdateHandler(context.getUI());
 
         CvsRevision cvsRevision = revision == null ? new CvsRevision(null, branch, null, null) : new CvsRevision(revision.getRevisionString());
         getCore(context).update(context.getBase(), cvsRevision, updateHandler);
         return CvsClient.convertRevision(cvsRevision);
+    }
+
+    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... spec) throws ScmException
+    {
+        return StandardPatchFileSupport.writePatchFile(this, context, patchFile, spec);
+    }
+
+    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... paths) throws ScmException
+    {
+        File workingDir = context.getBase();
+        File[] files = pathsToFiles(workingDir, paths);
+        WorkingCopyStatus status = new WorkingCopyStatus(workingDir);
+        StatusHandler statusHandler = new StatusHandler(workingDir, loadLocalWorkingModule(workingDir), status, context.getUI());
+
+        getCore(context).status(workingDir, files, statusHandler);
+
+        return status;
+    }
+
+    public boolean canDiff(WorkingCopyContext context, String path) throws ScmException
+    {
+        return false;
+    }
+
+    public void diff(WorkingCopyContext context, String path, OutputStream output) throws ScmException
+    {
+        getCore(context).diff(context.getBase(), path, output);
     }
 
     private String loadLocalWorkingModule(File workingDir) throws ScmException
@@ -152,6 +166,12 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
     private class UpdateHandler extends CVSAdapter
     {
         private String basePath = new File("").getAbsolutePath();
+        private PersonalBuildUI ui;
+
+        public UpdateHandler(PersonalBuildUI ui)
+        {
+            this.ui = ui;
+        }
 
         public void fileInfoGenerated(FileInfoEvent e)
         {
@@ -168,7 +188,7 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
                 }
             }
 
-            getUI().status(String.format("%s     %s", info.getType(), file));
+            ui.status(String.format("%s     %s", info.getType(), file));
         }
     }
 
@@ -177,12 +197,14 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
         private File workingDir;
         private String localWorkingModule;
         private WorkingCopyStatus status = null;
+        private PersonalBuildUI ui;
 
-        public StatusHandler(File workingDir, String localWorkingModule, WorkingCopyStatus status)
+        public StatusHandler(File workingDir, String localWorkingModule, WorkingCopyStatus status, PersonalBuildUI ui)
         {
             this.workingDir = workingDir;
             this.localWorkingModule = localWorkingModule;
             this.status = status;
+            this.ui = ui;
         }
 
         public void fileInfoGenerated(FileInfoEvent e)
@@ -256,7 +278,7 @@ public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements Worki
                 FileStatus fs = new FileStatus(path, fileState, localFile.isDirectory(), localWorkingModule + "/" + path);
                 if (fs.isInteresting())
                 {
-                    getUI().status(fs.toString());
+                    ui.status(fs.toString());
                     status.addFileStatus(fs);
                 }
             }

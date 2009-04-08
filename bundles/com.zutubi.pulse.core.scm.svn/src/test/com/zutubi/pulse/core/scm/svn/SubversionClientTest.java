@@ -92,13 +92,13 @@ public class SubversionClientTest extends PulseTestCase
         super.setUp();
         tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
         File repoDir = new File(tmpDir, "repo");
-        repoDir.mkdirs();
+        FileSystemUtils.createDirectory(repoDir);
 
         expectedDir = new File(repoDir, "expected");
-        expectedDir.mkdirs();
+        FileSystemUtils.createDirectory(expectedDir);
 
         gotDir = new File(repoDir, "got");
-        gotDir.mkdirs();
+        FileSystemUtils.createDirectory(gotDir);
 
         context = new PulseExecutionContext();
         context.setWorkingDir(gotDir);

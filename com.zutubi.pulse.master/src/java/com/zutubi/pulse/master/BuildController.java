@@ -154,6 +154,7 @@ public class BuildController implements EventListener
         MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
         MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig));
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, projectConfig.getScm());
 
         activateBuildAuthenticationToken();
 
@@ -435,11 +436,11 @@ public class BuildController implements EventListener
                 Bootstrapper initialBootstrapper;
                 if (buildContext.getBoolean(PROPERTY_INCREMENTAL_BOOTSTRAP, false))
                 {
-                    initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision());
+                    initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), request.getRevision());
                 }
                 else
                 {
-                    initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision());
+                    initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), request.getRevision());
                     if (request.isPersonal())
                     {
                         initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
@@ -795,10 +796,7 @@ public class BuildController implements EventListener
         }
 
         MasterBuildProperties.addRevisionProperties(buildContext, buildRevision);
-        if (!buildResult.isPersonal())
-        {
-            getChanges(buildRevision);
-        }
+        getChanges(buildRevision);
 
         buildResult.commence(buildRevision.getTimestamp());
         buildLogger.commenced(buildResult);
@@ -814,7 +812,7 @@ public class BuildController implements EventListener
         Revision revision = buildRevision.getRevision();
         buildResult.setRevision(revision);
 
-        if (!buildResult.isUserRevision())
+        if (!buildResult.isPersonal() && !buildResult.isUserRevision())
         {
             ScmConfiguration scm = projectConfig.getScm();
             Revision previousRevision = buildManager.getPreviousRevision(project);

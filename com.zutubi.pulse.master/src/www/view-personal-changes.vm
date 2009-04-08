@@ -12,19 +12,19 @@
 
     <h3 id="checked.out.revision">
         #wwtext("name=checked.out.revision")
-        $action.updateChangeUrl($buildResult.project, $patchArchive.metadata.revision)
+        $action.updateChangeUrl($buildResult.project, $buildResult.revision)
         #set($url = $action.getChangeUrl())
-        #if($url)<a href="$url">#end${patchArchive.metadata.revision}#if($url)</a>#end
+        #if($url)<a href="$url">#end${buildResult.revision}#if($url)</a>#end
     </h3>
     <br/>
     <table id='#id("${buildResult.ownerName}-build-${buildResult.number}-changes")' class="content">
         #headingRow("patch.changes" 2)
-#if($patchArchive.metadata.fileStatuses.size() > 0)
+#if($fileStatuses.size() > 0)
         <tr>
             #contentHeading("patch.path" 1)
             #contentHeading("patch.status" 1)
         </tr>
-    #foreach($fileStatus in $patchArchive.metadata.fileStatuses)
+    #foreach($fileStatus in $fileStatuses)
         <tr>
             #dynamicCell($fileStatus.path)
             #dynamicCell($fileStatus.state.toString().toLowerCase())

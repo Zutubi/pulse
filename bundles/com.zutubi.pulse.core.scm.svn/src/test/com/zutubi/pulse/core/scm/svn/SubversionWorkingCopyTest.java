@@ -1,5 +1,8 @@
 package com.zutubi.pulse.core.scm.svn;
 
+import com.zutubi.diff.Hunk;
+import com.zutubi.diff.Patch;
+import com.zutubi.diff.PatchFile;
 import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
@@ -17,12 +20,8 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCClient;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 
-/**
- */
 public class SubversionWorkingCopyTest extends PulseTestCase
 {
     private File tempDir;
@@ -67,7 +66,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
 
         // Create empty repo
         File repoDir = new File(tempDir, "repo");
-        repoDir.mkdir();
+        FileSystemUtils.createDirectory(repoDir);
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "create", repoDir.getAbsolutePath() });
         svnProcess.waitFor();
 
@@ -94,29 +93,28 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         createWC();
     }
 
-    private void createWC() throws ScmException, SVNException
+    private void createWC() throws ScmException, SVNException, IOException
     {
         base = new File(tempDir, "base");
-        base.mkdir();
+        FileSystemUtils.createDirectory(base);
         updateClient = new SVNUpdateClient(new BasicAuthenticationManager("anonymous", ""), clientManager.getOptions());
         updateClient.doCheckout(SVNURL.parseURIDecoded("svn://localhost/test/trunk"), base, SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNDepth.INFINITY, false);
         client = clientManager.getWCClient();
         wc = new SubversionWorkingCopy();
-        wc.setUI(new TestPersonalBuildUI());
-        context = new WorkingCopyContextImpl(base, new PropertiesConfig());
+        context = new WorkingCopyContextImpl(base, new PropertiesConfig(), new TestPersonalBuildUI());
     }
 
-    private void createOtherWC() throws SVNException
+    private void createOtherWC() throws SVNException, IOException
     {
         otherBase = new File(tempDir, "other");
-        otherBase.mkdir();
+        FileSystemUtils.createDirectory(otherBase);
         updateClient.doCheckout(SVNURL.parseURIDecoded("svn://localhost/test/trunk"), otherBase, SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNDepth.INFINITY, false);
     }
 
-    private void createBranchWC() throws SVNException
+    private void createBranchWC() throws SVNException, IOException
     {
         branchBase = new File(tempDir, "branch");
-        branchBase.mkdir();
+        FileSystemUtils.createDirectory(branchBase);
         updateClient.doCheckout(SVNURL.parseURIDecoded("svn://localhost/test/branches/2"), branchBase, SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNDepth.INFINITY, false);
     }
 
@@ -513,6 +511,41 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertSimpleStatus("file1", FileStatus.State.UNRESOLVED);
     }
 
+    public void testCanDiffTextFile() throws Exception
+    {
+        edit("file1");
+        assertTrue(wc.canDiff(context, "file1"));
+    }
+
+    public void testCanDiffBinaryFile() throws Exception
+    {
+        edit("bin1");
+        assertFalse(wc.canDiff(context, "bin1"));
+    }
+
+    public void testDiff() throws Exception
+    {
+        File f = new File(base, "file1");
+        FileSystemUtils.createFile(f, "a line\n");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        wc.diff(context, "file1", baos);
+
+        StringReader reader = new StringReader(new String(baos.toByteArray()));
+        PatchFile pf = PatchFile.read(reader);
+        assertEquals(1, pf.getPatches().size());
+
+        Patch patch = pf.getPatches().get(0);
+        assertEquals(1, patch.getHunks().size());
+
+        Hunk hunk = patch.getHunks().get(0);
+        assertEquals(1, hunk.getLines().size());
+        
+        Hunk.Line line = hunk.getLines().get(0);
+        assertEquals("a line", line.getContent());
+        assertEquals(Hunk.LineType.ADDED, line.getType());
+    }
+
     private File edit(String path) throws IOException, SVNException
     {
         doEdit(path, base, false);
@@ -568,13 +601,13 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         doDelete(path, base, false);
     }
 
-    private void otherDelete(String path) throws SVNException
+    private void otherDelete(String path) throws SVNException, IOException
     {
         createOtherWC();
         doDelete(path, otherBase, true);
     }
 
-    private long branchDelete(String path) throws SVNException
+    private long branchDelete(String path) throws SVNException, IOException
     {
         createBranchWC();
         return doDelete(path, branchBase, true);

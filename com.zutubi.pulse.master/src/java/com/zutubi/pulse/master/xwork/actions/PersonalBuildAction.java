@@ -4,6 +4,7 @@ import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.Project;
@@ -23,7 +24,7 @@ public class PersonalBuildAction extends ActionSupport
     private static final Logger LOG = Logger.getLogger(PersonalBuildAction.class);
 
     private String project;
-    private String version;
+    private String revision;
     private long number;
     private String errorMessage;
     private MasterConfigurationManager configurationManager;
@@ -33,9 +34,9 @@ public class PersonalBuildAction extends ActionSupport
         this.project = project;
     }
 
-    public void setVersion(String version)
+    public void setRevision(String revision)
     {
-        this.version = version;
+        this.revision = revision;
     }
 
     public long getNumber()
@@ -119,14 +120,14 @@ public class PersonalBuildAction extends ActionSupport
             errorMessage = "Patch file '" + patchFile.getAbsolutePath() + "' already exists.  Retry the build.";
         }
 
-        PatchArchive archive = null;
+        PatchArchive archive;
         try
         {
             IOUtils.copyFile(uploadedPatch, patchFile);
             uploadedPatch.delete();
             
             archive = new PatchArchive(patchFile);
-            projectManager.triggerBuild(number, p, user, archive);
+            projectManager.triggerBuild(number, p, user, new Revision(revision), archive);
         }
         catch (Exception e)
         {

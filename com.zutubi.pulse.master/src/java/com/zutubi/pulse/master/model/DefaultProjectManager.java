@@ -573,7 +573,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    public void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException
+    public void triggerBuild(long number, Project project, User user, Revision revision, PatchArchive archive) throws PulseException
     {
         ProjectConfiguration projectConfig = getProjectConfig(project.getId(), false);
         if(projectConfig == null)
@@ -581,7 +581,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             return;
         }
 
-        Revision revision = archive.getMetadata().getRevision();
         try
         {
             PulseFileSource pulseFile = getPulseFile(projectConfig, revision, archive);

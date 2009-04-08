@@ -1,9 +1,7 @@
 package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
-import com.zutubi.pulse.core.scm.api.PersonalBuildUIAwareSupport;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
@@ -30,19 +28,21 @@ import java.net.MalformedURLException;
  * The client does the work of actually talking to the Pulse server, sending
  * personal build requests and getting back the results.
  */
-public class PersonalBuildClient extends PersonalBuildUIAwareSupport
+public class PersonalBuildClient
 {
     private PersonalBuildConfig config;
+    private PersonalBuildUI ui;
     private String password;
 
-    public PersonalBuildClient(PersonalBuildConfig config)
+    public PersonalBuildClient(PersonalBuildConfig config, PersonalBuildUI ui)
     {
         this.config = config;
+        this.ui = ui;
     }
 
     public Pair<WorkingCopy, WorkingCopyContext> checkConfiguration() throws PersonalBuildException
     {
-        getUI().debug("Verifying configuration with pulse server...");
+        ui.debug("Verifying configuration with pulse server...");
         checkRequiredConfig();
 
         try
@@ -55,11 +55,11 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
 
             try
             {
-                getUI().debug("Logging in to pulse: url: " + config.getPulseUrl() + ", user: " + config.getPulseUser());
+                ui.debug("Logging in to pulse: url: " + config.getPulseUrl() + ", user: " + config.getPulseUser());
                 token = rpc.login(config.getPulseUser(), getPassword());
-                getUI().debug("Login successful.");
+                ui.debug("Login successful.");
                 Pair<WorkingCopy, WorkingCopyContext> pair = prepare(rpc, token);
-                getUI().debug("Verified: personal build for project: " + config.getProject() + ".");
+                ui.debug("Verified: personal build for project: " + config.getProject() + ".");
                 return pair;
             }
             catch (PersonalBuildException e)
@@ -88,7 +88,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
             password = config.getPulsePassword();
             if (password == null)
             {
-                password = getUI().passwordPrompt("Pulse password");
+                password = ui.passwordPrompt("Pulse password");
                 if (password == null)
                 {
                     password = "";
@@ -104,13 +104,13 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         int ourBuild = Version.getVersion().getBuildNumberAsInt();
         int confirmedBuild = config.getConfirmedVersion();
 
-        getUI().debug("Checking pulse server version...");
+        ui.debug("Checking pulse server version...");
         try
         {
             int serverBuild = rpc.getVersion();
             if (serverBuild != ourBuild)
             {
-                getUI().debug(String.format("Server build (%d) does not match local build (%d)", serverBuild, ourBuild));
+                ui.debug(String.format("Server build (%d) does not match local build (%d)", serverBuild, ourBuild));
                 if (serverBuild != confirmedBuild)
                 {
                     String serverVersion = Version.buildNumberToVersion(serverBuild);
@@ -126,7 +126,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
                         question = String.format("Server version (%s) does not match tools version (%s).  Continue anyway?", serverVersion, ourVersion);
                     }
 
-                    PersonalBuildUI.Response response = getUI().ynaPrompt(question, PersonalBuildUI.Response.NO);
+                    PersonalBuildUI.Response response = ui.ynaPrompt(question, PersonalBuildUI.Response.NO);
                     if (response == PersonalBuildUI.Response.ALWAYS)
                     {
                         config.setConfirmedVersion(serverBuild);
@@ -138,7 +138,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
                 }
             }
 
-            getUI().debug("Version accepted.");
+            ui.debug("Version accepted.");
         }
         catch (PulseXmlRpcException e)
         {
@@ -150,10 +150,10 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
     {
         if (config.getPulseUrl() == null)
         {
-            PersonalBuildUI.Response response = getUI().ynPrompt("No pulse server configured.  Configure one now?", PersonalBuildUI.Response.YES);
+            PersonalBuildUI.Response response = ui.ynPrompt("No pulse server configured.  Configure one now?", PersonalBuildUI.Response.YES);
             if (response.isAffirmative())
             {
-                new ConfigCommand().setupPulseConfig(getUI(), config);
+                new ConfigCommand().setupPulseConfig(ui, config);
             }
             else
             {
@@ -163,10 +163,10 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
 
         if (config.getProject() == null)
         {
-            PersonalBuildUI.Response response = getUI().ynPrompt("No pulse project configured.  Configure one now?", PersonalBuildUI.Response.YES);
+            PersonalBuildUI.Response response = ui.ynPrompt("No pulse project configured.  Configure one now?", PersonalBuildUI.Response.YES);
             if (response.isAffirmative())
             {
-                new ConfigCommand().setupLocalConfig(getUI(), config);
+                new ConfigCommand().setupLocalConfig(ui, config);
             }
             else
             {
@@ -179,30 +179,25 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
     {
         try
         {
-            getUI().debug("Checking configuration and obtaining project SCM details...");
+            ui.debug("Checking configuration and obtaining project SCM details...");
             ScmLocation scmLocation = rpc.preparePersonalBuild(token, config.getProject());
-            getUI().debug("Configuration accepted.");
+            ui.debug("Configuration accepted.");
             String scmType = scmLocation.getType();
-            getUI().debug("SCM type: " + scmType);
+            ui.debug("SCM type: " + scmType);
 
-            WorkingCopyContext context = new WorkingCopyContextImpl(config.getBase(), config);
+            WorkingCopyContext context = new WorkingCopyContextImpl(config.getBase(), config, ui);
             WorkingCopy wc = WorkingCopyFactory.create(scmType);
             if (wc == null)
             {
                 throw new PersonalBuildException("Personal builds are not supported for this SCM (" + scmType + ")");
             }
 
-            if (wc instanceof PersonalBuildUIAware)
-            {
-                ((PersonalBuildUIAware) wc).setUI(getUI());
-            }
-
             if (config.getCheckRepository())
             {
-                getUI().debug("Checking working copy matches project SCM configuration");
+                ui.debug("Checking working copy matches project SCM configuration");
                 if (!wc.matchesLocation(context, scmLocation.getLocation()))
                 {
-                    PersonalBuildUI.Response response = getUI().ynaPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", PersonalBuildUI.Response.NO);
+                    PersonalBuildUI.Response response = ui.ynaPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", PersonalBuildUI.Response.NO);
                     if (response.isPersistent())
                     {
                         config.setCheckRepository(!response.isAffirmative());
@@ -215,7 +210,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
                 }
                 else
                 {
-                    getUI().debug("Configuration matches.");
+                    ui.debug("Configuration matches.");
                 }
             }
 
@@ -231,89 +226,62 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         }
     }
 
-    public PatchArchive preparePatch(WorkingCopy wc, WorkingCopyContext context, File patchFile, String... spec) throws PersonalBuildException
+    public Revision preparePatch(WorkingCopy wc, WorkingCopyContext context, File patchFile, String... spec) throws PersonalBuildException
     {
         Revision rev;
         try
         {
-            getUI().status("Updating working copy...");
-            getUI().enterContext();
+            ui.status("Updating working copy...");
+            ui.enterContext();
             try
             {
                 rev = wc.update(context, Revision.HEAD);
             }
             finally
             {
-                getUI().exitContext();
+                ui.exitContext();
             }
-            getUI().status("Update complete.");
+            ui.status("Update complete.");
         }
         catch (ScmException e)
         {
             throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
         }
 
-        getUI().status("Getting working copy status...");
-        getUI().enterContext();
-
-        WorkingCopyStatus status;
         try
         {
-            status = getStatus(wc, context, spec);
-        }
-        finally
-        {
-            getUI().exitContext();
-        }
-        getUI().status("Status retrieved.");
+            boolean created;
 
-        if (status.hasStatuses())
-        {
-            getUI().status("Creating patch archive...");
-            getUI().enterContext();
+            ui.status("Creating patch archive...");
+            ui.enterContext();
 
-            PatchArchive patchArchive;
             try
             {
-                patchArchive = new PatchArchive(rev, status, patchFile, getUI());
+                created = wc.writePatchFile(context, patchFile, spec);
             }
             finally
             {
-                getUI().exitContext();
+                ui.exitContext();
             }
-            getUI().status("Patch created.");
 
-            return patchArchive;
-        }
-        else
-        {
-            return null;
-        }
-    }
+            ui.status("Patch created.");
 
-    public WorkingCopyStatus getStatus(WorkingCopy wc, WorkingCopyContext context, String... spec) throws PersonalBuildException
-    {
-        WorkingCopyStatus status;
-
-        try
-        {
-            status = wc.getLocalStatus(context, spec);
+            if (created)
+            {
+                return rev;
+            }
+            else
+            {
+                return null;
+            }
         }
         catch (ScmException e)
         {
-            throw new PersonalBuildException("Unable to get working copy status: " + e.getMessage(), e);
+            throw new PersonalBuildException("Unable to create patch file: " + e.getMessage(), e);
         }
-
-        if (!status.inConsistentState())
-        {
-            // Fatal, we can't deal with wc's in this state
-            throw new PersonalBuildException("Working copy is not in a consistent state.");
-        }
-
-        return status;
     }
 
-    public long sendRequest(PatchArchive patch) throws PersonalBuildException
+    public long sendRequest(Revision revision, File patchFile) throws PersonalBuildException
     {
         HttpClient client = new HttpClient();
 
@@ -327,13 +295,13 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         try
         {
             Part[] parts = {
-                    new StringPart("version", Version.getVersion().getBuildNumber()),
                     new StringPart("project", config.getProject()),
-                    new FilePart("patch.zip", patch.getPatchFile()),
+                    new StringPart("revision", revision.getRevisionString()),
+                    new FilePart("patch.zip", patchFile),
             };
             post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
 
-            getUI().status("Sending patch to pulse server...");
+            ui.status("Sending patch to pulse server...");
             int status = client.executeMethod(post);
             if (status == HttpStatus.SC_OK)
             {
@@ -345,7 +313,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
                     try
                     {
                         long number = Long.parseLong(numberStr);
-                        getUI().status("Patch accepted: personal build " + numberStr + ".");
+                        ui.status("Patch accepted: personal build " + numberStr + ".");
                         return number;
                     }
                     catch (NumberFormatException e)

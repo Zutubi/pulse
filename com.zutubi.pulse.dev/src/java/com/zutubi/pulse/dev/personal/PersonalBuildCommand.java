@@ -2,11 +2,10 @@ package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
-import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
-import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.util.config.CommandLineConfig;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.util.Pair;
@@ -138,45 +137,30 @@ public class PersonalBuildCommand implements Command
         {
             Pair<WorkingCopy,WorkingCopyContext> pair = client.checkConfiguration();
 
-            if (statusOnly)
+            File patchFile;
+
+            if(patchFilename == null)
             {
-                WorkingCopyStatus wcs = client.getStatus(pair.first, pair.second, files);
-                if(!wcs.hasStatuses())
+                try
                 {
-                    console.status("No changes found.");
+                    patchFile = File.createTempFile("pulse.patch.", ".zip");
+                    patchFile.deleteOnExit();
+                }
+                catch (IOException e)
+                {
+                    console.error("Unable to create temporary patch file: " + e.getMessage(), e);
+                    return 1;
                 }
             }
             else
             {
-                File patchFile;
+                patchFile = new File(patchFilename);
+            }
 
-                if(patchFilename == null)
-                {
-                    try
-                    {
-                        patchFile = File.createTempFile("pulse.patch.", ".zip");
-                        patchFile.deleteOnExit();
-                    }
-                    catch (IOException e)
-                    {
-                        console.error("Unable to create temporary patch file: " + e.getMessage(), e);
-                        return 1;
-                    }
-                }
-                else
-                {
-                    patchFile = new File(patchFilename);
-                }
-
-                PatchArchive patch = client.preparePatch(pair.first, pair.second, patchFile, files);
-                if(patch == null)
-                {
-                    console.status("No changes found.");
-                }
-                else if(!noRequest)
-                {
-                    client.sendRequest(patch);
-                }
+            Revision revision = client.preparePatch(pair.first, pair.second, patchFile, files);
+            if (revision != null && !noRequest)
+            {
+                client.sendRequest(revision, patchFile);
             }
         }
         catch (UserAbortException e)
@@ -201,8 +185,7 @@ public class PersonalBuildCommand implements Command
         {
             CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
             PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig);
-            PersonalBuildClient client = new PersonalBuildClient(config);
-            client.setUI(console);
+            PersonalBuildClient client = new PersonalBuildClient(config, console);
 
             return execute(client);
         }

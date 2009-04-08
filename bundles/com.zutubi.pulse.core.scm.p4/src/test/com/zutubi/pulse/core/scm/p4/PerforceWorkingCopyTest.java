@@ -41,15 +41,13 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
 
         wc = new PerforceWorkingCopy();
 
-        ui = new TestPersonalBuildUI();
-        wc.setUI(ui);
-
         PropertiesConfig config = new PropertiesConfig();
         config.setProperty(PerforceWorkingCopy.PROPERTY_CLIENT, CLIENT_NAME);
         config.setProperty(PerforceWorkingCopy.PROPERTY_PORT, getP4Port());
         config.setProperty(PerforceWorkingCopy.PROPERTY_USER, "test-user");
 
-        context = new WorkingCopyContextImpl(clientRoot, config);
+        ui = new TestPersonalBuildUI();
+        context = new WorkingCopyContextImpl(clientRoot, config, ui);
     }
 
     private void createClients() throws ScmException

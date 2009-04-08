@@ -5,9 +5,12 @@ import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
 
+import java.io.File;
+import java.io.OutputStream;
+
 /**
  */
-public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements WorkingCopy
+public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
 {
     // Note that the preferred way to set these standard Perforce properties is
     // to just use regular p4 configuration (e.g. environment, P4CONFIG, etc).
@@ -48,7 +51,7 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
 
                     if(!value.equals(pieces[1]))
                     {
-                        getUI().warning("P4PORT setting '" + value + "' does not match Pulse project's P4PORT '" + pieces[1] + "'");
+                        context.getUI().warning("P4PORT setting '" + value + "' does not match Pulse project's P4PORT '" + pieces[1] + "'");
                         return false;
                     }
                 }
@@ -60,11 +63,58 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
         return true;
     }
 
+    public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
+    {
+        PerforceCore core = createCore(context);
+        revision = revision == null ? core.getLatestRevisionForFiles(null) : revision;
+
+        PersonalBuildUI ui = context.getUI();
+        PerforceSyncHandler syncHandler = new PerforceSyncHandler(ui);
+        core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + revision.getRevisionString());
+
+        if(syncHandler.isResolveRequired())
+        {
+            ConfigSupport configSupport = new ConfigSupport(context.getConfig());
+            if(configSupport.getBooleanProperty(PROPERTY_CONFIRM_RESOLVE, true))
+            {
+                PersonalBuildUI.Response response = ui.ynaPrompt("Some files must be resolved.  Auto-resolve now?", PersonalBuildUI.Response.YES);
+                if(response.isPersistent())
+                {
+                    configSupport.setBooleanProperty(PROPERTY_CONFIRM_RESOLVE, !response.isAffirmative());
+                }
+
+                if(!response.isAffirmative())
+                {
+                    return revision;
+                }
+            }
+
+            ui.status("Running auto-resolve...");
+            ui.enterContext();
+            try
+            {
+                core.runP4WithHandler(new PerforceProgressPrintingHandler(ui, false), null, getP4Command(COMMAND_RESOLVE), COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+            }
+            finally
+            {
+                ui.exitContext();
+            }
+            ui.status("Resolve complete.");
+        }
+
+        return revision;
+    }
+
+    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... spec) throws ScmException
+    {
+        return StandardPatchFileSupport.writePatchFile(this, context, patchFile, spec);
+    }
+
     public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
         PerforceCore core = createCore(context);
         WorkingCopyStatus status = new WorkingCopyStatus(core.getClientRoot());
-        PerforceFStatHandler handler = new PerforceFStatHandler(getUI(), status);
+        PerforceFStatHandler handler = new PerforceFStatHandler(context.getUI(), status);
 
         ConfigSupport configSupport = new ConfigSupport(context.getConfig());
         boolean pre2004_2 = configSupport.getBooleanProperty(PROPERTY_PRE_2004_2, false);
@@ -115,45 +165,14 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
         return status;
     }
 
-    public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
+    public boolean canDiff(WorkingCopyContext context, String path) throws ScmException
     {
-        PerforceCore core = createCore(context);
-        revision = revision == null ? core.getLatestRevisionForFiles(null) : revision;
+        return false;
+    }
 
-        PerforceSyncHandler syncHandler = new PerforceSyncHandler(getUI());
-        core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + revision.getRevisionString());
-
-        if(syncHandler.isResolveRequired())
-        {
-            ConfigSupport configSupport = new ConfigSupport(context.getConfig());
-            if(configSupport.getBooleanProperty(PROPERTY_CONFIRM_RESOLVE, true))
-            {
-                PersonalBuildUI.Response response = getUI().ynaPrompt("Some files must be resolved.  Auto-resolve now?", PersonalBuildUI.Response.YES);
-                if(response.isPersistent())
-                {
-                    configSupport.setBooleanProperty(PROPERTY_CONFIRM_RESOLVE, !response.isAffirmative());
-                }
-
-                if(!response.isAffirmative())
-                {
-                    return revision;
-                }
-            }
-
-            getUI().status("Running auto-resolve...");
-            getUI().enterContext();
-            try
-            {
-                core.runP4WithHandler(new PerforceProgressPrintingHandler(getUI(), false), null, getP4Command(COMMAND_RESOLVE), COMMAND_RESOLVE, FLAG_AUTO_MERGE);
-            }
-            finally
-            {
-                getUI().exitContext();
-            }
-            getUI().status("Resolve complete.");
-        }
-
-        return revision;
+    public void diff(WorkingCopyContext context, String path, OutputStream output) throws ScmException
+    {
+        throw new RuntimeException("Not implemented");
     }
 
     private PerforceCore createCore(WorkingCopyContext context)

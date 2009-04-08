@@ -30,6 +30,9 @@ public class FileStatusConverter implements Converter
         writer.startNode("state");
         writer.setValue(status.getState().toString());
         writer.endNode();
+        writer.startNode("payloadType");
+        writer.setValue(status.getPayloadType().toString());
+        writer.endNode();
         writer.startNode("directory");
         context.convertAnother(status.isDirectory());
         writer.endNode();
@@ -52,6 +55,7 @@ public class FileStatusConverter implements Converter
         String path = null;
         String targetPath = null;
         FileStatus.State state = null;
+        FileStatus.PayloadType payloadType = null;
         boolean directory = false;
         Map<String, String> properties = new HashMap<String, String>();
 
@@ -78,6 +82,19 @@ public class FileStatusConverter implements Converter
                 catch (IllegalArgumentException e)
                 {
                     throw new ConversionException("Unrecognised file state '" + stateString + "'");
+                }
+            }
+            else if(fieldName.equals("payloadType"))
+            {
+                String payloadString = reader.getValue();
+
+                try
+                {
+                    payloadType = FileStatus.PayloadType.valueOf(payloadString);
+                }
+                catch (IllegalArgumentException e)
+                {
+                    throw new ConversionException("Unrecognised payload type '" + payloadString + "'");
                 }
             }
             else if(fieldName.equals("directory"))
@@ -114,17 +131,23 @@ public class FileStatusConverter implements Converter
             reader.moveUp();
         }
 
-        if(path == null)
+        if (path == null)
         {
             throw new ConversionException("Incomplete file status: missing path");
         }
 
-        if(state == null)
+        if (state == null)
         {
             throw new ConversionException("Incomplete file status: missing state");
         }
 
+        if (payloadType == null)
+        {
+            throw new ConversionException("Incomplete file status: missing payload type");
+        }
+
         FileStatus status = new FileStatus(path, state, directory, targetPath);
+        status.setPayloadType(payloadType);
         for (Map.Entry<String, String> entry: properties.entrySet())
         {
             status.setProperty(entry.getKey(), entry.getValue());

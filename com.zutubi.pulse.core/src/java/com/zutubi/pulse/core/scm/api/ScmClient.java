@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
 import java.io.Closeable;
@@ -27,7 +28,9 @@ public interface ScmClient extends Closeable
      * <p/>
      * Note that exclusive access to the passed context is guaranteed for the duration
      * of this call.
-     * 
+     * <p/>
+     * Required for all implementations, may be a no-op.
+     *
      * @param context the scm context that will be used for subsequent calls.
      * @param handler handler for receipt of feedback during long-running initialisation
      *
@@ -50,6 +53,8 @@ public interface ScmClient extends Closeable
      * Note that it is not necessary to delete the persistent working directory in
      * the SCM context, as this will be done by Pulse after the destroy operation is
      * complete.
+     * <p/>
+     * Required for all implementations, may be a no-op.
      *
      * @param context the scm context that has been used for previous calls
      * @param handler handler for receipt of feedback for long-running tasks
@@ -319,4 +324,64 @@ public interface ScmClient extends Closeable
      * @throws ScmException on any error
      */
     Revision getPreviousRevision(ScmContext context, Revision revision, boolean isFile) throws ScmException;
+
+    /**
+     * Applies the changes in the given patch file to a working copy based at
+     * the given directory.  This patch file would have been created by calling
+     * {@link WorkingCopy#writePatchFile(WorkingCopyContext, java.io.File, String[])}.
+     * If the patch file is in standard Pulse format, {@link StandardPatchFileSupport#applyPatch(java.io.File, java.io.File, EOLStyle, ScmFeedbackHandler)}
+     * may be used to apply the changes.
+     * <p/>
+     * Generally speaking the implementation should reject patches that don't
+     * apply cleanly.  Smaller, recoverable, problems may be reported as
+     * warning features in the returned feature list, but any significant
+     * problems should cause the patch to fail with an {@link ScmException}.
+     * <p/>
+     * Required for {@link ScmCapability#PATCH}.
+     *
+     * @param context            context of the build in which the patch is
+     *                           being applied
+     * @param patchFile          the patch file to apply
+     * @param baseDir            base of the working copy to which the patch
+     *                           should be applied
+     * @param localEOL           the local SCM configuration's end-of-line
+     *                           policy - the value returned by {@link #getEOLPolicy(ScmContext)}
+     *                           for this implementation (invoked on the master
+     *                           rather than during the build)
+     * @param scmFeedbackHandler handler used to report status for long-running
+     *                           operations - the implementation should also
+     *                           call {@link ScmFeedbackHandler#checkCancelled()}
+     *                           on this handler as frequently as practical
+     * @return                   a list of messages from applying the patch,
+     *                           which will be added to the command invoking
+     *                           this method.  Use this to report information
+     *                           or warnings about recoverable problems
+     *                           applying the patch.
+     * @throws ScmException on any error, including problems with clean
+     *         application of the patch
+     *
+     * @see StandardPatchFileSupport#applyPatch(java.io.File, java.io.File, EOLStyle, ScmFeedbackHandler)
+     */
+    List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException;
+
+    /**
+     * Reads all file status information from the given patch file.  The
+     * returned list should contain an entry for every file that is represented
+     * in the patch file.
+     * <p/>
+     * If the implementation uses files in the standard Pulse patch format,
+     * {@link StandardPatchFileSupport#readFileStatuses(java.io.File)} may be
+     * used to implement this method.
+     * <p/>
+     * Required for {@link ScmCapability#PATCH}.
+     *
+     * @param context   defines the scm context in which the operation is being
+     *                  run
+     * @param patchFile the patch file to read the status information from
+     * @return a list of status information from the given patch file
+     * @throws ScmException on any error
+     *
+     * @see StandardPatchFileSupport#readFileStatuses(java.io.File)
+     */
+    List<FileStatus> readFileStatuses(ScmContext context, File patchFile) throws ScmException;
 }

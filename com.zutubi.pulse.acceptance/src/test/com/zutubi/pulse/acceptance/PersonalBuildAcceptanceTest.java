@@ -192,9 +192,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     private TestPersonalBuildUI requestPersonalBuild()
     {
         PersonalBuildConfig config = new PersonalBuildConfig(workingCopyDir, null);
-        PersonalBuildClient client = new PersonalBuildClient(config);
         TestPersonalBuildUI ui = new TestPersonalBuildUI();
-        client.setUI(ui);
+        PersonalBuildClient client = new PersonalBuildClient(config, ui);
 
         PersonalBuildCommand command = new PersonalBuildCommand();
         command.execute(client);

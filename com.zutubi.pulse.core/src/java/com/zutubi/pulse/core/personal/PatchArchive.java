@@ -2,67 +2,43 @@ package com.zutubi.pulse.core.personal;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.zutubi.diff.DiffException;
+import com.zutubi.diff.Patch;
+import com.zutubi.diff.PatchFile;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.Feature;
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.FileStatus;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 /**
  */
 public class PatchArchive
 {
-    private static final String FILES_PATH = "files/";
-    private static final String META_ENTRY = "meta.xml";
+    public static final String FILES_PATH = "files/";
+    public static final String META_ENTRY = "meta.xml";
 
     private File patchFile;
     private PatchMetadata metadata;
 
     /**
-     * Creates a new archive from a working copy at base.  The state of the
-     * working copy is established and the patch created based on that state.
-     *
-     * @param revision  revision to which this patch should be applied
-     * @param status    status of the working copy based at base
-     * @param patchFile the destination of the patch file created
-     * @param ui the ui reference to allow logging to the command output.
-     *
-     * @throws PersonalBuildException in the event of any error creating the patch
-     */
-    public PatchArchive(Revision revision, WorkingCopyStatus status, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
-    {
-        this.patchFile = patchFile;
-        this.metadata = new PatchMetadata(revision, status.getFileStatuses());
-
-        try
-        {
-            createPatchArchive(status.getBase(), ui);
-        }
-        catch (IOException e)
-        {
-            throw new PersonalBuildException("I/O error creating patch file: " + e.getMessage(), e);
-        }
-    }
-
-    /**
      * Creates a patch from an existing archive file.
      *
      * @param patchFile the file to create the patch from
-     * @throws com.zutubi.pulse.core.api.PulseException on error
+     * @throws com.zutubi.pulse.core.api.PulseException
+     *          on error
      */
     public PatchArchive(File patchFile) throws PulseException
     {
@@ -73,7 +49,7 @@ public class PatchArchive
         {
             zin = new ZipInputStream(new FileInputStream(patchFile));
             ZipEntry entry = zin.getNextEntry();
-            if(entry == null || !entry.getName().equals(META_ENTRY))
+            if (entry == null || !entry.getName().equals(META_ENTRY))
             {
                 throw new PulseException("Missing meta entry in patch file '" + patchFile.getAbsolutePath() + "'");
             }
@@ -81,94 +57,13 @@ public class PatchArchive
             XStream xstream = createXStream();
             metadata = (PatchMetadata) xstream.fromXML(zin);
         }
-        catch(IOException e)
+        catch (IOException e)
         {
             throw new PulseException("I/O error reading status from patch file '" + patchFile.getAbsolutePath() + "': " + e.getMessage(), e);
         }
         finally
         {
             IOUtils.close(zin);
-        }
-    }
-
-    private void createPatchArchive(File base, PersonalBuildUI ui) throws IOException
-    {
-        // The zip archive is laid out as follows:
-        // <root>/
-        //     meta.xml: information about the patch: revision and change info for files
-        //     files/
-        //         <changed files>: all files that have been added/edited, laid out in
-        //                          the same directory structure as the working copy
-
-        ZipOutputStream os = null;
-
-        try
-        {
-            os = new ZipOutputStream(new FileOutputStream(patchFile));
-            addMeta(os, ui);
-            addFiles(base, os, ui);
-        }
-        finally
-        {
-            IOUtils.close(os);
-        }
-    }
-
-    private void addMeta(ZipOutputStream os, PersonalBuildUI ui) throws IOException
-    {
-        status(ui, META_ENTRY);
-
-        ZipEntry entry = new ZipEntry(META_ENTRY);
-        os.putNextEntry(entry);
-        XStream xstream = createXStream();
-        xstream.toXML(metadata, os);
-    }
-
-    private XStream createXStream()
-    {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.alias("status", PatchMetadata.class);
-        xstream.addImplicitCollection(PatchMetadata.class, "fileStatuses");
-        xstream.alias("revision", Revision.class);
-        xstream.alias("fileStatus", FileStatus.class);
-        xstream.setMode(XStream.NO_REFERENCES);
-        xstream.registerConverter(new FileStatusConverter());
-        xstream.registerConverter(new RevisionConverter());
-
-        return xstream;
-    }
-
-    private void addFiles(File base, ZipOutputStream os, PersonalBuildUI ui) throws IOException
-    {
-        os.putNextEntry(new ZipEntry(FILES_PATH));
-        for(FileStatus fs: metadata.getFileStatuses())
-        {
-            if (fs.getState().requiresFile() && !fs.isDirectory())
-            {
-                File f = new File(base, FileSystemUtils.localiseSeparators(fs.getPath()));
-                String path = FILES_PATH + fs.getTargetPath();
-                addFile(os, f, path, ui);
-            }
-        }
-    }
-
-    private void addFile(ZipOutputStream os, File f, String path, PersonalBuildUI ui) throws IOException
-    {
-        status(ui, path);
-
-        ZipEntry entry = new ZipEntry(path);
-        entry.setTime(f.lastModified());
-        os.putNextEntry(entry);
-        FileInputStream is = null;
-
-        try
-        {
-            is = new FileInputStream(f);
-            IOUtils.joinStreams(is, os);
-        }
-        finally
-        {
-            IOUtils.close(is);
         }
     }
 
@@ -182,8 +77,9 @@ public class PatchArchive
         return metadata;
     }
 
-    public void apply(File base, EOLStyle localEOL, CommandContext commandContext) throws PulseException
+    public List<Feature> apply(File base, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws PulseException
     {
+        scmFeedbackHandler.status("Applying patch...");
         try
         {
             List<FileStatus> statuses = new LinkedList<FileStatus>(metadata.getFileStatuses());
@@ -199,17 +95,23 @@ public class PatchArchive
                 }
             });
 
-            for(FileStatus fs: statuses)
+            List<Feature> features = new LinkedList<Feature>();
+            for (FileStatus fs : statuses)
             {
-                preApply(fs, base, commandContext);
+                preApply(fs, base, features);
+                scmFeedbackHandler.checkCancelled();
             }
 
-            unzip(base);
+            unzip(base, scmFeedbackHandler);
 
-            for(FileStatus fs: statuses)
+            for (FileStatus fs : statuses)
             {
                 postApply(fs, base, localEOL);
+                scmFeedbackHandler.checkCancelled();
             }
+
+            scmFeedbackHandler.status("Patch applied.");
+            return features;
         }
         catch (IOException e)
         {
@@ -217,45 +119,45 @@ public class PatchArchive
         }
     }
 
-    private void preApply(FileStatus fileStatus, File base, CommandContext context) throws IOException
+    private void preApply(FileStatus fileStatus, File base, List<Feature> features) throws IOException
     {
         switch (fileStatus.getState())
         {
             case MODIFIED:
             case MERGED:
             case METADATA_MODIFIED:
-                checkTargetFile(fileStatus, base, context);
+                checkTargetFile(fileStatus, base, features);
                 break;
 
             case DELETED:
             case REPLACED:
-                File f = checkTargetFile(fileStatus, base, context);
+                File f = checkTargetFile(fileStatus, base, features);
                 if (fileStatus.isDirectory())
                 {
                     if (!FileSystemUtils.rmdir(f))
                     {
-                        context.addFeature(new Feature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target directory '" + fileStatus.getTargetPath() + "'"));
+                        features.add(new Feature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target directory '" + fileStatus.getTargetPath() + "'"));
                     }
                 }
                 else
                 {
                     if (!f.delete())
                     {
-                        context.addFeature(new Feature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target file '" + fileStatus.getTargetPath() + "'"));
+                        features.add(new Feature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target file '" + fileStatus.getTargetPath() + "'"));
                     }
                 }
                 break;
         }
     }
 
-    private File checkTargetFile(FileStatus fileStatus, File base, CommandContext context)
+    private File checkTargetFile(FileStatus fileStatus, File base, List<Feature> features)
     {
         File f = new File(base, fileStatus.getTargetPath());
         if (!f.exists())
         {
-            context.addFeature(new Feature(Feature.Level.WARNING, "Problem applying patch: Target file '" + fileStatus.getTargetPath() + "' with status " + fileStatus.getState() + " in patch does not exist"));
+            features.add(new Feature(Feature.Level.WARNING, "Problem applying patch: Target file '" + fileStatus.getTargetPath() + "' with status " + fileStatus.getState() + " in patch does not exist"));
         }
-        
+
         return f;
     }
 
@@ -265,7 +167,7 @@ public class PatchArchive
 
         // Apply line ending settings
         String eolName = fileStatus.getProperty(FileStatus.PROPERTY_EOL_STYLE);
-        if(eolName != null)
+        if (eolName != null)
         {
             try
             {
@@ -280,19 +182,17 @@ public class PatchArchive
 
         // Handle the executable bit
         String executableValue = fileStatus.getProperty(FileStatus.PROPERTY_EXECUTABLE);
-        if(executableValue != null)
+        if (executableValue != null)
         {
             boolean executable = Boolean.parseBoolean(executableValue);
-            if(file.exists())
+            if (file.exists())
             {
                 FileSystemUtils.setExecutable(file, executable);
             }
         }
     }
 
-
-
-    private void unzip(File base) throws IOException
+    private void unzip(File base, ScmFeedbackHandler scmFeedbackHandler) throws IOException, PulseException
     {
         ZipInputStream zin = null;
 
@@ -300,14 +200,24 @@ public class PatchArchive
         {
             zin = new ZipInputStream(new FileInputStream(patchFile));
 
-            // Skip over meta entry
-            zin.getNextEntry();
+            // Skip over meta.xml and files/ entries
+            if (zin.getNextEntry() == null)
+            {
+                return;
+            }
+            IOUtils.joinStreams(zin, new NullOutputStream());
+
+            if (zin.getNextEntry() == null)
+            {
+                return;
+            }
             IOUtils.joinStreams(zin, new NullOutputStream());
 
             ZipEntry entry;
-            while((entry = zin.getNextEntry()) != null)
+            while ((entry = zin.getNextEntry()) != null)
             {
-                extractEntry(base, entry, zin);
+                extractEntry(base, entry, zin, scmFeedbackHandler);
+                scmFeedbackHandler.checkCancelled();
             }
         }
         finally
@@ -316,44 +226,85 @@ public class PatchArchive
         }
     }
 
-    private void extractEntry(File base, ZipEntry entry, ZipInputStream zin) throws IOException
+    private void extractEntry(File base, ZipEntry entry, ZipInputStream zin, ScmFeedbackHandler scmFeedbackHandler) throws IOException, PulseException
     {
         String path = getPath(entry);
-        File f = new File(base, path);
-        if(entry.isDirectory())
+        FileStatus status = metadata.getFileStatus(path);
+        if (status == null)
         {
-            f.mkdirs();
+            throw new PulseException("Entry for path '" + path + "' has no metadata");
+        }
+
+        scmFeedbackHandler.status(status.toString());
+
+        File f = new File(base, path);
+        if (entry.isDirectory())
+        {
+            if (!f.isDirectory() && !f.mkdirs())
+            {
+                throw new IOException("Cannot create directory '" + f.getAbsolutePath() + "'");
+            }
         }
         else
         {
             File parent = f.getParentFile();
-            if(parent != null && !parent.isDirectory())
+            if (parent != null && !parent.isDirectory())
             {
-                parent.mkdirs();
+                if (!parent.mkdirs())
+                {
+                    throw new IOException("Cannot create parent directory '" + parent.getAbsolutePath() + "'");
+                }
             }
 
-            if(!f.canWrite())
+            if (!f.canWrite())
             {
                 FileSystemUtils.setWritable(f);
             }
 
-            FileOutputStream out = null;
-            try
+            if (status.getPayloadType() == FileStatus.PayloadType.DIFF)
             {
-                out = new FileOutputStream(f);
-                IOUtils.joinStreams(zin, out);
+                applyDiff(path, IOUtils.inputStreamToString(zin), f);
             }
-            finally
+            else
             {
-                IOUtils.close(out);
+                FileOutputStream out = null;
+                try
+                {
+                    out = new FileOutputStream(f);
+                    IOUtils.joinStreams(zin, out);
+                }
+                finally
+                {
+                    IOUtils.close(out);
+                }
             }
+        }
+    }
+
+    private void applyDiff(String path, String diff, File targetFile) throws PulseException
+    {
+        try
+        {
+            PatchFile patchFile = PatchFile.read(new StringReader(diff));
+            List<Patch> patches = patchFile.getPatches();
+            if (patches.size() != 1)
+            {
+                throw new PulseException("Patch for path '" + path + "' is invalid");
+            }
+
+            Patch patch = patches.get(0);
+            patch.apply(targetFile);
+        }
+        catch (DiffException e)
+        {
+            throw new PulseException(e);
         }
     }
 
     private String getPath(ZipEntry entry) throws IOException
     {
         String name = entry.getName();
-        if(!name.startsWith(FILES_PATH))
+        if (!name.startsWith(FILES_PATH))
         {
             throw new IOException("Unexpected entry path '" + name + "': should start with '" + FILES_PATH + "'");
         }
@@ -363,9 +314,9 @@ public class PatchArchive
 
     public boolean containsPath(String path)
     {
-        for(FileStatus fs: metadata.getFileStatuses())
+        for (FileStatus fs : metadata.getFileStatuses())
         {
-            if(fs.getPath().equals(path) && fs.getState().requiresFile())
+            if (fs.getPath().equals(path) && fs.getState().preferredPayloadType() != FileStatus.PayloadType.NONE)
             {
                 return true;
             }
@@ -377,15 +328,15 @@ public class PatchArchive
     public String retrieveFile(String path) throws IOException
     {
         path = FILES_PATH + path;
-        
+
         ZipInputStream zin = null;
         try
         {
             zin = new ZipInputStream(new FileInputStream(patchFile));
             ZipEntry entry;
-            while((entry = zin.getNextEntry()) != null)
+            while ((entry = zin.getNextEntry()) != null)
             {
-                if(entry.getName().equals(path))
+                if (entry.getName().equals(path))
                 {
                     // This is it
                     return IOUtils.inputStreamToString(zin);
@@ -400,11 +351,17 @@ public class PatchArchive
         }
     }
 
-    private void status(PersonalBuildUI ui, String message)
+    public static XStream createXStream()
     {
-        if(ui != null)
-        {
-            ui.status(message);
-        }
+        XStream xstream = new XStream(new DomDriver());
+        xstream.alias("status", PatchMetadata.class);
+        xstream.addImplicitCollection(PatchMetadata.class, "fileStatuses");
+        xstream.alias("revision", Revision.class);
+        xstream.alias("fileStatus", FileStatus.class);
+        xstream.setMode(XStream.NO_REFERENCES);
+        xstream.registerConverter(new FileStatusConverter());
+        xstream.registerConverter(new RevisionConverter());
+
+        return xstream;
     }
 }

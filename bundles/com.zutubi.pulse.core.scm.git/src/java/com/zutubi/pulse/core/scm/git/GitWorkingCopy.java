@@ -1,6 +1,11 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.WorkingCopy;
+import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
+
+import java.io.File;
 
 /**
  * to be implemented.
@@ -12,9 +17,9 @@ public class GitWorkingCopy implements WorkingCopy
         return false;
     }
 
-    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
+    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... spec) throws ScmException
     {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     public Revision update(WorkingCopyContext context, Revision revision) throws ScmException

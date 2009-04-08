@@ -103,7 +103,7 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
                     ui.status(fs.toString());
                 }
 
-                if(fs.getState().requiresFile())
+                if(fs.getState().preferredPayloadType() != FileStatus.PayloadType.NONE)
                 {
                     String type = getCurrentItemType();
                     String headType = getCurrentItemHeadType();

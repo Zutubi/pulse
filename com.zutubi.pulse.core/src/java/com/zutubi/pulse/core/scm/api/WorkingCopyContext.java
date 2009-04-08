@@ -35,4 +35,12 @@ public interface WorkingCopyContext
      * @return user configuration to customise the working copy operation
      */
     Config getConfig();
+
+    /**
+     * Returns a user interface that can be used to interact with the user
+     * during working copy operations.
+     * 
+     * @return interface with the user running the operation
+     */
+    PersonalBuildUI getUI();
 }

@@ -1,15 +1,16 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.util.*;
+import static com.zutubi.util.FileSystemUtils.createFile;
 import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.IOUtils;
-import static com.zutubi.util.FileSystemUtils.createFile;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -352,6 +353,16 @@ public class CvsClient implements ScmClient
             // just in case.
             return null;
         }
+    }
+
+    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
+    {
+        return StandardPatchFileSupport.applyPatch(patchFile, baseDir, localEOL, scmFeedbackHandler);
+    }
+
+    public List<FileStatus> readFileStatuses(ScmContext context, File patchFile) throws ScmException
+    {
+        return StandardPatchFileSupport.readFileStatuses(patchFile);
     }
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException

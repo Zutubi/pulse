@@ -94,6 +94,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_COMPRESS_WORKING_DIR    = "compress.working.dir";
     /**
+     * The dependency descriptor instance for a build.  This is an instance of the ivy ModuleDescriptor.
+     */
+    public static final String PROPERTY_DEPENDENCY_DESCRIPTOR   = "dependency.descriptor";
+    /**
      * Set to "true" if the SCM bootstrap for the build is incremental, "false"
      * otherwise.  Different to incremental.build: incremental bootstraps are
      * also used for the "clean update" scheme, for example.
@@ -128,6 +132,10 @@ public class BuildProperties
      * The unique 64-bit handle of the project being built.
      */
     public static final String PROPERTY_PROJECT_HANDLE          = "project.handle";
+    /**
+     * The SCM configuration for the project being built.
+     */
+    public static final String PROPERTY_SCM_CONFIGURATION       = "scm.config";
     /**
      * The number of times the project has been built successfully before the
      * running build.
@@ -205,12 +213,6 @@ public class BuildProperties
      * The pattern that defines where retrieved dependencies are to be delivered.
      */
     public static final String PROPERTY_RETRIEVAL_PATTERN       = "retrieval.pattern";
-    
-    /**
-     * The dependency descriptor instance for a build.  This is an instance of the ivy ModuleDescriptor.
-     */
-    public static final String PROPERTY_DEPENDENCY_DESCRIPTOR   = "dependency.descriptor";
-
     /**
      * Internal property used to collect test results for a recipe.
      */

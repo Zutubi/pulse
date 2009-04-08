@@ -25,15 +25,13 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
     private static final Logger LOG = Logger.getLogger(ScmBootstrapper.class);
 
     protected String project;
-    protected ScmConfiguration scmConfig;
     protected BuildRevision revision;
-    protected boolean terminated = false;
+    protected volatile boolean terminated = false;
     protected transient PrintWriter outputWriter;
 
-    public ScmBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision)
+    public ScmBootstrapper(String project, BuildRevision revision)
     {
         this.project = project;
-        this.scmConfig = scmConfig;
         this.revision = revision;
     }
 
@@ -114,6 +112,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
 
     protected ScmClient createScmClient(ExecutionContext executionContext) throws ScmException
     {
+        ScmConfiguration scmConfig = executionContext.getValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_SCM_CONFIGURATION, ScmConfiguration.class);
         ScmClientFactory scmClientFactory = executionContext.getValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_SCM_CLIENT_FACTORY, ScmClientFactory.class);
         return scmClientFactory.createClient(scmConfig);
     }

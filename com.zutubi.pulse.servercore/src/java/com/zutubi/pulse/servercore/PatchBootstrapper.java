@@ -1,24 +1,25 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.personal.PatchArchive;
-import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.servercore.repository.FileRepository;
 
 import java.io.File;
+import java.io.PrintWriter;
 
 /**
  * A bootstrapper that applies a patch to a working directory bootstrapped
  * by some other bootstrapper.
  */
-public class PatchBootstrapper implements Bootstrapper
+public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
 {
     private static final String DEFAULT_PATCH_BOOSTRAP_PREFIX = "personal.patch.prefix.default";
 
@@ -28,6 +29,8 @@ public class PatchBootstrapper implements Bootstrapper
     private long userId;
     private long number;
     private EOLStyle localEOL;
+    private volatile boolean terminated;
+    private transient PrintWriter outputWriter;
 
     public PatchBootstrapper(Bootstrapper delegate, long userId, long number, EOLStyle localEOL)
     {
@@ -40,28 +43,48 @@ public class PatchBootstrapper implements Bootstrapper
     public void bootstrap(CommandContext commandContext) throws BuildException
     {
         delegate.bootstrap(commandContext);
+
+        ExecutionContext context = commandContext.getExecutionContext();
+        FileRepository fileRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, FileRepository.class);
+        File patchFile;
         try
         {
-            ExecutionContext context = commandContext.getExecutionContext();
-            FileRepository fileRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, FileRepository.class);
-            PatchArchive patch = new PatchArchive(fileRepository.getPatchFile(userId, number));
-            // apply a patch prefix to the if one is specified. Used to work around a cvs issue.
-            patch.apply(getBaseBuildDir(context), localEOL, commandContext);
+            patchFile = fileRepository.getPatchFile(userId, number);
+        }
+        catch (PulseException e)
+        {
+            throw new BuildException("Unable to retrieve patch file '" + e.getMessage(), e);
+        }
+
+        ScmConfiguration scmConfig = context.getValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_SCM_CONFIGURATION, ScmConfiguration.class);
+        ScmClientFactory scmClientFactory = context.getValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_SCM_CLIENT_FACTORY, ScmClientFactory.class);
+        ScmClient scmClient = null;
+        try
+        {
+            scmClient = scmClientFactory.createClient(scmConfig);
+            outputWriter = new PrintWriter(commandContext.getExecutionContext().getOutputStream());
+            for (Feature feature: scmClient.applyPatch(context, patchFile, getBaseBuildDir(context), localEOL, this))
+            {
+                commandContext.addFeature(feature);
+            }
         }
         catch(PulseException e)
         {
             throw new BuildException("Unable to apply patch: " + e.getMessage(), e);
         }
-    }
-
-    public void terminate()
-    {
-        delegate.terminate();
+        finally
+        {
+            outputWriter.flush();
+            if (scmClient != null)
+            {
+                scmClient.close();
+            }
+        }
     }
 
     private File getBaseBuildDir(ExecutionContext context)
     {
-        // check if we need to apply a patch prefix for this bootstrap. 
+        // check if we need to apply a patch prefix for this bootstrap.
 
         String defaultPrefix = System.getProperty(DEFAULT_PATCH_BOOSTRAP_PREFIX);
 
@@ -87,5 +110,24 @@ public class PatchBootstrapper implements Bootstrapper
             return new File(context.getWorkingDir(), prefix);
         }
         return context.getWorkingDir();
+    }
+
+    public void terminate()
+    {
+        delegate.terminate();
+        terminated = true;
+    }
+
+    public void status(String message)
+    {
+        outputWriter.println(message);
+    }
+
+    public void checkCancelled() throws ScmCancelledException
+    {
+        if (terminated)
+        {
+            throw new ScmCancelledException("Operation cancelled");
+        }
     }
 }

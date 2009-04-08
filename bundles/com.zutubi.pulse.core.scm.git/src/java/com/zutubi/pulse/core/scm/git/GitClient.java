@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
@@ -499,6 +500,16 @@ public class GitClient implements ScmClient
         // The previous revision is in fact revision^.  However, we should
         // return the actual SHA this is resolved as.
         return null;
+    }
+
+    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public List<FileStatus> readFileStatuses(ScmContext context, File patchFile) throws ScmException
+    {
+        throw new RuntimeException("Not implemented");
     }
 
     public void setRepository(String repository)

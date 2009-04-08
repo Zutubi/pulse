@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 
@@ -136,6 +137,16 @@ public class MockScmClient implements ScmClient, DataCacheAware
     public Revision getPreviousRevision(ScmContext context, Revision fileRevision, boolean isFile) throws ScmException
     {
         throw new RuntimeException("Method not yet implemented");
+    }
+
+    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public List<FileStatus> readFileStatuses(ScmContext context, File patchFile) throws ScmException
+    {
+        throw new RuntimeException("Not implemented");
     }
 
     public String getCacheId()

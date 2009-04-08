@@ -19,6 +19,7 @@ import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
+import org.netbeans.lib.cvsclient.command.diff.DiffCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.status.StatusCommand;
@@ -33,13 +34,15 @@ import org.netbeans.lib.cvsclient.event.MessageEvent;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -387,6 +390,14 @@ public class CvsCore
         {
             CvsUtils.close(connection);
         }
+    }
+
+    public void diff(File base, String path, OutputStream output) throws ScmException
+    {
+        DiffCommand diffCommand = new DiffCommand();
+        diffCommand.setUnifiedDiff(true);
+        diffCommand.setFiles(new File[]{ new File(base, path) });
+        executeCommand(diffCommand, base, new OutputListener(new PrintWriter(output)));
     }
 
     /**

@@ -32,6 +32,25 @@ public class FileStatus
     public static final String PROPERTY_EXECUTABLE = "executable";
 
     /**
+     * Types of payloads that are carried for files in patches.
+     */
+    public enum PayloadType
+    {
+        /**
+         * The payload is a unified diff representing changes to a text file.
+         */
+        DIFF,
+        /**
+         * No payload is present for the file.
+         */
+        NONE,
+        /**
+         * The payload is the full file content.
+         */
+        FULL
+    }
+
+    /**
      * Indicates the state that a path is in.  For example, if local edits have
      * been made, the state will be #MODIFIED.  If no changes have been made,
      * the state will be #UNCHANGED.
@@ -71,9 +90,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return true;
+                return PayloadType.FULL;
             }
         },
         /**
@@ -93,9 +112,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return true;
+                return PayloadType.FULL;
             }
         },
         /**
@@ -113,9 +132,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return false;
+                return PayloadType.NONE;
             }
         },
         /**
@@ -134,9 +153,9 @@ public class FileStatus
                 return false;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return false;
+                return PayloadType.NONE;
             }
         },
         /**
@@ -156,9 +175,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return false;
+                return PayloadType.NONE;
             }
         },
         /**
@@ -182,9 +201,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return true;
+                return PayloadType.DIFF;
             }
         },
         /**
@@ -207,9 +226,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return false;
+                return PayloadType.NONE;
             }
         },
         /**
@@ -231,9 +250,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return true;
+                return PayloadType.DIFF;
             }
         },
         /**
@@ -255,9 +274,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return false;
+                return PayloadType.NONE;
             }
         },
         /**
@@ -280,9 +299,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return false;
+                return PayloadType.NONE;
             }
         },
         /**
@@ -303,9 +322,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return true;
+                return PayloadType.FULL;
             }
         },
         /**
@@ -325,9 +344,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return true;
+                return PayloadType.FULL;
             }
         },
         /**
@@ -346,9 +365,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return false;
+                return PayloadType.NONE;
             }
         },
         /**
@@ -367,9 +386,9 @@ public class FileStatus
                 return true;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return false;
+                return PayloadType.NONE;
             }
         },
         /**
@@ -387,9 +406,9 @@ public class FileStatus
                 return false;
             }
 
-            public boolean requiresFile()
+            public PayloadType preferredPayloadType()
             {
-                return false;
+                return PayloadType.NONE;
             }
         };
 
@@ -416,22 +435,28 @@ public class FileStatus
         public abstract boolean isInteresting();
 
         /**
-         * Indicates if the file data itself is required to replicate the local
-         * file state in a target working copy.  For example, if a file has
-         * just been added or changed, the new file content will need
+         * Indicates the preferred type of payload required to replicate the
+         * local file state in a target working copy.  For example, if a file
+         * has just been added or changed, the new file content will need
          * replication in the target working copy.  If a file is marked for
          * deletion, however, the data is not required as the target file can
-         * just be deleted.
+         * just be deleted.  If a file has been changed, the preferred payload
+         * is just the differences.
+         * <p/>
+         * The actual payload type may differ from the preferred type, for
+         * example if a binary file is changed, a unified diff is not possible,
+         * so the entire file content is used.
          *
          * @return true if the file data is required to replicate changes to
          *         the local path in a remote working copy
          */
-        public abstract boolean requiresFile();
+        public abstract PayloadType preferredPayloadType();
     }
 
     private String path;
     private FileStatus.State state;
     private boolean directory;
+    private PayloadType payloadType;
     private String targetPath;
     private Map<String, String> properties = new HashMap<String, String>();
 
@@ -461,11 +486,10 @@ public class FileStatus
      * @param state      state of the file in the working copy, may not be null
      * @param directory  true to indicate the path refers to a directory, false
      *                   for a regular file
-     * @param targetPath path to which the status should be applied in a target
+     *@param targetPath path to which the status should be applied in a target
      *                   working copy, or null to use the same path as in the
      *                   local working copy
-     *
-     * @throws NullPointerException is path or state is null
+     *  @throws NullPointerException is path or state is null
      */
     public FileStatus(String path, FileStatus.State state, boolean directory, String targetPath)
     {
@@ -482,6 +506,7 @@ public class FileStatus
         this.path = FileSystemUtils.normaliseSeparators(path);
         this.state = state;
         this.directory = directory;
+        this.payloadType = state.preferredPayloadType();
 
         if (targetPath == null)
         {
@@ -518,6 +543,29 @@ public class FileStatus
     public boolean isDirectory()
     {
         return directory;
+    }
+
+    /**
+     * @return the type of payload stored for this status, i.e. no content,
+     *         the entire file or a diff from the base revision file
+     */
+    public PayloadType getPayloadType()
+    {
+        return payloadType;
+    }
+
+    /**
+     * Sets the payload type.  Use to override the preferred payload type when
+     * it cannot be used: for example if the preferred is a diff but the file
+     * is binary.
+     *
+     * @param payloadType the new payload type
+     *
+     * @see #getPayloadType()
+     */
+    public void setPayloadType(PayloadType payloadType)
+    {
+        this.payloadType = payloadType;
     }
 
     /**

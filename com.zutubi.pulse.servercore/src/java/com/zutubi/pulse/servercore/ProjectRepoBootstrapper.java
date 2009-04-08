@@ -7,7 +7,6 @@ import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import static com.zutubi.util.FileSystemUtils.*;
 
 import java.io.File;
@@ -24,14 +23,12 @@ import java.io.PrintWriter;
 public class ProjectRepoBootstrapper implements Bootstrapper
 {
     private final String projectName;
-    private final ScmConfiguration scmConfig;
     private BuildRevision revision;
     private ScmBootstrapper childBootstrapper;
 
-    public ProjectRepoBootstrapper(String projectName, ScmConfiguration scmConfig, BuildRevision revision)
+    public ProjectRepoBootstrapper(String projectName, BuildRevision revision)
     {
         this.projectName = projectName;
-        this.scmConfig = scmConfig;
         this.revision = revision;
     }
 
@@ -126,11 +123,11 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         // else we can update.
         if (localDir.list().length == 0)
         {
-            return new CheckoutBootstrapper(projectName, scmConfig, revision);
+            return new CheckoutBootstrapper(projectName, revision);
         }
         else
         {
-            return new UpdateBootstrapper(projectName, scmConfig, revision);
+            return new UpdateBootstrapper(projectName, revision);
         }
     }
 }

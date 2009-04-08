@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.personal;
 
 import com.zutubi.pulse.core.scm.api.FileStatus;
-import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -17,27 +16,16 @@ import java.util.List;
  */
 public class PatchMetadata
 {
-    private Revision revision;
     private List<FileStatus> fileStatuses;
 
     /**
      * Creates metadata to go in a patch archive.
      *
-     * @param revision     the revision to which the patch should be applied
      * @param fileStatuses information about changed files in this patch
      */
-    public PatchMetadata(Revision revision, List<FileStatus> fileStatuses)
+    public PatchMetadata(List<FileStatus> fileStatuses)
     {
-        this.revision = revision;
         this.fileStatuses = new LinkedList<FileStatus>(fileStatuses);
-    }
-
-    /**
-     * @return the revision to which the patch should be applied
-     */
-    public Revision getRevision()
-    {
-        return revision;
     }
 
     /**

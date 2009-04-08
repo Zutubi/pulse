@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.scm.api.PersonalBuildUIAwareSupport;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
 import com.zutubi.util.config.Config;
@@ -9,16 +8,18 @@ import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.internal.wc.DefaultSVNGNUDiffGenerator;
 import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  */
-public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implements WorkingCopy
+public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
 {
     public static final String PROPERTY_ALLOW_EXTERNALS = "svn.allow.externals";
 
@@ -68,7 +69,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         }
         else
         {
-            authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(user, getPassword(config));
+            authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(user, getPassword(context.getUI(), config));
 
             if(config.hasProperty(PROPERTY_KEYFILE))
             {
@@ -82,12 +83,12 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         return authenticationManager;
     }
 
-    public String getPassword(Config config)
+    public String getPassword(PersonalBuildUI ui, Config config)
     {
         String password = config.getProperty(PROPERTY_PASSWORD);
         if(password == null)
         {
-            password = getUI().passwordPrompt("Subversion password");
+            password = ui.passwordPrompt("Subversion password");
             if(password == null)
             {
                 password = "";
@@ -130,7 +131,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             }
             else
             {
-                getUI().warning("Working copy's repository URL '" + wcUrl + "' does not match Pulse project's repository URL '" + location + "'");
+                context.getUI().warning("Working copy's repository URL '" + wcUrl + "' does not match Pulse project's repository URL '" + location + "'");
                 return false;
             }
         }
@@ -138,6 +139,30 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         {
             throw convertException(e);
         }
+    }
+
+    public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
+    {
+        SVNClientManager clientManager = getClientManager(context, true);
+
+        SVNUpdateClient updateClient = clientManager.getUpdateClient();
+        updateClient.setEventHandler(new UpdateHandler(context.getUI()));
+
+        try
+        {
+            SVNRevision svnRevision = revision == null ? SVNRevision.HEAD : SVNRevision.parse(revision.getRevisionString());
+            long rev = updateClient.doUpdate(context.getBase(), svnRevision, SVNDepth.INFINITY, false, false);
+            return new Revision(Long.toString(rev));
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+    }
+
+    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... spec) throws ScmException
+    {
+        return StandardPatchFileSupport.writePatchFile(this, context, patchFile, spec);
     }
 
     public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... paths) throws ScmException
@@ -187,7 +212,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
 
         for (FileStatus fs : wcs.getFileStatuses())
         {
-            if (fs.getState().requiresFile())
+            if (fs.getState().preferredPayloadType() != FileStatus.PayloadType.NONE)
             {
                 SVNPropertyData property = wcc.doGetProperty(new File(wcs.getBase(), fs.getPath()), SVN_PROPERTY_EOL_STYLE, SVNRevision.WORKING, SVNRevision.WORKING);
                 if (property != null)
@@ -257,18 +282,28 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         }
     }
 
-    public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
+    public boolean canDiff(WorkingCopyContext context, String path) throws ScmException
     {
-        SVNClientManager clientManager = getClientManager(context, true);
-
-        SVNUpdateClient updateClient = clientManager.getUpdateClient();
-        updateClient.setEventHandler(new UpdateHandler());
-
+        SVNWCClient wcClient = getClientManager(context, false).getWCClient();
         try
         {
-            SVNRevision svnRevision = revision == null ? SVNRevision.HEAD : SVNRevision.parse(revision.getRevisionString());
-            long rev = updateClient.doUpdate(context.getBase(), svnRevision, SVNDepth.INFINITY, false, false);
-            return new Revision(Long.toString(rev));
+            SVNPropertyData propertyData = wcClient.doGetProperty(new File(context.getBase(), path), SVNProperty.MIME_TYPE, SVNRevision.UNDEFINED, SVNRevision.WORKING);
+            return propertyData == null || !SVNProperty.isBinaryMimeType(propertyData.getValue().getString());
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+    }
+
+    public void diff(WorkingCopyContext context, String path, OutputStream output) throws ScmException
+    {
+        SVNDiffClient diffClient = getClientManager(context, false).getDiffClient();
+        diffClient.setDiffGenerator(new DefaultSVNGNUDiffGenerator());
+        File f = new File(context.getBase(), path);
+        try
+        {
+            diffClient.doDiff(f, SVNRevision.BASE, f, SVNRevision.WORKING, SVNDepth.EMPTY, false, output, null);
         }
         catch (SVNException e)
         {
@@ -401,16 +436,16 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
 
     private class StatusHandler implements ISVNEventHandler, ISVNStatusHandler
     {
-        private File base;
+        private WorkingCopyContext context;
         private ConfigSupport configSupport;
         private WorkingCopyStatus status;
         private List<String> propertyChangedPaths = new LinkedList<String>();
 
         public StatusHandler(WorkingCopyContext context)
         {
-            base = context.getBase();
+            this.context = context;
             configSupport = new ConfigSupport(context.getConfig());
-            status = new WorkingCopyStatus(base);
+            status = new WorkingCopyStatus(context.getBase());
         }
 
         public void handleEvent(SVNEvent event, double progress)
@@ -418,7 +453,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             SVNEventAction action = event.getAction();
             if (action == SVNEventAction.STATUS_COMPLETED)
             {
-                getUI().status("Repository revision: " + event.getRevision());
+                context.getUI().status("Repository revision: " + event.getRevision());
             }
         }
 
@@ -428,10 +463,10 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
 
         public void handleStatus(SVNStatus svnStatus)
         {
-            FileStatus fs = convertStatus(base, configSupport, svnStatus, propertyChangedPaths);
+            FileStatus fs = convertStatus(context.getBase(), configSupport, svnStatus, propertyChangedPaths);
             if (fs.isInteresting())
             {
-                getUI().status(fs.toString());
+                context.getUI().status(fs.toString());
                 status.addFileStatus(fs);
             }
         }
@@ -444,6 +479,13 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
 
     private class UpdateHandler implements ISVNEventHandler
     {
+        private PersonalBuildUI ui;
+
+        private UpdateHandler(PersonalBuildUI ui)
+        {
+            this.ui = ui;
+        }
+
         public void handleEvent(SVNEvent event, double progress)
         {
             SVNEventAction action = event.getAction();
@@ -476,8 +518,8 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             }
             else if (action == SVNEventAction.UPDATE_EXTERNAL)
             {
-                getUI().status("Fetching external item into '" + event.getFile().getAbsolutePath() + "'");
-                getUI().status("External at revision " + event.getRevision());
+                ui.status("Fetching external item into '" + event.getFile().getAbsolutePath() + "'");
+                ui.status("External at revision " + event.getRevision());
                 return;
             }
             else if (action == SVNEventAction.UPDATE_COMPLETED)
@@ -485,27 +527,27 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
                 /*
                 * Updating the working copy is completed. Prints out the revision.
                 */
-                getUI().status("Updated to revision " + event.getRevision());
+                ui.status("Updated to revision " + event.getRevision());
                 return;
             }
             else if (action == SVNEventAction.ADD)
             {
-                getUI().status("A     " + event.getFile().getPath());
+                ui.status("A     " + event.getFile().getPath());
                 return;
             }
             else if (action == SVNEventAction.DELETE)
             {
-                getUI().status("D     " + event.getFile().getPath());
+                ui.status("D     " + event.getFile().getPath());
                 return;
             }
             else if (action == SVNEventAction.LOCKED)
             {
-                getUI().status("L     " + event.getFile().getPath());
+                ui.status("L     " + event.getFile().getPath());
                 return;
             }
             else if (action == SVNEventAction.LOCK_FAILED)
             {
-                getUI().status("Failed to lock: " + event.getFile().getPath());
+                ui.status("Failed to lock: " + event.getFile().getPath());
                 return;
             }
 
@@ -539,7 +581,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             String message = pathChangeType + propertiesChangeType + lockLabel + "       " + event.getFile().getPath();
             if(message.trim().length() > 0)
             {
-                getUI().status(message);
+                ui.status(message);
             }
         }
 
