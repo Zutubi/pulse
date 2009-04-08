@@ -55,6 +55,7 @@
                 <ref local="multiRecipeProjectType"/>
                 <ref local="skeletonPostProcessors"/>
                 <ref local="toveFile"/>
+                <ref local="dependencies"/>
              </list>
         </property>
         <property name="systemTasks">
@@ -191,4 +192,9 @@
     <bean id="toveFile" class="com.zutubi.pulse.master.upgrade.tasks.ToveFileUpgradeTask">
         <property name="buildNumber" value="200999005"/>
     </bean>
+
+    <bean id="dependencies" class="com.zutubi.pulse.master.upgrade.tasks.DependenciesUpgradeTask">
+        <property name="buildNumber" value="200999006"/>
+    </bean>
+    
 </beans>
