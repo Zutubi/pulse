@@ -37,14 +37,8 @@ public class JUnitReportPostProcessorConfigurationExamples
     {
         JUnitReportPostProcessorConfiguration processor = new JUnitReportPostProcessorConfiguration();
         processor.setName(NAME);
-
         output.addPostProcessor(processor);
 
-        ExecutableCommandConfiguration exe = new ExecutableCommandConfiguration();
-        exe.setName("build");
-        exe.setExe("ant");
-        exe.addOutput(output);
-
-        return ExamplesBuilder.buildProjectForCaptureProcessor(exe, processor);
+        return ExamplesBuilder.buildProjectForCaptureProcessor("ant", output);
     }
 }

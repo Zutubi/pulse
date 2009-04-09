@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileSystemOutputConfigurationSupport;
 import com.zutubi.pulse.core.commands.core.ExamplesBuilder;
-import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
 import com.zutubi.tove.config.api.ConfigurationExample;
 
 /**
@@ -39,14 +38,8 @@ public class UnitTestPlusPlusReportPostProcessorConfigurationExamples
     {
         UnitTestPlusPlusReportPostProcessorConfiguration processor = new UnitTestPlusPlusReportPostProcessorConfiguration();
         processor.setName(NAME);
-
         output.addPostProcessor(processor);
 
-        ExecutableCommandConfiguration exe = new ExecutableCommandConfiguration();
-        exe.setName("build");
-        exe.setExe("make");
-        exe.addOutput(output);
-
-        return ExamplesBuilder.buildProjectForCaptureProcessor(exe, processor);
+        return ExamplesBuilder.buildProjectForCaptureProcessor("make", output);
     }
 }
