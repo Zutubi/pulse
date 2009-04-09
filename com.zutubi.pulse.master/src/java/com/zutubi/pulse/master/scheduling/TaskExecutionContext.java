@@ -35,7 +35,7 @@ public class TaskExecutionContext
         return trigger;
     }
 
-    protected void setTrigger(Trigger trigger)
+    public void setTrigger(Trigger trigger)
     {
         this.trigger = trigger;
     }
