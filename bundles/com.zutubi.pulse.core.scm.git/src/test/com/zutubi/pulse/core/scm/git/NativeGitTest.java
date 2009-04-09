@@ -9,8 +9,10 @@ import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
@@ -180,6 +182,56 @@ public class NativeGitTest extends PulseTestCase
         List<String> messages = handler.getStatusMessages();
         assertEquals(2, messages.size());
         assertEquals("M\tsmiley.txt", messages.get(1));
+    }
+
+    public void testLogParse() throws IOException, GitException
+    {
+        logParseHelper();
+    }
+
+    public void testLogParseLeadingBlankLines() throws IOException, GitException
+    {
+        logParseHelper();
+    }
+
+    private void logParseHelper() throws IOException, GitException
+    {
+        NativeGit.LogOutputHandler handler = new NativeGit.LogOutputHandler();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(getInput("txt")));
+        String line;
+        while ((line = reader.readLine()) != null)
+        {
+            handler.handleStdout(line);
+        }
+
+        List<GitLogEntry> entries = handler.getEntries();
+        assertEquals(2, entries.size());
+
+        GitLogEntry entry = entries.get(0);
+        assertEquals("c3bb01f6713e2625d4cc70e6d689feabf88731b4", entry.getId());
+        assertEquals("Alan User", entry.getAuthor());
+        assertEquals("Revert \"Some change\"\nThis reverts commit dcfef78f9a8be49b71512d47e3bbe076c2beb4c8.", entry.getComment());
+        assertEquals("Wed Apr 8 21:01:00 2009 +1000", entry.getDateString());
+        assertSingleFileEntry(entry, "configure.exe");
+
+        entry = entries.get(1);
+        assertEquals("406d8ef682af938172aa5f196774666f83811289", entry.getId());
+        assertEquals("Alan User", entry.getAuthor());
+        assertEquals("Revert \"Another Change\"\n" +
+                "This reverts commit 0d29f576e6a64b61f56b3087fd72b2d21ca65f7f.", entry.getComment());
+        assertEquals("Wed Apr 8 21:01:51 2009 +1000", entry.getDateString());
+        assertSingleFileEntry(entry, "tools/configure/configureapp.cpp");
+    }
+
+    private void assertSingleFileEntry(GitLogEntry entry, String path)
+    {
+        List<GitLogEntry.FileChangeEntry> files;
+        GitLogEntry.FileChangeEntry file;
+        files = entry.getFiles();
+        assertEquals(1, files.size());
+        file = files.get(0);
+        assertEquals("M", file.getAction());
+        assertEquals(path, file.getName());
     }
 
     public void testPull() throws ScmException, IOException

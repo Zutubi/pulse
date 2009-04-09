@@ -1,0 +1,21 @@
+
+
+
+#
+c3bb01f6713e2625d4cc70e6d689feabf88731b4
+Alan User
+Wed Apr 8 21:01:00 2009 +1000
+Revert "Some change"
+This reverts commit dcfef78f9a8be49b71512d47e3bbe076c2beb4c8.
+#
+M       configure.exe
+
+#
+406d8ef682af938172aa5f196774666f83811289
+Alan User
+Wed Apr 8 21:01:51 2009 +1000
+Revert "Another Change"
+This reverts commit 0d29f576e6a64b61f56b3087fd72b2d21ca65f7f.
+#
+M       tools/configure/configureapp.cpp
+

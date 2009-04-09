@@ -30,10 +30,6 @@ public class NativeGit
      * comment character).
      */
     private static final String LOG_SENTINAL = "#";
-    /**
-     * The date format used to read the 'date' field on git log output.
-     */
-    private final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
 
     private ProcessBuilder git;
 
@@ -377,8 +373,13 @@ public class NativeGit
      *
      * This format is generated using --pretty=format:... (see {@link NativeGit#log})
      */
-    private class LogOutputHandler extends OutputHandlerAdapter
+    static class LogOutputHandler extends OutputHandlerAdapter
     {
+        /**
+         * The date format used to read the 'date' field on git log output.
+         */
+        private final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
+
         private List<GitLogEntry> entries;
 
         private List<String> lines;
@@ -412,10 +413,13 @@ public class NativeGit
 
                     Iterator<String> i = lines.iterator();
 
-                    // Skip initial sentinal
-                    if (i.hasNext())
+                    // Skip up to and including initial sentinal
+                    while (i.hasNext())
                     {
-                        i.next();
+                        if (i.next().equals(LOG_SENTINAL))
+                        {
+                            break;
+                        }
                     }
                     
                     while (i.hasNext())
