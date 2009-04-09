@@ -1,10 +1,10 @@
 package com.zutubi.validation.providers;
 
-import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.reflection.AnnotationUtils;
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.Validator;

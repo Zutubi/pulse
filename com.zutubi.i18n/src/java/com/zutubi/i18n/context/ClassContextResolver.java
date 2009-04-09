@@ -1,7 +1,7 @@
 package com.zutubi.i18n.context;
 
 import com.zutubi.util.UnaryProcedure;
-import com.zutubi.util.ReflectionUtils;
+import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.util.LinkedList;
 import java.util.List;

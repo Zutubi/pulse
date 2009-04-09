@@ -7,9 +7,10 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.ReflectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+import static com.zutubi.util.reflection.MethodPredicates.*;
+import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -63,15 +64,8 @@ public class ConfigurationActions
     {
         if (actionHandlerClass != null)
         {
-            actionListingMethod = CollectionUtils.find(actionHandlerClass.getMethods(), new Predicate<Method>()
-            {
-                public boolean satisfied(Method method)
-                {
-                    return method.getName().equals("getActions") &&
-                           (ReflectionUtils.acceptsParameters(method) || ReflectionUtils.acceptsParameters(method, configurationClass)) &&
-                           ReflectionUtils.returnsParameterisedType(method, List.class, String.class);
-                }
-            });
+            actionListingMethod = CollectionUtils.find(actionHandlerClass.getMethods(),
+                    and(hasName("getActions"), or(acceptsParameters(), acceptsParameters(configurationClass)), returnsType(List.class, String.class)));
         }
     }
 

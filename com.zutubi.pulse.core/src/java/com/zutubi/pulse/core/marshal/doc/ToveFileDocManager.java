@@ -14,11 +14,15 @@ import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.*;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.map;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import static com.zutubi.util.reflection.MethodPredicates.*;
 import com.zutubi.validation.annotations.Required;
 import nu.xom.Element;
 
@@ -227,17 +231,8 @@ public class ToveFileDocManager
         Class<?> examplesClass = ConventionSupport.getExamples(type.getClazz());
         if (examplesClass != null)
         {
-            List<Method> exampleMethods = CollectionUtils.filter(examplesClass.getMethods(), new Predicate<Method>()
-            {
-                public boolean satisfied(Method method)
-                {
-                    String name = method.getName();
-                    return name.length() > EXAMPLE_METHOD_PREFIX.length() &&
-                            name.startsWith(EXAMPLE_METHOD_PREFIX) &&
-                            method.getParameterTypes().length == 0 &&
-                            ConfigurationExample.class.isAssignableFrom(method.getReturnType());
-                }
-            });
+            List<Method> exampleMethods = CollectionUtils.filter(examplesClass.getMethods(),
+                    and(hasPrefix(EXAMPLE_METHOD_PREFIX, false), acceptsParameters(), returnsType(ConfigurationExample.class)));
 
             try
             {

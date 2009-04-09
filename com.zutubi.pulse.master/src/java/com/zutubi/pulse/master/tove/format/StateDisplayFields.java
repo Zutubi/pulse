@@ -2,10 +2,9 @@ package com.zutubi.pulse.master.tove.format;
 
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.ReflectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+import static com.zutubi.util.reflection.MethodPredicates.*;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -39,15 +38,8 @@ public class StateDisplayFields
     {
         if (stateDisplayClass != null)
         {
-            fieldListingMethod = CollectionUtils.find(stateDisplayClass.getMethods(), new Predicate<Method>()
-            {
-                public boolean satisfied(Method method)
-                {
-                    return method.getName().equals("getFields") &&
-                           (ReflectionUtils.acceptsParameters(method) || ReflectionUtils.acceptsParameters(method, configurationClass)) &&
-                           ReflectionUtils.returnsParameterisedType(method, List.class, String.class);
-                }
-            });
+            fieldListingMethod = CollectionUtils.find(stateDisplayClass.getMethods(),
+                    and(hasName("getFields"), or(acceptsParameters(), acceptsParameters(configurationClass)), returnsType(List.class, String.class)));
         }
     }
 

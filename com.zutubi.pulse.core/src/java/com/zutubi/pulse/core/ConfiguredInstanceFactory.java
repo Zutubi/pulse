@@ -2,9 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.tove.config.api.NamedConfiguration;
-import com.zutubi.util.ReflectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.lang.reflect.Constructor;
 

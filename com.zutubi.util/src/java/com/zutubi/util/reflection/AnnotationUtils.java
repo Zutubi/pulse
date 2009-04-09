@@ -1,5 +1,8 @@
-package com.zutubi.util;
+package com.zutubi.util.reflection;
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.BeanUtils;
 
 import java.beans.BeanInfo;

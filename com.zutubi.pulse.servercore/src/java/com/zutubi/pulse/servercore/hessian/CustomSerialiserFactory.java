@@ -7,7 +7,7 @@ import com.caucho.hessian.io.Serializer;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.ReflectionUtils;
+import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;

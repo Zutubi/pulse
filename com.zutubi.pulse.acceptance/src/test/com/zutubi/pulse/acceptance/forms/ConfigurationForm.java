@@ -5,10 +5,10 @@ import com.zutubi.tove.annotations.Field;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.AnnotationUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

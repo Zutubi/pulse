@@ -1,8 +1,8 @@
 package com.zutubi.util.junit;
 
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.ReflectionUtils;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.reflection.ReflectionUtils;
 import junit.framework.TestCase;
 
 import java.io.File;

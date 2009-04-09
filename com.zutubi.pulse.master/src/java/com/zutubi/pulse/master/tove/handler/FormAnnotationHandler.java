@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.tove.annotations.Form;
 import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.pulse.master.tove.model.FormDescriptor;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.type.CompositeType;
-import com.zutubi.util.AnnotationUtils;
+import com.zutubi.util.reflection.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
 

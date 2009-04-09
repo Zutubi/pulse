@@ -5,10 +5,10 @@ import com.zutubi.tove.config.ConfigurationMap;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.AnnotationUtils;
 
 import java.beans.IntrospectionException;
 import java.util.*;

@@ -1,5 +1,8 @@
-package com.zutubi.util;
+package com.zutubi.util.reflection;
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Sort;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -314,22 +317,32 @@ public class ReflectionUtilsTest extends ZutubiTestCase
         assertTrue(ReflectionUtils.acceptsParameters(parentParam, Child.class));
     }
 
-    public void testReturnsList() throws Exception
+    public void testReturnsListMatch() throws Exception
     {
-        assertFalse(ReflectionUtils.returnsParameterisedType(returnsList, List.class));
+        assertTrue(ReflectionUtils.returnsType(returnsList, List.class));
+    }
+
+    public void testReturnsListSuperclass() throws Exception
+    {
+        assertTrue(ReflectionUtils.returnsType(returnsList, Collection.class));
+    }
+
+    public void testReturnsListMismatch() throws Exception
+    {
+        assertFalse(ReflectionUtils.returnsType(returnsList, Set.class));
     }
 
     public void testReturnsStringList() throws Exception
     {
-        assertFalse(ReflectionUtils.returnsParameterisedType(returnsList, List.class, String.class));
-        assertFalse(ReflectionUtils.returnsParameterisedType(returnsStringList, List.class, Foo.class));
-        assertFalse(ReflectionUtils.returnsParameterisedType(returnsStringList, Foo.class, String.class));
-        assertTrue(ReflectionUtils.returnsParameterisedType(returnsStringList, List.class, String.class));
+        assertFalse(ReflectionUtils.returnsType(returnsList, List.class, String.class));
+        assertFalse(ReflectionUtils.returnsType(returnsStringList, List.class, Foo.class));
+        assertFalse(ReflectionUtils.returnsType(returnsStringList, Foo.class, String.class));
+        assertTrue(ReflectionUtils.returnsType(returnsStringList, List.class, String.class));
     }
 
     public void testReturnsStringListCollection() throws Exception
     {
-        assertTrue(ReflectionUtils.returnsParameterisedType(returnsStringList, Collection.class, String.class));
+        assertTrue(ReflectionUtils.returnsType(returnsStringList, Collection.class, String.class));
     }
 
     public static class Methods
@@ -602,7 +615,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals("Cannot set final field 'com.zutubi.util.ReflectionUtilsTest$SetFieldValue.publicFinalField', even if it succeeds it may have no effect due to compiler optimisations", e.getMessage());
+            assertEquals("Cannot set final field 'com.zutubi.util.reflection.ReflectionUtilsTest$SetFieldValue.publicFinalField', even if it succeeds it may have no effect due to compiler optimisations", e.getMessage());
         }
     }
 

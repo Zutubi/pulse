@@ -4,8 +4,8 @@ import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.AnnotationUtils;
 
 import java.beans.IntrospectionException;
 

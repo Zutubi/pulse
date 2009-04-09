@@ -4,12 +4,11 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.ReflectionUtils;
-import static com.zutubi.util.ReflectionUtils.acceptsParameters;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.MethodPredicates;
+import static com.zutubi.util.reflection.MethodPredicates.*;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -52,15 +51,8 @@ public class ConfigurationLinks
                 return;
             }
 
-            linksMethod = CollectionUtils.find(linksClass.getMethods(), new Predicate<Method>()
-            {
-                public boolean satisfied(Method method)
-                {
-                    return method.getName().equals(METHOD_NAME) &&
-                            acceptsParameters(method, ConfigurationLinks.this.configurationClass) &&
-                            ReflectionUtils.returnsParameterisedType(method, List.class, ConfigurationLink.class);
-                }
-            });
+            linksMethod = CollectionUtils.find(linksClass.getMethods(),
+                    and(hasName(METHOD_NAME), or(MethodPredicates.acceptsParameters(), MethodPredicates.acceptsParameters(configurationClass)), returnsType(List.class, ConfigurationLink.class)));
         }
     }
 

@@ -1,6 +1,6 @@
 package com.zutubi.util.bean;
 
-import com.zutubi.util.ReflectionUtils;
+import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;

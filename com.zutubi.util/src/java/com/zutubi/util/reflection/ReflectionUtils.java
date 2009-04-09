@@ -1,4 +1,6 @@
-package com.zutubi.util;
+package com.zutubi.util.reflection;
+
+import com.zutubi.util.*;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -205,22 +207,27 @@ public class ReflectionUtils
     }
 
     /**
-     * Returns true if the given method returns a parameterised type that is
-     * compatible with the given type details.  The returned type must be
-     * declared generic with the given type parameters, and be assignable to
-     * the given raw class.
+     * Returns true if the given method returns a type that is compatible with
+     * the given type details.  The returned type must be assignable to the
+     * given raw class.  If type arguments are specified, the returned type
+     * must be declared generic with the given type arguments.
      *
      * @param method        the method to test
      * @param rawClass      the raw class to test the return type for
      * @param typeArguments type arguments that the return type should be
-     *                      parameterised by
-     * @return true if the given method returns a compatible parameterised
-     *         type
+     *                      parameterised by (leave empty for a non-generic
+     *                      return type)
+     * @return true if the given method returns a compatible type
      */
-    public static boolean returnsParameterisedType(Method method, Class rawClass, Type... typeArguments)
+    public static boolean returnsType(Method method, Class rawClass, Type... typeArguments)
     {
         if(rawClass.isAssignableFrom(method.getReturnType()))
         {
+            if (typeArguments.length == 0)
+            {
+                return true;
+            }
+
             java.lang.reflect.Type returnType = method.getGenericReturnType();
             if(returnType instanceof ParameterizedType)
             {
