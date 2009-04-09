@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.servercore.repository.FileRepository;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -75,10 +76,7 @@ public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
         finally
         {
             outputWriter.flush();
-            if (scmClient != null)
-            {
-                scmClient.close();
-            }
+            IOUtils.close(scmClient);
         }
     }
 

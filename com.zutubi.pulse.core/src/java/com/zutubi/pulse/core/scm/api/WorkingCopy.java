@@ -91,7 +91,7 @@ public interface WorkingCopy
      * @param context   the context in which the operation is run, in particular
      *                  contains the base directory
      * @param patchFile the file to write the patch to
-     * @param spec     implementation-defined specification of the scope of the
+     * @param scope    implementation-defined specification of the scope of the
      *                 operation.  If empty, the operation should apply to the
      *                 entire working copy.  A common implementation will use
      *                 any provided strings as paths of files/directories to be
@@ -106,6 +106,6 @@ public interface WorkingCopy
      *         any one of these things is not true
      * @throws ScmException on any error creating the patch
      */
-    boolean writePatchFile(WorkingCopyContext context, File patchFile, String... spec) throws ScmException;
+    boolean writePatchFile(WorkingCopyContext context, File patchFile, String... scope) throws ScmException;
 
 }

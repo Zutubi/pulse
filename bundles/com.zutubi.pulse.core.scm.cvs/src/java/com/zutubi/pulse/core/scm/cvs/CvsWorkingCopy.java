@@ -54,9 +54,9 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
         return CvsClient.convertRevision(cvsRevision);
     }
 
-    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... spec) throws ScmException
+    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... scope) throws ScmException
     {
-        return StandardPatchFileSupport.writePatchFile(this, context, patchFile, spec);
+        return StandardPatchFileSupport.writePatchFile(this, context, patchFile, scope);
     }
 
     public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... paths) throws ScmException

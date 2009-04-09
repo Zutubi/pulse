@@ -40,7 +40,7 @@ public class StandardPatchFileSupport
      *                      possible)
      * @param context       context for the working copy operations
      * @param patchFile     output file that the patch will be written to
-     * @param spec          specification of what to include in the patch
+     * @param scope         specification of what to include in the patch
      *                      (should be passed through directly from
      *                      {@link WorkingCopy#writePatchFile(WorkingCopyContext, java.io.File, String[])},
      *                      - this method is passes it on to
@@ -52,9 +52,9 @@ public class StandardPatchFileSupport
      *
      * @see WorkingCopy#writePatchFile(WorkingCopyContext, java.io.File, String[])
      */
-    public static boolean writePatchFile(WorkingCopyStatusBuilder statusBuilder, WorkingCopyContext context, File patchFile, String... spec) throws ScmException
+    public static boolean writePatchFile(WorkingCopyStatusBuilder statusBuilder, WorkingCopyContext context, File patchFile, String... scope) throws ScmException
     {
-        WorkingCopyStatus status = statusBuilder.getLocalStatus(context, spec);
+        WorkingCopyStatus status = statusBuilder.getLocalStatus(context, scope);
         if (!status.inConsistentState())
         {
             context.getUI().error("Working copy is not in a consistent state.");

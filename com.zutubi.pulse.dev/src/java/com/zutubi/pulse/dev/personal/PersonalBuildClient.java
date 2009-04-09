@@ -264,14 +264,14 @@ public class PersonalBuildClient
                 ui.exitContext();
             }
 
-            ui.status("Patch created.");
-
             if (created)
             {
+                ui.status("Patch created.");
                 return rev;
             }
             else
             {
+                ui.status("No patch created.");
                 return null;
             }
         }

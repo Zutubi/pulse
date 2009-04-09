@@ -17,7 +17,7 @@ public class GitWorkingCopy implements WorkingCopy
         return false;
     }
 
-    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... spec) throws ScmException
+    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... scope) throws ScmException
     {
         throw new RuntimeException("Not implemented");
     }
