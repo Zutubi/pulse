@@ -26,6 +26,7 @@ public class PerforceConstants
     public static final String COMMAND_CLIENTS = "clients";
     public static final String COMMAND_DELETE = "delete";
     public static final String COMMAND_DESCRIBE = "describe";
+    public static final String COMMAND_DIFF = "diff";
     public static final String COMMAND_EDIT = "edit";
     public static final String COMMAND_INFO = "info";
     public static final String COMMAND_INTEGRATE = "integrate";
@@ -56,6 +57,7 @@ public class PerforceConstants
     public static final String FLAG_SHORT = "-s";
     public static final String FLAG_STATUS = "-s";
     public static final String FLAG_TYPE = "-t";
+    public static final String FLAG_UNIFIED_DIFF = "-du";
     public static final String OPTION_LOCKED = "locked";
     public static final String VALUE_SUBMITTED = "submitted";
     public static final String VALUE_ALL_FILES = "...";

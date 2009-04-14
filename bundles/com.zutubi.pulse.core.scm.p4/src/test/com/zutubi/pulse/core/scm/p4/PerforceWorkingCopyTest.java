@@ -1,5 +1,9 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.zutubi.diff.Hunk;
+import com.zutubi.diff.Patch;
+import com.zutubi.diff.PatchFile;
+import com.zutubi.diff.PatchParseException;
 import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
@@ -7,8 +11,10 @@ import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 
 public class PerforceWorkingCopyTest extends PerforceTestBase
@@ -355,6 +361,52 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         wc.update(context, Revision.HEAD);
         WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "file1", FileStatus.State.UNRESOLVED, false);
+    }
+
+    public void testCanDiffText() throws ScmException
+    {
+        assertTrue(wc.canDiff(context, "file1"));
+    }
+
+    public void testCanDiffTextOpenForEdit() throws ScmException
+    {
+        openForEdit("file1");
+        assertTrue(wc.canDiff(context, "file1"));
+    }
+
+    public void testCanDiffBinary() throws ScmException
+    {
+        assertFalse(wc.canDiff(context, "bin1"));
+    }
+
+    public void testCanDiffBinaryOpenForEdit() throws ScmException
+    {
+        openForEdit("bin1");
+        assertFalse(wc.canDiff(context, "bin1"));
+    }
+
+    public void testDiffTextFile() throws ScmException, PatchParseException, IOException
+    {
+        openForEdit("file1");
+        FileSystemUtils.createFile(new File(clientRoot, "file1"), "a line\n");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        wc.diff(context, "file1", baos);
+
+        String diff = new String(baos.toByteArray());
+        StringReader reader = new StringReader(diff);
+        PatchFile pf = PatchFile.read(reader);
+        assertEquals(1, pf.getPatches().size());
+
+        Patch patch = pf.getPatches().get(0);
+        assertEquals(1, patch.getHunks().size());
+
+        Hunk hunk = patch.getHunks().get(0);
+        assertEquals(1, hunk.getLines().size());
+
+        Hunk.Line line = hunk.getLines().get(0);
+        assertEquals("a line", line.getContent());
+        assertEquals(Hunk.LineType.ADDED, line.getType());
     }
 
     private void openForEdit(String path) throws ScmException

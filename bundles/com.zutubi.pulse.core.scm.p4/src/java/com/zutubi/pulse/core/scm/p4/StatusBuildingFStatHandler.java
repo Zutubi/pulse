@@ -1,74 +1,25 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.FileStatus;
+import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
+import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
+ * A handler for p4 fstat output that builds up a working copy status.
  */
-public class PerforceFStatHandler extends PerforceErrorDetectingHandler
+public class StatusBuildingFStatHandler extends AbstractPerforceFStatHandler
 {
-    private PersonalBuildUI ui;
     private WorkingCopyStatus status;
-    private Map<String, String> currentItem = new HashMap<String, String>();
 
-    public PerforceFStatHandler(PersonalBuildUI ui, WorkingCopyStatus status)
+    public StatusBuildingFStatHandler(PersonalBuildUI ui, WorkingCopyStatus status)
     {
-        super(true);
-        this.ui = ui;
+        super(ui);
         this.status = status;
     }
 
-    public void handleStdout(String line)
-    {
-        line = line.trim();
-        if(line.length() == 0)
-        {
-            if(currentItem.size() > 0)
-            {
-                handleItem();
-                currentItem.clear();
-            }
-        }
-        else
-        {
-            String[] parts = line.split(" ", 3);
-            if(parts.length == 3)
-            {
-                currentItem.put(parts[1], parts[2]);
-            }
-            else if(parts.length == 2)
-            {
-                currentItem.put(parts[1], "");
-            }
-        }
-    }
-
-    public void handleStderr(String line)
-    {
-        // Filter out spurious error (nothing changed)
-        if(!line.contains("file(s) not opened on this client") && !line.equals("//... - no such file(s)."))
-        {
-            super.handleStderr(line);
-        }
-    }
-
-    public void handleExitCode(int code) throws ScmException
-    {
-        super.handleExitCode(code);
-        if(currentItem.size() > 0)
-        {
-            handleItem();
-        }
-    }
-
-    public void checkCancelled() throws ScmCancelledException
-    {
-    }
-
-    private void handleItem()
+    protected void handleItem()
     {
         if(currentItem.containsKey(FSTAT_CLIENT_FILE))
         {
@@ -119,27 +70,6 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
                 status.addFileStatus(fs);
             }
         }
-    }
-
-    private String getCurrentItemType()
-    {
-        String type = currentItem.get(FSTAT_TYPE);
-        if(type == null)
-        {
-            type = getCurrentItemHeadType();
-        }
-        return type;
-    }
-
-    private String getCurrentItemHeadType()
-    {
-        String type = currentItem.get(FSTAT_HEAD_TYPE);
-        if(type == null)
-        {
-            type = "text";
-        }
-
-        return type;
     }
 
     private void resolveExecutableProperty(FileStatus fs, String type, String headType)
@@ -233,19 +163,6 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
         }
 
         return false;
-    }
-
-    private boolean fileIsText(String type)
-    {
-        return type.contains("text");
-    }
-
-    private void warning(String message)
-    {
-        if(ui != null)
-        {
-            ui.warning(message);
-        }
     }
 
     // Run: p4 fstat -Op -Rc //...@revision

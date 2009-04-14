@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.zutubi.diff.Patch;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.util.config.Config;
@@ -7,8 +8,11 @@ import com.zutubi.util.config.ConfigSupport;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 
 /**
+ * Implementation of {@link WorkingCopy} that interfaces with Perforce by
+ * wrapping the p4 command-line tool.
  */
 public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
 {
@@ -114,7 +118,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
     {
         PerforceCore core = createCore(context);
         WorkingCopyStatus status = new WorkingCopyStatus(core.getClientRoot());
-        PerforceFStatHandler handler = new PerforceFStatHandler(context.getUI(), status);
+        StatusBuildingFStatHandler handler = new StatusBuildingFStatHandler(context.getUI(), status);
 
         ConfigSupport configSupport = new ConfigSupport(context.getConfig());
         boolean pre2004_2 = configSupport.getBooleanProperty(PROPERTY_PRE_2004_2, false);
@@ -167,12 +171,35 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
     public boolean canDiff(WorkingCopyContext context, String path) throws ScmException
     {
-        return false;
+        FileTypeFStatHandler handler = new FileTypeFStatHandler(context.getUI());
+        PerforceCore core = createCore(context);
+        File f = new File(context.getBase(), path);
+        core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, f.getAbsolutePath());
+        return handler.isText();
     }
 
     public void diff(WorkingCopyContext context, String path, OutputStream output) throws ScmException
     {
-        throw new RuntimeException("Not implemented");
+        PerforceCore core = createCore(context);
+        File f = new File(context.getBase(), path);
+        final PrintWriter writer = new PrintWriter(output);
+
+        // p4 outputs only hunks, no header, so we output a header ourselves
+        writer.println(Patch.HEADER_OLD_FILE + " " + path);
+        writer.println(Patch.HEADER_NEW_FILE + " " + path);
+        
+        core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
+        {
+            public void handleStdout(String line)
+            {
+                writer.println(line);
+            }
+
+            public void checkCancelled() throws ScmCancelledException
+            {
+            }
+        }, null, getP4Command(COMMAND_DIFF), COMMAND_DIFF, FLAG_UNIFIED_DIFF, f.getAbsolutePath());
+        writer.flush();
     }
 
     private PerforceCore createCore(WorkingCopyContext context)
