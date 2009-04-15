@@ -156,7 +156,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         AntBuildConfiguration build = new AntBuildConfiguration();
         build.addFileToCreate("incorrect/path/artifact.jar");
 
-        int buildNumber = triggerBuild(project, build, null);
+        int buildNumber = triggerBuild(project, build);
         assertTrue(isBuildErrored(project.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
@@ -458,7 +458,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         AntBuildConfiguration buildB = new AntBuildConfiguration();
         buildB.addExpectedFile("lib/artifact.jar");
 
-        int buildNumber = triggerBuild(projectB, buildB, null);
+        int buildNumber = triggerBuild(projectB, buildB);
         assertTrue(isBuildFailure(projectB.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
@@ -567,7 +567,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private int triggerSuccessfulBuild(Project project, AntBuildConfiguration build) throws Exception
     {
-        return triggerSuccessfulBuild(project, build, null);
+        int buildNumber = triggerBuild(project, build);
+        assertTrue(isBuildSuccessful(project.getName(), buildNumber));
+        return buildNumber;
     }
 
     private int triggerSuccessfulBuild(Project project, AntBuildConfiguration build, String status) throws Exception
@@ -579,6 +581,21 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private int triggerBuild(Project project, AntBuildConfiguration build, String status) throws Exception
     {
+        triggerBuildCommon(project, build);
+
+        return xmlRpcHelper.runBuild(project.getName(), status, BUILD_TIMEOUT);
+    }
+
+    private int triggerBuild(Project project, AntBuildConfiguration build) throws Exception
+    {
+        // for each stage, set the necessary build properties.
+        triggerBuildCommon(project, build);
+
+        return xmlRpcHelper.runBuild(project.getName(), BUILD_TIMEOUT);
+    }
+
+    private void triggerBuildCommon(Project project, AntBuildConfiguration build) throws Exception
+    {
         // for each stage, set the necessary build properties.
         for (Stage stage : project.stages)
         {
@@ -586,8 +603,6 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             xmlRpcHelper.insertOrUpdateStageProperty(project.getName(), stage.getName(), PROPERTY_EXPECTED_LIST, build.getExpectedList());
             xmlRpcHelper.insertOrUpdateStageProperty(project.getName(), stage.getName(), PROPERTY_NOT_EXPECTED_LIST, build.getNotExpectedList());
         }
-
-        return xmlRpcHelper.runBuild(project.getName(), status, BUILD_TIMEOUT);
     }
 
     private void createProject(Project project) throws Exception

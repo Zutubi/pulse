@@ -2,10 +2,14 @@ package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.TimeStamps;
+
+import java.util.Collection;
 
 /**
  * Base class for build requests.  Specific subclasses are used to
@@ -82,5 +86,25 @@ public abstract class AbstractBuildRequestEvent extends Event
     public TriggerOptions getOptions()
     {
         return options;
+    }
+
+    public BuildReason getReason()
+    {
+        return options.getReason();
+    }
+
+    public Collection<ResourcePropertyConfiguration> getProperties()
+    {
+        return options.getProperties();
+    }
+
+    public String getRequestSource()
+    {
+        return options.getSource();
+    }
+
+    public boolean isReplaceable()
+    {
+        return options.isReplaceable();
     }
 }
