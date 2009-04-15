@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.ResultNotifier;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
@@ -53,12 +54,12 @@ public class DashboardAction extends ActionSupport
     {
         return models;
     }
-    
+
     public List<String> getColumns()
     {
         return dashboardConfig.getColumns();
     }
-    
+
     public List<PersistentChangelist> getChangelists()
     {
         return changelists;
@@ -75,7 +76,7 @@ public class DashboardAction extends ActionSupport
         {
             Set<Long> ids = changelistDao.getAllAffectedResultIds(changelist);
             List<BuildResult> buildResults = new LinkedList<BuildResult>();
-            for(Long id: ids)
+            for (Long id : ids)
             {
                 BuildResult buildResult = buildManager.getBuildResult(id);
                 if (buildResult != null)
@@ -90,9 +91,9 @@ public class DashboardAction extends ActionSupport
                 {
                     NamedEntityComparator comparator = new NamedEntityComparator();
                     int result = comparator.compare(b1.getProject(), b2.getProject());
-                    if(result == 0)
+                    if (result == 0)
                     {
-                        result = (int)(b1.getNumber() - b2.getNumber());
+                        result = (int) (b1.getNumber() - b2.getNumber());
                     }
 
                     return result;
@@ -129,9 +130,11 @@ public class DashboardAction extends ActionSupport
         dashboardConfig = user.getConfig().getPreferences().getDashboard();
 
         Predicate<Project> projectPredicate;
+        Comparator<Project> projectComparator;
         if (dashboardConfig.isShowAllProjects())
         {
             projectPredicate = new TruePredicate<Project>();
+            projectComparator = new ProjectNameComparator();
         }
         else
         {
@@ -142,10 +145,13 @@ public class DashboardAction extends ActionSupport
                     return dashboardConfig.getShownProjects().contains(project.getConfig());
                 }
             };
+            projectComparator = new DashboardConfigurationProjectComparator(dashboardConfig);
         }
 
         boolean showUngrouped;
         Predicate<ProjectGroup> groupPredicate;
+        Comparator<ProjectGroup> groupComparator = new ProjectGroupNameComparator();
+
         if (dashboardConfig.isGroupsShown())
         {
             showUngrouped = dashboardConfig.isShowUngrouped();
@@ -162,6 +168,7 @@ public class DashboardAction extends ActionSupport
                         return dashboardConfig.getShownGroups().contains(projectGroup.getName());
                     }
                 };
+                groupComparator = new DashboardConfigurationProjectGroupComparator(dashboardConfig);
             }
         }
         else
@@ -171,20 +178,20 @@ public class DashboardAction extends ActionSupport
         }
 
         ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
-        models = helper.createProjectsModels(dashboardConfig, projectPredicate, groupPredicate, showUngrouped);
+        models = helper.createProjectsModels(dashboardConfig, projectPredicate, projectComparator, groupPredicate, groupComparator, showUngrouped);
 
         changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
         Collections.sort(changelists, new ChangelistComparator());
 
         Set<Project> projects = userManager.getUserProjects(user, projectManager);
-        if(projects.size() > 0 && dashboardConfig.isShowProjectChanges())
+        if (projects.size() > 0 && dashboardConfig.isShowProjectChanges())
         {
             projectChangelists = buildManager.getLatestChangesForProjects(projects.toArray(new Project[projects.size()]), dashboardConfig.getProjectChangeCount());
         }
 
-        for(ContactConfiguration contact: user.getConfig().getPreferences().getContacts().values())
+        for (ContactConfiguration contact : user.getConfig().getPreferences().getContacts().values())
         {
-            if(resultNotifier.hasError(contact))
+            if (resultNotifier.hasError(contact))
             {
                 contactPointsWithErrors.add(contact.getName());
             }
@@ -206,5 +213,75 @@ public class DashboardAction extends ActionSupport
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    /**
+     * A comparator that will order projects based on the order defined in the shownProjects
+     * list in the dashboard configuration
+     */
+    private class DashboardConfigurationProjectComparator implements Comparator<Project>
+    {
+        private Map<Long, Integer> projectIndicies;
+
+        private DashboardConfigurationProjectComparator(DashboardConfiguration configuration)
+        {
+            projectIndicies = new HashMap<Long, Integer>();
+            int index = 0;
+            for (ProjectConfiguration projectConfig : configuration.getShownProjects())
+            {
+                projectIndicies.put(projectConfig.getProjectId(), index);
+                index++;
+            }
+        }
+
+        public int compare(Project o1, Project o2)
+        {
+            if (!projectIndicies.containsKey(o1.getId()))
+            {
+                return 1;
+            }
+            if (!projectIndicies.containsKey(o2.getId()))
+            {
+                return 1;
+            }
+            int indexA = projectIndicies.get(o1.getId());
+            int indexB = projectIndicies.get(o2.getId());
+            return indexA - indexB;
+        }
+    }
+
+    /**
+     * A comparator that will order project groups based on the order defined in the shownProjectGroups
+     * list in the dashboard configuration
+     */
+    private class DashboardConfigurationProjectGroupComparator implements Comparator<ProjectGroup>
+    {
+        private Map<String, Integer> groupIndicies;
+
+        private DashboardConfigurationProjectGroupComparator(DashboardConfiguration config)
+        {
+            groupIndicies = new HashMap<String, Integer>();
+            int index = 0;
+            for (String groupName : config.getShownGroups())
+            {
+                groupIndicies.put(groupName, index);
+                index++;
+            }
+        }
+
+        public int compare(ProjectGroup o1, ProjectGroup o2)
+        {
+            if (!groupIndicies.containsKey(o1.getName()))
+            {
+                return 1;
+            }
+            if (!groupIndicies.containsKey(o2.getName()))
+            {
+                return 1;
+            }
+            int indexA = groupIndicies.get(o1.getName());
+            int indexB = groupIndicies.get(o2.getName());
+            return  indexA - indexB;
+        }
     }
 }

@@ -1,11 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.util.Sort;
 import com.zutubi.util.UnaryProcedure;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,7 +11,6 @@ import java.util.List;
 public class TemplateProjectModel extends ProjectModel
 {
     private static final ProjectHealth[] SUMMARY_HEALTHS = { ProjectHealth.OK, ProjectHealth.WARNINGS, ProjectHealth.BROKEN };
-    private static final ChildComparator CHILD_COMPARATOR = new ChildComparator();
 
     private List<ProjectModel> children = new LinkedList<ProjectModel>();
 
@@ -32,7 +28,6 @@ public class TemplateProjectModel extends ProjectModel
     {
         children.add(child);
         child.setParent(this);
-        Collections.sort(children, CHILD_COMPARATOR);
     }
 
     public ProjectHealth[] getSummaryHealths()
@@ -98,16 +93,6 @@ public class TemplateProjectModel extends ProjectModel
         for(ProjectModel child: children)
         {
             child.forEach(proc);
-        }
-    }
-
-    private static class ChildComparator implements Comparator<ProjectModel>
-    {
-        private Comparator<String> cmp = new Sort.StringComparator();
-
-        public int compare(ProjectModel o1, ProjectModel o2)
-        {
-            return cmp.compare(o1.getName(), o2.getName());
         }
     }
 }
