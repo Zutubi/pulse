@@ -46,7 +46,7 @@ public class ProjectsModelsHelper
         for (ProjectGroup group : groups)
         {
             List<Project> groupProjects = CollectionUtils.filter(group.getProjects(), projectPredicate);
-            Collections.sort(groupProjects, projectComparator);
+            //Collections.sort(groupProjects, projectComparator);
             if (!groupProjects.isEmpty())
             {
                 result.add(createModel(group.getName(), true, groupProjects, hierarchy, configuration));
