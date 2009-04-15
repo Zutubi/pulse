@@ -52,6 +52,12 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
      */
     private boolean supercedeQueued;
 
+    /**
+     * If true, build requests raised by this trigger will inherit the status
+     * of the completed build.
+     */
+    private boolean propagateStatus;
+
     @Transient
     private ConfigurationProvider configurationProvider;
 
@@ -99,6 +105,16 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
         this.supercedeQueued = supercedeQueued;
     }
 
+    public boolean isPropagateStatus()
+    {
+        return propagateStatus;
+    }
+
+    public void setPropagateStatus(boolean propagateStatus)
+    {
+        this.propagateStatus = propagateStatus;
+    }
+
     public Trigger newTrigger()
     {
         ProjectConfiguration project = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
@@ -119,6 +135,7 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
     private void populateDataMap(Map<Serializable, Serializable> dataMap)
     {
         dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, this.project.getProjectId());
+        dataMap.put(BuildCompletedEventFilter.PARAM_PROPAGATE_STATUS, propagateStatus);
         dataMap.put(BuildCompletedEventFilter.PARAM_PROPAGATE_REVISION, propagateRevision);
         dataMap.put(BuildCompletedEventFilter.PARAM_REPLACEABLE, supercedeQueued);
 

@@ -2367,6 +2367,28 @@ public class RemoteApi
      */
     public boolean triggerBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
     {
+        return triggerBuild(token, projectName, revision, null, properties);
+    }
+
+    /**
+     * Triggers a build of the given project at the given revision with the given project property
+     * values.  The revision will be verified before requesting the build.  The properties are added
+     * to the project configuration (for properties that already exist, the values are overridden)
+     * for this build only.  This function returns as soon as the request has been made.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project to trigger
+     * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
+     *                    may be empty to indicate the latest revision should be used
+     * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
+     * @param status      the status category associated with the build request 
+     * @return true
+     * @access requires trigger permission for the given project
+     * @see #triggerBuild(String, String)
+     * @see #triggerBuild(String, String, String)
+     */
+    public boolean triggerBuild(String token, String projectName, final String revision, String status, Hashtable<String, String> properties)
+    {
         User user = tokenManager.loginAndReturnUser(token);
         try
         {
@@ -2407,8 +2429,12 @@ public class RemoteApi
                     resourceProperties.add(new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
                 }
             }
-
-            projectManager.triggerBuild(project.getConfig(), resourceProperties, new RemoteTriggerBuildReason(user.getLogin()), r, "remote api", false, true);
+            TriggerOptions options = new TriggerOptions(new RemoteTriggerBuildReason(user.getLogin()), r, "remote api");
+            options.setReplaceable(false);
+            options.setForce(true);
+            options.setProperties(resourceProperties);
+            options.setStatus(status);
+            projectManager.triggerBuild(project.getConfig(), options);
             return true;
         }
         finally

@@ -6,7 +6,6 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.personal.PatchArchive;
@@ -523,7 +522,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         licenseManager.refreshAuthorisations();
     }
 
-    public void triggerBuild(ProjectConfiguration projectConfig, Collection<ResourcePropertyConfiguration> properties, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force)
+    public void triggerBuild(ProjectConfiguration projectConfig, TriggerOptions options)
     {
         Project project = getProject(projectConfig.getProjectId(), false);
 
@@ -531,7 +530,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         // to the persistent version (e.g. it could have additional properties).
         project.setConfig(projectConfig);
 
-        if(revision == null)
+        if(options.getRevision() == null)
         {
             if(projectConfig.getOptions().getIsolateChangelists())
             {
@@ -542,18 +541,21 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(project, projectConfig, scmManager);
                     if(capabilities.contains(ScmCapability.REVISIONS))
                     {
-                            List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
+                            List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, options.isForce());
                             for(Revision r: revisions)
                             {
                                 // Note when isolating changelists we never replace existing requests
-                                requestBuildOfRevision(reason, project, properties, r, source, false);
+                                TriggerOptions copy = new TriggerOptions(options);
+                                copy.setRevision(r);
+                                options.setReplaceable(false);
+                                requestBuildOfRevision(project, copy);
                             }
                     }
                     else
                     {
                         LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() +
                                 "' as the SCM does not support revisions");
-                        requestBuildFloating(reason, project, properties, source, replaceable);
+                        requestBuildFloating(project, options);
                     }
                 }
                 catch (ScmException e)
@@ -563,13 +565,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
             else
             {
-                requestBuildFloating(reason, project, properties, source, replaceable);
+                requestBuildFloating(project, options);
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, project, properties, revision, source, replaceable);
+            requestBuildOfRevision(project, options);
         }
     }
 
@@ -609,21 +611,22 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private void requestBuildFloating(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, String category, boolean replaceable)
+    private void requestBuildFloating(Project project, TriggerOptions options)
     {
-        eventManager.publish(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(), category, replaceable));
+        eventManager.publish(new BuildRequestEvent(this, project, new BuildRevision(), options));
     }
 
-    private void requestBuildOfRevision(BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, Revision revision, String source, boolean replaceable)
+    private void requestBuildOfRevision(Project project, TriggerOptions options)
     {
         try
         {
-            PulseFileSource pulseFile = getPulseFile(project.getConfig(), revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, project, properties, new BuildRevision(revision, pulseFile, reason.isUser()), source, replaceable));
+            PulseFileSource pulseFile = getPulseFile(project.getConfig(), options.getRevision(), null);
+
+            eventManager.publish(new BuildRequestEvent(this, project, new BuildRevision(options.getRevision(), pulseFile, options.getReason().isUser()), options));
         }
         catch (Exception e)
         {
-            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
+            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + options.getRevision().getRevisionString() + "': " + e.getMessage(), e);
         }
     }
 

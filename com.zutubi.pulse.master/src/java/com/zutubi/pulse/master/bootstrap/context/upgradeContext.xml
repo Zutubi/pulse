@@ -5,10 +5,6 @@
 -->
 <beans default-autowire="byName">
 
-    <!-- WARNING: as of 05/05/06, the context is empty when this file is being loaded.
-        In particular, NO DATASOURCE!. You have been warned.
-    -->
-
     <bean id="upgradeManager" class="com.zutubi.pulse.master.upgrade.DefaultUpgradeManager">
         <property name="upgradeableComponents">
             <list>
@@ -56,6 +52,9 @@
                 <ref local="skeletonPostProcessors"/>
                 <ref local="toveFile"/>
                 <ref local="dependencies"/>
+                <ref local="addStatusFieldToBuildResultTable"/>
+                <ref local="addDependencyStatusField"/>
+                <ref local="addPropagateStatusField"/>
              </list>
         </property>
         <property name="systemTasks">
@@ -197,4 +196,21 @@
         <property name="buildNumber" value="200999006"/>
     </bean>
     
+    <bean id="addStatusFieldToBuildResultTable" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="200999007"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.99-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="addDependencyStatusField" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyStatusFieldUpgradeTask">
+        <property name="buildNumber" value="200999008"/>
+    </bean>
+
+    <bean id="addPropagateStatusField" class="com.zutubi.pulse.master.upgrade.tasks.AddPropagateStatusFieldUpgradeTask">
+        <property name="buildNumber" value="200999009"/>
+    </bean>
+
 </beans>

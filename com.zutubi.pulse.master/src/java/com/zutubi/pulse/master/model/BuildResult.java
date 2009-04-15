@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.util.Predicate;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
@@ -43,6 +42,8 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
      */
     private boolean hasWorkDir;
 
+    private String status;
+
     public BuildResult()
     {
 
@@ -73,12 +74,6 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     {
         this(reason, project, number, false);
         this.user = user;
-    }
-
-    private static String getLogin(User user)
-    {
-        UserConfiguration config = user.getConfig();
-        return config == null ? "" : config.getLogin();
     }
 
     public BuildReason getReason()
@@ -363,6 +358,16 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     public void setVersion(String version)
     {
         this.version = version;
+    }
+
+    public String getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(String status)
+    {
+        this.status = status;
     }
 
     private class ResultIterator implements Iterator<RecipeResultNode>

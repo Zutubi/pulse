@@ -37,7 +37,7 @@ public class IvySupport
 
     private static final String[] ALL_CONFS = new String[]{"*"};
 
-    private static final String[] BUILD_CONF = new String[]{"build"};
+    public static final String CONFIGURATION_BUILD = "build";
 
     private Ivy ivy;
 
@@ -93,7 +93,7 @@ public class IvySupport
      */
     public void retrieve(ModuleRevisionId mrid, String targetPattern) throws IOException
     {
-        retrieve(mrid, targetPattern, BUILD_CONF);
+        retrieve(mrid, targetPattern, CONFIGURATION_BUILD);
     }
 
     /**
@@ -291,11 +291,24 @@ public class IvySupport
         return command;
     }
 
+    /**
+     * Return true if the specified descriptor has configured dependencies.
+     * @param descriptor    the descriptor in question
+     * @return  true if the descriptor has dependencies, false otherwise.
+     */
     public boolean hasDependencies(ModuleDescriptor descriptor)
     {
         return descriptor != null && descriptor.getDependencies().length > 0;
     }
 
+    /**
+     * Return true if the specified descriptor has artifacts for the specified
+     * configuration
+     *
+     * @param descriptor    the descriptor in question
+     * @param conf          the configuration
+     * @return  true if the descriptor has artifacts for the specified configuration.
+     */
     public boolean hasArtifacts(ModuleDescriptor descriptor, String conf)
     {
         return descriptor != null && descriptor.getArtifacts(conf).length > 0;

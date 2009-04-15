@@ -1,9 +1,8 @@
 package com.zutubi.pulse.servercore.dependency.ivy;
 
 import com.caucho.hessian.io.AbstractHessianInput;
-import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.Ivy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 import static org.mockito.Mockito.verify;
@@ -22,6 +21,10 @@ public class ModuleDescriptorDeserialiserTest extends AbstractHessianTestCase
 
         deserialiser = new ModuleDescriptorDeserialiser();
         deserialiser.setTmpDir(tmpDir);
+
+        IvyManager ivyManager = new IvyManager();
+        ivyManager.init();
+        deserialiser.setIvyManager(ivyManager);
     }
 
     public void testDeserialisation() throws IOException, ParseException

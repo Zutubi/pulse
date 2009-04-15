@@ -1,9 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
@@ -127,7 +124,8 @@ public class ProjectConfigurationActions
         String user = AcegiUtils.getLoggedInUsername();
         if (user != null)
         {
-            projectManager.triggerBuild(projectConfig, Collections.<ResourcePropertyConfiguration>emptyList(), new ManualTriggerBuildReason(user), null, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
+            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), null, ProjectManager.TRIGGER_CATEGORY_MANUAL);
+            projectManager.triggerBuild(projectConfig, options);
         }
     }
 

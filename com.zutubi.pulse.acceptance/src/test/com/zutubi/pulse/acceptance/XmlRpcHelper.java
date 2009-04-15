@@ -586,6 +586,11 @@ public class XmlRpcHelper
         call("triggerBuild", projectName, revision, properties);
     }
 
+    public void triggerBuild(String projectName, String revision, String status, Hashtable<String, String> properties) throws Exception
+    {
+        call("triggerBuild", projectName, revision, status, properties);
+    }
+
     /**
      * Requests the given build be terminated.
      *
@@ -631,6 +636,26 @@ public class XmlRpcHelper
     {
         int number = getNextBuildNumber(projectName);
         triggerBuild(projectName);
+        waitForBuildToComplete(projectName, number, timeout);
+        return number;
+    }
+
+    /**
+     * Triggers a build of the given project and waits for up to the given timeout (milliseconds)
+     * for it to complete.
+     *
+     * @param projectName   the name of the project to trigger
+     * @param status        the status of the build being triggered.
+     * @param timeout       maximum number of milliseconds to wait for the build
+     * @return  the build number
+     * @throws Exception is thrown on any error.
+     *
+     * @see #runBuild(String, long)
+     */
+    public int runBuild(String projectName, String status, long timeout) throws Exception
+    {
+        int number = getNextBuildNumber(projectName);
+        triggerBuild(projectName, "", status, new Hashtable<String, String>());
         waitForBuildToComplete(projectName, number, timeout);
         return number;
     }

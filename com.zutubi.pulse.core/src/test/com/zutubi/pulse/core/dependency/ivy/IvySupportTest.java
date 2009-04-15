@@ -37,7 +37,7 @@ public class IvySupportTest extends PulseTestCase
         variables.setVariable("repository.base", tmp.getAbsolutePath(), true);
 
         IvySettings settings = new IvySettings(variables);
-        settings.load(DefaultIvyProvider.class.getResource("ivysettings.xml"));
+        settings.load(IvyManager.class.getResource("ivysettings.xml"));
 
         String artifactPattern = "${repository.base}/repository/[organisation]/[module]/([stage]/)[type]s/[artifact]-[revision].[type]";
         String ivyPattern = "${repository.base}/repository/[organisation]/[module]/([stage]/)ivy-[revision].xml";

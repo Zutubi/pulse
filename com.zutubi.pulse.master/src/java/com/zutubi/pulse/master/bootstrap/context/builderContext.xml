@@ -111,7 +111,6 @@
     <bean id="recipeTerminationService" class="com.zutubi.pulse.master.agent.RecipeTerminationService" init-method="init"/>
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor"/>
-    <bean id="ivyProvider" class="com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider"/>
 
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.master.engine.marshal.MasterPulseFileLoaderFactory" init-method="init"/>
 
@@ -222,7 +221,12 @@
 
     <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
         <property name="customSerialiserFactory" ref="customSerialiserFactory"/>
+        <property name="ivyManager" ref="dependencyManager"/>
     </bean>
 
     <bean id="toveFileDocManager" class="com.zutubi.pulse.core.marshal.doc.ToveFileDocManager"/>
+
+    <bean id="dependencyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init"/>
+    <alias name="dependencyManager" alias="ivyProvider"/>
+    
 </beans>

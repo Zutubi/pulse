@@ -22,6 +22,7 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
     public static final String PARAM_STATES             = "build.states";
     public static final String PARAM_PROPAGATE_REVISION = "propagate.revision";
     public static final String PARAM_REPLACEABLE        = "replaceable";
+    public static final String PARAM_PROPAGATE_STATUS   = "propagate.status";
     public static final String SEPARATOR = ",";
 
     public boolean accept(Trigger trigger, Event event, TaskExecutionContext context)
@@ -34,9 +35,13 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
             // Pass some information to the task.
             if (getBooleanParam(dataMap, PARAM_PROPAGATE_REVISION, false))
             {
-                // Copy the revision: we don't want to shage the persistent instance.
+                // Copy the revision: we don't want to share the persistent instance.
                 context.put(BuildProjectTask.PARAM_REVISION, new Revision(bce.getBuildResult().getRevision().getRevisionString()));
                 context.put(BuildProjectTask.PARAM_REPLACEABLE, getBooleanParam(dataMap, PARAM_REPLACEABLE, false));
+            }
+            if (getBooleanParam(dataMap, PARAM_PROPAGATE_STATUS, false))
+            {
+                context.put(BuildProjectTask.PARAM_STATUS, bce.getBuildResult().getStatus());
             }
         }
         return accept;
@@ -89,5 +94,4 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
             return value;
         }
     }
-
 }

@@ -2,15 +2,14 @@ package com.zutubi.pulse.servercore.dependency.ivy;
 
 import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.core.dependency.ivy.IvyMessageLoggerAdapter;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
 import org.apache.ivy.plugins.repository.Resource;
-import org.apache.ivy.util.Message;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,26 +23,8 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
     private static final String FIELD_VALUE = "value";
 
     private File tmpDir;
-    private IvySettings ivySettings;
 
-    public ModuleDescriptorDeserialiser()
-    {
-        // redirect the default logging to our own logging system.
-        Message.setDefaultLogger(new IvyMessageLoggerAdapter());
-
-        try
-        {
-            // we need some ivy settings to tell the descriptor parser how to behave.  The defaults
-            // should be fine for this.
-            ivySettings = new IvySettings();
-            ivySettings.loadDefault();
-            ivySettings.setValidate(false);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+    private IvyManager ivyManager;
 
     public Object readMap(AbstractHessianInput input) throws IOException
     {
@@ -94,6 +75,8 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
             Resource res = new MemoryResource("ivy.xml", descriptor);
             ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser(res);
 
+            IvySettings ivySettings = ivyManager.getDefaultSettings();
+
             return parser.parseDescriptor(ivySettings, tmp.toURI().toURL(), res, ivySettings.doValidate());
         }
         catch (ParseException e)
@@ -134,5 +117,10 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
     public void setTmpDir(File tmpDir)
     {
         this.tmpDir = tmpDir;
+    }
+
+    public void setIvyManager(IvyManager ivyManager)
+    {
+        this.ivyManager = ivyManager;
     }
 }

@@ -132,7 +132,10 @@ public class BuildQueueTestCase extends PulseTestCase
     protected AbstractBuildRequestEvent createRequest(final Project owner, final long buildId, String source, boolean replaceable, Revision revision)
     {
         BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, new PulseFileSource("pulse file"), false);
-        return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), null, null, source, replaceable)
+        TriggerOptions options = new TriggerOptions(null, revision, source);
+        options.setStatus("integration");
+        options.setReplaceable(replaceable);
+        return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), options)
         {
             public Entity getOwner()
             {
@@ -148,6 +151,7 @@ public class BuildQueueTestCase extends PulseTestCase
             {
                 BuildResult buildResult = new BuildResult(new UnknownBuildReason(), owner, 0, false);
                 buildResult.setId(buildId);
+                buildResult.setStatus(options.getStatus());
                 return buildResult;
             }
         };

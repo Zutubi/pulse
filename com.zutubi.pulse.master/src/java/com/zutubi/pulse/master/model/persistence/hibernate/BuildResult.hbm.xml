@@ -44,6 +44,8 @@
                      cascade="all"/>
 
         <property name="version" column="VERSION" type="string" length="255"/>
+        
+        <property name="status" column="STATUS" type="string" length="255"/>
 
         <property name="hasWorkDir" type="boolean"/>
 

@@ -38,9 +38,9 @@
     <bean id="logManager" class="com.zutubi.pulse.core.util.logging.LogManager">
         <property name="factories">
             <map>
-                <entry><key><value>FileHandler</value></key><ref local="fileHandlerFactory"/></entry>
-                <entry><key><value>ConsoleHandler</value></key><ref local="consoleHandlerFactory"/></entry>
-                <entry><key><value>MemoryHandler</value></key><ref local="memoryHandlerFactory"/></entry>
+                <entry key="FileHandler"><ref local="fileHandlerFactory"/></entry>
+                <entry key="ConsoleHandler"><ref local="consoleHandlerFactory"/></entry>
+                <entry key="MemoryHandler"><ref local="memoryHandlerFactory"/></entry>
             </map>
         </property>
     </bean>
@@ -48,9 +48,7 @@
     <bean name="jettyServerManager" class="com.zutubi.pulse.servercore.jetty.JettyServerManager"/>
 
     <bean id="fileHandlerFactory" class="com.zutubi.pulse.servercore.util.logging.FileHandlerFactory">
-        <property name="objectFactory">
-            <ref bean="objectFactory"/>
-        </property>
+        <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
     <bean id="consoleHandlerFactory" class="com.zutubi.pulse.core.util.logging.ConsoleHandlerFactory"/>
@@ -65,7 +63,6 @@
     <bean id="slaveRecipeProcessor" class="com.zutubi.pulse.slave.SlaveRecipeProcessor" />
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" />
-    <bean id="ivyProvider" class="com.zutubi.pulse.core.dependency.ivy.DefaultIvyProvider"/>
 
     <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" />
 
@@ -106,5 +103,8 @@
     <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
         <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
     </bean>
+
+    <bean id="dependencyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init"/>
+    <alias name="dependencyManager" alias="ivyProvider"/>
 
 </beans>

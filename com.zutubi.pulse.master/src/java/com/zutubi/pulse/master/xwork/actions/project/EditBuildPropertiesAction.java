@@ -3,9 +3,11 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.dependency.DependencyManager;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
@@ -15,6 +17,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
+import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationPanel;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationResponse;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -23,6 +26,8 @@ import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -43,11 +48,13 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String formSource;
     private String revision;
     private List<ResourcePropertyConfiguration> properties;
+    private String status;
     private boolean ajax;
     private ConfigurationPanel newPanel;
     private ConfigurationResponse configurationResponse;
     private String submitField;
 
+    private DependencyManager dependencyManager;
     private ScmManager scmManager;
     private Configuration configuration;
 
@@ -74,6 +81,16 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public void setRevision(String revision)
     {
         this.revision = revision;
+    }
+
+    public String getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(String status)
+    {
+        this.status = status;
     }
 
     public void setPath(String path)
@@ -124,6 +141,14 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         addLatestAction(field, project, project.getConfig());
 
         form.add(field);
+
+        OptionFieldDescriptor statusFieldDescriptor = new OptionFieldDescriptor();
+        statusFieldDescriptor.setName("status");
+        statusFieldDescriptor.setType(FieldType.TEXT);
+        statusFieldDescriptor.setList(dependencyManager.getStatuses());
+        MutableRecord r = new MutableRecordImpl();
+        r.put("status", project.getConfig().getDependencies().getStatus());
+        form.add(statusFieldDescriptor.instantiate(null, r));
 
         for(ResourcePropertyConfiguration property: properties)
         {
@@ -239,7 +264,10 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         try
         {
-            projectManager.triggerBuild(project.getConfig(), mapProperties(project.getConfig()), new ManualTriggerBuildReason(getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
+            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL);
+            options.setProperties(mapProperties(project.getConfig()));
+            options.setStatus(status);
+            projectManager.triggerBuild(project.getConfig(), options);
         }
         catch (Exception e)
         {
@@ -301,5 +329,10 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public void setFreemarkerConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
+    }
+
+    public void setDependencyManager(DependencyManager dependencyManager)
+    {
+        this.dependencyManager = dependencyManager;
     }
 }

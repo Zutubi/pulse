@@ -1,11 +1,8 @@
 package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.model.*;
-
-import java.util.Collection;
 
 /**
  * A request for a project build.
@@ -14,9 +11,9 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
     private Project owner;
 
-    public BuildRequestEvent(Object source, BuildReason reason, Project project, Collection<ResourcePropertyConfiguration> properties, BuildRevision revision, String requestSource, boolean replaceable)
+    public BuildRequestEvent(Object source, Project project, BuildRevision buildRevision, TriggerOptions options)
     {
-        super(source, revision, project.getConfig(), properties, reason, requestSource, replaceable);
+        super(source, buildRevision, project.getConfig(), options);
         this.owner = project;
     }
 
@@ -33,7 +30,16 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
     public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
     {
         Project project = projectManager.getProject(getProjectConfig().getProjectId(), false);
-        return new BuildResult(getReason(), project, projectManager.getNextBuildNumber(project), getRevision().isUser());
+        BuildResult result = new BuildResult(options.getReason(), project, projectManager.getNextBuildNumber(project), getRevision().isUser());
+
+        String status = getProjectConfig().getDependencies().getStatus();
+        if (getOptions().hasStatus())
+        {
+            status = getOptions().getStatus();
+        }
+        result.setStatus(status);
+        
+        return result;
     }
 
     public String toString()
@@ -44,16 +50,16 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
             // should never be null, but then again, toString must never fail either.
             buff.append(": name: ").append(getProjectConfig().getName());
         }
-        if (getReason() != null)
+        if (options.getReason() != null)
         {
             // should never be null, but then again, toString must never fail either.
-            buff.append(": summary: ").append(getReason().getSummary());
+            buff.append(": summary: ").append(options.getReason().getSummary());
         }
-        if (getRequestSource() != null)
+        if (options.getSource() != null)
         {
-            buff.append(": source: ").append(getRequestSource());
+            buff.append(": source: ").append(options.getSource());
         }
-        if(isReplaceable())
+        if(options.isReplaceable())
         {
             buff.append(" (replaceable)");
         }

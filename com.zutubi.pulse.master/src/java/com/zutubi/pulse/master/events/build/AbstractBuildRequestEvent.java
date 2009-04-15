@@ -2,16 +2,10 @@ package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.master.model.BuildReason;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.TimeStamps;
-
-import java.util.Collection;
 
 /**
  * Base class for build requests.  Specific subclasses are used to
@@ -22,10 +16,7 @@ public abstract class AbstractBuildRequestEvent extends Event
     private BuildRevision revision;
     private long queued;
     protected ProjectConfiguration projectConfig;
-    protected Collection<ResourcePropertyConfiguration> properties;
-    protected String requestSource;
-    protected boolean replaceable;
-    protected BuildReason reason;
+    protected TriggerOptions options;
 
     /**
      * @param source        the event source
@@ -33,36 +24,20 @@ public abstract class AbstractBuildRequestEvent extends Event
      *                      initialised if the revision should float
      * @param projectConfig configuration of the project to build, snapshotted
      *                      in time for this entire build
-     * @param properties    additional properties introduced into the build
-     *                      context just after the project properties
-     * @param buildReason   the reason why this build request event was generated.
-     * @param requestSource the source of the request - requests from the same
-     *                      source may replace each other if replaceable is
-     *                      true
-     * @param replaceable   if true, this request may be replaced by later
-     *                      requests with the same request source, provided the
-     *                      build has not yet commenced
+     * @param options       the options for this build.
      */
-    public AbstractBuildRequestEvent(Object source, BuildRevision revision, ProjectConfiguration projectConfig, Collection<ResourcePropertyConfiguration> properties, BuildReason buildReason, String requestSource, boolean replaceable)
+    public AbstractBuildRequestEvent(Object source, BuildRevision revision, ProjectConfiguration projectConfig, TriggerOptions options)
     {
         super(source);
         this.revision = revision;
         this.projectConfig = projectConfig;
-        this.properties = properties;
-        this.reason = buildReason;
+        this.options = options;
         this.queued = System.currentTimeMillis();
-        this.requestSource = requestSource;
-        this.replaceable = replaceable;
     }
 
     public abstract Entity getOwner();
     public abstract boolean isPersonal();
     public abstract BuildResult createResult(ProjectManager projectManager, UserManager userManager);
-
-    public BuildReason getReason()
-    {
-        return reason;
-    }
 
     public BuildRevision getRevision()
     {
@@ -78,22 +53,20 @@ public abstract class AbstractBuildRequestEvent extends Event
      */
     public void setRevision(BuildRevision revision)
     {
-        if (!replaceable)
+        if (!options.isReplaceable())
         {
             throw new IllegalStateException("Attempt to update revision for a non-replaceable build request.");
         }
 
         this.revision = revision;
+        // update the revision in the options to keep it in sync.  Might be better to not have the
+        // revision in the options?
+        this.options.setRevision(revision.getRevision());
     }
 
     public ProjectConfiguration getProjectConfig()
     {
         return projectConfig;
-    }
-
-    public Collection<ResourcePropertyConfiguration> getProperties()
-    {
-        return properties;
     }
 
     public long getQueued()
@@ -106,13 +79,8 @@ public abstract class AbstractBuildRequestEvent extends Event
         return TimeStamps.getPrettyTime(queued);
     }
 
-    public String getRequestSource()
+    public TriggerOptions getOptions()
     {
-        return requestSource;
-    }
-
-    public boolean isReplaceable()
-    {
-        return replaceable;
+        return options;
     }
 }

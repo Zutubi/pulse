@@ -196,7 +196,7 @@ public class EntityBuildQueue
 
     private boolean eventCanReplaceRequest(AbstractBuildRequestEvent event, AbstractBuildRequestEvent existingRequest)
     {
-        return existingRequest.isReplaceable() && StringUtils.equals(existingRequest.getRequestSource(), event.getRequestSource());
+        return existingRequest.getOptions().isReplaceable() && StringUtils.equals(existingRequest.getOptions().getSource(), event.getOptions().getSource());
     }
 
     private void queue(AbstractBuildRequestEvent event)

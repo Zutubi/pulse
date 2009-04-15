@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.scheduling.tasks;
 
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.TriggerBuildReason;
 import com.zutubi.pulse.master.scheduling.Task;
@@ -33,6 +34,11 @@ public class BuildProjectTask implements Task
      */
     public static final String PARAM_REPLACEABLE = "replaceable";
 
+    /**
+     * The status to be used for the build.
+     */
+    public static final String PARAM_STATUS = "status";
+
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
 
     private ProjectManager projectManager;
@@ -45,6 +51,7 @@ public class BuildProjectTask implements Task
 
         Boolean replaceableValue = (Boolean) context.get(PARAM_REPLACEABLE);
         boolean replaceable = replaceableValue == null || replaceableValue;
+        String status = (String) context.get(PARAM_STATUS);
 
         ProjectConfiguration project = projectManager.getProjectConfig(projectId, false);
         if (project != null)
@@ -63,7 +70,12 @@ public class BuildProjectTask implements Task
             }
 
             // generate build request.
-            projectManager.triggerBuild(project, properties, new TriggerBuildReason(trigger.getName()), revision, getSource(trigger), replaceable, false);
+            TriggerOptions options = new TriggerOptions(new TriggerBuildReason(trigger.getName()), revision, getSource(trigger));
+            options.setReplaceable(replaceable);
+            options.setForce(false);
+            options.setProperties(properties);
+            options.setStatus(status);
+            projectManager.triggerBuild(project, options);
         }
         else
         {

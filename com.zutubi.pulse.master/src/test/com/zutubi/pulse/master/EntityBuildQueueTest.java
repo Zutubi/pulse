@@ -352,7 +352,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
     {
         try
         {
-            AbstractBuildRequestEvent request = new AbstractBuildRequestEvent(null, null, null, null, null, null, false)
+            AbstractBuildRequestEvent request = new AbstractBuildRequestEvent(null, null, null, null)
             {
                 public Entity getOwner()
                 {

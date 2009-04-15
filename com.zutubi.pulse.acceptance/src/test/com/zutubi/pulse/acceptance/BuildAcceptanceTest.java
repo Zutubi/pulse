@@ -10,8 +10,11 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.getIvyFile;
+import static com.zutubi.pulse.acceptance.dependencies.DependencyConstants.STATUS_INTEGRATION;
+import static com.zutubi.pulse.acceptance.dependencies.DependencyConstants.STATUS_RELEASE;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
-import com.zutubi.pulse.acceptance.forms.admin.SpecifyBuildPropertiesForm;
+import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
@@ -39,6 +42,8 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TextUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -449,12 +454,12 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         home.triggerBuild();
 
         // we should be prompted for a revision and a pname value.
-        SpecifyBuildPropertiesForm sbpf = new SpecifyBuildPropertiesForm(selenium);
+        TriggerBuildForm sbpf = new TriggerBuildForm(selenium);
         sbpf.waitFor();
         assertTrue(sbpf.isFormPresent());
-        
+
         // leave the revision blank
-        sbpf.triggerFormElements("");
+        sbpf.triggerFormElements("", STATUS_INTEGRATION);
 
         // next page is the project homepage.
         waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
@@ -463,7 +468,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     /**
      * Check that the prompted property values that in a manual build are added to the build,
      * but do not change the project configuration.
-     *  
+     *
      * @throws Exception on error.
      */
     public void testManualTriggerBuildWithPromptAllowsPropertyValueOverride() throws Exception
@@ -483,10 +488,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         home.triggerBuild();
 
         // we should be prompted for a revision and a pname value.
-        SpecifyBuildPropertiesForm sbpf = new SpecifyBuildPropertiesForm(selenium, "pname");
+        TriggerBuildForm sbpf = new TriggerBuildForm(selenium, "pname");
         sbpf.waitFor();
         // leave the revision blank, update pname to qvalue.
-        sbpf.triggerFormElements("", "qvalue");
+        sbpf.triggerFormElements("", STATUS_INTEGRATION, "qvalue");
 
         // next page is the project homepage.
         waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
@@ -500,6 +505,27 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         assertEquals("pname", propertiesPage.getCellContent(0, 0));
         assertEquals("pvalue", propertiesPage.getCellContent(0, 1));
+    }
+
+    public void testManualTriggerBuildWithPromptAllowsStatusSelection() throws Exception
+    {
+        loginAsAdmin();
+        ensureProject(random);
+        enableBuildPrompting(random);
+
+        // trigger a build
+        ProjectHomePage home = new ProjectHomePage(selenium, urls, random);
+        home.goTo();
+        home.triggerBuild();
+
+        TriggerBuildForm triggerBuildForm = new TriggerBuildForm(selenium);
+        triggerBuildForm.waitFor();
+        triggerBuildForm.triggerFormElements("", STATUS_RELEASE);
+
+        // next page is the project homepage.
+        waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
+
+        assertThat(getIvyFile(random, 1), containsString("status=\"" + STATUS_RELEASE + "\""));
     }
 
     public void testTriggerProperties() throws Exception
@@ -541,7 +567,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         antConfig.put(Constants.Project.AntCommand.TARGETS, "test");
         String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TEST_ANT_REPOSITORY), antConfig);
         insertTestCapture(projectPath, "junit xml report processor");
-        
+
         int buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
         loginAsAdmin();
@@ -559,7 +585,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         TestSuitePage suitePage = stageTestsPage.clickSuiteAndWait("com.zutubi.testant.UnitTest");
         assertEquals(expectedSummary, suitePage.getTestSummary());
-        
+
         suitePage.clickStageCrumb();
         stageTestsPage.waitFor();
         stageTestsPage.clickAllCrumb();

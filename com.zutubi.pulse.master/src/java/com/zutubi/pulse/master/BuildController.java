@@ -224,7 +224,7 @@ public class BuildController implements EventListener
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);
             recipeRequest.addAllResourceRequirements(resourceRequirements);
             recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
-            recipeRequest.addAllProperties(asResourceProperties(request.getProperties()));
+            recipeRequest.addAllProperties(asResourceProperties(request.getOptions().getProperties()));
             recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
 
             RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
@@ -256,9 +256,10 @@ public class BuildController implements EventListener
 
         DependenciesConfiguration dependenciesConfiguration = project.getDependencies();
 
-        String status = "integration";
+        // or maybe we pick the status up from some properties?..
+        String status = buildResult.getStatus();
         DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, status, null); // the status needs to be configurable - options include 'release'..
-        descriptor.addConfiguration(new Configuration("build"));
+        descriptor.addConfiguration(new Configuration(IvySupport.CONFIGURATION_BUILD));
         descriptor.addExtraAttributeNamespace("e", "http://ant.apache.org/ivy/extra");
 
         // setup the module dependencies.
@@ -284,7 +285,7 @@ public class BuildController implements EventListener
                 });
                 stages = StringUtils.join(",", stageNames);
             }
-            depDesc.addDependencyConfiguration("build", stages);
+            depDesc.addDependencyConfiguration(IvySupport.CONFIGURATION_BUILD, stages);
 
             descriptor.addDependency(depDesc);
         }
@@ -941,7 +942,7 @@ public class BuildController implements EventListener
         // Unfortunately, if we can not write to the db, then we are a little stuffed.
         try
         {
-            if (buildResult.getRoot().getWorstState(null) == ResultState.SUCCESS)
+            if (buildResult.getRoot().getWorstState(null) == ResultState.SUCCESS && !buildResult.isPersonal())
             {
                 try
                 {

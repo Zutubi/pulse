@@ -2,19 +2,23 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.clearArtifactRepository;
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.waitUntilInRepository;
+import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
+import static com.zutubi.pulse.acceptance.dependencies.DependencyConstants.STATUS_MILESTONE;
+import static com.zutubi.pulse.acceptance.dependencies.DependencyConstants.STATUS_RELEASE;
+import static com.zutubi.pulse.acceptance.dependencies.DependencyConstants.STATUS_INTEGRATION;
+import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
 import java.util.*;
@@ -152,7 +156,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         AntBuildConfiguration build = new AntBuildConfiguration();
         build.addFileToCreate("incorrect/path/artifact.jar");
 
-        int buildNumber = triggerBuild(project, build);
+        int buildNumber = triggerBuild(project, build, null);
         assertTrue(isBuildErrored(project.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
@@ -193,7 +197,68 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertIvyInRepository(project.getName(), buildNumber);
         assertJarInRepository(project.getName(), project.getDefaultStage().getName(), "artifact", buildNumber);
         assertJarInRepository(project.getName(), project.getDefaultStage().getName(), "another-artifact", buildNumber);
+    }
 
+    public void testPublish_StatusConfiguration() throws Exception
+    {
+        Project project = new Project(randomName());
+        project.setStatus(STATUS_RELEASE);
+        project.getDefaultStage().addArtifacts("artifact.jar");
+        createProject(project);
+
+        AntBuildConfiguration build = new AntBuildConfiguration();
+        build.addFileToCreate("build/artifact.jar");
+
+        int buildNumber = triggerSuccessfulBuild(project, build);
+
+        // ensure that we have the expected artifact in the repository.
+        assertIvyInRepository(project.getName(), buildNumber);
+        assertIvyStatus(STATUS_RELEASE, project.getName(), buildNumber);
+    }
+
+    public void testPublish_DefaultStatus() throws Exception
+    {
+        Project project = new Project(randomName());
+        project.getDefaultStage().addArtifacts("artifact.jar");
+        createProject(project);
+
+        AntBuildConfiguration build = new AntBuildConfiguration();
+        build.addFileToCreate("build/artifact.jar");
+
+        int buildNumber = triggerSuccessfulBuild(project, build);
+
+        assertIvyStatus(STATUS_INTEGRATION, project.getName(), buildNumber);
+    }
+
+    public void testStatusValidation() throws Exception
+    {
+        try
+        {
+            Project project = new Project(randomName());
+            project.setStatus("invalid");
+            project.getDefaultStage().addArtifacts("artifact.jar");
+            createProject(project);
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("status is invalid"));
+        }
+    }
+
+    public void testRemoteTriggerWithCustomStatus() throws Exception
+    {
+        Project project = new Project(randomName());
+        project.getDefaultStage().addArtifacts("artifact.jar");
+        createProject(project);
+
+        AntBuildConfiguration build = new AntBuildConfiguration();
+        build.addFileToCreate("build/artifact.jar");
+
+        int buildNumber = triggerSuccessfulBuild(project, build, STATUS_MILESTONE);
+
+        // ensure that we have the expected artifact in the repository.
+        assertIvyInRepository(project.getName(), buildNumber);
+        assertIvyStatus(STATUS_MILESTONE, project.getName(), buildNumber);
     }
 
     public void testRetrieve_SingleArtifact() throws Exception
@@ -393,7 +458,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         AntBuildConfiguration buildB = new AntBuildConfiguration();
         buildB.addExpectedFile("lib/artifact.jar");
 
-        int buildNumber = triggerBuild(projectB, buildB);
+        int buildNumber = triggerBuild(projectB, buildB, null);
         assertTrue(isBuildFailure(projectB.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
@@ -502,12 +567,17 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private int triggerSuccessfulBuild(Project project, AntBuildConfiguration build) throws Exception
     {
-        int buildNumber = triggerBuild(project, build);
+        return triggerSuccessfulBuild(project, build, null);
+    }
+
+    private int triggerSuccessfulBuild(Project project, AntBuildConfiguration build, String status) throws Exception
+    {
+        int buildNumber = triggerBuild(project, build, status);
         assertTrue(isBuildSuccessful(project.getName(), buildNumber));
         return buildNumber;
     }
 
-    private int triggerBuild(Project project, AntBuildConfiguration build) throws Exception
+    private int triggerBuild(Project project, AntBuildConfiguration build, String status) throws Exception
     {
         // for each stage, set the necessary build properties.
         for (Stage stage : project.stages)
@@ -517,7 +587,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             xmlRpcHelper.insertOrUpdateStageProperty(project.getName(), stage.getName(), PROPERTY_NOT_EXPECTED_LIST, build.getNotExpectedList());
         }
 
-        return xmlRpcHelper.runBuild(project.getName(), BUILD_TIMEOUT);
+        return xmlRpcHelper.runBuild(project.getName(), status, BUILD_TIMEOUT);
     }
 
     private void createProject(Project project) throws Exception
@@ -605,6 +675,10 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> dependencies = xmlRpcHelper.getConfig(dependenciesPath);
         dependencies.put("publicationPattern", project.publicationPattern);
         dependencies.put("retrievalPattern", project.retrievalPattern);
+        if (TextUtils.stringSet(project.status))
+        {
+            dependencies.put("status", project.status);
+        }
         xmlRpcHelper.saveConfig(dependenciesPath, dependencies, false);
     }
 
@@ -679,14 +753,19 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         return v;
     }
 
+    private void assertIvyStatus(String status, String projectName, int buildNumber) throws IOException
+    {
+        assertThat(getIvyFile(projectName, buildNumber), containsString("status=\""+status+"\""));
+    }
+
     private void assertIvyInRepository(String projectName, int buildNumber) throws IOException
     {
-        assertInRepository(projectName + "/ivy-" + buildNumber + ".xml");
+        assertInRepository(ivyPath(projectName, buildNumber));
     }
 
     private void assertIvyNotInRepository(String projectName, int buildNumber) throws IOException
     {
-        assertNotInRepository(projectName + "/ivy-" + buildNumber + ".xml");
+        assertNotInRepository(ivyPath(projectName, buildNumber));
     }
 
     private void assertJarInRepository(String projectName, String stageName, String artifactName, int buildNumber) throws IOException
@@ -721,6 +800,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         private String name;
         private String org;
+        private String status;
         private List<Dependency> dependencies = new LinkedList<Dependency>();
         private List<String> artifacts = new LinkedList<String>();
         private List<Stage> stages = new LinkedList<Stage>();
@@ -813,6 +893,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private void setOrg(String org)
         {
             this.org = org;
+        }
+
+        public void setStatus(String status)
+        {
+            this.status = status;
         }
     }
 
