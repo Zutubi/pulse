@@ -24,11 +24,10 @@ public class ProcessControl
         if (!initialised)
         {
             File dll = findDLL();
-            if (SystemUtils.getBooleanProperty(NATIVE_PROCESS_KILL, false) && SystemUtils.IS_WINDOWS && dll != null)
+            if (SystemUtils.getBooleanProperty(NATIVE_PROCESS_KILL, true) && SystemUtils.IS_WINDOWS && dll != null)
             {
                 try
                 {
-                    System.out.println("Loading DLL from '" + dll.getAbsolutePath() + "'");
                     System.load(dll.getAbsolutePath());
                     Class clazz = ProcessControl.class.getClassLoader().loadClass("java.lang.ProcessImpl");
                     handleField = clazz.getDeclaredField("handle");
