@@ -13,7 +13,7 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,8 +84,7 @@ public class GitClientTest extends PulseTestCase
 
         assertEquals(REVISION_MASTER_LATEST, rev.getRevisionString());
 
-        assertFiles(workingDir, "a.txt", "b.txt", "d.txt");
-        assertGitDir(workingDir);
+        assertHeadCheckedOut();
 
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
     }
@@ -121,7 +120,7 @@ public class GitClientTest extends PulseTestCase
         assertEquals("83d35b25a6b4711c4d9424c337bf82e5398756f3", rev.getRevisionString());
 
         assertGitDir(workingDir);
-        assertEquals(1, workingDir.list().length);
+        assertEquals(2, workingDir.list().length);
     }
 
     public void testGetLatestRevision() throws ScmException
@@ -176,6 +175,7 @@ public class GitClientTest extends PulseTestCase
         client.checkout(context, null, handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertTrue(handler.getStatusMessages().contains("Branch local set up to track remote branch refs/remotes/origin/master."));
+        assertThat(handler.getStatusMessages(), not(hasItem(GitClient.INCOMPLETE_CHECKOUT_WARNING)));
 
         handler.reset();
 
@@ -207,6 +207,26 @@ public class GitClientTest extends PulseTestCase
         assertEquals("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112", rev.getRevisionString());
 
         assertEquals("content", IOUtils.fileToString(new File(workingDir, "a.txt")));
+    }
+
+    public void testUpdateNoCheckout() throws ScmException
+    {
+        client.update(context, null, handler);
+        assertThat(handler.getStatusMessages(), hasItem(GitClient.INCOMPLETE_CHECKOUT_WARNING));
+        assertHeadCheckedOut();
+    }
+
+    public void testUpdateIncompleteCheckout() throws ScmException
+    {
+        client.checkout(context, null, handler);
+        handler.reset();
+
+        File completeFile = new File(workingDir, GitClient.CHECKOUT_COMPLETE_FILENAME);
+        assertTrue(completeFile.delete());
+
+        client.update(context, null, handler);
+        assertThat(handler.getStatusMessages(), hasItem(GitClient.INCOMPLETE_CHECKOUT_WARNING));
+        assertHeadCheckedOut();
     }
 
     public void testChanges() throws ScmException
@@ -326,6 +346,12 @@ public class GitClientTest extends PulseTestCase
     public void testBrowseAvailableWhenContextAvailable()
     {
         assertTrue(client.getCapabilities(scmContext).contains(ScmCapability.BROWSE));
+    }
+
+    private void assertHeadCheckedOut()
+    {
+        assertFiles(workingDir, "a.txt", "b.txt", "d.txt");
+        assertGitDir(workingDir);
     }
 
     private void assertFiles(File base, String... filenames)
