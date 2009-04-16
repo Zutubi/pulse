@@ -23,6 +23,13 @@ public class GitClient implements ScmClient
 {
     private static final Revision HEAD = new Revision("HEAD");
 
+    static final String INCOMPLETE_CHECKOUT_WARNING = "Warning: Missing or incomplete checkout detected, performing a clean checkout.";
+    /**
+     * Marker file used to indicate a checkout completed.  Used to detect
+     * incomplete checkouts (e.g. those that were cancelled part way through)
+     * which may leave things in an unclean state.
+     */
+    static final String CHECKOUT_COMPLETE_FILENAME = ".pulse.git.complete";
     /**
      * Timeout for acquiring the ScmContext lock.
      */
@@ -200,17 +207,37 @@ public class GitClient implements ScmClient
             git.diff(handler, revision);
         }
 
+        createMarker(workingDir);
+
         // Determine the head revision from this checkout.  This is equivalent to the evaluated version
         // revision parameter which may be a relative revision (HEAD~4 for instance).
         return new Revision(logs.get(logs.size() - 1).getId());
     }
 
+    private void createMarker(File workingDir) throws ScmException
+    {
+        File marker = new File(workingDir, CHECKOUT_COMPLETE_FILENAME);
+        try
+        {
+            if (!marker.createNewFile())
+            {
+                throw new ScmException("Could not create marker file.");
+            }
+        }
+        catch (IOException e)
+        {
+            throw new ScmException("Could not create marker file: " + e.getMessage(), e);
+        }
+    }
+
     public Revision update(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         File workingDir = context.getWorkingDir();
-        if (!isGitRepository(workingDir))
+        File checkoutMarker = new File(workingDir, CHECKOUT_COMPLETE_FILENAME);
+        if (!isGitRepository(workingDir) || !checkoutMarker.isFile())
         {
-            throw new ScmException("");
+            handler.status(INCOMPLETE_CHECKOUT_WARNING);
+            return checkout(context, revision, handler);
         }
 
         NativeGit git = new NativeGit();

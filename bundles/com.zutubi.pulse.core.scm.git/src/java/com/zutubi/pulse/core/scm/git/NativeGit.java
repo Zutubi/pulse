@@ -272,13 +272,7 @@ public class NativeGit
 
     protected String getGitCommand()
     {
-        String git = System.getProperty(PROPERTY_GIT_COMMAND);
-        if (git == null)
-        {
-            git = DEFAULT_GIT;
-        }
-
-        return git;
+        return System.getProperty(PROPERTY_GIT_COMMAND, DEFAULT_GIT);
     }
 
     interface OutputHandler
