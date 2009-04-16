@@ -1133,7 +1133,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         this.choice.on('focus', this.onInputFocus, this);
         this.choice.on('blur', this.onInputBlur, this);
 
-        this.addButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-add-up.gif', overImage: '/images/buttons/sb-add-over.gif', downImage: '/images/buttons/sb-add-down.gif'});
+        this.addButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-add-up.gif', overImage: window.baseUrl + '/images/buttons/sb-add-over.gif', downImage: window.baseUrl + '/images/buttons/sb-add-down.gif'});
         this.addButton.on('click', this.onAdd, this);
 
         this.nav = new Ext.KeyNav(this.input || this.el, {
@@ -1158,13 +1158,13 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
             scope: this
         });
 
-        this.removeButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-delete-up.gif', overImage: '/images/buttons/sb-delete-over.gif', downImage: '/images/buttons/sb-delete-down.gif'});
+        this.removeButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-delete-up.gif', overImage: window.baseUrl + '/images/buttons/sb-delete-over.gif', downImage: window.baseUrl + '/images/buttons/sb-delete-down.gif'});
         this.removeButton.on('click', this.onRemove, this);
 
-        this.upButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-up-up.gif', overImage: '/images/buttons/sb-up-over.gif', downImage: '/images/buttons/sb-up-down.gif'});
+        this.upButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-up-up.gif', overImage: window.baseUrl + '/images/buttons/sb-up-over.gif', downImage: window.baseUrl + '/images/buttons/sb-up-down.gif'});
         this.upButton.on('click', this.onUp, this);
 
-        this.downButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-down-up.gif', overImage: '/images/buttons/sb-down-over.gif', downImage: '/images/buttons/sb-down-down.gif'});
+        this.downButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-down-up.gif', overImage: window.baseUrl + '/images/buttons/sb-down-over.gif', downImage: window.baseUrl + '/images/buttons/sb-down-down.gif'});
         this.downButton.on('click', this.onDown, this);
 
         var cls = 'x-item-picker';
