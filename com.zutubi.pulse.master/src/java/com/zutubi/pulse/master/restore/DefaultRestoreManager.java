@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.util.monitor.Task;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -68,11 +68,11 @@ public class DefaultRestoreManager implements RestoreManager
             {
                 String name = component.getName();
                 File archiveComponentBase = new File(archive.getBase(), name);
-
-                // does it matter if this does not exist, do we need to process something regardless?
-
-                RestoreComponentTask task = new RestoreComponentTask(component, archiveComponentBase);
-                tasks.add(task);
+                if (component.exists(archiveComponentBase))
+                {
+                    RestoreComponentTask task = new RestoreComponentTask(component, archiveComponentBase);
+                    tasks.add(task);
+                }
             }
 
             jobManager.register(ARCHIVE_JOB_KEY, tasks);
@@ -92,10 +92,6 @@ public class DefaultRestoreManager implements RestoreManager
 
     public List<Task> previewRestore()
     {
-        // Check which of the restorable components is represented within the backup.
-
-        // return a list of tasks that need to be processed.
-
         return tasks;
     }
 
@@ -104,7 +100,7 @@ public class DefaultRestoreManager implements RestoreManager
         Monitor monitor = jobManager.getMonitor(ARCHIVE_JOB_KEY);
         if (monitor.isStarted())
         {
-            LOG.warning("Attempted to execute an executing upgrade.  Request has been ignored.");
+            LOG.warning("Attempted to execute a restore when a restore is already executing.  Request has been ignored.");
             return;
         }
 

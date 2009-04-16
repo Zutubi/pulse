@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.restore;
 
+import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.HSQLDBUtils;
-import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.FileSystemUtils;
 
@@ -33,16 +33,17 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
 
     public String getDescription()
     {
-        return "The configuration restoration takes the appropriate 1.2.x system files and restores " +
-                "them to their 2.0 locations.  Note, the one system file excluded from this process is the" +
-                "database.properties file.  The database configured for your 2.0 installation will be retained.";
+        return "The configuration restoration task restores system configuration files.  These " +
+                "contain low-level configuration that is not editable via the UI.  Note that the " +
+                "database.properties file is explicitly excluded: the database of the Pulse " +
+                "installation you are restoring into is preserved.";
     }
 
     public void backup(File archive) throws ArchiveException
     {
         try
         {
-            FileSystemUtils.copy(new File(archive, "config"), paths.getUserConfigRoot());
+            FileSystemUtils.copy(getConfigDir(archive), paths.getUserConfigRoot());
             FileSystemUtils.copy(archive, new File(paths.getData(), "pulse.config.properties"));
 
             // provide some backward compatibility with the original backup process by backing up the
@@ -68,6 +69,11 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
         }
     }
 
+    public boolean exists(File dir)
+    {
+        return getConfigDir(dir).isDirectory();
+    }
+
     public void restore(File archive) throws ArchiveException
     {
         // replace the existing files with the archived files.
@@ -84,7 +90,7 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
             {
                 throw new IOException("Failed to create directory: " + configRoot.getCanonicalPath());
             }
-            copy(paths.getUserConfigRoot(), new File(archive, "config").listFiles());
+            copy(paths.getUserConfigRoot(), getConfigDir(archive).listFiles());
 
             FileSystemUtils.copy(paths.getData(), new File(archive, "pulse.config.properties"));
 
@@ -97,6 +103,11 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
         {
             throw new ArchiveException(e);
         }
+    }
+
+    private File getConfigDir(File archive)
+    {
+        return new File(archive, "config");
     }
 
     /**
@@ -149,7 +160,7 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
 
     /**
      * Delete all of the files located in the specified directory unless the name of the
-     * file begins with 'database'/
+     * file begins with 'database'.
      *
      * @param base  the directory being cleaned up.
      * @throws IOException  is thrown on error.

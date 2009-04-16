@@ -11,10 +11,6 @@ import com.zutubi.util.FileSystemUtils;
 import java.io.File;
 import java.util.List;
 
-/**
- *
- *
- */
 public class DefaultRestoreManagerTest extends PulseTestCase
 {
     private DefaultRestoreManager manager;
@@ -57,7 +53,7 @@ public class DefaultRestoreManagerTest extends PulseTestCase
 
         manager.add(new NoopArchiveableComponent());
 
-        Archive preparedArchive = manager.prepareRestore(archiveFile);
+        manager.prepareRestore(archiveFile);
         List<Task> tasks = manager.previewRestore();
         assertEquals(1, tasks.size());
 
@@ -82,7 +78,7 @@ public class DefaultRestoreManagerTest extends PulseTestCase
 
         manager.add(new FailingArchiveableComponent());
 
-        Archive preparedArchive = manager.prepareRestore(archiveFile);
+        manager.prepareRestore(archiveFile);
         List<Task> tasks = manager.previewRestore();
         assertEquals(1, tasks.size());
 
@@ -103,7 +99,24 @@ public class DefaultRestoreManagerTest extends PulseTestCase
         manager.postRestore();
     }
 
-    private abstract class TestArchiveableComponent extends AbstractArchiveableComponent
+    public void testDoesNotRestoreNonExistant() throws ArchiveException
+    {
+        Archive archive = factory.createArchive();
+        File archiveFile = factory.exportArchive(archive, new File(tmpDir, "export"));
+
+        manager.add(new NonExistantArchiveableComponent());
+        manager.prepareRestore(archiveFile);
+
+        assertEquals(0, manager.previewRestore().size());
+
+        // Ensure that the component is not restored (it would throw if it
+        // was).
+        manager.restoreArchive();
+        assertTrue(manager.getTaskMonitor().isFinished());
+        assertTrue(manager.getTaskMonitor().isSuccessful());
+    }
+
+    private static abstract class TestArchiveableComponent extends AbstractArchiveableComponent
     {
         private String name;
 
@@ -123,7 +136,7 @@ public class DefaultRestoreManagerTest extends PulseTestCase
         }
     }
 
-    private class FailingArchiveableComponent extends TestArchiveableComponent
+    private static class FailingArchiveableComponent extends TestArchiveableComponent
     {
         public FailingArchiveableComponent()
         {
@@ -138,6 +151,29 @@ public class DefaultRestoreManagerTest extends PulseTestCase
         public void restore(File archive) throws ArchiveException
         {
             throw new ArchiveException("Expected failure.");
+        }
+    }
+
+    private static class NonExistantArchiveableComponent extends TestArchiveableComponent
+    {
+        public NonExistantArchiveableComponent()
+        {
+            super("non-existant");
+        }
+
+        public void backup(File archive) throws ArchiveException
+        {
+        }
+
+        @Override
+        public boolean exists(File dir)
+        {
+            return false;
+        }
+
+        public void restore(File archive) throws ArchiveException
+        {
+            throw new ArchiveException("Should never be called");
         }
     }
 }

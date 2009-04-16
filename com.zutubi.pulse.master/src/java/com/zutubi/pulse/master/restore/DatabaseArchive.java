@@ -3,14 +3,14 @@ package com.zutubi.pulse.master.restore;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
-import com.zutubi.pulse.master.util.monitor.FeedbackAware;
-import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.pulse.master.transfer.Table;
 import com.zutubi.pulse.master.transfer.TransferAPI;
 import com.zutubi.pulse.master.transfer.TransferException;
 import com.zutubi.pulse.master.transfer.TransferListener;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.master.util.monitor.FeedbackAware;
+import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -100,11 +100,16 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
         }
     }
 
+    public boolean exists(File dir)
+    {
+        return getTablesFile(dir).isFile();
+    }
+
     public void restore(File base) throws ArchiveException
     {
         try
         {
-            final Map<String, Long> tableSizes = readTableSizes(new File(base, TRACKING_FILENAME));
+            final Map<String, Long> tableSizes = readTableSizes(getTablesFile(base));
 
             File export = new File(base, EXPORT_FILENAME);
             if (export.isFile())
@@ -158,6 +163,11 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
         {
             throw new ArchiveException(e);
         }
+    }
+
+    private File getTablesFile(File base)
+    {
+        return new File(base, TRACKING_FILENAME);
     }
 
     private void writeTableSizes(Map<String, Long> tableSizes, File file) throws IOException

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.tove.type.record.*;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.XmlRecordSerialiser;
 import com.zutubi.tove.type.record.store.RecordStore;
 
 import java.io.File;
@@ -11,8 +12,9 @@ import java.io.IOException;
  */
 public class RecordsArchive extends AbstractArchiveableComponent
 {
-    private RecordStore recordStore;
     protected static final String ARCHIVE_FILENAME = "export.xml";
+
+    private RecordStore recordStore;
 
     public String getName()
     {
@@ -28,7 +30,7 @@ public class RecordsArchive extends AbstractArchiveableComponent
     {
         Record export = recordStore.exportRecords();
 
-        File archive = new File(dir, ARCHIVE_FILENAME);
+        File archive = getArchiveFile(dir);
         try
         {
             if (!archive.createNewFile())
@@ -46,18 +48,23 @@ public class RecordsArchive extends AbstractArchiveableComponent
         serialiser.serialise(archive, export, true);
     }
 
+    public boolean exists(File dir)
+    {
+        return getArchiveFile(dir).isFile();
+    }
+
     public void restore(File dir)
     {
-        File archive = new File(dir, ARCHIVE_FILENAME);
-        if (!archive.isFile())
-        {
-            return;
-        }
-
+        File archive = getArchiveFile(dir);
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
         Record baseRecord = serialiser.deserialise(archive);
 
         recordStore.importRecords(baseRecord);
+    }
+
+    private File getArchiveFile(File dir)
+    {
+        return new File(dir, ARCHIVE_FILENAME);
     }
 
     public void setRecordStore(RecordStore recordStore)
