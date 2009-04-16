@@ -9,6 +9,137 @@ import java.util.Map;
 
 /**
  * Abstract base for handlers which deal with p4 fstat output.
+ * <p/>
+ * Run: p4 fstat -Op -Rc //...@revision
+ * <p/>
+ * Summary (so far):
+ * <ul>
+ *   <li>file is changed on client if we have an [action] (which also
+ *       denotes the type of the change)</li>
+ *   <li>file is out of date on client if the [headRev] is different
+ *       to the [haveRev], or there is no [haveRev]</li>
+ *   <li>file is in an inconsistent state if we have an [unresolved]:
+ *       i.e. a merge (possibly just a sync) has not been resolved</li>
+ * </ul>
+ * Full details:
+ * <pre>
+ * Normal item:
+ * ... depotFile //depot/script1
+ * ... clientFile /home/jason/p41\script1
+ * ... isMapped
+ * ... headAction add
+ * ... headType xtext
+ * ... headTime 1160291666
+ * ... headRev 1
+ * ... headChange 1
+ * ... headModTime 1160295147
+ * ... haveRev 1
+ *
+ * Open for edit:
+ * ... depotFile //depot/script1
+ * ... clientFile /home/jason/p41\script1
+ * ... isMapped
+ * ... headAction add
+ * ... headType xtext
+ * ... headTime 1160291666
+ * ... headRev 1
+ * ... headChange 1
+ * ... headModTime 1160295147
+ * ... haveRev 1
+ * ... action edit
+ * ... change default
+ * ... type xtext
+ * ... actionOwner test-user
+ *
+ * Open for add:
+ * ... depotFile //depot/newfile
+ * ... clientFile /home/jason/p41\newfile
+ * ... action add
+ * ... change default
+ * ... type text
+ * ... actionOwner test-user
+ *
+ * Open for delete:
+ * ... depotFile //depot/script1
+ * ... clientFile /home/jason/p41\script1
+ * ... isMapped
+ * ... headAction add
+ * ... headType xtext
+ * ... headTime 1160291666
+ * ... headRev 1
+ * ... headChange 1
+ * ... headModTime 1160295147
+ * ... haveRev 1
+ * ... action delete
+ * ... change default
+ * ... type xtext
+ * ... actionOwner test-user
+ *
+ * Open for edit (change type):
+ * ... depotFile //depot/file5
+ * ... clientFile /home/jason/p41\file5
+ * ... isMapped
+ * ... headAction add
+ * ... headType text
+ * ... headTime 1160291666
+ * ... headRev 1
+ * ... headChange 1
+ * ... headModTime 1160294903
+ * ... haveRev 1
+ * ... action edit
+ * ... change default
+ * ... type xtext
+ * ... actionOwner test-user
+ *
+ * Integrate new file:
+ * ... depotFile //depot/script2
+ * ... clientFile /home/jason/p41\script2
+ * ... action branch
+ * ... change default
+ * ... type xtext
+ * ... actionOwner test-user
+ * ... resolved
+ *
+ * Integrate (merge) from branch:
+ * ... depotFile //depot/file1
+ * ... clientFile /home/jason/p41\file1
+ * ... isMapped
+ * ... headAction add
+ * ... headType text
+ * ... headTime 1160291666
+ * ... headRev 1
+ * ... headChange 1
+ * ... headModTime 1160294897
+ * ... haveRev 1
+ * ... action integrate
+ * ... change default
+ * ... type text
+ * ... actionOwner test-user
+ * ... unresolved
+ *
+ * New file in repo (not yet sync'd):
+ * ... depotFile //depot/newfile
+ * ... clientFile /home/jason/p41\newfile
+ * ... isMapped
+ * ... headAction add
+ * ... headType text
+ * ... headTime 1160307400
+ * ... headRev 1
+ * ... headChange 4
+ * ... headModTime 1160310899
+ *
+ * File deleted in repo (not yet sync'd):
+ * ... depotFile //depot/file1
+ * ... clientFile /home/jason/p41\file1
+ * ... isMapped
+ * ... headAction delete
+ * ... headType text
+ * ... headTime 1160307528
+ * ... headRev 2
+ * ... headChange 5
+ * ... headModTime 0
+ * ... haveRev 1
+ * </pre>
  */
 public abstract class AbstractPerforceFStatHandler extends PerforceErrorDetectingHandler
 {
@@ -28,7 +159,7 @@ public abstract class AbstractPerforceFStatHandler extends PerforceErrorDetectin
         {
             if(currentItem.size() > 0)
             {
-                handleItem();
+                handleCurrentItem();
                 currentItem.clear();
             }
         }
@@ -60,7 +191,7 @@ public abstract class AbstractPerforceFStatHandler extends PerforceErrorDetectin
         super.handleExitCode(code);
         if(currentItem.size() > 0)
         {
-            handleItem();
+            handleCurrentItem();
         }
     }
 
@@ -94,13 +225,5 @@ public abstract class AbstractPerforceFStatHandler extends PerforceErrorDetectin
         return type.contains("text");
     }
 
-    protected void warning(String message)
-    {
-        if(ui != null)
-        {
-            ui.warning(message);
-        }
-    }
-
-    protected abstract void handleItem();
+    protected abstract void handleCurrentItem();
 }

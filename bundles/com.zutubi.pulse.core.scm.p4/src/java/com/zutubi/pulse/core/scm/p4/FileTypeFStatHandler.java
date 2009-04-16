@@ -19,7 +19,7 @@ public class FileTypeFStatHandler extends AbstractPerforceFStatHandler
         return text;
     }
 
-    protected void handleItem()
+    protected void handleCurrentItem()
     {
         String type = getCurrentItemType();
         if (type == null)
