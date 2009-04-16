@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModel;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelsHelper;
+import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelSorter;
 import com.zutubi.util.FalsePredicate;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TruePredicate;
@@ -130,11 +131,11 @@ public class DashboardAction extends ActionSupport
         dashboardConfig = user.getConfig().getPreferences().getDashboard();
 
         Predicate<Project> projectPredicate;
-        Comparator<Project> projectComparator;
+        ProjectsModelSorter sorter = new ProjectsModelSorter();
+
         if (dashboardConfig.isShowAllProjects())
         {
             projectPredicate = new TruePredicate<Project>();
-            projectComparator = new ProjectNameComparator();
         }
         else
         {
@@ -145,12 +146,11 @@ public class DashboardAction extends ActionSupport
                     return dashboardConfig.getShownProjects().contains(project.getConfig());
                 }
             };
-            projectComparator = new DashboardConfigurationProjectComparator(dashboardConfig);
+            sorter.setProjectNameComparator(new DashboardConfigurationProjectComparator(dashboardConfig));
         }
 
         boolean showUngrouped;
         Predicate<ProjectGroup> groupPredicate;
-        Comparator<ProjectGroup> groupComparator = new ProjectGroupNameComparator();
 
         if (dashboardConfig.isGroupsShown())
         {
@@ -168,7 +168,7 @@ public class DashboardAction extends ActionSupport
                         return dashboardConfig.getShownGroups().contains(projectGroup.getName());
                     }
                 };
-                groupComparator = new DashboardConfigurationProjectGroupComparator(dashboardConfig);
+                sorter.setGroupNameComparator(new DashboardConfigurationProjectGroupComparator(dashboardConfig));
             }
         }
         else
@@ -178,7 +178,8 @@ public class DashboardAction extends ActionSupport
         }
 
         ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
-        models = helper.createProjectsModels(dashboardConfig, projectPredicate, projectComparator, groupPredicate, groupComparator, showUngrouped);
+        models = helper.createProjectsModels(dashboardConfig, projectPredicate, groupPredicate, showUngrouped);
+        sorter.sort(models);
 
         changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
         Collections.sort(changelists, new ChangelistComparator());
@@ -219,33 +220,33 @@ public class DashboardAction extends ActionSupport
      * A comparator that will order projects based on the order defined in the shownProjects
      * list in the dashboard configuration
      */
-    private class DashboardConfigurationProjectComparator implements Comparator<Project>
+    private class DashboardConfigurationProjectComparator implements Comparator<String>
     {
-        private Map<Long, Integer> projectIndicies;
+        private Map<String, Integer> projectIndicies;
 
         private DashboardConfigurationProjectComparator(DashboardConfiguration configuration)
         {
-            projectIndicies = new HashMap<Long, Integer>();
+            projectIndicies = new HashMap<String, Integer>();
             int index = 0;
             for (ProjectConfiguration projectConfig : configuration.getShownProjects())
             {
-                projectIndicies.put(projectConfig.getProjectId(), index);
+                projectIndicies.put(projectConfig.getName(), index);
                 index++;
             }
         }
 
-        public int compare(Project o1, Project o2)
+        public int compare(String o1, String o2)
         {
-            if (!projectIndicies.containsKey(o1.getId()))
+            if (!projectIndicies.containsKey(o1))
             {
                 return 1;
             }
-            if (!projectIndicies.containsKey(o2.getId()))
+            if (!projectIndicies.containsKey(o2))
             {
-                return 1;
+                return -1;
             }
-            int indexA = projectIndicies.get(o1.getId());
-            int indexB = projectIndicies.get(o2.getId());
+            int indexA = projectIndicies.get(o1);
+            int indexB = projectIndicies.get(o2);
             return indexA - indexB;
         }
     }
@@ -254,7 +255,7 @@ public class DashboardAction extends ActionSupport
      * A comparator that will order project groups based on the order defined in the shownProjectGroups
      * list in the dashboard configuration
      */
-    private class DashboardConfigurationProjectGroupComparator implements Comparator<ProjectGroup>
+    private class DashboardConfigurationProjectGroupComparator implements Comparator<String>
     {
         private Map<String, Integer> groupIndicies;
 
@@ -269,18 +270,18 @@ public class DashboardAction extends ActionSupport
             }
         }
 
-        public int compare(ProjectGroup o1, ProjectGroup o2)
+        public int compare(String o1, String o2)
         {
-            if (!groupIndicies.containsKey(o1.getName()))
+            if (!groupIndicies.containsKey(o1))
             {
                 return 1;
             }
-            if (!groupIndicies.containsKey(o2.getName()))
+            if (!groupIndicies.containsKey(o2))
             {
-                return 1;
+                return -1;
             }
-            int indexA = groupIndicies.get(o1.getName());
-            int indexB = groupIndicies.get(o2.getName());
+            int indexA = groupIndicies.get(o1);
+            int indexB = groupIndicies.get(o2);
             return  indexA - indexB;
         }
     }
