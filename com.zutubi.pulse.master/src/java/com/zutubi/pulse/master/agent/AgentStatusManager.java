@@ -242,10 +242,7 @@ public class AgentStatusManager implements EventListener
             case BUILDING:
                 // Can happen legitimately, but if we pass the
                 // timeout then presume something is wrong.
-                if (agent.getSecondsSincePing() > getAgentOfflineTimeout())
-                {
-                    publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent idle before recipe expected to complete"));
-                }
+                checkForStatusTimeout(agent, "Agent idle before recipe expected to complete");
                 break;
 
             case BUILDING_INVALID:
@@ -253,10 +250,7 @@ public class AgentStatusManager implements EventListener
                 break;
 
             case RECIPE_ASSIGNED:
-                if (agent.getSecondsSincePing() > getAgentOfflineTimeout())
-                {
-                    publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent idle after recipe expected to have commenced"));
-                }
+                checkForStatusTimeout(agent, "Agent idle after recipe expected to have commenced");
                 break;
 
             default:
@@ -272,9 +266,8 @@ public class AgentStatusManager implements EventListener
             case BUILDING:
             case RECIPE_ASSIGNED:
                 // Don't immediately give up - wait for the timeout.
-                if (agent.getSecondsSincePing() > getAgentOfflineTimeout())
+                if (checkForStatusTimeout(agent, "Connection to agent lost during recipe execution"))
                 {
-                    publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Connection to agent lost during recipe execution"));
                     agent.updateStatus(pingStatus);
                 }
                 break;
@@ -283,6 +276,19 @@ public class AgentStatusManager implements EventListener
                 agent.updateStatus(pingStatus);
                 break;
         }
+    }
+
+    private boolean checkForStatusTimeout(Agent agent, String message)
+    {
+        long timeSincePing = agent.getSecondsSincePing();
+        long timeout = getAgentOfflineTimeout();
+        if (timeSincePing > timeout)
+        {
+            publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), message + " (agent: " + agent.getName() + ", recipe: " + agent.getRecipeId() + ", since ping: " + timeSincePing + ", timeout: " + timeout + ")"));
+            return true;
+        }
+
+        return false;
     }
 
     private void handleRecipeAssigned(RecipeAssignedEvent event)

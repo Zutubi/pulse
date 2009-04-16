@@ -26,8 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-/**
- */
 public class AgentStatusManagerTest extends PulseTestCase implements EventListener
 {
     private EventManager eventManager;
@@ -195,7 +193,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         clearEvents();
         waitForTimeout();
         sendPing(agent, new SlaveStatus(PingStatus.IDLE, 1000, false));
-        assertEvents(new RecipeErrorEvent(this, 1000, "Agent idle after recipe expected to have commenced"));
+        assertEvents(new RecipeErrorEvent(this, 1000, "Agent idle after recipe expected to have commenced (agent: agent 1, recipe: 1000, since ping: 2, timeout: 1)"));
         sendRecipeCollecting(1000);
 
         onComplete();
@@ -286,7 +284,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         waitForTimeout();
         sendPing(agent, new SlaveStatus(PingStatus.OFFLINE));
         assertEvents(
-                new RecipeErrorEvent(this, 1000, "Connection to agent lost during recipe execution"),
+                new RecipeErrorEvent(this, 1000, "Connection to agent lost during recipe execution (agent: agent 1, recipe: 1000, since ping: 2, timeout: 1)"),
                 new AgentOfflineEvent(this, agent)
         );
         sendRecipeCollecting(1000);
