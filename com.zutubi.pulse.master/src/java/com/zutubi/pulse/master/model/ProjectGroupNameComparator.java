@@ -5,7 +5,7 @@ import com.zutubi.util.Sort;
 import java.util.Comparator;
 
 /**
- * A comparator that uses lexological ordering to order project groups based on their names.
+ * A comparator that uses lexicographical ordering to order project groups based on their names.
  */
 public class ProjectGroupNameComparator implements Comparator<ProjectGroup>
 {

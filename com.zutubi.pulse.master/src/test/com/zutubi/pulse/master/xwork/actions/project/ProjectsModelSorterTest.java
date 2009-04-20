@@ -44,12 +44,49 @@ public class ProjectsModelSorterTest extends PulseTestCase
     public void testNestedSorting()
     {
         List<ProjectsModel> groups = new LinkedList<ProjectsModel>(Arrays.asList(
-                createHierarchicalGroup("z", "cp2", createTemplates("a", "y", "c"), "b")
+                createHierarchicalGroup("label-a", "cp2", createTemplates("a", "y", "c"), "b")
         ));
         sorter.sort(groups);
 
         List<ProjectsModel> expectedSorting = new LinkedList<ProjectsModel>(Arrays.asList(
-                createHierarchicalGroup("z", "b", "cp2", createTemplates("a", "c", "y"))
+                createHierarchicalGroup("label-a", "b", "cp2", createTemplates("a", "c", "y"))
+        ));
+
+        assertProjectsModelLists(expectedSorting, groups);
+    }
+
+    public void testNestedSorting_MultipleTemplates()
+    {
+        List<ProjectsModel> groups = new LinkedList<ProjectsModel>(Arrays.asList(
+                createHierarchicalGroup("x", "cp2", createTemplates("p1", "y", "c"), "b",
+                        createTemplates("p2", "2", "1", "3"), "m", createTemplates("p0", "j", "k")
+                )
+        ));
+        sorter.sort(groups);
+
+        List<ProjectsModel> expectedSorting = new LinkedList<ProjectsModel>(Arrays.asList(
+                createHierarchicalGroup("x", "b", "cp2", "m", createTemplates("p0", "j", "k"),
+                        createTemplates("p1", "c", "y"), createTemplates("p2", "1", "2", "3"))
+        ));
+
+        assertProjectsModelLists(expectedSorting, groups);
+    }
+
+    public void testNestedSorting_MixedDepth()
+    {
+        List<ProjectsModel> groups = new LinkedList<ProjectsModel>(Arrays.asList(
+                createHierarchicalGroup("g1", createTemplates("p1", "y", "c"),
+                        createTemplates("p2", createTemplates("p4", "r", "t"), "1", "3"),
+                        createTemplates("p0", "j", createTemplates("p4", "u", "t"), "k", createTemplates("p5", "h"))
+                )
+        ));
+        sorter.sort(groups);
+
+        List<ProjectsModel> expectedSorting = new LinkedList<ProjectsModel>(Arrays.asList(
+                createHierarchicalGroup("g1", createTemplates("p0", "j", "k", createTemplates("p4", "t", "u"), createTemplates("p5", "h")),
+                        createTemplates("p1", "c", "y"),
+                        createTemplates("p2", "1", "3", createTemplates("p4", "r", "t"))
+                )
         ));
 
         assertProjectsModelLists(expectedSorting, groups);
@@ -136,12 +173,19 @@ public class ProjectsModelSorterTest extends PulseTestCase
         return model;
     }
 
-    private TemplateProjectModel createTemplates(String projectName, String... children)
+    private TemplateProjectModel createTemplates(String projectName, Object... members)
     {
         TemplateProjectModel root = new TemplateProjectModel(null, projectName);
-        for (String child : children)
+        for (Object member : members)
         {
-            root.addChild(createConcrete(child));
+            if (member instanceof String)
+            {
+                root.addChild(createConcrete((String)member));
+            }
+            else
+            {
+                root.addChild((ProjectModel)member);
+            }
         }
         return root;
     }
