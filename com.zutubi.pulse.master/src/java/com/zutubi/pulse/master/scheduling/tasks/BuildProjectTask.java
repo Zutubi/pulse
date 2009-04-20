@@ -70,12 +70,12 @@ public class BuildProjectTask implements Task
             }
 
             // generate build request.
-            TriggerOptions options = new TriggerOptions(new TriggerBuildReason(trigger.getName()), revision, getSource(trigger));
+            TriggerOptions options = new TriggerOptions(new TriggerBuildReason(trigger.getName()), getSource(trigger));
             options.setReplaceable(replaceable);
             options.setForce(false);
             options.setProperties(properties);
             options.setStatus(status);
-            projectManager.triggerBuild(project, options);
+            projectManager.triggerBuild(project, options, revision);
         }
         else
         {

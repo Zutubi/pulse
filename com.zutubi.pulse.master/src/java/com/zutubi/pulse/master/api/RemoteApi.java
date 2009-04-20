@@ -2323,8 +2323,9 @@ public class RemoteApi
      * @param projectName the name of the project to trigger
      * @return true
      * @access requires trigger permission for the given project
-     * @see #triggerBuild(String, String, String) 
-     * @see #triggerBuild(String, String, String, Hashtable)
+     * @see #triggerBuild(String, String, String)
+     * @see #triggerBuild(String, String, String, java.util.Hashtable)
+     * @see #triggerBuild(String, String, String, String, java.util.Hashtable)
      */
     public boolean triggerBuild(String token, String projectName)
     {
@@ -2342,7 +2343,8 @@ public class RemoteApi
      * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String) 
-     * @see #triggerBuild(String, String, String, Hashtable)
+     * @see #triggerBuild(String, String, String, java.util.Hashtable)
+     * @see #triggerBuild(String, String, String, String, java.util.Hashtable)
      */
     public boolean triggerBuild(String token, String projectName, String revision)
     {
@@ -2364,6 +2366,7 @@ public class RemoteApi
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String)
      * @see #triggerBuild(String, String, String)
+     * @see #triggerBuild(String, String, String, String, java.util.Hashtable)
      */
     public boolean triggerBuild(String token, String projectName, final String revision, Hashtable<String, String> properties)
     {
@@ -2381,11 +2384,12 @@ public class RemoteApi
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
      *                    may be empty to indicate the latest revision should be used
      * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
-     * @param status      the status category associated with the build request 
+     * @param status      the dependency status associated with the build request 
      * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String)
      * @see #triggerBuild(String, String, String)
+     * @see #triggerBuild(String, String, String, java.util.Hashtable) 
      */
     public boolean triggerBuild(String token, String projectName, final String revision, String status, Hashtable<String, String> properties)
     {
@@ -2429,12 +2433,12 @@ public class RemoteApi
                     resourceProperties.add(new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
                 }
             }
-            TriggerOptions options = new TriggerOptions(new RemoteTriggerBuildReason(user.getLogin()), r, "remote api");
+            TriggerOptions options = new TriggerOptions(new RemoteTriggerBuildReason(user.getLogin()), "remote api");
             options.setReplaceable(false);
             options.setForce(true);
             options.setProperties(resourceProperties);
             options.setStatus(status);
-            projectManager.triggerBuild(project.getConfig(), options);
+            projectManager.triggerBuild(project.getConfig(), options, r);
             return true;
         }
         finally

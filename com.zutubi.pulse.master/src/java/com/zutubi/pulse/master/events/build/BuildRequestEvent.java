@@ -35,7 +35,7 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
         String status = getProjectConfig().getDependencies().getStatus();
         if (getOptions().hasStatus())
         {
-            status = getOptions().getStatus();
+            status = options.getStatus();
         }
         result.setStatus(status);
         

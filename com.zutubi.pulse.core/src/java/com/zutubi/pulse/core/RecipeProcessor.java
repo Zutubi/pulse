@@ -6,8 +6,8 @@ import com.zutubi.pulse.core.commands.CommandFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandContext;
 import com.zutubi.pulse.core.commands.OutputFactory;
 import com.zutubi.pulse.core.commands.api.*;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
-import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
@@ -62,7 +62,7 @@ public class RecipeProcessor
     private CommandFactory commandFactory;
     private OutputFactory outputFactory;
     private PostProcessorFactory postProcessorFactory;
-    private IvyProvider ivyProvider;
+    private IvyManager ivyManager;
 
     public void build(RecipeRequest request)
     {
@@ -138,7 +138,7 @@ public class RecipeProcessor
             return;
         }
 
-        IvySupport ivy = ivyProvider.getIvySupport(context.getString(PROPERTY_MASTER_URL) + "/repository");
+        IvySupport ivy = ivyManager.getIvySupport(context.getString(PROPERTY_MASTER_URL) + "/repository");
         ivy.setMessageLogger(new IvyMessageOutputStreamAdapter(context.getOutputStream()));
 
         ModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
@@ -469,9 +469,9 @@ public class RecipeProcessor
         this.fileLoaderFactory = fileLoaderFactory;
     }
 
-    public void setIvyProvider(IvyProvider provider)
+    public void setIvyManager(IvyManager manager)
     {
-        this.ivyProvider = provider;
+        this.ivyManager = manager;
     }
 
     public void setCommandFactory(CommandFactory commandFactory)

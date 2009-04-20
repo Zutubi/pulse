@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.master.model.*;
@@ -17,7 +18,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
 
     public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, ProjectConfiguration projectConfig)
     {
-        super(source, revision, projectConfig, new TriggerOptions(new PersonalBuildReason(user.getLogin()), revision.getRevision(), null));
+        super(source, revision, projectConfig, new TriggerOptions(new PersonalBuildReason(user.getLogin()), null));
         this.number = number;
         this.user = user;
         this.patch = patch;
@@ -39,7 +40,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
         BuildResult result = new BuildResult(options.getReason(), user, project, number);
         // although a personal build doesn't have it's ivy file published, it still
         // requires a status.
-        result.setStatus("integration");
+        result.setStatus(STATUS_INTEGRATION);
         return result;
     }
 

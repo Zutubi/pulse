@@ -10,7 +10,8 @@ import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
-import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
@@ -38,8 +39,7 @@ import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
 import org.apache.ivy.util.MessageLoggerEngine;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -120,15 +120,11 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         stub(resolver.getName()).toReturn("pulse");
         IvySettings settings = mock(IvySettings.class);
         stub(settings.getDefaultResolver()).toReturn(resolver);
-        final Ivy ivy = mock(Ivy.class);
+        Ivy ivy = mock(Ivy.class);
         stub(ivy.getSettings()).toReturn(settings);
-        recipeProcessor.setIvyProvider(new IvyProvider()
-        {
-            public IvySupport getIvySupport(String repositoryBase) throws Exception
-            {
-                return new IvySupport(ivy);
-            }
-        });
+        IvyManager ivyManager = mock(IvyManager.class);
+        stub(ivyManager.getIvySupport(anyString())).toReturn(new IvySupport(ivy));
+        recipeProcessor.setIvyManager(ivyManager);
         stub(ivy.getLoggerEngine()).toReturn(loggerEngine);
     }
 
@@ -144,7 +140,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         PulseExecutionContext context = makeContext(1, "default");
 
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(ModuleRevisionId.newInstance("org", "module", null), "integration", null);
+        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(ModuleRevisionId.newInstance("org", "module", null), STATUS_INTEGRATION, null);
 
         addArtifact(descriptor, "build", "artifact", "jar");
         addArtifact(descriptor, "build", "artifact", "txt");
@@ -164,7 +160,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         PulseExecutionContext context = makeContext(1, "default");
 
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(ModuleRevisionId.newInstance("org", "module", null), "integration", null);
+        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(ModuleRevisionId.newInstance("org", "module", null), STATUS_INTEGRATION, null);
 
         addDependency(descriptor, "org", "projectA", "1.0");
         addDependency(descriptor, "org", "projectB", "1.0");

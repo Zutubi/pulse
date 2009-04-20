@@ -124,8 +124,8 @@ public class ProjectConfigurationActions
         String user = AcegiUtils.getLoggedInUsername();
         if (user != null)
         {
-            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), null, ProjectManager.TRIGGER_CATEGORY_MANUAL);
-            projectManager.triggerBuild(projectConfig, options);
+            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);
+            projectManager.triggerBuild(projectConfig, options, null);
         }
     }
 

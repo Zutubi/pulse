@@ -9,7 +9,7 @@
     <bean id="configurationRegistry" class="com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry" init-method="init"/>
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor"/>
-    <bean id="ivyProvider" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init"/>
+    <bean id="ivyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init"/>
 
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory" init-method="init"/>
 

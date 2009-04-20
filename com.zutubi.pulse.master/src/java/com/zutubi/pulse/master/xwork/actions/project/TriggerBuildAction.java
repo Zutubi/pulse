@@ -26,8 +26,8 @@ public class TriggerBuildAction extends ProjectActionBase
             return "prompt";
         }
         
-        TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), null, ProjectManager.TRIGGER_CATEGORY_MANUAL);
-        getProjectManager().triggerBuild(projectConfig, options);
+        TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), ProjectManager.TRIGGER_CATEGORY_MANUAL);
+        getProjectManager().triggerBuild(projectConfig, options, null);
 
         try
         {

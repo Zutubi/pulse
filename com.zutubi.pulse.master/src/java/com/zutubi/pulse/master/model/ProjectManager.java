@@ -122,11 +122,13 @@ public interface ProjectManager extends EntityManager<Project>
      *
      * @param project       the project to trigger a build of
      * @param options       the options for the build being triggered.
+     * @param revision      the revision to build, or null if the revision is not fixed
+     * (in which case changelist isolation may result in multiple build requests).
      *
      * @see TriggerOptions
      */
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = ProjectConfiguration.class)
-    void triggerBuild(ProjectConfiguration project, TriggerOptions options);
+    void triggerBuild(ProjectConfiguration project, TriggerOptions options, Revision revision);
 
     // Personal builds are shielded by their own permission, not the trigger
     // authority.

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.tove.type.record.PathUtils;
@@ -282,7 +283,7 @@ public class IvySupportTest extends PulseTestCase
     {
         ModuleRevisionId mrid = ModuleRevisionId.newInstance(project.getOrg(), project.getName(), null);
 
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, "integration", null); // the status needs to be configurable - options include 'release'..
+        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, STATUS_INTEGRATION, null); // the status needs to be configurable - options include 'release'..
         descriptor.addConfiguration(new Configuration("build"));
 
         // setup the module dependencies.

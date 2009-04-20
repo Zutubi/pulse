@@ -8,10 +8,14 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scheduling.EventTriggerFilter;
 import com.zutubi.pulse.master.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * An event filter that only accepts build completed events associated with a
@@ -20,6 +24,8 @@ import com.zutubi.util.Predicate;
  */
 public class DependentBuildEventFilter implements EventTriggerFilter
 {
+    public static final String PARAM_PROPAGATE_STATUS   = "propagate.status";
+
     private ProjectManager projectManager;
 
     public boolean accept(Trigger trigger, Event event, TaskExecutionContext context)
@@ -48,6 +54,12 @@ public class DependentBuildEventFilter implements EventTriggerFilter
             return false;
         }
 
+        boolean progagateStatus = getBooleanParam(trigger.getDataMap(), PARAM_PROPAGATE_STATUS, false);
+        if (progagateStatus)
+        {
+            context.put(BuildProjectTask.PARAM_STATUS, result.getStatus());
+        }
+
         final Project builtProject = result.getProject();
 
         // Return true iif the triggers project contains a dependency to the built project.
@@ -65,8 +77,22 @@ public class DependentBuildEventFilter implements EventTriggerFilter
         return (event instanceof BuildCompletedEvent);
     }
 
+    private boolean getBooleanParam(Map<Serializable, Serializable> dataMap, String param, boolean defaultValue)
+    {
+        Boolean value = (Boolean) dataMap.get(param);
+        if (value == null)
+        {
+            return defaultValue;
+        }
+        else
+        {
+            return value;
+        }
+    }
+
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
     }
+
 }

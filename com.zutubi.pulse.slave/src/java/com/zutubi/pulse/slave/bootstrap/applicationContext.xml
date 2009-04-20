@@ -106,6 +106,6 @@
     </bean>
 
     <bean id="dependencyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init"/>
-    <alias name="dependencyManager" alias="ivyProvider"/>
+    <alias name="dependencyManager" alias="ivyManager"/>
 
 </beans>

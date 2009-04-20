@@ -522,7 +522,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         licenseManager.refreshAuthorisations();
     }
 
-    public void triggerBuild(ProjectConfiguration projectConfig, TriggerOptions options)
+    public void triggerBuild(ProjectConfiguration projectConfig, TriggerOptions options, Revision revision)
     {
         Project project = getProject(projectConfig.getProjectId(), false);
 
@@ -530,7 +530,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         // to the persistent version (e.g. it could have additional properties).
         project.setConfig(projectConfig);
 
-        if(options.getRevision() == null)
+        if(revision == null)
         {
             if(projectConfig.getOptions().getIsolateChangelists())
             {
@@ -546,9 +546,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                             {
                                 // Note when isolating changelists we never replace existing requests
                                 TriggerOptions copy = new TriggerOptions(options);
-                                copy.setRevision(r);
                                 options.setReplaceable(false);
-                                requestBuildOfRevision(project, copy);
+                                requestBuildOfRevision(project, copy, r);
                             }
                     }
                     else
@@ -571,7 +570,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(project, options);
+            requestBuildOfRevision(project, options, revision);
         }
     }
 
@@ -616,17 +615,17 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         eventManager.publish(new BuildRequestEvent(this, project, new BuildRevision(), options));
     }
 
-    private void requestBuildOfRevision(Project project, TriggerOptions options)
+    private void requestBuildOfRevision(Project project, TriggerOptions options, Revision revision)
     {
         try
         {
-            PulseFileSource pulseFile = getPulseFile(project.getConfig(), options.getRevision(), null);
+            PulseFileSource pulseFile = getPulseFile(project.getConfig(), revision, null);
 
-            eventManager.publish(new BuildRequestEvent(this, project, new BuildRevision(options.getRevision(), pulseFile, options.getReason().isUser()), options));
+            eventManager.publish(new BuildRequestEvent(this, project, new BuildRevision(revision, pulseFile, options.getReason().isUser()), options));
         }
         catch (Exception e)
         {
-            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + options.getRevision().getRevisionString() + "': " + e.getMessage(), e);
+            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
         }
     }
 

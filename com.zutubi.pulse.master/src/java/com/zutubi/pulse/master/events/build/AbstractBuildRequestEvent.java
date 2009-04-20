@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.events.build;
 import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -63,9 +62,6 @@ public abstract class AbstractBuildRequestEvent extends Event
         }
 
         this.revision = revision;
-        // update the revision in the options to keep it in sync.  Might be better to not have the
-        // revision in the options?
-        this.options.setRevision(revision.getRevision());
     }
 
     public ProjectConfiguration getProjectConfig()

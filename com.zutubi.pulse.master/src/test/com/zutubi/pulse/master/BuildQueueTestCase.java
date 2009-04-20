@@ -3,6 +3,7 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -132,8 +133,8 @@ public class BuildQueueTestCase extends PulseTestCase
     protected AbstractBuildRequestEvent createRequest(final Project owner, final long buildId, String source, boolean replaceable, Revision revision)
     {
         BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, new PulseFileSource("pulse file"), false);
-        TriggerOptions options = new TriggerOptions(null, revision, source);
-        options.setStatus("integration");
+        TriggerOptions options = new TriggerOptions(null, source);
+        options.setStatus(STATUS_INTEGRATION);
         options.setReplaceable(replaceable);
         return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), options)
         {

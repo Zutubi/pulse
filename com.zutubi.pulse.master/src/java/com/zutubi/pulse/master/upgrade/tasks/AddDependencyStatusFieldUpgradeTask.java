@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Arrays;
 
 /**
- * Upgrade task that adds the status field to the project/dependencies
+ * Upgrade task that adds the status field to the project/triggers
  */
 public class AddDependencyStatusFieldUpgradeTask extends AbstractRecordPropertiesUpgradeTask
 {

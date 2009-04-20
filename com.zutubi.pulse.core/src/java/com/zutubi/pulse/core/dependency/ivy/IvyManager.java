@@ -21,8 +21,12 @@ import org.apache.ivy.plugins.resolver.URLResolver;
 /**
  * The ivy implementation of the dependency manager interface.
  */
-public class IvyManager implements DependencyManager, IvyProvider
+public class IvyManager implements DependencyManager
 {
+    public static String STATUS_INTEGRATION   = "integration";
+    public static String STATUS_MILESTONE     = "milestone";
+    public static String STATUS_RELEASE       = "release";
+
     private static final String RESOLVER_NAME = "pulse";
 
     private static final String VARIABLE_REPOSITORY_BASE = "repository.base";
@@ -102,6 +106,15 @@ public class IvyManager implements DependencyManager, IvyProvider
         return Ivy.newInstance(settings);
     }
 
+    /**
+     * Get a configured instance of support ivy.
+     *
+     * @param repositoryBase    defines the base path to the internal pulse repository.  The
+     * format of this field must be a valid url.
+     * @return  a new configured ivy support instance.
+     *
+     * @throws Exception on error.
+     */
     public IvySupport getIvySupport(String repositoryBase) throws Exception
     {
         return new IvySupport(newIvyInstance(repositoryBase));

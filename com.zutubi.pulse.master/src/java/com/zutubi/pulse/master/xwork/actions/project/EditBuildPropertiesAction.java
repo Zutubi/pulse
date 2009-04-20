@@ -264,10 +264,10 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         try
         {
-            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL);
+            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), ProjectManager.TRIGGER_CATEGORY_MANUAL);
             options.setProperties(mapProperties(project.getConfig()));
             options.setStatus(status);
-            projectManager.triggerBuild(project.getConfig(), options);
+            projectManager.triggerBuild(project.getConfig(), options, r);
         }
         catch (Exception e)
         {

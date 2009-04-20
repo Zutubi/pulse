@@ -3,9 +3,9 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
-import static com.zutubi.pulse.acceptance.dependencies.DependencyConstants.STATUS_MILESTONE;
-import static com.zutubi.pulse.acceptance.dependencies.DependencyConstants.STATUS_RELEASE;
-import static com.zutubi.pulse.acceptance.dependencies.DependencyConstants.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_MILESTONE;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_RELEASE;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -482,6 +482,28 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1, BUILD_TIMEOUT);
     }
 
+    public void testDependentBuild_PropagateStatus() throws Exception
+    {
+        Project projectA = new Project(randomName());
+        projectA.getDefaultStage().addArtifacts("artifact.jar");
+        projectA.setStatus(STATUS_RELEASE);
+        createProject(projectA);
+
+        Project projectB = new Project(randomName());
+        projectB.addDependency(projectA);
+        projectB.setStatus(STATUS_INTEGRATION);
+        projectB.setPropagateStatus(true);
+        createProject(projectB);
+
+        AntBuildConfiguration buildA = new AntBuildConfiguration();
+        buildA.addFileToCreate("build/artifact.jar");
+        triggerSuccessfulBuild(projectA, buildA);
+
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1, BUILD_TIMEOUT);
+
+        assertIvyStatus(STATUS_RELEASE, projectB.getName(), 1);
+    }
+
     public void testRepositoryFormat_OrgSpecified() throws Exception
     {
         Project project = new Project(randomName(), "org");
@@ -659,6 +681,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> trigger = xmlRpcHelper.createEmptyConfig(DependentBuildTriggerConfiguration.class);
         trigger.put("name", "dependency trigger");
         xmlRpcHelper.insertConfig(triggersPath, trigger);
+
+        if (project.isPropagateStatus())
+        {
+            setPropagateStatusOnTrigger(project);
+        }
     }
 
     private void setProjectOrganisation(Project p) throws Exception
@@ -695,6 +722,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             dependencies.put("status", project.status);
         }
         xmlRpcHelper.saveConfig(dependenciesPath, dependencies, false);
+    }
+
+    public void setPropagateStatusOnTrigger(Project project) throws Exception
+    {
+        String triggerPath = "projects/" + project.getName() + "/triggers/dependency trigger";
+        Hashtable<String, Object> trigger = xmlRpcHelper.getConfig(triggerPath);
+        trigger.put("propagateStatus", project.isPropagateStatus());
+        xmlRpcHelper.saveConfig(triggerPath, trigger, false);
     }
 
     private void addPublication(String projectName, String stageName, String artifact) throws Exception
@@ -821,6 +856,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private List<Stage> stages = new LinkedList<Stage>();
         private Stage defaultStage = new Stage("default");
 
+        private boolean propagateStatus = false;
+
         private String publicationPattern = "build/[artifact].[ext]";
 
         private String retrievalPattern = "lib/[artifact].[ext]";
@@ -913,6 +950,16 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         public void setStatus(String status)
         {
             this.status = status;
+        }
+
+        public boolean isPropagateStatus()
+        {
+            return propagateStatus;
+        }
+
+        public void setPropagateStatus(boolean propagateStatus)
+        {
+            this.propagateStatus = propagateStatus;
         }
     }
 

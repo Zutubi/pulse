@@ -13,31 +13,31 @@ public class TriggerOptions
 {
     /**
      * Additional properties introduced into the build context just
-     * after the project properties
+     * after the project properties.
      */
     private Collection<ResourcePropertyConfiguration> properties = new LinkedList<ResourcePropertyConfiguration>();
 
     /**
-     * The reason the build was triggered
+     * The reason the build was triggered.
      */
     private final BuildReason reason;
 
     /**
-     * The revision to build, or null if the revision is
-     * not fixed (in which case changelist isolation may
-     * result in multiple build requests
+     * The revision to build, or null if the revision is not fixed
+     * (in which case changelist isolation may result in multiple build
+     * requests).
      */
     private Revision revision;
 
     /**
      * A freeform source for the trigger, used to identify related
-     * triggers for superceding
+     * triggers for replacing.
      */
     private final String source;
 
     /**
      * If true, while queue this build request may be replaced by
-     * another with the same source(has no effect if isolating changelists)
+     * another with the same source(has no effect if isolating changelists).
      */
     private boolean replaceable = false;
 
@@ -48,7 +48,7 @@ public class TriggerOptions
     private boolean force = true;
 
     /**
-     * The status associated with this build request.
+     * The dependency status associated with this build request.
      */
     private String status = null;
 
@@ -56,17 +56,15 @@ public class TriggerOptions
     {
         this.properties.addAll(other.properties);
         this.reason = other.reason;
-        this.revision = other.revision;
         this.source = other.source;
         this.replaceable = other.replaceable;
         this.force = other.force;
         this.status = other.status;
     }
 
-    public TriggerOptions(BuildReason reason, Revision revision, String source)
+    public TriggerOptions(BuildReason reason, String source)
     {
         this.reason = reason;
-        this.revision = revision;
         this.source = source;
     }
 
@@ -108,16 +106,6 @@ public class TriggerOptions
     public BuildReason getReason()
     {
         return reason;
-    }
-
-    public Revision getRevision()
-    {
-        return revision;
-    }
-
-    public void setRevision(Revision revision)
-    {
-        this.revision = revision;
     }
 
     public String getSource()

@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.dependency.ivy.IvyProvider;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvySupport;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.engine.PulseFileSource;
@@ -102,7 +102,7 @@ public class BuildController implements EventListener
     private DefaultBuildLogger buildLogger;
     private RecipeDispatchService recipeDispatchService;
 
-    private IvyProvider ivyProvider;
+    private IvyManager ivyManager;
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -256,7 +256,6 @@ public class BuildController implements EventListener
 
         DependenciesConfiguration dependenciesConfiguration = project.getDependencies();
 
-        // or maybe we pick the status up from some properties?..
         String status = buildResult.getStatus();
         DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, status, null); // the status needs to be configurable - options include 'release'..
         descriptor.addConfiguration(new Configuration(IvySupport.CONFIGURATION_BUILD));
@@ -1012,7 +1011,7 @@ public class BuildController implements EventListener
             CredentialsStore.INSTANCE.addCredentials("Pulse", new URL(masterUrl).getHost(), "pulse", buildContext.getSecurityHash());
 
             String repositoryUrl = masterUrl + "/repository";
-            IvySupport ivy = ivyProvider.getIvySupport(repositoryUrl);
+            IvySupport ivy = ivyManager.getIvySupport(repositoryUrl);
             ivy.setMessageLogger(buildLogger.getMessageLogger());
             
             ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
@@ -1150,9 +1149,9 @@ public class BuildController implements EventListener
         this.buildTokenAuthenticationProvider = buildTokenAuthenticationProvider;
     }
 
-    public void setIvyProvider(IvyProvider ivyProvider)
+    public void setIvyManager(IvyManager ivyManager)
     {
-        this.ivyProvider = ivyProvider;
+        this.ivyManager = ivyManager;
     }
 
     private static interface BootstrapperCreator
