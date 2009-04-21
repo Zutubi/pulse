@@ -25,9 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 public class DefaultScmManager implements ScmManager, Stoppable
 {
@@ -162,64 +160,32 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
         }
 
-        // Process each of the server queues on a separate thread.  Record the status of each thread
-        // so that we can accurately wait on it before returning from this method.
-        final Map<List<ProjectConfiguration>, Boolean> queueProcessingComplete = new HashMap<List<ProjectConfiguration>, Boolean>();
+        List<Future> pollingResults = new LinkedList<Future>();
         for (final List<ProjectConfiguration> queue : serverQueues.values())
         {
-            queueProcessingComplete.put(queue, false);
-            pollingExecutor.execute(new Runnable()
+            pollingResults.add(pollingExecutor.submit(new Runnable()
             {
                 public void run()
                 {
-                    try
+                    for (ProjectConfiguration project : queue)
                     {
-                        for (ProjectConfiguration project : queue)
-                        {
-                            process(project);
-                        }
+                        process(project);
                     }
-                    catch (Exception e)
-                    {
-                        LOG.severe(e);
-                    }
-                    queueProcessingComplete.put(queue, true);
                 }
-            });
+            }));
         }
 
-        // wait until the polling is complete before exiting.  This way we keep the
-        // polling task running, blocking it from running again until this is complete.
-
-        waitForCondition(new Condition()
+        boolean allPollingTasksComplete = false;
+        while (!allPollingTasksComplete)
         {
-            public boolean satisfied()
+            allPollingTasksComplete = true;
+            for (Future result : pollingResults)
             {
-                boolean pollingComplete = true;
-                for (Boolean queueComplete : queueProcessingComplete.values())
+                if (!result.isDone())
                 {
-                    if (!queueComplete)
-                    {
-                        pollingComplete = false;
-                        break;
-                    }
+                    allPollingTasksComplete = false;
+                    break;
                 }
-                return pollingComplete;
-            }
-        });
-    }
-
-    private void waitForCondition(Condition c)
-    {
-        while (!c.satisfied())
-        {
-            try
-            {
-                Thread.sleep(Constants.SECOND);
-            }
-            catch (InterruptedException e)
-            {
-                // noop.
             }
         }
     }

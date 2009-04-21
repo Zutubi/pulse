@@ -18,27 +18,6 @@ public class AcceptanceTestUtils
         return workingDir;
     }
 
-    public static void waitForCondition(Condition condition, long timeout, String description)
-    {
-        long endTime = System.currentTimeMillis() + timeout;
-        while(!condition.satisfied())
-        {
-            if(System.currentTimeMillis() > endTime)
-            {
-                throw new RuntimeException("Timed out waiting for " + description);
-            }
-
-            try
-            {
-                Thread.sleep(200);
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException("Interrupted waiting for " + description);
-            }
-        }
-    }
-
     /**
      * Returns the location of a Pulse package, based on the pulse.package
      * system property.

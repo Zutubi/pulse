@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
@@ -589,7 +590,7 @@ public class XmlRpcHelper
      */
     public void waitForBuildInProgress(final String projectName, final int number, long timeout) throws Exception
     {
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
@@ -616,7 +617,7 @@ public class XmlRpcHelper
      */
     public void waitForBuildToComplete(final String projectName, final int number, long timeout) throws Exception
     {
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

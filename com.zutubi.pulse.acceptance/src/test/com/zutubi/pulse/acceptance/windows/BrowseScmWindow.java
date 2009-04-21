@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance.windows;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.util.Condition;
 
 import java.util.Arrays;
@@ -28,7 +28,7 @@ public class BrowseScmWindow
 
     public void waitForWindow()
     {
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.condition.NotifyConditionFactory;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
@@ -120,7 +121,7 @@ public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void assertEmailsFrom(final String... recipients)
     {
         // wait for emails to arrive.
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

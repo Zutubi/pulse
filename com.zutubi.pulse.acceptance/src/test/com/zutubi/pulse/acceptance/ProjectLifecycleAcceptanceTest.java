@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.ProjectLogPage;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
@@ -59,7 +60,7 @@ public class ProjectLifecycleAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> scmConfig = xmlRpcHelper.getConfig(scmPath);
         xmlRpcHelper.deleteConfig(scmPath);
 
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
