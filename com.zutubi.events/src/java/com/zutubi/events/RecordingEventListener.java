@@ -1,5 +1,8 @@
 package com.zutubi.events;
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,9 +35,25 @@ public class RecordingEventListener implements EventListener
         return events;
     }
 
+    public <T extends Event> List<Event> getEventsReceived(final Class<T> type)
+    {
+        return CollectionUtils.filter(events, new Predicate<Event>()
+        {
+            public boolean satisfied(Event event)
+            {
+                return event.getClass() == type;
+            }
+        });
+    }
+
     public int getReceivedCount()
     {
         return getEventsReceived().size();
+    }
+
+    public int getReceivedCount(Class<? extends Event> type)
+    {
+        return getEventsReceived(type).size();
     }
 
     public void reset()

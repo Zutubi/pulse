@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.scm;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
+import com.zutubi.events.Event;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
@@ -23,6 +24,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class DefaultScmManagerTest extends PulseTestCase
@@ -34,6 +36,7 @@ public class DefaultScmManagerTest extends PulseTestCase
     private ThreadFactory threadFactory;
     private LinkedList<Project> projects;
     private ScmManagerHandle scmManagerHandle;
+    private RecordingEventListener events;
 
     protected void setUp() throws Exception
     {
@@ -71,7 +74,7 @@ public class DefaultScmManagerTest extends PulseTestCase
         // trigger the scmManager init.
         eventManager.publish(new SystemStartedEvent(this));
 
-        RecordingEventListener events = new RecordingEventListener();
+        events = new RecordingEventListener();
         eventManager.register(events);
 
         scmManagerHandle = new ScmManagerHandle(scmManager);
@@ -108,8 +111,8 @@ public class DefaultScmManagerTest extends PulseTestCase
 
     public void testPollingIsParallelForDifferentScmServers() throws ScmException, InterruptedException
     {
-        ScmServer serverA = new ScmServer("a");
-        ScmServer serverB = new ScmServer("b");
+        ScmServer serverA = new ScmServer("a", true);
+        ScmServer serverB = new ScmServer("b", true);
 
         ScmClient clientA = stubClientWithServer(createProject(1, true, true), serverA);
         ScmClient clientB = stubClientWithServer(createProject(2, true, true), serverB);
@@ -132,7 +135,7 @@ public class DefaultScmManagerTest extends PulseTestCase
 
     public void testPollingIsSequentialForSingleScmServer() throws ScmException, InterruptedException
     {
-        ScmServer serverA = new ScmServer("a");
+        ScmServer serverA = new ScmServer("a", true);
 
         ScmClient clientA = stubClientWithServer(createProject(1, true, true), serverA);
         ScmClient clientB = stubClientWithServer(createProject(2, true, true), serverA);
@@ -156,6 +159,22 @@ public class DefaultScmManagerTest extends PulseTestCase
         assertTrue(scmManagerHandle.isPollingComplete());
     }
 
+    public void testScmChangeEventDetails() throws ScmException, InterruptedException
+    {
+        ScmServer serverA = new ScmServer("a");
+        stubClientWithServer(createProject(1, true, true), serverA);
+
+        scmManagerHandle.pollAndWait();
+        assertEquals(0, events.getReceivedCount(ScmChangeEvent.class));
+
+        scmManagerHandle.pollAndWait();
+        List<Event> changeEvents = events.getEventsReceived(ScmChangeEvent.class);
+        assertEquals(1, changeEvents.size());
+        ScmChangeEvent change = (ScmChangeEvent) changeEvents.get(0);
+        assertEquals(new Revision(0), change.getPreviousRevision());
+        assertEquals(new Revision(1), change.getNewRevision());
+    }
+
     private ScmClient stubClientWithServer(final ScmClient client, final ScmServer server) throws ScmException
     {
         stub(client.getUid()).toAnswer(new Answer<Object>()
@@ -170,6 +189,15 @@ public class DefaultScmManagerTest extends PulseTestCase
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 return server.getLatestRevision();
+            }
+        });
+        stub(client.getRevisions((ScmContext) anyObject(), (Revision) anyObject(), (Revision) anyObject())).toAnswer(new Answer<Object>()
+        {
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                Revision from = (Revision) invocationOnMock.getArguments()[1];
+                Revision to = (Revision) invocationOnMock.getArguments()[2];
+                return server.getRevisions(from, to);
             }
         });
         return client;
@@ -239,26 +267,15 @@ public class DefaultScmManagerTest extends PulseTestCase
 
         private boolean waitForPollingComplete()
         {
-            return waitForPollingComplete(TIMEOUT);
-        }
-
-        private boolean waitForPollingComplete(long timeout)
-        {
             try
             {
-                waitForCondition(new Condition()
-                {
-                    public boolean satisfied()
-                    {
-                        return isPollingComplete();
-                    }
-                }, timeout, "");
-                return true;
+                result.get();
             }
             catch (Exception e)
             {
-                return false;
+                e.printStackTrace();
             }
+            return result.isDone();
         }
 
         public void stop()
@@ -277,17 +294,23 @@ public class DefaultScmManagerTest extends PulseTestCase
     private class ScmServer
     {
         private String uid;
-
+        private boolean blocking = false;
         private Semaphore entrySemaphore;
         private Semaphore processSemaphore;
 
-        private long revision = 0;
+        private long nextRevision = 0;
 
         private int requestId = 0;
 
         private ScmServer(String uid)
         {
+            this(uid, false);
+        }
+
+        private ScmServer(String uid, boolean blocking)
+        {
             this.uid = uid;
+            this.blocking = blocking;
             this.entrySemaphore = new Semaphore(1);
             this.processSemaphore = new Semaphore(0);
         }
@@ -306,7 +329,10 @@ public class DefaultScmManagerTest extends PulseTestCase
             try
             {
                 requestId++;
-                processSemaphore.acquire();
+                if (blocking)
+                {
+                    processSemaphore.acquire();
+                }
 
                 return new Revision(nextRevision());
             }
@@ -332,6 +358,7 @@ public class DefaultScmManagerTest extends PulseTestCase
                         return isInProgress(requestId);
                     }
                 }, TIMEOUT, "");
+
                 return true;
             }
             catch (Exception e)
@@ -342,12 +369,26 @@ public class DefaultScmManagerTest extends PulseTestCase
 
         public void releaseProcess()
         {
+            if (!blocking)
+            {
+                throw new RuntimeException("No need to release a non-blocking server.");
+            }
             processSemaphore.release();
         }
 
         private long nextRevision()
         {
-            return revision++;
+            return nextRevision++;
+        }
+
+        public List<Revision> getRevisions(Revision from, Revision to)
+        {
+            List<Revision> revisions = new LinkedList<Revision>();
+            for (long i = Long.valueOf(from.getRevisionString()) + 1;i <= nextRevision; i++)
+            {
+                revisions.add(new Revision(i));
+            }
+            return revisions;
         }
     }
 }

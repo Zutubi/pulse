@@ -160,10 +160,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
         }
 
-        List<Future> pollingResults = new LinkedList<Future>();
+        List<Future> pollingTasks = new LinkedList<Future>();
         for (final List<ProjectConfiguration> queue : serverQueues.values())
         {
-            pollingResults.add(pollingExecutor.submit(new Runnable()
+            pollingTasks.add(pollingExecutor.submit(new Runnable()
             {
                 public void run()
                 {
@@ -175,18 +175,29 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }));
         }
 
-        boolean allPollingTasksComplete = false;
-        while (!allPollingTasksComplete)
+        try
         {
-            allPollingTasksComplete = true;
-            for (Future result : pollingResults)
+            for (Future task : pollingTasks)
             {
-                if (!result.isDone())
+                try
                 {
-                    allPollingTasksComplete = false;
-                    break;
+                    task.get();
+                }
+                catch (CancellationException e)
+                {
+                    // the task was cancelled, and hence is complete.  Lets keep going.
+                }
+                catch (ExecutionException e)
+                {
+                    // the task generated an exception during execution. Log it and continue.
+                    LOG.severe(e);
                 }
             }
+        }
+        catch (InterruptedException e)
+        {
+            // we have been interrupted while waiting.  Time to continue.
+            LOG.warning(e);
         }
     }
 
