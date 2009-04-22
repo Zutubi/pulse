@@ -146,7 +146,10 @@ public class DashboardAction extends ActionSupport
                     return dashboardConfig.getShownProjects().contains(project.getConfig());
                 }
             };
-            sorter.setProjectNameComparator(new DashboardConfigurationProjectComparator(dashboardConfig));
+            if (!dashboardConfig.isSortProjectsAlphabetically())
+            {
+                sorter.setProjectNameComparator(new DashboardConfigurationProjectComparator(dashboardConfig));
+            }
         }
 
         boolean showUngrouped;
@@ -168,7 +171,10 @@ public class DashboardAction extends ActionSupport
                         return dashboardConfig.getShownGroups().contains(projectGroup.getName());
                     }
                 };
-                sorter.setGroupNameComparator(new DashboardConfigurationProjectGroupComparator(dashboardConfig));
+                if (!dashboardConfig.isSortGroupsAlphabetically())
+                {
+                    sorter.setGroupNameComparator(new DashboardConfigurationProjectGroupComparator(dashboardConfig));
+                }
             }
         }
         else
@@ -179,6 +185,10 @@ public class DashboardAction extends ActionSupport
 
         ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
         models = helper.createProjectsModels(dashboardConfig, projectPredicate, groupPredicate, showUngrouped);
+        if (!dashboardConfig.isSortProjectsAlphabetically())
+        {
+            sorter.sortTemplatesToStart();
+        }
         sorter.sort(models);
 
         changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());

@@ -16,6 +16,7 @@ public class ProjectsModelSorter
 {
     private Comparator<String> groupNameComparator = new Sort.StringComparator();
     private Comparator<String> projectNameComparator = new Sort.StringComparator();
+    private TemplateSortStrategy templateSortStrategy = TemplateSortStrategy.MIXED;
 
     public void setGroupNameComparator(Comparator<String> groupNameComparator)
     {
@@ -25,6 +26,16 @@ public class ProjectsModelSorter
     public void setProjectNameComparator(Comparator<String> projectNameComparator)
     {
         this.projectNameComparator = projectNameComparator;
+    }
+
+    public void sortTemplatesToStart()
+    {
+        templateSortStrategy = TemplateSortStrategy.TO_START;
+    }
+
+    public void sortTemplatesToEnd()
+    {
+        templateSortStrategy = TemplateSortStrategy.TO_END;
     }
 
     public void sort(List<ProjectsModel> projectsModels)
@@ -49,7 +60,7 @@ public class ProjectsModelSorter
             }
         });
         
-        final Comparator<ProjectModel> projectModelComparator = new ProjectModelComparator(projectNameComparator);
+        final Comparator<ProjectModel> projectModelComparator = new ProjectModelComparator(projectNameComparator, templateSortStrategy);
         
         // b) sort the contents of the group.
         for (ProjectsModel projects : projectsModels)
@@ -80,9 +91,12 @@ public class ProjectsModelSorter
     {
         private Comparator<String> delegate;
 
-        private ProjectModelComparator(Comparator<String> delegate)
+        private TemplateSortStrategy strategy;
+
+        private ProjectModelComparator(Comparator<String> delegate, TemplateSortStrategy strategy)
         {
             this.delegate = delegate;
+            this.strategy = strategy;
         }
 
         public int compare(ProjectModel o1, ProjectModel o2)
@@ -91,17 +105,37 @@ public class ProjectsModelSorter
             {
                 return delegate.compare(o1.getName(), o2.getName());
             }
-            if (o1 instanceof TemplateProjectModel)
+
+            switch (strategy)
             {
-                return 1;
-            }
-            if (o2 instanceof TemplateProjectModel)
-            {
-                return -1;
+                case TO_START:
+                    if (o1 instanceof TemplateProjectModel)
+                    {
+                        return -1;
+                    }
+                    if (o2 instanceof TemplateProjectModel)
+                    {
+                        return 1;
+                    }
+                case TO_END:
+                    if (o1 instanceof TemplateProjectModel)
+                    {
+                        return 1;
+                    }
+                    if (o2 instanceof TemplateProjectModel)
+                    {
+                        return -1;
+                    }
+                case MIXED:
+                    break;
             }
 
             return delegate.compare(o1.getName(), o2.getName());
         }
     }
 
+    public enum TemplateSortStrategy
+    {
+        TO_START, TO_END, MIXED
+    }
 }

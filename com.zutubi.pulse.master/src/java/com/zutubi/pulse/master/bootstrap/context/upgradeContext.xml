@@ -50,6 +50,7 @@
                 <ref local="fixPermanentUsers"/>
                 <ref local="revisionStringLimit"/>
                 <ref local="triggerProperties"/>
+                <ref local="dashboardSortProperties"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -166,4 +167,9 @@
     <bean id="triggerProperties" class="com.zutubi.pulse.master.upgrade.tasks.TriggerPropertiesUpgradeTask">
         <property name="buildNumber" value="200025001"/>
     </bean>
+
+    <bean id="dashboardSortProperties" class="com.zutubi.pulse.master.upgrade.tasks.AddDashboardSortPropertiesUpgradeTask">
+        <property name="buildNumber" value="200027001"/>
+    </bean>
+    
 </beans>

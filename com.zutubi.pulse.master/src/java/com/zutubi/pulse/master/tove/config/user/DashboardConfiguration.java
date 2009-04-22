@@ -10,7 +10,7 @@ import java.util.List;
  * User preferences controlling what they see on their dashboard.
  */
 @SymbolicName("zutubi.dashboardConfig")
-@Form(labelWidth = 300, fieldOrder = {"showAllProjects", "shownProjects", "groupsShown", "showUngrouped", "showAllGroups", "shownGroups", "hierarchyShown", "hiddenHierarchyLevels", "buildsPerProject", "columns", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
+@Form(labelWidth = 300, fieldOrder = {"showAllProjects", "sortProjectsAlphabetically", "shownProjects", "groupsShown", "showUngrouped", "showAllGroups", "sortGroupsAlphabetically", "shownGroups", "hierarchyShown", "hiddenHierarchyLevels", "buildsPerProject", "columns", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
 @Classification(single = "dashboard")
 public class DashboardConfiguration extends ProjectsSummaryConfiguration
 {
@@ -21,10 +21,14 @@ public class DashboardConfiguration extends ProjectsSummaryConfiguration
      */
     @Reference
     private List<ProjectConfiguration> shownProjects = new LinkedList<ProjectConfiguration>();
+    private boolean sortProjectsAlphabetically = true;
+
     @ControllingCheckbox(dependentFields = {"showAllGroups", "showUngrouped"})
     private boolean groupsShown = true;
     @ControllingCheckbox(invert = true, dependentFields = {"shownGroups"})
     private boolean showAllGroups = true;
+    private boolean sortGroupsAlphabetically = true;
+
     /**
      * Project groups to show on dashboard.
      */
@@ -148,5 +152,25 @@ public class DashboardConfiguration extends ProjectsSummaryConfiguration
     public void setProjectChangeCount(int projectChangeCount)
     {
         this.projectChangeCount = projectChangeCount;
+    }
+
+    public boolean isSortProjectsAlphabetically()
+    {
+        return sortProjectsAlphabetically;
+    }
+
+    public void setSortProjectsAlphabetically(boolean sortProjectsAlphabetically)
+    {
+        this.sortProjectsAlphabetically = sortProjectsAlphabetically;
+    }
+
+    public boolean isSortGroupsAlphabetically()
+    {
+        return sortGroupsAlphabetically;
+    }
+
+    public void setSortGroupsAlphabetically(boolean sortGroupsAlphabetically)
+    {
+        this.sortGroupsAlphabetically = sortGroupsAlphabetically;
     }
 }
