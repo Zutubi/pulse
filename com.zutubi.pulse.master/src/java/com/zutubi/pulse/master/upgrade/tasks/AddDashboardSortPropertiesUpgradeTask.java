@@ -18,9 +18,8 @@ public class AddDashboardSortPropertiesUpgradeTask extends AbstractRecordPropert
 
     protected RecordLocator getRecordLocator()
     {
-        // Find all triggers, filter down to build completed triggers.
-        RecordLocator triggerLocator = RecordLocators.newPathPattern(PathUtils.getPath("users", PathUtils.WILDCARD_ANY_ELEMENT, "dashboard", PathUtils.WILDCARD_ANY_ELEMENT));
-        return RecordLocators.newTypeFilter(triggerLocator, "zutubi.dashboardConfig");
+        RecordLocator locator = RecordLocators.newPathPattern(PathUtils.getPath("users", PathUtils.WILDCARD_ANY_ELEMENT, "preferences/dashboard"));
+        return RecordLocators.newTypeFilter(locator, "zutubi.dashboardConfig");
     }
 
     protected List<RecordUpgrader> getRecordUpgraders()

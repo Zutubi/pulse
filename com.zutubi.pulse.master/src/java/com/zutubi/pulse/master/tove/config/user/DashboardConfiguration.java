@@ -14,7 +14,7 @@ import java.util.List;
 @Classification(single = "dashboard")
 public class DashboardConfiguration extends ProjectsSummaryConfiguration
 {
-    @ControllingCheckbox(invert = true, dependentFields = {"shownProjects"})
+    @ControllingCheckbox(invert = true, dependentFields = {"shownProjects", "sortProjectsAlphabetically"})
     private boolean showAllProjects = true;
     /**
      * Projects to show on the dashboard.
@@ -25,7 +25,7 @@ public class DashboardConfiguration extends ProjectsSummaryConfiguration
 
     @ControllingCheckbox(dependentFields = {"showAllGroups", "showUngrouped"})
     private boolean groupsShown = true;
-    @ControllingCheckbox(invert = true, dependentFields = {"shownGroups"})
+    @ControllingCheckbox(invert = true, dependentFields = {"shownGroups", "sortGroupsAlphabetically"})
     private boolean showAllGroups = true;
     private boolean sortGroupsAlphabetically = true;
 

@@ -13,9 +13,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- *
- */
 public class ProjectsModelTestBase extends PulseTestCase
 {
     private long nextId = 1;

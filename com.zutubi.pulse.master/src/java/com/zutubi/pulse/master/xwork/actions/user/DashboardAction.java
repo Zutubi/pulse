@@ -149,6 +149,7 @@ public class DashboardAction extends ActionSupport
             if (!dashboardConfig.isSortProjectsAlphabetically())
             {
                 sorter.setProjectNameComparator(new DashboardConfigurationProjectComparator(dashboardConfig));
+                sorter.sortTemplatesToStart();
             }
         }
 
@@ -185,10 +186,6 @@ public class DashboardAction extends ActionSupport
 
         ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
         models = helper.createProjectsModels(dashboardConfig, projectPredicate, groupPredicate, showUngrouped);
-        if (!dashboardConfig.isSortProjectsAlphabetically())
-        {
-            sorter.sortTemplatesToStart();
-        }
         sorter.sort(models);
 
         changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
