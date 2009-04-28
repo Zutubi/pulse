@@ -20,6 +20,7 @@ public class DependenciesTestSuite
         TestSuite dependencySuite = new TestSuite();
         dependencySuite.addTestSuite(DependenciesAcceptanceTest.class);
         dependencySuite.addTestSuite(AritfactRepositoryIsolationTest.class);
+        dependencySuite.addTestSuite(IvyIntegrationAcceptanceTest.class);
 
         // cleanup the artifact repository before continueing on.
         return new CleanArtifactRepository(dependencySuite);

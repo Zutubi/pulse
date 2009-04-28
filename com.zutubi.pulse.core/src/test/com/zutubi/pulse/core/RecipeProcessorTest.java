@@ -12,7 +12,7 @@ import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
-import com.zutubi.pulse.core.dependency.ivy.IvySupport;
+import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
@@ -123,7 +123,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         Ivy ivy = mock(Ivy.class);
         stub(ivy.getSettings()).toReturn(settings);
         IvyManager ivyManager = mock(IvyManager.class);
-        stub(ivyManager.getIvySupport(anyString())).toReturn(new IvySupport(ivy));
+        stub(ivyManager.createIvyClient(anyString())).toReturn(new IvyClient(ivy));
         recipeProcessor.setIvyManager(ivyManager);
         stub(ivy.getLoggerEngine()).toReturn(loggerEngine);
     }

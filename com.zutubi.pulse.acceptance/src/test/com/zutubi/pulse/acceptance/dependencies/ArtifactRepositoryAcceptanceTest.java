@@ -32,7 +32,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
     }
 
     // test that an external ivy process can publish to the internal artifact repository.
-    public void testIvyCanPublishToRepository() throws Exception
+    public void testExternalIvyCanPublishToRepository() throws Exception
     {
         assertTrue(isNotInArtifactRepository("zutubi/com.zutubi.sample/jars"));
 
@@ -46,7 +46,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
     }
 
     // test that an external ivy process can retrieve from the internal artifact repository.
-    public void testIvyCanRetrieveFromRepository() throws Exception
+    public void testExternalIvyCanRetrieveFromRepository() throws Exception
     {
         // create the expected artifact file.
         createArtifactFile("zutubi/artifact/jars/artifact-1.0.0.jar");

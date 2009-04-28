@@ -22,6 +22,16 @@ public class PublicationConfiguration extends AbstractConfiguration
     @Required
     private String ext = "jar";
 
+    public PublicationConfiguration()
+    {
+    }
+
+    public PublicationConfiguration(String name, String ext)
+    {
+        this.name = name;
+        this.ext = ext;
+    }
+
     public String getName()
     {
         return name;

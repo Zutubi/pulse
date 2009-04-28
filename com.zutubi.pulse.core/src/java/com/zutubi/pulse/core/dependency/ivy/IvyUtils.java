@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.zutubi.util.StringUtils;
 import org.apache.ivy.util.Message;
 
 import java.util.logging.Level;
@@ -63,20 +64,26 @@ public class IvyUtils
         StringBuffer buffer = new StringBuffer();
         for (int i = 0; i < stageName.length(); i++)
         {
-            char c = stageName.charAt(i);
-            switch (c)
+            char character = stageName.charAt(i);
+            if(StringUtils.isAsciiAlphaNumeric(character))
             {
-                case ',':
-                case ';':
-                case '%':
-                case '#':
-                case '*':
-                case '=':
-                case '_':
-                    buffer.append("_").append((int)c);
-                    break;
-                default:
-                    buffer.append(c);
+                buffer.append(character);
+            }
+            else
+            {
+                // A few more likely-used characters
+                switch(character)
+                {
+                    case ' ':
+                    case '-':
+                    case '.':
+                        buffer.append(character);
+                        break;
+                    default:
+                        buffer.append("_").append((int)character);
+                        break;
+                }
+
             }
         }
         return buffer.toString();

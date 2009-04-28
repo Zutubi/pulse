@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * An annoying hack to get security working in a sensible maner with ivy.
+ * An annoying hack to get security working in a sensible manner with ivy.
  *
  * The basic problem is that HttpClientHandler does not handle the file protocol, but the BasicURLHandler
  * does.  At the same time, the HttpClientHandler handles authentication, but the BasicURLHandler does not

@@ -5,6 +5,7 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * A dependency defines a project and the artifacts built by that project that this project requires
@@ -45,7 +46,7 @@ public class DependencyConfiguration extends AbstractConfiguration
     private boolean allStages = true;
 
     @Reference @Select(optionProvider = "DependencyStagesOptionProvider") 
-    private List<BuildStageConfiguration> stages = null;
+    private List<BuildStageConfiguration> stages = new LinkedList<BuildStageConfiguration>();
 
     public String getOrg()
     {

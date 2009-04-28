@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class PublishArtifactsCommand extends BaseIvyCommand
 {
-    private IvySupport ivy;
+    private IvyClient ivy;
     private RecipeRequest request;
 
     public PublishArtifactsCommand(PublishArtifactsCommandConfiguration config)

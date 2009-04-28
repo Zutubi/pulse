@@ -13,7 +13,7 @@ import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
  */
 public class RetrieveDependenciesCommand extends BaseIvyCommand
 {
-    private IvySupport ivy;
+    private IvyClient ivy;
 
     public RetrieveDependenciesCommand(RetrieveDependenciesCommandConfiguration config)
     {

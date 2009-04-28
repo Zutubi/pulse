@@ -10,9 +10,8 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
-import com.zutubi.pulse.core.dependency.ivy.IvySupport;
-import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -29,6 +28,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
@@ -45,8 +45,8 @@ import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import org.apache.ivy.core.module.descriptor.*;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
+import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.util.url.CredentialsStore;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -249,66 +249,9 @@ public class BuildController implements EventListener
 
     private ModuleDescriptor createModuleDescriptor(ProjectConfiguration project)
     {
-        String org = project.getOrganisation();
-        org = (org == null) ? "" : org.trim();
-
-        ModuleRevisionId mrid = ModuleRevisionId.newInstance(org, project.getName(), null);
-
-        DependenciesConfiguration dependenciesConfiguration = project.getDependencies();
-
-        String status = buildResult.getStatus();
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, status, null); // the status needs to be configurable - options include 'release'..
-        descriptor.addConfiguration(new Configuration(IvySupport.CONFIGURATION_BUILD));
-        descriptor.addExtraAttributeNamespace("e", "http://ant.apache.org/ivy/extra");
-
-        // setup the module dependencies.
-        for (DependencyConfiguration dependency : dependenciesConfiguration.getDependencies())
-        {
-            String projectName = dependency.getModule();
-
-            String projectOrg = projectManager.getProjectConfig(projectName, true).getOrganisation();
-            projectOrg = (projectOrg == null) ? "" : projectOrg.trim();
-
-            ModuleRevisionId dependencyMrid = ModuleRevisionId.newInstance(projectOrg, projectName, dependency.getRevision());
-            DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(descriptor, dependencyMrid, true, false, dependency.isTransitive());
-
-            String stages = DependencyConfiguration.ALL_STAGES;
-            if (!dependency.isAllStages())
-            {
-                List<String> stageNames = CollectionUtils.map(dependency.getStages(), new Mapping<BuildStageConfiguration, String>()
-                {
-                    public String map(BuildStageConfiguration stage)
-                    {
-                        return IvyUtils.ivyEncodeStageName(stage.getName());
-                    }
-                });
-                stages = StringUtils.join(",", stageNames);
-            }
-            depDesc.addDependencyConfiguration(IvySupport.CONFIGURATION_BUILD, stages);
-
-            descriptor.addDependency(depDesc);
-        }
-
-        // setup the module artifacts.
-        for (BuildStageConfiguration stage : project.getStages().values())
-        {
-            List<PublicationConfiguration> publications = new LinkedList<PublicationConfiguration>();
-            publications.addAll(project.getDependencies().getPublications());
-            publications.addAll(stage.getPublications());
-            if (publications.size() > 0)
-            {
-                String confName = IvyUtils.ivyEncodeStageName(stage.getName());
-                descriptor.addConfiguration(new Configuration(confName));
-                for (PublicationConfiguration artifact : publications)
-                {
-                    Map<String, String> extraAttributes = new HashMap<String, String>();
-                    extraAttributes.put("e:stage", IvyUtils.ivyEncodeStageName(stage.getName()));
-                    MDArtifact ivyArtifact = new MDArtifact(descriptor, artifact.getName(), artifact.getExt(), artifact.getExt(), null, extraAttributes);
-                    ivyArtifact.addConfiguration(confName);
-                    descriptor.addArtifact(confName, ivyArtifact);
-                }
-            }
-        }
+        ModuleDescriptorFactory f = new ModuleDescriptorFactory();
+        DefaultModuleDescriptor descriptor = f.createDescriptor(project);
+        descriptor.setStatus(buildResult.getStatus());
         return descriptor;
     }
 
@@ -1011,11 +954,10 @@ public class BuildController implements EventListener
             CredentialsStore.INSTANCE.addCredentials("Pulse", new URL(masterUrl).getHost(), "pulse", buildContext.getSecurityHash());
 
             String repositoryUrl = masterUrl + "/repository";
-            IvySupport ivy = ivyManager.getIvySupport(repositoryUrl);
+            IvyClient ivy = ivyManager.createIvyClient(repositoryUrl);
             ivy.setMessageLogger(buildLogger.getMessageLogger());
             
             ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
-            descriptor.getModuleRevisionId().getOrganisation();
             ivy.resolve(descriptor);
 
             ivy.publishIvy(descriptor, Long.toString(buildResult.getNumber()));

@@ -4,19 +4,19 @@ import com.zutubi.pulse.core.commands.api.CommandConfigurationSupport;
 
 public class RetrieveDependenciesCommandConfiguration extends CommandConfigurationSupport
 {
-    private IvySupport ivy;
+    private IvyClient ivy;
 
     public RetrieveDependenciesCommandConfiguration()
     {
         super(RetrieveDependenciesCommand.class);
     }
 
-    public IvySupport getIvy()
+    public IvyClient getIvy()
     {
         return ivy;
     }
 
-    public void setIvy(IvySupport ivy)
+    public void setIvy(IvyClient ivy)
     {
         this.ivy = ivy;
     }

@@ -2,38 +2,48 @@ package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.Ivy;
+import org.apache.ivy.core.cache.ArtifactOrigin;
 import org.apache.ivy.core.cache.ResolutionCacheManager;
 import org.apache.ivy.core.deliver.DeliverOptions;
+import org.apache.ivy.core.module.descriptor.Artifact;
+import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.publish.PublishOptions;
+import org.apache.ivy.core.report.ResolveReport;
+import org.apache.ivy.core.resolve.ResolveData;
 import org.apache.ivy.core.resolve.ResolveEngine;
 import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
+import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorParser;
 import org.apache.ivy.plugins.resolver.AbstractPatternsBasedResolver;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
+import org.apache.ivy.plugins.resolver.RepositoryResolver;
+import org.apache.ivy.plugins.resolver.util.ResolvedResource;
+import org.apache.ivy.plugins.repository.Resource;
 import org.apache.ivy.util.MessageLogger;
 import org.apache.ivy.util.url.URLHandler;
 import org.apache.ivy.util.url.URLHandlerRegistry;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
- * The IvySupport provides a facade around the ivy dependency management system
+ * The IvyClient provides a facade around the ivy dependency management system
  */
-public class IvySupport
+public class IvyClient
 {
-    private static final Logger LOG = Logger.getLogger(IvySupport.class);
+    private static final Logger LOG = Logger.getLogger(IvyClient.class);
 
     private static final String[] ALL_CONFS = new String[]{"*"};
 
@@ -41,7 +51,7 @@ public class IvySupport
 
     private Ivy ivy;
 
-    public IvySupport(Ivy ivy)
+    public IvyClient(Ivy ivy)
     {
         this.ivy = ivy;
     }
@@ -52,6 +62,7 @@ public class IvySupport
      *
      * @param mrid     the id of the module descriptor to be delivered
      * @param revision the revision of the delivered file.
+     * 
      * @throws java.io.IOException      on error
      * @throws java.text.ParseException on error
      */
@@ -212,15 +223,74 @@ public class IvySupport
         }
     }
 
-    public void resolve(ModuleDescriptor descriptor) throws IOException, ParseException
+    public ResolveReport resolve(ModuleDescriptor descriptor) throws IOException, ParseException
     {
-        // we need to resolve the ivy.xml files before we do anything that uses them.
         ResolveOptions options = new ResolveOptions();
         options.setValidate(ivy.getSettings().doValidate());
         options.setConfs(ALL_CONFS);
         options.setCheckIfChanged(true);
 
-        ivy.resolve(descriptor, options);
+        return ivy.resolve(descriptor, options);
+    }
+
+    public ResolveReport resolve(ModuleRevisionId mrid, String... confs) throws IOException, ParseException
+    {
+        ResolveOptions options = new ResolveOptions();
+        options.setValidate(ivy.getSettings().doValidate());
+        options.setConfs(ALL_CONFS);
+        options.setUseCacheOnly(true);
+        options.setConfs(confs);
+        options.setResolveId(ResolveOptions.getDefaultResolveId(mrid.getModuleId()));
+
+        return ivy.resolve(mrid, options, false);
+    }
+
+    /**
+     * Resolve the artifacts associated with the specified module revision id.  This revision id needs
+     * to uniquely specify a published ivy file so that its artifacts can be resolved and located.
+     *
+     * @param mrid  the module revision id.
+     * @return a list of artifact origin instances for the resolved artifacts, or null if the module
+     * revision id could not be resolved.
+     *
+     * @throws IOException  on error.
+     * @throws ParseException   if there is an error parsing the resolved ivy descriptor.
+     */
+    public List<ArtifactOrigin> resolveArtifacts(ModuleRevisionId mrid) throws IOException, ParseException
+    {
+        final RepositoryResolver resolver = (RepositoryResolver) ivy.getSettings().getDefaultResolver();
+
+        ResolveOptions resolveOptions = new ResolveOptions();
+        ResolveData resolveData = new ResolveData(ivy.getResolveEngine(), resolveOptions);
+        DefaultDependencyDescriptor dependencyDescriptor = new DefaultDependencyDescriptor(mrid, true);
+
+        ResolvedResource resolvedResource = resolver.findIvyFileRef(dependencyDescriptor, resolveData);
+        if (resolvedResource == null || !resolvedResource.getResource().exists())
+        {
+            // failed to locate the ivy file, we can not continue.
+            return null;
+        }
+
+        XmlModuleDescriptorParser parser = XmlModuleDescriptorParser.getInstance();
+        Resource resource = resolvedResource.getResource();
+        URL ivyFileUrl = new File(resource.getName()).toURI().toURL();
+        ModuleDescriptor repositoryBasedDescriptor = parser.parseDescriptor(ivy.getSettings(), ivyFileUrl, false);
+
+        List<ArtifactOrigin> artifactOrigins = CollectionUtils.map(repositoryBasedDescriptor.getAllArtifacts(), new Mapping<Artifact, ArtifactOrigin>()
+        {
+            public ArtifactOrigin map(Artifact artifact)
+            {
+                return resolver.locate(artifact);
+            }
+        });
+        // resolver.locate returns null if the artifact does not exist, so we filter out the nulls.
+        return CollectionUtils.filter(artifactOrigins, new Predicate<ArtifactOrigin>()
+        {
+            public boolean satisfied(ArtifactOrigin artifactOrigin)
+            {
+                return artifactOrigin != null;
+            }
+        });
     }
 
     public boolean isResolved(ModuleRevisionId mrid)

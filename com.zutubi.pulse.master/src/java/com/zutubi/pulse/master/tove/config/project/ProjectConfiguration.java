@@ -76,6 +76,21 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
 
     private ChangeViewerConfiguration changeViewer;
 
+    public ProjectConfiguration()
+    {
+    }
+
+    public ProjectConfiguration(String name)
+    {
+        this.name = name;
+    }
+
+    public ProjectConfiguration(String organisation, String name)
+    {
+        this.organisation = organisation;
+        this.name = name;
+    }
+
     public long getProjectId()
     {
         return projectId;

@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 
 public class PublishArtifactsCommandConfiguration extends CommandConfigurationSupport
 {
-    private IvySupport ivy;
+    private IvyClient ivy;
     private RecipeRequest request;
     
     public PublishArtifactsCommandConfiguration()
@@ -13,12 +13,12 @@ public class PublishArtifactsCommandConfiguration extends CommandConfigurationSu
         super(PublishArtifactsCommand.class);
     }
 
-    public IvySupport getIvy()
+    public IvyClient getIvy()
     {
         return ivy;
     }
 
-    public void setIvy(IvySupport ivy)
+    public void setIvy(IvyClient ivy)
     {
         this.ivy = ivy;
     }
