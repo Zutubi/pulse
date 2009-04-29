@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.jetty;
+package com.zutubi.pulse.master.security;
 
 import static com.zutubi.util.CollectionUtils.contains;
 import com.zutubi.util.Predicate;

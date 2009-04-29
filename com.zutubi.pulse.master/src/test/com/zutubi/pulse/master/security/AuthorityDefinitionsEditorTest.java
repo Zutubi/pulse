@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.jetty;
+package com.zutubi.pulse.master.security;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 

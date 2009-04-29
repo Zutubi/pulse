@@ -86,7 +86,7 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="basicEntryPoint" ref="basicProcessingFilterEntryPoint"/>
     </bean>
 
-    <bean name="artifactRepositoryAuthorityProvider" class="com.zutubi.pulse.servercore.jetty.ArtifactRepositoryAuthorityProvider">
+    <bean name="artifactRepositoryAuthorityProvider" class="com.zutubi.pulse.master.security.ArtifactRepositoryAuthorityProvider">
         <property name="accessManager" ref="accessManager"/>
         <property name="definitions"><value>
             /,ROLE_ANONYMOUS

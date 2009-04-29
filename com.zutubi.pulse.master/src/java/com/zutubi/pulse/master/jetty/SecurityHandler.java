@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.jetty;
 
 import com.zutubi.pulse.master.security.AnonymousActor;
-import com.zutubi.pulse.servercore.jetty.HttpInvocation;
+import com.zutubi.pulse.master.security.HttpInvocation;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
 import org.mortbay.http.HttpRequest;
@@ -17,9 +17,10 @@ import java.io.IOException;
 
 /**
  * An implementation of the {@link org.mortbay.http.HttpHandler} interface
- * that delegates a security check to a {@link com.zutubi.pulse.servercore.jetty.PrivilegeEvaluator}.  If the request
- * is denied, the request is marked as handled and the forbidden error is sent via
- * the response.
+ * that delegates a security check to the acess manager.  If the request is
+ * denied and the user is anonymous, then a basic authentication  response
+ * will be sent out.  If the user is authenticated but denied, then the
+ * resource will be forbidden.
  */
 public class SecurityHandler extends AbstractHttpHandler
 {
@@ -29,7 +30,7 @@ public class SecurityHandler extends AbstractHttpHandler
 
     public void handle(final String pathInContext, final String pathParams, final HttpRequest httpRequest, final HttpResponse httpResponse) throws IOException
     {
-        HttpInvocation invocation = new HttpInvocation(httpRequest, httpResponse, pathInContext);
+        HttpInvocation invocation = new HttpInvocation(httpRequest, httpResponse, pathInContext, accessManager.getActor());
 
         if (!accessManager.hasPermission(invocation.getMethod(), invocation))
         {
