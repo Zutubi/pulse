@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.test;
 
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.Condition;
 import junit.framework.AssertionFailedError;
 
 import java.io.File;
@@ -17,6 +18,35 @@ public class TestUtils
     private static final String PROPERTY_WORKING_DIRECTORY = "user.dir";
 
     private static final String MODULE_MASTER = "com.zutubi.pulse.master";
+
+    public static void waitForCondition(Condition condition, long timeout, String description)
+    {
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + timeout;
+        
+        if (endTime < startTime)
+        {
+            // we have wrapped around.
+            endTime = Long.MAX_VALUE;
+        }
+        
+        while(!condition.satisfied())
+        {
+            if(System.currentTimeMillis() > endTime)
+            {
+                throw new RuntimeException("Timed out waiting for " + description);
+            }
+
+            try
+            {
+                Thread.sleep(200);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException("Interrupted waiting for " + description);
+            }
+        }
+    }
 
     public static File getPulseRoot()
     {

@@ -24,11 +24,10 @@ import com.zutubi.util.logging.Logger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.LinkedList;
+import java.util.concurrent.*;
 
-public class DefaultScmManager implements ScmManager
+public class DefaultScmManager implements ScmManager, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(DefaultScmManager.class);
 
@@ -63,16 +62,7 @@ public class DefaultScmManager implements ScmManager
             }
         });
 
-        shutdownManager.addStoppable(new Stoppable()
-        {
-            public void stop(boolean force)
-            {
-                if (pollingExecutor != null)
-                {
-                    pollingExecutor.shutdown();
-                }
-            }
-        });
+        shutdownManager.addStoppable(this);
     }
 
     private void initialise()
@@ -110,7 +100,7 @@ public class DefaultScmManager implements ScmManager
         {
             public boolean satisfied(Project project)
             {
-                if (project == null || !project.getState().isInitialised())
+                if (project == null || !project.isInitialised())
                 {
                     return false;
                 }
@@ -126,7 +116,7 @@ public class DefaultScmManager implements ScmManager
                 return ((Pollable) scm).isMonitor();
             }
         });
-        
+
         return CollectionUtils.map(filteredProjects, new Mapping<Project, ProjectConfiguration>()
         {
             public ProjectConfiguration map(Project project)
@@ -138,29 +128,76 @@ public class DefaultScmManager implements ScmManager
 
     public void pollActiveScms()
     {
-        for (final ProjectConfiguration project : getActiveProjects())
-        {
-            pollingExecutor.execute(new Runnable()
-            {
-                public void run()
-                {
-                    process(project);
-                }
-            });
-        }
+        // When polling the scms, there are a couple of important considerations.
+        // a) polling an scm can take time. -> threads && polling interval.
+        // b) the scm server may or may not be available. -> sensible timeout.  Scm operations may validly
+        //    take some time, so for now we leave this open.
+        // c) multiple scms may be referencing the same server. -> queue single server requests.
 
-        // wait until the polling is complete becore exiting.  This way we keep the
-        // polling task running, blocking it from running again until this is complete.
-        while (pollingExecutor.getActiveCount() > 0)
+        List<ProjectConfiguration> activeProjects = getActiveProjects();
+
+        // C) Generate the per server request queued.
+        Map<String, List<ProjectConfiguration>> serverQueues = new HashMap<String, List<ProjectConfiguration>>();
+        for (ProjectConfiguration project : activeProjects)
         {
             try
             {
-                Thread.sleep(Constants.SECOND);
+                ScmClient client = createClient(project.getScm());
+                String serverUid = client.getUid();
+                if (!serverQueues.containsKey(serverUid))
+                {
+                    serverQueues.put(serverUid, new LinkedList<ProjectConfiguration>());
+                }
+                List<ProjectConfiguration> queue = serverQueues.get(serverUid);
+                queue.add(project);
             }
-            catch (InterruptedException e)
+            catch (ScmException e)
             {
-                // noop.
+                // if we are having problems with any particular scm, log the issue
+                // and continue.  One scm having a problem should not delay the other
+                // scms.
+                LOG.warning(e);
             }
+        }
+
+        List<Future> pollingTasks = new LinkedList<Future>();
+        for (final List<ProjectConfiguration> queue : serverQueues.values())
+        {
+            pollingTasks.add(pollingExecutor.submit(new Runnable()
+            {
+                public void run()
+                {
+                    for (ProjectConfiguration project : queue)
+                    {
+                        process(project);
+                    }
+                }
+            }));
+        }
+
+        try
+        {
+            for (Future task : pollingTasks)
+            {
+                try
+                {
+                    task.get();
+                }
+                catch (CancellationException e)
+                {
+                    // the task was cancelled, and hence is complete.  Lets keep going.
+                }
+                catch (ExecutionException e)
+                {
+                    // the task generated an exception during execution. Log it and continue.
+                    LOG.severe(e);
+                }
+            }
+        }
+        catch (InterruptedException e)
+        {
+            // we have been interrupted while waiting.  Time to continue.
+            LOG.warning(e);
         }
     }
 
@@ -184,8 +221,8 @@ public class DefaultScmManager implements ScmManager
             projectManager.updateLastPollTime(projectId, now);
 
             // when was the last time that we checked? if never, get the latest revision.
-            ScmContext context = scmContextFactory.createContext(projectConfig);
-            client = scmClientFactory.createClient(projectConfig.getScm());
+            ScmContext context = createContext(projectConfig);
+            client = createClient(projectConfig.getScm());
 
             Revision previous = latestRevisions.get(projectId);
 
@@ -325,6 +362,14 @@ public class DefaultScmManager implements ScmManager
     public int getDefaultPollingInterval()
     {
         return configurationProvider.get(GlobalConfiguration.class).getScmPollingInterval();
+    }
+
+    public void stop(boolean force)
+    {
+        if (pollingExecutor != null)
+        {
+            pollingExecutor.shutdown();
+        }
     }
 
     public void setEventManager(EventManager eventManager)

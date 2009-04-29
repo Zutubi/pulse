@@ -1,10 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -18,7 +16,7 @@ import org.mockito.stubbing.Answer;
 
 import java.util.*;
 
-public class ProjectsModelsHelperTest extends PulseTestCase
+public class ProjectsModelsHelperTest extends ProjectsModelTestBase
 {
     private static final String TEMPLATE_GLOBAL = "global";
     private static final String TEMPLATE_CHILD = "child";
@@ -26,8 +24,6 @@ public class ProjectsModelsHelperTest extends PulseTestCase
     private static final String LABEL_ODD = "odd";
     private static final String LABEL_LONELY = "lonely";
     private static final String LABEL_STRANGE = "strange";
-
-    private long nextId = 1;
 
     private Project p1;
     private Project p2;
@@ -108,26 +104,6 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         helper.setBuildManager(buildManager);
     }
 
-    private Project createProject(String name, String... labels)
-    {
-        ProjectConfiguration configuration = new ProjectConfiguration();
-        configuration.setName(name);
-        configuration.setLabels(CollectionUtils.map(labels, new Mapping<String, LabelConfiguration>()
-        {
-            public LabelConfiguration map(String s)
-            {
-                LabelConfiguration label = new LabelConfiguration();
-                label.setLabel(s);
-                return label;
-            }
-        }));
-
-        Project project = new Project();
-        project.setId(nextId++);
-        project.setConfig(configuration);
-        return project;
-    }
-
     private TemplateNode createNode(String name, boolean concrete)
     {
         return new TemplateNode(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, name), name, concrete);
@@ -177,10 +153,10 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHiddenHierarchyLevels(0);
 
         List<ProjectsModel> expectedModels = Arrays.asList(
-                createHierarchicalGroup(LABEL_LONELY, TEMPLATE_GLOBAL, p1),
-                createHierarchicalGroup(LABEL_ODD, TEMPLATE_GLOBAL, p1, p3, TEMPLATE_CHILD, cp1),
-                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_GLOBAL, TEMPLATE_CHILD, cp1, cp2),
-                createHierarchicalGroup(null, TEMPLATE_GLOBAL, p2, TEMPLATE_CHILD, cp3)
+                createHierarchicalGroup(LABEL_LONELY, createTemplates(LABEL_LONELY, TEMPLATE_GLOBAL, p1)),
+                createHierarchicalGroup(LABEL_ODD, createTemplates(LABEL_ODD, TEMPLATE_GLOBAL, createTemplates(LABEL_ODD, TEMPLATE_CHILD, cp1), p1, p3)),
+                createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_GLOBAL, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2))),
+                createHierarchicalGroup(null, createTemplates(null, TEMPLATE_GLOBAL, createTemplates(null, TEMPLATE_CHILD, cp3), p2))
         );
         assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, true));
     }
@@ -192,9 +168,9 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHiddenHierarchyLevels(0);
 
         List<ProjectsModel> expectedModels = Arrays.asList(
-                createHierarchicalGroup(LABEL_LONELY, TEMPLATE_GLOBAL, p1),
-                createHierarchicalGroup(LABEL_ODD, TEMPLATE_GLOBAL, p1, p3, TEMPLATE_CHILD, cp1),
-                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_GLOBAL, TEMPLATE_CHILD, cp1, cp2)
+                createHierarchicalGroup(LABEL_LONELY, createTemplates(LABEL_LONELY, TEMPLATE_GLOBAL, p1)),
+                createHierarchicalGroup(LABEL_ODD, createTemplates(LABEL_ODD, TEMPLATE_GLOBAL, createTemplates(LABEL_ODD, TEMPLATE_CHILD, cp1), p1, p3)),
+                createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_GLOBAL, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)))
         );
         assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, false));
     }
@@ -207,9 +183,9 @@ public class ProjectsModelsHelperTest extends PulseTestCase
 
         List<ProjectsModel> expectedModels = Arrays.asList(
                 createHierarchicalGroup(LABEL_LONELY, p1),
-                createHierarchicalGroup(LABEL_ODD, p1, p3, TEMPLATE_CHILD, cp1),
-                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2),
-                createHierarchicalGroup(null, p2, TEMPLATE_CHILD, cp3)
+                createHierarchicalGroup(LABEL_ODD, createTemplates(LABEL_ODD, TEMPLATE_CHILD, cp1), p1, p3),
+                createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)),
+                createHierarchicalGroup(null, createTemplates(null, TEMPLATE_CHILD, cp3), p2)
         );
         assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, true));
     }
@@ -222,8 +198,8 @@ public class ProjectsModelsHelperTest extends PulseTestCase
 
         List<ProjectsModel> expectedModels = Arrays.asList(
                 createHierarchicalGroup(LABEL_LONELY, p1),
-                createHierarchicalGroup(LABEL_ODD, p1, p3, TEMPLATE_CHILD, cp1),
-                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)
+                createHierarchicalGroup(LABEL_ODD, createTemplates(LABEL_ODD, TEMPLATE_CHILD, cp1), p1, p3),
+                createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2))
         );
         assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, false));
     }
@@ -269,7 +245,9 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(0);
 
-        List<ProjectsModel> expectedModels = Arrays.asList(createHierarchicalGroup(null, TEMPLATE_GLOBAL, p1, p2, p3, TEMPLATE_CHILD, cp1, cp2, cp3));
+        List<ProjectsModel> expectedModels = Arrays.asList(
+                createHierarchicalGroup(null, createTemplates(null, TEMPLATE_GLOBAL, createTemplates(null, TEMPLATE_CHILD, cp1, cp2, cp3), p1, p2, p3))
+        );
         assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
     }
 
@@ -288,7 +266,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(1);
 
-        List<ProjectsModel> expectedModels = Arrays.asList(createHierarchicalGroup(null, p1, p2, p3, TEMPLATE_CHILD, cp1, cp2, cp3));
+        List<ProjectsModel> expectedModels = Arrays.asList(createHierarchicalGroup(null, createTemplates(null, TEMPLATE_CHILD, cp1, cp2, cp3), p1, p2, p3));
         assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
     }
 
@@ -338,8 +316,8 @@ public class ProjectsModelsHelperTest extends PulseTestCase
 
         List<ProjectsModel> expectedModels = Arrays.asList(
                 createHierarchicalGroup(LABEL_LONELY, p1),
-                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2),
-                createHierarchicalGroup(null, p2, p3, TEMPLATE_CHILD, cp3)
+                createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)),
+                createHierarchicalGroup(null, createTemplates(null, TEMPLATE_CHILD, cp3), p2, p3)
         );
 
         List<ProjectsModel> gotModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), true);
@@ -354,7 +332,7 @@ public class ProjectsModelsHelperTest extends PulseTestCase
 
         List<ProjectsModel> expectedModels = Arrays.asList(
                 createHierarchicalGroup(LABEL_LONELY, p1),
-                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)
+                createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2))
         );
 
         List<ProjectsModel> gotModels = helper.createProjectsModels(config, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), false);
@@ -399,8 +377,8 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         config.setHiddenHierarchyLevels(1);
 
         List<ProjectsModel> expectedModels = Arrays.asList(
-                createHierarchicalGroup(LABEL_ODD, p3, TEMPLATE_CHILD, cp1),
-                createHierarchicalGroup(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2),
+                createHierarchicalGroup(LABEL_ODD, createTemplates(LABEL_ODD, TEMPLATE_CHILD, cp1), p3),
+                createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)),
                 createHierarchicalGroup(null, p2)
         );
 
@@ -461,57 +439,6 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         assertEquals("projects", ungroup.getGroupName());
     }
 
-    private void assertProjectsModelLists(List<ProjectsModel> expectedModels, List<ProjectsModel> gotModels)
-    {
-        assertEquals(expectedModels.size(), gotModels.size());
-        for (int i = 0; i < expectedModels.size(); i++)
-        {
-            assertProjectsModels(expectedModels.get(i), gotModels.get(i));
-        }
-    }
-
-    private void assertProjectsModels(ProjectsModel expected, ProjectsModel got)
-    {
-        assertEquals(expected.isLabelled(), got.isLabelled());
-        if (expected.isLabelled())
-        {
-            assertEquals(expected.getGroupName(), got.getGroupName());
-        }
-
-        assertTemplateModels(expected.getRoot(), got.getRoot());
-    }
-
-    private void assertModels(ProjectModel expected, ProjectModel got)
-    {
-        assertEquals(expected.getName(), got.getName());
-        assertSame(expected.getClass(), got.getClass());
-
-        if (expected instanceof TemplateProjectModel)
-        {
-            assertTemplateModels((TemplateProjectModel) expected, (TemplateProjectModel) got);
-        }
-        else
-        {
-            assertConcreteModels((ConcreteProjectModel) expected, (ConcreteProjectModel) got);
-        }
-    }
-
-    private void assertTemplateModels(TemplateProjectModel expected, TemplateProjectModel got)
-    {
-        List<ProjectModel> expectedChildren = expected.getChildren();
-        List<ProjectModel> gotChildren = got.getChildren();
-        assertEquals(expectedChildren.size(), gotChildren.size());
-        for (int i = 0; i < expectedChildren.size(); i++)
-        {
-            assertModels(expectedChildren.get(i), gotChildren.get(i));
-        }
-    }
-
-    private void assertConcreteModels(ConcreteProjectModel expected, ConcreteProjectModel got)
-    {
-        assertSame(expected.getProject(), got.getProject());
-    }
-
     private List<ProjectsModel> getAllFlatGroups(boolean includeUngrouped)
     {
         List<ProjectsModel> flatGroups = new LinkedList<ProjectsModel>(Arrays.asList(
@@ -526,61 +453,5 @@ public class ProjectsModelsHelperTest extends PulseTestCase
         }
 
         return flatGroups;
-    }
-
-    /**
-     * A simple way to create a hierarchical group when templates have only one
-     * child that is also a template.  The group is created, then all members
-     * are added by checking if they are a template name (String) or a concrete
-     * Project.  If the former, the template is added and subsequent members
-     * will nest under that template.  If the latter, the Project is simply
-     * added to the latest seen template.
-     *
-     * @param label   label or name of the group
-     * @param members list of template names and projects ordered from root to
-     *                leaf of the desired hierarchy
-     * @return the hierarchical group model
-     */
-    private ProjectsModel createHierarchicalGroup(String label, Object... members)
-    {
-        ProjectsModel group = createGroup(label);
-        TemplateProjectModel node = group.getRoot();
-        for (Object member: members)
-        {
-            if (member instanceof String)
-            {
-                // Name of template.  Add it and then ensure future members
-                // nest under it.
-                TemplateProjectModel child = new TemplateProjectModel(group, (String) member);
-                node.addChild(child);
-                node = child;
-            }
-            else
-            {
-                node.addChild(createConcrete(group, (Project) member));
-            }
-        }
-
-        return group;
-    }
-
-    private ProjectsModel createFlatGroup(String label, Project... projects)
-    {
-        ProjectsModel group = createGroup(label);
-        for (Project p: projects)
-        {
-            group.getRoot().addChild(createConcrete(group, p));
-        }
-        return group;
-    }
-
-    private ProjectsModel createGroup(String label)
-    {
-        return new ProjectsModel(label, label != null);
-    }
-
-    private ConcreteProjectModel createConcrete(ProjectsModel group, Project project)
-    {
-        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), 0);
     }
 }

@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
 import com.zutubi.util.*;
+import com.zutubi.pulse.core.test.TestUtils;
 import junit.framework.Assert;
 
 import java.io.File;
@@ -192,7 +193,7 @@ public class SeleniumUtils
     {
         try
         {
-            AcceptanceTestUtils.waitForCondition(new Condition()
+            TestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()
                 {

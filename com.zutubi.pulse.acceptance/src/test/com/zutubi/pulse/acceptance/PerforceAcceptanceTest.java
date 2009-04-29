@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.PerforceConstants;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
@@ -68,7 +69,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         xmlRpcHelper.deleteConfig(projectPath);
 
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

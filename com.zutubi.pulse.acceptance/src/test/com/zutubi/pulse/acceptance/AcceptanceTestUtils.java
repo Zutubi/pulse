@@ -1,17 +1,15 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.Condition;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
-import com.zutubi.util.io.IOUtils;
-import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
 
 public class AcceptanceTestUtils
 {

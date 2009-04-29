@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.ImportingNotSupportedFileResolver;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.tove.type.TypeRegistry;
@@ -87,7 +88,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         assertEquals(Plugin.State.ENABLED, plugin.getState());
 
         // ensure that we are picking up the expected post processors from the installed plugin.
-        AcceptanceTestUtils.waitForCondition(new Condition()
+        waitForCondition(new Condition()
         {
             public boolean satisfied()
             {

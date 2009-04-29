@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.model.NamedEntityComparator;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
@@ -10,7 +9,6 @@ import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.Sort;
 import com.zutubi.util.TruePredicate;
 
 import java.util.*;
@@ -25,47 +23,42 @@ public class ProjectsModelsHelper
     private BuildManager buildManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
+    private ProjectsModelSorter sorter = new ProjectsModelSorter();
+
     public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, boolean showUngrouped)
     {
         return createProjectsModels(configuration, new TruePredicate<Project>(), new TruePredicate<ProjectGroup>(), showUngrouped);
     }
-    
+
     public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, Predicate<Project> projectPredicate, Predicate<ProjectGroup> groupPredicate, boolean showUngrouped)
     {
         List<Project> projects = CollectionUtils.filter(projectManager.getProjects(false), projectPredicate);
         List<ProjectGroup> groups = CollectionUtils.filter(projectManager.getAllProjectGroups(), groupPredicate);
         TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(MasterConfigurationRegistry.PROJECTS_SCOPE);
-        final Comparator<String> stringComparator = new Sort.StringComparator();
-
-        Collections.sort(groups, new Comparator<ProjectGroup>()
-        {
-            public int compare(ProjectGroup o1, ProjectGroup o2)
-            {
-                return stringComparator.compare(o1.getName(), o2.getName());
-            }
-        });
 
         List<ProjectsModel> result = new LinkedList<ProjectsModel>();
 
         for (ProjectGroup group : groups)
         {
-            Collection<Project> groupProjects = CollectionUtils.filter(group.getProjects(), projectPredicate);
+            List<Project> groupProjects = CollectionUtils.filter(group.getProjects(), projectPredicate);
             if (!groupProjects.isEmpty())
             {
-                result.add(createModel(group.getName(), true, groupProjects, hierarchy, configuration));
+                ProjectsModel projectsModel = createModel(group.getName(), true, groupProjects, hierarchy, configuration);
+                result.add(projectsModel);
                 projects.removeAll(groupProjects);
             }
         }
 
         if (showUngrouped && projects.size() > 0)
         {
-            Collections.sort(projects, new NamedEntityComparator());
-
-            // CIB-1550: Only label as ungrouped if there are some other
-            // groups.
+            // CIB-1550: Only label as ungrouped if there are some other groups.
             Messages messages = Messages.getInstance(ProjectsModelsHelper.class);
-            result.add(createModel(result.size() > 0 ? messages.format("projects.ungrouped") : messages.format("projects.all"), false, projects, hierarchy, configuration));
+            String name = result.size() > 0 ? messages.format("projects.ungrouped") : messages.format("projects.all");
+            ProjectsModel projectsModel = createModel(name, false, projects, hierarchy, configuration);
+            result.add(projectsModel);
         }
+
+        sorter.sort(result);
 
         return result;
     }
@@ -79,10 +72,10 @@ public class ProjectsModelsHelper
             // ancestors (which may overlap).  The ancestors may not define the
             // label, but are included to prevent "holes" in the hierarchy.
             Set<String> includedInGroup = new HashSet<String>();
-            for(Project p: projects)
+            for (Project p : projects)
             {
                 TemplateNode node = hierarchy.getNodeById(p.getName());
-                while(node != null)
+                while (node != null)
                 {
                     includedInGroup.add(node.getId());
                     node = node.getParent();
@@ -93,7 +86,7 @@ public class ProjectsModelsHelper
         }
         else
         {
-            for(Project p: projects)
+            for (Project p : projects)
             {
                 model.getRoot().addChild(new ConcreteProjectModel(model, p, getBuilds(p, configuration), configuration.getBuildsPerProject()));
             }
@@ -135,11 +128,17 @@ public class ProjectsModelsHelper
         }
     }
 
+    /**
+     * Get a list of builds for the specified project.  The number of results returned is at least 2 in length
+     * since we require at least 2 build results (one is possibly active) to be able to determine the health of
+     * the project.  This assumes that only one active build per project at a time.
+     *
+     * @param project       the project in question
+     * @param configuration the project summary configuration
+     * @return a list of build results.
+     */
     private List<BuildResult> getBuilds(Project project, ProjectsSummaryConfiguration configuration)
     {
-        // We need to retrieve at least 2 to determine the health when the
-        // latest build is in progress (this assumes one in progress build
-        // per project).
         return buildManager.getLatestBuildResultsForProject(project, Math.max(2, configuration.getBuildsPerProject()));
     }
 
@@ -156,5 +155,10 @@ public class ProjectsModelsHelper
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setSorter(ProjectsModelSorter sorter)
+    {
+        this.sorter = sorter;
     }
 }

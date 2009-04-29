@@ -45,6 +45,7 @@
                 <ref local="dashboardShowUngrouped"/>
                 <ref local="fixPermanentUsers"/>
                 <ref local="revisionStringLimit"/>
+                <ref local="dashboardSortProperties"/>
                 <ref local="resourceRequirementOptional"/>
                 <ref local="triggerProperties"/>
                 <ref local="globalPostProcessors"/>
@@ -55,7 +56,7 @@
                 <ref local="addStatusFieldToBuildResultTable"/>
                 <ref local="addDependencyStatusField"/>
                 <ref local="addPropagateStatusField"/>
-             </list>
+            </list>
         </property>
         <property name="systemTasks">
             <list>
@@ -172,6 +173,10 @@
         <property name="buildNumber" value="200025001"/>
     </bean>
 
+    <bean id="dashboardSortProperties" class="com.zutubi.pulse.master.upgrade.tasks.AddDashboardSortPropertiesUpgradeTask">
+        <property name="buildNumber" value="200027001"/>
+    </bean>
+
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">
         <property name="buildNumber" value="200999001"/>
     </bean>
@@ -212,5 +217,4 @@
     <bean id="addPropagateStatusField" class="com.zutubi.pulse.master.upgrade.tasks.AddPropagateStatusFieldUpgradeTask">
         <property name="buildNumber" value="200999009"/>
     </bean>
-
 </beans>
