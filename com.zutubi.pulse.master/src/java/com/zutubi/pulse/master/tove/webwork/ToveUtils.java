@@ -4,7 +4,9 @@ import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ValidationAware;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.freemarker.BaseNameMethod;
 import com.zutubi.pulse.master.tove.freemarker.GetTextMethod;
 import com.zutubi.pulse.master.tove.freemarker.ValidIdMethod;
@@ -612,5 +614,63 @@ public class ToveUtils
         freemarker.template.Configuration config = FreemarkerConfigurationFactoryBean.addClassTemplateLoader(i18nClazz, configuration);
         Template template = config.getTemplate("tove/xhtml/form.ftl");
         template.process(context, writer);
+    }
+
+    public static String getStatusIcon(BuildResult result)
+    {
+        return getStatusIcon(result.getState(), result.getWarningFeatureCount());
+    }
+
+    public static String getStatusIcon(ResultState state, int warningCount)
+    {
+        switch (state)
+        {
+            case SUCCESS:
+                if (warningCount == 0)
+                {
+                    return "accept.gif";
+                }
+                else
+                {
+                    return "error.gif";
+                }
+            case ERROR:
+            case FAILURE:
+                return "exclamation.gif";
+            case IN_PROGRESS:
+                return "inprogress.gif";
+            case INITIAL:
+                return "hourglass.gif";
+            case TERMINATING:
+                return "stop.gif";
+            default:
+                return "help.gif";
+        }
+    }
+
+    public static String getStatusClass(BuildResult result)
+    {
+        return getStatusClass(result.getState(), result.getWarningFeatureCount());
+    }
+
+    public static String getStatusClass(ResultState state, int warningCount)
+    {
+        switch (state)
+        {
+            case SUCCESS:
+                if (warningCount == 0)
+                {
+                    return "success";
+                }
+                else
+                {
+                    return "warning";
+                }
+            case ERROR:
+            case FAILURE:
+                return "failure";
+            default:
+                return "content";
+        }
     }
 }

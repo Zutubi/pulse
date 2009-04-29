@@ -5,8 +5,8 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryProcedure;
 
 /**
- * Details for a single project or project template for display on the
- * dashboard or browse view.
+ * JSON-encodable details for a single project or project template for display
+ * on the dashboard or browse view.
  */
 public abstract class ProjectModel
 {
@@ -25,20 +25,15 @@ public abstract class ProjectModel
         return name;
     }
 
-    public ProjectModel getParent()
-    {
-        return parent;
-    }
-
-    protected void setParent(ProjectModel parent)
-    {
-        this.parent = parent;
-    }
-
     public String getId()
     {
         String groupPrefix = group.isLabelled() ? "grouped." + group.getGroupName() : "ungrouped";
         return StringUtils.toValidHtmlName(groupPrefix + "." + name);
+    }
+
+    public String getHealth()
+    {
+        return latestHealth().toString().toLowerCase();
     }
 
     public int getDepth()
@@ -58,13 +53,16 @@ public abstract class ProjectModel
         return getCount(ResultState.IN_PROGRESS);
     }
 
+    protected void setParent(ProjectModel parent)
+    {
+        this.parent = parent;
+    }
+
     public abstract boolean isConcrete();
 
-    public abstract boolean isLeaf();
+    public abstract ProjectHealth latestHealth();
 
-    public abstract ProjectHealth getHealth();
-
-    public abstract ResultState getLatestState();
+    public abstract ResultState latestState();
 
     public abstract int getCount(ProjectHealth health);
 

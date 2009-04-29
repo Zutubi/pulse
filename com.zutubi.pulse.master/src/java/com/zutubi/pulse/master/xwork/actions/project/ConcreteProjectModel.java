@@ -3,29 +3,62 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
+import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.UnaryProcedure;
+import flexjson.JSON;
 
 import java.util.List;
 
 /**
+ * JSON-encodable object representing the current state of a concrete project.
  */
 public class ConcreteProjectModel extends ProjectModel
 {
-    private Project project;
-    private List<BuildResult> latestBuilds;
-    private int buildRows;
+    private String projectName;
+    private ProjectHealth health;
+    private boolean built;
+    private List<ProjectBuildModel> buildRows;
+    private boolean canTrigger;
+    private boolean canViewSource;
+    private long projectId;
 
-    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, int buildRows)
+    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean canTrigger, boolean canViewSource)
     {
         super(group, project.getName());
-        this.project = project;
-        this.latestBuilds = latestBuilds;
-        this.buildRows = buildRows;
+
+        projectName = project.getName();
+        projectId = project.getId();
+        health = ProjectHealth.fromLatestBuilds(latestBuilds);
+        built = latestBuilds.size() > 0;
+
+        buildRows = CollectionUtils.map(latestBuilds, new Mapping<BuildResult, ProjectBuildModel>()
+        {
+            public ProjectBuildModel map(BuildResult buildResult)
+            {
+                return new ProjectBuildModel(buildResult, configuration, urls);
+            }
+        });
+
+        this.canTrigger = canTrigger;
+        this.canViewSource = canViewSource;
     }
 
-    public Project getProject()
+    public String getName()
     {
-        return project;
+        return projectName;
+    }
+
+    public long getProjectId()
+    {
+        return projectId;
+    }
+
+    public ProjectHealth latestHealth()
+    {
+        return health;
     }
 
     public boolean isConcrete()
@@ -33,63 +66,47 @@ public class ConcreteProjectModel extends ProjectModel
         return true;
     }
 
-    public boolean isLeaf()
-    {
-        return true;
-    }
-
     public boolean isBuilt()
     {
-        return latestBuilds.size() > 0;
+        return built;
     }
 
-    public int getBuildRows()
+    @JSON
+    public List<ProjectBuildModel> getBuildRows()
     {
-        int buildCount = latestBuilds.size();
-        if(buildCount <= 1)
-        {
-            return 1;
-        }
-        else if(buildCount > buildRows)
-        {
-            return buildRows;
-        }
-        else
-        {
-            return buildCount;
-        }
+        return buildRows;
     }
 
-    public List<BuildResult> getBuilds()
+    public boolean isCanTrigger()
     {
-        return latestBuilds.subList(0, getBuildRows());
+        return canTrigger;
     }
 
-    public ProjectHealth getHealth()
+    public boolean isCanViewSource()
     {
-        return ProjectHealth.fromLatestBuilds(latestBuilds);
+        return canViewSource;
     }
 
-    public ResultState getLatestState()
+    public ResultState latestState()
     {
-        if(latestBuilds.size() == 0)
+        if(buildRows.size() == 0)
         {
             return null;
         }
         else
         {
-            return latestBuilds.get(0).getState();
+            return buildRows.get(0).getState();
         }
     }
 
     public int getCount(ProjectHealth health)
     {
-        return getHealth() == health ? 1 : 0;
+        return latestHealth() == health ? 1 : 0;
     }
 
     public int getCount(ResultState state)
     {
-        return state == getLatestState() ? 1 : 0;
+        return state == latestState() ? 1 : 0;
     }
 
     public void forEach(UnaryProcedure<ProjectModel> proc)

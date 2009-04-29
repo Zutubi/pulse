@@ -5,7 +5,6 @@ var ZUTUBI = window.ZUTUBI || {};
 ZUTUBI.widget = ZUTUBI.widget || {};
 
 ZUTUBI.FloatManager = function() {
-    var listener = false;
     var idByCategory = {};
     var displayedCategories = 0;
     var showTime = new Date();
@@ -118,7 +117,7 @@ ZUTUBI.FloatManager = function() {
                 windowEl.anchorTo(linkEl, align);
             }
         }
-    }
+    };
 }();
 
 /**
@@ -386,7 +385,7 @@ ZUTUBI.ConfigTree = function(config)
 {
     ZUTUBI.ConfigTree.superclass.constructor.call(this, config);
     this.dead = false;
-}
+};
 
 Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
     configPathToTreePath: function(configPath)
@@ -501,7 +500,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
 
         if(response.removedPaths)
         {
-            each(response.removedPaths, function(path) { tree.removeNode(path) });
+            each(response.removedPaths, function(path) { tree.removeNode(path); });
         }
     },
 
@@ -566,7 +565,7 @@ ZUTUBI.TemplateTree = function(scope, config)
     this.scope = scope;
     this.dead = false;
     ZUTUBI.TemplateTree.superclass.constructor.call(this, config);
-}
+};
 
 Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
     handleResponse: function(response)
@@ -710,7 +709,7 @@ Ext.extend(ZUTUBI.FormLayout, Ext.layout.FormLayout, {
 
 ZUTUBI.FormPanel = function(config)
 {
-    config.layout = new ZUTUBI.FormLayout({})
+    config.layout = new ZUTUBI.FormLayout({});
     ZUTUBI.FormPanel.superclass.constructor.call(this, config);
 };
 
@@ -724,7 +723,8 @@ Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
 
     onRender : function(ct, position){
         ZUTUBI.FormPanel.superclass.onRender.call(this, ct, position);
-        this.layoutTarget = this.form.el.createChild({tag: 'table', cls: 'x-form'}).createChild({tag: 'tbody'});
+        this.form.el.update('<table><tbody></tbody></table>');
+        this.layoutTarget = this.form.el.first().first();
     },
 
     getLayoutTarget: function()
@@ -1398,13 +1398,14 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         }
 
         this.store.removeAll();
-        for(var i = 0; i < this.hiddenFields.length; i++)
+        var i;
+        for(i = 0; i < this.hiddenFields.length; i++)
         {
             this.hiddenFields[i].remove();
         }
         this.hiddenFields = [];
         
-        for(var i = 0; i < value.length; i++)
+        for(i = 0; i < value.length; i++)
         {
             var text = this.getTextForValue(value[i]);
             if(text)
@@ -1712,7 +1713,7 @@ Ext.reg('xzhelppanel', ZUTUBI.HelpPanel);
 Ext.form.Checkbox.prototype.onResize = function()
 {
     Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
-}
+};
 
 // Bug fix lifted directly from:
 // http://extjs.com/forum/showthread.php?t=45982
@@ -1721,12 +1722,12 @@ Ext.override(Ext.form.ComboBox, {
     {
         Ext.form.ComboBox.superclass.initEvents.call(this);
         this.keyNav = new Ext.KeyNav(this.el, {
-            "up" : function(e)
+            "up" : function()
             {
                 this.inKeyMode = true;
                 this.selectPrev();
             },
-            "down" : function(e)
+            "down" : function()
             {
                 if (!this.isExpanded())
                 {
@@ -1738,17 +1739,17 @@ Ext.override(Ext.form.ComboBox, {
                     this.selectNext();
                 }
             },
-            "enter" : function(e)
+            "enter" : function()
             {
                 this.onViewClick();
                 this.delayedCheck = true;
                 this.unsetDelayCheck.defer(10, this);
             },
-            "esc" : function(e)
+            "esc" : function()
             {
                 this.collapse();
             },
-            "tab" : function(e)
+            "tab" : function()
             {
                 this.onViewClick(false);
                 return true;
@@ -1791,103 +1792,3 @@ Ext.override(Ext.form.ComboBox, {
         Ext.form.ComboBox.superclass.onKeyUp.call(this, e);
     }
 });
-
-ZUTUBI.ProjectModel = function(key) {
-    this.key = key;
-    this.collapsed = false;
-    this.hidden = false;
-    this.children = [];
-    this.rowCount = 1;
-}
-
-ZUTUBI.ProjectModel.prototype = {
-    addChild: function(child) {
-        this.children.push(child);
-    },
-
-    getEl: function() {
-        return Ext.get(this.key);
-    },
-
-    toggle: function() {
-        if(this.collapsed)
-        {
-            this.expand();
-        }
-        else
-        {
-            this.collapse();
-        }
-    },
-    
-    collapse: function() {
-        if(!this.collapsed)
-        {
-            this.hideDescendents();
-            this.collapsed = true;
-            this.getEl().addClass('project-collapsed');
-        }
-    },
-
-    setRowDisplay: function(display) {
-        Ext.get(this.key).setStyle('display', display);
-        if(this.rowCount > 1)
-        {
-            for(var i = 2; i <= this.rowCount; i++)
-            {
-                Ext.get('b' + i + '.' + this.key).setStyle('display', display);
-            }
-        }
-    },
-
-    hide: function() {
-        if(!this.hidden)
-        {
-            this.setRowDisplay('none');
-            this.hidden = true;
-        }
-
-        if(!this.collapsed)
-        {
-            this.hideDescendents();
-        }
-    },
-
-    hideDescendents: function() {
-        for(var i = 0; i < this.children.length; i++)
-        {
-            var child = this.children[i];
-            child.hide();
-        }
-    },
-
-    expand: function() {
-        if(this.collapsed)
-        {
-            this.showDescendents();
-            this.collapsed = false;
-            this.getEl().removeClass('project-collapsed');
-        }
-    },
-
-    show: function() {
-        if(this.hidden)
-        {
-            this.setRowDisplay('');
-            this.hidden = false;
-        }
-
-        if(!this.collapsed)
-        {
-            this.showDescendents();
-        }
-    },
-
-    showDescendents: function() {
-        for(var i = 0; i < this.children.length; i++)
-        {
-            var child = this.children[i];
-            child.show();
-        }
-    }
-}

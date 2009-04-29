@@ -7,19 +7,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Represents a group of projects for display on the dashboard or browse view.
+ * JSON-encodable representation of a group of projects for display on the
+ * dashboard or browse view.
  */
 public class ProjectsModel
 {
     private String groupName;
     private boolean labelled;
 
-    private TemplateProjectModel root = new TemplateProjectModel(this, null);
+    private TemplateProjectModel root;
 
-    public ProjectsModel(String name, boolean labelled)
+    public ProjectsModel(String name, boolean labelled, boolean collapsed)
     {
         this.groupName = name;
         this.labelled = labelled;
+        root = new TemplateProjectModel(this, null, collapsed);
     }
 
     public String getGroupName()
@@ -42,27 +44,6 @@ public class ProjectsModel
         return root;
     }
 
-    public int getMaxDepth()
-    {
-        final int[] maxDepth = new int[]{0};
-        root.forEach(new UnaryProcedure<ProjectModel>()
-        {
-            public void process(ProjectModel projectModel)
-            {
-                if (projectModel.isLeaf())
-                {
-                    int depth = projectModel.getDepth();
-                    if (depth > maxDepth[0])
-                    {
-                        maxDepth[0] = depth;
-                    }
-                }
-            }
-        });
-
-        return maxDepth[0];
-    }
-    
     public List<ProjectModel> getFlattened()
     {
         final List<ProjectModel> result = new LinkedList<ProjectModel>();

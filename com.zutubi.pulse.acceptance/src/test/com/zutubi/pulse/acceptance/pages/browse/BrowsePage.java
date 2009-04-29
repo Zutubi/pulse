@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -20,8 +21,10 @@ public class BrowsePage extends ProjectsSummaryPage
         return urls.projects();
     }
 
-    public void triggerProject(String name)
+    @Override
+    public void waitFor()
     {
-        selenium.click("trigger-" + name);
+        super.waitFor();
+        SeleniumUtils.waitForVariable(selenium, "view.initialised", 30000);
     }
 }

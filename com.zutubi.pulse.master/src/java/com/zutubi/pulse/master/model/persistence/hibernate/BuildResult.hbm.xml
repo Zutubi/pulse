@@ -24,7 +24,9 @@
             <one-to-many class="com.zutubi.pulse.core.model.PersistentFeature"/>
         </bag>
 
-        <property name="number" column="NUMBER" type="long" not-null="true"/>
+        <property name="number" type="long">
+            <column name="NUMBER" not-null="true" index="idx_buildresult_number"/>
+        </property>
 
         <property name="userRevision" column="USER_REVISION" type="boolean"/>
 

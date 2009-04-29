@@ -2,8 +2,8 @@ package com.zutubi.pulse.acceptance;
 
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
-import com.zutubi.util.*;
 import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.util.*;
 import junit.framework.Assert;
 
 import java.io.File;
@@ -289,7 +289,7 @@ public class SeleniumUtils
         {
             if (SystemUtils.IS_WINDOWS)
             {
-                browser = "*iexplore";
+                browser = "*iexploreproxy";
             }
             else
             {

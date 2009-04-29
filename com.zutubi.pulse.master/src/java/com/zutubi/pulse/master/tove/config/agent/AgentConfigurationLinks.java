@@ -16,7 +16,7 @@ public class AgentConfigurationLinks
     {
         if (agentConfiguration.isConcrete())
         {
-            Urls urls = new Urls("");
+            Urls urls = Urls.getBaselessInstance();
             String name = agentConfiguration.getName();
             return Arrays.asList(
                     new ConfigurationLink("status", urls.agentStatus(name)),

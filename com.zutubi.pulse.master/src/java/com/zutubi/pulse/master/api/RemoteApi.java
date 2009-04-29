@@ -820,6 +820,20 @@ public class RemoteApi
         }
     }
 
+    public boolean smartClone(String token, String parentPath, String rootKey, String parentKey, Hashtable<String, String> originalKeyToCloneKey)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            configurationRefactoringManager.smartClone(parentPath, rootKey, parentKey, originalKeyToCloneKey);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+    
     /**
      * Deletes the configuration object at the given path, if one exists.  If the object is complex,
      * all nested objects will be deleted with it.  Further cleanup actions (e.g. deleting all build
