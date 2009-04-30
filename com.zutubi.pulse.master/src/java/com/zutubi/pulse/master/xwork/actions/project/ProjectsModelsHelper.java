@@ -99,15 +99,10 @@ public class ProjectsModelsHelper
         Set<String> result = new HashSet<String>();
         for (LabelProjectTuple tuple: tuples)
         {
-            long handle = tuple.getProjectHandle();
             String project = null;
-            if (handle == 0)
+            if (tuple.isSpecificProject())
             {
-                project = "";
-            }
-            else
-            {
-                String path = recordManager.getPathForHandle(handle);
+                String path = recordManager.getPathForHandle(tuple.getProjectHandle());
                 if (path != null)
                 {
                     ProjectConfiguration configuration = configurationTemplateManager.getInstance(path, ProjectConfiguration.class);
@@ -116,6 +111,10 @@ public class ProjectsModelsHelper
                         project = configuration.getName();
                     }
                 }
+            }
+            else
+            {
+                project = "";
             }
 
             if (project != null)

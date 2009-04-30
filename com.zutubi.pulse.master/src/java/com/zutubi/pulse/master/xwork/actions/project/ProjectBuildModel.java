@@ -3,6 +3,11 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.opensymphony.util.TextUtils;
 import static com.opensymphony.util.TextUtils.htmlEncode;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.core.ReferenceResolver;
+import com.zutubi.pulse.core.ResolutionException;
+import com.zutubi.pulse.core.engine.api.HashReferenceMap;
+import com.zutubi.pulse.core.engine.api.Property;
+import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -35,19 +40,6 @@ public class ProjectBuildModel
     private static final String REVISION_NONE = "none";
     private static final String TESTS_NONE = "none";
     private static final String VERSION_NONE = "none";
-
-    private static final String TAG_ANCHOR = "a";
-    private static final String TAG_IMAGE = "img";
-    private static final String TAG_SPAN = "span";
-
-    private static final String ATTRIBUTE_ALTERNATIVE = "alt";
-    private static final String ATTRIBUTE_CLASS = "class";
-    private static final String ATTRIBUTE_HREF = "href";
-    private static final String ATTRIBUTE_ID = "id";
-    private static final String ATTRIBUTE_ONCLICK = "onclick";
-    private static final String ATTRIBUTE_SOURCE = "src";
-    private static final String ATTRIBUTE_STYLE = "style";
-    private static final String ATTRIBUTE_TITLE = "title";
 
     private long number;
     private ResultState state;
@@ -162,15 +154,16 @@ public class ProjectBuildModel
         }
         else if (column.equals(BuildColumns.KEY_WHEN))
         {
-            String timeId = "time." + buildResult.getId();
-            String dateId = "date." + buildResult.getId();
-
-            String date = buildResult.getStamps().getPrettyStartDate(ActionContext.getContext().getLocale());
-
-            String image = wrap(null, TAG_IMAGE, asPair(ATTRIBUTE_ALTERNATIVE, "toggle format"), asPair(ATTRIBUTE_SOURCE, urls.image("calendar.gif")));
-            content = wrap(image, TAG_ANCHOR, asPair(ATTRIBUTE_HREF, "#"), asPair(ATTRIBUTE_CLASS, "unadorned"), asPair(ATTRIBUTE_TITLE, date) , asPair(ATTRIBUTE_ONCLICK, "toggleDisplay('" + timeId + "'); toggleDisplay('" + dateId + "'); return false;"));
-            content += " " + wrap(buildResult.getStamps().getPrettyStartTime(), TAG_SPAN, asPair(ATTRIBUTE_ID, timeId));
-            content += wrap(date, TAG_SPAN, asPair(ATTRIBUTE_ID, dateId), asPair(ATTRIBUTE_STYLE, "display: none"));
+            content = merge("<a href='#' class='unadorned' title='${date}' onclick=\\\"toggleDisplay('${timeId}'); toggleDisplay('${dateId}'); return false;\\\">" +
+                                "<img alt='toggle format' src='${base}images/calendar.gif'/>" +
+                            "</a> " +
+                            "<span id='${timeId}'>${time}</span>" +
+                            "<span id='${dateId}' style='display: none'>${date}</span>",
+                    asPair("base", urls.base()),
+                    asPair("timeId", "time." + buildResult.getId()),
+                    asPair("dateId", "date." + buildResult.getId()),
+                    asPair("date", buildResult.getStamps().getPrettyStartDate(ActionContext.getContext().getLocale())),
+                    asPair("time", buildResult.getStamps().getPrettyStartTime()));
         }
         else if (column.equals(BuildColumns.KEY_TESTS))
         {
@@ -214,7 +207,9 @@ public class ProjectBuildModel
     {
         if (revision.isAbbreviated())
         {
-            return wrap(htmlEncode(revision.getAbbreviatedRevisionString()), TAG_SPAN, asPair(ATTRIBUTE_TITLE, htmlEncode(revision.getRevisionString())));
+            return merge("<span title='${rev}'>${shortRev}</span>",
+                    asPair("rev", htmlEncode(revision.getRevisionString())),
+                    asPair("shortRev", htmlEncode(revision.getAbbreviatedRevisionString())));
         }
         else
         {
@@ -222,38 +217,27 @@ public class ProjectBuildModel
         }
     }
 
-    private String link(String content, String url)
+    private String merge(String template, Pair<String, String>... properties)
     {
-        return wrap(content, TAG_ANCHOR, asPair(ATTRIBUTE_HREF, url));
+        ReferenceMap referenceMap = new HashReferenceMap();
+        for (Pair<String, String> p: properties)
+        {
+            referenceMap.add(new Property(p.first, p.second));
+        }
+
+        try
+        {
+            return ReferenceResolver.resolveReferences(template, referenceMap, ReferenceResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
+        }
+        catch (ResolutionException e)
+        {
+            // Never happens
+            return template;
+        }
     }
 
-    private String wrap(String content, String tag, Pair<String, String>... attributes)
+    private String link(String content, String url)
     {
-        StringBuilder builder = new StringBuilder();
-        builder.append('<');
-        builder.append(tag);
-        for (Pair<String, String> attribute: attributes)
-        {
-            builder.append(' ');
-            builder.append(attribute.first);
-            builder.append("=\"");
-            builder.append(attribute.second);
-            builder.append('"');
-        }
-
-        if (content == null)
-        {
-            builder.append("/>");
-        }
-        else
-        {
-            builder.append('>');
-            builder.append(content);
-            builder.append("</");
-            builder.append(tag);
-            builder.append('>');
-        }
-
-        return builder.toString();
+        return merge("<a href='${url}'>${content}</a>", asPair("content", content), asPair("url", url));
     }
 }

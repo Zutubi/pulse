@@ -805,6 +805,7 @@ public class RemoteApi
      * @access requires write permission for the map path, or server create
      *         permission for projects or agents when cloning in those scopes
      * @see #canCloneConfig(String, String)
+     * @see #smartClone(String, String, String, String, java.util.Hashtable)
      */
     public boolean cloneConfig(String token, String parentPath, Hashtable<String, String> keyMap)
     {
@@ -820,6 +821,34 @@ public class RemoteApi
         }
     }
 
+    /**
+     * Clones a top-level templated item (e.g. a project or an agent) by
+     * extracting its details into a parent template and adding a new empty
+     * sibling (the clone) which will inherit identical configuration.  The
+     * item's descendents may also optionally be cloned, although those clones
+     * themselves will not be 'smart', their details will be copied.
+     *
+     * @param token                 authentication token (see {@link #login})
+     * @param parentPath            path to the templated collection that
+     *                              owns the item to clone (e.g. "projects")
+     * @param rootKey               name of the item to smart clone (e.g.
+     *                              project name)
+     * @param parentKey             name to give to the newly-extracted parent
+     *                              template
+     * @param originalKeyToCloneKey {@xtype struct<string:string>} a mapping
+     *                              from existing name to new name for all
+     *                              items to clone (must include at least a
+     *                              mapping for rootKey)
+     * @return the path of the smart clone
+     * @throws IllegalArgumentException if the parentPath is not a templated
+     *         collection; rootKey is not a member of the collection;
+     *         parentKey or any clone key is not unique in the collection;
+     *         originalKeyToCloneKey does not contain a mapping for rootKey
+     * @access requires write permission for the map path, or server create
+     *         permission for projects or agents when cloning in those scopes
+     * @see #canCloneConfig(String, String)
+     * @see #cloneConfig(String, String, java.util.Hashtable)
+     */
     public boolean smartClone(String token, String parentPath, String rootKey, String parentKey, Hashtable<String, String> originalKeyToCloneKey)
     {
         tokenManager.loginUser(token);

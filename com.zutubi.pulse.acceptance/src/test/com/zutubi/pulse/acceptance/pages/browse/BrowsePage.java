@@ -25,6 +25,6 @@ public class BrowsePage extends ProjectsSummaryPage
     public void waitFor()
     {
         super.waitFor();
-        SeleniumUtils.waitForVariable(selenium, "view.initialised", 30000);
+        SeleniumUtils.waitForVariable(selenium, "view.initialised", SeleniumUtils.DEFAULT_TIMEOUT);
     }
 }

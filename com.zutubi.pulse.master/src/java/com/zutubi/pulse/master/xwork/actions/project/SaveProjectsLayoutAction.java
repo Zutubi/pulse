@@ -67,7 +67,7 @@ public class SaveProjectsLayoutAction extends ActionSupport
                 boolean collapsed = group.getBoolean(PROPERTY_COLLAPSED);
                 if (collapsed)
                 {
-                    tuples.add(new LabelProjectTuple(label, 0));
+                    tuples.add(new LabelProjectTuple(label));
                 }
 
                 JSONObject templates = group.getJSONObject(PROPERTY_LAYOUT);

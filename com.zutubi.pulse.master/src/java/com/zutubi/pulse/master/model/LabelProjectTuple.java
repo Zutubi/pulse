@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.util.TextUtils;
+
 /**
  * Stores a (label, project template) pairing used to represent a collapsible
  * row on project summary views (e.g. the dashboard and browse views).
@@ -10,6 +12,8 @@ package com.zutubi.pulse.master.model;
  */
 public class LabelProjectTuple
 {
+    private static final int NO_PROJECT = 0;
+    
     /**
      * Label, may be empty to indicate "ungrouped" projects.
      */
@@ -24,10 +28,20 @@ public class LabelProjectTuple
     {
     }
 
+    public LabelProjectTuple(String label)
+    {
+        this(label, NO_PROJECT);
+    }
+
     public LabelProjectTuple(String label, long projectHandle)
     {
         this.label = label;
         this.projectHandle = projectHandle;
+    }
+
+    public boolean isUnlabelled()
+    {
+        return !TextUtils.stringSet(label);
     }
 
     public String getLabel()
@@ -38,6 +52,11 @@ public class LabelProjectTuple
     public void setLabel(String label)
     {
         this.label = label;
+    }
+
+    public boolean isSpecificProject()
+    {
+        return projectHandle != NO_PROJECT;
     }
 
     public long getProjectHandle()
