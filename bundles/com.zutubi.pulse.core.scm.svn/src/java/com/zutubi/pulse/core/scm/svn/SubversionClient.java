@@ -569,18 +569,36 @@ public class SubversionClient implements ScmClient
     {
         try
         {
-            SVNDirEntry entry = repository.info(".", SVNRevision.HEAD.getNumber());
-            if (entry == null)
-            {
-                throw new ScmException("Unable to retrieve latest revision: no repository found at '" + url + "'");
-            }
+            long revision = getLatestRepositoryRevision(repository);
             
-            return new Revision(entry.getRevision());
+            for (ExternalDefinition external: getExternals(null))
+            {
+                SVNRepository repo = SVNRepositoryFactory.create(external.url);
+                repo.setAuthenticationManager(authenticationManager);
+                long externalRevision = getLatestRepositoryRevision(repo);
+                if (externalRevision > revision)
+                {
+                    revision = externalRevision;
+                }
+            }
+
+            return new Revision(revision);
         }
         catch (SVNException e)
         {
             throw convertException(e);
         }
+    }
+
+    private long getLatestRepositoryRevision(SVNRepository repository) throws SVNException, ScmException
+    {
+        SVNDirEntry entry = repository.info(".", SVNRevision.HEAD.getNumber());
+        if (entry == null)
+        {
+            throw new ScmException("Unable to retrieve latest revision: no repository found at '" + repository.getLocation() + "'");
+        }
+
+        return entry.getRevision();
     }
 
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
