@@ -448,12 +448,14 @@ public class ConfigurationTemplateManager
         String templateParentPath = getTemplateParentPath(newPath, record, true);
         if (templateParentPath != null)
         {
+            checkNestedPathsCompatibleWithAncestry(templateParentPath, record);
+
             TemplateRecord templateParent = (TemplateRecord) getRecord(templateParentPath);
             if(isConcreteOwner(templateParent))
             {
                 throw new IllegalArgumentException("Cannot inherit from concrete path '" + templateParentPath + "'");
             }
-            
+
             TemplateRecord parentSkeleton = new TemplateRecord(null, null, actualType, createSkeletonRecord(actualType, templateParent.getMoi()));
             TemplateRecord template = new TemplateRecord(null, parentSkeleton, actualType, record);
             record = template.flatten();
@@ -461,6 +463,53 @@ public class ConfigurationTemplateManager
         }
 
         return record;
+    }
+
+    private void checkNestedPathsCompatibleWithAncestry(String templateParentPath, Record record)
+    {
+        for (Pair<String, Record> nested: getAllNestedPaths(record))
+        {
+            Record parent = getRecord(PathUtils.getPath(templateParentPath, nested.first));
+            if (parent == null)
+            {
+                String ancestorPath = findAncestorPath(PathUtils.getPath(templateParentPath, nested.first));
+                if (ancestorPath != null)
+                {
+                    throw new IllegalArgumentException("Cannot insert record: nested item '" + nested.first + "' conflicts with hidden ancestor path '" + ancestorPath + "'");
+                }
+            }
+            else if(!StringUtils.equals(parent.getSymbolicName(), nested.second.getSymbolicName()))
+            {
+                throw new IllegalArgumentException("Cannot inserted record: nested item '" + nested.first + "' of type '" + nested.second.getSymbolicName() + "' conflicts with type in parent '" + parent.getSymbolicName() + "'");
+            }
+        }
+    }
+
+    private List<Pair<String, Record>> getAllNestedPaths(Record record)
+    {
+        List<Pair<String, Record>> result = new LinkedList<Pair<String, Record>>();
+        gatherAllNestedPaths(record, "", result);
+        // Sort by path length so we check parent paths before their children
+        // (a cheating way to check breadth-first).
+        Collections.sort(result, new Comparator<Pair<String, Record>>()
+        {
+            public int compare(Pair<String, Record> o1, Pair<String, Record> o2)
+            {
+                return o1.first.length() - o2.first.length();
+            }
+        });
+        return result;
+    }
+
+    private void gatherAllNestedPaths(Record record, String prefix, List<Pair<String, Record>> result)
+    {
+        for (String key: record.nestedKeySet())
+        {
+            String path = PathUtils.getPath(prefix, key);
+            Record child = (Record) record.get(key);
+            result.add(new Pair<String, Record>(path, child));
+            gatherAllNestedPaths(child, path, result);
+        }
     }
 
     private void addInheritedSkeletons(final String scope, final String remainderPath, CompositeType actualType, Record record, TemplateNode node)

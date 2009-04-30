@@ -260,12 +260,25 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         failedInsertHelper("project/grandchild/stages", createStage("default"), "Unable to insert record with name 'default' into path 'project/grandchild/stages': a record with this name already exists in ancestor 'global'");
     }
 
+    public void testInsertNestedPathHiddenInAncestor()
+    {
+        insertGlobal();
+        insertTemplateChild();
+        configurationTemplateManager.delete("project/child/stages/default");
+
+        MutableRecord grandchild = createGrandchild();
+        MutableRecord stages = (MutableRecord) grandchild.get("stages");
+        stages.put("default", createStage("default"));
+        
+        failedInsertHelper("project", grandchild, "Cannot insert record: nested item 'stages/default' conflicts with hidden ancestor path 'project/global/stages/default'");
+    }
+
     private void failedInsertHelper(String path, MutableRecord record, String message)
     {
         try
         {
             configurationTemplateManager.insertRecord(path, record);
-            fail();
+            fail("Expected insert at path '" + path + "' to fail");
         }
         catch (IllegalArgumentException e)
         {
