@@ -141,6 +141,10 @@ public class BuildController implements EventListener
         buildContext = new PulseExecutionContext();
         MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
         MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
+        for (ResourceProperty requestProperty: asResourceProperties(request.getProperties()))
+        {
+            buildContext.add(requestProperty);
+        }
 
         configure(root, buildResult.getRoot());
 
