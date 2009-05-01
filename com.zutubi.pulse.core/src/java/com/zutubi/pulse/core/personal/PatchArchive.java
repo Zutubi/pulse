@@ -143,32 +143,42 @@ public class PatchArchive
         os.putNextEntry(new ZipEntry(FILES_PATH));
         for(FileStatus fs: metadata.getFileStatuses())
         {
-            if (fs.getState().requiresFile() && !fs.isDirectory())
+            if (fs.getState().requiresFile())
             {
-                File f = new File(base, FileSystemUtils.localiseSeparators(fs.getPath()));
                 String path = FILES_PATH + fs.getTargetPath();
-                addFile(os, f, path, ui);
+                status(ui, path);
+
+                File f = new File(base, FileSystemUtils.localiseSeparators(fs.getPath()));
+                addEntry(os, f, path, fs.isDirectory());
             }
         }
     }
 
-    private void addFile(ZipOutputStream os, File f, String path, PersonalBuildUI ui) throws IOException
+    private void addEntry(ZipOutputStream os, File f, String path, boolean directory) throws IOException
     {
-        status(ui, path);
+        if (directory)
+        {
+            // Directory entries are identified by a trailing slash.
+            path += '/';
+        }
 
         ZipEntry entry = new ZipEntry(path);
         entry.setTime(f.lastModified());
         os.putNextEntry(entry);
-        FileInputStream is = null;
 
-        try
+        if (!directory)
         {
-            is = new FileInputStream(f);
-            IOUtils.joinStreams(is, os);
-        }
-        finally
-        {
-            IOUtils.close(is);
+            FileInputStream is = null;
+
+            try
+            {
+                is = new FileInputStream(f);
+                IOUtils.joinStreams(is, os);
+            }
+            finally
+            {
+                IOUtils.close(is);
+            }
         }
     }
 
@@ -289,8 +299,6 @@ public class PatchArchive
             }
         }
     }
-
-
 
     private void unzip(File base) throws IOException
     {
