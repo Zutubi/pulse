@@ -763,7 +763,7 @@ public class SubversionClient implements ScmClient
         }
         catch(NumberFormatException e)
         {
-            throw new ScmException("Invalid revision '" + revision + ": must be a valid revision number");
+            throw new ScmException("Invalid revision '" + revision + "': must be a valid revision number");
         }
         catch (SVNException e)
         {

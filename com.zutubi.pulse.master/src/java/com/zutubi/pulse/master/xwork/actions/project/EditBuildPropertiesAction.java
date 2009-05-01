@@ -202,7 +202,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         Project project = getRequiredProject();
 
         Revision r = null;
-        if(TextUtils.stringSet(revision))
+        revision = revision.trim();
+        if (TextUtils.stringSet(revision))
         {
             try
             {
