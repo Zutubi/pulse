@@ -227,6 +227,10 @@
             <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
 
+        <action name="databaseFileDialog" class="com.zutubi.pulse.master.xwork.actions.setup.DatabaseFileDialogAction">
+            <result name="success" type="velocity">tree/filedialog.vm</result>
+        </action>
+
         <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="velocity">tree/browse-new-folder.vm</result>
         </action>
