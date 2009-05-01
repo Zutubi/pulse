@@ -12,6 +12,8 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +54,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         command.setExe("unknown");
         command.setArgs("command");
 
-        CommandResult result = null;
+        CommandResult result;
         try
         {
             result = runCommand(command);
@@ -218,13 +220,8 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         }
     }
 
-    public void testNoSuchWorkDirOnWindows()
+    public void testNoSuchWorkDir()
     {
-        if(!SystemUtils.IS_WINDOWS)
-        {
-            return;
-        }
-
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("dir");
         command.setWorkingDir(new File("nosuchworkdir"));
@@ -236,10 +233,27 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         }
         catch (BuildException e)
         {
-            String message = e.getMessage();
-            boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
-            boolean java16 = message.endsWith("The directory name is invalid");
-            assertTrue(java15 || java16);
+            assertThat(e.getMessage(), containsString("Working directory 'nosuchworkdir' does not exist"));
+        }
+    }
+
+    public void testSpecifiedWorkDirIsFile() throws IOException
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("dir");
+
+        File plainFile = new File(baseDir, "f");
+        assertTrue(plainFile.createNewFile());
+        command.setWorkingDir(new File("f"));
+
+        try
+        {
+            runCommand(command, 1234);
+            fail("Should not be able to run with a working directory that is a file");
+        }
+        catch (BuildException e)
+        {
+            assertThat(e.getMessage(), containsString("Working directory 'f' exists, but is not a directory"));
         }
     }
 

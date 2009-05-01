@@ -122,10 +122,6 @@ public class ExecutableCommand extends CommandSupport implements Validateable
             {
                 message = "No such executable '" + exe + "'";
             }
-            else if (message.endsWith("error=267"))
-            {
-                message = "Working directory '" + this.workingDir.getPath() + "' does not exist";
-            }
 
             throw new BuildException("Unable to create process: " + message, e);
         }
@@ -513,26 +509,40 @@ public class ExecutableCommand extends CommandSupport implements Validateable
      *   b) if it is relative, then it is taken as the directory relative to the base directory.
      *
      * @param baseDir the base directory for the recipe
-     *
      * @return working directory for the command.
+     * @throws BuildException if the user-configured working directory does not
+     *         exist
      */
     protected File getWorkingDir(File baseDir)
     {
+        File result;
         if (workingDir == null)
         {
-            return baseDir;
+            result = baseDir;
         }
         else
         {
             if (workingDir.isAbsolute())
             {
-                return workingDir;
+                result = workingDir;
             }
             else
             {
-                return new File(baseDir, workingDir.getPath());
+                result = new File(baseDir, workingDir.getPath());
+            }
+
+            if (!result.exists())
+            {
+                throw new BuildException("Working directory '" + this.workingDir.getPath() + "' does not exist");
+            }
+
+            if (!result.isDirectory())
+            {
+                throw new BuildException("Working directory '" + this.workingDir.getPath() + "' exists, but is not a directory");
             }
         }
+
+        return result;
     }
 
     private void updateChildEnvironment(ExecutionContext context, ProcessBuilder builder)
