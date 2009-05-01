@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.pulse.master.events.build.BuildEvent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 
 /**
  * A build hook that is only ever triggered manually.
@@ -34,6 +34,12 @@ public class ManualBuildHookConfiguration extends BuildHookConfiguration
     }
 
     public boolean enabled()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean canTriggerFor(BuildResult result)
     {
         return true;
     }

@@ -39,75 +39,76 @@ public class BuildHookManager
     {
         final BuildEvent be = (BuildEvent) event;
         BuildResult buildResult = be.getBuildResult();
-        if (!buildResult.isPersonal())
-        {
-            // generate the execution context.
-            PulseExecutionContext context = new PulseExecutionContext(be.getContext());
-            Project project = buildResult.getProject();
-            for (BuildHookConfiguration hook : project.getConfig().getBuildHooks().values())
-            {
-                if (hook.enabled() && hook.triggeredBy(be))
-                {
-                    RecipeResultNode resultNode = null;
-                    if (be instanceof StageEvent)
-                    {
-                        resultNode = ((StageEvent) be).getStageNode();
-                    }
 
-                    logger.hookCommenced(hook.getName());
-                    OutputStream out = null;
-                    try
-                    {
-                        // stream the output to whoever is listening.
-                        out = new OutputLoggerOutputStream(logger);
-                        context.setOutputStream(out);
-                        executeTask(hook, context, be.getBuildResult(), resultNode, false);
-                    }
-                    finally
-                    {
-                        IOUtils.close(out);
-                    }
-                    logger.hookCompleted(hook.getName());
+        // generate the execution context.
+        PulseExecutionContext context = new PulseExecutionContext(be.getContext());
+        Project project = buildResult.getProject();
+        for (BuildHookConfiguration hook : project.getConfig().getBuildHooks().values())
+        {
+            if (hook.enabled() && hook.triggeredBy(be))
+            {
+                RecipeResultNode resultNode = null;
+                if (be instanceof StageEvent)
+                {
+                    resultNode = ((StageEvent) be).getStageNode();
                 }
+
+                logger.hookCommenced(hook.getName());
+                OutputStream out = null;
+                try
+                {
+                    // stream the output to whoever is listening.
+                    out = new OutputLoggerOutputStream(logger);
+                    context.setOutputStream(out);
+                    executeTask(hook, context, be.getBuildResult(), resultNode, false);
+                }
+                finally
+                {
+                    IOUtils.close(out);
+                }
+                logger.hookCompleted(hook.getName());
             }
         }
     }
 
     public void manualTrigger(final BuildHookConfiguration hook, final BuildResult result)
     {
-        HibernateBuildResultDao.intialise(result);
-        executor.execute(new Runnable()
+        if (hook.canTriggerFor(result))
         {
-            public void run()
+            HibernateBuildResultDao.intialise(result);
+            executor.execute(new Runnable()
             {
-                final PulseExecutionContext context = new PulseExecutionContext();
-                MasterBuildProperties.addAllBuildProperties(context, result, masterLocationProvider, configurationManager);
-                if (hook.appliesTo(result))
+                public void run()
                 {
-                    executeTask(hook, context, result, null, true);
-                }
-
-                result.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
-                {
-                    public void process(RecipeResultNode recipeResultNode)
+                    final PulseExecutionContext context = new PulseExecutionContext();
+                    MasterBuildProperties.addAllBuildProperties(context, result, masterLocationProvider, configurationManager);
+                    if (hook.appliesTo(result))
                     {
-                        if (hook.appliesTo(recipeResultNode))
+                        executeTask(hook, context, result, null, true);
+                    }
+
+                    result.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
+                    {
+                        public void process(RecipeResultNode recipeResultNode)
                         {
-                            context.push();
-                            try
+                            if (hook.appliesTo(recipeResultNode))
                             {
-                                MasterBuildProperties.addStageProperties(context, result, recipeResultNode, configurationManager, false);
-                                executeTask(hook, context, result, recipeResultNode, true);
-                            }
-                            finally
-                            {
-                                context.pop();
+                                context.push();
+                                try
+                                {
+                                    MasterBuildProperties.addStageProperties(context, result, recipeResultNode, configurationManager, false);
+                                    executeTask(hook, context, result, recipeResultNode, true);
+                                }
+                                finally
+                                {
+                                    context.pop();
+                                }
                             }
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        }
     }
 
     private void executeTask(BuildHookConfiguration hook, ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode, boolean manual)

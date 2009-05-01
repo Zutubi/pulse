@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
+import com.zutubi.pulse.master.events.build.BuildEvent;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.tove.annotations.Internal;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.pulse.master.events.build.BuildEvent;
 
 /**
  * A build hook that is triggered automatically at some point in a build.
@@ -12,6 +13,8 @@ public abstract class AutoBuildHookConfiguration extends BuildHookConfiguration
 {
     @Internal
     private boolean enabled = true;
+    private boolean runForPersonal = false;
+    private boolean allowManualTrigger = true;
     private boolean failOnError = false;
 
     public boolean isEnabled()
@@ -34,7 +37,25 @@ public abstract class AutoBuildHookConfiguration extends BuildHookConfiguration
         this.failOnError = failOnError;
     }
 
-    public abstract boolean triggeredBy(BuildEvent event);
+    public boolean isRunForPersonal()
+    {
+        return runForPersonal;
+    }
+
+    public void setRunForPersonal(boolean runForPersonal)
+    {
+        this.runForPersonal = runForPersonal;
+    }
+
+    public boolean isAllowManualTrigger()
+    {
+        return allowManualTrigger;
+    }
+
+    public void setAllowManualTrigger(boolean allowManualTrigger)
+    {
+        this.allowManualTrigger = allowManualTrigger;
+    }
 
     public boolean failOnError()
     {
@@ -45,4 +66,12 @@ public abstract class AutoBuildHookConfiguration extends BuildHookConfiguration
     {
         return isEnabled();
     }
+
+    @Override
+    public boolean canTriggerFor(BuildResult result)
+    {
+        return allowManualTrigger && (result == null || !result.isPersonal() || runForPersonal);
+    }
+
+    public abstract boolean triggeredBy(BuildEvent event);
 }

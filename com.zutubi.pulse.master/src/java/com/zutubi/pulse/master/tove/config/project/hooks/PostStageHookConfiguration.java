@@ -17,7 +17,7 @@ import java.util.List;
  * hook can be easily applied to multiple stages.
  */
 @SymbolicName("zutubi.postStageHookConfig")
-@Form(fieldOrder = {"name", "applyToAllStages", "stages", "runForAll", "runForStates", "failOnError"})
+@Form(fieldOrder = {"name", "applyToAllStages", "stages", "runForAll", "runForStates", "failOnError", "runForPersonal", "allowManualTrigger"})
 public class PostStageHookConfiguration extends AutoBuildHookConfiguration
 {
     @ControllingCheckbox(dependentFields = "stages", invert = true)
@@ -75,7 +75,7 @@ public class PostStageHookConfiguration extends AutoBuildHookConfiguration
         {
             PostStageEvent pse = (PostStageEvent) event;
             long stage = pse.getStageNode().getStageHandle();
-            return stageMatches(stage) && stateMatches(pse);
+            return (!pse.getBuildResult().isPersonal() || isRunForPersonal()) && stageMatches(stage) && stateMatches(pse);
         }
 
         return false;

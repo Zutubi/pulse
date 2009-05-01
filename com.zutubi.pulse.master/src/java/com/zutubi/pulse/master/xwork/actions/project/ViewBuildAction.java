@@ -12,10 +12,11 @@ import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -109,12 +110,18 @@ public class ViewBuildAction extends CommandActionBase
 
     public String execute()
     {
-        BuildResult result = getRequiredBuildResult();
+        final BuildResult result = getRequiredBuildResult();
         boolean canWrite = accessManager.hasPermission(AccessManager.ACTION_WRITE, result.getProject());
-        if (!isPersonal() && canWrite)
+        if (canWrite)
         {
             ProjectConfiguration projectConfig = getRequiredProject().getConfig();
-            hooks = new LinkedList<BuildHookConfiguration>(projectConfig.getBuildHooks().values());
+            hooks = CollectionUtils.filter(projectConfig.getBuildHooks().values(), new Predicate<BuildHookConfiguration>()
+            {
+                public boolean satisfied(BuildHookConfiguration hookConfiguration)
+                {
+                    return hookConfiguration.canTriggerFor(result);
+                }
+            });
             Collections.sort(hooks, new NamedConfigurationComparator());
         }
         else

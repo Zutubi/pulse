@@ -17,7 +17,7 @@ import java.util.List;
  * A post build hookis run when a build completes.
  */
 @SymbolicName("zutubi.postBuildHookConfig")
-@Form(fieldOrder = {"name", "runForAll", "runForStates", "failOnError"})
+@Form(fieldOrder = {"name", "runForAll", "runForStates", "failOnError", "runForPersonal", "allowManualTrigger"})
 public class PostBuildHookConfiguration extends AutoBuildHookConfiguration
 {
     @ControllingCheckbox(dependentFields = "runForStates", invert = true)
@@ -51,7 +51,7 @@ public class PostBuildHookConfiguration extends AutoBuildHookConfiguration
         {
             PostBuildEvent pbe = (PostBuildEvent) event;
             BuildResult buildResult = pbe.getBuildResult();
-            return stateMatches(buildResult);
+            return (!buildResult.isPersonal() || isRunForPersonal()) && stateMatches(buildResult);
         }
 
         return false;

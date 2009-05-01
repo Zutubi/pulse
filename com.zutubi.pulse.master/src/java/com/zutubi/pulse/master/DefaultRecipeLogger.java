@@ -19,6 +19,8 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
     static final String PRE_RULE = "============================[ command output below ]============================";
     static final String POST_RULE = "============================[ command output above ]============================";
 
+    private int hookCount = 0;
+
     public DefaultRecipeLogger(File logFile)
     {
         super(logFile);
@@ -126,16 +128,18 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
 
     public void postStage()
     {
+        hookCount = 0;
         logMarker("Running post stage hooks...");
     }
 
     public void postStageComplete()
     {
-        logMarker("Post stage hooks complete.");
+        logMarker(String.format("Post stage hooks complete (%d hook%s run).", hookCount, hookCount == 1 ? "" : "s"));
     }
 
     public void hookCommenced(String name)
     {
+        hookCount++;
         logMarker("Hook '" + name + "' commenced");
         writePreRule();
     }

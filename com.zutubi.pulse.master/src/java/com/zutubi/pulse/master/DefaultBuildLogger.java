@@ -9,6 +9,8 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
     private static final String PRE_MARKER = "============================[ task output below ]============================";
     private static final String POST_MARKER = "============================[ task output above ]============================";
 
+    private int hookCount = 0;
+
     public DefaultBuildLogger(File logFile)
     {
         super(logFile);
@@ -16,16 +18,18 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
 
     public void preBuild()
     {
+        hookCount = 0;
         logMarker("Running pre build hooks...");
     }
 
     public void preBuildCompleted()
     {
-        logMarker("Pre build hooks complete.");
+        logMarker(String.format("Pre build hooks complete (%d hook%s run).", hookCount, hookCount == 1 ? "" : "s"));
     }
 
     public void hookCommenced(String name)
     {
+        hookCount++;
         logMarker("Hook '" + name + "' commenced");
         if (writer != null)
         {
@@ -62,11 +66,12 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
 
     public void postBuild()
     {
+        hookCount = 0;
         logMarker("Running post build hooks...");
     }
 
     public void postBuildCompleted()
     {
-        logMarker("Post build hooks complete.");
+        logMarker(String.format("Post build hooks complete (%d hook%s run).", hookCount, hookCount == 1 ? "" : "s"));
     }
 }

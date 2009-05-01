@@ -11,6 +11,9 @@ import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import com.zutubi.pulse.master.tove.config.project.hooks.PostBuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.PreBuildHookConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -116,6 +119,67 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild("failure");
         verifyPersonalBuildTabs(buildNumber, AGENT_NAME);
+    }
+
+    public void testPersonalBuildWithHooks() throws Exception
+    {
+        String projectPath = addProject(random, true);
+        String hooksPath = PathUtils.getPath(projectPath, "buildHooks");
+
+        // Create two of each type of hook: one that runs for personal builds,
+        // and another that doesn't.
+        Hashtable<String, Object> hook = xmlRpcHelper.createEmptyConfig(PreBuildHookConfiguration.class);
+        hook.put("name", "prebuildno");
+        hook.put("runForPersonal", false);
+        xmlRpcHelper.insertConfig(hooksPath, hook);
+
+        hook.put("name", "prebuildyes");
+        hook.put("runForPersonal", true);
+        xmlRpcHelper.insertConfig(hooksPath, hook);
+
+        hook = xmlRpcHelper.createEmptyConfig(PostBuildHookConfiguration.class);
+        hook.put("name", "postbuildno");
+        hook.put("runForPersonal", false);
+        xmlRpcHelper.insertConfig(hooksPath, hook);
+
+        hook.put("name", "postbuildyes");
+        hook.put("runForPersonal", true);
+        xmlRpcHelper.insertConfig(hooksPath, hook);
+
+        hook = xmlRpcHelper.createPostStageHook(random, "poststageno");
+        hook.put("runForPersonal", false);
+        xmlRpcHelper.insertConfig(hooksPath, hook);
+
+        hook.put("name", "poststageyes");
+        hook.put("runForPersonal", true);
+        xmlRpcHelper.insertConfig(hooksPath, hook);
+
+        // Now make a change and run a personal build.
+        checkout(Constants.TRIVIAL_ANT_REPOSITORY);
+        makeChangeToBuildFile();
+        createConfigFile(random);
+
+        loginAsAdmin();
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
+        long buildNumber = runPersonalBuild("failure");
+
+        // Finally check that only the enabled hooks ran.
+        String text = getLogText(urls.dashboardMyBuildLog(Long.toString(buildNumber)));
+        assertFalse("Pre-build hook not for personal should not have run", text.contains("prebuildno"));
+        assertTrue("Pre-build hook for personal should have run", text.contains("prebuildyes"));
+        assertFalse("Post-build hook not for personal should not have run", text.contains("postbuildno"));
+        assertTrue("Post-build hook for personal should have run", text.contains("postbuildyes"));
+
+        text = getLogText(urls.dashboardMyStageLog(Long.toString(buildNumber), ProjectConfigurationWizard.DEFAULT_STAGE));
+        assertFalse("Post-stage hook not for personal should not have run", text.contains("poststageno"));
+        assertTrue("Post-stage hook for personal should have run", text.contains("poststageyes"));
+    }
+
+    private String getLogText(String url)
+    {
+        selenium.open(url + "raw/true");
+        selenium.waitForPageToLoad(Long.toString(SeleniumUtils.DEFAULT_TIMEOUT));
+        return selenium.getBodyText();
     }
 
     private void checkout(String url) throws SVNException

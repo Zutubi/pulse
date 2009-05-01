@@ -31,4 +31,16 @@ public abstract class BuildHookConfiguration extends AbstractNamedConfiguration
     public abstract boolean appliesTo(RecipeResultNode result);
     public abstract boolean failOnError();
     public abstract boolean enabled();
+    /**
+     * Indicates if this hook can be manually triggered for a given build
+     * result.  Note that the result may be null, in which case this method
+     * should just indicate if there are builds which this hook can be manually
+     * triggered for.
+     *
+     * @param result the result to check triggerability for - may be null if
+     *        the result has not yet been chosen by the user
+     * @return true if this hook can be manually triggered for the given build
+     *         result, or at all if the result is null
+     */
+    public abstract boolean canTriggerFor(BuildResult result);
 }

@@ -25,9 +25,19 @@ public class BuildSummaryPage extends SeleniumPage
         return urls.buildSummary(projectName, Long.toString(buildId));
     }
 
+    private String getHookId(String hookName)
+    {
+        return "hook." + hookName;
+    }
+
+    public boolean isHookPresent(String hookName)
+    {
+        return selenium.isElementPresent(getHookId(hookName));
+    }
+    
     public void clickHook(String hookName)
     {
-        selenium.click("hook." + hookName);
+        selenium.click(getHookId(hookName));
     }
 
     public boolean hasTests()

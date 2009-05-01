@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class BuildHookConfigurationActions
 {
-    private static final String ACTION_TRIGGER = "trigger";
+    public static final String ACTION_TRIGGER = "trigger";
 
     private BuildHookManager buildHookManager;
     private ProjectManager projectManager;
@@ -26,7 +26,10 @@ public class BuildHookConfigurationActions
     public List<String> getActions(BuildHookConfiguration instance)
     {
         List<String> actions = new LinkedList<String>();
-        actions.add(ACTION_TRIGGER);
+        if (instance.canTriggerFor(null))
+        {
+            actions.add(ACTION_TRIGGER);
+        }
         return actions;
     }
 

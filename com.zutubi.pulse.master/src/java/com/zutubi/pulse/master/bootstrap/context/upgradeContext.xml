@@ -53,6 +53,7 @@
                 <ref local="dashboardSortProperties"/>
                 <ref local="buildResultNumberIndex"/>
                 <ref local="userCollapsedProjects"/>
+                <ref local="hookTriggerOptions"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -185,5 +186,9 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.28-patch-01.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="hookTriggerOptions" class="com.zutubi.pulse.master.upgrade.tasks.HookTriggerOptionsUpgradeTask">
+        <property name="buildNumber" value="200028003"/>
     </bean>
 </beans>
