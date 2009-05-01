@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
@@ -86,18 +85,17 @@ public class DirectoryArtifact extends LocalArtifact
         {
             if(result.succeeded() && getFailIfNotPresent())
             {
-                throw new BuildException("Capturing artifact '" + getName() + "': base directory '" + base.getAbsolutePath() + "' does not exist");
+                result.error("Capturing artifact '" + getName() + "': base directory '" + base.getAbsolutePath() + "' does not exist");
             }
-            else
-            {
-                // Don't attempt to capture.
-                return;
-            }
+
+            // Don't attempt to capture.
+            return;
         }
 
         if (!base.isDirectory())
         {
-            throw new BuildException("Directory artifact '" + getName() + "': base '" + base.getAbsolutePath() + "' is not a directory");
+            result.error("Directory artifact '" + getName() + "': base '" + base.getAbsolutePath() + "' is not a directory");
+            return;
         }
 
         DirectoryScanner scanner = new DirectoryScanner();

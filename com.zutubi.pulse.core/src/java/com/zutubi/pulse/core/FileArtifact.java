@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
@@ -63,11 +62,9 @@ public class FileArtifact extends LocalArtifact
             }
             else
             {
-                // absolute file without wildcards that does not exist. This will be picked up by the getFailIfNotPresent
-                // check at the end of this method.
                 if (result.succeeded() && getFailIfNotPresent())
                 {
-                    throw new BuildException("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
+                    result.error("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
                 }
             }
         }
@@ -99,7 +96,7 @@ public class FileArtifact extends LocalArtifact
         {
             if (result.succeeded() && getFailIfNotPresent())
             {
-                throw new BuildException("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
+                result.error("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
             }
         }
     }

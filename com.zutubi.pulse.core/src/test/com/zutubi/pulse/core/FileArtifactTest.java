@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -9,9 +8,6 @@ import com.zutubi.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * <class-comment/>
- */
 public class FileArtifactTest extends PulseTestCase
 {
     /**
@@ -98,16 +94,9 @@ public class FileArtifactTest extends PulseTestCase
 
         fileArtifactObject.setFailIfNotPresent(true);
         fileArtifactObject.setFile("file.jpg");
-        try
-        {
-            capture();
-            fail();
-        }
-        catch (BuildException be)
-        {
-            // noop.
-        }
+        capture();
         assertCapturedArtifactCount(0);
+        assertTrue(result.errored());
     }
 
     public void testSupportsWildCardMatchingOfSingleFile()

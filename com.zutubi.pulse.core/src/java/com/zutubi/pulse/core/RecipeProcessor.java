@@ -277,7 +277,16 @@ public class RecipeProcessor
     {
         for (Artifact artifact : command.getArtifacts())
         {
-            artifact.capture(result, context);
+            try
+            {
+                artifact.capture(result, context);
+            }
+            catch (Exception e)
+            {
+                String message = "Unexpected error capturing artifact '" + artifact.getName() + "': " + e.getMessage();
+                LOG.severe(message, e);
+                result.error(message + " (check agent logs)");
+            }
         }
     }
 

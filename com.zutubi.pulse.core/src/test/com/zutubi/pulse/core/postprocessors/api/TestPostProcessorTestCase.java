@@ -31,7 +31,7 @@ import java.io.IOException;
  * @see com.zutubi.pulse.core.postprocessors.api.PostProcessorTestCase
  * @see com.zutubi.pulse.core.postprocessors.api.XMLTestPostProcessorTestCase
  */
-public class TestPostProcessorTestCase extends PostProcessorTestCase
+public abstract class TestPostProcessorTestCase extends PostProcessorTestCase
 {
     /**
      * Equivalent to runProcessorAndGetTests(postProcessor, getExtension()).
