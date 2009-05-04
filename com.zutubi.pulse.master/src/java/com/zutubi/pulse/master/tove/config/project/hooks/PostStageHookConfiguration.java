@@ -75,7 +75,7 @@ public class PostStageHookConfiguration extends AutoBuildHookConfiguration
         {
             PostStageEvent pse = (PostStageEvent) event;
             long stage = pse.getStageNode().getStageHandle();
-            return (!pse.getBuildResult().isPersonal() || isRunForPersonal()) && stageMatches(stage) && stateMatches(pse);
+            return triggeredByBuildType(pse.getBuildResult()) && stageMatches(stage) && stateMatches(pse);
         }
 
         return false;

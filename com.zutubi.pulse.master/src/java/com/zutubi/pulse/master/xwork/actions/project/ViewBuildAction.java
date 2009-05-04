@@ -119,7 +119,7 @@ public class ViewBuildAction extends CommandActionBase
             {
                 public boolean satisfied(BuildHookConfiguration hookConfiguration)
                 {
-                    return hookConfiguration.canTriggerFor(result);
+                    return hookConfiguration.canManuallyTriggerFor(result);
                 }
             });
             Collections.sort(hooks, new NamedConfigurationComparator());

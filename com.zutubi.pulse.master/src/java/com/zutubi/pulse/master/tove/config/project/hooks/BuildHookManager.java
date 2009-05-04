@@ -73,7 +73,7 @@ public class BuildHookManager
 
     public void manualTrigger(final BuildHookConfiguration hook, final BuildResult result)
     {
-        if (hook.canTriggerFor(result))
+        if (hook.canManuallyTriggerFor(result))
         {
             HibernateBuildResultDao.intialise(result);
             executor.execute(new Runnable()

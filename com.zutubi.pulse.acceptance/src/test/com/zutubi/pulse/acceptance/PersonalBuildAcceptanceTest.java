@@ -12,7 +12,9 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.PostBuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.PreBuildHookConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -128,31 +130,12 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         // Create two of each type of hook: one that runs for personal builds,
         // and another that doesn't.
-        Hashtable<String, Object> hook = xmlRpcHelper.createEmptyConfig(PreBuildHookConfiguration.class);
-        hook.put("name", "prebuildno");
-        hook.put("runForPersonal", false);
-        xmlRpcHelper.insertConfig(hooksPath, hook);
-
-        hook.put("name", "prebuildyes");
-        hook.put("runForPersonal", true);
-        xmlRpcHelper.insertConfig(hooksPath, hook);
-
-        hook = xmlRpcHelper.createEmptyConfig(PostBuildHookConfiguration.class);
-        hook.put("name", "postbuildno");
-        hook.put("runForPersonal", false);
-        xmlRpcHelper.insertConfig(hooksPath, hook);
-
-        hook.put("name", "postbuildyes");
-        hook.put("runForPersonal", true);
-        xmlRpcHelper.insertConfig(hooksPath, hook);
-
-        hook = xmlRpcHelper.createPostStageHook(random, "poststageno");
-        hook.put("runForPersonal", false);
-        xmlRpcHelper.insertConfig(hooksPath, hook);
-
-        hook.put("name", "poststageyes");
-        hook.put("runForPersonal", true);
-        xmlRpcHelper.insertConfig(hooksPath, hook);
+        insertHook(hooksPath, PreBuildHookConfiguration.class, "prebuildno", false);
+        insertHook(hooksPath, PreBuildHookConfiguration.class, "prebuildyes", true);
+        insertHook(hooksPath, PostBuildHookConfiguration.class, "postbuildno", false);
+        insertHook(hooksPath, PostBuildHookConfiguration.class, "postbuildyes", true);
+        insertHook(hooksPath, PostStageHookConfiguration.class, "poststageno", false);
+        insertHook(hooksPath, PostStageHookConfiguration.class, "poststageyes", true);
 
         // Now make a change and run a personal build.
         checkout(Constants.TRIVIAL_ANT_REPOSITORY);
@@ -173,6 +156,15 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         text = getLogText(urls.dashboardMyStageLog(Long.toString(buildNumber), ProjectConfigurationWizard.DEFAULT_STAGE));
         assertFalse("Post-stage hook not for personal should not have run", text.contains("poststageno"));
         assertTrue("Post-stage hook for personal should have run", text.contains("poststageyes"));
+    }
+
+    private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception
+    {
+        Hashtable<String, Object> hook = xmlRpcHelper.createEmptyConfig(hookClass);
+        hook.put("name", name);
+        hook.put("runForPersonal", runForPersonal);
+        xmlRpcHelper.insertConfig(hooksPath, hook);
+        return hook;
     }
 
     private String getLogText(String url)

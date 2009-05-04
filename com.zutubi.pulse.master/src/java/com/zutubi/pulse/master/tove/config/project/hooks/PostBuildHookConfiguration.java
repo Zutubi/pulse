@@ -49,9 +49,8 @@ public class PostBuildHookConfiguration extends AutoBuildHookConfiguration
     {
         if(event instanceof PostBuildEvent)
         {
-            PostBuildEvent pbe = (PostBuildEvent) event;
-            BuildResult buildResult = pbe.getBuildResult();
-            return (!buildResult.isPersonal() || isRunForPersonal()) && stateMatches(buildResult);
+            BuildResult buildResult = event.getBuildResult();
+            return triggeredByBuildType(buildResult) && stateMatches(buildResult);
         }
 
         return false;

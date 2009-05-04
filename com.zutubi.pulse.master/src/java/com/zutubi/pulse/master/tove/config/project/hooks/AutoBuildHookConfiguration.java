@@ -68,10 +68,15 @@ public abstract class AutoBuildHookConfiguration extends BuildHookConfiguration
     }
 
     @Override
-    public boolean canTriggerFor(BuildResult result)
+    public boolean canManuallyTriggerFor(BuildResult result)
     {
         return allowManualTrigger && (result == null || !result.isPersonal() || runForPersonal);
     }
 
     public abstract boolean triggeredBy(BuildEvent event);
+
+    protected boolean triggeredByBuildType(BuildResult buildResult)
+    {
+        return !buildResult.isPersonal() || isRunForPersonal();
+    }
 }

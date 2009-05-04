@@ -39,7 +39,7 @@ public class ManualBuildHookConfiguration extends BuildHookConfiguration
     }
 
     @Override
-    public boolean canTriggerFor(BuildResult result)
+    public boolean canManuallyTriggerFor(BuildResult result)
     {
         return true;
     }

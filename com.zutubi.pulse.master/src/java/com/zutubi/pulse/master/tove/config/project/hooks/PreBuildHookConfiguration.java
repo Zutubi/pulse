@@ -17,8 +17,7 @@ public class PreBuildHookConfiguration extends AutoBuildHookConfiguration
     {
         if (event instanceof PreBuildEvent)
         {
-            PreBuildEvent pbe = (PreBuildEvent) event;
-            return !pbe.getBuildResult().isPersonal() || isRunForPersonal();
+            return triggeredByBuildType(event.getBuildResult());
         }
 
         return false;

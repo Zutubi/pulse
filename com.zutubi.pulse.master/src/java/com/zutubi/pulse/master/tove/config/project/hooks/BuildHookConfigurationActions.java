@@ -26,7 +26,7 @@ public class BuildHookConfigurationActions
     public List<String> getActions(BuildHookConfiguration instance)
     {
         List<String> actions = new LinkedList<String>();
-        if (instance.canTriggerFor(null))
+        if (instance.canManuallyTriggerFor(null))
         {
             actions.add(ACTION_TRIGGER);
         }

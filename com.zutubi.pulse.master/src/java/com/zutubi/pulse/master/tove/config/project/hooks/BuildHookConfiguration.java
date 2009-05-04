@@ -42,5 +42,5 @@ public abstract class BuildHookConfiguration extends AbstractNamedConfiguration
      * @return true if this hook can be manually triggered for the given build
      *         result, or at all if the result is null
      */
-    public abstract boolean canTriggerFor(BuildResult result);
+    public abstract boolean canManuallyTriggerFor(BuildResult result);
 }
