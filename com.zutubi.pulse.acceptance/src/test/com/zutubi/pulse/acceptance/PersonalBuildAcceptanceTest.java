@@ -169,9 +169,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private String getLogText(String url)
     {
-        selenium.open(url + "raw/true");
+        selenium.open(url);
         selenium.waitForPageToLoad(Long.toString(SeleniumUtils.DEFAULT_TIMEOUT));
-        return selenium.getBodyText();
+        return selenium.getText("panel");
     }
 
     private void checkout(String url) throws SVNException
