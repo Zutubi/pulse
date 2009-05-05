@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
@@ -19,7 +20,7 @@ public class ProjectsModelTestBase extends PulseTestCase
 {
     private long nextId = 1;
 
-    protected ProjectsSummaryConfiguration config;
+    protected ProjectsSummaryConfiguration config = new BrowseViewConfiguration();
     protected Urls urls = Urls.getBaselessInstance();
     private Map<String, ProjectsModel> groups = new HashMap<String, ProjectsModel>();
 

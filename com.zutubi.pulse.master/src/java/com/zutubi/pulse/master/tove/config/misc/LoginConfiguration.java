@@ -5,6 +5,7 @@ import com.zutubi.tove.annotations.Password;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Text;
 import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * Transient configuration used for the login form.  The odd field names are
@@ -14,7 +15,7 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 @SymbolicName("zutubi.transient.login")
 public class LoginConfiguration extends AbstractConfiguration
 {
-    @Text(size = 200)
+    @Text(size = 200) @Required
     private String j_username;
     @Password(size = 200)
     private String j_password;
