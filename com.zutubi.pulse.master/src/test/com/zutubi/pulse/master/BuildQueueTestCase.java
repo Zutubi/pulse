@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Base helper test class for tests of the build queues, which share many
  * dependencies.
  */
-public class BuildQueueTestCase extends PulseTestCase
+public abstract class BuildQueueTestCase extends PulseTestCase
 {
     protected MasterConfigurationManager configurationManager;
     protected EventManager eventManager;

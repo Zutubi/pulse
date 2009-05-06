@@ -6,9 +6,9 @@ import com.zutubi.pulse.core.commands.CommandFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandContext;
 import com.zutubi.pulse.core.commands.OutputFactory;
 import com.zutubi.pulse.core.commands.api.*;
+import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
-import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
@@ -424,8 +424,21 @@ public class RecipeProcessor
     {
         for (OutputConfiguration outputConfiguration : commandConfig.getOutputs().values())
         {
-            Output output = outputFactory.create(outputConfiguration);
-            output.capture(context);
+            try
+            {
+                Output output = outputFactory.create(outputConfiguration);
+                output.capture(context);
+            }
+            catch (BuildException e)
+            {
+                context.error("Unable to capture output '" + outputConfiguration.getName() + "': " + e.getMessage());
+            }
+            catch (Exception e)
+            {
+                String message = "Unexpected error capturing output '" + outputConfiguration.getName() + "': " + e.getMessage();
+                LOG.warning(message, e);
+                context.error(message + " (check agent logs)");
+            }
         }
     }
 

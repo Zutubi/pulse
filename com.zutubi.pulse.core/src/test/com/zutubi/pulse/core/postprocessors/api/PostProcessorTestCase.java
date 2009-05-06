@@ -33,7 +33,7 @@ import java.io.IOException;
  * @see com.zutubi.pulse.core.postprocessors.api.TestPostProcessorTestCase
  * @see com.zutubi.pulse.core.engine.api.FeatureMatchers
  */
-public class PostProcessorTestCase extends PulseTestCase
+public abstract class PostProcessorTestCase extends PulseTestCase
 {
     private static final String EXTENSION_TEXT = "txt";
 

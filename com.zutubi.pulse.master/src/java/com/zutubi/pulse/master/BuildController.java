@@ -155,6 +155,10 @@ public class BuildController implements EventListener
         MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig));
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, projectConfig.getScm());
+        for (ResourceProperty requestProperty: asResourceProperties(request.getProperties()))
+        {
+            buildContext.add(requestProperty);
+        }
 
         activateBuildAuthenticationToken();
 

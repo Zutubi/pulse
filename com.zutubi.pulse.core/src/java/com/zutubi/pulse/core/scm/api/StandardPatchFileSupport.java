@@ -128,7 +128,7 @@ public class StandardPatchFileSupport
         os.putNextEntry(new ZipEntry(PatchArchive.FILES_PATH));
         for(FileStatus fs: metadata.getFileStatuses())
         {
-            if (!fs.isDirectory() && fs.getPayloadType() != FileStatus.PayloadType.NONE)
+            if (fs.getPayloadType() != FileStatus.PayloadType.NONE)
             {
                 String path = PatchArchive.FILES_PATH + fs.getTargetPath();
                 reportStatus(context.getUI(), path);
@@ -140,7 +140,7 @@ public class StandardPatchFileSupport
                 else
                 {
                     File f = new File(base, FileSystemUtils.localiseSeparators(fs.getPath()));
-                    addFile(os, f, path);
+                    addEntry(os, f, path, f.isDirectory());
                 }
             }
         }
@@ -153,21 +153,31 @@ public class StandardPatchFileSupport
         statusBuilder.diff(context, filePath, os);
     }
 
-    private static void addFile(ZipOutputStream os, File f, String path) throws IOException
+    private static void addEntry(ZipOutputStream os, File f, String path, boolean directory) throws IOException
     {
+        if (directory)
+        {
+            // Directory entries are identified by a trailing slash.
+            path += '/';
+        }
+
         ZipEntry entry = new ZipEntry(path);
         entry.setTime(f.lastModified());
         os.putNextEntry(entry);
-        FileInputStream is = null;
 
-        try
+        if (!directory)
         {
-            is = new FileInputStream(f);
-            IOUtils.joinStreams(is, os);
-        }
-        finally
-        {
-            IOUtils.close(is);
+            FileInputStream is = null;
+
+            try
+            {
+                is = new FileInputStream(f);
+                IOUtils.joinStreams(is, os);
+            }
+            finally
+            {
+                IOUtils.close(is);
+            }
         }
     }
 

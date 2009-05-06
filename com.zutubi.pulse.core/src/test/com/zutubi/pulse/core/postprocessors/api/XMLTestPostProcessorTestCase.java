@@ -7,7 +7,7 @@ package com.zutubi.pulse.core.postprocessors.api;
  *
  * @see com.zutubi.pulse.core.postprocessors.api.PostProcessorTestCase
  */
-public class XMLTestPostProcessorTestCase extends TestPostProcessorTestCase
+public abstract class XMLTestPostProcessorTestCase extends TestPostProcessorTestCase
 {
     private static final String EXTENSION_XML = "xml";
 

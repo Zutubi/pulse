@@ -309,7 +309,13 @@ public class PatchArchive
             throw new IOException("Unexpected entry path '" + name + "': should start with '" + FILES_PATH + "'");
         }
 
-        return name.substring(FILES_PATH.length());
+        name = name.substring(FILES_PATH.length());
+        if (name.endsWith("/"))
+        {
+            name = name.substring(0, name.length() - 1);
+        }
+        
+        return name;
     }
 
     public boolean containsPath(String path)

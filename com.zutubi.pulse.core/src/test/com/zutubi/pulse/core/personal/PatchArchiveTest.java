@@ -139,6 +139,21 @@ public class PatchArchiveTest extends PulseTestCase
         assertThat(features.get(0).getSummary(), containsString("Target file 'notintarget' with status MODIFIED in patch does not exist"));
     }
 
+    public void testApplyNewEmptyDirectory() throws PulseException, IOException
+    {
+        final String DIR_NAME = "iamnew";
+
+        File newDir = new File(wcDir, DIR_NAME);
+        assertTrue(newDir.mkdir());
+
+        WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
+        status.addFileStatus(new FileStatus(DIR_NAME, FileStatus.State.ADDED, true));
+
+        createAndApplyPatch(status);
+
+        assertTrue("Expected directory to be created", new File(targetDir, DIR_NAME).isDirectory());
+    }
+
     private List<Feature> createAndApplyPatch(WorkingCopyStatus status) throws PulseException, IOException
     {
         stub(statusBuilder.getLocalStatus(context)).toReturn(status);
@@ -146,5 +161,4 @@ public class PatchArchiveTest extends PulseTestCase
         PatchArchive archive = new PatchArchive(archiveFile);
         return archive.apply(targetDir, EOLStyle.BINARY, new RecordingScmFeedbackHandler());
     }
-
 }

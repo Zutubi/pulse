@@ -110,6 +110,30 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         assertArgs(random, "some.value");
     }
 
+    public void testPostBuildHookCanAccessTriggerProperty() throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(random, false);
+        // Also add the property to the project - we want to make sure it is
+        // overridden by the value passed on trigger.
+        xmlRpcHelper.insertProjectProperty(random, "some.property", "some.value");
+
+        chooseHookType(random, "zutubi.postBuildHookConfig");
+
+        ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
+        hookForm.waitFor();
+        hookForm.nextFormElements(random, "true", null, "false");
+
+        selectFromAllTasks();
+        addTask(random, "${some.property}");
+
+        Hashtable<String, String> properties = new Hashtable<String, String>();
+        properties.put("some.property", "trigger.value");
+        int number = xmlRpcHelper.getNextBuildNumber(random);
+        xmlRpcHelper.triggerBuild(random, "", properties);
+        xmlRpcHelper.waitForBuildToComplete(random, number, BUILD_TIMEOUT);
+        assertArgs("trigger.value");
+    }
+
     public void testPostStageHook() throws Exception
     {
         postStageHelper();
