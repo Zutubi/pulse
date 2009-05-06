@@ -34,6 +34,11 @@ public class ConcreteProjectModel extends ProjectModel
         health = ProjectHealth.fromLatestBuilds(latestBuilds);
         built = latestBuilds.size() > 0;
 
+        if (configuration.getBuildsPerProject() < latestBuilds.size())
+        {
+            latestBuilds = latestBuilds.subList(0, configuration.getBuildsPerProject());
+        }
+        
         buildRows = CollectionUtils.map(latestBuilds, new Mapping<BuildResult, ProjectBuildModel>()
         {
             public ProjectBuildModel map(BuildResult buildResult)

@@ -4,10 +4,10 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.Pair;
 import junit.framework.Assert;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Base for form classes: supports methods for reading and writing fields and
@@ -119,13 +119,13 @@ public abstract class SeleniumForm
         return selenium.getEval(js).split(",");
     }
 
-    public void submitFormElements(String submitValue, Map<String, String> fieldValues)
+    public void submitNamedFormElements(String submitValue, Pair<String, String>... fieldValues)
     {
         if (fieldValues != null)
         {
-            for (Map.Entry<String, String> entry: fieldValues.entrySet())
+            for (Pair<String, String> fv: fieldValues)
             {
-                setFieldValue(entry.getKey(), entry.getValue());
+                setFieldValue(fv.first, fv.second);
             }
         }
 
@@ -138,9 +138,9 @@ public abstract class SeleniumForm
         submit(submitValue);
     }
 
-    public void nextFormElements(Map<String, String> fieldValues)
+    public void nextNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitFormElements("next", fieldValues);
+        submitNamedFormElements("next", fieldValues);
     }
 
     public void nextFormElements(String... args)
@@ -148,9 +148,9 @@ public abstract class SeleniumForm
         submitFormElements("next", args);
     }
 
-    public void applyFormElements(Map<String, String> fieldValues)
+    public void applyNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitFormElements("apply", fieldValues);
+        submitNamedFormElements("apply", fieldValues);
     }
 
     public void applyFormElements(String... args)
@@ -158,9 +158,9 @@ public abstract class SeleniumForm
         submitFormElements("apply", args);
     }
 
-    public void saveFormElements(Map<String, String> fieldValues)
+    public void saveNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitFormElements("save", fieldValues);
+        submitNamedFormElements("save", fieldValues);
     }
 
     public void saveFormElements(String... args)
@@ -168,9 +168,9 @@ public abstract class SeleniumForm
         submitFormElements("save", args);
     }
 
-    public void finishFormElements(Map<String, String> fieldValues)
+    public void finishNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitFormElements("finish", fieldValues);
+        submitNamedFormElements("finish", fieldValues);
     }
 
     public void finishFormElements(String... args)
@@ -178,9 +178,9 @@ public abstract class SeleniumForm
         submitFormElements("finish", args);
     }
 
-    public void cancelFormElements(Map<String, String> fieldValues)
+    public void cancelNamedFormElements(Pair<String, String>... fieldValues)
     {
-        submitFormElements("cancel", fieldValues);
+        submitNamedFormElements("cancel", fieldValues);
     }
 
     public void cancelFormElements(String... args)

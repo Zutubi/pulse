@@ -35,6 +35,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     private CompositeType projectType;
     private CompositeType propertyType;
     private CompositeType stageType;
+    private CompositeType specialStageType;
 
     protected void setUp() throws Exception
     {
@@ -43,6 +44,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         projectType = typeRegistry.register(Project.class);
         propertyType = typeRegistry.getType(Property.class);
         stageType = typeRegistry.getType(Stage.class);
+        specialStageType = typeRegistry.register(SpecialStage.class);
         TemplatedMapType templatedMapType = new TemplatedMapType(projectType, typeRegistry);
 
         MapType mapType = new MapType(projectType, typeRegistry);
@@ -271,6 +273,20 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         stages.put("default", createStage("default"));
         
         failedInsertHelper("project", grandchild, "Cannot insert record: nested item 'stages/default' conflicts with hidden ancestor path 'project/global/stages/default'");
+    }
+
+    public void testInsertNestedPathDifferentTypeInParent()
+    {
+        insertGlobal();
+        insertTemplateChild();
+
+        MutableRecord grandchild = createGrandchild();
+        MutableRecord stages = (MutableRecord) grandchild.get("stages");
+        MutableRecord stage = specialStageType.createNewRecord(true);
+        stage.put("name", "default");
+        stages.put("default", stage);
+        
+        failedInsertHelper("project", grandchild, "Cannot inserted record: nested item 'stages/default' of type 'specialStage' conflicts with type in parent 'stage'");
     }
 
     private void failedInsertHelper(String path, MutableRecord record, String message)
@@ -1951,6 +1967,19 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         public void addProperty(String name, String value)
         {
             properties.put(name, new Property(name, value));
+        }
+    }
+
+    @SymbolicName("specialStage")
+    public static class SpecialStage extends Stage
+    {
+        public SpecialStage()
+        {
+        }
+
+        public SpecialStage(String name)
+        {
+            super(name);
         }
     }
 }

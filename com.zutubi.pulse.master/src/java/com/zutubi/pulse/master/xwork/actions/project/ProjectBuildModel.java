@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.BuildColumns;
+import com.zutubi.pulse.master.model.BuildReason;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
@@ -36,6 +37,7 @@ public class ProjectBuildModel
     private static final String LABEL_REMAINING = "remaining";
     private static final String LABEL_TIME = "time";
 
+    private static final String REASON_NONE = "none";
     private static final String REVISION_PERSONAL = "personal";
     private static final String REVISION_NONE = "none";
     private static final String TESTS_NONE = "none";
@@ -109,7 +111,15 @@ public class ProjectBuildModel
         }
         else if (column.equals(BuildColumns.KEY_REASON))
         {
-            content = htmlEncode(buildResult.getReason().getSummary());
+            BuildReason reason = buildResult.getReason();
+            if (reason == null)
+            {
+                content = REASON_NONE;
+            }
+            else
+            {
+                content = htmlEncode(reason.getSummary());
+            }
         }
         else if (column.equals(BuildColumns.KEY_REVISION))
         {
@@ -168,7 +178,7 @@ public class ProjectBuildModel
         else if (column.equals(BuildColumns.KEY_TESTS))
         {
             TestResultSummary summary = buildResult.getTestSummary();
-            if (summary.getTotal() == 0)
+            if (summary == null || summary.getTotal() == 0)
             {
                 content = TESTS_NONE;
             }

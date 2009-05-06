@@ -212,6 +212,7 @@
           onload="$page.getProperty('page.onLoad')"
 #end
       >
+      <noscript><ul class="error"><li class="error">The Pulse UI requires JavaScript.</li></ul></noscript>
       <div id="north">
       <div id="header">
         <table>

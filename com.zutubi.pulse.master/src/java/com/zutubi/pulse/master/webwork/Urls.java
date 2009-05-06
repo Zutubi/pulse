@@ -76,9 +76,19 @@ public class Urls
         return dashboardMyBuildDetails(number) + stageName + "/";
     }
 
+    public String dashboardMyBuildLog(String number)
+    {
+        return dashboardMyBuild(number) + "log/";
+    }
+
     public String dashboardMyBuildTests(String number)
     {
         return dashboardMyBuild(number) + "tests/";
+    }
+
+    public String dashboardMyStageLog(String number, String stage)
+    {
+        return dashboardMyBuild(number) + "logs/" + uriComponentEncode(stage) + "/";
     }
 
     public String dashboardMyBuildFile(String number)
@@ -258,6 +268,11 @@ public class Urls
     public String buildLog(BuildResult build)
     {
         return build(build) + "log/";
+    }
+
+    public String buildLog(Object project, String number)
+    {
+        return build(project, number) + "log/";
     }
 
     public String stageLogs(BuildResult build, RecipeResultNode node)

@@ -125,7 +125,7 @@ public class FileSystemUtils
                 // The canonical path tells us where the file really is, and we
                 // double check it is under the directory (using the canonical
                 // path for the directory too).
-                if (file.isDirectory() && canonicalFile.startsWith(canonicalDir))
+                if (file.isDirectory() && canonicalFile.equals(composeFilename(canonicalDir, file.getName())))
                 {
                     if (!rmdir(file))
                     {

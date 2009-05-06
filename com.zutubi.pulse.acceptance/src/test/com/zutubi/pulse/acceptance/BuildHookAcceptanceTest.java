@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -62,7 +63,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, PreBuildHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random, "false");
+        hookForm.nextNamedFormElements(asPair("name", random));
 
         addTask("${project} ${status}");
 
@@ -101,7 +102,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random, "true", null, "false");
+        hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
         addTask(random, "${project} ${some.property}");
@@ -121,7 +122,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random, "true", null, "false");
+        hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
         addTask(random, "${some.property}");
@@ -162,7 +163,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, ManualBuildHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random);
+        hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
 
@@ -180,11 +181,30 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, PreBuildHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random, "false");
+        hookForm.nextNamedFormElements(asPair("name", random));
 
         CompositePage hookPage = addTask("${project} ${status}");
         triggerHook(hookPage, buildNumber);
         assertArgs(PROJECT_NAME, "success");
+    }
+
+    public void testManualTriggerNotAvailableWhenDisabled() throws Exception
+    {
+        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, BUILD_TIMEOUT);
+
+        chooseHookType("zutubi.preBuildHookConfig");
+
+        ConfigurationForm hookForm = new ConfigurationForm(selenium, PreBuildHookConfiguration.class);
+        hookForm.waitFor();
+        hookForm.nextNamedFormElements(asPair("name", random), asPair("allowManualTrigger", "false"));
+
+        CompositePage hookPage = addTask("${project} ${status}");
+        hookPage.goTo();
+        assertFalse(hookPage.isActionPresent(BuildHookConfigurationActions.ACTION_TRIGGER));
+
+        BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, PROJECT_NAME, buildNumber);
+        summaryPage.goTo();
+        assertFalse(summaryPage.isHookPresent(random));
     }
 
     public void testManuallyTriggerPostStageHook() throws Exception
@@ -203,7 +223,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random, "true", null, "true");
+        hookForm.nextNamedFormElements(asPair("name", random), asPair("failOnError", "true"));
 
         selectFromAllTasks();
         ConfigurationForm taskForm = new ConfigurationForm(selenium, RunExecutableTaskConfiguration.class);
@@ -222,7 +242,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random, "false", "error", "false");
+        hookForm.nextNamedFormElements(asPair("name", random), asPair("runForAll", "false"), asPair("runForStates", "error"));
 
         selectFromAllTasks();
         addTask("${project}");
@@ -248,7 +268,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, ManualBuildHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random);
+        hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
 
@@ -271,7 +291,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random, "true", null, "false");
+        hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
     }
@@ -282,7 +302,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm hookForm = new ConfigurationForm(selenium, PostStageHookConfiguration.class);
         hookForm.waitFor();
-        hookForm.nextFormElements(random, "true", null, "true", null, "false");
+        hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromStageTasks();
     }

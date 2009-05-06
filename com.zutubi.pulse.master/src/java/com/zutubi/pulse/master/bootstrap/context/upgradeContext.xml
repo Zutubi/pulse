@@ -48,6 +48,7 @@
                 <ref local="dashboardSortProperties"/>
                 <ref local="buildResultNumberIndex"/>
                 <ref local="userCollapsedProjects"/>
+                <ref local="hookTriggerOptions"/>
                 <ref local="resourceRequirementOptional"/>
                 <ref local="triggerProperties"/>
                 <ref local="globalPostProcessors"/>
@@ -192,6 +193,10 @@
         </property>
     </bean>
 
+    <bean id="hookTriggerOptions" class="com.zutubi.pulse.master.upgrade.tasks.HookTriggerOptionsUpgradeTask">
+        <property name="buildNumber" value="200028003"/>
+    </bean>
+    
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">
         <property name="buildNumber" value="200999001"/>
     </bean>

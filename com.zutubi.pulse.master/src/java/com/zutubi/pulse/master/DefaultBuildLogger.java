@@ -1,19 +1,20 @@
 package com.zutubi.pulse.master;
 
-import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
 import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.logging.Logger;
+import org.apache.ivy.util.AbstractMessageLogger;
+import org.apache.ivy.util.MessageLogger;
 
 import java.io.File;
-
-import org.apache.ivy.util.MessageLogger;
-import org.apache.ivy.util.AbstractMessageLogger;
 
 public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogger
 {
     private static final String PRE_MARKER = "============================[ task output below ]============================";
     private static final String POST_MARKER = "============================[ task output above ]============================";
+
+    private int hookCount = 0;
 
     public DefaultBuildLogger(File logFile)
     {
@@ -22,16 +23,18 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
 
     public void preBuild()
     {
+        hookCount = 0;
         logMarker("Running pre build hooks...");
     }
 
     public void preBuildCompleted()
     {
-        logMarker("Pre build hooks complete.");
+        logMarker(String.format("Pre build hooks complete (%d hook%s run).", hookCount, hookCount == 1 ? "" : "s"));
     }
 
     public void hookCommenced(String name)
     {
+        hookCount++;
         logMarker("Hook '" + name + "' commenced");
         if (writer != null)
         {
@@ -68,12 +71,13 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
 
     public void postBuild()
     {
+        hookCount = 0;
         logMarker("Running post build hooks...");
     }
 
     public void postBuildCompleted()
     {
-        logMarker("Post build hooks complete.");
+        logMarker(String.format("Post build hooks complete (%d hook%s run).", hookCount, hookCount == 1 ? "" : "s"));
     }
 
     public void preIvyPublish()

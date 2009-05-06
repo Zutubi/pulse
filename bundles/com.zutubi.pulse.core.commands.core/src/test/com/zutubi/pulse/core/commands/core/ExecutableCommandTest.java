@@ -218,13 +218,8 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         }
     }
 
-    public void testNoSuchWorkDirOnWindows()
+    public void testNoSuchWorkDir()
     {
-        if(!SystemUtils.IS_WINDOWS)
-        {
-            return;
-        }
-
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
         config.setExe("dir");
         config.setWorkingDir(new File("nosuchworkdir"));
@@ -237,10 +232,28 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         }
         catch (BuildException e)
         {
-            String message = e.getMessage();
-            boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
-            boolean java16 = message.endsWith("The directory name is invalid");
-            assertTrue(java15 || java16);
+            assertEquals("Working directory 'nosuchworkdir' does not exist", e.getMessage());
+        }
+    }
+
+    public void testSpecifiedWorkDirIsFile() throws IOException
+    {
+        File plainFile = new File(baseDir, "f");
+        assertTrue(plainFile.createNewFile());
+
+        ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
+        config.setExe("dir");
+        config.setWorkingDir(new File("f"));
+
+        ExecutableCommand command = new ExecutableCommand(config);
+        try
+        {
+            runCommand(command, 1234);
+            fail("Command with working directory that is a plain file should throw.");
+        }
+        catch (BuildException e)
+        {
+            assertEquals("Working directory 'f' exists, but is not a directory", e.getMessage());
         }
     }
 

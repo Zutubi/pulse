@@ -390,13 +390,17 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         verifyNoMoreInteractions(buildManager);
     }
 
-    public void testAtLeastTwoBuildsRetrieved()
+    public void testTwoBuildsRetrievedButOnlyOneShown()
     {
         config.setBuildsPerProject(1);
-        
-        helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
+
+        stub(buildManager.getLatestBuildResultsForProject((Project) anyObject(), anyInt())).toReturn(Arrays.asList(createBuild(p1, 2), createBuild(p1, 1)));
+        List<ProjectsModel> models = helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
         verify(buildManager).getLatestBuildResultsForProject(p1, 2);
         verifyNoMoreInteractions(buildManager);
+
+        ConcreteProjectModel model = (ConcreteProjectModel) models.get(0).getRoot().getChildren().get(0);
+        assertEquals(1, model.getBuildRows().size());
     }
 
     public void testLabellingOfUngroupedSomeGroups()
@@ -416,6 +420,11 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         ProjectsModel ungroup = projectsModels.get(projectsModels.size() - 1);
         assertFalse(ungroup.isLabelled());
         assertEquals("projects", ungroup.getGroupName());
+    }
+
+    private BuildResult createBuild(Project project, int number)
+    {
+        return new BuildResult(new ManualTriggerBuildReason(), project, number, false);
     }
 
     private List<ProjectsModel> getAllFlatGroups(boolean includeUngrouped)

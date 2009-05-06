@@ -11,7 +11,6 @@ import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
@@ -62,7 +61,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm recipeForm = new ConfigurationForm(selenium, RecipeConfiguration.class, true);
         recipeForm.waitFor();
-        recipeForm.finishFormElements(asMap(asPair("name", RECIPE)));
+        recipeForm.finishNamedFormElements(asPair("name", RECIPE));
 
         waitForRecipePage(random, RECIPE);
     }
@@ -163,7 +162,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm recipeForm = new ConfigurationForm(selenium, RecipeConfiguration.class, true);
         recipeForm.waitFor();
-        recipeForm.finishFormElements(asMap(asPair("name", RECIPE_DEFAULT)));
+        recipeForm.finishNamedFormElements(asPair("name", RECIPE_DEFAULT));
 
         CompositePage recipePage = waitForRecipePage(random, RECIPE_DEFAULT);
         recipePage.clickAction(AccessManager.ACTION_DELETE);

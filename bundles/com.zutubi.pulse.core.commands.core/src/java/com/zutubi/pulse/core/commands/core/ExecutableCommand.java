@@ -4,7 +4,10 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
-import com.zutubi.pulse.core.engine.api.*;
+import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.Reference;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.util.process.ProcessControl;
 import com.zutubi.util.Constants;
 import com.zutubi.util.SystemUtils;
@@ -90,10 +93,6 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             if (message.contains("nosuchexe") || message.endsWith("error=2") || message.contains("error=2,"))
             {
                 message = "No such executable '" + builder.command().get(0) + "'";
-            }
-            else if (message.endsWith("error=267") || message.contains("error=267,"))
-            {
-                message = "Working directory '" + getConfig().getWorkingDir().getPath() + "' does not exist";
             }
 
             throw new BuildException("Unable to create process: " + message, e);
@@ -392,27 +391,36 @@ public class ExecutableCommand extends OutputProducingCommandSupport
      *   b) if it is relative, then it is taken as the directory relative to the base directory.
      *
      * @param baseDir the base directory for the recipe
-     *
      * @return working directory for the command.
+     * @throws BuildException if the user-configured working directory does not
+     *         exist
      */
     protected File getWorkingDir(File baseDir)
     {
         File workingDir = getConfig().getWorkingDir();
         if (workingDir == null)
         {
-            return baseDir;
+            workingDir = baseDir;
         }
         else
         {
-            if (workingDir.isAbsolute())
+            if (!workingDir.isAbsolute())
             {
-                return workingDir;
+                workingDir = new File(baseDir, workingDir.getPath());
             }
-            else
+
+            if (!workingDir.exists())
             {
-                return new File(baseDir, workingDir.getPath());
+                throw new BuildException("Working directory '" + getConfig().getWorkingDir().getPath() + "' does not exist");
+            }
+
+            if (!workingDir.isDirectory())
+            {
+                throw new BuildException("Working directory '" + getConfig().getWorkingDir().getPath() + "' exists, but is not a directory");
             }
         }
+
+        return workingDir;
     }
 
     private void updateChildEnvironment(ExecutionContext context, ProcessBuilder builder)

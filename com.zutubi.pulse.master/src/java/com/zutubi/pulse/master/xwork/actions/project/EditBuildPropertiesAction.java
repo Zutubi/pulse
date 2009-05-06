@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.dependency.DependencyManager;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -25,9 +25,9 @@ import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
 import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.config.NamedConfigurationComparator;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -227,7 +227,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         Project project = getRequiredProject();
 
         Revision r = null;
-        if(TextUtils.stringSet(revision))
+        revision = revision.trim();
+        if (TextUtils.stringSet(revision))
         {
             try
             {

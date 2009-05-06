@@ -10,12 +10,11 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Pair;
 
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -111,22 +110,22 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     private void createMavenProject() throws Exception
     {
-        createMavenProject("zutubi.mavenCommandConfig", asMap(asPair("targets", "install")));
+        createMavenProject("zutubi.mavenCommandConfig", asPair("targets", "install"));
     }
 
     private void createMaven2Project() throws Exception
     {
-        createMavenProject("zutubi.maven2CommandConfig", asMap(asPair("goals", "install")));
+        createMavenProject("zutubi.maven2CommandConfig", asPair("goals", "install"));
     }
 
-    private void createMavenProject(final String commandType, final Map<String, String> fieldValues) throws Exception
+    private void createMavenProject(final String commandType, final Pair<String, String>... fieldValues) throws Exception
     {
         runAddProjectWizard(new DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             @Override
             public void scmState(AddProjectWizard.ScmState form)
             {
-                form.nextFormElements(asMap(asPair("url", Constants.TEST_MAVEN_REPOSITORY)));
+                form.nextNamedFormElements(asPair("url", Constants.TEST_MAVEN_REPOSITORY));
             }
 
             @Override
@@ -138,8 +137,11 @@ public class MavenAcceptanceTest extends SeleniumTestBase
             @Override
             public void commandState(AddProjectWizard.CommandState form)
             {
-                fieldValues.put("name", COMMAND_NAME);
-                form.finishFormElements(fieldValues);
+                @SuppressWarnings({"unchecked"})
+                Pair<String, String> values[] = new Pair[fieldValues.length + 1];
+                System.arraycopy(fieldValues, 0, values, 0, fieldValues.length);
+                fieldValues[fieldValues.length] = new Pair<String, String>("name", COMMAND_NAME);
+                form.finishNamedFormElements(values);
             }
         });
 

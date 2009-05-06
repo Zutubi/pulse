@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
@@ -52,28 +53,32 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         {
             final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
-            // has this user been added yet?.
-            final UserConfiguration user = userManager.getUserConfig(token.getName());
-            if (user == null)
+            final String login = token.getName();
+            if (TextUtils.stringSet(login))
             {
-                LOG.debug("User '" + token.getName() + "' does not exist, asking LDAP manager");
-                AcegiUtils.runAsSystem(new Runnable()
+                // has this user been added yet?.
+                final UserConfiguration user = userManager.getUserConfig(login);
+                if (user == null)
                 {
-                    public void run()
+                    LOG.debug("User '" + login + "' does not exist, asking LDAP manager");
+                    AcegiUtils.runAsSystem(new Runnable()
                     {
-                        tryAutoAdd(token.getName(), (String) token.getCredentials());
-                    }
-                });
-            }
-            else if (user.isAuthenticatedViaLdap())
-            {
-                AcegiUtils.runAsSystem(new Runnable()
+                        public void run()
+                        {
+                            tryAutoAdd(login, (String) token.getCredentials());
+                        }
+                    });
+                }
+                else if (user.isAuthenticatedViaLdap())
                 {
-                    public void run()
+                    AcegiUtils.runAsSystem(new Runnable()
                     {
-                        setRandomPassword(user);
-                    }
-                });
+                        public void run()
+                        {
+                            setRandomPassword(user);
+                        }
+                    });
+                }
             }
         }
 
