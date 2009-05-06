@@ -12,7 +12,7 @@ public class BrowseProjectsActionResolver extends ActionResolverSupport
 {
     public BrowseProjectsActionResolver()
     {
-        super("viewProjects");
+        super("browse");
     }
 
     public List<String> listChildren()

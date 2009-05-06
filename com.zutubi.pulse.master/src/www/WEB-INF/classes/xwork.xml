@@ -81,9 +81,10 @@
             <result name="error" type="velocity">/404.vm</result>
         </action>
 
-        <action name="viewProjects" class="com.zutubi.pulse.master.xwork.actions.project.BrowseAction">
+        <action name="browse" class="com.zutubi.pulse.master.xwork.actions.project.BrowseAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">/view-projects.vm</result>
+            <result name="guest" type="redirect">/login.action</result>
+            <result name="success" type="velocity">/browse.vm</result>
         </action>
 
         <action name="projectAction" class="com.zutubi.pulse.master.xwork.actions.project.ProjectActionAction">
@@ -298,13 +299,13 @@
         <action name="home" class="com.zutubi.pulse.master.xwork.actions.user.DashboardAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/dashboard.vm</result>
-            <result name="guest" type="redirect">/viewProjects.action</result>
+            <result name="guest" type="redirect">/browse.action</result>
         </action>
 
         <action name="my" class="com.zutubi.pulse.master.xwork.actions.user.MyBuildsAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/my-builds.vm</result>
-            <result name="guest" type="redirect">/viewProjects.action</result>
+            <result name="guest" type="redirect">/browse.action</result>
         </action>
     </package>
 
@@ -411,18 +412,22 @@
             <result name="error" type="velocity">/ajax/generic-error-panel.vm</result>
         </global-results>
 
-        <action name="dashboardPanel" class="com.zutubi.pulse.master.xwork.actions.user.DashboardAction">
-            <result name="success" type="velocity">dashboard-panel.vm</result>
-            <result name="error" type="redirect">/</result>
-        </action>
-
         <action name="myBuildsPanel" class="com.zutubi.pulse.master.xwork.actions.user.MyBuildsAction">
             <result name="success" type="velocity">my-builds-panel.vm</result>
             <result name="error" type="redirect">/</result>
         </action>
 
-        <action name="viewProjectsPanel" class="com.zutubi.pulse.master.xwork.actions.project.BrowseAction">
-            <result name="success" type="velocity">view-projects-panel.vm</result>
+        <action name="browseData" class="com.zutubi.pulse.master.xwork.actions.project.BrowseDataAction">
+            <result name="success" type="flexjson">models</result>
+        </action>
+
+        <action name="dashboardData" class="com.zutubi.pulse.master.xwork.actions.user.DashboardDataAction">
+            <result name="success" type="flexjson">model</result>
+        </action>
+
+        <action name="saveProjectsLayout" class="com.zutubi.pulse.master.xwork.actions.project.SaveProjectsLayoutAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="httpheader">200</result>
         </action>
 
         <action name="projectHomePanel" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">

@@ -816,7 +816,8 @@ Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
 
     onRender : function(ct, position){
         ZUTUBI.FormPanel.superclass.onRender.call(this, ct, position);
-        this.layoutTarget = this.form.el.createChild({tag: 'table', cls: 'x-form'}).createChild({tag: 'tbody'});
+        this.form.el.update('<table><tbody></tbody></table>');
+        this.layoutTarget = this.form.el.first().first();
     },
 
     getLayoutTarget: function()
@@ -1814,12 +1815,12 @@ Ext.override(Ext.form.ComboBox, {
     {
         Ext.form.ComboBox.superclass.initEvents.call(this);
         this.keyNav = new Ext.KeyNav(this.el, {
-            "up" : function(e)
+            "up" : function()
             {
                 this.inKeyMode = true;
                 this.selectPrev();
             },
-            "down" : function(e)
+            "down" : function()
             {
                 if (!this.isExpanded())
                 {
@@ -1831,17 +1832,17 @@ Ext.override(Ext.form.ComboBox, {
                     this.selectNext();
                 }
             },
-            "enter" : function(e)
+            "enter" : function()
             {
                 this.onViewClick();
                 this.delayedCheck = true;
                 this.unsetDelayCheck.defer(10, this);
             },
-            "esc" : function(e)
+            "esc" : function()
             {
                 this.collapse();
             },
-            "tab" : function(e)
+            "tab" : function()
             {
                 this.onViewClick(false);
                 return true;
@@ -1884,103 +1885,3 @@ Ext.override(Ext.form.ComboBox, {
         Ext.form.ComboBox.superclass.onKeyUp.call(this, e);
     }
 });
-
-ZUTUBI.ProjectModel = function(key) {
-    this.key = key;
-    this.collapsed = false;
-    this.hidden = false;
-    this.children = [];
-    this.rowCount = 1;
-};
-
-ZUTUBI.ProjectModel.prototype = {
-    addChild: function(child) {
-        this.children.push(child);
-    },
-
-    getEl: function() {
-        return Ext.get(this.key);
-    },
-
-    toggle: function() {
-        if(this.collapsed)
-        {
-            this.expand();
-        }
-        else
-        {
-            this.collapse();
-        }
-    },
-    
-    collapse: function() {
-        if(!this.collapsed)
-        {
-            this.hideDescendents();
-            this.collapsed = true;
-            this.getEl().addClass('project-collapsed');
-        }
-    },
-
-    setRowDisplay: function(display) {
-        Ext.get(this.key).setStyle('display', display);
-        if(this.rowCount > 1)
-        {
-            for(var i = 2; i <= this.rowCount; i++)
-            {
-                Ext.get('b' + i + '.' + this.key).setStyle('display', display);
-            }
-        }
-    },
-
-    hide: function() {
-        if(!this.hidden)
-        {
-            this.setRowDisplay('none');
-            this.hidden = true;
-        }
-
-        if(!this.collapsed)
-        {
-            this.hideDescendents();
-        }
-    },
-
-    hideDescendents: function() {
-        for(var i = 0; i < this.children.length; i++)
-        {
-            var child = this.children[i];
-            child.hide();
-        }
-    },
-
-    expand: function() {
-        if(this.collapsed)
-        {
-            this.showDescendents();
-            this.collapsed = false;
-            this.getEl().removeClass('project-collapsed');
-        }
-    },
-
-    show: function() {
-        if(this.hidden)
-        {
-            this.setRowDisplay('');
-            this.hidden = false;
-        }
-
-        if(!this.collapsed)
-        {
-            this.showDescendents();
-        }
-    },
-
-    showDescendents: function() {
-        for(var i = 0; i < this.children.length; i++)
-        {
-            var child = this.children[i];
-            child.show();
-        }
-    }
-};

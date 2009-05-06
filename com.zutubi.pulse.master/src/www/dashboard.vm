@@ -4,14 +4,52 @@
 <html>
 <head>
     <title>#wwtext("name=dashboard")</title>
+    <script type="text/javascript" src="$base/js/projects.js"></script>
     <script type="text/javascript">
-        #updater("$base/ajax/dashboardPanel.action" "dashboard-panel" $principle)
+        #if($refreshInterval)
+            var refreshInterval = $refreshInterval;
+        #elseif($principle.preferences.refreshingEnabled)
+            var refreshInterval = $principle.preferences.refreshInterval;
+        #else
+            var refreshInterval = 0;
+        #end
 
-        var modelMap = {};
+        var view;
+        var projectsTable;
+        var myChangesTable;
+        var myProjectsChangesTable;
 
-        var toggleModel = function(key) {
-            modelMap[key].toggle();
+        function update(data) {
+            if (data.contactPointsWithErrors)
+            {
+                var center = Ext.get('center');
+                var points = data.contactPointsWithErrors;
+                for (var i = 0; i < points.length; i++)
+                {
+                    center.insertHtml("afterBegin", "<p class='note'>Your contact point '" + Ext.util.Format.htmlEncode(points[i]) + "' has caused a notification error. View its <a href='$base/dashboard/preferences/contacts/" + encodeURIComponent(points[i]) + "/'>configuration</a> for details.</p>");
+                }
+            }
+
+            projectsTable.update(data.projects);
+#if($dashboardConfig.showMyChanges)
+            myChangesTable.update(data.myChanges);
+#end
+#if($dashboardConfig.showProjectChanges)
+            myProjectsChangesTable.update(data.myProjectChanges);
+#end
         }
+
+        Ext.onReady(function() {
+            projectsTable = new ZUTUBI.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $rssEnabled, true);
+#if($dashboardConfig.showMyChanges)
+            myChangesTable = new ZUTUBI.ChangesTable(Ext.get('my.changes'), 'my', '#wwtext("name=my.latest.changes")', false);
+#end
+#if($dashboardConfig.showProjectChanges)
+            myProjectsChangesTable = new ZUTUBI.ChangesTable(Ext.get('project.changes'), 'project', '#wwtext("name=my.project.changes")', true);
+#end
+            view = new ZUTUBI.ActiveView(window.baseUrl + '/ajax/dashboardData.action', refreshInterval, update, window, Ext.get('dashboard-content'), 'Unable to load data.');
+            view.init();
+        });
     </script>
 #if ($rssEnabled)
     <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?userId=$principle.id"/>
@@ -20,8 +58,33 @@
 <body>
     #dashboardTabs("homepage")
 
-    <div id="dashboard-panel">
-        #parse("ajax/dashboard-panel.vm")
+<div id="dashboard-content" style="padding-bottom: 20px;">
+    <span id="projects.toolbar" style="float:right">
+    </span>
+    <h2>
+        :: #wwtext("name=my.projects") ::
+#if($rssEnabled)
+        <a style="border-bottom: none" href="$base/rss.action?userId=$principle.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+#end
+    </h2>
+
+    <div id="projects">
+        <img alt="loading" src="$base/images/inprogress.gif"/> Loading projects...
     </div>
+
+#if($dashboardConfig.showMyChanges)
+    <h2>:: #wwtext("name=my.changes") ::</h2>
+    <div id="my.changes">
+        <img alt="loading" src="$base/images/inprogress.gif"/> Loading changes...
+    </div>
+#end
+
+#if($dashboardConfig.showProjectChanges)
+    <h2>:: #wwtext("name=project.changes") ::</h2>
+    <div id="project.changes">
+        <img alt="loading" src="$base/images/inprogress.gif"/> Loading changes...
+    </div>
+#end
+</div>
 </body>
 </html>

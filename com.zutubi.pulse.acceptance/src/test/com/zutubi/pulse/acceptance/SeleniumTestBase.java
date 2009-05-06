@@ -60,7 +60,7 @@ public class SeleniumTestBase extends PulseTestCase
         port = System.getProperty("pulse.port", "8080");
         xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", Integer.parseInt(port), "/xmlrpc"));
         baseUrl = "http://localhost:" + port + "/";
-        urls = new Urls("");
+        urls = Urls.getBaselessInstance();
         random = getName() + "-" + RandomUtils.randomString(10);
 
         String browser = SeleniumUtils.getSeleniumBrowserProperty();

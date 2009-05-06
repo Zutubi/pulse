@@ -560,7 +560,7 @@ function getAjaxCallback(maskedElement)
             }
         },
 
-        failure: function(response)
+        failure: function(/*response*/)
         {
             try
             {

@@ -350,19 +350,6 @@
     </tr>
 #end
 
-#macro(rssHeadingRow $key $span $rssEnabled $rssUrl $rssId)
-<tr>
-    <th class="heading" #if($span > 1) colspan="$span" #end>
-        <span class="action">
-        #if($rssEnabled == "true")
-            <a class="unadorned" #if($rssId != "")id="$rssId"#end href="$rssUrl"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
-        #end
-        </span>
-        #wwtext("name=$key")
-    </th>
-</tr>
-#end
-
 ##
 ## Outputs a heading cell for a content table
 ##
@@ -730,73 +717,6 @@
 
 #macro(showHideButton $category $id $align)
     <a href="#" class="unadorned" id="${id}_link" onclick="showHideFloat('$category', '$id', '$align'); return false"><img alt="actions" id="${id}_button" class="popdown floating-widget" src="$base/images/default/s.gif"/></a>
-#end
-
-#macro(aggregateResultCell $changelist $myProjects)
-    #set ($selectedResult = "n")
-    #set ($changelistResults = $action.getChangelistResults($changelist))
-    #foreach($result in $changelistResults)
-        #if ($selectedResult == "n")
-            #set($selectedResult = $result)
-        #end
-        #if (!$result.succeeded())
-            #set($selectedResult = $result)
-        #end
-    #end
-
-    #if($myProjects)
-        #set($changeId = "${changelist.id}_projects")
-    #else
-        #set($changeId = "${changelist.id}")
-    #end
-
-    <td id="${changeId}_cell" class="$selectedResult.state.string">
-        #if($selectedResult.succeeded())
-            <img alt="success" src="$base/images/accept.gif"/>
-        #elseif($selectedResult.inProgress())
-            <img alt="in progress" src="$base/images/inprogress.gif"/>
-        #elseif($selectedResult.terminating())
-            <img alt="terminating" src="$base/images/stop.gif"/>
-        #elseif($selectedResult.pending())
-            <img alt="pending" src="$base/images/hourglass.gif"/>
-        #elseif($selectedResult.errored() || $selectedResult.failed())
-            <img alt="failure" src="$base/images/exclamation.gif"/>
-        #else
-            &nbsp;
-        #end
-        #if ($selectedResult == "n")
-            #wwtext("builds.none")
-        #else
-            $selectedResult.state.prettyString
-            #showHideButton("builds" "${changeId}" "tr-br?")
-            <div id="$changeId" style="display: none">
-            <table class="content" style="margin: 0">
-                <tr>
-                    <th class="heading" colspan="4">
-                        <span class="action">
-                            <a href="#" onclick="showHideFloat('builds', '$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
-                        </span>
-                        #wwtext("name=build.results")
-                    </th>
-                </tr>
-                <tr>
-                    #contentHeading("project" 1)
-                    #contentHeading("build id" 1)
-                    #contentHeading("status" 2)
-                </tr>
-            #foreach($result in $changelistResults)
-                <tr>
-                #set($result = $action.getResult($id))
-                    <td class="content"><a href="$urls.projectHome($result.project)">$!webwork.htmlEncode($result.project.name)</a></td>
-                    #assignGlobalResultCssClass($result)
-                    #dynamicRightLinkCell($result.number "$urls.build($result)")
-                    #statusCell($result true)
-                </tr>
-            #end
-        #end
-        </table>
-        </div>
-    </td>
 #end
 
 ##

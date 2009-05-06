@@ -11,17 +11,12 @@ import com.zutubi.tove.config.ConfigurationProvider;
  */
 public class HideDashboardProjectAction extends UserActionSupport
 {
-    private long id;
+    private String projectName;
     private ConfigurationProvider configurationProvider;
 
-    public long getId()
+    public void setProjectName(String projectName)
     {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
+        this.projectName = projectName;
     }
 
     public String execute() throws Exception
@@ -37,7 +32,7 @@ public class HideDashboardProjectAction extends UserActionSupport
         User user = getUser();
         DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
 
-        Project p = projectManager.getProject(id, false);
+        Project p = projectManager.getProject(projectName, false);
         if(p != null)
         {
             dashboardConfig = configurationProvider.deepClone(dashboardConfig);

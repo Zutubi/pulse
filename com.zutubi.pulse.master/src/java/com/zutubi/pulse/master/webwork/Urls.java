@@ -571,4 +571,9 @@ public class Urls
         pathPart = PathUtils.getPath(1, PathUtils.getPathElements(pathPart));
         return fileFileArtifact(Long.toString(artifact.getId()), pathPart);
     }
+
+    public String image(String imageFile)
+    {
+        return base() + "images/" + imageFile;
+    }
 }

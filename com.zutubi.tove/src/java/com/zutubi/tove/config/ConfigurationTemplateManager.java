@@ -2237,7 +2237,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * @param clazz defines the required type of the instance to be retrieved
      * @return instance
      */
-    <T extends Configuration> T getInstance(String path, Class<T> clazz)
+    public <T extends Configuration> T getInstance(String path, Class<T> clazz)
     {
         Configuration instance = getInstance(path);
         if (instance == null)

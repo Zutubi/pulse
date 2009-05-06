@@ -1,9 +1,8 @@
 package com.zutubi.pulse.acceptance.pages;
 
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.thoughtworks.selenium.Selenium;
 
 /**
  * Base class for pages that show projects with their latest status (e.g. the
@@ -45,7 +44,7 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
 
     public void clickProjectAction(String group, String project, String action)
     {
-        selenium.click(getProjectMenuId(group, project));
+        selenium.click(getProjectMenuId(group, project) + "_link");
         SeleniumUtils.waitAndClickId(selenium, getProjectActionId(group, project, action));
     }
 

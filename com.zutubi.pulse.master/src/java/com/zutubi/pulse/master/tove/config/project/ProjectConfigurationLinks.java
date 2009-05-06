@@ -16,7 +16,7 @@ public class ProjectConfigurationLinks
     {
         if (projectConfiguration.isConcrete())
         {
-            Urls urls = new Urls("");
+            Urls urls = Urls.getBaselessInstance();
             String name = projectConfiguration.getName();
             return Arrays.asList(
                     new ConfigurationLink("home", urls.projectHome(name)),

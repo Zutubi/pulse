@@ -3,14 +3,10 @@
 <hibernate-mapping>
     <class name="com.zutubi.pulse.master.model.User" table="LOCAL_USER" lazy="false">
         <cache usage="read-write"/>
-        
+
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
-
-        <property name="enabled" column="ENABLED" type="boolean"/>
-
-        <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
 
         <set name="browseViewCollapsed" table="USER_BROWSE_VIEW_COLLAPSED" lazy="true">
             <key column="USER_ID"/>

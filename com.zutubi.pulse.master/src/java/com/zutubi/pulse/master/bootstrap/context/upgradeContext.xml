@@ -46,6 +46,8 @@
                 <ref local="fixPermanentUsers"/>
                 <ref local="revisionStringLimit"/>
                 <ref local="dashboardSortProperties"/>
+                <ref local="buildResultNumberIndex"/>
+                <ref local="userCollapsedProjects"/>
                 <ref local="resourceRequirementOptional"/>
                 <ref local="triggerProperties"/>
                 <ref local="globalPostProcessors"/>
@@ -175,6 +177,19 @@
 
     <bean id="dashboardSortProperties" class="com.zutubi.pulse.master.upgrade.tasks.AddDashboardSortPropertiesUpgradeTask">
         <property name="buildNumber" value="200027001"/>
+    </bean>
+
+    <bean id="buildResultNumberIndex" class="com.zutubi.pulse.master.upgrade.tasks.BuildResultNumberIndexUpgradeTask">
+        <property name="buildNumber" value="200028001"/>
+    </bean>
+
+    <bean id="userCollapsedProjects" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="200028002"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.28-patch-01.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">

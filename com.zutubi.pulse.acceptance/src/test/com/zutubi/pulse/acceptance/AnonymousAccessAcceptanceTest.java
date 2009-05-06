@@ -46,7 +46,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
         // We should be denied access and redirected to the login page.
         LoginPage loginPage = new LoginPage(selenium, urls);
-        assertTrue(loginPage.isPresent());
+        loginPage.waitFor();
         assertTitle(loginPage);
     }
 

@@ -1,23 +1,36 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.UnaryProcedure;
+import flexjson.JSON;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * JSON-encodable object representing the current state of a template project
+ * and its descendents.
  */
 public class TemplateProjectModel extends ProjectModel
 {
-    private static final ProjectHealth[] SUMMARY_HEALTHS = { ProjectHealth.OK, ProjectHealth.WARNINGS, ProjectHealth.BROKEN };
+    private static final Messages I18N = Messages.getInstance(TemplateProjectModel.class);
+
+    private boolean collapsed;
     private List<ProjectModel> children = new LinkedList<ProjectModel>();
 
-    public TemplateProjectModel(ProjectsModel group, String name)
+    public TemplateProjectModel(ProjectsModel group, String name, boolean collapsed)
     {
         super(group, name);
+        this.collapsed = collapsed;
     }
 
+    public boolean isCollapsed()
+    {
+        return collapsed;
+    }
+
+    @JSON
     public List<ProjectModel> getChildren()
     {
         return children;
@@ -29,27 +42,17 @@ public class TemplateProjectModel extends ProjectModel
         child.setParent(this);
     }
 
-    public ProjectHealth[] getSummaryHealths()
-    {
-        return SUMMARY_HEALTHS;
-    }
-
     public boolean isConcrete()
     {
         return false;
     }
 
-    public boolean isLeaf()
-    {
-        return children.size() == 0;
-    }
-
-    public ProjectHealth getHealth()
+    public ProjectHealth latestHealth()
     {
         ProjectHealth health = ProjectHealth.UNKNOWN;
         for (ProjectModel child: children)
         {
-            ProjectHealth childHealth = child.getHealth();
+            ProjectHealth childHealth = child.latestHealth();
             if(childHealth.ordinal() > health.ordinal())
             {
                 health = childHealth;
@@ -59,7 +62,39 @@ public class TemplateProjectModel extends ProjectModel
         return health;
     }
 
-    public ResultState getLatestState()
+    public int getOkCount()
+    {
+        return getCount(ProjectHealth.OK);
+    }
+
+    public int getWarningCount()
+    {
+        return getCount(ProjectHealth.WARNINGS);
+    }
+
+    public int getBrokenCount()
+    {
+        return getCount(ProjectHealth.BROKEN);
+    }
+
+    public String getBuilding()
+    {
+        int count = getCount(ResultState.IN_PROGRESS);
+        if (count == 0)
+        {
+            return I18N.format("builds.inprogress.none");
+        }
+        else if (count == 1)
+        {
+            return I18N.format("builds.inprogress.one");
+        }
+        else
+        {
+            return I18N.format("builds.inprogress", count);
+        }
+    }
+    
+    public ResultState latestState()
     {
         return null;
     }

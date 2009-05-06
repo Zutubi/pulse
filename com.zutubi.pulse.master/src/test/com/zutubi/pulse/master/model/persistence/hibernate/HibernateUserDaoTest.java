@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
+import com.zutubi.pulse.master.model.LabelProjectTuple;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.UserDao;
 
@@ -28,6 +29,8 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
     {
         User user = new User();
         user.setEnabled(true);
+        user.getBrowseViewCollapsed().add(new LabelProjectTuple("label", 123));
+        user.getDashboardCollapsed().add(new LabelProjectTuple("", 0));
         userDao.save(user);
         commitAndRefreshTransaction();
 

@@ -76,6 +76,11 @@
            eternal="true"
            overflowToDisk="false"/>
 
+    <cache name="com.zutubi.pulse.master.model.LabelProjectTuple"
+           maxElementsInMemory="10000"
+           eternal="true"
+           overflowToDisk="false"/>
+
     <cache name="com.zutubi.pulse.master.model.ProjectGroup"
            maxElementsInMemory="100"
            eternal="true"
@@ -95,5 +100,4 @@
            maxElementsInMemory="1000"
            eternal="true"
            overflowToDisk="false"/>
-
 </ehcache>

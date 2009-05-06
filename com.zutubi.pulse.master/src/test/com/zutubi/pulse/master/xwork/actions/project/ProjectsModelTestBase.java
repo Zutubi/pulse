@@ -1,22 +1,26 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
-import java.util.List;
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ProjectsModelTestBase extends PulseTestCase
 {
     private long nextId = 1;
 
+    protected ProjectsSummaryConfiguration config;
+    protected Urls urls = Urls.getBaselessInstance();
     private Map<String, ProjectsModel> groups = new HashMap<String, ProjectsModel>();
 
     protected void assertProjectsModelLists(List<ProjectsModel> expectedModels, List<ProjectsModel> gotModels)
@@ -67,27 +71,27 @@ public class ProjectsModelTestBase extends PulseTestCase
 
     protected void assertConcreteModels(ConcreteProjectModel expected, ConcreteProjectModel got)
     {
-        assertSame(expected.getProject(), got.getProject());
+        assertSame(expected.getName(), got.getName());
     }
 
     protected ProjectsModel createGroup(String label)
     {
         if (!groups.containsKey(label))
         {
-            groups.put(label, new ProjectsModel(label, label != null));
+            groups.put(label, new ProjectsModel(label, label != null, false));
         }
         return groups.get(label);
     }
 
     protected ConcreteProjectModel createConcrete(ProjectsModel group, Project project)
     {
-        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), 0);
+        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), config, urls, true, true);
     }
 
     protected TemplateProjectModel createTemplates(String label, String projectName, Object... members)
     {
         ProjectsModel group = createGroup(label);
-        TemplateProjectModel root = new TemplateProjectModel(null, projectName);
+        TemplateProjectModel root = new TemplateProjectModel(null, projectName, false);
         for (Object member : members)
         {
             if (member instanceof String)
