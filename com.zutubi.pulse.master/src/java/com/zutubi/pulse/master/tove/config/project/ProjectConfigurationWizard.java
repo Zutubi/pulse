@@ -17,6 +17,7 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
@@ -35,11 +36,22 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 {
     private static final Logger LOG = Logger.getLogger(ProjectConfigurationWizard.class);
 
+    public static final String DEPENDENCY_TRIGGER = "dependency trigger";
+    public static final String SCM_TRIGGER = "scm trigger";
     public static final String DEFAULT_STAGE = "default";
     public static final String DEFAULT_RECIPE = "default";
     public static final String DEFAULT_COMMAND = "build";
 
+    private static final String PROPERTY_COMMANDS = "commands";
+    private static final String PROPERTY_DEFAULT_RECIPE = "defaultRecipe";
+    private static final String PROPERTY_NAME = "name";
+    private static final String PROPERTY_PRIMARY_TYPE = "primaryType";
     private static final String PROPERTY_PROJECT_REQUIREMENTS = "requirements";
+    private static final String PROPERTY_RECIPES = "recipes";
+    private static final String PROPERTY_SCM = "scm";
+    private static final String PROPERTY_STAGES = "stages";
+    private static final String PROPERTY_TRIGGERS = "triggers";
+    private static final String PROPERTY_TYPE = "type";
 
     private CompositeType projectType;
     private CompositeType scmType;
@@ -109,7 +121,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         commandType = typeRegistry.getType(CommandConfiguration.class);
 
         List<AbstractChainableState> states = addWizardStates(null, parentPath, projectType, templateParentRecord);
-        states = addWizardStates(states, null, scmType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("scm")));
+        states = addWizardStates(states, null, scmType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get(PROPERTY_SCM)));
 
         ProjectConfiguration templateParent = templateParentPath == null ? null : configurationProvider.get(templateParentPath, ProjectConfiguration.class);
         if (templateParent != null && templateParent.getType() != null)
@@ -125,7 +137,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             }
             else
             {
-                addWizardStates(states, null, typeType, (TemplateRecord) templateParentRecord.get("type"));
+                addWizardStates(states, null, typeType, (TemplateRecord) templateParentRecord.get(PROPERTY_TYPE));
             }
         }
         else
@@ -134,7 +146,6 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             SpringComponentContext.autowire(typeSelectState);
             addWizardState(states, typeSelectState);
         }
-
     }
 
     private TemplateRecord getSingleCommandTemplate(TypeConfiguration configuredType)
@@ -162,23 +173,24 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 
         MutableRecord record = projectType.createNewRecord(false);
         record.update(getCompletedStateForType(projectType).getDataRecord());
-        record.put("scm", getCompletedStateForType(scmType).getDataRecord());
+        record.put(PROPERTY_SCM, getCompletedStateForType(scmType).getDataRecord());
 
         ProjectConfiguration templateParentProject = configurationProvider.get(templateParentPath, ProjectConfiguration.class);
-        if (templateParentProject.getStages().size() == 0)
+        if (templateParentProject.getStages().size() == 0 &&
+            configurationTemplateManager.findAncestorPath(PathUtils.getPath(templateParentPath, PROPERTY_STAGES, DEFAULT_STAGE)) == null)
         {
             // Add a default stage to our new project.
-            CollectionType stagesType = (CollectionType) projectType.getProperty("stages").getType();
+            CollectionType stagesType = (CollectionType) projectType.getProperty(PROPERTY_STAGES).getType();
             CompositeType stageType = (CompositeType) stagesType.getTargetType();
             MutableRecord stagesRecord = stagesType.createNewRecord(true);
             MutableRecord stageRecord = stageType.createNewRecord(true);
-            stageRecord.put("name", DEFAULT_STAGE);
+            stageRecord.put(PROPERTY_NAME, DEFAULT_STAGE);
             stagesRecord.put(DEFAULT_STAGE, stageRecord);
-            record.put("stages", stagesRecord);
+            record.put(PROPERTY_STAGES, stagesRecord);
         }
 
-        ensureTrigger(record, templateParentProject, ScmBuildTriggerConfiguration.class, "scm trigger");
-        ensureTrigger(record, templateParentProject, DependentBuildTriggerConfiguration.class, "dependency trigger");
+        ensureTrigger(record, templateParentProject, ScmBuildTriggerConfiguration.class, SCM_TRIGGER);
+        ensureTrigger(record, templateParentProject, DependentBuildTriggerConfiguration.class, DEPENDENCY_TRIGGER);
 
         MutableRecord typeRecord = null;
 
@@ -198,7 +210,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         }
         else
         {
-            String primaryType = (String) typeSelectionState.getDataRecord().get("primaryType");
+            String primaryType = (String) typeSelectionState.getDataRecord().get(PROPERTY_PRIMARY_TYPE);
             if (primaryType.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))
             {
                 typeRecord = createSingleCommandType(templateParentProject);
@@ -217,7 +229,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 
         if (typeRecord != null)
         {
-            record.put("type", typeRecord);
+            record.put(PROPERTY_TYPE, typeRecord);
         }
 
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
@@ -277,15 +289,15 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         }
 
         MutableRecord typeRecord = createMultiRecipeType();
-        typeRecord.put("defaultRecipe", DEFAULT_RECIPE);
+        typeRecord.put(PROPERTY_DEFAULT_RECIPE, DEFAULT_RECIPE);
 
         MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
-        recipeRecord.put("name", DEFAULT_RECIPE);
-        MutableRecord commandsRecord = (MutableRecord) recipeRecord.get("commands");
+        recipeRecord.put(PROPERTY_NAME, DEFAULT_RECIPE);
+        MutableRecord commandsRecord = (MutableRecord) recipeRecord.get(PROPERTY_COMMANDS);
         Record commandRenderRecord = commandState.getRenderRecord();
-        commandsRecord.put((String) commandRenderRecord.get("name"), commandDataRecord);
+        commandsRecord.put((String) commandRenderRecord.get(PROPERTY_NAME), commandDataRecord);
 
-        MutableRecord recipesRecord = (MutableRecord) typeRecord.get("recipes");
+        MutableRecord recipesRecord = (MutableRecord) typeRecord.get(PROPERTY_RECIPES);
         recipesRecord.put(DEFAULT_RECIPE, recipeRecord);
         return typeRecord;
     }
@@ -297,31 +309,31 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 
     private <T extends TriggerConfiguration> void ensureTrigger(MutableRecord record, ProjectConfiguration project, Class<T> triggerType, String name)
     {
-        if (!hasTrigger(project, triggerType))
+        if (!hasTrigger(project, triggerType, name) && configurationTemplateManager.findAncestorPath(PathUtils.getPath(templateParentPath, PROPERTY_TRIGGERS, name)) == null)
         {
-            CollectionType triggersType = (CollectionType) projectType.getProperty("triggers").getType();
-            if (!record.containsKey("triggers"))
+            CollectionType triggersType = (CollectionType) projectType.getProperty(PROPERTY_TRIGGERS).getType();
+            if (!record.containsKey(PROPERTY_TRIGGERS))
             {
                 MutableRecord triggersRecord = triggersType.createNewRecord(true);
-                record.put("triggers", triggersRecord);
+                record.put(PROPERTY_TRIGGERS, triggersRecord);
             }
-            MutableRecord triggersRecord = (MutableRecord) record.get("triggers");
+            MutableRecord triggersRecord = (MutableRecord) record.get(PROPERTY_TRIGGERS);
 
             CompositeType triggerCompositeType = typeRegistry.getType(triggerType);
 
             MutableRecord triggerRecord = triggerCompositeType.createNewRecord(true);
-            triggerRecord.put("name", name);
+            triggerRecord.put(PROPERTY_NAME, name);
             triggersRecord.put(name, triggerRecord);
         }
     }
 
-    private <T extends TriggerConfiguration> boolean hasTrigger(ProjectConfiguration project, Class<T> triggerType)
+    private <T extends TriggerConfiguration> boolean hasTrigger(ProjectConfiguration project, Class<T> triggerType, String triggerName)
     {
         @SuppressWarnings("unchecked")
-        Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) project.getExtensions().get("triggers");
+        Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) project.getExtensions().get(PROPERTY_TRIGGERS);
         for (TriggerConfiguration trigger : triggers.values())
         {
-            if (trigger.getClass() == triggerType)
+            if (trigger.getClass() == triggerType || triggerName.equals(trigger.getName()))
             {
                 return true;
             }

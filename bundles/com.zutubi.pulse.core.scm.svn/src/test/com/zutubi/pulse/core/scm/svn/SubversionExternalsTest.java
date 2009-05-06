@@ -6,6 +6,9 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import org.tmatesoft.svn.core.SVNDepth;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.wc.SVNClientManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,8 +18,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- */
 public class SubversionExternalsTest extends PulseTestCase
 {
     private SubversionClient server;
@@ -219,6 +220,18 @@ public class SubversionExternalsTest extends PulseTestCase
         assertFile("pull1/file1", "");
         assertFile("pull1/file2", "");
         assertFile("pull2/file2", "");
+    }
+
+    public void testGetLatestRevisionLatestInExternal() throws ScmException, IOException, SVNException
+    {
+        doCheckout(8);
+
+        File f1 = new File(checkoutDir, "pull1/file1");
+        FileSystemUtils.createFile(f1, "edit in external");
+        SVNClientManager clientManager = SVNClientManager.newInstance();
+        clientManager.getCommitClient().doCommit(new File[] { f1 }, true, "edit ext", null, null, false, false, SVNDepth.EMPTY);
+        
+        assertEquals("9", server.getLatestRevision(null).getRevisionString());
     }
 
     private void doCheckout(int rev) throws ScmException
