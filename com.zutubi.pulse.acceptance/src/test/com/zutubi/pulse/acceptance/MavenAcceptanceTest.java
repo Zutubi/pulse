@@ -140,7 +140,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
                 @SuppressWarnings({"unchecked"})
                 Pair<String, String> values[] = new Pair[fieldValues.length + 1];
                 System.arraycopy(fieldValues, 0, values, 0, fieldValues.length);
-                fieldValues[fieldValues.length] = new Pair<String, String>("name", COMMAND_NAME);
+                values[fieldValues.length] = new Pair<String, String>("name", COMMAND_NAME);
                 form.finishNamedFormElements(values);
             }
         });
