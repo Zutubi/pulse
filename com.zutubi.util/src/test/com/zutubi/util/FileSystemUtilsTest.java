@@ -826,6 +826,165 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertEquals(expected, FileSystemUtils.getNormalisedAbsolutePath(new File("one", File.separator + getOtherSeparator() + "two" + File.separator)));
     }
 
+    public void testRmdirNormal() throws IOException
+    {
+        File dir = new File(tmpDir, "dir");
+        createDirectoryLayout(dir);
+        
+        assertTrue(FileSystemUtils.rmdir(dir));
+        assertFalse(dir.exists());
+    }
+
+    public void testRmdirWholeDirectoryUnderSymlink() throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            File linkTarget = new File(tmpDir, "target");
+            assertTrue(linkTarget.mkdir());
+
+            File dir = new File(linkTarget, "dir");
+            createDirectoryLayout(dir);
+
+            File link = new File(tmpDir, "link");
+            FileSystemUtils.createSymlink(link, linkTarget);
+
+            File underLink = new File(link, "dir");
+            assertTrue(FileSystemUtils.rmdir(underLink));
+            assertFalse(underLink.exists());
+            assertFalse(dir.exists());
+            assertTrue(link.exists());
+            assertTrue(linkTarget.exists());
+        }
+    }
+
+    public void testRmdirDirectoryContainsSymlinkToOutside() throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            File linkTarget = new File(tmpDir, "target");
+            assertTrue(linkTarget.mkdir());
+
+            File dir = new File(tmpDir, "dir");
+            createDirectoryLayout(dir);
+
+            File link = new File(dir, "link");
+            FileSystemUtils.createSymlink(link, linkTarget);
+
+            assertTrue(FileSystemUtils.rmdir(dir));
+            assertFalse(link.exists());
+            assertFalse(dir.exists());
+            assertTrue(linkTarget.exists());
+        }
+    }
+
+    public void testRmdirDirectoryContainsSymlinkToSibling() throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            File dir = new File(tmpDir, "dir");
+            createDirectoryLayout(dir);
+
+            File linkTarget = new File(dir, "target");
+            assertTrue(linkTarget.mkdir());
+
+            File link = new File(dir, "link");
+            FileSystemUtils.createSymlink(link, linkTarget);
+
+            assertTrue(FileSystemUtils.rmdir(dir));
+            assertFalse(dir.exists());
+        }
+    }
+
+    public void testRmdirDirectoryContainsSymlinkToUnderSibling() throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            File dir = new File(tmpDir, "dir");
+            createDirectoryLayout(dir);
+
+            File sibling = new File(dir, "sibling");
+            assertTrue(sibling.mkdir());
+            File linkTarget = new File(sibling, "target");
+            assertTrue(linkTarget.mkdir());
+
+            File link = new File(dir, "link");
+            FileSystemUtils.createSymlink(link, linkTarget);
+
+            assertTrue(FileSystemUtils.rmdir(dir));
+            assertFalse(dir.exists());
+        }
+    }
+
+    public void testRmdirDirectoryContainsSymlinkToParent() throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            File dir = new File(tmpDir, "dir");
+            createDirectoryLayout(dir);
+
+            File parent = new File(dir, "parent");
+            assertTrue(parent.mkdir());
+
+            File link = new File(parent, "link");
+            FileSystemUtils.createSymlink(link, parent);
+
+            assertTrue(FileSystemUtils.rmdir(dir));
+            assertFalse(dir.exists());
+        }
+    }
+
+    public void testRmdirDirectoryContainsSymlinkToAncestor() throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            File dir = new File(tmpDir, "dir");
+            createDirectoryLayout(dir);
+
+            File ancestor = new File(dir, "ancestor");
+            assertTrue(ancestor.mkdir());
+            File parent = new File(ancestor, "parent");
+            assertTrue(parent.mkdir());
+
+            File link = new File(parent, "link");
+            FileSystemUtils.createSymlink(link, ancestor);
+
+            assertTrue(FileSystemUtils.rmdir(dir));
+            assertFalse(dir.exists());
+        }
+    }
+
+    public void testRmdirDirectoryContainsSymlinkToDir() throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            File dir = new File(tmpDir, "dir");
+            createDirectoryLayout(dir);
+
+            File parent = new File(dir, "parent");
+            assertTrue(parent.mkdir());
+
+            File link = new File(parent, "link");
+            FileSystemUtils.createSymlink(link, dir);
+
+            assertTrue(FileSystemUtils.rmdir(dir));
+            assertFalse(dir.exists());
+        }
+    }
+
+    private void createDirectoryLayout(File dir) throws IOException
+    {
+        File file1 = new File(dir, "f1");
+        File file2 = new File(dir, "f2");
+        File nestedDir = new File(dir, "nest");
+        File nestedFile = new File(nestedDir, "f");
+
+        assertTrue(dir.mkdir());
+        assertTrue(file1.createNewFile());
+        FileSystemUtils.createFile(file2, "some content\nin this file\n");
+        assertTrue(nestedDir.mkdir());
+        FileSystemUtils.createFile(nestedFile, "yay");
+    }
+
     private String getOtherSeparator()
     {
         if (File.separatorChar == '/')
