@@ -6,30 +6,26 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.cleanup.DeleteFileProcessor;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.model.persistence.ArtifactDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- *
- *
+ * The build manager interface implementation.
  */
 public class DefaultBuildManager implements BuildManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultBuildManager.class);
-
-    private static final String DEAD_DIR_SUFFIX = ".dead";
 
     private BuildResultDao buildResultDao;
     private ArtifactDao artifactDao;
@@ -39,35 +35,13 @@ public class DefaultBuildManager implements BuildManager
     private PulseThreadFactory threadFactory;
     private DatabaseConsole databaseConsole;
 
-    private BlockingQueue<CleanupRequest> cleanupQueue = new LinkedBlockingQueue<CleanupRequest>();
+    private DeleteFileProcessor deleteFileProcessor;
 
     public void init()
     {
-        Thread cleanupThread = threadFactory.newThread(new Runnable()
-        {
-            @SuppressWarnings({"InfiniteLoopStatement"})
-            public void run()
-            {
-                while(true)
-                {
-                    try
-                    {
-                        CleanupRequest request = cleanupQueue.take();
-                        if(request.dir.exists() && !FileSystemUtils.rmdir(request.dir))
-                        {
-                            LOG.warning("Unable to remove directory '" + request.dir.getAbsolutePath() + "'");
-                        }
-                    }
-                    catch (InterruptedException e)
-                    {
-                        LOG.warning(e);
-                    }
-                }
-            }
-        }, "Build Cleanup Service");
-
-        cleanupThread.setDaemon(true);
-        cleanupThread.start();
+        deleteFileProcessor = new DeleteFileProcessor();
+        deleteFileProcessor.setThreadFactory(threadFactory);
+        deleteFileProcessor.init();
 
         // CIB-1147: detect and remove old .dead dirs on restart.
         cleanupDeadDirectories();
@@ -92,13 +66,13 @@ public class DefaultBuildManager implements BuildManager
                 {
                     public boolean accept(File f)
                     {
-                        return f.isDirectory() && f.getName().endsWith(DEAD_DIR_SUFFIX);
+                        return f.isDirectory() && f.getName().endsWith(DeleteFileProcessor.SUFFIX);
                     }
                 });
 
                 for(File dead: deadDirs)
                 {
-                    scheduleDeadCleanup(dead);
+                    scheduleCleanup(dead);
                 }
             }
         }
@@ -521,7 +495,7 @@ public class DefaultBuildManager implements BuildManager
         if(build.isPersonal())
         {
             File patch = paths.getUserPatchFile(build.getUser().getId(), build.getNumber());
-            patch.delete();
+            scheduleCleanup(patch);
         }
         else
         {
@@ -563,18 +537,11 @@ public class DefaultBuildManager implements BuildManager
 
     private void scheduleCleanup(File dir)
     {
-        File dead = new File(dir + DEAD_DIR_SUFFIX);
-        dir.renameTo(dead);
-        scheduleDeadCleanup(dead);
-    }
-
-    private void scheduleDeadCleanup(File dead)
-    {
         try
         {
-            cleanupQueue.put(new CleanupRequest(dead));
+            deleteFileProcessor.delete(dir);
         }
-        catch (InterruptedException e)
+        catch (IOException e)
         {
             LOG.warning(e);
         }
@@ -603,15 +570,5 @@ public class DefaultBuildManager implements BuildManager
     public void setThreadFactory(PulseThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
-    }
-
-    private class CleanupRequest
-    {
-        private File dir;
-
-        public CleanupRequest(File dir)
-        {
-            this.dir = dir;
-        }
     }
 }
