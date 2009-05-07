@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.cleanup.DeleteFileProcessor;
+import com.zutubi.pulse.master.cleanup.FileDeletionService;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.model.persistence.ArtifactDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
@@ -17,7 +17,6 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -35,13 +34,13 @@ public class DefaultBuildManager implements BuildManager
     private PulseThreadFactory threadFactory;
     private DatabaseConsole databaseConsole;
 
-    private DeleteFileProcessor deleteFileProcessor;
+    private FileDeletionService fileDeletionService;
 
     public void init()
     {
-        deleteFileProcessor = new DeleteFileProcessor();
-        deleteFileProcessor.setThreadFactory(threadFactory);
-        deleteFileProcessor.init();
+        fileDeletionService = new FileDeletionService();
+        fileDeletionService.setThreadFactory(threadFactory);
+        fileDeletionService.init();
 
         // CIB-1147: detect and remove old .dead dirs on restart.
         cleanupDeadDirectories();
@@ -66,7 +65,7 @@ public class DefaultBuildManager implements BuildManager
                 {
                     public boolean accept(File f)
                     {
-                        return f.isDirectory() && f.getName().endsWith(DeleteFileProcessor.SUFFIX);
+                        return fileDeletionService.wasScheduledForDeletion(f);
                     }
                 });
 
@@ -537,14 +536,7 @@ public class DefaultBuildManager implements BuildManager
 
     private void scheduleCleanup(File dir)
     {
-        try
-        {
-            deleteFileProcessor.delete(dir);
-        }
-        catch (IOException e)
-        {
-            LOG.warning(e);
-        }
+        fileDeletionService.delete(dir);
     }
 
     public void setChangelistDao(ChangelistDao changelistDao)
