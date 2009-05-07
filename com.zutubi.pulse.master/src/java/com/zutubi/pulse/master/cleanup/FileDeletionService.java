@@ -1,12 +1,14 @@
 package com.zutubi.pulse.master.cleanup;
 
-import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.i18n.Messages;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 /**
  * The delete file processor, as the name suggests, handles the deletion of
@@ -19,33 +21,15 @@ import java.util.concurrent.*;
  * <p/>
  * Secondly, it allows the deletion to occur across Pulse restarts.
  */
-public class DeleteFileProcessor implements Stoppable
+public class FileDeletionService extends BackgroundServiceSupport
 {
-    public static final String SUFFIX = ".dead";
+    private static final Messages I18N = Messages.getInstance(FileDeletionService.class);
 
-    private static final int DELETE_THREAD_COUNT = 1;
+    public static final String SUFFIX = "." + I18N.format("suffix");
 
-    private ThreadPoolExecutor executor = null;
-    private ThreadFactory threadFactory = Executors.defaultThreadFactory();
-
-    /**
-     * Initialise the processor
-     */
-    public void init()
+    public FileDeletionService()
     {
-        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DELETE_THREAD_COUNT, threadFactory);
-    }
-
-    public void stop(boolean force)
-    {
-        if (force)
-        {
-            executor.shutdownNow();
-        }
-        else
-        {
-            executor.shutdown();
-        }
+        super(I18N.format("service.name"));
     }
 
     /**
@@ -53,35 +37,44 @@ public class DeleteFileProcessor implements Stoppable
      * point in the future.
      *
      * @param file to be deleted.
-     *
-     * @return a Future representing pending completion of the deletion.
-     *
-     * @throws IOException on error
+     * @return a Future representing pending completion of the deletion.  The
+     *         future will return true if the file has been deleted or no longer
+     *         does exists, false otherwise.
      */
-    public Future<Boolean> delete(File file) throws IOException
+    public Future<Boolean> delete(File file)
     {
+        if (file == null)
+        {
+            throw new IllegalArgumentException(I18N.format("delete.null.exception"));
+        }
+
+        if (!file.exists())
+        {
+            FutureTask<Boolean> task = new FutureTask<Boolean>(new ReturnBoolean(true));
+            task.run();
+            return task;
+        }
+
         // only rename the file if it has not already been renamed.
         if (!file.getName().endsWith(SUFFIX))
         {
             File dest = determineRenamedFile(file);
-            if (!file.renameTo(dest))
+            if (file.renameTo(dest))
             {
-                // if rename fails, maybe we should try to delete it inline?
-                throw new IOException("Failed to rename file from '" + file.getCanonicalPath() + "' to '" + dest.getCanonicalPath() + "'");
-            }
-            file = dest;
+                file = dest;
+            } // else rename fails, but should not prevent us from scheduling the deletion.
         }
 
         return scheduleDeletion(file);
     }
 
-    public void setThreadFactory(ThreadFactory threadFactory)
+    public boolean wasScheduledForDeletion(File f)
     {
-        this.threadFactory = threadFactory;
+        return f.getName().endsWith(SUFFIX);
     }
 
     /**
-     * Determine a sutable name to rename this file to prior to deletion.  The
+     * Determine a suitable name to rename this file to prior to deletion.  The
      * criteria are that a) the file does not exist, b) the file name has the
      * suffix '.dead' so that it can later be identified as a file/directory that
      * we attempted to delete at some stage, and hence is safe to delete.
@@ -92,17 +85,17 @@ public class DeleteFileProcessor implements Stoppable
     private File determineRenamedFile(File file)
     {
         int i = 1;
-        File dest = new File(file.getParentFile(), file.getName() + SUFFIX);
+        File dest = new File(file.getAbsolutePath() + SUFFIX);
         while (dest.exists())
         {
-            dest = new File(file.getParentFile(), file.getName() + RandomUtils.randomString(i++) + SUFFIX);
+            dest = new File(file.getAbsolutePath() + RandomUtils.randomString(i++) + SUFFIX);
         }
         return dest;
     }
 
     private Future<Boolean> scheduleDeletion(File file)
     {
-        return executor.submit(new Delete(file));
+        return getExecutorService().submit(new Delete(file));
     }
 
     private class Delete implements Callable<Boolean>
@@ -128,6 +121,21 @@ public class DeleteFileProcessor implements Stoppable
                 }
             }
             return true;
+        }
+    }
+
+    private class ReturnBoolean implements Callable<Boolean>
+    {
+        private boolean b;
+
+        private ReturnBoolean(boolean b)
+        {
+            this.b = b;
+        }
+
+        public Boolean call() throws Exception
+        {
+            return b;
         }
     }
 }
