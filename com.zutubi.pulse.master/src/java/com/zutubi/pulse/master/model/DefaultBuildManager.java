@@ -1,11 +1,15 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.pulse.core.dependency.ivy.IvyClient;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.MasterBuildPaths;
+import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.cleanup.FileDeletionService;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.model.persistence.ArtifactDao;
@@ -13,10 +17,18 @@ import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
+import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.util.RandomUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -34,7 +46,11 @@ public class DefaultBuildManager implements BuildManager
     private PulseThreadFactory threadFactory;
     private DatabaseConsole databaseConsole;
 
+    private RepositoryAuthenticationProvider repositoryAuthenticationProvider;
     private FileDeletionService fileDeletionService;
+
+    private IvyManager ivyManager;
+    private MasterLocationProvider masterLocationProvider;
 
     public void init()
     {
@@ -59,7 +75,7 @@ public class DefaultBuildManager implements BuildManager
                 }
             });
 
-            for(File projectDir: projectDirs)
+            for (File projectDir : projectDirs)
             {
                 File[] deadDirs = projectDir.listFiles(new FileFilter()
                 {
@@ -69,7 +85,7 @@ public class DefaultBuildManager implements BuildManager
                     }
                 });
 
-                for(File dead: deadDirs)
+                for (File dead : deadDirs)
                 {
                     scheduleCleanup(dead);
                 }
@@ -170,15 +186,15 @@ public class DefaultBuildManager implements BuildManager
 
     public BuildResult getByProjectAndVirtualId(Project project, String buildId)
     {
-        if(isLatest(buildId))
+        if (isLatest(buildId))
         {
             return getLatestBuildResult(project);
         }
-        else if(isLatestSuccessful(buildId))
+        else if (isLatestSuccessful(buildId))
         {
             return getLatestSuccessfulBuildResult(project);
         }
-        else if(isLatestBroken(buildId))
+        else if (isLatestBroken(buildId))
         {
             return extractResult(queryBuilds(project, ResultState.getBrokenStates(), -1, -1, 1, 1, true, true));
         }
@@ -189,7 +205,7 @@ public class DefaultBuildManager implements BuildManager
                 long id = Long.parseLong(buildId);
                 return getByProjectAndNumber(project, id);
             }
-            catch(NumberFormatException e)
+            catch (NumberFormatException e)
             {
                 return null;
             }
@@ -198,7 +214,7 @@ public class DefaultBuildManager implements BuildManager
 
     private BuildResult extractResult(List<BuildResult> results)
     {
-        if(results.size() > 0)
+        if (results.size() > 0)
         {
             return results.get(0);
         }
@@ -230,15 +246,15 @@ public class DefaultBuildManager implements BuildManager
 
     public BuildResult getByUserAndVirtualId(User user, String buildId)
     {
-        if(isLatest(buildId))
+        if (isLatest(buildId))
         {
             return getLatestBuildResult(user);
         }
-        else if(isLatestSuccessful(buildId))
+        else if (isLatestSuccessful(buildId))
         {
-            return extractResult(buildResultDao.getLatestByUser(user, new ResultState[]{ ResultState.SUCCESS}, 1));
+            return extractResult(buildResultDao.getLatestByUser(user, new ResultState[]{ResultState.SUCCESS}, 1));
         }
-        else if(isLatestBroken(buildId))
+        else if (isLatestBroken(buildId))
         {
             return extractResult(buildResultDao.getLatestByUser(user, ResultState.getBrokenStates(), 1));
         }
@@ -249,7 +265,7 @@ public class DefaultBuildManager implements BuildManager
                 long id = Long.parseLong(buildId);
                 return getByUserAndNumber(user, id);
             }
-            catch(NumberFormatException e)
+            catch (NumberFormatException e)
             {
                 return null;
             }
@@ -301,7 +317,7 @@ public class DefaultBuildManager implements BuildManager
         Revision previousRevision = null;
         int offset = 0;
 
-        while(true)
+        while (true)
         {
             List<BuildResult> previousBuildResults = getLatestCompletedBuildResults(project, offset, 1);
 
@@ -359,9 +375,9 @@ public class DefaultBuildManager implements BuildManager
         do
         {
             results = buildResultDao.findOldestByProject(project, null, 100, true);
-            for (BuildResult r : results)
+            for (BuildResult build : results)
             {
-                cleanupResult(r, false);
+                process(build, BuildCleanupOptions.DATABASE_ONLY);
             }
         }
         while (results.size() > 0);
@@ -373,22 +389,22 @@ public class DefaultBuildManager implements BuildManager
         File userDir = paths.getUserDir(user.getId());
         scheduleCleanup(userDir);
 
-        List<BuildResult> results = buildResultDao.findByUser(user);
-        for (BuildResult r : results)
+        List<BuildResult> builds = buildResultDao.findByUser(user);
+        for (BuildResult build : builds)
         {
-            cleanupResult(r, false);
+            process(build, BuildCleanupOptions.DATABASE_ONLY);
         }
     }
 
     public void delete(BuildResult result)
     {
-        cleanupResult(result, true);
+        process(result, BuildCleanupOptions.ALL);
     }
 
     public List<BuildResult> abortUnfinishedBuilds(Project project, String message)
     {
-        List<BuildResult> incompleteBuilds = queryBuilds(new Project[]{ project}, ResultState.getIncompleteStates(), -1, -1, null, -1, -1, true);
-        for(BuildResult r: incompleteBuilds)
+        List<BuildResult> incompleteBuilds = queryBuilds(new Project[]{project}, ResultState.getIncompleteStates(), -1, -1, null, -1, -1, true);
+        for (BuildResult r : incompleteBuilds)
         {
             abortBuild(r, message);
         }
@@ -398,7 +414,7 @@ public class DefaultBuildManager implements BuildManager
     public void abortUnfinishedBuilds(User user, String message)
     {
         List<BuildResult> incompleteBuilds = buildResultDao.getLatestByUser(user, ResultState.getIncompleteStates(), -1);
-        for(BuildResult r: incompleteBuilds)
+        for (BuildResult r : incompleteBuilds)
         {
             abortBuild(r, message);
         }
@@ -418,11 +434,7 @@ public class DefaultBuildManager implements BuildManager
 
     public boolean isSpaceAvailableForBuild()
     {
-        if (databaseConsole.isEmbedded())
-        {
-            return databaseConsole.getDatabaseUsagePercent() < 99.5;
-        }
-        return true;
+        return !databaseConsole.isEmbedded() || databaseConsole.getDatabaseUsagePercent() < 99.5;
     }
 
     public BuildResult getPreviousBuildResult(BuildResult result)
@@ -482,43 +494,117 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatestSuccessful();
     }
 
-    public void cleanupResult(BuildResult build, boolean rmdir)
+    public void process(BuildResult build, BuildCleanupOptions request)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File buildDir = paths.getBuildDir(build);
-        if (rmdir && buildDir.exists())
-        {
-            scheduleCleanup(buildDir);
-        }
 
-        if(build.isPersonal())
+        if (request.isCleanBuildDir())
         {
-            File patch = paths.getUserPatchFile(build.getUser().getId(), build.getNumber());
-            scheduleCleanup(patch);
-        }
-        else
-        {
-            // Remove records of this build from changelists
-            Revision revision = build.getRevision();
-            if(revision != null)
+            File buildDir = paths.getBuildDir(build);
+            if (buildDir.exists())
             {
-                List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId());
-                for(PersistentChangelist change: changelists)
-                {
-                    changelistDao.delete(change);
-                }
+                scheduleCleanup(buildDir);
             }
         }
 
-        buildResultDao.delete(build);
+        if (request.isCleanWorkDir())
+        {
+            build.setHasWorkDir(false);
+            buildResultDao.save(build);
+            cleanupWorkForNodes(paths, build, build.getRoot().getChildren());
+        }
+
+        if (request.isCleanDatabase())
+        {
+            if (build.isPersonal())
+            {
+                File patch = paths.getUserPatchFile(build.getUser().getId(), build.getNumber());
+                scheduleCleanup(patch);
+            }
+            else
+            {
+                // Remove records of this build from changelists
+                Revision revision = build.getRevision();
+                if (revision != null)
+                {
+                    List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId());
+                    for (PersistentChangelist change : changelists)
+                    {
+                        changelistDao.delete(change);
+                    }
+                }
+            }
+
+            try
+            {
+                // clean artifact repository artifacts for this build.
+                for (File f : getRepositoryFilesFor(build))
+                {
+                    scheduleCleanup(f);
+                }
+            }
+            catch (Exception e)
+            {
+                LOG.warning(e);
+            }
+
+            buildResultDao.delete(build);
+        }
     }
 
-    public void cleanupWork(BuildResult build)
+    private List<File> getRepositoryFilesFor(BuildResult build) throws Exception
     {
-        build.setHasWorkDir(false);
-        buildResultDao.save(build);
-        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        cleanupWorkForNodes(paths, build, build.getRoot().getChildren());
+        List<File> repositoryFiles = new LinkedList<File>();
+
+        String securityToken = RandomUtils.randomToken(15);
+        try
+        {
+            repositoryAuthenticationProvider.activate(securityToken);
+
+            // provide the authentication details for the subsquent repository requests.
+            String masterLocation = masterLocationProvider.getMasterUrl();
+            String host = new URL(masterLocation).getHost();
+
+            // the reponse from the ivy client will be relative to the repository root.
+            File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
+
+            IvyClient ivy = ivyManager.createIvyClient(masterLocation + WebManager.REPOSITORY_PATH);
+            ivy.addCredentials(host, "pulse", securityToken);
+
+            ProjectConfiguration project = build.getProject().getConfig();
+            ModuleRevisionId mrid = ModuleRevisionId.newInstance(project.getOrganisation(), project.getName(), String.valueOf(build.getNumber()));
+
+            List<String> artifacts = ivy.getArtifactPaths(mrid);
+            if (artifacts != null)
+            {
+                for (String relativePath : artifacts)
+                {
+                    File file = new File(repositoryRoot, relativePath);
+                    repositoryFiles.add(file);
+                    repositoryFiles.addAll(findRelatedFiles(file));
+                }
+            }
+            File file = new File(repositoryRoot, ivy.getIvyPath(mrid));
+            repositoryFiles.add(file);
+            repositoryFiles.addAll(findRelatedFiles(file));
+        }
+        finally
+        {
+            repositoryAuthenticationProvider.deactivate(securityToken);
+        }
+
+        return repositoryFiles;
+    }
+
+    private List<File> findRelatedFiles(final File file)
+    {
+        return Arrays.asList(file.getParentFile().listFiles(new FilenameFilter()
+        {
+            public boolean accept(File dir, String name)
+            {
+                return name.startsWith(file.getName());
+            }
+        }));
     }
 
     private void cleanupWorkForNodes(MasterBuildPaths paths, BuildResult build, List<RecipeResultNode> nodes)
@@ -562,5 +648,20 @@ public class DefaultBuildManager implements BuildManager
     public void setThreadFactory(PulseThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setIvyManager(IvyManager ivyManager)
+    {
+        this.ivyManager = ivyManager;
+    }
+
+    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
+    {
+        this.masterLocationProvider = masterLocationProvider;
+    }
+
+    public void setRepositoryAuthenticationProvider(RepositoryAuthenticationProvider repositoryAuthenticationProvider)
+    {
+        this.repositoryAuthenticationProvider = repositoryAuthenticationProvider;
     }
 }

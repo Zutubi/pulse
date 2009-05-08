@@ -23,12 +23,12 @@ public class DefaultIvyClientFactory
     /**
      * The artifact pattern used by the internal pulse repository.
      */
-    private static final String PATTERN_ARTIFACT = "${repository.base}/([organisation]/)[module]/([stage]/)[type]s/[artifact]-[revision].[ext]";
+    private static final String PATTERN_ARTIFACT = "([organisation]/)[module]/([stage]/)[type]s/[artifact]-[revision].[ext]";
 
     /**
      * The ivy pattern used by the internal pulse repository.
      */
-    private static final String PATTERN_IVY = "${repository.base}/([organisation]/)[module]/([stage]/)ivy-[revision].xml";
+    private static final String PATTERN_IVY = "([organisation]/)[module]/([stage]/)ivy-[revision].xml";
 
     public static final String VARIABLE_REPOSITORY_BASE = "repository.base";
 
@@ -75,14 +75,14 @@ public class DefaultIvyClientFactory
         }
 
         resolver.setName(RESOLVER_NAME);
-        resolver.addArtifactPattern(IvyPatternHelper.substituteVariables(artifactPattern, variables));
-        resolver.addIvyPattern(IvyPatternHelper.substituteVariables(ivyPattern, variables));
+        resolver.addArtifactPattern(IvyPatternHelper.substituteVariables("${"+VARIABLE_REPOSITORY_BASE+"}/" + artifactPattern, variables));
+        resolver.addIvyPattern(IvyPatternHelper.substituteVariables("${"+VARIABLE_REPOSITORY_BASE+"}/" + ivyPattern, variables));
         resolver.setCheckmodified(true);
 
         settings.addResolver(resolver);
         settings.setDefaultResolver(RESOLVER_NAME);
 
-        return new IvyClient(Ivy.newInstance(settings));
+        return new IvyClient(Ivy.newInstance(settings), ivyPattern, artifactPattern);
     }
 
     private boolean isFile(URI uri)

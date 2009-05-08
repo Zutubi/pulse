@@ -28,13 +28,14 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider;
+import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
@@ -47,7 +48,6 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.util.url.CredentialsStore;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -93,7 +93,7 @@ public class BuildController implements EventListener
     private BuildResult previousSuccessful;
     private PulseExecutionContext buildContext;
     private BuildHookManager buildHookManager;
-    private BuildTokenAuthenticationProvider buildTokenAuthenticationProvider;
+    private RepositoryAuthenticationProvider repositoryAuthenticationProvider;
 
     private ScmManager scmManager;
     private ThreadFactory threadFactory;
@@ -176,7 +176,7 @@ public class BuildController implements EventListener
     {
         String token = RandomUtils.randomToken(15);
         buildContext.setSecurityHash(token);
-        buildTokenAuthenticationProvider.activate(token);
+        repositoryAuthenticationProvider.activate(token);
     }
 
     /**
@@ -186,7 +186,7 @@ public class BuildController implements EventListener
     private void deactivateBuildAuthenticationToken()
     {
         String token = buildContext.getSecurityHash();
-        buildTokenAuthenticationProvider.deactivate(token);
+        repositoryAuthenticationProvider.deactivate(token);
     }
 
     private BuildResult getPreviousSuccessfulBuild()
@@ -955,10 +955,11 @@ public class BuildController implements EventListener
         try
         {
             String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
-            CredentialsStore.INSTANCE.addCredentials("Pulse", new URL(masterUrl).getHost(), "pulse", buildContext.getSecurityHash());
+            String repositoryUrl = masterUrl + WebManager.REPOSITORY_PATH;
 
-            String repositoryUrl = masterUrl + "/repository";
             IvyClient ivy = ivyManager.createIvyClient(repositoryUrl);
+            ivy.addCredentials(new URL(masterUrl).getHost(), "pulse", buildContext.getSecurityHash());
+
             ivy.setMessageLogger(buildLogger.getMessageLogger());
             
             ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
@@ -1090,9 +1091,9 @@ public class BuildController implements EventListener
         this.recipeDispatchService = recipeDispatchService;
     }
 
-    public void setBuildTokenAuthenticationProvider(BuildTokenAuthenticationProvider buildTokenAuthenticationProvider)
+    public void setRepositoryAuthenticationProvider(RepositoryAuthenticationProvider repositoryAuthenticationProvider)
     {
-        this.buildTokenAuthenticationProvider = buildTokenAuthenticationProvider;
+        this.repositoryAuthenticationProvider = repositoryAuthenticationProvider;
     }
 
     public void setIvyManager(IvyManager ivyManager)

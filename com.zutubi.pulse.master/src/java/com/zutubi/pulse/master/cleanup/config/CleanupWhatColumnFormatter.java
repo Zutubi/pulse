@@ -4,22 +4,23 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.tove.config.api.Formatter;
 
 /**
+ * An implementation of the Formatter interface that handles the formatting
+ * of CleanupWhat instances.
  *
- *
+ * @see com.zutubi.pulse.master.cleanup.config.CleanupWhat
  */
 public class CleanupWhatColumnFormatter implements Formatter<CleanupWhat>
 {
+    private static final Messages I18N = Messages.getInstance(CleanupConfiguration.class);
+    
     public String format(CleanupWhat what)
     {
-        if (what == CleanupWhat.WHOLE_BUILDS)
+        String key = "what." + what + ".label";
+        if (I18N.isKeyDefined(key))
         {
-            return Messages.format(CleanupConfiguration.class, "what.WHOLE_BUILDS.label");
+            return I18N.format(key);
         }
-        else if (what == CleanupWhat.WORKING_DIRECTORIES_ONLY)
-        {
-            return Messages.format(CleanupConfiguration.class, "what.WORKING_DIRECTORIES_ONLY.label");
-        }
-        return "";
+        return key;
     }
 }
 

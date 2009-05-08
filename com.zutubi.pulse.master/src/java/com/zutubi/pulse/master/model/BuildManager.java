@@ -198,8 +198,5 @@ public interface BuildManager
     Boolean canDecorateArtifact(long artifactId);
 
     @SecureParameter(parameterType = BuildResult.class, action = AccessManager.ACTION_WRITE)
-    void cleanupResult(BuildResult build, boolean rmdir);
-
-    @SecureParameter(parameterType = BuildResult.class, action = AccessManager.ACTION_WRITE)
-    void cleanupWork(BuildResult build);
+    void process(BuildResult result, BuildCleanupOptions options);    
 }

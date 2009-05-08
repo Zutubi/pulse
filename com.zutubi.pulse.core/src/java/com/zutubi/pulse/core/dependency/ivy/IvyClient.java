@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.Ivy;
+import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.cache.ArtifactOrigin;
 import org.apache.ivy.core.cache.ResolutionCacheManager;
 import org.apache.ivy.core.deliver.DeliverOptions;
@@ -20,23 +21,23 @@ import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorParser;
+import org.apache.ivy.plugins.repository.Resource;
+import org.apache.ivy.plugins.repository.file.FileResource;
 import org.apache.ivy.plugins.resolver.AbstractPatternsBasedResolver;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
 import org.apache.ivy.plugins.resolver.RepositoryResolver;
 import org.apache.ivy.plugins.resolver.util.ResolvedResource;
-import org.apache.ivy.plugins.repository.Resource;
 import org.apache.ivy.util.MessageLogger;
 import org.apache.ivy.util.url.URLHandler;
 import org.apache.ivy.util.url.URLHandlerRegistry;
+import org.apache.ivy.util.url.CredentialsStore;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * The IvyClient provides a facade around the ivy dependency management system
@@ -50,10 +51,14 @@ public class IvyClient
     public static final String CONFIGURATION_BUILD = "build";
 
     private Ivy ivy;
+    private String ivyPattern;
+    private String artifactPattern;
 
-    public IvyClient(Ivy ivy)
+    public IvyClient(Ivy ivy, String ivyPattern, String artifactPattern)
     {
         this.ivy = ivy;
+        this.ivyPattern = ivyPattern;
+        this.artifactPattern = artifactPattern;
     }
 
     /**
@@ -245,18 +250,7 @@ public class IvyClient
         return ivy.resolve(mrid, options, false);
     }
 
-    /**
-     * Resolve the artifacts associated with the specified module revision id.  This revision id needs
-     * to uniquely specify a published ivy file so that its artifacts can be resolved and located.
-     *
-     * @param mrid  the module revision id.
-     * @return a list of artifact origin instances for the resolved artifacts, or null if the module
-     * revision id could not be resolved.
-     *
-     * @throws IOException  on error.
-     * @throws ParseException   if there is an error parsing the resolved ivy descriptor.
-     */
-    public List<ArtifactOrigin> resolveArtifacts(ModuleRevisionId mrid) throws IOException, ParseException
+    public List<String> getArtifactPaths(ModuleRevisionId mrid) throws IOException, ParseException
     {
         final RepositoryResolver resolver = (RepositoryResolver) ivy.getSettings().getDefaultResolver();
 
@@ -268,12 +262,12 @@ public class IvyClient
         if (resolvedResource == null || !resolvedResource.getResource().exists())
         {
             // failed to locate the ivy file, we can not continue.
-            return null;
+            throw new IllegalArgumentException("Failed to located ivy descriptor for '" + mrid + "'");
         }
 
         XmlModuleDescriptorParser parser = XmlModuleDescriptorParser.getInstance();
         Resource resource = resolvedResource.getResource();
-        URL ivyFileUrl = new File(resource.getName()).toURI().toURL();
+        URL ivyFileUrl = resourceToURL(resource);
         ModuleDescriptor repositoryBasedDescriptor = parser.parseDescriptor(ivy.getSettings(), ivyFileUrl, false);
 
         List<ArtifactOrigin> artifactOrigins = CollectionUtils.map(repositoryBasedDescriptor.getAllArtifacts(), new Mapping<Artifact, ArtifactOrigin>()
@@ -283,20 +277,51 @@ public class IvyClient
                 return resolver.locate(artifact);
             }
         });
+
         // resolver.locate returns null if the artifact does not exist, so we filter out the nulls.
-        return CollectionUtils.filter(artifactOrigins, new Predicate<ArtifactOrigin>()
+        List<ArtifactOrigin> artifacts = CollectionUtils.filter(artifactOrigins, new Predicate<ArtifactOrigin>()
         {
             public boolean satisfied(ArtifactOrigin artifactOrigin)
             {
                 return artifactOrigin != null;
             }
         });
+
+        return CollectionUtils.map(artifacts, new Mapping<ArtifactOrigin, String>()
+        {
+            public String map(ArtifactOrigin artifact)
+            {
+                return IvyPatternHelper.substitute(artifactPattern, artifact.getArtifact(), artifact);
+            }
+        });
+    }
+
+    private URL resourceToURL(Resource resource) throws MalformedURLException
+    {
+        if (resource instanceof FileResource)
+        {
+            return new File(resource.getName()).toURI().toURL();
+        }
+        else
+        {
+            return new URL(resource.getName());
+        }
+    }
+
+    public String getIvyPath(ModuleRevisionId mrid) throws IOException, ParseException
+    {
+        return IvyPatternHelper.substitute(ivyPattern, mrid);
     }
 
     public boolean isResolved(ModuleRevisionId mrid)
     {
         File ivyFile = getCache().getResolvedIvyFileInCache(mrid);
         return ivyFile != null && ivyFile.isFile();
+    }
+
+    public void addCredentials(String host, String user, String pass)
+    {
+        CredentialsStore.INSTANCE.addCredentials("Pulse", host, user, pass);
     }
 
     public IvySettings getSettings()

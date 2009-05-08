@@ -123,7 +123,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         Ivy ivy = mock(Ivy.class);
         stub(ivy.getSettings()).toReturn(settings);
         IvyManager ivyManager = mock(IvyManager.class);
-        stub(ivyManager.createIvyClient(anyString())).toReturn(new IvyClient(ivy));
+        stub(ivyManager.createIvyClient(anyString())).toReturn(new IvyClient(ivy, null, null));
         recipeProcessor.setIvyManager(ivyManager);
         stub(ivy.getLoggerEngine()).toReturn(loggerEngine);
     }

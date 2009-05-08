@@ -10,7 +10,6 @@ import java.util.*;
 public class MockBuildManager implements BuildManager
 {
     private long nextId = 1;
-    private long nextBuildNumber = 1;
     private Map<Long, BuildResult> buildResults = new TreeMap<Long, BuildResult>();
     private Map<Long, RecipeResultNode> recipeResultNodes = new TreeMap<Long, RecipeResultNode>();
     private Map<Long, RecipeResult> recipeResults = new TreeMap<Long, RecipeResult>();
@@ -201,11 +200,6 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public long getNextBuildNumber(Project project)
-    {
-        return nextBuildNumber++;
-    }
-
     public Revision getPreviousRevision(Project project)
     {
         throw new RuntimeException("Method not implemented.");
@@ -263,11 +257,6 @@ public class MockBuildManager implements BuildManager
     {
     }
 
-    public PersistentChangelist getChangelistByRevision(String serverUid, Revision revision)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public void delete(BuildResult result)
     {
         buildResults.remove(result.getId());
@@ -313,12 +302,7 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void cleanupResult(BuildResult build, boolean rmdir)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public void cleanupWork(BuildResult build)
+    public void process(BuildResult result, BuildCleanupOptions options)
     {
         throw new RuntimeException("Method not implemented.");
     }

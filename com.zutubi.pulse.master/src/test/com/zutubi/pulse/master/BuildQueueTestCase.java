@@ -13,7 +13,7 @@ import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.security.BuildTokenAuthenticationProvider;
+import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
@@ -47,7 +47,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
     protected File tempDir;
     protected AtomicInteger nextId = new AtomicInteger(1);
     protected AccessManager accessManager;
-    protected BuildTokenAuthenticationProvider buildTokenAuthenticationProvider;
+    protected RepositoryAuthenticationProvider repositoryAuthenticationProvider;
 
     protected void setUp() throws Exception
     {
@@ -71,7 +71,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         objectFactory = new WiringObjectFactory();
         testManager = mock(TestManager.class);
         accessManager = mock(AccessManager.class);
-        buildTokenAuthenticationProvider = mock(BuildTokenAuthenticationProvider.class);
+        repositoryAuthenticationProvider = mock(RepositoryAuthenticationProvider.class);
     }
 
     protected void tearDown() throws Exception

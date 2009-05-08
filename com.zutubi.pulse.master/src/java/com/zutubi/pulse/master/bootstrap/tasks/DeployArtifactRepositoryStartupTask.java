@@ -29,7 +29,7 @@ public class DeployArtifactRepositoryStartupTask implements StartupTask
 
         repository.setBase(repositoryBase); // need to make this configurable.
 
-        jettyServerManager.configureContext(WebManager.WEBAPP_PULSE, "/repository", repository);
+        jettyServerManager.configureContext(WebManager.WEBAPP_PULSE, WebManager.REPOSITORY_PATH, repository);
     }
 
     private void ensureIsDirectory(File dir)

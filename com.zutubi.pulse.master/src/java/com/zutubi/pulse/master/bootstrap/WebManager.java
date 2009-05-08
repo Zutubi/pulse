@@ -24,7 +24,8 @@ public class WebManager
     private static final Logger LOG = Logger.getLogger(WebManager.class);
 
     public static final String WEBAPP_PULSE = "pulse";
-
+    public static final String REPOSITORY_PATH = "/repository";
+    
     private ConfigurationManager configurationManager;
 
     private JettyServerManager jettyServerManager;

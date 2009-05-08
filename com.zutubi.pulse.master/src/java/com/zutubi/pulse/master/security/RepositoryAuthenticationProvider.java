@@ -12,7 +12,7 @@ import java.util.Set;
  * An authentication provider implementation that uses a token (a shared token
  * between the pulse master and agents) to provide an authentication.
  */
-public class BuildTokenAuthenticationProvider implements AuthenticationProvider
+public class RepositoryAuthenticationProvider implements AuthenticationProvider
 {
     private static final String USERNAME = "pulse";
 
@@ -32,14 +32,14 @@ public class BuildTokenAuthenticationProvider implements AuthenticationProvider
 
     private Authentication validateToken(Authentication auth)
     {
-        if (!activeTokens.contains(auth.getCredentials()))
+        if (activeTokens.contains(auth.getCredentials()))
         {
-            return null;
+            return getRepositoryAuthentication();
         }
-        return createAuthentication();
+        return null;
     }
 
-    private Authentication createAuthentication()
+    private Authentication getRepositoryAuthentication()
     {
         AcegiUser repositoryUser = AcegiUtils.getRepositoryUser();
         return new UsernamePasswordAuthenticationToken(repositoryUser, null, repositoryUser.getAuthorities());

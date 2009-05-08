@@ -62,6 +62,18 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     int getCompletedResultCount(User user);
 
+    /**
+     * Retrieve the oldest completed builds for the specified user.  The limit indicates how many
+     * builds should be skipped before we start returning builds.
+     * <p/>
+     * For example, if a user has 10 builds, and the limit is 3, then the 7 oldest builds are
+     * returned by this method.
+     *
+     * @param user      that triggered the builds.
+     * @param limit     the number of the newest builds to skip from the resulting list.
+     *
+     * @return a list of old personal build results. 
+     */
     List<BuildResult> getOldestCompletedBuilds(User user, int limit);
 
     List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit);

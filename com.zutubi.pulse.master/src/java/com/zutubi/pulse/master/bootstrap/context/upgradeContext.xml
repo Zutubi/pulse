@@ -59,6 +59,7 @@
                 <ref local="addStatusFieldToBuildResultTable"/>
                 <ref local="addDependencyStatusField"/>
                 <ref local="addPropagateStatusField"/>
+                <ref local="addCleanupStatusesField"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -236,5 +237,9 @@
 
     <bean id="addPropagateStatusField" class="com.zutubi.pulse.master.upgrade.tasks.AddPropagateStatusFieldUpgradeTask">
         <property name="buildNumber" value="200999009"/>
+    </bean>
+
+    <bean id="addCleanupStatusesField" class="com.zutubi.pulse.master.upgrade.tasks.AddCleanupStatusesFieldUpgradeTask">
+        <property name="buildNumber" value="200999010"/>
     </bean>
 </beans>

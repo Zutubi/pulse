@@ -203,6 +203,7 @@
     </bean>
 
     <bean id="cleanupManager" class="com.zutubi.pulse.master.cleanup.CleanupManager" init-method="init"/>
+    <bean id="cleanupScheduler" class="com.zutubi.pulse.master.cleanup.CleanupScheduler" init-method="init"/>
 
     <bean id="triggerManager" class="com.zutubi.pulse.master.tove.config.project.triggers.TriggerManager"/>
 

@@ -13,7 +13,6 @@ import com.zutubi.pulse.master.tove.config.project.PublicationConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 import org.apache.ivy.core.IvyPatternHelper;
-import org.apache.ivy.core.cache.ArtifactOrigin;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -43,8 +42,8 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
         Map<String, String> variables = new HashMap<String, String>();
         variables.put("repository.base", tmp.toURI().toString());//"http://localhost:8080/repository");//tmp.toURI().toString());
 
-        String artifactPattern = "${repository.base}/" + repository.getArtifactPattern();
-        String ivyPattern = "${repository.base}/" + repository.getIvyPattern();
+        String artifactPattern = repository.getArtifactPattern();
+        String ivyPattern = repository.getIvyPattern();
 
         DefaultIvyClientFactory icf = new DefaultIvyClientFactory(artifactPattern, ivyPattern);
         core = icf.createClient(variables);
@@ -304,10 +303,9 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
 
         ModuleRevisionId mrid = ModuleRevisionId.newInstance(project.getOrganisation(), project.getName(), revision);
 
-        List<ArtifactOrigin> artifacts = core.resolveArtifacts(mrid);
-        assertEquals(1, artifacts.size());
-        ArtifactOrigin artifactOrigin = artifacts.get(0);
-        assertEquals(mrid, artifactOrigin.getArtifact().getModuleRevisionId());
+        List<String> artifactPaths = core.getArtifactPaths(mrid);
+        assertEquals(1, artifactPaths.size());
+        assertTrue(repository.isFile(artifactPaths.get(0)));
     }
 
     public void testResolvingLatestArtifact() throws IOException, ParseException
@@ -322,10 +320,9 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
 
         ModuleRevisionId mrid = ModuleRevisionId.newInstance(project.getOrganisation(), project.getName(), "latest.integration");
 
-        List<ArtifactOrigin> artifacts = core.resolveArtifacts(mrid);
-        assertEquals(1, artifacts.size());
-        ArtifactOrigin artifactOrigin = artifacts.get(0);
-        assertEquals(ModuleRevisionId.newInstance(project.getOrganisation(), project.getName(), "3"), artifactOrigin.getArtifact().getModuleRevisionId());
+        List<String> artifactPaths = core.getArtifactPaths(mrid);
+        assertEquals(1, artifactPaths.size());
+        assertTrue(repository.isFile(artifactPaths.get(0)));
     }
 
     private ProjectConfiguration newProject(String organisation, String name)
@@ -513,6 +510,11 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
             File f = new File(baseDir, path);
             assertTrue(f.getParentFile().exists() || f.getParentFile().mkdirs());
             assertTrue(f.exists() || f.createNewFile());
+        }
+
+        public boolean isFile(String relativePath)
+        {
+            return new File(baseDir, relativePath).isFile();
         }
 
         public boolean isFile(String org, String name, String revision, String stageName, String artifactName, String artifactExt)
