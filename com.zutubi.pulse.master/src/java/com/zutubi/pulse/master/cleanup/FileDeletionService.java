@@ -25,7 +25,7 @@ public class FileDeletionService extends BackgroundServiceSupport
 {
     private static final Messages I18N = Messages.getInstance(FileDeletionService.class);
 
-    public static final String SUFFIX = "." + I18N.format("suffix");
+    public static final String SUFFIX = ".dead";
 
     public FileDeletionService()
     {
@@ -50,7 +50,13 @@ public class FileDeletionService extends BackgroundServiceSupport
 
         if (!file.exists())
         {
-            FutureTask<Boolean> task = new FutureTask<Boolean>(new ReturnBoolean(true));
+            FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>()
+            {
+                public Boolean call() throws Exception
+                {
+                    return true;
+                }
+            });
             task.run();
             return task;
         }
@@ -68,6 +74,16 @@ public class FileDeletionService extends BackgroundServiceSupport
         return scheduleDeletion(file);
     }
 
+    /**
+     * This method indicates whether or not the specified file was previously scheduled for
+     * deletion.  Note that this method does not identify all previously scheduled files
+     * with 100% accuracy.  A result of true indicates that this file was previously scheduled,
+     * whilst a result of false indicates that it is unlikely that this file was previously
+     * scheduled for deletion.
+     *
+     * @param f the file in question
+     * @return  true if the file was previously scheduled for deletion, false otherwise.
+     */
     public boolean wasScheduledForDeletion(File f)
     {
         return f.getName().endsWith(SUFFIX);
@@ -121,21 +137,6 @@ public class FileDeletionService extends BackgroundServiceSupport
                 }
             }
             return true;
-        }
-    }
-
-    private class ReturnBoolean implements Callable<Boolean>
-    {
-        private boolean b;
-
-        private ReturnBoolean(boolean b)
-        {
-            this.b = b;
-        }
-
-        public Boolean call() throws Exception
-        {
-            return b;
         }
     }
 }
