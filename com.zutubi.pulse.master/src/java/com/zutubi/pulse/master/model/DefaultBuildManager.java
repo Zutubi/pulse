@@ -406,6 +406,12 @@ public class DefaultBuildManager implements BuildManager
         {
             cleanupResult(r, false);
         }
+
+        results = buildResultDao.findByResponsible(user);
+        for (BuildResult result: results)
+        {
+            clearResponsibility(result);
+        }
     }
 
     public void delete(BuildResult result)
@@ -547,6 +553,24 @@ public class DefaultBuildManager implements BuildManager
         buildResultDao.save(build);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         cleanupWorkForNodes(paths, build, build.getRoot().getChildren());
+    }
+
+    public List<BuildResult> findByResponsible(User user)
+    {
+        return buildResultDao.findByResponsible(user);
+    }
+
+    public void takeResponsibility(BuildResult build, User user, String comment)
+    {
+        BuildResponsibility responsibility = new BuildResponsibility(user, comment);
+        build.setResponsibility(responsibility);
+        buildResultDao.save(build);
+    }
+
+    public void clearResponsibility(BuildResult build)
+    {
+        build.setResponsibility(null);
+        buildResultDao.save(build);
     }
 
     public void executeInTransaction(Runnable runnable)

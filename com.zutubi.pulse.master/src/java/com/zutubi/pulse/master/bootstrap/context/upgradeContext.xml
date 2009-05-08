@@ -54,6 +54,7 @@
                 <ref local="buildResultNumberIndex"/>
                 <ref local="userCollapsedProjects"/>
                 <ref local="hookTriggerOptions"/>
+                <ref local="buildResponsibility"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -190,5 +191,14 @@
 
     <bean id="hookTriggerOptions" class="com.zutubi.pulse.master.upgrade.tasks.HookTriggerOptionsUpgradeTask">
         <property name="buildNumber" value="200028003"/>
+    </bean>
+
+    <bean id="buildResponsibility" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="200029001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.29-patch-01.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>

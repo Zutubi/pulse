@@ -1,12 +1,12 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.events.DefaultEventManager;
-import com.zutubi.tove.config.cleanup.ConfigurationCleanupManager;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.cleanup.ConfigurationCleanupManager;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.security.ActorProvider;
-import com.zutubi.tove.security.DefaultAccessManager;
 import com.zutubi.tove.security.AuthorityProvider;
+import com.zutubi.tove.security.DefaultAccessManager;
 import com.zutubi.tove.transaction.AbstractTransactionTestCase;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.CompositeType;
@@ -90,6 +90,11 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
                         Set<String> auths = new HashSet<String>();
                         auths.add("ADMINISTER");
                         return auths;
+                    }
+
+                    public boolean isAnonymous()
+                    {
+                        return false;
                     }
                 };
             }

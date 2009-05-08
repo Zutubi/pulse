@@ -1,14 +1,13 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 
 /**
  * The summary tab for a build result.
  */
-public class BuildSummaryPage extends SeleniumPage
+public class BuildSummaryPage extends ResponsibilityPage
 {
     private String projectName;
     private long buildId;
@@ -34,10 +33,25 @@ public class BuildSummaryPage extends SeleniumPage
     {
         return selenium.isElementPresent(getHookId(hookName));
     }
-    
+
     public void clickHook(String hookName)
     {
         selenium.click(getHookId(hookName));
+    }
+
+    private String getActionId(String actionName)
+    {
+        return "action." + actionName;
+    }
+
+    public boolean isActionPresent(String actionName)
+    {
+        return selenium.isElementPresent(getActionId(actionName));
+    }
+
+    public void clickAction(String actionName)
+    {
+        selenium.click(getActionId(actionName));
     }
 
     public boolean hasTests()

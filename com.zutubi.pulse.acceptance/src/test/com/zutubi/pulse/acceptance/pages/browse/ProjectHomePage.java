@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 
@@ -9,7 +8,7 @@ import com.zutubi.util.StringUtils;
  * The project home page is a summary of the state and recent activity for a
  * project.
  */
-public class ProjectHomePage extends SeleniumPage
+public class ProjectHomePage extends ResponsibilityPage
 {
     private String projectName;
 

@@ -489,6 +489,16 @@
         <action name="triggerBuildHook" class="com.zutubi.pulse.master.xwork.actions.ajax.TriggerBuildHookAction">
             <result name="success" type="flexjson">result</result>
         </action>
+
+        <action name="takeResponsibility" class="com.zutubi.pulse.master.xwork.actions.ajax.TakeResponsibilityAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
+
+        <action name="clearResponsibility" class="com.zutubi.pulse.master.xwork.actions.ajax.ClearResponsibilityAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
     </package>
 
     <package name="configAjax" namespace="/aconfig" extends="default">

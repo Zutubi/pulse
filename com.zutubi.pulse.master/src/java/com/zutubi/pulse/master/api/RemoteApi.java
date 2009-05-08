@@ -1509,7 +1509,7 @@ public class RemoteApi
      * of the build, including artifacts, are permanently removed and may not be recoevered.
      *
      * @param token       authentication token, see {@link #login}
-     * @param projectName name of the projec that owns the build to delete
+     * @param projectName name of the project that owns the build to delete
      * @param id          id of the build to delete
      * @return true if the build was found and deleted, false if the build does not exist
      * @throws IllegalArgumentException if the given project name is invalid
@@ -1530,6 +1530,134 @@ public class RemoteApi
 
             buildManager.delete(build);
             return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Gets details about who, if anyone, is responsible for a given build.  If no user is
+     * responsible, the returned struct is empty.  Otherwise, the struct will contain a "user"
+     * property with the login of the responsible user.  If the user left a comment, the struct will
+     * also contain a "comment" property with the comment text.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project that owns the build
+     * @param id          id of the build
+     * @return {@xtype struct} details of the responsibility for the build (as described above)
+     * @throws IllegalArgumentException if the given project name or build id is invalid
+     * @access requires view permission for the given project
+     *
+     * @see #takeResponsibility(String, String, int, String)
+     * @see #clearResponsibility(String, String, int)
+     */
+    public Hashtable<String, String> getResponsibilityInfo(String token, String projectName, int id)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Project project = internalGetProject(projectName, true);
+            BuildResult build = internalGetBuild(project, id);
+
+            Hashtable<String, String> result = new Hashtable<String, String>();
+            BuildResponsibility responsibility = build.getResponsibility();
+            if (responsibility != null)
+            {
+                result.put("user", responsibility.getUser().getLogin());
+                if (TextUtils.stringSet(responsibility.getComment()))
+                {
+                    result.put("comment", responsibility.getComment());
+                }
+            }
+
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Takes responsibility for the given build.  The user represented by token will be responsible
+     * for the build until the responsibility is cleared.  An optional comment can be provided to
+     * communicate with other users why responsibility has been taken and/or what actions are
+     * being taken.
+     * <p/>
+     * Only one user may be responsible at a time.  If another user is responsible, it is up to them
+     * to clear responsibility before another user can take it.  Only users with administration
+     * privileges can override this.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project that owns the build
+     * @param id          id of the build
+     * @param comment     optional comment to communicate to other users (shown along with the
+     *                    message indicating the responsible user)
+     * @return true
+     * @throws IllegalArgumentException if the given project name or build id is invalid
+     * @access requires view permission for the given project; no other user can currently be
+     *         responsible for the build
+     *
+     * @see #getResponsibilityInfo(String, String, int)
+     * @see #clearResponsibility(String, String, int)
+     */
+    public boolean takeResponsibility(String token, String projectName, int id, String comment)
+    {
+        User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            Project project = internalGetProject(projectName, true);
+            BuildResult build = internalGetBuild(project, id);
+
+            buildManager.takeResponsibility(build, user, comment);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Clears responsibility for the given build.  This restores the build to its normal state - no
+     * user is responsible.  It also allows other users to take responsibility (they cannot when it
+     * is already held).
+     * <p/>
+     * Responsibility can only be cleared by the holding user, or a user with administration
+     * privileges.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project that owns the build
+     * @param id          id of the build
+     * @return true if a user was responsible and the resposibility was cleared, false if no user
+     *         was responsible to begin with
+     * @throws IllegalArgumentException if the given project name or build id is invalid
+     * @access requires view permission for the project, and that the user represented by token is
+     *         the currently-responsible user for the build (if any), or has administration
+     *         privileges
+     *
+     * @see #getResponsibilityInfo(String, String, int)
+     * @see #takeResponsibility(String, String, int, String) 
+     */
+    public boolean clearResponsibility(String token, String projectName, int id)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Project project = internalGetProject(projectName, true);
+            BuildResult build = internalGetBuild(project, id);
+
+            if (build.getResponsibility() == null)
+            {
+                return false;
+            }
+            else
+            {
+                buildManager.clearResponsibility(build);
+                return true;
+            }
         }
         finally
         {

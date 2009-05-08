@@ -19,6 +19,13 @@ ZUTUBI.BUILD_CELLS = '<td class="build-id fit-width">' +
                      '</td>' +
                      '<td class="fit-width">' +
                          ':: <span id="{buildId}.status"><img alt="status" src="{base}/images/{statusIcon}"/> {status}</span>' +
+                     '<tpl if="responsibleMessage">' +
+                         ' <img alt="fixing" id="{buildId}_fixing" src="{base}/images/config/actions/takeResponsibility.gif" ext:qtip="{responsibleMessage:htmlEncode}' +
+                         '<tpl if="responsibleComment">' +
+                             ': {responsibleComment:htmlEncode}' +
+                         '</tpl>' +
+                         '"/>' +
+                     '</tpl>' +
                      '</td>' +
                      '<td class="build-details">' +
                          '<tpl for="columns">{.} <tpl if="xindex &lt; xcount"><span class="understated">//</span> </tpl></tpl>' +
@@ -47,6 +54,8 @@ ZUTUBI.ConcreteProject.prototype = {
         templateData.buildLink = window.baseUrl + '/browse/projects/' + encodeURIComponent(templateData.name) + '/builds/' + build.number + '/';
         templateData.status = build.status;
         templateData.statusIcon = build.statusIcon;
+        templateData.responsibleMessage = build.responsibleMessage;
+        templateData.responsibleComment= build.responsibleComment;
         templateData.columns = build.columns;
     },
 

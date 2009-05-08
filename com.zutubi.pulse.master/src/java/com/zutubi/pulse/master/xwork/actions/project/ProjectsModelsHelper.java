@@ -36,14 +36,15 @@ public class ProjectsModelsHelper
 
     private ProjectsModelSorter sorter = new ProjectsModelSorter();
 
-    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, Urls urls, boolean showUngrouped)
+    public List<ProjectsModel> createProjectsModels(User loggedInUser, ProjectsSummaryConfiguration configuration, Urls urls, boolean showUngrouped)
     {
-        return createProjectsModels(configuration, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new TruePredicate<ProjectGroup>(), showUngrouped);
+        return createProjectsModels(loggedInUser, configuration, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new TruePredicate<ProjectGroup>(), showUngrouped);
     }
 
     /**
      * Creates a list of models, one for each group of projects to be shown.
      *
+     * @param loggedInUser     the user that is currently logged in, if any
      * @param configuration    configuration controlling overall layout (e.g.
      *                         are hierarchies shown)
      * @param tuples           set of (label,project) tuples, one for each
@@ -59,7 +60,7 @@ public class ProjectsModelsHelper
      * @return a list of models ready for JSON encoding and sending to a
      *         projects view in the UI 
      */
-    public List<ProjectsModel> createProjectsModels(ProjectsSummaryConfiguration configuration, Set<LabelProjectTuple> tuples, Urls urls, Predicate<Project> projectPredicate, Predicate<ProjectGroup> groupPredicate, boolean showUngrouped)
+    public List<ProjectsModel> createProjectsModels(User loggedInUser, ProjectsSummaryConfiguration configuration, Set<LabelProjectTuple> tuples, Urls urls, Predicate<Project> projectPredicate, Predicate<ProjectGroup> groupPredicate, boolean showUngrouped)
     {
         Set<String> collapsed = translateCollapsed(tuples);
         List<Project> projects = CollectionUtils.filter(projectManager.getProjects(false), projectPredicate);
@@ -74,7 +75,7 @@ public class ProjectsModelsHelper
             List<Project> groupProjects = CollectionUtils.filter(group.getProjects(), projectPredicate);
             if (!groupProjects.isEmpty())
             {
-                ProjectsModel projectsModel = createModel(group.getName(), true, groupProjects, hierarchy, configuration, collapsed, buildCache, urls);
+                ProjectsModel projectsModel = createModel(group.getName(), true, groupProjects, hierarchy, loggedInUser, configuration, collapsed, buildCache, urls);
                 result.add(projectsModel);
                 projects.removeAll(groupProjects);
             }
@@ -85,7 +86,7 @@ public class ProjectsModelsHelper
             // CIB-1550: Only label as ungrouped if there are some other groups.
             Messages messages = Messages.getInstance(ProjectsModelsHelper.class);
             String name = result.size() > 0 ? messages.format("projects.ungrouped") : messages.format("projects.all");
-            ProjectsModel projectsModel = createModel(name, false, projects, hierarchy, configuration, collapsed, buildCache, urls);
+            ProjectsModel projectsModel = createModel(name, false, projects, hierarchy, loggedInUser, configuration, collapsed, buildCache, urls);
             result.add(projectsModel);
         }
 
@@ -126,7 +127,7 @@ public class ProjectsModelsHelper
         return result;
     }
 
-    private ProjectsModel createModel(String name, boolean labelled, Collection<Project> projects, TemplateHierarchy hierarchy, ProjectsSummaryConfiguration configuration, Set<String> collapsed, Map<Project, List<BuildResult>> buildCache, Urls urls)
+    private ProjectsModel createModel(String name, boolean labelled, Collection<Project> projects, TemplateHierarchy hierarchy, User loggedInUser, ProjectsSummaryConfiguration configuration, Set<String> collapsed, Map<Project, List<BuildResult>> buildCache, Urls urls)
     {
         ProjectsModel model = new ProjectsModel(name, labelled, collapsed.contains((labelled ? name : "") + SEPARATOR));
         if (configuration.isHierarchyShown())
@@ -145,7 +146,7 @@ public class ProjectsModelsHelper
                 }
             }
 
-            processLevel(model, model.getRoot(), Arrays.asList(hierarchy.getRoot()), 0, includedInGroup, configuration, collapsed, buildCache, urls);
+            processLevel(model, model.getRoot(), Arrays.asList(hierarchy.getRoot()), 0, includedInGroup, loggedInUser, configuration, collapsed, buildCache, urls);
         }
         else
         {
@@ -153,14 +154,14 @@ public class ProjectsModelsHelper
             {
                 boolean canTrigger = accessManager.hasPermission(ProjectConfigurationActions.ACTION_TRIGGER, p);
                 boolean canViewSource = accessManager.hasPermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, p);
-                model.getRoot().addChild(new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), configuration, urls, canTrigger, canViewSource));
+                model.getRoot().addChild(new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, canTrigger, canViewSource));
             }
         }
 
         return model;
     }
 
-    private void processLevel(ProjectsModel group, TemplateProjectModel parentModel, List<TemplateNode> nodes, int depth, Set<String> includedInGroup, ProjectsSummaryConfiguration configuration, Set<String> collapsed, Map<Project, List<BuildResult>> buildCache, Urls urls)
+    private void processLevel(ProjectsModel group, TemplateProjectModel parentModel, List<TemplateNode> nodes, int depth, Set<String> includedInGroup, User loggedInUser, ProjectsSummaryConfiguration configuration, Set<String> collapsed, Map<Project, List<BuildResult>> buildCache, Urls urls)
     {
         for (TemplateNode node : nodes)
         {
@@ -176,13 +177,13 @@ public class ProjectsModelsHelper
                         List<BuildResult> builds = getBuilds(project, configuration, buildCache);
                         boolean canTrigger = accessManager.hasPermission(ProjectConfigurationActions.ACTION_TRIGGER, project);
                         boolean canViewSource = accessManager.hasPermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, project);
-                        model = new ConcreteProjectModel(group, project, builds, configuration, urls, canTrigger, canViewSource);
+                        model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, canTrigger, canViewSource);
                     }
                     else
                     {
                         String groupName = group.isLabelled() ? group.getGroupName() : "";
                         TemplateProjectModel template = new TemplateProjectModel(group, name, collapsed.contains(groupName + SEPARATOR + name));
-                        processLevel(group, template, node.getChildren(), depth + 1, includedInGroup, configuration, collapsed, buildCache, urls);
+                        processLevel(group, template, node.getChildren(), depth + 1, includedInGroup, loggedInUser, configuration, collapsed, buildCache, urls);
                         model = template;
                     }
 
@@ -191,7 +192,7 @@ public class ProjectsModelsHelper
             }
             else
             {
-                processLevel(group, parentModel, node.getChildren(), depth + 1, includedInGroup, configuration, collapsed, buildCache, urls);
+                processLevel(group, parentModel, node.getChildren(), depth + 1, includedInGroup, loggedInUser, configuration, collapsed, buildCache, urls);
             }
         }
     }

@@ -323,6 +323,21 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public List<BuildResult> findByResponsible(User user)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void takeResponsibility(BuildResult buildResult, User user, String comment)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void clearResponsibility(BuildResult buildResult)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
     // debugging hack: need to work out a better way
     public void executeInTransaction(Runnable runnable)
     {

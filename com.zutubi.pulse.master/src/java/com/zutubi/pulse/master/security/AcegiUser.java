@@ -1,13 +1,14 @@
 package com.zutubi.pulse.master.security;
 
+import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.master.model.GrantedAuthority;
-import com.zutubi.pulse.master.model.User;
 import com.zutubi.tove.security.Actor;
 import org.acegisecurity.userdetails.UserDetails;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,13 +48,15 @@ public class AcegiUser implements Actor, UserDetails
         return authoritySet;
     }
 
+    public boolean isAnonymous()
+    {
+        return false;
+    }
+
     private synchronized void initAuthorities(UserConfiguration config, List<GroupConfiguration> groups)
     {
         authoritySet = new HashSet<String>();
-        for(String a: config.getGrantedAuthorities())
-        {
-            authoritySet.add(a);
-        }
+        authoritySet.addAll(Arrays.asList(config.getGrantedAuthorities()));
 
         if (groups != null)
         {
@@ -66,10 +69,7 @@ public class AcegiUser implements Actor, UserDetails
 
     private void addGroupAuthorities(AbstractGroupConfiguration g)
     {
-        for(String a: g.getGrantedAuthorities())
-        {
-            authoritySet.add(a);
-        }
+        authoritySet.addAll(Arrays.asList(g.getGrantedAuthorities()));
     }
 
     public synchronized org.acegisecurity.GrantedAuthority[] getAuthorities()

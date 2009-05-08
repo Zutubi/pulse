@@ -59,7 +59,7 @@ public class BrowseDataAction extends ProjectActionSupport
 
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
-        models = helper.createProjectsModels(browseConfig, collapsed, urls, new TruePredicate<Project>(), new Predicate<ProjectGroup>()
+        models = helper.createProjectsModels(user, browseConfig, collapsed, urls, new TruePredicate<Project>(), new Predicate<ProjectGroup>()
         {
             public boolean satisfied(ProjectGroup projectGroup)
             {

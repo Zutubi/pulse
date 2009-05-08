@@ -483,6 +483,17 @@ public class XmlRpcHelper
         return path;
     }
 
+    public boolean ensureUser(String login) throws Exception
+    {
+        if(!configPathExists("users/" + login))
+        {
+            insertTrivialUser(login);
+            return true;
+        }
+
+        return false;
+    }
+
     public String insertTrivialUser(String login) throws Exception
     {
         Hashtable<String, Object> user = createDefaultConfig(UserConfiguration.class);
@@ -632,6 +643,21 @@ public class XmlRpcHelper
                 }
             }
         }, timeout, "build " + number + " of project " + projectName + " to complete");
+    }
+
+    public Hashtable<String, String> getResponsibilityInfo(String projectName, int number) throws Exception
+    {
+        return call("getResponsibilityInfo", projectName, number);
+    }
+
+    public void takeResponsibility(String projectName, int number, String comment) throws Exception
+    {
+        call("takeResponsibility", projectName, number, comment);
+    }
+
+    public boolean clearResponsibility(String projectName, int number) throws Exception
+    {
+        return (Boolean) call("clearResponsibility", projectName, number);
     }
 
     public static void main(String[] argv) throws Exception

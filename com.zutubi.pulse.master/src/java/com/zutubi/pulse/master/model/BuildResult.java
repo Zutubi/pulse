@@ -21,6 +21,10 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     public static final String BUILD_LOG = "build.log";
     public static final String PULSE_FILE = "pulse.xml";
 
+    public static final String ACTION_CANCEL = "cancel";
+    public static final String ACTION_CLEAR_RESPONSIBILITY = "clearResponsibility";
+    public static final String ACTION_TAKE_RESPONSIBILITY = "takeResponsibility";
+
     private BuildReason reason;
     private Project project;
     /**
@@ -42,6 +46,10 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
      * Set to false when the working directory is cleaned up.
      */
     private boolean hasWorkDir;
+    /**
+     * If not null, holds details about the user responsible for this build.
+     */
+    private BuildResponsibility responsibility;
 
     public BuildResult()
     {
@@ -432,5 +440,15 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         {
             calculateNodeFeatureCounts(child);
         }
+    }
+
+    public BuildResponsibility getResponsibility()
+    {
+        return responsibility;
+    }
+
+    public void setResponsibility(BuildResponsibility responsibility)
+    {
+        this.responsibility = responsibility;
     }
 }

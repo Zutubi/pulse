@@ -50,6 +50,11 @@
         <property name="hasWorkDir" type="boolean"/>
 
         <property name="revisionString" column="REVISION_STRING" type="string" length="8191"/>
+
+        <component name="responsibility" class="com.zutubi.pulse.master.model.BuildResponsibility">
+            <many-to-one name="user" column="RESPONSIBLE_USER_ID" class="com.zutubi.pulse.master.model.User" cascade="none" not-null="false"/>
+            <property name="comment" column="RESPONSIBLE_COMMENT" type="string" length="8191" not-null="false"/>
+        </component>
     </class>
 
     <class name="com.zutubi.pulse.master.model.AbstractBuildReason" table="BUILD_REASON" lazy="false">

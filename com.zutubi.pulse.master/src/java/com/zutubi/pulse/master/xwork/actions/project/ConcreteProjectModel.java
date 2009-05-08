@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
@@ -25,7 +26,7 @@ public class ConcreteProjectModel extends ProjectModel
     private boolean canViewSource;
     private long projectId;
 
-    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean canTrigger, boolean canViewSource)
+    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean canTrigger, boolean canViewSource)
     {
         super(group, project.getName());
 
@@ -43,7 +44,7 @@ public class ConcreteProjectModel extends ProjectModel
         {
             public ProjectBuildModel map(BuildResult buildResult)
             {
-                return new ProjectBuildModel(buildResult, configuration, urls);
+                return new ProjectBuildModel(buildResult, loggedInUser, configuration, urls);
             }
         });
 

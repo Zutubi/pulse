@@ -86,7 +86,7 @@ public class ProjectsModelTestBase extends PulseTestCase
 
     protected ConcreteProjectModel createConcrete(ProjectsModel group, Project project)
     {
-        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), config, urls, true, true);
+        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), null, config, urls, true, true);
     }
 
     protected TemplateProjectModel createTemplates(String label, String projectName, Object... members)

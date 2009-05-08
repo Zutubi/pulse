@@ -1,22 +1,29 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildColumns;
+import com.zutubi.pulse.master.model.BuildResponsibility;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.master.tove.model.ActionLink;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
+import java.io.File;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -33,15 +40,18 @@ public class ViewBuildAction extends CommandActionBase
 
     private List<PersistentChangelist> changelists;
     private BuildColumns summaryColumns;
-
-    private MasterConfigurationManager configurationManager;
     /**
      * Insanity to work around lack of locals in velocity.
      */
     private Stack<String> pathStack = new Stack<String>();
-    private boolean cancelAvailable;
-    private boolean deleteAvailable;
+    private String responsibleOwner;
+    private String responsibleComment;
+    private boolean canClearResponsible = false;
+    private List<ActionLink> actions = new LinkedList<ActionLink>();
     private List<BuildHookConfiguration> hooks;
+
+    private MasterConfigurationManager configurationManager;
+    private SystemPaths systemPaths;
 
     public boolean haveRecipeResultNode()
     {
@@ -88,24 +98,29 @@ public class ViewBuildAction extends CommandActionBase
         return limit;
     }
 
+    public String getResponsibleOwner()
+    {
+        return responsibleOwner;
+    }
+
+    public String getResponsibleComment()
+    {
+        return responsibleComment;
+    }
+
+    public boolean isCanClearResponsible()
+    {
+        return canClearResponsible;
+    }
+
+    public List<ActionLink> getActions()
+    {
+        return actions;
+    }
+
     public List<BuildHookConfiguration> getHooks()
     {
         return hooks;
-    }
-
-    public boolean isCancelAvailable()
-    {
-        return cancelAvailable;
-    }
-
-    public boolean isDeleteAvailable()
-    {
-        return deleteAvailable;
-    }
-
-    public boolean hasActions()
-    {
-        return cancelAvailable || deleteAvailable;
     }
 
     public String execute()
@@ -129,15 +144,39 @@ public class ViewBuildAction extends CommandActionBase
             hooks = Collections.emptyList();
         }
 
+        Messages messages = Messages.getInstance(BuildResult.class);
+        File contentRoot = systemPaths.getContentRoot();
         if (result.completed())
         {
-            cancelAvailable = false;
-            deleteAvailable = canWrite;
+            if (canWrite)
+            {
+                actions.add(ToveUtils.getActionLink(AccessManager.ACTION_DELETE, messages, contentRoot));
+            }
         }
         else
         {
-            cancelAvailable = accessManager.hasPermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, result);
-            deleteAvailable = false;
+            if (accessManager.hasPermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, result))
+            {
+                actions.add(ToveUtils.getActionLink(BuildResult.ACTION_CANCEL, messages, contentRoot));
+            }
+        }
+
+        BuildResponsibility buildResponsibility = result.getResponsibility();
+        if (buildResponsibility == null && accessManager.hasPermission(BuildResult.ACTION_TAKE_RESPONSIBILITY, result))
+        {
+            actions.add(ToveUtils.getActionLink(BuildResult.ACTION_TAKE_RESPONSIBILITY, messages, contentRoot));
+        }
+
+        if (buildResponsibility != null)
+        {
+            responsibleOwner = buildResponsibility.getMessage(getLoggedInUser());
+            responsibleComment = buildResponsibility.getComment();
+
+            if (accessManager.hasPermission(BuildResult.ACTION_CLEAR_RESPONSIBILITY, result))
+            {
+                canClearResponsible = true;
+                actions.add(ToveUtils.getActionLink(BuildResult.ACTION_CLEAR_RESPONSIBILITY, messages, contentRoot));
+            }
         }
 
         // Initialise detail down to the command level (optional)
@@ -182,5 +221,10 @@ public class ViewBuildAction extends CommandActionBase
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setSystemPaths(SystemPaths systemPaths)
+    {
+        this.systemPaths = systemPaths;
     }
 }

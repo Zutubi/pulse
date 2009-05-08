@@ -865,6 +865,41 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(p2, results.get(1).getProject());
     }
 
+    public void testFindByResponsible()
+    {
+        Project p = new Project();
+        projectDao.save(p);
+
+        User u1 = new User();
+        User u2 = new User();
+        User u3 = new User();
+        userDao.save(u1);
+        userDao.save(u2);
+        userDao.save(u3);
+
+        BuildResult r1 = createCompletedBuild(p, 1);
+        r1.setResponsibility(new BuildResponsibility(u1, null));
+        BuildResult r2 = createCompletedBuild(p, 2);
+        BuildResult r3 = createCompletedBuild(p, 3);
+        r3.setResponsibility(new BuildResponsibility(u2, "yep"));
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> results = buildResultDao.findByResponsible(u1);
+        assertEquals(1, results.size());
+        assertEquals(u1, results.get(0).getResponsibility().getUser());
+
+        results = buildResultDao.findByResponsible(u2);
+        assertEquals(1, results.size());
+        assertEquals(u2, results.get(0).getResponsibility().getUser());
+
+        results = buildResultDao.findByResponsible(u3);
+        assertEquals(0, results.size());
+    }
+
     private void addMessageBuild(Project p1, Feature.Level level, int number)
     {
         BuildResult result = createCompletedBuild(p1, number);

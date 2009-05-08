@@ -60,6 +60,24 @@ public class DashboardDataAction extends ActionSupport
             return ERROR;
         }
 
+        List<String> contactPointsWithErrors = new LinkedList<String>();
+        for (ContactConfiguration contact : user.getConfig().getPreferences().getContacts().values())
+        {
+            if (resultNotifier.hasError(contact))
+            {
+                contactPointsWithErrors.add(contact.getName());
+            }
+        }
+
+        List<BuildResult> responsibleFor = buildManager.findByResponsible(user);
+        List<ResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Mapping<BuildResult, ResponsibilityModel>()
+        {
+            public ResponsibilityModel map(BuildResult buildResult)
+            {
+                return new ResponsibilityModel(buildResult.getProject().getName(), buildResult.getId(), buildResult.getNumber());
+            }
+        });
+
         final DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
 
         Predicate<Project> projectPredicate;
@@ -118,7 +136,7 @@ public class DashboardDataAction extends ActionSupport
 
         ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
-        List<ProjectsModel> projectsModels = helper.createProjectsModels(dashboardConfig, user.getDashboardCollapsed(), urls, projectPredicate, groupPredicate, showUngrouped);
+        List<ProjectsModel> projectsModels = helper.createProjectsModels(user, dashboardConfig, user.getDashboardCollapsed(), urls, projectPredicate, groupPredicate, showUngrouped);
         sorter.sort(projectsModels);
 
         List<PersistentChangelist> changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
@@ -131,16 +149,7 @@ public class DashboardDataAction extends ActionSupport
             projectChangelists.addAll(buildManager.getLatestChangesForProjects(projects.toArray(new Project[projects.size()]), dashboardConfig.getProjectChangeCount()));
         }
 
-        List<String> contactPointsWithErrors = new LinkedList<String>();
-        for (ContactConfiguration contact : user.getConfig().getPreferences().getContacts().values())
-        {
-            if (resultNotifier.hasError(contact))
-            {
-                contactPointsWithErrors.add(contact.getName());
-            }
-        }
-
-        model = new DashboardModel(contactPointsWithErrors, projectsModels, mapChangelists(changelists), mapChangelists(projectChangelists));
+        model = new DashboardModel(contactPointsWithErrors, responsibilities, projectsModels, mapChangelists(changelists), mapChangelists(projectChangelists));
 
         return SUCCESS;
     }

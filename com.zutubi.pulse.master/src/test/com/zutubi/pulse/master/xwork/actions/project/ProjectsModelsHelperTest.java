@@ -140,14 +140,14 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
     {
         config.setHierarchyShown(false);
 
-        assertProjectsModelLists(getAllFlatGroups(true), helper.createProjectsModels(config, urls, true));
+        assertProjectsModelLists(getAllFlatGroups(true), helper.createProjectsModels(null, config, urls, true));
     }
 
     public void testNoHierarchyNoUngrouped()
     {
         config.setHierarchyShown(false);
 
-        assertProjectsModelLists(getAllFlatGroups(false), helper.createProjectsModels(config, urls, false));
+        assertProjectsModelLists(getAllFlatGroups(false), helper.createProjectsModels(null, config, urls, false));
     }
 
     public void testHierarchyFull()
@@ -161,7 +161,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_GLOBAL, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2))),
                 createHierarchicalGroup(null, createTemplates(null, TEMPLATE_GLOBAL, createTemplates(null, TEMPLATE_CHILD, cp3), p2))
         );
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, urls, true));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, urls, true));
     }
 
     public void testHierarchyFullNoUngrouped()
@@ -174,7 +174,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createHierarchicalGroup(LABEL_ODD, createTemplates(LABEL_ODD, TEMPLATE_GLOBAL, createTemplates(LABEL_ODD, TEMPLATE_CHILD, cp1), p1, p3)),
                 createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_GLOBAL, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)))
         );
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, urls, false));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, urls, false));
     }
 
     public void testHierarchyOneLevelHidden()
@@ -188,7 +188,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2)),
                 createHierarchicalGroup(null, createTemplates(null, TEMPLATE_CHILD, cp3), p2)
         );
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, urls, true));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, urls, true));
     }
 
     public void testHierarchyOneLevelHiddenNoUngrouped()
@@ -201,7 +201,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createHierarchicalGroup(LABEL_ODD, createTemplates(LABEL_ODD, TEMPLATE_CHILD, cp1), p1, p3),
                 createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2))
         );
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, urls, false));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, urls, false));
     }
     
     public void testHierarchyTwoLevelsHidden()
@@ -209,7 +209,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(2);
 
-        assertProjectsModelLists(getAllFlatGroups(true), helper.createProjectsModels(config, urls, true));
+        assertProjectsModelLists(getAllFlatGroups(true), helper.createProjectsModels(null, config, urls, true));
     }
 
     public void testHierarchyThreeLevelsHidden()
@@ -217,7 +217,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(3);
 
-        assertProjectsModelLists(getAllFlatGroups(true), helper.createProjectsModels(config, urls, true));
+        assertProjectsModelLists(getAllFlatGroups(true), helper.createProjectsModels(null, config, urls, true));
     }
 
     public void testFilterOutAllGroupsNoHierarchy()
@@ -225,14 +225,14 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         config.setHierarchyShown(false);
 
         List<ProjectsModel> expectedModels = Arrays.asList(createFlatGroup(null, cp1, cp2, cp3, p1, p2, p3));
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutAllGroupsNoUngroupedNoHierarchy()
     {
         config.setHierarchyShown(false);
 
-        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), false));
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), false));
     }
 
     public void testFilterOutAllGroupsHierarchyFull()
@@ -243,7 +243,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         List<ProjectsModel> expectedModels = Arrays.asList(
                 createHierarchicalGroup(null, createTemplates(null, TEMPLATE_GLOBAL, createTemplates(null, TEMPLATE_CHILD, cp1, cp2, cp3), p1, p2, p3))
         );
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutAllGroupsNoUngroupedHierarchyFull()
@@ -251,7 +251,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(0);
 
-        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), false));
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), false));
     }
 
     public void testFilterOutAllGroupsHierarchyOneLevelHidden()
@@ -260,7 +260,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         config.setHiddenHierarchyLevels(1);
 
         List<ProjectsModel> expectedModels = Arrays.asList(createHierarchicalGroup(null, createTemplates(null, TEMPLATE_CHILD, cp1, cp2, cp3), p1, p2, p3));
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutAllGroupsNoUngroupedHierarchyOneLevelHidden()
@@ -268,7 +268,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(1);
 
-        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), false));
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), false));
     }
 
     public void testFilterOutSpecificGroupsNoHierarchy()
@@ -281,7 +281,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createFlatGroup(null, cp3, p2, p3)
         );
 
-        List<ProjectsModel> gotModels = helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), true);
+        List<ProjectsModel> gotModels = helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), true);
         assertProjectsModelLists(expectedModels, gotModels);
     }
 
@@ -294,7 +294,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createFlatGroup(LABEL_STRANGE, cp1, cp2)
         );
 
-        List<ProjectsModel> gotModels = helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), false);
+        List<ProjectsModel> gotModels = helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), false);
         assertProjectsModelLists(expectedModels, gotModels);
     }
 
@@ -309,7 +309,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createHierarchicalGroup(null, createTemplates(null, TEMPLATE_CHILD, cp3), p2, p3)
         );
 
-        List<ProjectsModel> gotModels = helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), true);
+        List<ProjectsModel> gotModels = helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), true);
         assertProjectsModelLists(expectedModels, gotModels);
     }
 
@@ -323,7 +323,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createHierarchicalGroup(LABEL_STRANGE, createTemplates(LABEL_STRANGE, TEMPLATE_CHILD, cp1, cp2))
         );
 
-        List<ProjectsModel> gotModels = helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), false);
+        List<ProjectsModel> gotModels = helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY), groups.get(LABEL_STRANGE)), false);
         assertProjectsModelLists(expectedModels, gotModels);
     }
     
@@ -331,7 +331,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
     {
         config.setHierarchyShown(false);
 
-        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new FalsePredicate<Project>(), new TruePredicate<ProjectGroup>(), true));
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new FalsePredicate<Project>(), new TruePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutAllProjectsHierarchyFull()
@@ -339,7 +339,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         config.setHierarchyShown(true);
         config.setHiddenHierarchyLevels(0);
 
-        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new FalsePredicate<Project>(), new TruePredicate<ProjectGroup>(), true));
+        assertProjectsModelLists(Collections.<ProjectsModel>emptyList(), helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new FalsePredicate<Project>(), new TruePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutSpecificProjectsNoHierarchy()
@@ -352,7 +352,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createFlatGroup(null, p2)
         );
 
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new TruePredicate<ProjectGroup>(), true));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new TruePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutSpecificProjectsHierarchyOneLevelHidden()
@@ -366,7 +366,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createHierarchicalGroup(null, p2)
         );
 
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new TruePredicate<ProjectGroup>(), true));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new TruePredicate<ProjectGroup>(), true));
     }
 
     public void testFilterOutSpecificProjectsAndGroupsNoHierarchy()
@@ -378,14 +378,14 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
                 createFlatGroup(null, cp2, p2)
         );
 
-        assertProjectsModelLists(expectedModels, helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_ODD)), true));
+        assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_ODD)), true));
     }
 
     public void testBuildCountApplied()
     {
         config.setBuildsPerProject(3);
         
-        helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
+        helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
         verify(buildManager).getLatestBuildResultsForProject(p1, 3);
         verifyNoMoreInteractions(buildManager);
     }
@@ -395,7 +395,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         config.setBuildsPerProject(1);
 
         stub(buildManager.getLatestBuildResultsForProject((Project) anyObject(), anyInt())).toReturn(Arrays.asList(createBuild(p1, 2), createBuild(p1, 1)));
-        List<ProjectsModel> models = helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
+        List<ProjectsModel> models = helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
         verify(buildManager).getLatestBuildResultsForProject(p1, 2);
         verifyNoMoreInteractions(buildManager);
 
@@ -405,7 +405,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
 
     public void testLabellingOfUngroupedSomeGroups()
     {
-        List<ProjectsModel> projectsModels = helper.createProjectsModels(config, urls, true);
+        List<ProjectsModel> projectsModels = helper.createProjectsModels(null, config, urls, true);
         // Upgrouped projects come last.
         ProjectsModel ungroup = projectsModels.get(projectsModels.size() - 1);
         assertFalse(ungroup.isLabelled());
@@ -414,7 +414,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
 
     public void testLabellingOfUngroupedNoGroups()
     {
-        List<ProjectsModel> projectsModels = helper.createProjectsModels(config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true);
+        List<ProjectsModel> projectsModels = helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new FalsePredicate<ProjectGroup>(), true);
 
         // When there are no other groups, don't use the "ungrouped" term
         ProjectsModel ungroup = projectsModels.get(projectsModels.size() - 1);

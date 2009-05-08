@@ -8,6 +8,7 @@
             <h2 class="section top">#wwtext("name=current.build")</h2>
 
         #if($currentBuild)
+            #responsibilityPanel($currentBuild)
             #showBuild($currentBuild true false)
             #buildTableColumns($summaryColumns "project.summary")            
         #else

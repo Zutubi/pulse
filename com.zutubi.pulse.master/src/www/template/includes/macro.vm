@@ -2226,4 +2226,18 @@
     <strong>Total Elapsed Time</strong>: $monitor.elapsedTimePretty
 </p>
 
-#end        
+#end
+
+#macro(responsibilityPanel $result)
+    #if($responsibleOwner)
+    <p class="note" style="margin-bottom: 16px" id="responsible-panel">
+            <img alt="fixing" src="$base/images/config/actions/takeResponsibility.gif" style="padding: 0 6px 0 6px"/> <span id="responsible-message">#html($responsibleOwner)</span>
+        #if($canClearResponsible)
+            [<a href="#" id="responsible-clear" onclick="clearResponsibility('$result.id'); return false">clear</a>]
+        #end
+        #if($responsibleComment && $responsibleComment.length() > 0)
+            : <img alt="comment" src="$base/images/comment.gif" style="padding: 0 6px 0 6px"/> <span id="responsible-comment" class="comment">#html($responsibleComment)</span>
+        #end
+    </p>
+    #end
+#end

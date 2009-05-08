@@ -31,4 +31,9 @@ public class AnonymousActor implements Actor
     {
         return grantedAuthorities;
     }
+
+    public boolean isAnonymous()
+    {
+        return true;
+    }
 }

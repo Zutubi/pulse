@@ -28,6 +28,11 @@ public class DefaultActor implements Actor
         return grantedAuthorities;
     }
 
+    public boolean isAnonymous()
+    {
+        return false;
+    }
+
     public void addGrantedAuthority(String authority)
     {
         grantedAuthorities.add(authority);
