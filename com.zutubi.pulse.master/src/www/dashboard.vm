@@ -20,14 +20,26 @@
         var myProjectsChangesTable;
 
         function update(data) {
-            if (data.contactPointsWithErrors)
+            var center = Ext.get('center');
+            center.select('.note').remove();
+
+            var responsibilities = data.responsibilities;
+            if (responsibilities.length > 0)
             {
-                var center = Ext.get('center');
-                var points = data.contactPointsWithErrors;
-                for (var i = 0; i < points.length; i++)
-                {
-                    center.insertHtml("afterBegin", "<p class='note'>Your contact point '" + Ext.util.Format.htmlEncode(points[i]) + "' has caused a notification error. View its <a href='$base/dashboard/preferences/contacts/" + encodeURIComponent(points[i]) + "/'>configuration</a> for details.</p>");
-                }
+                var template = new Ext.XTemplate('<div id="responsibilities" class="note">You are currently responsible for:' +
+                                                     '<ul class="fixing">' +
+                                                         '<tpl for="responsibilities">' +
+                                                             '<li id="{id}"><a href="{base}{url}">{project:htmlEncode}</a>: <a href="{base}{url}builds/{number}/">build {number}</a> [<a href="#" id="clear-{id}" onclick="clearResponsibility(\'{buildId}\'); return false">clear</a>]</li>' +
+                                                         '</tpl>' +
+                                                     '</ul>' +
+                                                 '</div>');
+                template.insertFirst(center, {base: window.baseUrl, responsibilities: responsibilities});
+            }
+
+            var points = data.contactPointsWithErrors;
+            for (var i = 0; i < points.length; i++)
+            {
+                center.insertHtml("afterBegin", "<p class='note'>Your contact point '" + Ext.util.Format.htmlEncode(points[i]) + "' has caused a notification error. View its <a href='$base/dashboard/preferences/contacts/" + encodeURIComponent(points[i]) + "/'>configuration</a> for details.</p>");
             }
 
             projectsTable.update(data.projects);

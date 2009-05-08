@@ -3,10 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.master.model.BuildColumns;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
@@ -35,6 +32,9 @@ public class ProjectHomeAction extends ProjectActionBase
     private boolean paused;
     private boolean pausable;
     private boolean resumable;
+    private String responsibleOwner;
+    private String responsibleComment;
+    private boolean canClearResponsible = false;
     private BuildResult currentBuild;
     private List<PersistentChangelist> latestChanges;
     private List<BuildResult> recentBuilds;
@@ -119,6 +119,21 @@ public class ProjectHomeAction extends ProjectActionBase
         return project.getState() == Project.State.PAUSED || project.getState() == Project.State.IDLE;
     }
 
+    public String getResponsibleOwner()
+    {
+        return responsibleOwner;
+    }
+
+    public String getResponsibleComment()
+    {
+        return responsibleComment;
+    }
+
+    public boolean isCanClearResponsible()
+    {
+        return canClearResponsible;
+    }
+
     public BuildResult getCurrentBuild()
     {
         return currentBuild;
@@ -161,6 +176,17 @@ public class ProjectHomeAction extends ProjectActionBase
         successfulBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS});
         failedBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE});
         currentBuild = buildManager.getLatestBuildResult(project);
+        if (currentBuild != null)
+        {
+            BuildResponsibility buildResponsibility = currentBuild.getResponsibility();
+            if (buildResponsibility != null)
+            {
+                responsibleOwner = buildResponsibility.getMessage(getLoggedInUser());
+                responsibleComment = buildResponsibility.getComment();
+                canClearResponsible = accessManager.hasPermission(BuildResult.ACTION_CLEAR_RESPONSIBILITY, currentBuild);
+            }
+        }
+
         latestChanges = buildManager.getLatestChangesForProject(project, 10);
         recentBuilds = buildManager.getLatestBuildResultsForProject(project, 11);
         if(!recentBuilds.isEmpty())

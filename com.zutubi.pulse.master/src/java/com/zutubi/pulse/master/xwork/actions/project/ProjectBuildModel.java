@@ -11,9 +11,7 @@ import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.model.BuildColumns;
-import com.zutubi.pulse.master.model.BuildReason;
-import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -22,6 +20,7 @@ import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;
+import com.zutubi.util.StringUtils;
 import flexjson.JSON;
 
 import java.util.LinkedList;
@@ -34,6 +33,8 @@ import java.util.List;
  */
 public class ProjectBuildModel
 {
+    private static final int MAX_COMMENT_LENGTH = 60;
+
     private static final String LABEL_REMAINING = "remaining";
     private static final String LABEL_TIME = "time";
 
@@ -47,14 +48,24 @@ public class ProjectBuildModel
     private ResultState state;
     private String status;
     private String statusIcon;
+    private String responsibleMessage;
+    private String responsibleComment;
     private List<String> columns = new LinkedList<String>();
 
-    public ProjectBuildModel(final BuildResult buildResult, ProjectsSummaryConfiguration configuration, final Urls urls)
+    public ProjectBuildModel(final BuildResult buildResult, User loggedInUser, ProjectsSummaryConfiguration configuration, final Urls urls)
     {
         number = buildResult.getNumber();
         state = buildResult.getState();
         status = buildResult.getState().getPrettyString();
         statusIcon = ToveUtils.getStatusIcon(buildResult);
+
+        BuildResponsibility responsibility = buildResult.getResponsibility();
+        if (responsibility != null)
+        {
+            responsibleMessage = responsibility.getMessage(loggedInUser);
+            responsibleComment = StringUtils.trimmedString(responsibility.getComment(), MAX_COMMENT_LENGTH);
+        }
+
         columns = CollectionUtils.map(configuration.getColumns(), new Mapping<String, String>()
         {
             public String map(String column)
@@ -83,6 +94,16 @@ public class ProjectBuildModel
     public String getStatusIcon()
     {
         return statusIcon;
+    }
+
+    public String getResponsibleMessage()
+    {
+        return responsibleMessage;
+    }
+
+    public String getResponsibleComment()
+    {
+        return responsibleComment;
     }
 
     @JSON

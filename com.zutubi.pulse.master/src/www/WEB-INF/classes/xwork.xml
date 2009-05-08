@@ -494,13 +494,23 @@
         <action name="triggerBuildHook" class="com.zutubi.pulse.master.xwork.actions.ajax.TriggerBuildHookAction">
             <result name="success" type="flexjson">result</result>
         </action>
-        
+
         <action name="reference" class="com.zutubi.pulse.master.tove.webwork.help.ReferenceAction">
             <result name="builtin" type="velocity">reference/builtins/${baseName}.vm</result>
             <result name="element" type="velocity">reference/element.vm</result>
             <result name="extensible" type="velocity">reference/extensible.vm</result>
             <result name="filetype" type="velocity">reference/filetypes/${baseName}.vm</result>
             <result name="static" type="velocity">reference/static/${baseName}.vm</result>
+        </action>
+
+        <action name="takeResponsibility" class="com.zutubi.pulse.master.xwork.actions.ajax.TakeResponsibilityAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
+
+        <action name="clearResponsibility" class="com.zutubi.pulse.master.xwork.actions.ajax.ClearResponsibilityAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="flexjson">result</result>
         </action>
     </package>
 

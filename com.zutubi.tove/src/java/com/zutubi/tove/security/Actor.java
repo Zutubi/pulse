@@ -10,4 +10,10 @@ public interface Actor
 {
     String getUsername();
     Set<String> getGrantedAuthorities();
+    /**
+     * Indicates if this actor represents an anonymous user.
+     *
+     * @return true if the actor is anonymous, false if they have an identity
+     */
+    boolean isAnonymous();
 }

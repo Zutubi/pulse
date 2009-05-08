@@ -1,29 +1,33 @@
+#responsibilityPanel($result)
+
 #if($personal)
     #set($ownerArg = "personal=true")
 #else
     #set($ownerArg = "projectName=$u_projectName")
 #end
-#if($action.hasActions() || $hooks.size() > 0)
+#if($actions.size() > 0 || $hooks.size() > 0)
     <div id="action-column" style="margin-left: 20px; float: right;">
-    #if($action.hasActions())
+    #if($actions.size() > 0)
         <table width="150" class="content">
             <tr>
                 <th class="heading">actions</th>
             </tr>
-        #if($cancelAvailable)
+        #foreach($actionLink in $actions)
             <tr>
                 <td class="content">
-                    <img alt="cancel" src="$base/images/cancel.gif"/>
-                    <a href="$base/cancelBuild.action?buildId=$result.id&fromBuild=true">#wwtext("name=cancel")</a>
-                </td>
-            </tr>
-        #end
-        #if($deleteAvailable)
-            #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
-            <tr>
-                <td class="content">
-                    <img alt="delete" src="$base/images/delete.gif"/>
-                    <a href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?${ownerArg}&amp;buildVID=$buildResult.number')">#wwtext("name=build.delete")</a>
+                    <img alt="$actionLink.label" src="$base/images/config/actions/${actionLink.icon}.gif"/>
+                    <a id="action.${actionLink.action}"
+            #if($actionLink.action == "cancel")
+                        href="$base/cancelBuild.action?buildId=$result.id&fromBuild=true"
+            #elseif($actionLink.action == "delete")
+                        #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
+                        href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?${ownerArg}&amp;buildVID=$buildResult.number')"
+            #elseif($actionLink.action == "takeResponsibility")
+                        href="#" onclick="takeResponsibility('$result.id'); return false"
+            #elseif($actionLink.action == "clearResponsibility")
+                        href="#" onclick="clearResponsibility('$result.id'); return false"
+            #end
+                    >$actionLink.label</a>
                 </td>
             </tr>
         #end
@@ -50,4 +54,3 @@
     <div id='#id("${result.ownerName}-build-${result.number}-summary")'>
         #showBuild($buildResult false false)
     </div>
-    

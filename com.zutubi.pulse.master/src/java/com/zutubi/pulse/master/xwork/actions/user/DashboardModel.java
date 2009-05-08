@@ -11,13 +11,15 @@ import java.util.List;
 public class DashboardModel
 {
     private List<String> contactPointsWithErrors;
+    private List<ResponsibilityModel> responsibilities;
     private List<ProjectsModel> projects;
     private List<ChangelistModel> myChanges;
     private List<ChangelistModel> myProjectChanges;
 
-    public DashboardModel(List<String> contactPointsWithErrors, List<ProjectsModel> projects, List<ChangelistModel> myChanges, List<ChangelistModel> myProjectChanges)
+    public DashboardModel(List<String> contactPointsWithErrors, List<ResponsibilityModel> responsibilities, List<ProjectsModel> projects, List<ChangelistModel> myChanges, List<ChangelistModel> myProjectChanges)
     {
         this.contactPointsWithErrors = contactPointsWithErrors;
+        this.responsibilities = responsibilities;
         this.projects = projects;
         this.myChanges = myChanges;
         this.myProjectChanges = myProjectChanges;
@@ -27,6 +29,12 @@ public class DashboardModel
     public List<String> getContactPointsWithErrors()
     {
         return contactPointsWithErrors;
+    }
+
+    @JSON
+    public List<ResponsibilityModel> getResponsibilities()
+    {
+        return responsibilities;
     }
 
     @JSON

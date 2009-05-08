@@ -396,9 +396,18 @@ th.group {
     white-space: normal;
 }
 
-p.note {
+div.note, p.note {
     border: dashed 1px #f0c000;
     padding: 5px;
+}
+
+.comment {
+    font-style: italic;
+}
+
+ul.fixing li {
+    background: 0 3px no-repeat url(../images/config/actions/takeResponsibility.gif);
+    padding: 3px 0 3px 24px;
 }
 
 .status-message {

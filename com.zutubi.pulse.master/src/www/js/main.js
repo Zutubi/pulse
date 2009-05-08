@@ -667,3 +667,57 @@ function addFieldHelp(form, field, message)
     var helpEl = form.annotateField(field.getId(), 'help', window.baseUrl + '/images/help.gif', message);
     helpEl.on('click', function() { showFieldHelp(field.getName()); });
 }
+
+function handleResponsibilityResponse(options, success, response)
+{
+    if (success)
+    {
+        var result = Ext.util.JSON.decode(response.responseText);
+        if (result.success)
+        {
+            window.location.reload(true);
+        }
+        else
+        {
+            showStatus(Ext.util.Format.htmlEncode(result.detail), 'failure');
+        }
+
+    }
+    else
+    {
+        showStatus('Cannot contact server', 'failure');
+    }
+}
+
+function takeResponsibility(buildId)
+{
+    window.dialogBox = Ext.Msg.show({
+        title: 'Take Responsibility',
+        msg: 'Comment (optional):',
+        fn: function(btn, text) {
+                window.dialogBox = null;
+                if (btn == 'ok')
+                {
+                    showStatus('Taking responsibility...', 'working');
+                    Ext.Ajax.request({
+                        url: window.baseUrl + '/ajax/takeResponsibility.action',
+                        params: { buildId: buildId, comment: text },
+                        callback: handleResponsibilityResponse
+                    });
+                }
+        },
+        prompt: true,
+        width: 400,
+        buttons: Ext.Msg.OKCANCEL
+    });
+}
+
+function clearResponsibility(buildId)
+{
+    showStatus('Clearing responsibility...', 'working');
+    Ext.Ajax.request({
+        url: window.baseUrl + '/ajax/clearResponsibility.action',
+        params: { buildId: buildId },
+        callback: handleResponsibilityResponse
+    });
+}

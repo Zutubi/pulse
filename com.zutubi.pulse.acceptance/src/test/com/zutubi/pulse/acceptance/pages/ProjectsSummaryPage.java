@@ -91,4 +91,9 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
         SeleniumUtils.waitForElementId(selenium, id);
         return selenium.getText(id);
     }
+
+    public boolean isResponsibilityPresent(String group, String project, int buildRowNumber)
+    {
+        return selenium.isElementPresent("b" + buildRowNumber + "." + getProjectRowId(group, project) + "_fixing");
+    }
 }

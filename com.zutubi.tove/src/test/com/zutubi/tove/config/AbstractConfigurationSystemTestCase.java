@@ -88,6 +88,11 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
                         auths.add("ADMINISTER");
                         return auths;
                     }
+
+                    public boolean isAnonymous()
+                    {
+                        return false;
+                    }
                 };
             }
         });
