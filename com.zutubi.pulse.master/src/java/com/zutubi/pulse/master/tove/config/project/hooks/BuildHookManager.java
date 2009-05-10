@@ -114,19 +114,22 @@ public class BuildHookManager
     private void executeTask(BuildHookConfiguration hook, ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode, boolean manual)
     {
         BuildHookTaskConfiguration task = hook.getTask();
-        try
+        if (task != null)
         {
-            task.execute(context, buildResult, resultNode);
-        }
-        catch (Exception e)
-        {
-            if (!manual)
+            try
             {
-                Result result = resultNode == null ? buildResult : resultNode.getResult();
-                result.addFeature(Feature.Level.ERROR, "Error executing task for hook '" + hook.getName() + "': " + e.getMessage());
-                if (hook.failOnError())
+                task.execute(context, buildResult, resultNode);
+            }
+            catch (Exception e)
+            {
+                if (!manual)
                 {
-                    result.setState(ResultState.ERROR);
+                    Result result = resultNode == null ? buildResult : resultNode.getResult();
+                    result.addFeature(Feature.Level.ERROR, "Error executing task for hook '" + hook.getName() + "': " + e.getMessage());
+                    if (hook.failOnError())
+                    {
+                        result.setState(ResultState.ERROR);
+                    }
                 }
             }
         }
