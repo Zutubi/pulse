@@ -16,11 +16,8 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConf
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.*;
 import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
-import com.zutubi.util.StringUtils;
 import flexjson.JSON;
 
 import java.util.LinkedList;
@@ -56,7 +53,7 @@ public class ProjectBuildModel
     {
         number = buildResult.getNumber();
         state = buildResult.getState();
-        status = buildResult.getState().getPrettyString();
+        status = formatStatus(buildResult, urls);
         statusIcon = ToveUtils.getStatusIcon(buildResult);
 
         BuildResponsibility responsibility = buildResult.getResponsibility();
@@ -73,6 +70,45 @@ public class ProjectBuildModel
                 return renderColumn(buildResult, column, urls);
             }
         });
+    }
+
+    private String formatStatus(BuildResult buildResult, Urls urls)
+    {
+        String result;
+        TimeStamps stamps = buildResult.getStamps();
+        if (buildResult.inProgress() && stamps.hasEstimatedTimeRemaining())
+        {
+            // Show a progress bar.
+            int percentComplete = stamps.getEstimatedPercentComplete();
+            int percentRemaining = 100 - stamps.getEstimatedPercentComplete();
+
+            result = "";
+            if (percentComplete > 0)
+            {
+                result += formatBar(urls.base(), percentComplete, stamps.getPrettyElapsed(), "elapsed");
+            }
+
+            if (percentRemaining > 0)
+            {
+                result += formatBar(urls.base(), percentRemaining, stamps.getPrettyEstimatedTimeRemaining(), "remaining");
+            }
+        }
+        else
+        {
+            result = buildResult.getState().getPrettyString();
+        }
+
+        return result;
+    }
+
+    private String formatBar(String base, int percent, String pretty, String type)
+    {
+        return merge("<img class='centre' title='${pretty} (${percent}%) ${type}' src='${base}images/box-${type}.gif' height='10' width='${percent}'/>",
+                        asPair("base", base),
+                        asPair("percent", Integer.toString(percent)),
+                        asPair("type", type),
+                        asPair("pretty", pretty)
+                );
     }
 
     public long getNumber()

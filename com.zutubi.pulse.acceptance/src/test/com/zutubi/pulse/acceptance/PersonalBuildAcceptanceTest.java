@@ -12,10 +12,7 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
-import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
-import com.zutubi.pulse.master.tove.config.project.hooks.PostBuildHookConfiguration;
-import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
-import com.zutubi.pulse.master.tove.config.project.hooks.PreBuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -150,6 +147,34 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         text = getLogText(urls.dashboardMyStageLog(Long.toString(buildNumber), ProjectConfigurationWizard.DEFAULT_STAGE));
         assertFalse("Post-stage hook not for personal should not have run", text.contains("poststageno"));
         assertTrue("Post-stage hook for personal should have run", text.contains("poststageyes"));
+    }
+
+    public void testManuallyTriggerHook() throws Exception
+    {
+        final String HOOK_NAME = "manual-hook";
+
+        String projectPath = addProject(random, true);
+        Hashtable<String, Object> hook = xmlRpcHelper.createEmptyConfig(ManualBuildHookConfiguration.class);
+        hook.put("name", HOOK_NAME);
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "buildHooks"), hook);
+
+        // Now make a change and run a personal build.
+        checkout(Constants.TRIVIAL_ANT_REPOSITORY);
+        makeChangeToBuildFile();
+        createConfigFile(random);
+
+        loginAsAdmin();
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
+        long buildNumber = runPersonalBuild("failure");
+
+        PersonalBuildSummaryPage page = new PersonalBuildSummaryPage(selenium, urls, buildNumber);
+        page.goTo();
+
+        assertTrue(page.isHookPresent(HOOK_NAME));
+        page.clickHook(HOOK_NAME);
+        
+        SeleniumUtils.waitForVisible(selenium, "status-message");
+        assertTextPresent("triggered hook '" + HOOK_NAME + "'");
     }
 
     private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception

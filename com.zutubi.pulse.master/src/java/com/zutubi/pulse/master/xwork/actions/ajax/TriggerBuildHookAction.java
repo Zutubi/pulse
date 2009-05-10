@@ -32,7 +32,8 @@ public class TriggerBuildHookAction extends BuildActionBase
     {
         try
         {
-            Project project = getRequiredProject();
+            BuildResult buildResult = getRequiredBuildResult();
+            Project project = buildResult.getProject();
             BuildHookConfiguration hookConfig = CollectionUtils.find(project.getConfig().getBuildHooks().values(), new Predicate<BuildHookConfiguration>()
             {
                 public boolean satisfied(BuildHookConfiguration buildHookConfiguration)
@@ -41,12 +42,11 @@ public class TriggerBuildHookAction extends BuildActionBase
                 }
             });
 
-            if(hookConfig == null)
+            if (hookConfig == null)
             {
                 throw new LookupErrorException("Invalid hook handle " + hook);
             }
 
-            BuildResult buildResult = getRequiredBuildResult();
             buildHookManager.manualTrigger(hookConfig, buildResult);
             result = new SimpleResult(true, "triggered hook '" + hookConfig.getName() + "'");
         }
