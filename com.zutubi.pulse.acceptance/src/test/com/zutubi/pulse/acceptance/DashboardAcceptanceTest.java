@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
@@ -103,6 +104,8 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         assertTrue(dashboard.isGroupPresent(group1));
         assertTrue(dashboard.isGroupPresent(group2));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
+        // Check the upngrouped projects cannot be hidden (CIB-1963).
+        assertFalse(dashboard.isGroupActionPresent(null, ProjectsSummaryPage.ACTION_HIDE));
 
         dashboard.hideGroupAndWait(group1);
 
@@ -150,7 +153,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
 
     private void addLabel(String projectPath, String label) throws Exception
     {
-        Hashtable labelConfig = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
+        Hashtable<String, Object> labelConfig = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
         labelConfig.put("label", label);
         xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "labels"), labelConfig);
     }
@@ -158,7 +161,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
     private void setDashboard(Pair<String, ?>... values) throws Exception
     {
         String dashboardPath = PathUtils.getPath(userPath, "preferences", "dashboard");
-        Hashtable dashboardConfig = xmlRpcHelper.getConfig(dashboardPath);
+        Hashtable<String, Object> dashboardConfig = xmlRpcHelper.getConfig(dashboardPath);
         for (Pair<String, ?> pair : values)
         {
             if (!pair.second.equals(dashboardConfig.get(pair.first)))

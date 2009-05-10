@@ -53,6 +53,11 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
         return action + "." + getGroupId(group);
     }
 
+    public boolean isGroupActionPresent(String group, String action)
+    {
+        return selenium.isElementPresent(getGroupActionId(group, action));
+    }
+
     public void clickGroupAction(String group, String action)
     {
         selenium.click(getGroupActionId(group, action));
