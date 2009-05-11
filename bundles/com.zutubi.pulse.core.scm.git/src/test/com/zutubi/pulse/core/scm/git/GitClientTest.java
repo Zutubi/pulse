@@ -364,7 +364,7 @@ public class GitClientTest extends PulseTestCase
         }
         catch (GitException e)
         {
-            assertThat(e.getMessage(), containsString("Git command: 'git ls-remote file:///no/such/repo master' exited with non-zero exit code"));
+            assertThat(e.getMessage(), containsString("ls-remote file:///no/such/repo master' exited with non-zero exit code"));
         }
     }
 
