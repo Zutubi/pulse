@@ -106,16 +106,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
     {
         takeResponsibility();
 
-        xmlRpcHelper.loginAsAdmin();
-        try
-        {
-            xmlRpcHelper.insertTrivialUser(random);
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
-        
+        insertUser(random);     
         login(random, "");
 
         BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, TEST_PROJECT, 1);
@@ -134,6 +125,19 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         DashboardPage dashboardPage = new DashboardPage(selenium, urls);
         dashboardPage.goTo();
         assertFalse(dashboardPage.hasResponsibilities());
+    }
+
+    private void insertUser(String login) throws Exception
+    {
+        xmlRpcHelper.loginAsAdmin();
+        try
+        {
+            xmlRpcHelper.insertTrivialUser(login);
+        }
+        finally
+        {
+            xmlRpcHelper.logout();
+        }
     }
 
     public void testAdminCanClearResponsibility() throws Exception
