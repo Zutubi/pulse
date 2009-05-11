@@ -42,6 +42,14 @@ public class BuildResponsibility
         this.comment = comment;
     }
 
+    /**
+     * Gets a message describing this responsibility from the perspective of
+     * the given user.  The message changes depending on whether it is the
+     * user themself or another user who is responsible.
+     *
+     * @param loggedInUser the user to tailor the message for
+     * @return a description of this from the perspective of the given user
+     */
     public String getMessage(User loggedInUser)
     {
         if (user.equals(loggedInUser))

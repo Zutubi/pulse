@@ -22,10 +22,7 @@ public class GitConfigurationCheckHandler extends AbstractConfigurationCheckHand
         try
         {
             client = (GitClient) scmClientFactory.createClient(configuration);
-            // can check the repository details by creating a local (no checkout) clone.
-            // can check for the existance of the specified branch.
-            // - local clone of repository
-            // - list the remote branches, git remote show origin
+            client.testConnection();
         }
         finally
         {

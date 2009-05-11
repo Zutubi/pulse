@@ -1,3 +1,13 @@
+#macro(revisionValue $revision)
+    #if($revision.abbreviated)
+        <span title="$!webwork.htmlEncode($revision.revisionString)">
+    #end
+    #html($revision.abbreviatedRevisionString)
+    #if($revision.abbreviated)
+        </span>
+    #end
+#end
+
     <table id="server.activity" class="columns">
     <tr><td>
 
@@ -24,8 +34,8 @@
             #end
                 #dynamicLinkCell($buildRequest.projectConfig.name "$urls.projectHome($buildRequest.project)")
             #if($buildRequest.revision.revision)
-            <td class="content"> $buildRequest
-                $buildRequest.revision.revision #if($buildRequest.replaceable) [replaceable] #end
+            <td class="content">
+                #revisionValue($buildRequest.revision.revision) #if($buildRequest.replaceable) [replaceable] #end
             </td>
             #else
                 #contentCell("queue.revision.floating")
@@ -53,11 +63,12 @@
     </td></tr><tr><td>
 
     <table id="server.activity.active.builds" class="fill-content">
-        #headingRow("active.builds" 9)
+        #headingRow("active.builds" 10)
         <tr>
             #contentHeading("queue.owner" 1)
             #contentHeading("build.id" 1)
             #contentHeading("project" 1)
+            #contentHeading("queue.revision" 1)
             #contentHeading("build.status" 2)
             #contentHeading("build.when" 1)
             #contentHeading("reason" 1)
@@ -74,6 +85,13 @@
             #ownerCell($buildResult "content")
             #dynamicRightLinkCell($buildResult.number "$urls.build($buildResult)")
             <td class="content"><a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a></td>
+            #if($buildResult.revision)
+            <td class="content">
+                #revisionValue($buildResult.revision)
+            </td>
+            #else
+                #contentCell("revision.none")
+            #end
             #statusCell($buildResult true)
             #dateClassCell($buildResult)
             #staticCell($buildResult.reason.summary)
@@ -93,7 +111,7 @@
     #end
 #else
     <tr>
-        <td class="content" colspan="9">#wwtext("name=no.active.builds")</td>
+        <td class="content" colspan="10">#wwtext("name=no.active.builds")</td>
     </tr>
 #end
     </table>

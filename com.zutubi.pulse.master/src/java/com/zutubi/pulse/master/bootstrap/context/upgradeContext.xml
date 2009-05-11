@@ -44,6 +44,7 @@
                 <ref local="ensureGlobalConfigPermanent"/>
                 <ref local="dashboardShowUngrouped"/>
                 <ref local="fixPermanentUsers"/>
+                <ref local="gitInactivityTimeout"/>
                 <ref local="revisionStringLimit"/>
                 <ref local="dashboardSortProperties"/>
                 <ref local="buildResultNumberIndex"/>
@@ -206,6 +207,10 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.29-patch-01.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="gitInactivityTimeout" class="com.zutubi.pulse.master.upgrade.tasks.GitInactivityTimeoutUpgradeTask">
+        <property name="buildNumber" value="200029002"/>
     </bean>
 
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">

@@ -25,6 +25,7 @@ public class GitConstants
     public static final String COMMAND_BRANCH = "branch";
     public static final String COMMAND_SHOW = "show";
     public static final String COMMAND_DIFF = "diff";
+    public static final String COMMAND_LS_REMOTE = "ls-remote";
 
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_NAME_STATUS = "--name-status";

@@ -1,25 +1,25 @@
 package com.zutubi.pulse.core.scm.git.config;
 
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
-import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Transient;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.validation.annotations.Required;
 
 /**
- *
- *
+ * Configures integration with the git (http://www.git-scm.org/) SCM.
  */
 @SymbolicName("zutubi.gitConfig")
-//@ConfigurationCheck("GitConfigurationCheckHandler")
-@Form(fieldOrder = {"repository", "branch", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
+@ConfigurationCheck("GitConfigurationCheckHandler")
+@Form(fieldOrder = {"repository", "branch", "checkoutScheme", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
 public class GitConfiguration extends PollableScmConfiguration
 {
     @Required
     private String repository;
-
     @Required
     private String branch = "master";
+    @ControllingCheckbox(dependentFields = "inactivityTimeoutSeconds") @Wizard.Ignore
+    private boolean inactivityTimeoutEnabled = false;
+    @Wizard.Ignore
+    private int inactivityTimeoutSeconds = 300;
 
     @Transient
     public String getType()
@@ -45,5 +45,25 @@ public class GitConfiguration extends PollableScmConfiguration
     public String getBranch()
     {
         return branch;
+    }
+
+    public boolean isInactivityTimeoutEnabled()
+    {
+        return inactivityTimeoutEnabled;
+    }
+
+    public void setInactivityTimeoutEnabled(boolean inactivityTimeoutEnabled)
+    {
+        this.inactivityTimeoutEnabled = inactivityTimeoutEnabled;
+    }
+
+    public int getInactivityTimeoutSeconds()
+    {
+        return inactivityTimeoutSeconds;
+    }
+
+    public void setInactivityTimeoutSeconds(int inactivityTimeoutSeconds)
+    {
+        this.inactivityTimeoutSeconds = inactivityTimeoutSeconds;
     }
 }

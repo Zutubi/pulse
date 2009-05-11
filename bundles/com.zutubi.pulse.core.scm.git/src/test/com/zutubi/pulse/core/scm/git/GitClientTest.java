@@ -26,13 +26,6 @@ import java.util.List;
 
 public class GitClientTest extends PulseTestCase
 {
-    private File tmp;
-    private GitClient client;
-    private File workingDir;
-    private PulseExecutionContext context;
-    private RecordingScmFeedbackHandler handler;
-    private ScmContextImpl scmContext;
-    
     private static final String REVISION_HEAD = "HEAD";
     private static final String REVISION_INITIAL = "96e8d45dd7627d9e3cab980e90948e3ae1c99c62";
     private static final String REVISION_MASTER_LATEST = "a495e21cd263d9dca25379dfbff733461f0d9873";
@@ -46,6 +39,14 @@ public class GitClientTest extends PulseTestCase
     private static final String TEST_AUTHOR = "Jason Sankey";
     private static final String CONTENT_A_TXT = "another a edit";
 
+    private File tmp;
+    private String repository;
+    private GitClient client;
+    private File workingDir;
+    private PulseExecutionContext context;
+    private RecordingScmFeedbackHandler handler;
+    private ScmContextImpl scmContext;
+    
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -57,9 +58,9 @@ public class GitClientTest extends PulseTestCase
 
         File repositoryBase = new File(tmp, "repo");
 
-        String repository = "file://" + repositoryBase.getCanonicalPath();
+        repository = "file://" + repositoryBase.getCanonicalPath();
 
-        client = new GitClient(repository, "master");
+        client = new GitClient(repository, "master", 0);
 
         workingDir = new File(tmp, "wd");
         context = new PulseExecutionContext();
@@ -346,6 +347,39 @@ public class GitClientTest extends PulseTestCase
     public void testBrowseAvailableWhenContextAvailable()
     {
         assertTrue(client.getCapabilities(scmContext).contains(ScmCapability.BROWSE));
+    }
+
+    public void testTestConnectionOK() throws GitException
+    {
+        client.testConnection();
+    }
+
+    public void testTestConnectionBadRepo() throws GitException
+    {
+        client = new GitClient("file:///no/such/repo", "master", 0);
+        try
+        {
+            client.testConnection();
+            fail("Test of bad repo should fail");
+        }
+        catch (GitException e)
+        {
+            assertThat(e.getMessage(), containsString("ls-remote file:///no/such/repo master' exited with non-zero exit code"));
+        }
+    }
+
+    public void testTestConnectionBadBranch() throws GitException
+    {
+        client = new GitClient(repository, "nosuchbranch", 0);
+        try
+        {
+            client.testConnection();
+            fail("Test of bad branch should fail");
+        }
+        catch (GitException e)
+        {
+            assertThat(e.getMessage(), containsString("Branch 'nosuchbranch' does not exist"));
+        }
     }
 
     private void assertHeadCheckedOut()
