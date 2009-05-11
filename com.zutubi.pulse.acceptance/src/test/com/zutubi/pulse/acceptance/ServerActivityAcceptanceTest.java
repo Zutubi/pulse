@@ -83,6 +83,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         assertEquals(random, activeBuildsTable.getOwner());
         assertEquals("1", activeBuildsTable.getBuildId());
         assertEquals(random, activeBuildsTable.getProject());
+        assertEquals("4", activeBuildsTable.getRevision());
         assertEquals("in progress", activeBuildsTable.getStatus());
 
         waitForBuildToComplete(1);
@@ -304,12 +305,6 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
             super(ID_ACTIVITY_TABLE, EMPTY_MESSAGE);
         }
 
-        public String getReason()
-        {
-            // column 7 because the status column has two cells.
-            return getCell(row, 7);
-        }
-
         public String getOwner()
         {
             return getCell(row, 1);
@@ -325,9 +320,20 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
             return getCell(row, 3);
         }
 
+        public String getRevision()
+        {
+            return getCell(row, 4);
+        }
+
         public String getStatus()
         {
-            return getCell(row, 5);
+            return getCell(row, 6);
+        }
+
+        public String getReason()
+        {
+            // column 7 because the status column has two cells.
+            return getCell(row, 8);
         }
 
         public void clickCancel(String owner, long number)
