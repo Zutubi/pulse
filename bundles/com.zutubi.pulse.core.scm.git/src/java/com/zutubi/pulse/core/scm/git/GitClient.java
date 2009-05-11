@@ -75,18 +75,24 @@ public class GitClient implements ScmClient
      * The source repository from which the data will be retrieved.
      */
     private String repository;
-
     /**
      * The source repositories branch name.
      */
     private String branch;
+    /**
+     * Seconds of inactivity (lack of any output) from a git subprocess after
+     * which that process should be timed out.  May be set to zero to indicate
+     * no timeout should be applied.
+     */
+    private int inactivityTimeout;
 
     public static final String GIT_REPOSITORY_DIRECTORY = ".git";
 
-    public GitClient(String repository, String branch)
+    public GitClient(String repository, String branch, int inactivityTimeout)
     {
         this.repository = repository;
         this.branch = branch;
+        this.inactivityTimeout = inactivityTimeout;
     }
 
     /**
@@ -106,7 +112,7 @@ public class GitClient implements ScmClient
             throw new ScmException("Init failed. Could not delete directory: " + workingDir.getAbsolutePath());
         }
 
-        NativeGit git = new NativeGit();
+        NativeGit git = new NativeGit(inactivityTimeout);
         git.setWorkingDirectory(workingDir.getParentFile());
         // git clone -n <repository> dir
         handler.status("Initialising clone of git repository '" + repository + "'...");
@@ -181,7 +187,7 @@ public class GitClient implements ScmClient
             throw new ScmException("Checkout failed. Could not delete directory: " + workingDir.getAbsolutePath());
         }
 
-        NativeGit git = new NativeGit();
+        NativeGit git = new NativeGit(inactivityTimeout);
         git.setWorkingDirectory(workingDir.getParentFile());
         // git clone -n <repository> dir
         git.clone(handler, repository, workingDir.getName());
@@ -197,20 +203,12 @@ public class GitClient implements ScmClient
             git.checkout(handler, revision.getRevisionString(), TMP_BRANCH_PREFIX + revision.getRevisionString());
         }
 
-        List<GitLogEntry> logs = git.log(2);
-        if (logs.size() > 1)
-        {
-            // When this is not the initial revision (which has no previous revision to diff against),
-            // feedback can be determined by using git diff with the appropriate properties.  We can not
-            // get feedback from the checkout process itself, and so any feedback generated is delayed.
-            git.diff(handler, revision);
-        }
-
         createMarker(workingDir);
 
         // Determine the head revision from this checkout.  This is equivalent to the evaluated version
         // revision parameter which may be a relative revision (HEAD~4 for instance).
-        return new Revision(logs.get(logs.size() - 1).getId());
+        List<GitLogEntry> logs = git.log(1);
+        return new Revision(logs.get(0).getId());
     }
 
     private void createMarker(File workingDir) throws ScmException
@@ -239,7 +237,7 @@ public class GitClient implements ScmClient
             return checkout(context, revision, handler);
         }
 
-        NativeGit git = new NativeGit();
+        NativeGit git = new NativeGit(inactivityTimeout);
         git.setWorkingDirectory(workingDir);
 
         // switch to the primary local checkout and update.
@@ -287,7 +285,7 @@ public class GitClient implements ScmClient
 
             preparePersistentDirectory(workingDir);
 
-            NativeGit git = new NativeGit();
+            NativeGit git = new NativeGit(inactivityTimeout);
             git.setWorkingDirectory(workingDir);
 
             if (revision == null)
@@ -324,7 +322,7 @@ public class GitClient implements ScmClient
 
             preparePersistentDirectory(workingDir);
 
-            NativeGit git = new NativeGit();
+            NativeGit git = new NativeGit(inactivityTimeout);
             git.setWorkingDirectory(workingDir);
 
             GitLogEntry entry = git.log(1).get(0);
@@ -339,7 +337,7 @@ public class GitClient implements ScmClient
 
     private void preparePersistentDirectory(File workingDir) throws ScmException
     {
-        NativeGit git = new NativeGit();
+        NativeGit git = new NativeGit(inactivityTimeout);
         if (!isGitRepository(workingDir))
         {
             try
@@ -398,7 +396,7 @@ public class GitClient implements ScmClient
                 to = HEAD;
             }
 
-            NativeGit git = new NativeGit();
+            NativeGit git = new NativeGit(inactivityTimeout);
             git.setWorkingDirectory(workingDir);
 
             List<GitLogEntry> entries = git.log(from.getRevisionString(), to.getRevisionString());
@@ -430,7 +428,7 @@ public class GitClient implements ScmClient
 
             preparePersistentDirectory(workingDir);
 
-            NativeGit git = new NativeGit();
+            NativeGit git = new NativeGit(inactivityTimeout);
             git.setWorkingDirectory(workingDir);
 
             List<GitLogEntry> entries = git.log(from.getRevisionString(), to.getRevisionString());
@@ -538,11 +536,75 @@ public class GitClient implements ScmClient
         this.branch = branch;
     }
 
+    public void testConnection() throws GitException
+    {
+        NativeGit git = new NativeGit(inactivityTimeout);
+        LsRemoteOutputHandler handler = new LsRemoteOutputHandler();
+        git.lsRemote(handler, repository, branch);
+
+        String stderr = handler.getStderr().trim();
+        if (TextUtils.stringSet(stderr))
+        {
+            throw new GitException("Command '" + handler.getCommandLine() + "' output error: " + stderr);
+        }
+
+        if (!TextUtils.stringSet(handler.getStdout()))
+        {
+            throw new GitException("Branch '" + branch + "' does not exist");
+        }
+    }
+
     private static class GitDirectoryFilter implements FileFilter
     {
         public boolean accept(File file)
         {
             return !(file.isDirectory() && file.getName().equals(GIT_REPOSITORY_DIRECTORY));
+        }
+    }
+
+    private static class LsRemoteOutputHandler implements NativeGit.OutputHandler
+    {
+        private String commandLine;
+        private String stdout = "";
+        private String stderr = "";
+
+        public String getCommandLine()
+        {
+            return commandLine;
+        }
+
+        public String getStdout()
+        {
+            return stdout;
+        }
+
+        public String getStderr()
+        {
+            return stderr;
+        }
+
+        public void handleCommandLine(String line)
+        {
+            commandLine = line;
+        }
+
+        public void handleStdout(String line)
+        {
+            stdout += line + '\n';
+        }
+
+        public void handleStderr(String line)
+        {
+            stderr += line + '\n';
+        }
+
+        public void handleExitCode(int code) throws GitException
+        {
+            // Exit code checked in NativeGit
+        }
+
+        public void checkCancelled() throws GitOperationCancelledException
+        {
         }
     }
 }

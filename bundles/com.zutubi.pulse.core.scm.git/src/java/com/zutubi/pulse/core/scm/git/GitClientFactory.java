@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 
@@ -15,6 +15,6 @@ public class GitClientFactory implements ScmClientFactory<GitConfiguration>
 {
     public ScmClient createClient(GitConfiguration config) throws ScmException
     {
-        return new GitClient(config.getRepository(), config.getBranch());
+        return new GitClient(config.getRepository(), config.getBranch(), config.isInactivityTimeoutEnabled() ? config.getInactivityTimeoutSeconds() : 0);
     }
 }

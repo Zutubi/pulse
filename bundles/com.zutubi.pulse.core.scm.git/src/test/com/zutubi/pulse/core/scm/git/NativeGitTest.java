@@ -30,7 +30,7 @@ public class NativeGitTest extends PulseTestCase
 
         tmp = FileSystemUtils.createTempDir();
 
-        git = new NativeGit();
+        git = new NativeGit(0);
 
         URL url = getClass().getResource("NativeGitTest.zip");
         ZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));

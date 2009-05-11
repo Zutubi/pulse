@@ -7,6 +7,7 @@ import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -14,6 +15,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,10 +34,12 @@ public class NativeGit
     private static final String LOG_SENTINAL = "#";
 
     private ProcessBuilder git;
+    private int inactivityTimeout;
 
-    public NativeGit()
+    public NativeGit(int inactivityTimeout)
     {
         git = new ProcessBuilder();
+        this.inactivityTimeout = inactivityTimeout;
     }
 
     /**
@@ -178,6 +182,11 @@ public class NativeGit
         run(handler, command);
     }
 
+    public void lsRemote(OutputHandler handler, String repository, String branch) throws GitException
+    {
+        runWithHandler(handler, null, getGitCommand(), COMMAND_LS_REMOTE, repository, branch);
+    }
+
     protected void run(String... commands) throws GitException
     {
         run(null, commands);
@@ -223,12 +232,17 @@ public class NativeGit
             }
         }
 
+        final AtomicBoolean activity = new AtomicBoolean(false);
+        final StringBuilder stderr = new StringBuilder();
         AsyncProcess async = new AsyncProcess(child, new LineHandler()
         {
             public void handle(String line, boolean error)
             {
+                activity.set(true);
                 if (error)
                 {
+                    stderr.append(line);
+                    stderr.append('\n');
                     handler.handleStderr(line);
                 }
                 else
@@ -240,11 +254,28 @@ public class NativeGit
 
         try
         {
+            long lastActivityTime = System.currentTimeMillis();
+
             Integer exitCode;
             do
             {
                 handler.checkCancelled();
                 exitCode = async.waitFor(10, TimeUnit.SECONDS);
+                if (activity.getAndSet(false))
+                {
+                    lastActivityTime = System.currentTimeMillis();
+                }
+                else
+                {
+                    if (inactivityTimeout > 0)
+                    {
+                        long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / 1000;
+                        if (secondsSinceActivity >= inactivityTimeout)
+                        {
+                            throw new GitException("Timing out git process after " + secondsSinceActivity + " seconds of inactivity");
+                        }
+                    }
+                }
             }
             while (exitCode == null);
 
@@ -252,8 +283,14 @@ public class NativeGit
 
             if (exitCode != 0)
             {
-                throw new GitException("Git command: " + commandLine + " exited " +
-                        "with non zero exit code: " + handler.getExitCode() + ".");
+                String message = "Git command: '" + commandLine + "' exited with non-zero exit code: " + exitCode;
+                String error = stderr.toString().trim();
+                if (TextUtils.stringSet(error))
+                {
+                    message += " (" + error + ")";
+                }
+                
+                throw new GitException(message);
             }
         }
         catch (InterruptedException e)
@@ -284,8 +321,6 @@ public class NativeGit
         void handleStderr(String line);
 
         void handleExitCode(int code) throws GitException;
-
-        int getExitCode();
 
         void checkCancelled() throws GitOperationCancelledException;
     }
@@ -535,7 +570,7 @@ public class NativeGit
 
         try
         {
-            NativeGit git = new NativeGit();
+            NativeGit git = new NativeGit(0);
             git.setWorkingDirectory(new File("."));
             System.out.println(new File(".").getCanonicalPath());
             if (!Boolean.getBoolean("skip.env"))

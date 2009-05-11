@@ -34,7 +34,7 @@ public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
         URL url = getClass().getResource("GitClientIntegrationTest.git.zip");
         ZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
 
-        this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master");
+        this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master", 0);
         this.testData = new ExpectedTestResults(revisions);
         this.prefix = ""; // hmm, this is duplicated in the expected test results instance as well.
 
