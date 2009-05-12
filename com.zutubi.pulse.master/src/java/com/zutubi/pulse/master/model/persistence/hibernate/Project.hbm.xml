@@ -25,5 +25,10 @@
         </property>
 
         <property name="lastPollTime" column="LAST_POLL_TIME" type="long"/>
+
+        <component name="responsibility" class="com.zutubi.pulse.master.model.ProjectResponsibility">
+            <many-to-one name="user" column="RESPONSIBLE_USER_ID" class="com.zutubi.pulse.master.model.User" cascade="none" not-null="false"/>
+            <property name="comment" column="RESPONSIBLE_COMMENT" type="string" length="8191" not-null="false"/>
+        </component>
     </class>
 </hibernate-mapping>

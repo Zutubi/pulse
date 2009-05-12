@@ -1,4 +1,4 @@
-#responsibilityPanel($result)
+#responsibilityPanel($result "10px")
 
 #if($personal)
     #set($ownerArg = "personal=true")
@@ -23,9 +23,9 @@
                         #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
                         href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?${ownerArg}&amp;buildVID=$buildResult.number')"
             #elseif($actionLink.action == "takeResponsibility")
-                        href="#" onclick="takeResponsibility('$result.id'); return false"
+                        href="#" onclick="takeResponsibility('$result.project.id'); return false"
             #elseif($actionLink.action == "clearResponsibility")
-                        href="#" onclick="clearResponsibility('$result.id'); return false"
+                        href="#" onclick="clearResponsibility('$result.project.id'); return false"
             #end
                     >$actionLink.label</a>
                 </td>

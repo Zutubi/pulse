@@ -394,12 +394,6 @@ public class DefaultBuildManager implements BuildManager
         {
             process(build, BuildCleanupOptions.DATABASE_ONLY);
         }
-
-        builds = buildResultDao.findByResponsible(user);
-        for (BuildResult result: builds)
-        {
-            clearResponsibility(result);
-        }
     }
 
     public void delete(BuildResult result)
@@ -629,24 +623,6 @@ public class DefaultBuildManager implements BuildManager
     private void scheduleCleanup(File dir)
     {
         fileDeletionService.delete(dir);
-    }
-
-    public List<BuildResult> findByResponsible(User user)
-    {
-        return buildResultDao.findByResponsible(user);
-    }
-
-    public void takeResponsibility(BuildResult build, User user, String comment)
-    {
-        BuildResponsibility responsibility = new BuildResponsibility(user, comment);
-        build.setResponsibility(responsibility);
-        buildResultDao.save(build);
-    }
-
-    public void clearResponsibility(BuildResult build)
-    {
-        build.setResponsibility(null);
-        buildResultDao.save(build);
     }
 
     public void setChangelistDao(ChangelistDao changelistDao)

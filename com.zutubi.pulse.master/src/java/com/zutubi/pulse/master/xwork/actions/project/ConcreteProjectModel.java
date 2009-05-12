@@ -3,11 +3,13 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryProcedure;
 import flexjson.JSON;
 
@@ -18,8 +20,12 @@ import java.util.List;
  */
 public class ConcreteProjectModel extends ProjectModel
 {
+    private static final int MAX_COMMENT_LENGTH = 60;
+
     private String projectName;
     private ProjectHealth health;
+    private String responsibleMessage;
+    private String responsibleComment;
     private boolean built;
     private List<ProjectBuildModel> buildRows;
     private boolean canTrigger;
@@ -33,6 +39,14 @@ public class ConcreteProjectModel extends ProjectModel
         projectName = project.getName();
         projectId = project.getId();
         health = ProjectHealth.fromLatestBuilds(latestBuilds);
+
+        ProjectResponsibility responsibility = project.getResponsibility();
+        if (responsibility != null)
+        {
+            responsibleMessage = responsibility.getMessage(loggedInUser);
+            responsibleComment = StringUtils.trimmedString(responsibility.getComment(), MAX_COMMENT_LENGTH);
+        }
+
         built = latestBuilds.size() > 0;
 
         if (configuration.getBuildsPerProject() < latestBuilds.size())
@@ -44,7 +58,7 @@ public class ConcreteProjectModel extends ProjectModel
         {
             public ProjectBuildModel map(BuildResult buildResult)
             {
-                return new ProjectBuildModel(buildResult, loggedInUser, configuration, urls);
+                return new ProjectBuildModel(buildResult, configuration, urls);
             }
         });
 
@@ -65,6 +79,16 @@ public class ConcreteProjectModel extends ProjectModel
     public ProjectHealth latestHealth()
     {
         return health;
+    }
+
+    public String getResponsibleMessage()
+    {
+        return responsibleMessage;
+    }
+
+    public String getResponsibleComment()
+    {
+        return responsibleComment;
     }
 
     public boolean isConcrete()

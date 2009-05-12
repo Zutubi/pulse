@@ -176,16 +176,6 @@ public class ProjectHomeAction extends ProjectActionBase
         successfulBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS});
         failedBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE});
         currentBuild = buildManager.getLatestBuildResult(project);
-        if (currentBuild != null)
-        {
-            BuildResponsibility buildResponsibility = currentBuild.getResponsibility();
-            if (buildResponsibility != null)
-            {
-                responsibleOwner = buildResponsibility.getMessage(getLoggedInUser());
-                responsibleComment = buildResponsibility.getComment();
-                canClearResponsible = accessManager.hasPermission(BuildResult.ACTION_CLEAR_RESPONSIBILITY, currentBuild);
-            }
-        }
 
         latestChanges = buildManager.getLatestChangesForProject(project, 10);
         recentBuilds = buildManager.getLatestBuildResultsForProject(project, 11);
@@ -200,6 +190,7 @@ public class ProjectHomeAction extends ProjectActionBase
 
         File contentRoot = systemPaths.getContentRoot();
         ConfigurationActions configurationActions = actionManager.getConfigurationActions(typeRegistry.getType(ProjectConfiguration.class));
+        Messages messages = Messages.getInstance(ProjectConfiguration.class);
         for (String candidateAction: Arrays.asList(AccessManager.ACTION_WRITE, ProjectConfigurationActions.ACTION_MARK_CLEAN, ProjectConfigurationActions.ACTION_TRIGGER))
         {
             String permission = candidateAction;
@@ -208,12 +199,31 @@ public class ProjectHomeAction extends ProjectActionBase
             {
                 permission = configurationAction.getPermissionName();
             }
-            
-            if (accessManager.hasPermission(permission,  project))
+
+            if (accessManager.hasPermission(permission, project))
             {
-                actions.add(ToveUtils.getActionLink(candidateAction, Messages.getInstance(ProjectConfiguration.class), contentRoot));
+                actions.add(ToveUtils.getActionLink(candidateAction, messages, contentRoot));
             }
         }
+
+        ProjectResponsibility projectResponsibility = project.getResponsibility();
+        if (projectResponsibility == null && accessManager.hasPermission(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY, project))
+        {
+            actions.add(ToveUtils.getActionLink(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY, messages, contentRoot));
+        }
+
+        if (projectResponsibility != null)
+        {
+            responsibleOwner = projectResponsibility.getMessage(getLoggedInUser());
+            responsibleComment = projectResponsibility.getComment();
+
+            if (accessManager.hasPermission(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY, project))
+            {
+                canClearResponsible = true;
+                actions.add(ToveUtils.getActionLink(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY, messages, contentRoot));
+            }
+        }
+
 
         return SUCCESS;
     }

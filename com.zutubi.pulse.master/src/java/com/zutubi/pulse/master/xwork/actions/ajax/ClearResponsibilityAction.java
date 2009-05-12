@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
 /**
- * Action allowing a user to clear responsibility for a build.
+ * Action allowing a user to clear responsibility for a project.
  */
 public class ClearResponsibilityAction extends ResponsibilityActionBase
 {
     @Override
     public SimpleResult doExecute()
     {
-        buildManager.clearResponsibility(getBuildResult());
+        projectManager.clearResponsibility(getProject());
         return new SimpleResult(true, null);
     }
 }

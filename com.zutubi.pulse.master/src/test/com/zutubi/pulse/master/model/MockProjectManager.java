@@ -29,6 +29,11 @@ public class MockProjectManager extends DefaultProjectManager
         projects.put(project.getId(), project);
     }
 
+    public void removeReferencesToUser(User user)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
     public void updateLastPollTime(long projectId, long timestamp)
     {
         throw new RuntimeException("Method not yet implemented");

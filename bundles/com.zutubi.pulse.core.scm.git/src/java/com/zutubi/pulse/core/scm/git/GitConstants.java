@@ -26,6 +26,9 @@ public class GitConstants
     public static final String COMMAND_SHOW = "show";
     public static final String COMMAND_DIFF = "diff";
     public static final String COMMAND_LS_REMOTE = "ls-remote";
+    public static final String COMMAND_INIT = "init";
+    public static final String COMMAND_REMOTE = "remote";
+    public static final String COMMAND_MERGE = "merge";
 
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_FORCE = "-f";
@@ -36,6 +39,12 @@ public class GitConstants
     public static final String FLAG_REVERSE = "--reverse";
     public static final String FLAG_DELETE = "-D";
     public static final String FLAG_SHOW_MERGE_FILES = "-c";
+    public static final String FLAG_FETCH = "-f";
+    public static final String FLAG_TRACK = "-t";
+    public static final String FLAG_SET_HEAD = "-m";
+
+    public static final String ARG_ADD = "add";
+    public static final String ARG_ORIGIN = "origin";
 
     public static final String REVISION_HEAD = "HEAD";
 

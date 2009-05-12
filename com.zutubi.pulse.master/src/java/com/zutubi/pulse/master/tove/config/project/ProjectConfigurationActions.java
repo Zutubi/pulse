@@ -23,6 +23,8 @@ public class ProjectConfigurationActions
     public static final String ACTION_CANCEL_BUILD         = "cancel build";
     public static final String ACTION_CONVERT_TO_CUSTOM    = "convertToCustom";
     public static final String ACTION_CONVERT_TO_VERSIONED = "convertToVersioned";
+    public static final String ACTION_CLEAR_RESPONSIBILITY = "clearResponsibility";
+    public static final String ACTION_TAKE_RESPONSIBILITY  = "takeResponsibility";
     public static final String ACTION_INITIALISE           = "initialise";
     public static final String ACTION_PAUSE                = "pause";
     public static final String ACTION_RESUME               = "resume";

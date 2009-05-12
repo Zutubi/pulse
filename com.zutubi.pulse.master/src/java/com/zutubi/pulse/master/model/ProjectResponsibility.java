@@ -3,20 +3,20 @@ package com.zutubi.pulse.master.model;
 import com.zutubi.i18n.Messages;
 
 /**
- * Holds information about the user that is responsible for a build.  This
+ * Holds information about the user that is responsible for a project.  This
  * mechanism is typically used by developers to notify their colleagues that
  * they are working on a fixing a build issue.
  */
-public class BuildResponsibility
+public class ProjectResponsibility
 {
     private User user;
     private String comment;
 
-    public BuildResponsibility()
+    public ProjectResponsibility()
     {
     }
 
-    public BuildResponsibility(User user, String comment)
+    public ProjectResponsibility(User user, String comment)
     {
         this.user = user;
         this.comment = comment;
@@ -54,11 +54,11 @@ public class BuildResponsibility
     {
         if (user.equals(loggedInUser))
         {
-            return Messages.format(BuildResult.class, "responsible.self");
+            return Messages.format(ProjectResponsibility.class, "responsible.self");
         }
         else
         {
-            return Messages.format(BuildResult.class, "responsible.other", user.getLogin());
+            return Messages.format(ProjectResponsibility.class, "responsible.other", user.getLogin());
         }
     }
 }

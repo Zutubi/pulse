@@ -4,29 +4,27 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 
 /**
- * JSON-encodeable information about a build a user is responsible for.
+ * JSON-encodeable information about a project a user is responsible for.
  */
 public class ResponsibilityModel
 {
     private String project;
-    private long buildId;
-    private long number;
+    private long projectId;
 
-    public ResponsibilityModel(String project, long buildId, long number)
+    public ResponsibilityModel(String project, long projectId)
     {
         this.project = project;
-        this.buildId = buildId;
-        this.number = number;
+        this.projectId = projectId;
     }
 
     public String getId()
     {
-        return getResponsibilityId(project, number);
+        return getResponsibilityId(project);
     }
 
-    public static String getResponsibilityId(String project, long number)
+    public static String getResponsibilityId(String project)
     {
-        return StringUtils.toValidHtmlName("responsibility-" + project + "-" + number);
+        return StringUtils.toValidHtmlName("responsibility-" + project);
     }
 
     public String getProject()
@@ -34,14 +32,9 @@ public class ResponsibilityModel
         return project;
     }
 
-    public long getBuildId()
+    public long getProjectId()
     {
-        return buildId;
-    }
-
-    public long getNumber()
-    {
-        return number;
+        return projectId;
     }
 
     public String getUrl()

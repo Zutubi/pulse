@@ -4,10 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.model.BuildColumns;
-import com.zutubi.pulse.master.model.BuildResponsibility;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
@@ -126,7 +123,8 @@ public class ViewBuildAction extends CommandActionBase
     public String execute()
     {
         final BuildResult result = getRequiredBuildResult();
-        boolean canWrite = accessManager.hasPermission(AccessManager.ACTION_WRITE, result.getProject());
+        Project project = result.getProject();
+        boolean canWrite = accessManager.hasPermission(AccessManager.ACTION_WRITE, project);
         if (canWrite)
         {
             ProjectConfiguration projectConfig = getRequiredProject().getConfig();
@@ -161,21 +159,21 @@ public class ViewBuildAction extends CommandActionBase
             }
         }
 
-        BuildResponsibility buildResponsibility = result.getResponsibility();
-        if (buildResponsibility == null && accessManager.hasPermission(BuildResult.ACTION_TAKE_RESPONSIBILITY, result))
+        ProjectResponsibility projectResponsibility = project.getResponsibility();
+        if (projectResponsibility == null && accessManager.hasPermission(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY, project))
         {
-            actions.add(ToveUtils.getActionLink(BuildResult.ACTION_TAKE_RESPONSIBILITY, messages, contentRoot));
+            actions.add(ToveUtils.getActionLink(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY, messages, contentRoot));
         }
 
-        if (buildResponsibility != null)
+        if (projectResponsibility != null)
         {
-            responsibleOwner = buildResponsibility.getMessage(getLoggedInUser());
-            responsibleComment = buildResponsibility.getComment();
+            responsibleOwner = projectResponsibility.getMessage(getLoggedInUser());
+            responsibleComment = projectResponsibility.getComment();
 
-            if (accessManager.hasPermission(BuildResult.ACTION_CLEAR_RESPONSIBILITY, result))
+            if (accessManager.hasPermission(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY, project))
             {
                 canClearResponsible = true;
-                actions.add(ToveUtils.getActionLink(BuildResult.ACTION_CLEAR_RESPONSIBILITY, messages, contentRoot));
+                actions.add(ToveUtils.getActionLink(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY, messages, contentRoot));
             }
         }
 

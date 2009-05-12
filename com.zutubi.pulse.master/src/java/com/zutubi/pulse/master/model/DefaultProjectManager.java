@@ -784,6 +784,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
+    public void removeReferencesToUser(User user)
+    {
+        for (Project project: projectDao.findByResponsible(user))
+        {
+            clearResponsibility(project);
+        }
+    }
+
     public void markForCleanBuild(Project project)
     {
         boolean changed = false;
@@ -817,6 +825,23 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             unlockProjectState(projectId);
         }
+    }
+
+    public List<Project> findByResponsible(User user)
+    {
+        return projectDao.findByResponsible(user);
+    }
+
+    public void takeResponsibility(Project project, User user, String comment)
+    {
+        project.setResponsibility(new ProjectResponsibility(user, comment));
+        projectDao.save(project);
+    }
+
+    public void clearResponsibility(Project project)
+    {
+        project.setResponsibility(null);
+        projectDao.save(project);
     }
 
     public void setConfiguration(Project state)

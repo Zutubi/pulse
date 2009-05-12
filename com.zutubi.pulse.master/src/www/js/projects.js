@@ -2,6 +2,13 @@ ZUTUBI.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</
                        '<td class="fit-width" rowspan="{rowspan}">' +
                            '<img alt="-" src="{base}/images/default/s.gif" class="project-name" style="width: {indent}px; height: 16px;"/> ' +
                            '<span class="nowrap"><a href="{homeLink}">{name:htmlEncode}</a></span>' +
+                           '<tpl if="responsibleMessage">' +
+                               ' <img alt="fixing" id="{id}_fixing" src="{base}/images/config/actions/takeResponsibility.gif" ext:qtip="{responsibleMessage:htmlEncode}' +
+                               '<tpl if="responsibleComment">' +
+                                   ': {responsibleComment:htmlEncode}' +
+                               '</tpl>' +
+                               '"/>' +
+                           '</tpl>' +
                        '</td>' +
                        '<td class="actions-menu project-actions" rowspan="{rowspan}">' +
                            '<span id="{id}_actions_link">' +
@@ -19,13 +26,6 @@ ZUTUBI.BUILD_CELLS = '<td class="build-id fit-width">' +
                      '</td>' +
                      '<td class="fit-width">' +
                          ':: <span id="{buildId}.status"><img alt="status" src="{base}/images/{statusIcon}"/> {status}</span>' +
-                     '<tpl if="responsibleMessage">' +
-                         ' <img alt="fixing" id="{buildId}_fixing" src="{base}/images/config/actions/takeResponsibility.gif" ext:qtip="{responsibleMessage:htmlEncode}' +
-                         '<tpl if="responsibleComment">' +
-                             ': {responsibleComment:htmlEncode}' +
-                         '</tpl>' +
-                         '"/>' +
-                     '</tpl>' +
                      '</td>' +
                      '<td class="build-details">' +
                          '<tpl for="columns">{.} <tpl if="xindex &lt; xcount"><span class="understated">//</span> </tpl></tpl>' +
@@ -54,8 +54,6 @@ ZUTUBI.ConcreteProject.prototype = {
         templateData.buildLink = window.baseUrl + '/browse/projects/' + encodeURIComponent(templateData.name) + '/builds/' + build.number + '/';
         templateData.status = build.status;
         templateData.statusIcon = build.statusIcon;
-        templateData.responsibleMessage = build.responsibleMessage;
-        templateData.responsibleComment= build.responsibleComment;
         templateData.columns = build.columns;
     },
 
@@ -63,6 +61,8 @@ ZUTUBI.ConcreteProject.prototype = {
         var templateData = {
             id: this.data.id,
             health: this.data.health,
+            responsibleMessage: this.data.responsibleMessage,
+            responsibleComment: this.data.responsibleComment,
             rowspan: this.data.built ? this.data.buildRows.length : 1,
             base: window.baseUrl,
             indent: this.data.depth * 12,

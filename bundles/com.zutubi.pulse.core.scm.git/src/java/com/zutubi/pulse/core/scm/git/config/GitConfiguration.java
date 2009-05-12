@@ -9,13 +9,14 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.gitConfig")
 @ConfigurationCheck("GitConfigurationCheckHandler")
-@Form(fieldOrder = {"repository", "branch", "checkoutScheme", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
+@Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "checkoutScheme", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
 public class GitConfiguration extends PollableScmConfiguration
 {
     @Required
     private String repository;
     @Required
     private String branch = "master";
+    private boolean trackSelectedBranch = false;
     @ControllingCheckbox(dependentFields = "inactivityTimeoutSeconds") @Wizard.Ignore
     private boolean inactivityTimeoutEnabled = false;
     @Wizard.Ignore
@@ -45,6 +46,16 @@ public class GitConfiguration extends PollableScmConfiguration
     public String getBranch()
     {
         return branch;
+    }
+
+    public boolean isTrackSelectedBranch()
+    {
+        return trackSelectedBranch;
+    }
+
+    public void setTrackSelectedBranch(boolean trackSelectedBranch)
+    {
+        this.trackSelectedBranch = trackSelectedBranch;
     }
 
     public boolean isInactivityTimeoutEnabled()

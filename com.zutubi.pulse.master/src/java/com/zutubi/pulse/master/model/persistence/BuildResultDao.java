@@ -87,6 +87,4 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     BuildResult findLatestSuccessfulByProject(Project project);
 
     BuildResult findLatestSuccessful();
-
-    List<BuildResult> findByResponsible(User user);
 }

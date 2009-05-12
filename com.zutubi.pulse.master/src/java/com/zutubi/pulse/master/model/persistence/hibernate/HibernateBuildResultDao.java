@@ -495,20 +495,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (BuildResult)findFirstByNamedQuery("findLatestSuccessful", false);
     }
 
-    public List<BuildResult> findByResponsible(final User user)
-    {
-        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-                Query queryObject = session.createQuery("from BuildResult result where responsibility.user = :user");
-                queryObject.setEntity("user", user);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.list();
-            }
-        });
-    }
-
     public static void intialise(final BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());
