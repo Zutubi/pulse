@@ -11,7 +11,7 @@ import java.util.Comparator;
  *
  * <ul>
  *     <li>the agent priority; and for those of the same priority</li>
- *     <li>an arbitrary but deterministic order based the agent and project
+ *     <li>an arbitrary but deterministic order based on the agent and project
  *         names (this should improve performance of incremental builds).</li>
  * </ul>
  */
