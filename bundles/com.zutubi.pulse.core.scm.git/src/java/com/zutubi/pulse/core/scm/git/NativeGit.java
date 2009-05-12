@@ -57,11 +57,26 @@ public class NativeGit
         git.directory(dir);
     }
 
+    public void init(ScmFeedbackHandler handler) throws GitException
+    {
+        run(handler, getGitCommand(), COMMAND_INIT);
+    }
+
     public void clone(ScmFeedbackHandler handler, String repository, String dir) throws GitException
     {
         run(handler, getGitCommand(), COMMAND_CLONE, FLAG_NO_CHECKOUT, repository, dir);
     }
 
+    public void remoteAdd(ScmFeedbackHandler handler, String name, String repository, String branch) throws GitException
+    {
+        run(handler, getGitCommand(), COMMAND_REMOTE, ARG_ADD, FLAG_FETCH, FLAG_TRACK, branch, FLAG_SET_HEAD, branch, name, repository);
+    }
+
+    public void merge(ScmFeedbackHandler handler, String remote) throws GitException
+    {
+        run(handler, getGitCommand(), COMMAND_MERGE, remote);
+    }
+    
     public void pull(ScmFeedbackHandler handler) throws GitException
     {
         run(handler, getGitCommand(), COMMAND_PULL);

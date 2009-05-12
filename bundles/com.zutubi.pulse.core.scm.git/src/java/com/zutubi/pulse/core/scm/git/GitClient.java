@@ -85,14 +85,23 @@ public class GitClient implements ScmClient
      * no timeout should be applied.
      */
     private int inactivityTimeout;
+    /**
+     * If true, only the specified branch will be tracked from the remote
+     * repository.  The default behaviour when checking out is to perform a
+     * full clone of the remote repository.  When this option is true, however,
+     * a cut-down clone is done using remote-add to only track the specified
+     * branch.
+     */
+    private boolean trackSelectedBranch;
 
     public static final String GIT_REPOSITORY_DIRECTORY = ".git";
 
-    public GitClient(String repository, String branch, int inactivityTimeout)
+    public GitClient(String repository, String branch, int inactivityTimeout, boolean trackSelectedBranch)
     {
         this.repository = repository;
         this.branch = branch;
         this.inactivityTimeout = inactivityTimeout;
+        this.trackSelectedBranch = trackSelectedBranch;
     }
 
     /**
@@ -181,20 +190,40 @@ public class GitClient implements ScmClient
         // should select an alternate checkout scheme - both CLEAN_UPDATE and INCREMENTAL_UPDATE would do the trick. 
 
         File workingDir = context.getWorkingDir();
+
         // Git likes to create the directory we clone into, so we need to ensure that it can do so.
+        // This also cleans up any previous partial checkout.
         if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
         {
-            throw new ScmException("Checkout failed. Could not delete directory: " + workingDir.getAbsolutePath());
+            throw new ScmException("Could not delete directory '" + workingDir.getAbsolutePath() + "'");
         }
 
         NativeGit git = new NativeGit(inactivityTimeout);
-        git.setWorkingDirectory(workingDir.getParentFile());
-        // git clone -n <repository> dir
-        git.clone(handler, repository, workingDir.getName());
 
-        // cd workingDir
-        git.setWorkingDirectory(workingDir);
-        git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
+        if (trackSelectedBranch)
+        {
+            if (!workingDir.mkdir())
+            {
+                throw new ScmException("Could not create directory '" + workingDir.getAbsolutePath() + "'");
+            }
+
+            git.setWorkingDirectory(workingDir);
+            // git init
+            // git remote add -f -t <branch> -m <branch> origin <repository>
+            // git merge origin
+            git.init(handler);
+            git.remoteAdd(handler, ARG_ORIGIN, repository, branch);
+            git.merge(handler, ARG_ORIGIN);
+        }
+        else
+        {
+            // git clone -n <repository> dir
+            git.setWorkingDirectory(workingDir.getParentFile());
+            git.clone(handler, repository, workingDir.getName());
+            git.setWorkingDirectory(workingDir);
+        }
+
+        git.checkout(handler, ARG_ORIGIN + "/" + branch, LOCAL_BRANCH_NAME);
 
         // if we are after a specific revision, check it out to a temporary branch.  This also updates
         // the working copy to that branch.
@@ -534,6 +563,11 @@ public class GitClient implements ScmClient
     public void setBranch(String branch)
     {
         this.branch = branch;
+    }
+
+    public void setTrackSelectedBranch(boolean trackSelectedBranch)
+    {
+        this.trackSelectedBranch = trackSelectedBranch;
     }
 
     public void testConnection() throws GitException

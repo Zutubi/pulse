@@ -60,7 +60,7 @@ public class GitClientTest extends PulseTestCase
 
         repository = "file://" + repositoryBase.getCanonicalPath();
 
-        client = new GitClient(repository, "master", 0);
+        client = new GitClient(repository, "master", 0, false);
 
         workingDir = new File(tmp, "wd");
         context = new PulseExecutionContext();
@@ -92,6 +92,17 @@ public class GitClientTest extends PulseTestCase
 
     public void testCheckoutOnBranch() throws ScmException, ParseException
     {
+        checkoutBranchHelper();
+    }
+
+    public void testCheckoutSelectedBranch() throws ScmException, ParseException
+    {
+        client.setTrackSelectedBranch(true);
+        checkoutBranchHelper();
+    }
+
+    private void checkoutBranchHelper() throws ScmException
+    {
         client.setBranch(BRANCH_SIMPLE);
         Revision rev = client.checkout(context, null, handler);
 
@@ -114,6 +125,17 @@ public class GitClientTest extends PulseTestCase
     }
 
     public void testCheckoutToRevisionOnBranch() throws ScmException, ParseException
+    {
+        checkoutBranchToRevisionHelper();
+    }
+
+    public void testCheckoutToRevisionSelectedBranch() throws ScmException, ParseException
+    {
+        client.setTrackSelectedBranch(true);
+        checkoutBranchToRevisionHelper();
+    }
+
+    private void checkoutBranchToRevisionHelper() throws ScmException
     {
         client.setBranch(BRANCH_SIMPLE);
         Revision rev = client.checkout(context, new Revision("83d35b25a6b4711c4d9424c337bf82e5398756f3"), handler);
@@ -187,6 +209,17 @@ public class GitClientTest extends PulseTestCase
 
     public void testUpdateOnBranch() throws ScmException
     {
+        updateOnBranchHelper();
+    }
+
+    public void testUpdateSelectedBranch() throws ScmException
+    {
+        client.setTrackSelectedBranch(true);
+        updateOnBranchHelper();
+    }
+
+    private void updateOnBranchHelper() throws ScmException
+    {
         client.setBranch(BRANCH_SIMPLE);
         client.checkout(context, null, handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
@@ -200,6 +233,17 @@ public class GitClientTest extends PulseTestCase
     }
 
     public void testUpdateToRevision() throws ScmException, IOException, ParseException
+    {
+        updateToRevisionHelper();
+    }
+
+    public void testUpdateToRevisionSelectedBranch() throws ScmException, IOException, ParseException
+    {
+        client.setTrackSelectedBranch(true);
+        updateToRevisionHelper();
+    }
+
+    private void updateToRevisionHelper() throws ScmException, IOException
     {
         client.checkout(context, null, handler);
         assertEquals(CONTENT_A_TXT + "\n", IOUtils.fileToString(new File(workingDir, "a.txt")));
@@ -356,7 +400,7 @@ public class GitClientTest extends PulseTestCase
 
     public void testTestConnectionBadRepo() throws GitException
     {
-        client = new GitClient("file:///no/such/repo", "master", 0);
+        client = new GitClient("file:///no/such/repo", "master", 0, false);
         try
         {
             client.testConnection();
@@ -370,7 +414,7 @@ public class GitClientTest extends PulseTestCase
 
     public void testTestConnectionBadBranch() throws GitException
     {
-        client = new GitClient(repository, "nosuchbranch", 0);
+        client = new GitClient(repository, "nosuchbranch", 0, false);
         try
         {
             client.testConnection();

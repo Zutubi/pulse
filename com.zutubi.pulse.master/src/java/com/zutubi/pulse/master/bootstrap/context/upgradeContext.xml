@@ -57,6 +57,7 @@
                 <ref local="buildResponsibility"/>
                 <ref local="gitInactivityTimeout"/>
                 <ref local="agentPriority"/>
+                <ref local="gitTrackSelectedBranch"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -210,5 +211,9 @@
 
     <bean id="agentPriority" class="com.zutubi.pulse.master.upgrade.tasks.AgentPriorityUpgradeTask">
         <property name="buildNumber" value="200029003"/>
+    </bean>
+
+    <bean id="gitTrackSelectedBranch" class="com.zutubi.pulse.master.upgrade.tasks.GitTrackSelectedBranchUpgradeTask">
+        <property name="buildNumber" value="200029004"/>
     </bean>
 </beans>
