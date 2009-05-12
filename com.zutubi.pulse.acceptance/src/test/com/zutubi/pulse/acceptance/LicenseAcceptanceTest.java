@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Constants;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -151,7 +152,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         hierarchyPage.clickAdd();
         AgentForm form = new AgentForm(selenium);
         form.waitFor();
-        form.finishFormElements(random, "true", "localhost", "8090");
+        form.finishNamedFormElements(asPair("name", random), asPair("host", "localhost"));
         form.waitFor();
         assertTextPresent("Unable to add agent: license limit exceeded");
     }
@@ -170,7 +171,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         usersPage.clickAdd();
         AddUserForm form = new AddUserForm(selenium);
         form.waitFor();
-        form.finishFormElements(random, random, "false", "", "");
+        form.finishNamedFormElements(asPair("login", random), asPair("name", random));
         form.waitFor();
         assertTextPresent("Unable to add user: license limit exceeded");
     }

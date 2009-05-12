@@ -888,6 +888,8 @@
         #contentHeading("stage.recipe" 1)
         #contentHeading("stage.host" 1)
         #contentHeading("build.status" 2)
+        #contentHeading("build.errors" 1)
+        #contentHeading("build.warnings" 1)
         #contentHeading("build.tests" 1)
         #contentHeading("build.when" 1)
         #contentHeading("build.elapsed" 1)
@@ -924,6 +926,17 @@
 #end
 
 ##
+## Shows an error/warning feature count cell.
+##
+#macro(messageCountCell $count)
+    #if($count < 0)
+        #classCell("n/a")
+    #else
+        #rightClassCell($count)
+    #end
+#end
+
+##
 ## Shows a summary for a recipe result
 ##
 #macro(recipeSummary $resultNode $build $detailedView $showAnimated)
@@ -943,6 +956,8 @@
         #dynamicCell($recipe.recipeNameSafe)
         #dynamicIdCell("${build.project.name}.build.${build.number}.stage.${resultNode.stageName}.agent" $resultNode.hostSafe)
         #statusCell($recipe $showAnimated)
+        #messageCountCell($recipe.errorFeatureCount)
+        #messageCountCell($recipe.warningFeatureCount)
         #testResultsCell($build $resultNode $recipe)
         #dateClassCell($recipe)
         #elapsedCell($recipe)
@@ -1327,7 +1342,7 @@
 
     #if($buildResult.root.children.size() > 0)
     <table class="content">
-        #headingRow("build.stages" 9)
+        #headingRow("build.stages" 11)
         #recipeSummaryHeader()
         #foreach($recipeNode in $buildResult.root.children)
         #recipeSummary($recipeNode $buildResult $detailedView true)

@@ -28,6 +28,7 @@ public class GitConstants
     public static final String COMMAND_LS_REMOTE = "ls-remote";
 
     public static final String FLAG_BRANCH = "-b";
+    public static final String FLAG_FORCE = "-f";
     public static final String FLAG_NAME_STATUS = "--name-status";
     public static final String FLAG_PRETTY = "--pretty";
     public static final String FLAG_CHANGES = "-n";

@@ -7,10 +7,13 @@ import org.mortbay.util.Credential;
 import java.util.Comparator;
 
 /**
- * A Comparator to sort Agents in some arbitrary but deterministic order based
- * on the the Agent, Project, and Spec names.  This should improve performance
- * of incremental builds.
+ * A Comparator to sort agents by:
  *
+ * <ul>
+ *     <li>the agent priority; and for those of the same priority</li>
+ *     <li>an arbitrary but deterministic order based the agent and project
+ *         names (this should improve performance of incremental builds).</li>
+ * </ul>
  */
 public class Prioritiser implements Comparator<Agent>
 {
@@ -23,8 +26,14 @@ public class Prioritiser implements Comparator<Agent>
 
     public int compare(Agent agent1, Agent agent2)
     {
-        Sort.StringComparator stringComparator = new Sort.StringComparator();
-        return stringComparator.compare(getAgentHash(agent1), getAgentHash(agent2));
+        int result = agent2.getConfig().getPriority() - agent1.getConfig().getPriority();
+        if (result == 0)
+        {
+            Sort.StringComparator stringComparator = new Sort.StringComparator();
+            result = stringComparator.compare(getAgentHash(agent1), getAgentHash(agent2));
+        }
+
+        return result;
     }
 
     private String getAgentHash(Agent agent)

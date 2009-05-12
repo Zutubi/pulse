@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
+import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
@@ -132,22 +133,17 @@ public class NativeGit
 
     public void checkout(ScmFeedbackHandler handler, String branch) throws GitException
     {
-        run(handler, getGitCommand(), COMMAND_CHECKOUT, branch);
+        run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_FORCE, branch);
     }
 
     public void checkout(ScmFeedbackHandler handler, String branch, String localBranch) throws GitException
     {
-        run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_BRANCH, localBranch, branch);
+        run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_FORCE, FLAG_BRANCH, localBranch, branch);
     }
 
     public void deleteBranch(String branch) throws GitException
     {
         run(getGitCommand(), COMMAND_BRANCH, FLAG_DELETE, branch);
-    }
-
-    public void cretaeBranch(String branch) throws GitException
-    {
-        run(getGitCommand(), COMMAND_BRANCH, branch);
     }
 
     public List<GitBranchEntry> branch() throws GitException
@@ -269,7 +265,7 @@ public class NativeGit
                 {
                     if (inactivityTimeout > 0)
                     {
-                        long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / 1000;
+                        long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / Constants.SECOND;
                         if (secondsSinceActivity >= inactivityTimeout)
                         {
                             throw new GitException("Timing out git process after " + secondsSinceActivity + " seconds of inactivity");

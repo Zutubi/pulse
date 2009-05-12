@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  */
-@Form(fieldOrder = {"name", "remote", "host", "port"})
+@Form(fieldOrder = {"name", "remote", "host", "port", "allowPersonalBuilds", "priority"})
 @Table(columns = {"name", "location", "status"})
 @SymbolicName("zutubi.agentConfig")
 @Wire
@@ -34,6 +34,8 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     @Numeric(min = 1)
     private int port = 8090;
     private boolean allowPersonalBuilds = true;
+    @Numeric
+    private int priority = 0;
     private Map<String, ResourceConfiguration> resources;
     private List<AgentAclConfiguration> permissions = new LinkedList<AgentAclConfiguration>();
 
@@ -88,6 +90,16 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     public void setAllowPersonalBuilds(boolean allowPersonalBuilds)
     {
         this.allowPersonalBuilds = allowPersonalBuilds;
+    }
+
+    public int getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
     }
 
     public long getAgentStateId()

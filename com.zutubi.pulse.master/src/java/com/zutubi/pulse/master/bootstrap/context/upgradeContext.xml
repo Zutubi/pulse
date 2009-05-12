@@ -44,13 +44,14 @@
                 <ref local="ensureGlobalConfigPermanent"/>
                 <ref local="dashboardShowUngrouped"/>
                 <ref local="fixPermanentUsers"/>
-                <ref local="gitInactivityTimeout"/>
                 <ref local="revisionStringLimit"/>
                 <ref local="dashboardSortProperties"/>
                 <ref local="buildResultNumberIndex"/>
                 <ref local="userCollapsedProjects"/>
                 <ref local="hookTriggerOptions"/>
                 <ref local="buildResponsibility"/>
+                <ref local="gitInactivityTimeout"/>
+                <ref local="agentPriority"/>
                 <ref local="resourceRequirementOptional"/>
                 <ref local="triggerProperties"/>
                 <ref local="globalPostProcessors"/>
@@ -211,6 +212,10 @@
 
     <bean id="gitInactivityTimeout" class="com.zutubi.pulse.master.upgrade.tasks.GitInactivityTimeoutUpgradeTask">
         <property name="buildNumber" value="200029002"/>
+    </bean>
+
+    <bean id="agentPriority" class="com.zutubi.pulse.master.upgrade.tasks.AgentPriorityUpgradeTask">
+        <property name="buildNumber" value="200029003"/>
     </bean>
 
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">

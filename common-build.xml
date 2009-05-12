@@ -120,7 +120,6 @@
                 <exclude name="**/RlsCommandTest*"/>
                 <exclude name="**/VersionCommandTest*"/>
                 <exclude name="**/LogInformationAnalyserTest*"/>
-                <exclude name="**/*Git*Test*"/>
                 <exclude name="**/*Subversion*Test*"/>
                 <exclude name="**/*WorkingCopyTest*"/>
                 <exclude name="**/LocalBuildTest.java"/>
