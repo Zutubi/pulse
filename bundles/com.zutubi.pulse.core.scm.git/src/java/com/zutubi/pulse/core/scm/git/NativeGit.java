@@ -133,22 +133,17 @@ public class NativeGit
 
     public void checkout(ScmFeedbackHandler handler, String branch) throws GitException
     {
-        run(handler, getGitCommand(), COMMAND_CHECKOUT, branch);
+        run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_FORCE, branch);
     }
 
     public void checkout(ScmFeedbackHandler handler, String branch, String localBranch) throws GitException
     {
-        run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_BRANCH, localBranch, branch);
+        run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_FORCE, FLAG_BRANCH, localBranch, branch);
     }
 
     public void deleteBranch(String branch) throws GitException
     {
         run(getGitCommand(), COMMAND_BRANCH, FLAG_DELETE, branch);
-    }
-
-    public void cretaeBranch(String branch) throws GitException
-    {
-        run(getGitCommand(), COMMAND_BRANCH, branch);
     }
 
     public List<GitBranchEntry> branch() throws GitException
