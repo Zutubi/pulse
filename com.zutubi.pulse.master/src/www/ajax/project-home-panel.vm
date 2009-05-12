@@ -5,10 +5,11 @@
 
         <td class="columns" width="100%">
 
+            #responsibilityPanel($currentBuild "0px")
+
             <h2 class="section top">#wwtext("name=current.build")</h2>
 
         #if($currentBuild)
-            #responsibilityPanel($currentBuild)
             #showBuild($currentBuild true false)
             #buildTableColumns($summaryColumns "project.summary")            
         #else
@@ -142,8 +143,12 @@
                     <td class="content">
                         <img src="$base/images/config/actions/${act.icon}.gif"/>
                         <a id="action.$act.action"
-                #if($act.action.equals("trigger"))
+                #if($act.action == "trigger")
                             href="$base/triggerBuild.action?projectName=$u_projectName"
+                #elseif($act.action == "takeResponsibility")
+                        href="#" onclick="takeResponsibility('$project.id'); return false"
+                #elseif($act.action == "clearResponsibility")
+                        href="#" onclick="clearResponsibility('$project.id'); return false"
                 #else
                             href="$urls.projectAction($project, $act.action)"
                 #end

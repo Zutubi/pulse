@@ -1,22 +1,20 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
-import com.zutubi.pulse.master.model.BuildManager;
-import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 
 /**
- * Abstract base for actions that manipulate build responsibility.
+ * Abstract base for actions that manipulate project responsibility.
  */
 public abstract class ResponsibilityActionBase extends ActionSupport
 {
-    private long buildId;
+    private long projectId;
     private SimpleResult result;
-    protected BuildManager buildManager;
 
-    public void setBuildId(long buildId)
+    public void setProjectId(long projectId)
     {
-        this.buildId = buildId;
+        this.projectId = projectId;
     }
 
     public SimpleResult getResult()
@@ -24,19 +22,15 @@ public abstract class ResponsibilityActionBase extends ActionSupport
         return result;
     }
 
-    protected BuildResult getBuildResult()
+    protected Project getProject()
     {
-        BuildResult buildResult = buildManager.getBuildResult(buildId);
-        if (buildResult == null)
+        Project project = projectManager.getProject(projectId, true);
+        if (project == null)
         {
-            throw new LookupErrorException("Unknown build result [" + buildId + "]");
+            throw new LookupErrorException("Unknown project [" + projectId + "]");
         }
 
-        if (buildResult.isPersonal())
-        {
-            throw new IllegalArgumentException("Cannot change responsibility for a personal build");
-        }
-        return buildResult;
+        return project;
     }
 
     @Override
@@ -55,9 +49,4 @@ public abstract class ResponsibilityActionBase extends ActionSupport
     }
 
     protected abstract SimpleResult doExecute();
-
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
-    }
 }

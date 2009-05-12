@@ -689,7 +689,7 @@ function handleResponsibilityResponse(options, success, response)
     }
 }
 
-function takeResponsibility(buildId)
+function takeResponsibility(projectId)
 {
     window.dialogBox = Ext.Msg.show({
         title: 'Take Responsibility',
@@ -701,7 +701,7 @@ function takeResponsibility(buildId)
                     showStatus('Taking responsibility...', 'working');
                     Ext.Ajax.request({
                         url: window.baseUrl + '/ajax/takeResponsibility.action',
-                        params: { buildId: buildId, comment: text },
+                        params: { projectId: projectId, comment: text },
                         callback: handleResponsibilityResponse
                     });
                 }
@@ -712,12 +712,12 @@ function takeResponsibility(buildId)
     });
 }
 
-function clearResponsibility(buildId)
+function clearResponsibility(projectId)
 {
     showStatus('Clearing responsibility...', 'working');
     Ext.Ajax.request({
         url: window.baseUrl + '/ajax/clearResponsibility.action',
-        params: { buildId: buildId },
+        params: { projectId: projectId },
         callback: handleResponsibilityResponse
     });
 }

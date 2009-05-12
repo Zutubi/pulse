@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class BuildAborterTest extends PulseTestCase
 {
@@ -133,5 +134,9 @@ public class BuildAborterTest extends PulseTestCase
 
     public static class MockProjectDao extends MockEntityDao<Project> implements ProjectDao
     {
+        public List<Project> findByResponsible(User user)
+        {
+            throw new RuntimeException("Not implemented");
+        }
     }
 }

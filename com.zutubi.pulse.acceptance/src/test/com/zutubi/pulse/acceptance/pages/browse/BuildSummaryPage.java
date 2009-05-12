@@ -39,21 +39,6 @@ public class BuildSummaryPage extends ResponsibilityPage
         selenium.click(getHookId(hookName));
     }
 
-    private String getActionId(String actionName)
-    {
-        return "action." + actionName;
-    }
-
-    public boolean isActionPresent(String actionName)
-    {
-        return selenium.isElementPresent(getActionId(actionName));
-    }
-
-    public void clickAction(String actionName)
-    {
-        selenium.click(getActionId(actionName));
-    }
-
     public boolean hasTests()
     {
         return !getSummaryTestsColumnText().contains("none");

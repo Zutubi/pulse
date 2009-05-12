@@ -50,4 +50,19 @@ public abstract class ResponsibilityPage extends SeleniumPage
     {
         return selenium.isElementPresent(ID_RESPONSIBLE_CLEAR);
     }
+
+    private String getActionId(String actionName)
+    {
+        return "action." + actionName;
+    }
+
+    public boolean isActionPresent(String actionName)
+    {
+        return selenium.isElementPresent(getActionId(actionName));
+    }
+
+    public void clickAction(String actionName)
+    {
+        selenium.click(getActionId(actionName));
+    }
 }

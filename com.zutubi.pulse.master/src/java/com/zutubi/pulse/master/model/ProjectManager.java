@@ -155,6 +155,14 @@ public interface ProjectManager extends EntityManager<Project>
 
     void removeReferencesToAgent(long agentStateId);
 
+    /**
+     * Removes all references from projects to a given user (used when the user
+     * is deleted).
+     *
+     * @param user the user to remove all references to
+     */
+    void removeReferencesToUser(User user);
+
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER)
     void markForCleanBuild(Project project);
 
@@ -165,4 +173,34 @@ public interface ProjectManager extends EntityManager<Project>
      * @param timestamp the new last poll time in milliseconds since the epoch
      */
     void updateLastPollTime(long projectId, long timestamp);
+
+    /**
+     * Finds all projects that the given user is responsible for.
+     *
+     * @param user the user to find the resposibilities of
+     * @return all projects with a resposibility containing the given user
+     */
+    @SecureResult
+    List<Project> findByResponsible(User user);
+
+    /**
+     * Takes responsibility for the given project on behalf of the given user.
+     * No other user can already be responsible.
+     *
+     * @param project the project to take responsibility for
+     * @param user    the user taking responsibility
+     * @param comment an optional comment from the user describing why they are
+     *                responsible/what they are fixing
+     */
+    @SecureParameter(parameterType = Project.class, action = ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY)
+    void takeResponsibility(Project project, User user, String comment);
+
+    /**
+     * Clears responsibility for the given project if it is set.  Only the
+     * responsible user can do this, or an administrator.
+     *
+     * @param project the project to clear responsibility for
+     */
+    @SecureParameter(parameterType = Project.class, action = ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY)
+    void clearResponsibility(Project project);
 }

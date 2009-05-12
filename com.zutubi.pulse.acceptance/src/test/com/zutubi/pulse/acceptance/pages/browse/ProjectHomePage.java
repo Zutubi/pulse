@@ -18,16 +18,6 @@ public class ProjectHomePage extends ResponsibilityPage
         this.projectName = projectName;
     }
 
-    public String getActionLinkId(String action)
-    {
-        return "action." + action;
-    }
-
-    public void clickAction(String action)
-    {
-        selenium.click(getActionLinkId(action));
-    }
-
     public void triggerBuild()
     {
         clickAction("trigger");

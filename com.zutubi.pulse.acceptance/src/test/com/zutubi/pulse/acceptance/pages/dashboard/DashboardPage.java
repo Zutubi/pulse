@@ -70,23 +70,23 @@ public class DashboardPage extends ProjectsSummaryPage
         return selenium.isElementPresent(ID_RESPONSIBILITIES);
     }
 
-    public boolean hasResponsibility(String project, long number)
+    public boolean hasResponsibility(String project)
     {
-        return selenium.isElementPresent(ResponsibilityModel.getResponsibilityId(project, number));
+        return selenium.isElementPresent(ResponsibilityModel.getResponsibilityId(project));
     }
 
-    public void clearResponsibility(String project, long number)
+    public void clearResponsibility(String project)
     {
-        selenium.click(getClearResponsibilityId(project, number));
+        selenium.click(getClearResponsibilityId(project));
     }
 
-    public boolean isClearResponsibilityPresent(String project, long number)
+    public boolean isClearResponsibilityPresent(String project)
     {
-        return selenium.isElementPresent(getClearResponsibilityId(project, number));
+        return selenium.isElementPresent(getClearResponsibilityId(project));
     }
 
-    private String getClearResponsibilityId(String project, long number)
+    private String getClearResponsibilityId(String project)
     {
-        return "clear-" + ResponsibilityModel.getResponsibilityId(project, number);
+        return "clear-" + ResponsibilityModel.getResponsibilityId(project);
     }
 }

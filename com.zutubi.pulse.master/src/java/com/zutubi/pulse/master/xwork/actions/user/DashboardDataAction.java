@@ -69,12 +69,12 @@ public class DashboardDataAction extends ActionSupport
             }
         }
 
-        List<BuildResult> responsibleFor = buildManager.findByResponsible(user);
-        List<ResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Mapping<BuildResult, ResponsibilityModel>()
+        List<Project> responsibleFor = projectManager.findByResponsible(user);
+        List<ResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Mapping<Project, ResponsibilityModel>()
         {
-            public ResponsibilityModel map(BuildResult buildResult)
+            public ResponsibilityModel map(Project project)
             {
-                return new ResponsibilityModel(buildResult.getProject().getName(), buildResult.getId(), buildResult.getNumber());
+                return new ResponsibilityModel(project.getName(), project.getId());
             }
         });
 

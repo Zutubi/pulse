@@ -203,35 +203,5 @@ public interface BuildManager
     @SecureParameter(parameterType = BuildResult.class, action = AccessManager.ACTION_WRITE)
     void cleanupWork(BuildResult build);
 
-    /**
-     * Finds all builds that the given user is responsible for.
-     *
-     * @param user the user to find the resposibilities of
-     * @return all builds with a resposibility containing the given user
-     */
-    @SecureResult
-    List<BuildResult> findByResponsible(User user);
-
-    /**
-     * Takes responsibility for the given build on behalf of the given user.
-     * No other user can already be responsible.
-     *
-     * @param buildResult the build to take responsibility for
-     * @param user        the user taking responsibility
-     * @param comment     an optional comment from the user describing why they
-     *                    are responsible/what they are fixing
-     */
-    @SecureParameter(parameterType = BuildResult.class, action = BuildResult.ACTION_TAKE_RESPONSIBILITY)
-    void takeResponsibility(BuildResult buildResult, User user, String comment);
-
-    /**
-     * Clears responsibility for the given build if it is set.  Only the
-     * responsible user can do this, or an administrator.
-     *
-     * @param buildResult the build to clear responsibility for
-     */
-    @SecureParameter(parameterType = BuildResult.class, action = BuildResult.ACTION_CLEAR_RESPONSIBILITY)
-    void clearResponsibility(BuildResult buildResult);
-
     void executeInTransaction(Runnable runnable);
 }

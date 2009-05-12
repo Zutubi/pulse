@@ -547,6 +547,10 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private Long lastPollTime;
     private ProjectConfiguration config;
     private List<AgentState> forceCleanAgents = new LinkedList<AgentState>();
+    /**
+     * If not null, holds details about the user responsible for this project.
+     */
+    private ProjectResponsibility responsibility;
 
     public Project()
     {
@@ -729,6 +733,16 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         });
 
         return forceCleanAgents.size() != sizeBefore;
+    }
+
+    public ProjectResponsibility getResponsibility()
+    {
+        return responsibility;
+    }
+
+    public void setResponsibility(ProjectResponsibility responsibility)
+    {
+        this.responsibility = responsibility;
     }
 
     /**

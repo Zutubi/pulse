@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-    <class name="com.zutubi.pulse.master.model.BuildResult" table="BUILD_RESULT" lazy="false">
+    <class name="com.zutubi.pulse.master.model.Project" table="PROJECT" lazy="false">
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <component name="responsibility" class="com.zutubi.pulse.master.model.BuildResponsibility">
+        <component name="responsibility" class="com.zutubi.pulse.master.model.ProjectResponsibility">
             <many-to-one name="user" column="RESPONSIBLE_USER_ID" class="com.zutubi.pulse.master.model.User" cascade="none" not-null="false"/>
             <property name="comment" column="RESPONSIBLE_COMMENT" type="string" length="8191" not-null="false"/>
         </component>

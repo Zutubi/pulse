@@ -645,19 +645,19 @@ public class XmlRpcHelper
         }, timeout, "build " + number + " of project " + projectName + " to complete");
     }
 
-    public Hashtable<String, String> getResponsibilityInfo(String projectName, int number) throws Exception
+    public Hashtable<String, String> getResponsibilityInfo(String projectName) throws Exception
     {
-        return call("getResponsibilityInfo", projectName, number);
+        return call("getResponsibilityInfo", projectName);
     }
 
-    public void takeResponsibility(String projectName, int number, String comment) throws Exception
+    public void takeResponsibility(String projectName, String comment) throws Exception
     {
-        call("takeResponsibility", projectName, number, comment);
+        call("takeResponsibility", projectName, comment);
     }
 
-    public boolean clearResponsibility(String projectName, int number) throws Exception
+    public boolean clearResponsibility(String projectName) throws Exception
     {
-        return (Boolean) call("clearResponsibility", projectName, number);
+        return (Boolean) call("clearResponsibility", projectName);
     }
 
     public static void main(String[] argv) throws Exception
