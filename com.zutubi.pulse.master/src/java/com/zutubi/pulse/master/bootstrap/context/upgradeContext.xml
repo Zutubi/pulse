@@ -56,6 +56,7 @@
                 <ref local="hookTriggerOptions"/>
                 <ref local="buildResponsibility"/>
                 <ref local="gitInactivityTimeout"/>
+                <ref local="agentPriority"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -205,5 +206,9 @@
 
     <bean id="gitInactivityTimeout" class="com.zutubi.pulse.master.upgrade.tasks.GitInactivityTimeoutUpgradeTask">
         <property name="buildNumber" value="200029002"/>
+    </bean>
+
+    <bean id="agentPriority" class="com.zutubi.pulse.master.upgrade.tasks.AgentPriorityUpgradeTask">
+        <property name="buildNumber" value="200029003"/>
     </bean>
 </beans>
