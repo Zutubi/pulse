@@ -40,6 +40,22 @@
             visibleTree.redirectToNewPath(result);
         }
 
+        function expandAll()
+        {
+            if (visibleTree)
+            {
+                visibleTree.expandAll();
+            }
+        }
+
+        function collapseAll()
+        {
+            if (visibleTree)
+            {
+                visibleTree.collapseAll();
+            }
+        }
+
         // ------------------------------------------------------------------
         // Config tree
         // ------------------------------------------------------------------
@@ -177,7 +193,22 @@
                             layout: 'fit',
                             border: false
                         },
-                        items: [templateTree, configPanel]
+                        items: [templateTree, configPanel],
+                        bbar:  new Ext.Toolbar({
+                            style: {'background': '#dde'},
+                            items: [ '->',
+                                    {
+                                        icon: '$base/images/expand.gif',
+                                        cls: 'x-btn-text-icon',
+                                        text: 'expand all',
+                                        onClick: expandAll
+                                    }, {
+                                        icon: '$base/images/collapse.gif',
+                                        cls: 'x-btn-text-icon',
+                                        text: 'collapse all',
+                                        onClick: collapseAll
+                                    }]
+                            })
                     });
 
 
