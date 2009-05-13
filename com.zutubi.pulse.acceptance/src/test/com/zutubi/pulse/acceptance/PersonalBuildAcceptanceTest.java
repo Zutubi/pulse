@@ -44,6 +44,7 @@ import java.util.Properties;
 public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 {
     private static final String PROJECT_NAME = "PersonalBuildAcceptanceTest-Project";
+    private static final int BUILD_TIMEOUT = 90000;
 
     private File workingCopyDir;
 
@@ -251,7 +252,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         myBuildsPage.goTo();
         SeleniumUtils.refreshUntilElement(selenium, MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
-        SeleniumUtils.refreshUntilText(selenium, MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus);
+        SeleniumUtils.refreshUntilText(selenium, MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus, BUILD_TIMEOUT);
         return buildNumber;
     }
 
