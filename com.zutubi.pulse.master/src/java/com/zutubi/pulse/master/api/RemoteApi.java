@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -37,6 +38,8 @@ import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -129,6 +132,79 @@ public class RemoteApi
     public String ping()
     {
         return "pong";
+    }
+
+    /**
+     * Returns a struct of information about this server, both the runtime
+     * environment and Pulse itself.  All values in the struct are strings.
+     *
+     * @param token authentication token (see {@link #login})
+     * @return {@xtype struct} a struct containing key-value string pairs
+     * @access available to all users
+     */
+    public Hashtable getServerInfo(String token)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Hashtable<String, String> result = new Hashtable<String, String>();
+
+            Properties properties = System.getProperties();
+            copyProperty(properties, result, "os.name");
+            copyProperty(properties, result, "os.arch");
+            copyProperty(properties, result, "os.version");
+            copyProperty(properties, result, "java.version");
+            copyProperty(properties, result, "java.vendor");
+            copyProperty(properties, result, "user.dir");
+            copyProperty(properties, result, "user.home");
+            copyProperty(properties, result, "user.language");
+            copyProperty(properties, result, "user.name");
+            copyProperty(properties, result, "user.timezone");
+            copyProperty(properties, result, "file.encoding");
+
+            result.put("current.time", Long.toString(System.currentTimeMillis()));
+
+            result.put("pulse.build", Version.getVersion().getBuildNumber());
+            result.put("pulse.version", Version.getVersion().getVersionNumber());
+            result.put("pulse.config.file", getPulseConfig());
+            result.put("pulse.data.dir", configurationManager.getDataDirectory().getAbsolutePath());
+
+            File homeDir = configurationManager.getHomeDirectory();
+            if (homeDir != null)
+            {
+                result.put("pulse.home.dir", homeDir.getAbsolutePath());
+            }
+
+            try
+            {
+                result.put("pulse.database.url", configurationManager.getDatabaseConfig().getUrl());
+            }
+            catch (IOException e)
+            {
+                LOG.warning(e);
+            }
+
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private String getPulseConfig()
+    {
+        EnvConfig env = configurationManager.getEnvConfig();
+        return env.hasPulseConfig() ? env.getPulseConfig() : env.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
+    }
+
+    private void copyProperty(Properties from, Hashtable<String, String> to, String key)
+    {
+        String name = (String) from.get(key);
+        if (name != null)
+        {
+            to.put(key, name);
+        }
     }
 
     /**
@@ -2112,7 +2188,9 @@ public class RemoteApi
 
         TimeStamps timeStamps = result.getStamps();
         buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
+        buildDetails.put("startTimeMillis", Long.toString(timeStamps.getStartTime()));
         buildDetails.put("endTime", new Date(timeStamps.getEndTime()));
+        buildDetails.put("endTimeMillis", Long.toString(timeStamps.getEndTime()));
         if (timeStamps.hasEstimatedTimeRemaining())
         {
             buildDetails.put("progress", timeStamps.getEstimatedPercentComplete());

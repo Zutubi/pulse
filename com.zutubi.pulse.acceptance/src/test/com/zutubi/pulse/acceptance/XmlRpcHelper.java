@@ -95,6 +95,11 @@ public class XmlRpcHelper
         return (T) xmlRpcClient.execute("RemoteApi." + function, argVector);
     }
 
+    public Hashtable<String, String> getServerInfo() throws Exception
+    {
+        return call("getServerInfo");
+    }
+
     public String getSymbolicName(Class<? extends Configuration> clazz)
     {
         return clazz.getAnnotation(SymbolicName.class).value();

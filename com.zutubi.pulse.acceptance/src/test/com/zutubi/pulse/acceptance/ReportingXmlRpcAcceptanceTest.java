@@ -37,6 +37,13 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         super.tearDown();
     }
 
+    public void testGetServerInfo() throws Exception
+    {
+        Hashtable<String, String> info = xmlRpcHelper.getServerInfo();
+        assertTrue(info.containsKey("os.name"));
+        assertTrue(info.containsKey("pulse.version"));
+    }
+
     public void testGetAllUserLogins() throws Exception
     {
         getAllHelper(new GetAllHelper()
