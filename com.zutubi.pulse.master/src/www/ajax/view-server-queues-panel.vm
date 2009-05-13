@@ -43,7 +43,7 @@
                 #contentCell($buildRequest.prettyQueueTime)
                 #staticCell($buildRequest.reason.summary)
             #if($action.canCancel($buildRequest))
-                #actionCellId("cancel" "$base/cancelQueuedBuild.action?id=$buildRequest.id" "cancel.gif" "cancel.queued.${request.id}" false)
+                #actionCellId("cancel" "$base/cancelQueuedBuild.action?id=$buildRequest.id" "cancel.gif" "cancel.queued.${buildRequest.id}" false)
             #else
                 #contentCell("empty.cell")
             #end

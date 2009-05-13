@@ -283,6 +283,7 @@ public class NativeGit
                         long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / Constants.SECOND;
                         if (secondsSinceActivity >= inactivityTimeout)
                         {
+                            async.destroy();
                             throw new GitException("Timing out git process after " + secondsSinceActivity + " seconds of inactivity");
                         }
                     }
