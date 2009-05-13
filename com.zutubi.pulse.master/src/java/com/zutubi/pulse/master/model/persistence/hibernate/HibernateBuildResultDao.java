@@ -283,11 +283,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
                 if(mostRecentFirst)
                 {
-                    criteria.addOrder(Order.desc("number"));
+                    criteria.addOrder(Order.desc("id"));
                 }
                 else
                 {
-                    criteria.addOrder(Order.asc("number"));
+                    criteria.addOrder(Order.asc("id"));
                 }
 
                 return criteria.list();
@@ -357,7 +357,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                     criteria.setMaxResults(max);
                 }
 
-                criteria.addOrder(Order.desc("number"));
+                criteria.addOrder(Order.desc("id"));
                 return criteria.list();
             }
         });

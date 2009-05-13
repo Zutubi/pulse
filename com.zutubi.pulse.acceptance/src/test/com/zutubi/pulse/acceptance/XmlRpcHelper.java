@@ -665,6 +665,21 @@ public class XmlRpcHelper
         return (Boolean) call("clearResponsibility", projectName);
     }
 
+    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String project, boolean completedOnly, int maxResults) throws Exception
+    {
+        return call("getLatestBuildsForProject", project, completedOnly, maxResults);
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String project, int maxResults) throws Exception
+    {
+        return call("getLatestBuildsWithWarnings", project, maxResults);
+    }
+
+    public Vector<Hashtable<String, Object>> queryBuildsForProject(String project, Vector<String> resultStates, int firstResult, int maxResults, boolean mostRecentFirst) throws Exception
+    {
+        return call("queryBuildsForProject", project, resultStates, firstResult, maxResults, mostRecentFirst);
+    }
+
     public static void main(String[] argv) throws Exception
     {
         XmlRpcHelper helper = new XmlRpcHelper(new URL("http://localhost:8080/xmlrpc"));
