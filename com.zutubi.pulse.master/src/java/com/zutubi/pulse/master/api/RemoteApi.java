@@ -3018,24 +3018,8 @@ public class RemoteApi
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
         }
 
-        if (projectConfiguration.isConcrete())
-        {
-            return new Project[]{internalGetProject(projectName, allowInvalid)};
-        }
-        else
-        {
-            List<Project> projects = new LinkedList<Project>();
-            for (String descendentPath: configurationTemplateManager.getDescendentPaths(path, false, true, false))
-            {
-                Project project = projectManager.getProject(PathUtils.getBaseName(descendentPath), allowInvalid);
-                if (project != null)
-                {
-                    projects.add(project);
-                }
-            }
-
-            return projects.toArray(new Project[projects.size()]);
-        }
+        List<Project> projects = projectManager.getDescendentProjects(projectName, false, true);
+        return projects.toArray(new Project[projects.size()]);
     }
 
     private BuildResult internalGetBuild(Project project, int id)

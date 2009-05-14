@@ -20,6 +20,11 @@ public class MockProjectManager extends DefaultProjectManager
         return new LinkedList<Project>(projects.values());
     }
 
+    public List<Project> getDescendentProjects(String project, boolean strict, boolean allowInvalid)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
     public void save(Project project)
     {
         if (project.getId() == 0)

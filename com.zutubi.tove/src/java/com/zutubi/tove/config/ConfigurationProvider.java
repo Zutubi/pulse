@@ -4,6 +4,7 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.NullaryFunction;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * The configuration provider interface provides access to the configuration system.
@@ -69,6 +70,25 @@ public interface ConfigurationProvider
      * @return the located configuration instance, or null if none is found.
      */
     <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz);
+
+    /**
+     * Retrieves all descendents of a given path, which should all be of the specified type.  If the
+     * path is within a templated scope, all instances that descdend from the given path are
+     * returned, potentially including the instance at that path (see the {@code strict} parameter).
+     * If the path is not in a templated scope, either the empty set is returned (strict) or a set
+     * containing the instance at the path (non-strict).  If the path does not exist, the empty set
+     * is returned.
+     *
+     * @param path         path to retrieve all descendents of
+     * @param clazz        type of the instances to retrieve
+     * @param strict       if true, the instance at path is not included, otherwise it is included
+     * @param concreteOnly if true, only concrete instances are returned
+     * @return all instances that descend from the given path and match the filtering criteria
+     *
+     * @throws IllegalArgumentException if the given path references an invalid scope or any of the
+     *         located instances do not match the given type
+     */
+    <T extends Configuration> Set<T> getAllDescendents(String path, Class<T> clazz, boolean strict, boolean concreteOnly); 
 
     /**
      * Indicates if an instance and all instances reachable via its

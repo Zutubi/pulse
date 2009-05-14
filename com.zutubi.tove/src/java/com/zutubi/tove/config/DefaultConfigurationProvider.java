@@ -1,8 +1,8 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.events.*;
-import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.CompositeType;
@@ -11,7 +11,9 @@ import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
 /**
@@ -107,6 +109,18 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         return configurationTemplateManager.getAncestorOfType(c, clazz);
+    }
+
+    public <T extends Configuration> Set<T> getAllDescendents(String path, Class<T> clazz, boolean strict, boolean concreteOnly)
+    {
+        List<String> descendentPaths = configurationTemplateManager.getDescendentPaths(path, strict, concreteOnly, false);
+        Set<T> result = new HashSet<T>(descendentPaths.size());
+        for (String descendentPath: descendentPaths)
+        {
+            result.add(get(descendentPath, clazz));
+        }
+
+        return result;
     }
 
     public boolean isDeeplyValid(String path)
