@@ -18,5 +18,10 @@ import java.lang.annotation.Target;
 public @interface ItemPicker
 {
     String optionProvider();
-    boolean ordered() default true;
+    /**
+     * @return true if the user should be allowed to reorder selected items,
+     *         false if the order is not important (in this case items are
+     *         sorted for convenience)
+     */
+    boolean allowReordering() default true;
 }

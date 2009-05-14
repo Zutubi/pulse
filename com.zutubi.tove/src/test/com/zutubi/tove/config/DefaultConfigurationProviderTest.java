@@ -7,18 +7,25 @@ import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
+import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 
+import static java.util.Arrays.asList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
-/**
- */
 public class DefaultConfigurationProviderTest extends AbstractConfigurationSystemTestCase
 {
-    private DefaultConfigurationProvider provider;
+    private static final String SCOPE_TEMPLATE = "template";
+    private static final String SCOPE_SAMPLE = "sample";
 
-    private A a;
+    private DefaultConfigurationProvider provider;
+    private CompositeType typeA;
 
     protected void setUp() throws Exception
     {
@@ -37,24 +44,16 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         
         C c = new C("c");
         B b = new B("b");
-        a = new A("a");
+        A a = new A("a");
         a.setB(b);
         b.setC(c);
 
-        CompositeType typeA = typeRegistry.getType(A.class);
+        typeA = typeRegistry.getType(A.class);
         MapType mapA = new MapType(typeA, typeRegistry);
-        configurationPersistenceManager.register("sample", mapA);
+        configurationPersistenceManager.register(SCOPE_SAMPLE, mapA);
 
         MapType templatedMap = new TemplatedMapType(typeA, typeRegistry);
-        configurationPersistenceManager.register("template", templatedMap);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        a = null;
-        provider = null;
-
-        super.tearDown();
+        configurationPersistenceManager.register(SCOPE_TEMPLATE, templatedMap);
     }
 
     public void testRegisterListenerByClass()
@@ -66,7 +65,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         A a = new A("a");
 
         // check the insert events.
-        String path = configurationTemplateManager.insert("sample", a);
+        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
         listener.assertNextEvent(InsertEvent.class, "sample/a");
         listener.assertNextEvent(PostInsertEvent.class, "sample/a");
         listener.assertNoMoreEvents();
@@ -90,15 +89,15 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
     {
         // check that we receive the save events.
         MockConfigurationEventListener includingChildren = new MockConfigurationEventListener();
-        provider.registerEventListener(includingChildren, true, true, "sample");
+        provider.registerEventListener(includingChildren, true, true, SCOPE_SAMPLE);
 
         MockConfigurationEventListener excludingChildren = new MockConfigurationEventListener();
-        provider.registerEventListener(excludingChildren, true, false, "sample");
+        provider.registerEventListener(excludingChildren, true, false, SCOPE_SAMPLE);
 
         A a = new A("a");
 
         // check the insert events.
-        String aPath = configurationTemplateManager.insert("sample", a);
+        String aPath = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
         includingChildren.assertNextEvent(InsertEvent.class, "sample/a");
         includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a");
         includingChildren.assertNoMoreEvents();
@@ -150,7 +149,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         a.setB(new B("b"));
 
         // check the insert event.
-        configurationTemplateManager.insert("sample", a);
+        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
         listener.assertNextEvent(InsertEvent.class, "sample/a/b");
         listener.assertNextEvent(PostInsertEvent.class, "sample/a/b");
         listener.assertNoMoreEvents();
@@ -161,6 +160,60 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         listener.assertNoMoreEvents();
     }
 
+    public void testGetAllDescendents() throws TypeException
+    {
+        MutableRecord record = typeA.unstantiate(new A("global"));
+        configurationTemplateManager.markAsTemplate(record);
+
+        String globalPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATE, record);
+        long globalHandle = configurationTemplateManager.getRecord(globalPath).getHandle();
+
+        String childPath = insertConcreteChild(globalHandle, "concrete-child");
+
+        record = typeA.unstantiate(new A("template-child"));
+        configurationTemplateManager.markAsTemplate(record);
+        configurationTemplateManager.setParentTemplate(record, globalHandle);
+        String templatePath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATE, record);
+
+        long templateHandle = configurationTemplateManager.getRecord(templatePath).getHandle();
+
+        String grandchild1Path = insertConcreteChild(templateHandle, "concrete-grandchild1");
+        String grandchild2Path = insertConcreteChild(templateHandle, "concrete-grandchild2");
+
+        assertEquals(new HashSet<String>(asList(childPath, templatePath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(globalPath, true, false));
+        assertEquals(new HashSet<String>(asList(globalPath, childPath, templatePath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(globalPath, false, false));
+        assertEquals(new HashSet<String>(asList(childPath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(globalPath, true, true));
+        assertEquals(new HashSet<String>(asList(childPath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(globalPath, false, true));
+
+        assertEquals(new HashSet<String>(asList(grandchild1Path, grandchild2Path)), getAllDescendentPaths(templatePath, true, false));
+        assertEquals(new HashSet<String>(asList(templatePath, grandchild1Path, grandchild2Path)), getAllDescendentPaths(templatePath, false, false));
+        assertEquals(new HashSet<String>(asList(grandchild1Path, grandchild2Path)), getAllDescendentPaths(templatePath, true, true));
+        assertEquals(new HashSet<String>(asList(grandchild1Path, grandchild2Path)), getAllDescendentPaths(templatePath, false, true));
+        
+        assertEquals(new HashSet<String>(), getAllDescendentPaths(childPath, true, false));
+        assertEquals(new HashSet<String>(asList(childPath)), getAllDescendentPaths(childPath, false, false));
+        assertEquals(new HashSet<String>(), getAllDescendentPaths(childPath, true, true));
+        assertEquals(new HashSet<String>(asList(childPath)), getAllDescendentPaths(childPath, false, true));
+    }
+
+    private String insertConcreteChild(long parentHandle, String name) throws TypeException
+    {
+        MutableRecord record = typeA.unstantiate(new A(name));
+        configurationTemplateManager.setParentTemplate(record, parentHandle);
+        return configurationTemplateManager.insertRecord(SCOPE_TEMPLATE, record);
+    }
+
+    private Set<String> getAllDescendentPaths(String path, boolean strict, boolean concreteOnly)
+    {
+        Set<A> instances = configurationProvider.getAllDescendents(path, A.class, strict, concreteOnly);
+        return CollectionUtils.map(instances, new Mapping<A, String>()
+        {
+            public String map(A a)
+            {
+                return a.getConfigurationPath();
+            }
+        }, new HashSet<String>());
+    }
 
     @SymbolicName("a")
     public static class A extends AbstractConfiguration
