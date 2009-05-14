@@ -32,6 +32,9 @@ public class GitClientTest extends PulseTestCase
     private static final String REVISION_DEV_MERGE_NO_CONFLICTS = "9751b1dbd8cdbbeedce404bad38d1df1053078f6";
     private static final String REVISION_DEV_MERGE_CONFLICTS = "2b54f24e1facb7d97643d38e0f89cd5db88b186a";
     private static final String REVISION_MULTILINE_COMMENT = "01aaf6555b7524871204c8df64273597c0bc1f1b";
+    private static final String REVISION_MASTER_INTERMEDIATE = "b69a48a6b0f567d0be110c1fbca2c48fc3e1b112";
+    private static final String REVISION_SIMPLE_INTERMEDIATE = "83d35b25a6b4711c4d9424c337bf82e5398756f3";
+    private static final String REVISION_SIMPLE_LATEST = "c34b545b6954b8946967c250dde7617c24a9bb4b";
 
     private static final String BRANCH_SIMPLE = "branch";
     private static final String BRANCH_MERGES = "devbranch";
@@ -46,7 +49,7 @@ public class GitClientTest extends PulseTestCase
     private PulseExecutionContext context;
     private RecordingScmFeedbackHandler handler;
     private ScmContextImpl scmContext;
-    
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -106,7 +109,7 @@ public class GitClientTest extends PulseTestCase
         client.setBranch(BRANCH_SIMPLE);
         Revision rev = client.checkout(context, null, handler);
 
-        assertEquals("c34b545b6954b8946967c250dde7617c24a9bb4b", rev.getRevisionString());
+        assertEquals(REVISION_SIMPLE_LATEST, rev.getRevisionString());
 
         assertFiles(workingDir, "1.txt", "2.txt", "3.txt");
         assertGitDir(workingDir);
@@ -114,9 +117,9 @@ public class GitClientTest extends PulseTestCase
 
     public void testCheckoutToRevision() throws ScmException, ParseException
     {
-        Revision rev = client.checkout(context, new Revision("96e8d45dd7627d9e3cab980e90948e3ae1c99c62"), handler);
+        Revision rev = client.checkout(context, new Revision(REVISION_INITIAL), handler);
 
-        assertEquals("96e8d45dd7627d9e3cab980e90948e3ae1c99c62", rev.getRevisionString());
+        assertEquals(REVISION_INITIAL, rev.getRevisionString());
 
         assertFiles(workingDir, "a.txt", "b.txt", "c.txt");
         assertGitDir(workingDir);
@@ -138,9 +141,9 @@ public class GitClientTest extends PulseTestCase
     private void checkoutBranchToRevisionHelper() throws ScmException
     {
         client.setBranch(BRANCH_SIMPLE);
-        Revision rev = client.checkout(context, new Revision("83d35b25a6b4711c4d9424c337bf82e5398756f3"), handler);
+        Revision rev = client.checkout(context, new Revision(REVISION_SIMPLE_INTERMEDIATE), handler);
 
-        assertEquals("83d35b25a6b4711c4d9424c337bf82e5398756f3", rev.getRevisionString());
+        assertEquals(REVISION_SIMPLE_INTERMEDIATE, rev.getRevisionString());
 
         assertGitDir(workingDir);
         assertEquals(2, workingDir.list().length);
@@ -160,7 +163,7 @@ public class GitClientTest extends PulseTestCase
         client.init(scmContext, new ScmFeedbackAdapter());
         Revision rev = client.getLatestRevision(scmContext);
 
-        assertEquals("c34b545b6954b8946967c250dde7617c24a9bb4b", rev.getRevisionString());
+        assertEquals(REVISION_SIMPLE_LATEST, rev.getRevisionString());
     }
 
     public void testRetrieve() throws ScmException, IOException
@@ -173,7 +176,7 @@ public class GitClientTest extends PulseTestCase
     public void testRetrieveFromRevision() throws IOException, ScmException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
-        InputStream content = client.retrieve(scmContext, "a.txt", new Revision("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112"));
+        InputStream content = client.retrieve(scmContext, "a.txt", new Revision(REVISION_MASTER_INTERMEDIATE));
         assertEquals("content", IOUtils.inputStreamToString(content));
     }
 
@@ -232,6 +235,30 @@ public class GitClientTest extends PulseTestCase
         assertEquals("Already up-to-date.", handler.getStatusMessages().get(handler.getStatusMessages().size() - 1));
     }
 
+    public void testUpdateToLatestOnBranch() throws ScmException, IOException, ParseException
+    {
+        updateToLatestOnBranchHelper();
+    }
+
+    public void testUpdateToLatestSelectedBranch() throws ScmException, IOException, ParseException
+    {
+        client.setTrackSelectedBranch(true);
+        updateToLatestOnBranchHelper();
+    }
+
+    private void updateToLatestOnBranchHelper() throws ScmException, IOException
+    {
+        client.setBranch(BRANCH_SIMPLE);
+        client.checkout(context, new Revision(REVISION_SIMPLE_INTERMEDIATE), handler);
+        assertEquals(2, workingDir.list().length);
+
+        Revision rev = client.update(context, null, handler);
+        assertEquals(REVISION_SIMPLE_LATEST, rev.getRevisionString());
+
+        assertFiles(workingDir, "1.txt", "2.txt", "3.txt");
+        assertGitDir(workingDir);
+    }
+
     public void testUpdateToRevision() throws ScmException, IOException, ParseException
     {
         updateToRevisionHelper();
@@ -248,8 +275,8 @@ public class GitClientTest extends PulseTestCase
         client.checkout(context, null, handler);
         assertEquals(CONTENT_A_TXT + "\n", IOUtils.fileToString(new File(workingDir, "a.txt")));
 
-        Revision rev = client.update(context, new Revision("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112"), handler);
-        assertEquals("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112", rev.getRevisionString());
+        Revision rev = client.update(context, new Revision(REVISION_MASTER_INTERMEDIATE), handler);
+        assertEquals(REVISION_MASTER_INTERMEDIATE, rev.getRevisionString());
 
         assertEquals("content", IOUtils.fileToString(new File(workingDir, "a.txt")));
     }
