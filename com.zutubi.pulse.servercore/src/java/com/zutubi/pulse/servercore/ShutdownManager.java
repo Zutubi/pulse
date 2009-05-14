@@ -241,6 +241,7 @@ public class ShutdownManager
             }
 
             stop(true);
+            System.exit(0);
         }
     }
 }

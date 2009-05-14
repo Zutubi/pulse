@@ -1179,6 +1179,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
     valueField: 'value',
     selectedClass: 'x-item-picker-selected',
     hiddenFields: [],
+    ordered: true,
     value: [],
     optionStore: undefined,
     defaultAutoCreate: {tag: 'div', cls: 'x-item-picker-list', tabindex: '0'},
@@ -1254,11 +1255,14 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         this.removeButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-delete-up.gif', overImage: window.baseUrl + '/images/buttons/sb-delete-over.gif', downImage: window.baseUrl + '/images/buttons/sb-delete-down.gif'});
         this.removeButton.on('click', this.onRemove, this);
 
-        this.upButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-up-up.gif', overImage: window.baseUrl + '/images/buttons/sb-up-over.gif', downImage: window.baseUrl + '/images/buttons/sb-up-down.gif'});
-        this.upButton.on('click', this.onUp, this);
+        if (this.ordered)
+        {
+            this.upButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-up-up.gif', overImage: window.baseUrl + '/images/buttons/sb-up-over.gif', downImage: window.baseUrl + '/images/buttons/sb-up-down.gif'});
+            this.upButton.on('click', this.onUp, this);
 
-        this.downButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-down-up.gif', overImage: window.baseUrl + '/images/buttons/sb-down-over.gif', downImage: window.baseUrl + '/images/buttons/sb-down-down.gif'});
-        this.downButton.on('click', this.onDown, this);
+            this.downButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-down-up.gif', overImage: window.baseUrl + '/images/buttons/sb-down-over.gif', downImage: window.baseUrl + '/images/buttons/sb-down-down.gif'});
+            this.downButton.on('click', this.onDown, this);
+        }
 
         var cls = 'x-item-picker';
 
@@ -1335,13 +1339,17 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         }
         this.addButton.getEl().alignTo(this.el, 'tl-br', [2, 0]);
         this.removeButton.getEl().alignTo(this.el, 'tl-tr', [2, 0]);
-        this.upButton.getEl().alignTo(this.el, 'l-r', [2, 0]);
-        this.downButton.getEl().alignTo(this.upButton.getEl(), 't-b', [0, 2]);
+
+        if (this.ordered)
+        {
+            this.upButton.getEl().alignTo(this.el, 'l-r', [2, 0]);
+            this.downButton.getEl().alignTo(this.upButton.getEl(), 't-b', [0, 2]);
+        }
     },
 
     navUp: function(ctrl)
     {
-        if(ctrl)
+        if(this.ordered && ctrl)
         {
             this.onUp();
         }
@@ -1359,7 +1367,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
     navDown: function(ctrl)
     {
-        if(ctrl)
+        if(this.ordered && ctrl)
         {
             this.onDown();
         }
@@ -1402,8 +1410,8 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
         if(text.length > 0)
         {
-            this.appendItem(text, value);
-            this.view.select(this.store.getCount() - 1);
+            var index = this.appendItem(text, value);
+            this.view.select(index);
             this.ensureSelectionVisible();
             this.fireEvent('change', this, evt);
         }
@@ -1411,8 +1419,18 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
     appendItem: function(text, value)
     {
-        this.store.add(new this.ValueRecord({text: text, value: value}));
+        var r = new this.ValueRecord({text: text, value: value});
+        if (this.ordered)
+        {
+            this.store.add(r);
+        }
+        else
+        {
+            this.store.addSorted(r);
+        }
+        
         this.hiddenFields.push(this.wrap.createChild({tag: 'input', type: 'hidden', name: this.name, value: value}));
+        return this.store.indexOf(r);
     },
     
     onRemove: function(evt)

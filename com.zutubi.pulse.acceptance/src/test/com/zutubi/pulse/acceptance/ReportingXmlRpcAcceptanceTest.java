@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
@@ -23,8 +24,13 @@ import java.util.Vector;
  */
 public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
+    private static final String PROJECT_HIERARCHY_PREFIX = "reporting-xmlrpc-hierarchy";
+    private static final String PROJECT_HIERARCHY_TEMPLATE = PROJECT_HIERARCHY_PREFIX + "-template";
+    private static final String PROJECT_HIERARCHY_CHILD1 = PROJECT_HIERARCHY_PREFIX + "-child1";
+    private static final String PROJECT_HIERARCHY_CHILD2 = PROJECT_HIERARCHY_PREFIX + "-child2";
+
     private static final int BUILD_TIMEOUT = 90000;
-    
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -35,6 +41,13 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         logout();
         super.tearDown();
+    }
+
+    public void testGetServerInfo() throws Exception
+    {
+        Hashtable<String, String> info = xmlRpcHelper.getServerInfo();
+        assertTrue(info.containsKey("os.name"));
+        assertTrue(info.containsKey("pulse.version"));
     }
 
     public void testGetAllUserLogins() throws Exception
@@ -302,6 +315,109 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         assertThat(text, containsString("PULSE_EXISTING_PROPERTY=overriding value"));
         assertThat(text, containsString("PULSE_NEW_PROPERTY=new value"));
+    }
+
+    public void testGetLatestBuildsForProject() throws Exception
+    {
+        String projectName = randomName();
+        insertSimpleProject(projectName);
+        int number = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.getLatestBuildsForProject(projectName, true, 10);
+        assertEquals(1, builds.size());
+        assertEquals(number, builds.get(0).get("id"));
+    }
+
+    public void testGetLatestBuildsForProjectUnknownProject() throws Exception
+    {
+        try
+        {
+            xmlRpcHelper.getLatestBuildsForProject("thereisnosuchproject", true, 10);
+            fail("Can't get latest builds for unknown project");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Unknown project"));
+        }
+    }
+
+    public void testGetLatestBuildsForProjectTemplate() throws Exception
+    {
+        ensureProjectHierarchy();
+
+        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.getLatestBuildsForProject(PROJECT_HIERARCHY_TEMPLATE, true, 10);
+        assertEquals(2, builds.size());
+
+        Hashtable<String, Object> build = builds.get(0);
+        assertEquals(1, build.get("id"));
+        assertEquals(PROJECT_HIERARCHY_CHILD2, build.get("project"));
+
+        build = builds.get(1);
+        assertEquals(1, build.get("id"));
+        assertEquals(PROJECT_HIERARCHY_CHILD1, build.get("project"));
+    }
+
+    public void testQueryBuildsForProject() throws Exception
+    {
+        String projectName = randomName();
+        insertSimpleProject(projectName);
+        int number = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+
+        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.queryBuildsForProject(projectName, new Vector<String>(), -1, 10, true);
+        assertEquals(1, builds.size());
+        assertEquals(number, builds.get(0).get("id"));
+    }
+
+    public void testQueryBuildsForProjectUnknownProject() throws Exception
+    {
+        try
+        {
+            xmlRpcHelper.queryBuildsForProject("iamnothere", new Vector<String>(), -1, 10, true);
+            fail("Can't query builds for unknown project");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Unknown project"));
+        }
+    }
+
+    public void testQueryBuildsForProjectTemplate() throws Exception
+    {
+        ensureProjectHierarchy();
+
+        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.queryBuildsForProject(PROJECT_HIERARCHY_TEMPLATE, new Vector<String>(), -1, 10, true);
+        assertEquals(2, builds.size());
+
+        Hashtable<String, Object> build = builds.get(0);
+        assertEquals(1, build.get("id"));
+        assertEquals(PROJECT_HIERARCHY_CHILD2, build.get("project"));
+
+        build = builds.get(1);
+        assertEquals(1, build.get("id"));
+        assertEquals(PROJECT_HIERARCHY_CHILD1, build.get("project"));
+    }
+
+
+    public void testGetLatestBuildsWithWarningsNoWarnings() throws Exception
+    {
+        ensureProjectHierarchy();
+
+        // No builds have warnings, but this sanity check found a login bug.
+        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.getLatestBuildsWithWarnings(PROJECT_HIERARCHY_TEMPLATE, 10);
+        assertEquals(0, builds.size());
+    }
+
+    private void ensureProjectHierarchy() throws Exception
+    {
+        if (!xmlRpcHelper.configPathExists(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PROJECT_HIERARCHY_TEMPLATE)))
+        {
+            xmlRpcHelper.insertProject(PROJECT_HIERARCHY_TEMPLATE, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+            xmlRpcHelper.insertProject(PROJECT_HIERARCHY_CHILD1, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
+            xmlRpcHelper.insertProject(PROJECT_HIERARCHY_CHILD2, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
+
+            xmlRpcHelper.runBuild(PROJECT_HIERARCHY_CHILD1, BUILD_TIMEOUT);
+            xmlRpcHelper.runBuild(PROJECT_HIERARCHY_CHILD2, BUILD_TIMEOUT);
+        }
     }
 
     private void getAllHelper(GetAllHelper helper) throws Exception

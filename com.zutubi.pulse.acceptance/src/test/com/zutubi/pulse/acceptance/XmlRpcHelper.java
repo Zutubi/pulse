@@ -99,6 +99,11 @@ public class XmlRpcHelper
         return (T) xmlRpcClient.execute("RemoteApi." + function, argVector);
     }
 
+    public Hashtable<String, String> getServerInfo() throws Exception
+    {
+        return call("getServerInfo");
+    }
+
     public String getSymbolicName(Class<? extends Configuration> clazz)
     {
         return clazz.getAnnotation(SymbolicName.class).value();
@@ -740,6 +745,21 @@ public class XmlRpcHelper
     public boolean clearResponsibility(String projectName) throws Exception
     {
         return (Boolean) call("clearResponsibility", projectName);
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String project, boolean completedOnly, int maxResults) throws Exception
+    {
+        return call("getLatestBuildsForProject", project, completedOnly, maxResults);
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String project, int maxResults) throws Exception
+    {
+        return call("getLatestBuildsWithWarnings", project, maxResults);
+    }
+
+    public Vector<Hashtable<String, Object>> queryBuildsForProject(String project, Vector<String> resultStates, int firstResult, int maxResults, boolean mostRecentFirst) throws Exception
+    {
+        return call("queryBuildsForProject", project, resultStates, firstResult, maxResults, mostRecentFirst);
     }
 
     public static void main(String[] argv) throws Exception

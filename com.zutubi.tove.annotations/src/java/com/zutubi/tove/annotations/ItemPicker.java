@@ -18,4 +18,5 @@ import java.lang.annotation.Target;
 public @interface ItemPicker
 {
     String optionProvider();
+    boolean ordered() default true;
 }

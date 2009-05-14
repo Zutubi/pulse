@@ -39,11 +39,15 @@
 
     var store = new Ext.data.SimpleStore({
         fields: ['value', 'text'],
-        data: []
+        data: [],
+        sortInfo: {'field': 'text', 'direction': 'ASC'}
     });
 
     fc.store = store;
     fc.value = v;
+<#if parameters.ordered?exists>
+    fc.ordered = ${parameters.ordered?string};
+</#if>
 <#if parameters.width?exists>
     fc.width = ${parameters.width};
 </#if>

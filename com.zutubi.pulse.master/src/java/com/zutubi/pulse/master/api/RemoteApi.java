@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -37,6 +38,8 @@ import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -130,6 +133,79 @@ public class RemoteApi
     public String ping()
     {
         return "pong";
+    }
+
+    /**
+     * Returns a struct of information about this server, both the runtime
+     * environment and Pulse itself.  All values in the struct are strings.
+     *
+     * @param token authentication token (see {@link #login})
+     * @return {@xtype struct} a struct containing key-value string pairs
+     * @access available to all users
+     */
+    public Hashtable getServerInfo(String token)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Hashtable<String, String> result = new Hashtable<String, String>();
+
+            Properties properties = System.getProperties();
+            copyProperty(properties, result, "os.name");
+            copyProperty(properties, result, "os.arch");
+            copyProperty(properties, result, "os.version");
+            copyProperty(properties, result, "java.version");
+            copyProperty(properties, result, "java.vendor");
+            copyProperty(properties, result, "user.dir");
+            copyProperty(properties, result, "user.home");
+            copyProperty(properties, result, "user.language");
+            copyProperty(properties, result, "user.name");
+            copyProperty(properties, result, "user.timezone");
+            copyProperty(properties, result, "file.encoding");
+
+            result.put("current.time", Long.toString(System.currentTimeMillis()));
+
+            result.put("pulse.build", Version.getVersion().getBuildNumber());
+            result.put("pulse.version", Version.getVersion().getVersionNumber());
+            result.put("pulse.config.file", getPulseConfig());
+            result.put("pulse.data.dir", configurationManager.getDataDirectory().getAbsolutePath());
+
+            File homeDir = configurationManager.getHomeDirectory();
+            if (homeDir != null)
+            {
+                result.put("pulse.home.dir", homeDir.getAbsolutePath());
+            }
+
+            try
+            {
+                result.put("pulse.database.url", configurationManager.getDatabaseConfig().getUrl());
+            }
+            catch (IOException e)
+            {
+                LOG.warning(e);
+            }
+
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private String getPulseConfig()
+    {
+        EnvConfig env = configurationManager.getEnvConfig();
+        return env.hasPulseConfig() ? env.getPulseConfig() : env.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
+    }
+
+    private void copyProperty(Properties from, Hashtable<String, String> to, String key)
+    {
+        String name = (String) from.get(key);
+        if (name != null)
+        {
+            to.put(key, name);
+        }
     }
 
     /**
@@ -303,15 +379,22 @@ public class RemoteApi
      */
     public Hashtable<String, Object> createDefaultConfig(String token, String symbolicName) throws TypeException
     {
-        tokenManager.verifyUser(token);
-        CompositeType type = typeRegistry.getType(symbolicName);
-        if (type == null)
+        tokenManager.loginUser(token);
+        try
         {
-            throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "'");
-        }
+            CompositeType type = typeRegistry.getType(symbolicName);
+            if (type == null)
+            {
+                throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "'");
+            }
 
-        MutableRecord record = type.createNewRecord(true);
-        return type.toXmlRpc(null, record);
+            MutableRecord record = type.createNewRecord(true);
+            return type.toXmlRpc(null, record);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     /**
@@ -1657,7 +1740,9 @@ public class RemoteApi
      * is supported using the firstResult and maxResults parameters.
      * 
      * @param token           authentication token, see {@link #login}
-     * @param projectName     name of the project to query the build results of
+     * @param projectName     name of the project to query the build results of; may be the name of
+     *                        a project template in which case all concrete descendents of that
+     *                        template will be queried
      * @param resultStates    if not empty, only return results with the given statuses (available
      *                        states are given on the [RemoteApi.BuildResult] page.
      * @param firstResult     zero-based index of the first result to return, allows paging through
@@ -1680,9 +1765,9 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Project project = internalGetProject(projectName, true);
+            Project[] projects = internalGetProjectSet(projectName, true);
 
-            List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, mapStates(resultStates), -1, -1, null, firstResult, maxResults, mostRecentFirst);
+            List<BuildResult> builds = buildManager.queryBuilds(projects, mapStates(resultStates), -1, -1, null, firstResult, maxResults, mostRecentFirst);
             Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
             for (BuildResult build : builds)
             {
@@ -1828,7 +1913,9 @@ public class RemoteApi
      * The returned results are ordered most recent first.
      *
      * @param token         authentication token, see {@link #login}
-     * @param projectName   name of the project to retrieve the builds for
+     * @param projectName   name of the project to retrieve the build results of; may be the name of
+     *                      a project template in which case all concrete descendents of that
+     *                      template will be queried
      * @param completedOnly if true, only completed builds will be returned, if false the result may
      *                      contain in progress builds
      * @param maxResults    the maximum number of results to return
@@ -1847,7 +1934,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            Project project = internalGetProject(projectName, true);
+            Project[] projects = internalGetProjectSet(projectName, true);
 
             ResultState[] states = null;
             if (completedOnly)
@@ -1855,7 +1942,7 @@ public class RemoteApi
                 states = ResultState.getCompletedStates();
             }
 
-            List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, states, -1, -1, null, 0, maxResults, true);
+            List<BuildResult> builds = buildManager.queryBuilds(projects, states, -1, -1, null, 0, maxResults, true);
             Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
             for (BuildResult build : builds)
             {
@@ -1879,7 +1966,9 @@ public class RemoteApi
      * build exists.
      *
      * @param token         authentication token, see {@link #login}
-     * @param projectName   name of the project to retrieve the builds for
+     * @param projectName   name of the project to retrieve the build results of; may be the name of
+     *                      a project template in which case all concrete descendents of that
+     *                      template will be queried
      * @param completedOnly if true, only completed builds will be considered, if false the result
      *                      may be an in progress build
      * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array continaing the latest
@@ -1903,7 +1992,9 @@ public class RemoteApi
      * returned results will only include completed builds, and are ordered most recent first.
      *
      * @param token       authentication token, see {@link #login}
-     * @param projectName name of the project to retrieve the builds for
+     * @param projectName name of the project to retrieve the build results of; may be the name of
+     *                    a project template in which case all concrete descendents of that
+     *                    template will be queried
      * @param maxResults  the maximum number of builds to return
      * @return {@xtype array<[RemoteApi.BuildResult]>} the latest completed builds for the given
      *         project in which warning features were detected, ordered most recent first
@@ -1915,18 +2006,24 @@ public class RemoteApi
      */
     public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, String projectName, int maxResults)
     {
-        tokenManager.verifyUser(token);
-
-        Project project = internalGetProject(projectName, true);
-        List<BuildResult> builds = buildManager.queryBuildsWithMessages(new Project[]{project}, Feature.Level.WARNING, maxResults);
-        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-        for (BuildResult build : builds)
+        tokenManager.loginUser(token);
+        try
         {
-            Hashtable<String, Object> buildDetails = convertResult(build);
-            result.add(buildDetails);
-        }
+            Project[] projects = internalGetProjectSet(projectName, true);
+            List<BuildResult> builds = buildManager.queryBuildsWithMessages(projects, Feature.Level.WARNING, maxResults);
+            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+            for (BuildResult build : builds)
+            {
+                Hashtable<String, Object> buildDetails = convertResult(build);
+                result.add(buildDetails);
+            }
 
-        return result;
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     /**
@@ -1937,7 +2034,9 @@ public class RemoteApi
      * build exists.
      *
      * @param token       authentication token, see {@link #login}
-     * @param projectName name of the project to retrieve the builds for
+     * @param projectName name of the project to retrieve the build results of; may be the name of
+     *                    a project template in which case all concrete descendents of that
+     *                    template will be queried
      * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the latest
      *         completed build for the given project in which warning features were detected, or an
      *         empty array if no such build exists
@@ -2108,7 +2207,9 @@ public class RemoteApi
 
         TimeStamps timeStamps = result.getStamps();
         buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
+        buildDetails.put("startTimeMillis", Long.toString(timeStamps.getStartTime()));
         buildDetails.put("endTime", new Date(timeStamps.getEndTime()));
+        buildDetails.put("endTimeMillis", Long.toString(timeStamps.getEndTime()));
         if (timeStamps.hasEstimatedTimeRemaining())
         {
             buildDetails.put("progress", timeStamps.getEstimatedPercentComplete());
@@ -2935,6 +3036,35 @@ public class RemoteApi
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
         }
         return project;
+    }
+
+    private Project[] internalGetProjectSet(String projectName, boolean allowInvalid)
+    {
+        String path = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName);
+        ProjectConfiguration projectConfiguration = configurationProvider.get(path, ProjectConfiguration.class);
+        if (projectConfiguration == null)
+        {
+            throw new IllegalArgumentException("Unknown project '" + projectName + "'");
+        }
+
+        if (projectConfiguration.isConcrete())
+        {
+            return new Project[]{internalGetProject(projectName, allowInvalid)};
+        }
+        else
+        {
+            List<Project> projects = new LinkedList<Project>();
+            for (String descendentPath: configurationTemplateManager.getDescendentPaths(path, false, true, false))
+            {
+                Project project = projectManager.getProject(PathUtils.getBaseName(descendentPath), allowInvalid);
+                if (project != null)
+                {
+                    projects.add(project);
+                }
+            }
+
+            return projects.toArray(new Project[projects.size()]);
+        }
     }
 
     private BuildResult internalGetBuild(Project project, int id)
