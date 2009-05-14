@@ -45,8 +45,8 @@
 
     fc.store = store;
     fc.value = v;
-<#if parameters.ordered?exists>
-    fc.ordered = ${parameters.ordered?string};
+<#if parameters.allowReordering?exists>
+    fc.allowReordering = ${parameters.allowReordering?string};
 </#if>
 <#if parameters.width?exists>
     fc.width = ${parameters.width};

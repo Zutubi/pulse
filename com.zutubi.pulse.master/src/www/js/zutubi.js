@@ -1086,7 +1086,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
     valueField: 'value',
     selectedClass: 'x-item-picker-selected',
     hiddenFields: [],
-    ordered: true,
+    allowReordering: true,
     value: [],
     optionStore: undefined,
     defaultAutoCreate: {tag: 'div', cls: 'x-item-picker-list', tabindex: '0'},
@@ -1162,7 +1162,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         this.removeButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-delete-up.gif', overImage: window.baseUrl + '/images/buttons/sb-delete-over.gif', downImage: window.baseUrl + '/images/buttons/sb-delete-down.gif'});
         this.removeButton.on('click', this.onRemove, this);
 
-        if (this.ordered)
+        if (this.allowReordering)
         {
             this.upButton = new ZUTUBI.ImageButton(this.wrap, {image: window.baseUrl + '/images/buttons/sb-up-up.gif', overImage: window.baseUrl + '/images/buttons/sb-up-over.gif', downImage: window.baseUrl + '/images/buttons/sb-up-down.gif'});
             this.upButton.on('click', this.onUp, this);
@@ -1247,7 +1247,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         this.addButton.getEl().alignTo(this.el, 'tl-br', [2, 0]);
         this.removeButton.getEl().alignTo(this.el, 'tl-tr', [2, 0]);
 
-        if (this.ordered)
+        if (this.allowReordering)
         {
             this.upButton.getEl().alignTo(this.el, 'l-r', [2, 0]);
             this.downButton.getEl().alignTo(this.upButton.getEl(), 't-b', [0, 2]);
@@ -1256,7 +1256,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
     navUp: function(ctrl)
     {
-        if(this.ordered && ctrl)
+        if(this.allowReordering && ctrl)
         {
             this.onUp();
         }
@@ -1274,7 +1274,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
     navDown: function(ctrl)
     {
-        if(this.ordered && ctrl)
+        if(this.allowReordering && ctrl)
         {
             this.onDown();
         }
@@ -1327,7 +1327,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
     appendItem: function(text, value)
     {
         var r = new this.ValueRecord({text: text, value: value});
-        if (this.ordered)
+        if (this.allowReordering)
         {
             this.store.add(r);
         }
