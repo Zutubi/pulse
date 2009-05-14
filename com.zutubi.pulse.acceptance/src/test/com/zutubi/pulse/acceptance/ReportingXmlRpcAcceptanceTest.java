@@ -48,6 +48,8 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, String> info = xmlRpcHelper.getServerInfo();
         assertTrue(info.containsKey("os.name"));
         assertTrue(info.containsKey("pulse.version"));
+        assertTrue(info.containsKey("user.timezone"));
+        assertTrue(info.containsKey("current.time"));
     }
 
     public void testGetAllUserLogins() throws Exception
