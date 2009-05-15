@@ -2177,6 +2177,23 @@ public class RemoteApi
         return buildDetails;
     }
 
+    private Hashtable<String, Object> convertProject(Project project)
+    {
+        Hashtable<String, Object> projectDetails = new Hashtable<String, Object>();
+        projectDetails.put("id", String.valueOf(project.getId()));
+        projectDetails.put("name", project.getName());
+        if (project.getDescription() != null)
+        {
+            projectDetails.put("description", project.getDescription());
+        }
+        else
+        {
+            projectDetails.put("description", "");
+        }
+        projectDetails.put("state", project.getState().toString());
+        return projectDetails;
+    }
+
     private String getBuildRevision(BuildResult build)
  	{
         Revision revision = build.getRevision();
@@ -2764,9 +2781,9 @@ public class RemoteApi
      */
     public String getProjectState(String token, String projectName)
     {
-        tokenManager.loginUser(token);
         try
         {
+            tokenManager.loginUser(token);
             Project project = internalGetProject(projectName, true);
             return project.getState().toString();
         }
@@ -2875,6 +2892,30 @@ public class RemoteApi
             tokenManager.loginUser(token);
             Project project = internalGetProject(projectName, true);
             return projectManager.makeStateTransition(project.getId(), transition);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Retrieves the given project.  These details include the name, description
+     * url, state and database id of the project.
+     *
+     * @param token        authentication token (see {@link #login})
+     * @param projectName  name of the project to retrieve
+     * @return the project details
+     * @throws IllegalArgumentException if the project name is invalid
+     * @access requires view permission for the project
+     */
+    public Hashtable<String, Object> getProject(String token, String projectName)
+    {
+        try
+        {
+            tokenManager.loginUser(token);
+            Project project = internalGetProject(projectName, true);
+            return convertProject(project);
         }
         finally
         {

@@ -62,6 +62,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
     public static final String GROUPS_SCOPE = "groups";
 
     public static final String EXTENSION_PROJECT_TRIGGERS = "triggers";
+    public static final String EXTENSION_PROJECT_CLEANUP = "cleanup";
 
     private CompositeType transientConfig;
     private Map<CompositeType, CompositeType> checkTypeMapping = new HashMap<CompositeType, CompositeType>();
@@ -139,8 +140,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(ScmBuildTriggerConfiguration.class);
             registerConfigurationType(DependentBuildTriggerConfiguration.class);
 
-            MapType triggers = new MapType(triggerConfig, typeRegistry);
-            projectConfig.addProperty(new ExtensionTypeProperty(EXTENSION_PROJECT_TRIGGERS, triggers));
+            registerProjectMapExtension(EXTENSION_PROJECT_TRIGGERS, TriggerConfiguration.class);
 
             // commit message processors.
             registerConfigurationType(CustomTransformerConfiguration.class);
@@ -159,7 +159,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             configurationPersistenceManager.register(PROJECTS_SCOPE, projectCollection);
 
             // register cleanup configuration.  This will eventually be handled as an extension point
-            registerProjectMapExtension("cleanup", CleanupConfiguration.class);
+            registerProjectMapExtension(EXTENSION_PROJECT_CLEANUP, CleanupConfiguration.class);
 
             TemplatedMapType agentCollection = new TemplatedMapType(registerConfigurationType(AgentConfiguration.class), typeRegistry);
             configurationPersistenceManager.register(AGENTS_SCOPE, agentCollection);

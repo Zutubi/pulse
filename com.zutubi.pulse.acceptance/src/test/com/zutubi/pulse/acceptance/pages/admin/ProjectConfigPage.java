@@ -52,4 +52,14 @@ public class ProjectConfigPage extends CompositePage
         
         return form;
     }
+
+    public CleanupRulesPage clickCleanupAndWait()
+    {
+        ListPage listPage = clickCollection("cleanup", "cleanup rules");
+
+        CleanupRulesPage page = new CleanupRulesPage(selenium, urls, listPage.getPath());
+        page.waitFor();
+        return page;
+    }
+
 }

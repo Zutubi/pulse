@@ -25,13 +25,10 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     private BuildResultDao buildResultDao;
     private Project p1;
     private Project p2;
-    private BuildResult b0;
     private BuildResult b1;
     private BuildResult b2;
     private BuildResult b3;
     private BuildResult b4;
-    private BuildResult b5;
-    private BuildResult b6;
     private DependencyManager dependencyManager;
 
     protected void setUp() throws Exception
@@ -45,14 +42,14 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         projectDao.save(p1);
         projectDao.save(p2);
 
-        b0 = createBuild(p2, 1, System.currentTimeMillis() - Constants.DAY * 5, ResultState.SUCCESS, false, IvyManager.STATUS_INTEGRATION);
+        createBuild(p2, 1, System.currentTimeMillis() - Constants.DAY * 6, ResultState.SUCCESS, false, IvyManager.STATUS_INTEGRATION);
         b1 = createBuild(p1, 1, System.currentTimeMillis() - Constants.DAY * 5, ResultState.SUCCESS, false, IvyManager.STATUS_MILESTONE);
         b2 = createBuild(p1, 2, System.currentTimeMillis() - Constants.DAY * 4, ResultState.ERROR, false, IvyManager.STATUS_RELEASE);
         b3 = createBuild(p1, 3, System.currentTimeMillis() - Constants.DAY * 3, ResultState.SUCCESS, true, IvyManager.STATUS_INTEGRATION);
         b4 = createBuild(p1, 4, System.currentTimeMillis() - Constants.DAY * 2, ResultState.SUCCESS, true, IvyManager.STATUS_MILESTONE);
-        b5 = createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, true, IvyManager.STATUS_RELEASE);
+        createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, true, IvyManager.STATUS_RELEASE);
         // Create a build that has started but is not in progress yet: -1 timestamp
-        b6 = createBuild(p1, 6, -1, ResultState.INITIAL, true, IvyManager.STATUS_INTEGRATION);
+        createBuild(p1, 6, -1, ResultState.INITIAL, true, IvyManager.STATUS_INTEGRATION);
 
         dependencyManager = mock(DependencyManager.class);
         stub(dependencyManager.getStatuses()).toReturn(
@@ -70,7 +67,6 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         b2 = null;
         b3 = null;
         b4 = null;
-        b5 = null;
         dependencyManager = null;
         super.tearDown();
     }
@@ -117,7 +113,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);
     }
 
-    public void testStatus()
+    public void testSingleStatus()
     {
         CleanupConfiguration rule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
         rule.setStatuses(Arrays.asList(IvyManager.STATUS_INTEGRATION));
