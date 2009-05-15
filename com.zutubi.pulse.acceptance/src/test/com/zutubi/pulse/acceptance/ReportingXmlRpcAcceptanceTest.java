@@ -2,8 +2,8 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
@@ -413,7 +413,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         if (!xmlRpcHelper.configPathExists(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PROJECT_HIERARCHY_TEMPLATE)))
         {
-            xmlRpcHelper.insertProject(PROJECT_HIERARCHY_TEMPLATE, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+            xmlRpcHelper.insertSingleCommandProject(PROJECT_HIERARCHY_TEMPLATE, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
             xmlRpcHelper.insertProject(PROJECT_HIERARCHY_CHILD1, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
             xmlRpcHelper.insertProject(PROJECT_HIERARCHY_CHILD2, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
 

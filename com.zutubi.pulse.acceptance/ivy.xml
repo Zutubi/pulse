@@ -25,6 +25,7 @@
         <dependency org="zutubi" name="com.zutubi.pulse.slave" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.master" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.ant" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.bjam" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven2" rev="latest.integration" conf="*->@"/>
@@ -39,7 +40,6 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.boostregression" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.boosttest" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.ocunit" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.bjam" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.gcc" rev="latest.integration" conf="*->@"/>
 
         <dependency org="openqa" name="selenium" rev="1.0.b2" conf="external,build->default"/>
