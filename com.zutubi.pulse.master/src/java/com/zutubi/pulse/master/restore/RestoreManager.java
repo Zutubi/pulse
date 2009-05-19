@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface RestoreManager
 {
-    Monitor getTaskMonitor();
+    Monitor getMonitor();
 
     Archive prepareRestore(File backup) throws ArchiveException;
 

@@ -57,7 +57,7 @@ public class DefaultRestoreManagerTest extends PulseTestCase
         List<Task> tasks = manager.previewRestore();
         assertEquals(1, tasks.size());
 
-        Monitor monitor = manager.getTaskMonitor();
+        Monitor monitor = manager.getMonitor();
         assertFalse(monitor.isStarted());
 
         Task task = tasks.get(0);
@@ -84,7 +84,7 @@ public class DefaultRestoreManagerTest extends PulseTestCase
 
         Task task = tasks.get(0);
 
-        Monitor monitor = manager.getTaskMonitor();
+        Monitor monitor = manager.getMonitor();
         assertFalse(monitor.isStarted());
 
         manager.restoreArchive();
@@ -112,8 +112,8 @@ public class DefaultRestoreManagerTest extends PulseTestCase
         // Ensure that the component is not restored (it would throw if it
         // was).
         manager.restoreArchive();
-        assertTrue(manager.getTaskMonitor().isFinished());
-        assertTrue(manager.getTaskMonitor().isSuccessful());
+        assertTrue(manager.getMonitor().isFinished());
+        assertTrue(manager.getMonitor().isSuccessful());
     }
 
     private static abstract class TestArchiveableComponent extends AbstractArchiveableComponent

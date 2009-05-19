@@ -363,6 +363,11 @@
             <result name="success" type="velocity">hibernate-statistics.vm</result>
         </action>
 
+        <action name="triggerBackup" class="com.zutubi.pulse.master.xwork.actions.admin.debug.TriggerBackupAction">
+            <interceptor-ref name="defaultReadOnlyStack"/>
+            <result name="success" type="redirect">/admin/settings/</result>
+        </action>
+
         <action name="toggleHibernateStatistics" class="com.zutubi.pulse.master.xwork.actions.admin.debug.ToggleHibernateStatisticsAction">
             <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="redirect">hibernateStatistics.action</result>

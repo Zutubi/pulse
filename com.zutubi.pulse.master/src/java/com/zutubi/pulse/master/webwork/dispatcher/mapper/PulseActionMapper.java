@@ -277,6 +277,7 @@ public class PulseActionMapper implements ActionMapper
         {
             // /admin/actions?action=method takes your to:
             //   <action>!<method>
+            // for example:  http://..../admin/actions?hibernateStatistics=execute
             if(TextUtils.stringSet(request.getQueryString()))
             {
                 String[] pieces = request.getQueryString().split("=", 2);

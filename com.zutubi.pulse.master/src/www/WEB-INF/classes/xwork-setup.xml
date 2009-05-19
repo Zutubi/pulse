@@ -24,12 +24,15 @@
         <action name="setup" class="com.zutubi.pulse.master.xwork.actions.setup.SetupWorkflowAction">
             <result name="data" type="redirect">/setup/setupData!input.action</result>
             <result name="database" type="redirect">/setup/setupDatabaseType!input.action</result>
-            <result name="migrate" type="redirect">/migrate/preview!input.action</result>
-            <result name="restore" type="redirect">/restore/preview.action</result>
             <result name="license" type="redirect">/setup/setupLicense!input.action</result>
-            <result name="upgrade" type="redirect">/upgrade/preview.action</result>
             <result name="setup" type="redirect">/setupconfig/init/?wizard</result>
             <result name="starting" type="redirect">/startup/starting.action</result>
+            <result name="migrate" type="redirect">/migrate/preview!input.action</result>
+            <result name="migrateInProgress" type="redirect">/migrate/execute.action</result>
+            <result name="restore" type="redirect">/restore/preview.action</result>
+            <result name="restoreInProgress" type="redirect">/restore/execute.action</result>
+            <result name="upgrade" type="redirect">/upgrade/preview.action</result>
+            <result name="upgradeInProgress" type="redirect">/upgrade/execute.action</result>
             <result name="success" type="redirect">/</result>
         </action>
 
