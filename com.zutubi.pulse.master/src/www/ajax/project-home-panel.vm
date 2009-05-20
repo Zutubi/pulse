@@ -3,6 +3,13 @@
 
 <!-- ********** Left column ********** -->
 
+        <script type="text/javascript">
+            function handleSuccessfulConfigurationResponse(result)
+            {
+                // callback required by runAjaxRequest.
+            }
+        </script>
+
         <td class="columns" width="100%">
 
             #responsibilityPanel($currentBuild "0px")
@@ -146,11 +153,13 @@
                 #if($act.action == "trigger")
                             href="$base/triggerBuild.action?projectName=$u_projectName"
                 #elseif($act.action == "takeResponsibility")
-                        href="#" onclick="takeResponsibility('$project.id'); return false"
+                        href="#" onclick="takeResponsibility('$project.id'); return false;"
                 #elseif($act.action == "clearResponsibility")
-                        href="#" onclick="clearResponsibility('$project.id'); return false"
+                        href="#" onclick="clearResponsibility('$project.id'); return false;"
+                #elseif($act.action == "clean")
+                        href="#" onclick="runAjaxRequest('$base/aconfig/projects/$u_projectName?clean=clean'); return false;"
                 #else
-                            href="$urls.projectAction($project, $act.action)"
+                        href="$urls.projectAction($project, $act.action)"
                 #end
                         >$act.label</a>
                     </td>

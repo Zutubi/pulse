@@ -466,6 +466,8 @@ function handleConfigurationResponse(result)
             detailPanel.update(result.newPanel);
         }
 
+        // this check is not handling undefined correctly on firefox 3.0.10.  It generates
+        // an exception because handleSuccessfulConfigurationResponse is 'undefined'.
         if (handleSuccessfulConfigurationResponse)
         {
             handleSuccessfulConfigurationResponse(result);
