@@ -1375,10 +1375,10 @@ public class RemoteApi
      * Gets the name of a project by its database id, if such a project exists.
      *
      * @param token authentication token, see {@link #login}.
-     * @param id    id of the project's row in the database
+     * @param id    ID of the project's row in the database
      * @return the name of the project with the given id, or the empty string if there is no such
      *         project
-     * @throws IllegalArgumentException if the id cannot be parsed as a 64-bit integer
+     * @throws IllegalArgumentException if the ID cannot be parsed as a 64-bit integer
      * @access available to all users
      */
     public String getProjectNameById(String token, String id)
@@ -1399,7 +1399,7 @@ public class RemoteApi
         }
         catch (NumberFormatException e)
         {
-            throw new IllegalArgumentException("Invalid id '" + id + "'");
+            throw new IllegalArgumentException("Invalid ID '" + id + "'");
         }
     }
 
@@ -1553,7 +1553,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project to retrieve the build for
-     * @param id          id of the project to retrieve
+     * @param id          ID of the build to retrieve
      * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the build
      *         details as a struct, or an empty array if the build does not exist.
      * @throws IllegalArgumentException if the given project does not exist
@@ -1593,7 +1593,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project that owns the build to delete
-     * @param id          id of the build to delete
+     * @param id          ID of the build to delete
      * @return true if the build was found and deleted, false if the build does not exist
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires write permission for the given project
@@ -1794,8 +1794,8 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project to retrieve the builds for
-     * @param afterBuild  one less than the lowest build id that may be included in the range
-     * @param toBuild     the highest build id that may be included in the range
+     * @param afterBuild  one less than the lowest build ID that may be included in the range
+     * @param toBuild     the highest build ID that may be included in the range
      * @return {@xtype array<[RemoteApi.BuildResult]>} all builds of the given project that fall
      *         within the given range (most recent last)
      * @throws IllegalArgumentException if the given project name is invalid
@@ -1836,7 +1836,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the projec to retrieve the build for
-     * @param id          id of the build immediately following the build to return
+     * @param id          ID of the build immediately following the build to return
      * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the
      *         previous build, or an empty array if there is no previous build
      * @throws IllegalArgumentException if the given project name is invalid
@@ -1889,12 +1889,12 @@ public class RemoteApi
     }
 
     /**
-     * Returns the id that will be used for the next build of the given project.  Ids form an
+     * Returns the ID that will be used for the next build of the given project.  Ids form an
      * increasing sequence starting at one.
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project to retrieve the next build number of
-     * @return the id that will be assigned to the next build of the given project
+     * @return the ID that will be assigned to the next build of the given project
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires view permission for the given project
      */
@@ -1975,7 +1975,7 @@ public class RemoteApi
      *                      template will be queried
      * @param completedOnly if true, only completed builds will be considered, if false the result
      *                      may be an in progress build
-     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array continaing the latest
+     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the latest
      *         build result for the given project which meets the given criteria, or an empty array
      *         if no such build exists
      * @throws IllegalArgumentException if the given project name is invalid
@@ -2062,7 +2062,7 @@ public class RemoteApi
      * build exists.
      *
      * @param token authentication token, see {@link #login}
-     * @param id    id of the personal build to retrieve
+     * @param id    ID of the personal build to retrieve
      * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the
      *         specified personal build, or an empty array if no such build exists
      * @access available to all users (users can only access their own personal builds)
@@ -2230,7 +2230,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project that owns the build
-     * @param id          id of the build to retrieve the changes for
+     * @param id          ID of the build to retrieve the changes for
      * @return {@xtype array<[RemoteApi.Changelist]>} all new code changes that participated in the
      *         given build
      * @throws IllegalArgumentException if the given project name is invalid, or the given build
@@ -2329,7 +2329,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName name of the project that owns the build
-     * @param id          id of the build to retrieve the artifacts for
+     * @param id          ID of the build to retrieve the artifacts for
      * @return {@xtype array<[RemoteApi.Artifact]>} all artifacts captured in the given build
      * @throws IllegalArgumentException if the given project name or build is invalid
      * @access requires view permission for th given project
@@ -2396,7 +2396,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project owning the build
-     * @param id          id of the build to get the messages for
+     * @param id          ID of the build to get the messages for
      * @return {@xtype array<[RemoteApi.Feature]>} all messages found for the given build
      * @throws IllegalArgumentException if the given project or build does not exist
      * @access requires view permission for the given project
@@ -2478,7 +2478,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project owning the build
-     * @param id          id of the build to get the messages for
+     * @param id          ID of the build to get the messages for
      * @return {@xtype array<[RemoteApi.Feature]>} all error messages found for the given
      *         build
      * @throws IllegalArgumentException if the given project or build does not exist
@@ -2499,7 +2499,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project owning the build
-     * @param id          id of the build to get the messages for
+     * @param id          ID of the build to get the messages for
      * @return {@xtype array<[RemoteApi.Feature]>} all warning messages found for the given
      *         build
      * @throws IllegalArgumentException if the given project or build does not exist
@@ -2520,7 +2520,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project owning the build
-     * @param id          id of the build to get the messages for
+     * @param id          ID of the build to get the messages for
      * @return {@xtype array<[RemoteApi.Feature]>} all information messages found for the given
      *         build
      * @throws IllegalArgumentException if the given project or build does not exist
@@ -2687,7 +2687,7 @@ public class RemoteApi
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project that is building
-     * @param id          the id of the build to cancel
+     * @param id          the ID of the build to cancel
      * @return true if cancellation was requested, false if the build was not found or was not in
      *         progress
      * @throws IllegalArgumentException if the given project name is invalid
