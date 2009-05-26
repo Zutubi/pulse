@@ -4,7 +4,9 @@ import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.util.monitor.Task;
+import com.zutubi.pulse.master.util.monitor.Job;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -14,8 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * The concrete implementation of the RestoreManager interface.
  */
 public class DefaultRestoreManager implements RestoreManager
 {
@@ -23,11 +24,9 @@ public class DefaultRestoreManager implements RestoreManager
 
     private static final Logger LOG = Logger.getLogger(DefaultRestoreManager.class);
 
-    private List<Task> tasks = new LinkedList<Task>();
-
     private File source;
     private Archive archive;
-    private File backedUpArchive;
+    private File backedupArchive;
 
     private File tmpDirectory;
 
@@ -64,6 +63,8 @@ public class DefaultRestoreManager implements RestoreManager
 
             archive = factory.importArchive(source);
 
+            List<Task> tasks = new LinkedList<Task>();
+
             for (ArchiveableComponent component : archiveableComponents)
             {
                 String name = component.getName();
@@ -92,11 +93,26 @@ public class DefaultRestoreManager implements RestoreManager
 
     public List<Task> previewRestore()
     {
-        return tasks;
+        Job<Task> job = jobManager.getJob(ARCHIVE_JOB_KEY);
+        if (job != null)
+        {
+            return CollectionUtils.asList(job.getTasks());
+        }
+        return null;
     }
 
-    public void restoreArchive()
+    public boolean isArchiveAvailable()
     {
+        return jobManager.getJob(ARCHIVE_JOB_KEY) != null;
+    }
+
+    public void restoreArchive() throws ArchiveException
+    {
+        if (!isArchiveAvailable())
+        {
+            throw new ArchiveException("No archive is available for restore.");
+        }
+
         Monitor monitor = jobManager.getMonitor(ARCHIVE_JOB_KEY);
         if (monitor.isStarted())
         {
@@ -118,9 +134,9 @@ public class DefaultRestoreManager implements RestoreManager
         }
     }
 
-    public File postRestore()
+    public File getBackedupArchive()
     {
-        return backedUpArchive;
+        return backedupArchive;
     }
 
     private void backupSourceFile()
@@ -131,17 +147,17 @@ public class DefaultRestoreManager implements RestoreManager
             if(backupRoot.isDirectory() || backupRoot.mkdirs())
             {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-                backedUpArchive = new File(backupRoot, String.format("restored-%s.zip", sdf.format(System.currentTimeMillis())));
-                if(!backedUpArchive.exists())
+                backedupArchive = new File(backupRoot, String.format("restored-%s.zip", sdf.format(System.currentTimeMillis())));
+                if(!backedupArchive.exists())
                 {
-                    if(!source.renameTo(backedUpArchive))
+                    if(!source.renameTo(backedupArchive))
                     {
-                        LOG.severe("Unable to backup restore archive to '" + backedUpArchive.getAbsolutePath() + "'");
+                        LOG.severe("Unable to backup restore archive to '" + backedupArchive.getAbsolutePath() + "'");
                     }
                 }
                 else
                 {
-                    LOG.severe("Unable to store backup of restore archive as a file '" + backedUpArchive.getAbsolutePath() + "' already exists.");
+                    LOG.severe("Unable to store backup of restore archive as a file '" + backedupArchive.getAbsolutePath() + "' already exists.");
                 }
             }
             else

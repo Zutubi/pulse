@@ -382,4 +382,21 @@ public class CollectionUtils
 
         return count;
     }
+
+    /**
+     * Return a list of the items contained by the specified iterator.
+     * The ordering of the iterator is preserved by the list.
+     *
+     * @param iterator  containing the items to turn into a list.
+     * @return a list that is equivalent to the contents of the iterator.
+     */
+    public static <T> List<T> asList(Iterator<T> iterator)
+    {
+        List<T> result = new LinkedList<T>();
+        while (iterator.hasNext())
+        {
+            result.add(iterator.next());
+        }
+        return result;
+    }
 }

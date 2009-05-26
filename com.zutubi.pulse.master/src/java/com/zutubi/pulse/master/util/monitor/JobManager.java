@@ -7,11 +7,11 @@ import java.util.Map;
 
 public class JobManager
 {
-    private Map<String, Job> jobs = new HashMap<String, Job>();
+    private Map<String, Job<Task>> jobs = new HashMap<String, Job<Task>>();
     private Map<String, JobRunner> jobRunners = new HashMap<String, JobRunner>();
     private List<String> activeJobs = new LinkedList<String>();
 
-    public synchronized void register(String key, Job job)
+    public synchronized void register(String key, Job<Task> job)
     {
         if (jobs.containsKey(key))
         {
@@ -23,15 +23,15 @@ public class JobManager
 
     public synchronized void register(String key, Task... tasks)
     {
-        register(key, new ArrayJobWrapper(tasks));
+        register(key, new ArrayJobWrapper<Task>(tasks));
     }
 
     public synchronized void register(String key, List<Task> tasks)
     {
-        register(key, new ListJobWrapper(tasks));
+        register(key, new ListJobWrapper<Task>(tasks));
     }
 
-    public synchronized Job getJob(String key)
+    public synchronized Job<Task> getJob(String key)
     {
         return jobs.get(key);
     }

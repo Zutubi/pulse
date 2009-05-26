@@ -14,11 +14,6 @@ public class PreviewRestoreAction extends RestoreActionSupport
 {
     private Archive archive;
 
-    public List<Task> getTasks()
-    {
-        return restoreManager.previewRestore();
-    }
-
     public String getArchiveCreated()
     {
         return archive.getCreated();

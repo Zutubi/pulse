@@ -118,11 +118,11 @@ public class JobManagerTest extends PulseTestCase
         }
     }
 
-    private class NeverEndingJob implements Job<NeverEndingTask>
+    private class NeverEndingJob implements Job<Task>
     {
-        public Iterator<NeverEndingTask> getTasks()
+        public Iterator<Task> getTasks()
         {
-            List<NeverEndingTask> tasks = new LinkedList<NeverEndingTask>();
+            List<Task> tasks = new LinkedList<Task>();
             tasks.add(new NeverEndingTask("yawn"));
             return tasks.iterator();
         }

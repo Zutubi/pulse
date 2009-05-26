@@ -4,8 +4,8 @@ import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 
 /**
- *
- *
+ * Abort the restoration process, bypassing it and continuing on with
+ * the pulse setup workflow.
  */
 public class AbortRestoreAction extends RestoreActionSupport
 {

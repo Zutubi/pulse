@@ -7,24 +7,73 @@ import java.io.File;
 import java.util.List;
 
 /**
- *
- *
+ * The restore manager handles the restoration process on
+ * startup.
  */
 public interface RestoreManager
 {
+    /**
+     * Return a monitor instance for the current restoration process.  If
+     * no restoration has been prepared, then null is returned.
+     *
+     * @return a monitor
+     *
+     * @see #prepareRestore(java.io.File) 
+     */
     Monitor getMonitor();
 
+    /**
+     * Schedule the restoration from the specified backup file.  This method
+     * will return an archive instance that represents the backup, providing
+     * access to the details of the backup being restored.
+     *
+     * @param backup    the file that contains a valid backup of the pulse.
+     * @return an archive.
+     * @throws ArchiveException on error
+     *
+     * @see #createArchive() 
+     */
     Archive prepareRestore(File backup) throws ArchiveException;
 
+    /**
+     * Get the list of tasks that will be executed by this restoration process.
+     * This preview will return null if no restoration has been scheduled.
+     *
+     * @return a list of tasks.
+     *
+     * @see #getMonitor() 
+     */
     List<Task> previewRestore();
 
-    void restoreArchive();
+    /**
+     * Start the archive restoration process.  Once restored, the original archive
+     * file is available via the  {@link RestoreManager#getBackedupArchive()} method.
+     *
+     * @throws ArchiveException on error or if no archive has been prepared.
+     */
+    void restoreArchive() throws ArchiveException;
 
-    File postRestore();
+    /**
+     * Get the backup of the archive used in the restoration process.
+     * @return an archive file.
+     */
+    File getBackedupArchive();
 
+    /**
+     * Create a new archive based on the current state of the system.
+     * @return a handle to the archive.
+     *
+     * @throws ArchiveException on error.
+     */
     Archive createArchive() throws ArchiveException;
 
-    //--( proposed interface to make this much more of a manager, not yet implemented )---
+    /**
+     * The archive that was provided by the latest {@link RestoreManager#prepareRestore(java.io.File)} call.
+     * @return an archive, or null if prepareRestore has not been called.
+     */
+    Archive getArchive();
+
+    //--( proposed interface to make this manager re-usable / available during normal running. )---
 /*
     void restoreArchive(Archive archive);
 
@@ -37,11 +86,4 @@ public interface RestoreManager
     Archive getArchiveToBeRestoredOnRestart();
 */
 
-    // auto archive support.
-
-
-    //-----------------------------------------------------------
-
-
-    Archive getArchive();
 }
