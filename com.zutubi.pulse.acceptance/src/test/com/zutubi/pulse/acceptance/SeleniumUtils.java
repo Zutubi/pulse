@@ -157,7 +157,7 @@ public class SeleniumUtils
         }, "text '" + text + "' in element '" + id + "'");
     }
 
-    private static void refreshUntil(Selenium selenium, long timeout, Condition condition, String conditionText)
+    public static void refreshUntil(Selenium selenium, long timeout, Condition condition, String conditionText)
     {
         long startTime = System.currentTimeMillis();
         while (!condition.satisfied())
