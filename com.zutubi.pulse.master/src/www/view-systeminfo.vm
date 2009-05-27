@@ -33,47 +33,46 @@
     <table id="server.info" class="columns" width="90%">
         <tr>
             <td class="columns" width="40%">
-
-    <table class="fill-content">
-        #headingRow("system.info" 2)
+                <table class="fill-content">
+                    #headingRow("system.info" 2)
 #foreach ($key in $properties)
-        #dynamicRow($key $propertiesMap.get($key))
+                    #dynamicRow($key $propertiesMap.get($key))
 #end
 
 #set ($percentageUsed = $action.getPercentage($info.getUsedMemory(), $info.getTotalMemory()))
 #set ($percentageFree = $action.getPercentage($info.getFreeMemory(), $info.getTotalMemory()))
-    <tr>
-        <th class="content-row">#wwtext("name=memory.usage")</th>
-        <td class="content">
-            <table align=left border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
-                    <td valign=top width="50%">
-                        <table  border="0" cellpadding="0" cellspacing="0" width="100%">
-                            <td bgcolor="#CC3333" width="${percentageUsed}%">
-                                <a class="unadorned" title="Used Memory" >
-                                    <img src="$base/images/spacer.gif"
-                                         height=15
-                                         width="100%"
-                                         border=0 title="Used Memory ( ${percentageUsed} %)">
-                                </a>
-                            </td>
+                    <th class="content-row">#wwtext("name=memory.usage")</th>
+                    <td class="content">
+                        <table align=left border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td valign=top width="50%">
+                                    <table  border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <td bgcolor="#CC3333" width="${percentageUsed}%">
+                                            <a class="unadorned" title="Used Memory" >
+                                                <img src="$base/images/spacer.gif"
+                                                     height=15
+                                                     width="100%"
+                                                     border=0 title="Used Memory ( ${percentageUsed} %)">
+                                            </a>
+                                        </td>
 
-                            <td bgcolor="#00CC00" width="${percentageFree}%">
-                                <a class="unadorned" title="Free Memory">
-                                    <img src="$base/images/spacer.gif"
-                                         height=15
-                                         width="100%"
-                                         border=0 title="Free Memory ( ${percentageFree} %)">
-                                </a>
-                            </td>
+                                        <td bgcolor="#00CC00" width="${percentageFree}%">
+                                            <a class="unadorned" title="Free Memory">
+                                                <img src="$base/images/spacer.gif"
+                                                     height=15
+                                                     width="100%"
+                                                     border=0 title="Free Memory ( ${percentageFree} %)">
+                                            </a>
+                                        </td>
+                                    </table>
+                                </td>
+                                <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #if($agentName) #auth("action=ADMINISTER") (<a href="$urls.agentAction($agent, 'gc')tab/info/">gc</a>) #end #end </td>
+                            </tr>
                         </table>
                     </td>
-                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #if($agentName) #auth("action=ADMINISTER") (<a href="$urls.agentAction($agent, 'gc')tab/info/">gc</a>) #end #end </td>
                 </tr>
-            </table>
-        </td>
-    </tr>
-    </table>
+                </table>
             </td>
             <td class="columns" width="40%">
                 <table class="fill-content" id="version.info">
@@ -83,8 +82,29 @@
                 </table>
                 <table class="fill-content" id="pulse.info">
                     #headingRow("pulse.info" 2)
-#foreach($property in $info.paths.entrySet())
-                    #dynamicRow($property.key $property.value)
+#foreach($property in $info.coreProperties.entrySet())
+                    #dynamicRow("${property.key}.field" $property.value)
+#end
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table class="fill-content">
+                    #headingRow("system.raw.properties" 2)
+#foreach ($key in $sortedKeys)
+                    <tr>
+                        #dynamicHeading($key)
+                        <td class="content">
+    #set($propertyValue = $propertiesMap.get($key))
+    #if($propertyValue.length() > 100)
+                        <span title="#html($propertyValue)">
+                            #html($propertyValue.substring(0, 97))...
+                        </span>
+    #else
+                            #html($propertyValue)
+    #end
+                    </tr>
 #end
                 </table>
             </td>

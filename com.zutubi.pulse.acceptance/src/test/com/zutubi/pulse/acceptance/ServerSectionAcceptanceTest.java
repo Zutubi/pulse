@@ -53,7 +53,11 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         assertTextPresent("system information");
         assertTextPresent("java vm");
         assertTextPresent("version information");
-        assertTextPresent("pulse paths");
+        assertTextPresent("version number");
+        assertTextPresent("pulse configuration");
+        assertTextPresent("data directory");
+        assertTextPresent("all system properties");
+        assertTextPresent("bootstrap");
     }
 
     private void assertPagingLinks(ServerMessagesPage page, int pageCount)

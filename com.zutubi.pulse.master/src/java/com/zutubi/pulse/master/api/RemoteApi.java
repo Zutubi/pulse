@@ -9,7 +9,6 @@ import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -38,8 +37,6 @@ import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -166,23 +163,7 @@ public class RemoteApi
 
             result.put("pulse.build", Version.getVersion().getBuildNumber());
             result.put("pulse.version", Version.getVersion().getVersionNumber());
-            result.put("pulse.config.file", getPulseConfig());
-            result.put("pulse.data.dir", configurationManager.getDataDirectory().getAbsolutePath());
-
-            File homeDir = configurationManager.getHomeDirectory();
-            if (homeDir != null)
-            {
-                result.put("pulse.home.dir", homeDir.getAbsolutePath());
-            }
-
-            try
-            {
-                result.put("pulse.database.url", configurationManager.getDatabaseConfig().getUrl());
-            }
-            catch (IOException e)
-            {
-                LOG.warning(e);
-            }
+            result.putAll(configurationManager.getCoreProperties());
 
             return result;
         }
@@ -190,12 +171,6 @@ public class RemoteApi
         {
             tokenManager.logoutUser();
         }
-    }
-
-    private String getPulseConfig()
-    {
-        EnvConfig env = configurationManager.getEnvConfig();
-        return env.hasPulseConfig() ? env.getPulseConfig() : env.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
     }
 
     private void copyProperty(Properties from, Hashtable<String, String> to, String key)

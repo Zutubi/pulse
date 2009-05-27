@@ -1,18 +1,26 @@
 package com.zutubi.pulse.servercore.bootstrap;
 
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.config.CompositeConfig;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
-import com.zutubi.util.TextUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class SystemConfigurationSupport extends ConfigSupport implements SystemConfiguration
 {
-    public SystemConfigurationSupport(Config... config)
+    private String configFile;
+
+    public SystemConfigurationSupport(String configFile, Config... config)
     {
         super(new CompositeConfig(config));
+        this.configFile = configFile;
+    }
+
+    public String getConfigFilePath()
+    {
+        return configFile;
     }
 
     public String getBindAddress()

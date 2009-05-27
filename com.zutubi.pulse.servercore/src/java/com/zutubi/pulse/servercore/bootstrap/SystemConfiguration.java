@@ -29,6 +29,11 @@ public interface SystemConfiguration
     public static final String SSL_KEY_PASSWORD = "ssl.keyPassword";
 
     /**
+     * @return the location of the user's config file (note the file may not exist)
+     */
+    String getConfigFilePath();
+
+    /**
      * @return the address that we should bind the http server to.
      */
     String getBindAddress();
