@@ -466,9 +466,7 @@ function handleConfigurationResponse(result)
             detailPanel.update(result.newPanel);
         }
 
-        // this check is not handling undefined correctly on firefox 3.0.10.  It generates
-        // an exception because handleSuccessfulConfigurationResponse is 'undefined'.
-        if (handleSuccessfulConfigurationResponse)
+        if (typeof handleSuccessfulConfigurationResponse == 'function')
         {
             handleSuccessfulConfigurationResponse(result);
         }
@@ -720,6 +718,15 @@ function clearResponsibility(projectId)
     Ext.Ajax.request({
         url: window.baseUrl + '/ajax/clearResponsibility.action',
         params: { projectId: projectId },
+        callback: handleResponsibilityResponse
+    });
+}
+
+function markForClean(projectName)
+{
+    showStatus('Marking for clean build...', 'working');
+    Ext.Ajax.request({
+        url: window.baseUrl + '/aconfig/projects/'+projectName+'?clean=clean',
         callback: handleResponsibilityResponse
     });
 }

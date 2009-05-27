@@ -3,13 +3,6 @@
 
 <!-- ********** Left column ********** -->
 
-        <script type="text/javascript">
-            function handleSuccessfulConfigurationResponse(result)
-            {
-                // callback required by runAjaxRequest.
-            }
-        </script>
-
         <td class="columns" width="100%">
 
             #responsibilityPanel($currentBuild "0px")
@@ -157,7 +150,7 @@
                 #elseif($act.action == "clearResponsibility")
                         href="#" onclick="clearResponsibility('$project.id'); return false;"
                 #elseif($act.action == "clean")
-                        href="#" onclick="runAjaxRequest('$base/aconfig/projects/$u_projectName?clean=clean'); return false;"
+                        href="#" onclick="markForClean('$u_projectName'); return false;"
                 #else
                         href="$urls.projectAction($project, $act.action)"
                 #end
