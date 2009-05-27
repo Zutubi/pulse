@@ -37,6 +37,18 @@ function getElement(id)
     return element;
 }
 
+function stopEventPropagation(e)
+{
+    if (typeof e.stopPropagation == 'function')
+    {
+        e.stopPropagation();
+    }
+    else
+    {
+        e.cancelBubble = true;
+    }
+}
+
 // Function to encode the components of a path using encodeURIComponent.  This
 // effectively works like enodeURIComponent on the whole path but without
 // encoding the slashes.

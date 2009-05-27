@@ -491,8 +491,8 @@ Ext.extend(ZUTUBI.ProjectGroup, ZUTUBI.ProjectContainer, {
                 '<img alt="health: ok" src="{base}/images/health/ok.gif"> ok: {okCount} ' +
                 '<img alt="health: warnings" src="{base}/images/health/warnings.gif"> warnings: {warningCount} ' +
                 '<img alt="health: broken" src="{base}/images/health/broken.gif"> broken: {brokenCount}&nbsp;' +
-                '<tpl if="rssEnabled"><a class="unadorned" id="rss.builds.{id}" href="{base}/rss.action?groupName={encodedName}"><img alt="rss" src="{base}/images/feed-icon-16x16.gif"></a>&nbsp;</tpl>' +
-                '<tpl if="showHideLinks &amp;&amp; labelled"><a id="hide.{id}" href="{base}/user/hideDashboardGroup.action?groupName={encodedName}" class="unadorned"><img alt="hide group" src="{base}/images/close.gif"></a></tpl>' +
+                '<tpl if="rssEnabled"><a class="unadorned" id="rss.builds.{id}" href="{base}/rss.action?groupName={encodedName}" onclick="stopEventPropagation(event);"><img alt="rss" src="{base}/images/feed-icon-16x16.gif"></a>&nbsp;</tpl>' +
+                '<tpl if="showHideLinks &amp;&amp; labelled"><a class="unadorned" id="hide.{id}" href="{base}/user/hideDashboardGroup.action?groupName={encodedName}" onclick="stopEventPropagation(event);"><img alt="hide group" src="{base}/images/close.gif"></a></tpl>' +
             '</td>').compile(),
 
     render: function(parentEl) {
