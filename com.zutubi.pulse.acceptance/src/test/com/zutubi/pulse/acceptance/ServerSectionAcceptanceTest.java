@@ -57,7 +57,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         assertTextPresent("pulse configuration");
         assertTextPresent("data directory");
         assertTextPresent("all system properties");
-        assertTextPresent("bootstrap");
+        assertTextPresent("path.separator");
     }
 
     private void assertPagingLinks(ServerMessagesPage page, int pageCount)
