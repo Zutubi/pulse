@@ -734,11 +734,34 @@ function clearResponsibility(projectId)
     });
 }
 
+function handleMarkForCleanResponse(options, success, response)
+{
+    if (success)
+    {
+        var result = Ext.util.JSON.decode(response.responseText);
+        if (result.success)
+        {
+            if (result.status)
+            {
+                showStatus(result.status.message, result.status.type);
+            }
+        }
+        else
+        {
+            showStatus(Ext.util.Format.htmlEncode(result.detail), 'failure');
+        }
+    }
+    else
+    {
+        showStatus('Cannot contact server', 'failure');
+    }
+}
+
 function markForClean(projectName)
 {
     showStatus('Marking for clean build...', 'working');
     Ext.Ajax.request({
         url: window.baseUrl + '/aconfig/projects/'+projectName+'?clean=clean',
-        callback: handleResponsibilityResponse
+        callback: handleMarkForCleanResponse
     });
 }
