@@ -47,7 +47,7 @@
 <p class="introduction">
     #i18n("key=introduction")
 </p>
-<table>
+<table width="100%">
     <tr>
 #if($config.record || !$config.type.extendable)
         <td id="left-column">
