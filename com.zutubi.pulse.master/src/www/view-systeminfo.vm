@@ -92,7 +92,7 @@
             <td colspan="2">
                 <table class="fill-content">
                     #headingRow("system.raw.properties" 2)
-#foreach ($key in $sortedKeys)
+#foreach ($key in $sortedSystemPropertyKeys)
                     <tr>
                         #dynamicHeading($key)
                         <td class="content">
