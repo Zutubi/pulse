@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.database;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.util.jdbc.DriverWrapper;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -93,7 +93,7 @@ public class DriverRegistry
                 String uniqueFilename = jar.getName() + RandomUtils.randomString(5);
 
                 FileSystemUtils.copy(driverDir, jar);
-                if (!FileSystemUtils.rename(new File(driverDir, jar.getName()), new File(driverDir, uniqueFilename)))
+                if (!FileSystemUtils.robustRename(new File(driverDir, jar.getName()), new File(driverDir, uniqueFilename)))
                 {
                     LOG.warning("Rename failed?");
                 }

@@ -222,7 +222,7 @@ public class BackupManager
                 if (cleanupTarget.exists())
                 {
                     File renamedCleanupTarget = new File(cleanupTarget.getParentFile(), cleanupTarget.getName() + DELETE_FILE_SUFFIX);
-                    if (!cleanupTarget.renameTo(renamedCleanupTarget))
+                    if (!FileSystemUtils.robustRename(cleanupTarget, renamedCleanupTarget))
                     {
                         LOG.warning("Failed to rename " + cleanupTarget.getAbsolutePath() + " to " +
                                 renamedCleanupTarget.getAbsolutePath() + ". This is causing a " +

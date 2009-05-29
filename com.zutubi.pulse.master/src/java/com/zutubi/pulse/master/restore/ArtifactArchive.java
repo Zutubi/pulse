@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.util.monitor.FeedbackAware;
 import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
@@ -139,7 +140,7 @@ public class ArtifactArchive extends AbstractArchiveableComponent implements Fee
             }
 
             File newBuildDir = new File(mappedProjectDir, buildNumber);
-            if (!buildDir.renameTo(newBuildDir))
+            if (!FileSystemUtils.robustRename(buildDir, newBuildDir))
             {
                 throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
             }

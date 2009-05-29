@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.master.bootstrap.Data;
+import com.zutubi.pulse.master.util.monitor.Job;
 import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.util.monitor.Task;
-import com.zutubi.pulse.master.util.monitor.Job;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -150,7 +150,7 @@ public class DefaultRestoreManager implements RestoreManager
                 backedupArchive = new File(backupRoot, String.format("restored-%s.zip", sdf.format(System.currentTimeMillis())));
                 if(!backedupArchive.exists())
                 {
-                    if(!source.renameTo(backedupArchive))
+                    if(!FileSystemUtils.robustRename(source, backedupArchive))
                     {
                         LOG.severe("Unable to backup restore archive to '" + backedupArchive.getAbsolutePath() + "'");
                     }
