@@ -4,22 +4,22 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.master.model.persistence.UserDao;
-import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.security.AcegiUser;
+import com.zutubi.pulse.master.security.ldap.LdapManager;
+import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
+import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.events.ConfigurationEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
@@ -286,9 +286,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
             throw new UsernameNotFoundException("Unknown user");
         }
 
-        AcegiUser principle = new AcegiUser(user, groupsByUser.get(user.getConfig()));
-        principle.addGroup(allUsersGroup);
-        return principle;
+        return getPrinciple(user);
     }
 
     public void setPassword(UserConfiguration user, String rawPassword)
