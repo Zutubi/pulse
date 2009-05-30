@@ -1095,6 +1095,11 @@ table.template-actions
     height: 1.1em;
 }
 
+.x-btn button
+{
+    color: #000;
+}
+
 /*
  * Config pages
  */

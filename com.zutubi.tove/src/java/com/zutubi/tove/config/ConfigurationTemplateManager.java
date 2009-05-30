@@ -412,7 +412,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
                         if (!node.isConcrete())
                         {
-                            addInheritedSkeletons(elements[0], PathUtils.getPath(2, elements), actualType, record, node);
+                            addInheritedSkeletons(elements[0], PathUtils.getPath(2, elements), actualType, record, node, true);
                         }
                     }
                 }
@@ -519,7 +519,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
-    private void addInheritedSkeletons(final String scope, final String remainderPath, CompositeType actualType, Record record, TemplateNode node)
+    private void addInheritedSkeletons(final String scope, final String remainderPath, CompositeType actualType, Record record, TemplateNode node, boolean strict)
     {
         final Record skeleton = createSkeletonRecord(actualType, record);
 
@@ -540,7 +540,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     return false;
                 }
             }
-        }, true);
+        }, strict);
     }
 
     Record createSkeletonRecord(ComplexType type, Record record)
@@ -2141,7 +2141,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 TemplateRecord templateParent = getTemplateParentRecord(pathElements);
                 TemplateHierarchy templateHierarchy = getTemplateHierarchy(scope);
                 TemplateNode node = templateHierarchy.getNodeById(pathElements[1]);
-                addInheritedSkeletons(scope, PathUtils.getPath(2, pathElements), typeRegistry.getType(templateParent.getSymbolicName()), templateParent.getMoi(), node.getParent());
+                addInheritedSkeletons(scope, PathUtils.getPath(2, pathElements), typeRegistry.getType(templateParent.getSymbolicName()), templateParent.getMoi(), node, false);
 
                 refreshCaches();
                 State state = getState();

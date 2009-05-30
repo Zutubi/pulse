@@ -10,6 +10,8 @@ import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -23,12 +25,19 @@ import java.util.*;
  */
 public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTestCase
 {
+    private static final String SCOPE_PROJECT = "project";
+    private static final String SCOPE_NON_TEMPLATED_PROJECT = "nproject";
+
     private static final String GLOBAL_PROJECT = "global";
     private static final String GLOBAL_DESCRIPTION = "this is the daddy of them all";
     private static final String CHILD_PROJECT = "child";
     private static final String CHILD_DESCRIPTION = "my own way baby!";
     private static final String GRANDCHILD_PROJECT = "grandchild";
     private static final String GRANDCHILD_DESCRIPTION = "nkotb";
+
+    private static final String PATH_DEFAULT_STAGE = "stages/default";
+    private static final String PATH_CHILD_DEFAULT_STAGE = getPath(SCOPE_PROJECT, CHILD_PROJECT, PATH_DEFAULT_STAGE);
+    private static final String PATH_GRANDCHILD_DEFAULT_STAGE = getPath(SCOPE_PROJECT, GRANDCHILD_PROJECT, PATH_DEFAULT_STAGE);
 
     private static final String PROPERTY_VALUE = "wow!";
 
@@ -49,8 +58,8 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         MapType mapType = new MapType(projectType, typeRegistry);
 
-        configurationPersistenceManager.register("project", templatedMapType);
-        configurationPersistenceManager.register("nproject", mapType);
+        configurationPersistenceManager.register(SCOPE_PROJECT, templatedMapType);
+        configurationPersistenceManager.register(SCOPE_NON_TEMPLATED_PROJECT, mapType);
     }
 
     protected void tearDown() throws Exception
@@ -249,7 +258,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         insertGlobal();
         insertChild();
-        configurationTemplateManager.delete("project/child/stages/default");
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
 
         failedInsertHelper("project/child/stages", createStage("default"), "Unable to insert record with name 'default' into path 'project/child/stages': a record with this name already exists in ancestor 'global'");
     }
@@ -257,7 +266,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     public void testInsertPathHiddenInAncestor()
     {
         insertToGrandchild();
-        configurationTemplateManager.delete("project/child/stages/default");
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
 
         failedInsertHelper("project/grandchild/stages", createStage("default"), "Unable to insert record with name 'default' into path 'project/grandchild/stages': a record with this name already exists in ancestor 'global'");
     }
@@ -266,7 +275,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         insertGlobal();
         insertTemplateChild();
-        configurationTemplateManager.delete("project/child/stages/default");
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
 
         MutableRecord grandchild = createGrandchild();
         MutableRecord stages = (MutableRecord) grandchild.get("stages");
@@ -587,7 +596,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_PROJECT, stageTemplate.getOwner("name"));
         assertEquals("newname", stageTemplate.get("name"));
 
-        assertNull(configurationTemplateManager.getRecord("project/child/stages/default"));
+        assertNull(configurationTemplateManager.getRecord(PATH_CHILD_DEFAULT_STAGE));
 
         stageTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/child/stages/newname");
         assertEquals(GLOBAL_PROJECT, stageTemplate.getOwner("name"));
@@ -639,7 +648,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         // Rename the first property (if the order is not fixed this property
         // will then fall to the end).
-        String firstStagePath = PathUtils.getPath(stagesPath, newOrder.get(0));
+        String firstStagePath = getPath(stagesPath, newOrder.get(0));
         MutableRecord property = configurationTemplateManager.getRecord(firstStagePath).copy(true);
         property.put("name", "renamed");
         configurationTemplateManager.saveRecord(firstStagePath, property);
@@ -670,7 +679,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         // Rename the first property (if the order is not fixed this property
         // will then fall to the end).
-        String firstStagePath = PathUtils.getPath(stagesPath, newOrder.get(0));
+        String firstStagePath = getPath(stagesPath, newOrder.get(0));
         MutableRecord property = configurationTemplateManager.getRecord(firstStagePath).copy(true);
         property.put("name", "renamed");
         configurationTemplateManager.saveRecord(firstStagePath, property);
@@ -702,7 +711,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertChild();
         configurationTemplateManager.delete("project/global/stages/default");
         assertNull(configurationTemplateManager.getRecord("project/global/stages/default"));
-        assertNull(configurationTemplateManager.getRecord("project/child/stages/default"));
+        assertNull(configurationTemplateManager.getRecord(PATH_CHILD_DEFAULT_STAGE));
     }
 
     public void testInsertPerformance()
@@ -758,7 +767,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
         insertChild();
 
-        hideStageAndAssertEvents("project/child/stages/default");
+        hideStageAndAssertEvents(PATH_CHILD_DEFAULT_STAGE);
     }
 
     public void testHideListItem()
@@ -800,12 +809,11 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
         insertChild();
 
-        String stagePath = "project/child/stages/default";
-        Stage stage = configurationTemplateManager.getInstance(stagePath, Stage.class);
+        Stage stage = configurationTemplateManager.getInstance(PATH_CHILD_DEFAULT_STAGE, Stage.class);
         stage.setRecipe("over");
         configurationTemplateManager.save(stage);
 
-        hideStageAndAssertEvents(stagePath);
+        hideStageAndAssertEvents(PATH_CHILD_DEFAULT_STAGE);
     }
 
     public void testHideOverriddenNestedItem()
@@ -818,7 +826,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         property.setValue("over");
         configurationTemplateManager.save(property);
 
-        hideStageAndAssertEvents("project/child/stages/default");
+        hideStageAndAssertEvents(PATH_CHILD_DEFAULT_STAGE);
     }
 
     public void testHideOverriddenNewNestedItem()
@@ -826,19 +834,18 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
         insertChild();
 
-        String stagePath = "project/child/stages/default";
-        Stage stage = configurationTemplateManager.getInstance(stagePath, Stage.class);
+        Stage stage = configurationTemplateManager.getInstance(PATH_CHILD_DEFAULT_STAGE, Stage.class);
         stage.addProperty("new", "item");
         configurationTemplateManager.save(stage);
 
         Listener listener = registerListener();
-        hideStage(stagePath);
-        listener.assertEvents(new DeleteEventSpec(stagePath, false),
-                              new DeleteEventSpec(stagePath + "/properties/p1", true),
-                              new DeleteEventSpec(stagePath + "/properties/new", true),
-                              new PostDeleteEventSpec(stagePath, false),
-                              new PostDeleteEventSpec(stagePath + "/properties/p1", true),
-                              new PostDeleteEventSpec(stagePath + "/properties/new", true));
+        hideStage(PATH_CHILD_DEFAULT_STAGE);
+        listener.assertEvents(new DeleteEventSpec(PATH_CHILD_DEFAULT_STAGE, false),
+                              new DeleteEventSpec(PATH_CHILD_DEFAULT_STAGE + "/properties/p1", true),
+                              new DeleteEventSpec(PATH_CHILD_DEFAULT_STAGE + "/properties/new", true),
+                              new PostDeleteEventSpec(PATH_CHILD_DEFAULT_STAGE, false),
+                              new PostDeleteEventSpec(PATH_CHILD_DEFAULT_STAGE + "/properties/p1", true),
+                              new PostDeleteEventSpec(PATH_CHILD_DEFAULT_STAGE + "/properties/new", true));
     }
 
     public void testHideOverriddenAlreadyHiddenNestedItem()
@@ -846,12 +853,11 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
         insertChild();
 
-        String stagePath = "project/child/stages/default";
-        configurationTemplateManager.delete(stagePath + "/properties/p1");
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE + "/properties/p1");
 
         Listener listener = registerListener();
-        hideStage(stagePath);
-        listener.assertEvents(new DeleteEventSpec(stagePath, false), new PostDeleteEventSpec(stagePath, false));
+        hideStage(PATH_CHILD_DEFAULT_STAGE);
+        listener.assertEvents(new DeleteEventSpec(PATH_CHILD_DEFAULT_STAGE, false), new PostDeleteEventSpec(PATH_CHILD_DEFAULT_STAGE, false));
     }
 
     public void testAddItemToHidden()
@@ -897,29 +903,27 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         insertToGrandchild();
 
-        hideStageAndAssertEvents("project/grandchild/stages/default");
+        hideStageAndAssertEvents(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
     public void testHideInheritedWithDescendent()
     {
         insertToGrandchild();
 
-        String gcStagePath = "project/grandchild/stages/default";
-        hideStageAndAssertEvents("project/child/stages/default", gcStagePath);
-        assertDeletedStage(gcStagePath);
+        hideStageAndAssertEvents(PATH_CHILD_DEFAULT_STAGE, PATH_GRANDCHILD_DEFAULT_STAGE);
+        assertDeletedStage(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
     public void testHideDescendentOverridesSimpleProperty()
     {
         insertToGrandchild();
 
-        String gcStagePath = "project/grandchild/stages/default";
-        Stage stage = configurationTemplateManager.getInstance(gcStagePath, Stage.class);
+        Stage stage = configurationTemplateManager.getInstance(PATH_GRANDCHILD_DEFAULT_STAGE, Stage.class);
         stage.setRecipe("over");
         configurationTemplateManager.save(stage);
 
-        hideStageAndAssertEvents("project/child/stages/default", gcStagePath);
-        assertDeletedStage(gcStagePath);
+        hideStageAndAssertEvents(PATH_CHILD_DEFAULT_STAGE, PATH_GRANDCHILD_DEFAULT_STAGE);
+        assertDeletedStage(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
     public void testHideDescendentOverridesNestedItem()
@@ -931,51 +935,49 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         property.setValue("over");
         configurationTemplateManager.save(property);
 
-        hideStageAndAssertEvents("project/child/stages/default", "project/grandchild/stages/default");
+        hideStageAndAssertEvents(PATH_CHILD_DEFAULT_STAGE, PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
     public void testHideDescendentAddsNewNestedItem()
     {
         insertToGrandchild();
 
-        String gcStagePath = "project/grandchild/stages/default";
-        Stage stage = configurationTemplateManager.getInstance(gcStagePath, Stage.class);
+        Stage stage = configurationTemplateManager.getInstance(PATH_GRANDCHILD_DEFAULT_STAGE, Stage.class);
         stage.addProperty("new", "item");
         configurationTemplateManager.save(stage);
 
         Listener listener = registerListener();
-        hideStage("project/child/stages/default");
-        listener.assertEvents(new DeleteEventSpec(gcStagePath, false),
-                              new DeleteEventSpec(gcStagePath + "/properties/p1", true),
-                              new DeleteEventSpec(gcStagePath + "/properties/new", true),
-                              new PostDeleteEventSpec(gcStagePath, false),
-                              new PostDeleteEventSpec(gcStagePath + "/properties/p1", true),
-                              new PostDeleteEventSpec(gcStagePath + "/properties/new", true));
-        assertDeletedStage(gcStagePath);
+        hideStage(PATH_CHILD_DEFAULT_STAGE);
+        listener.assertEvents(new DeleteEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE, false),
+                              new DeleteEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE + "/properties/p1", true),
+                              new DeleteEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE + "/properties/new", true),
+                              new PostDeleteEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE, false),
+                              new PostDeleteEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE + "/properties/p1", true),
+                              new PostDeleteEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE + "/properties/new", true));
+        assertDeletedStage(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
     public void testHideDescendentHidesNestedItem()
     {
         insertToGrandchild();
 
-        String gcStagePath = "project/grandchild/stages/default";
-        configurationTemplateManager.delete(gcStagePath + "/properties/p1");
+        configurationTemplateManager.delete(PATH_GRANDCHILD_DEFAULT_STAGE + "/properties/p1");
 
         Listener listener = registerListener();
-        hideStage("project/child/stages/default");
-        listener.assertEvents(new DeleteEventSpec(gcStagePath, false), new PostDeleteEventSpec(gcStagePath, false));
-        assertDeletedStage(gcStagePath);
+        hideStage(PATH_CHILD_DEFAULT_STAGE);
+        listener.assertEvents(new DeleteEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE, false), new PostDeleteEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE, false));
+        assertDeletedStage(PATH_GRANDCHILD_DEFAULT_STAGE);
     }
 
     public void testHideDescendentAlreadyHidden()
     {
         insertToGrandchild();
 
-        String gcStagePath = "project/grandchild/stages/default";
+        String gcStagePath = PATH_GRANDCHILD_DEFAULT_STAGE;
         configurationTemplateManager.delete(gcStagePath);
 
         Listener listener = registerListener();
-        hideStage("project/child/stages/default");
+        hideStage(PATH_CHILD_DEFAULT_STAGE);
         listener.assertEvents();
         assertDeletedStage(gcStagePath);
     }
@@ -991,7 +993,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.insertRecord("project", greatGrandchild);
 
         String ggcStagePath = "project/greatgrandchild/stages/default";
-        hideStageAndAssertEvents("project/child/stages/default", ggcStagePath);
+        hideStageAndAssertEvents(PATH_CHILD_DEFAULT_STAGE, ggcStagePath);
         assertDeletedStage(ggcStagePath);
     }
 
@@ -1030,7 +1032,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         insertGlobal();
         insertChild();
-        failedRestoreHelper("project/child/stages/default", "Invalid path 'project/child/stages/default': not hidden");
+        failedRestoreHelper(PATH_CHILD_DEFAULT_STAGE, "Invalid path 'project/child/stages/default': not hidden");
     }
 
     private void failedRestoreHelper(String path, String message)
@@ -1051,13 +1053,12 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
         insertChild();
 
-        String path = "project/child/stages/default";
-        configurationTemplateManager.delete(path);
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
         Listener listener = registerListener();
-        configurationTemplateManager.restore(path);
-        listener.assertEvents(new InsertEventSpec(path, false), new PostInsertEventSpec(path, false), new InsertEventSpec(path + "/properties/p1", true), new PostInsertEventSpec(path + "/properties/p1", true));
-        assertStage(path);
-        TemplateRecord stagesRecord = (TemplateRecord) configurationTemplateManager.getRecord(PathUtils.getParentPath(path));
+        configurationTemplateManager.restore(PATH_CHILD_DEFAULT_STAGE);
+        listener.assertEvents(new InsertEventSpec(PATH_CHILD_DEFAULT_STAGE, false), new PostInsertEventSpec(PATH_CHILD_DEFAULT_STAGE, false), new InsertEventSpec(PATH_CHILD_DEFAULT_STAGE + "/properties/p1", true), new PostInsertEventSpec(PATH_CHILD_DEFAULT_STAGE + "/properties/p1", true));
+        assertStage(PATH_CHILD_DEFAULT_STAGE);
+        TemplateRecord stagesRecord = (TemplateRecord) configurationTemplateManager.getRecord(PathUtils.getParentPath(PATH_CHILD_DEFAULT_STAGE));
         assertEquals("global", stagesRecord.getOwner("default"));
     }
 
@@ -1082,10 +1083,9 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
         insertChild();
 
-        String path = "project/child/stages/default";
-        configurationTemplateManager.delete(path);
-        configurationTemplateManager.restore(path);
-        hideStageAndAssertEvents(path);
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
+        configurationTemplateManager.restore(PATH_CHILD_DEFAULT_STAGE);
+        hideStageAndAssertEvents(PATH_CHILD_DEFAULT_STAGE);
     }
 
     public void testModifyAfterRestore()
@@ -1093,17 +1093,16 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
         insertChild();
 
-        String path = "project/child/stages/default";
-        configurationTemplateManager.delete(path);
-        configurationTemplateManager.restore(path);
-        Stage stage = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(path, Stage.class));
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
+        configurationTemplateManager.restore(PATH_CHILD_DEFAULT_STAGE);
+        Stage stage = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(PATH_CHILD_DEFAULT_STAGE, Stage.class));
         stage.setRecipe("edited");
 
         Listener listener = registerListener();
         configurationTemplateManager.save(stage);
-        listener.assertEvents(new SaveEventSpec(path), new PostSaveEventSpec(path));
+        listener.assertEvents(new SaveEventSpec(PATH_CHILD_DEFAULT_STAGE), new PostSaveEventSpec(PATH_CHILD_DEFAULT_STAGE));
 
-        assertEquals("edited", configurationTemplateManager.getInstance(path, Stage.class).getRecipe());
+        assertEquals("edited", configurationTemplateManager.getInstance(PATH_CHILD_DEFAULT_STAGE, Stage.class).getRecipe());
     }
 
     public void testInsertChildAfterRestore()
@@ -1111,28 +1110,26 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
         insertChild();
 
-        String path = "project/child/stages/default";
-        configurationTemplateManager.delete(path);
-        configurationTemplateManager.restore(path);
-        Stage stage = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(path, Stage.class));
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
+        configurationTemplateManager.restore(PATH_CHILD_DEFAULT_STAGE);
+        Stage stage = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(PATH_CHILD_DEFAULT_STAGE, Stage.class));
         stage.addProperty("new", "value");
 
         Listener listener = registerListener();
         configurationTemplateManager.save(stage);
-        listener.assertEvents(new InsertEventSpec(path + "/properties/new", false), new PostInsertEventSpec(path + "/properties/new", false));
+        listener.assertEvents(new InsertEventSpec(PATH_CHILD_DEFAULT_STAGE + "/properties/new", false), new PostInsertEventSpec(PATH_CHILD_DEFAULT_STAGE + "/properties/new", false));
 
-        assertEquals("value", configurationTemplateManager.getInstance(path, Stage.class).getProperties().get("new").getValue());
+        assertEquals("value", configurationTemplateManager.getInstance(PATH_CHILD_DEFAULT_STAGE, Stage.class).getProperties().get("new").getValue());
     }
 
     public void testRestoreWithDescendent()
     {
         insertToGrandchild();
 
-        String path = "project/child/stages/default";
-        configurationTemplateManager.delete(path);
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
         Listener listener = registerListener();
-        configurationTemplateManager.restore(path);
-        String gcStagePath = "project/grandchild/stages/default";
+        configurationTemplateManager.restore(PATH_CHILD_DEFAULT_STAGE);
+        String gcStagePath = PATH_GRANDCHILD_DEFAULT_STAGE;
         listener.assertEvents(new InsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath, false), new InsertEventSpec(gcStagePath + "/properties/p1", true), new PostInsertEventSpec(gcStagePath + "/properties/p1", true));
         assertStage(gcStagePath);
     }
@@ -1141,15 +1138,47 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         insertToGrandchild();
 
-        String gcStagePath = "project/grandchild/stages/default";
-        configurationTemplateManager.delete(gcStagePath);
-        String cStagePath = "project/child/stages/default";
-        configurationTemplateManager.delete(cStagePath);
+        configurationTemplateManager.delete(PATH_GRANDCHILD_DEFAULT_STAGE);
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
 
         Listener listener = registerListener();
-        configurationTemplateManager.restore(cStagePath);
-        listener.assertEvents(new InsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath + "/properties/p1", true), new PostInsertEventSpec(gcStagePath + "/properties/p1", true));
-        assertStage(gcStagePath);
+        configurationTemplateManager.restore(PATH_CHILD_DEFAULT_STAGE);
+        listener.assertEvents(new InsertEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE, false), new PostInsertEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE, false), new PostInsertEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE + "/properties/p1", true), new PostInsertEventSpec(PATH_GRANDCHILD_DEFAULT_STAGE + "/properties/p1", true));
+        assertStage(PATH_GRANDCHILD_DEFAULT_STAGE);
+    }
+
+    public void testRestoreWithHiddenInSiblingTemplate()
+    {
+        final String PROJECT_SIBLING_CHILD = "child2";
+        final String PROJECT_SIBLING_GRANDCHILD = "grandchild2";
+
+        insertToGrandchild();
+
+        MutableRecord record = createProject(PROJECT_SIBLING_CHILD, "");
+        configurationTemplateManager.markAsTemplate(record);
+        setParent(record, GLOBAL_PROJECT);
+        String siblingChildPath = configurationTemplateManager.insertRecord(SCOPE_PROJECT, record);
+        String siblingChildStagePath = getPath(siblingChildPath, PATH_DEFAULT_STAGE);
+
+        record = createProject(PROJECT_SIBLING_GRANDCHILD, "");
+        setParent(record, PROJECT_SIBLING_CHILD);
+        String siblingGrandchildPath = configurationTemplateManager.insertRecord(SCOPE_PROJECT, record);
+        String siblingGrandchildStagePath = getPath(siblingGrandchildPath, PATH_DEFAULT_STAGE);
+
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
+        configurationTemplateManager.delete(siblingChildStagePath);
+        assertSiblingStageHidden(siblingChildStagePath, siblingGrandchildStagePath);
+
+        configurationTemplateManager.restore(PATH_CHILD_DEFAULT_STAGE);
+        assertSiblingStageHidden(siblingChildStagePath, siblingGrandchildStagePath);
+    }
+
+    private void assertSiblingStageHidden(String siblingChildStagePath, String siblingGrandchildStagePath)
+    {
+        assertHiddenItem(siblingChildStagePath);
+        // These checks are to verify no skeletons exist (CIB-1973).
+        assertNull(recordManager.select(siblingChildStagePath));
+        assertNull(recordManager.select(siblingGrandchildStagePath));
     }
 
     private void insertToGrandchild()
@@ -1250,7 +1279,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         // Should work now
         configurationTemplateManager.setOrder("project/child/stages", Arrays.asList("default"));
 
-        configurationTemplateManager.delete("project/child/stages/default");
+        configurationTemplateManager.delete(PATH_CHILD_DEFAULT_STAGE);
 
         // And fail now
         failedSetOrderHelper("project/child/stages", Arrays.asList("default"), "Invalid order: item 'default' does not exist in collection at path 'project/child/stages'");
@@ -1272,7 +1301,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     public void testSetOrder()
     {
         MutableRecord project = createProject("test", "desc");
-        configurationTemplateManager.insertRecord("nproject", project);
+        configurationTemplateManager.insertRecord(SCOPE_NON_TEMPLATED_PROJECT, project);
         String stagesPath = "nproject/test/stages";
         insertStage(stagesPath, "one", 0);
         insertStage(stagesPath, "two", 0);
@@ -1287,7 +1316,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     public void testSetOrderIncomplete()
     {
         MutableRecord project = createProject("test", "desc");
-        configurationTemplateManager.insertRecord("nproject", project);
+        configurationTemplateManager.insertRecord(SCOPE_NON_TEMPLATED_PROJECT, project);
         String stagesPath = "nproject/test/stages";
         insertStage(stagesPath, "one", 0);
         insertStage(stagesPath, "two", 0);
@@ -1300,7 +1329,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     public void testAddAfterSettingOrder()
     {
         MutableRecord project = createProject("test", "desc");
-        configurationTemplateManager.insertRecord("nproject", project);
+        configurationTemplateManager.insertRecord(SCOPE_NON_TEMPLATED_PROJECT, project);
         String stagesPath = "nproject/test/stages";
         insertStage(stagesPath, "one", 0);
         insertStage(stagesPath, "two", 0);
@@ -1314,7 +1343,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     public void testDeleteAfterSettingOrder()
     {
         MutableRecord project = createProject("test", "desc");
-        configurationTemplateManager.insertRecord("nproject", project);
+        configurationTemplateManager.insertRecord(SCOPE_NON_TEMPLATED_PROJECT, project);
         String stagesPath = "nproject/test/stages";
         insertStage(stagesPath, "one", 0);
         insertStage(stagesPath, "two", 0);
@@ -1322,7 +1351,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         configurationTemplateManager.setOrder(stagesPath, Arrays.asList("three", "two", "one"));
         assertEquals(Arrays.asList("three", "two", "one"), getOrder(stagesPath));
-        configurationTemplateManager.delete(PathUtils.getPath(stagesPath, "three"));
+        configurationTemplateManager.delete(getPath(stagesPath, "three"));
         assertEquals(Arrays.asList("two", "one"), getOrder(stagesPath));
 
         // Re-insert to also check that it lands at the end again (i.e. order
@@ -1452,7 +1481,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         configurationTemplateManager.setOrder(childStagesPath, Arrays.asList("default2", "default", "childs", "default3"));
         assertEquals(Arrays.asList("default2", "default", "childs", "default3"), getOrder(childStagesPath));
-        configurationTemplateManager.delete(PathUtils.getPath(parentStagesPath, "default"));
+        configurationTemplateManager.delete(getPath(parentStagesPath, "default"));
         assertEquals(Arrays.asList("default2", "childs", "default3"), getOrder(childStagesPath));
 
         // Insert again and it should now appear at the end
@@ -1474,7 +1503,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         configurationTemplateManager.setOrder(childStagesPath, Arrays.asList("default2", "default", "childs", "default3"));
         assertEquals(Arrays.asList("default2", "default", "childs", "default3"), getOrder(childStagesPath));
-        String hidePath = PathUtils.getPath(childStagesPath, "default");
+        String hidePath = getPath(childStagesPath, "default");
         configurationTemplateManager.delete(hidePath);
         assertEquals(Arrays.asList("default2", "childs", "default3"), getOrder(childStagesPath));
 
@@ -1504,6 +1533,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(Arrays.asList("default", "gcs", "default2"), getOrder(gcStagesPath));
     }
 
+    @SuppressWarnings({"unchecked"})
     private List<String> getOrder(String path)
     {
         // Determine the order by iterating over an instance - this verifies
@@ -1542,7 +1572,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     private String insertGlobal()
     {
         MutableRecord global = createGlobal();
-        return configurationTemplateManager.insertRecord("project", global);
+        return configurationTemplateManager.insertRecord(SCOPE_PROJECT, global);
     }
 
     private MutableRecord createGlobal()
@@ -1555,49 +1585,55 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     private String insertChild()
     {
         MutableRecord child = createChild();
-        return configurationTemplateManager.insertRecord("project", child);
+        return configurationTemplateManager.insertRecord(SCOPE_PROJECT, child);
     }
 
     private void insertTemplateChild()
     {
         MutableRecord child = createChild();
         configurationTemplateManager.markAsTemplate(child);
-        configurationTemplateManager.insertRecord("project", child);
+        configurationTemplateManager.insertRecord(SCOPE_PROJECT, child);
     }
 
     private MutableRecord createChild()
     {
         MutableRecord child = createProject(CHILD_PROJECT, CHILD_DESCRIPTION);
-        configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
+        setParent(child, GLOBAL_PROJECT);
         return child;
     }
 
     private void insertGrandchild()
     {
         MutableRecord grandchild = createGrandchild();
-        configurationTemplateManager.insertRecord("project", grandchild);
+        configurationTemplateManager.insertRecord(SCOPE_PROJECT, grandchild);
     }
 
     private void insertTemplateGrandchild()
     {
         MutableRecord grandchild = createGrandchild();
         configurationTemplateManager.markAsTemplate(grandchild);
-        configurationTemplateManager.insertRecord("project", grandchild);
+        configurationTemplateManager.insertRecord(SCOPE_PROJECT, grandchild);
     }
 
     private MutableRecord createGrandchild()
     {
         MutableRecord child = createProject(GRANDCHILD_PROJECT, GRANDCHILD_DESCRIPTION);
-        configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/child").getHandle());
+        setParent(child, CHILD_PROJECT);
         return child;
+    }
+
+    private void setParent(MutableRecord projectRecord, String parentName)
+    {
+        Record parentRecord = configurationTemplateManager.getRecord(getPath(SCOPE_PROJECT, parentName));
+        configurationTemplateManager.setParentTemplate(projectRecord, parentRecord.getHandle());
     }
 
     private void insertLargeProject(String name, long parent, int stages, int propertiesPerStage)
     {
         MutableRecord project = createProject(name, "fake");
         configurationTemplateManager.setParentTemplate(project, parent);
-        configurationTemplateManager.insertRecord("project", project);
-        String stagePath = PathUtils.getPath("project", name, "stages");
+        configurationTemplateManager.insertRecord(SCOPE_PROJECT, project);
+        String stagePath = getPath(SCOPE_PROJECT, name, "stages");
         for(int i = 0; i < stages; i++)
         {
             insertStage(stagePath, "stage " + i, propertiesPerStage);
@@ -1609,7 +1645,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         MutableRecord stage = stageType.createNewRecord(false);
         stage.put("name", name);
         configurationTemplateManager.insertRecord(path, stage);
-        String propertiesPath = PathUtils.getPath(path, name, "properties");
+        String propertiesPath = getPath(path, name, "properties");
         for(int i = 0; i < properties; i++)
         {
             insertProperty(propertiesPath, "property " + i);
