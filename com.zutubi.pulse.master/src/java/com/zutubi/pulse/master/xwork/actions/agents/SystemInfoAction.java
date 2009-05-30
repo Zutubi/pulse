@@ -4,7 +4,12 @@ import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
+import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An action to display information about the machine and JVM an agent is
@@ -61,6 +66,18 @@ public class SystemInfoAction extends AgentActionBase
     public SystemInfo getInfo()
     {
         return info;
+    }
+
+    public List<String> getSortedKeys()
+    {
+        List<String> keys = new LinkedList<String>();
+        for (Object o: info.getSystemProperties().keySet())
+        {
+            keys.add((String) o);
+        }
+        
+        Collections.sort(keys, new Sort.StringComparator());
+        return keys;
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

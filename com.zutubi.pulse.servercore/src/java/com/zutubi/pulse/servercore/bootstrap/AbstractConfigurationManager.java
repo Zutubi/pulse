@@ -1,9 +1,11 @@
 package com.zutubi.pulse.servercore.bootstrap;
 
-import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.pulse.core.util.config.EnvConfig;
+import com.zutubi.util.config.PropertiesConfig;
 
 import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 
@@ -37,6 +39,28 @@ public abstract class AbstractConfigurationManager implements ConfigurationManag
             systemPaths = new DefaultSystemPaths(pulseHome, versionHome);
         }
         return systemPaths;
+    }
+
+    public Map<String, String> getCoreProperties()
+    {
+        Map<String, String> result = new LinkedHashMap<String, String>();
+
+        EnvConfig envConfig = getEnvConfig();
+        String pulseHome = envConfig.getPulseHome();
+        if(pulseHome != null)
+        {
+            result.put(CORE_PROPERTY_PULSE_HOME_DIR, new File(pulseHome).getAbsolutePath());
+        }
+
+        SystemConfiguration systemConfig = getSystemConfig();
+
+        result.put(CORE_PROPERTY_USER_HOME_DIR, envConfig.getUserHome());
+        result.put(CORE_PROPERTY_PULSE_CONFIG_FILE, systemConfig.getConfigFilePath());
+        result.put(CORE_PROPERTY_PULSE_DATA_DIR, getUserPaths().getData().getAbsolutePath());
+        result.put(CORE_PROPERTY_PULSE_BIND_ADDRESS, systemConfig.getBindAddress());
+        result.put(CORE_PROPERTY_PULSE_WEBAPP_PORT, Integer.toString(systemConfig.getServerPort()));
+        result.put(CORE_PROPERTY_PULSE_CONTEXT_PATH, systemConfig.getContextPath());
+        return result;
     }
 
     private File getHomeDir(String home, String property)

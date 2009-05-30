@@ -2,8 +2,13 @@ package com.zutubi.pulse.dev.xmlrpc;
 
 import com.zutubi.pulse.core.scm.ScmLocation;
 import org.apache.xmlrpc.XmlRpcClient;
+import org.apache.xmlrpc.XmlRpcClientException;
+import org.apache.xmlrpc.XmlRpcTransport;
+import org.apache.xmlrpc.XmlRpcTransportFactory;
 
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -14,15 +19,32 @@ public class PulseXmlRpcClient
 {
     private XmlRpcClient client;
 
-    public PulseXmlRpcClient(String url) throws MalformedURLException
+    public PulseXmlRpcClient(String pulseURL) throws MalformedURLException
     {
-        if(!url.endsWith("/"))
+        this(pulseURL, null, 0);
+    }
+
+    public PulseXmlRpcClient(String pulseUrl, final String proxyHost, final int proxyPort) throws MalformedURLException
+    {
+        if(!pulseUrl.endsWith("/"))
         {
-            url += "/";
+            pulseUrl += "/";
         }
 
-        url += "xmlrpc";
-        client = new XmlRpcClient(url);
+        pulseUrl += "xmlrpc";
+        final URL url = new URL(pulseUrl);
+        client = new XmlRpcClient(url, new XmlRpcTransportFactory()
+        {
+            public XmlRpcTransport createTransport() throws XmlRpcClientException
+            {
+                return new PulseXmlRpcTransport(url, proxyHost, proxyPort);
+            }
+
+            public void setProperty(String propertyName, Object value)
+            {
+                // No properties supported.
+            }
+        });
     }
 
     public int getVersion()
@@ -64,15 +86,9 @@ public class PulseXmlRpcClient
     @SuppressWarnings({"unchecked"})
     private <T> T execute(String method, String... args)
     {
-        Vector v = new Vector(args.length);
-        for(String arg: args)
-        {
-            v.add(arg);
-        }
-
         try
         {
-            return (T) client.execute(method, v);
+            return (T) client.execute(method, new Vector(Arrays.asList(args)));
         }
         catch (Exception e)
         {

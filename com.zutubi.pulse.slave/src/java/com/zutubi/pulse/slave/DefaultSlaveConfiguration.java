@@ -1,9 +1,9 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.pulse.core.util.config.EnvConfig;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.config.*;
 
@@ -19,6 +19,7 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
     private static final String LOG_EVENTS = "log.events";
 
     private EnvConfig envConfig;
+    private String pulseConfigProperties;
     private ConfigSupport config;
     private SystemPaths systemPaths;
 
@@ -37,7 +38,7 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
         File systemConfigProperties = new File(systemPaths.getConfigRoot(), PROPERTIES_FILE);
         FileConfig systemConfig = new FileConfig(systemConfigProperties);
 
-        String pulseConfigProperties = env.getDefaultPulseConfig(CONFIG_DIR);
+        pulseConfigProperties = env.getDefaultPulseConfig(CONFIG_DIR);
         if (env.hasPulseConfig())
         {
             pulseConfigProperties = env.getPulseConfig();
@@ -53,6 +54,11 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
         {
             config = new ConfigSupport(new CompositeConfig(commandLineAndSystemProperties, systemConfig));
         }
+    }
+
+    public String getConfigFilePath()
+    {
+        return pulseConfigProperties;
     }
 
     public String getBindAddress()

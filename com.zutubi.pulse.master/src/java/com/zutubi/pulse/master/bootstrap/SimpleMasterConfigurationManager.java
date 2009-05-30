@@ -3,28 +3,33 @@ package com.zutubi.pulse.master.bootstrap;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.util.config.Config;
-import com.zutubi.util.config.FileConfig;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.database.DriverRegistry;
 import com.zutubi.pulse.servercore.bootstrap.AbstractConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfigurationSupport;
-import com.zutubi.pulse.core.util.config.EnvConfig;
-import com.zutubi.util.config.VolatileReadOnlyConfig;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.config.Config;
+import com.zutubi.util.config.FileConfig;
+import com.zutubi.util.config.VolatileReadOnlyConfig;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 /**
  */
 public class SimpleMasterConfigurationManager extends AbstractConfigurationManager implements MasterConfigurationManager
 {
+    public static final String CORE_PROPERTY_PULSE_DATABASE_URL = "pulse.database.url";
     public static final String DATABASE_CONFIG_FILE_PREFIX = "database";
+
+    private static final Logger LOG = Logger.getLogger(SimpleMasterConfigurationManager.class);
 
     private SystemConfiguration sysConfig;
     private DatabaseConfig dbConfig;
@@ -53,10 +58,10 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
             if (!userProps.isFile())
             {
                 // user config not yet available, so just use the defaults for now.
-                return new SystemConfigurationSupport(system);
+                return new SystemConfigurationSupport(configPath, system);
             }
             Config user = new FileConfig(userProps);
-            sysConfig = new SystemConfigurationSupport(system, user);
+            sysConfig = new SystemConfigurationSupport(configPath, system, user);
         }
         return sysConfig;
     }
@@ -170,5 +175,21 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
 
         // refresh the data instance.
         data = null;
+    }
+
+    @Override
+    public Map<String, String> getCoreProperties()
+    {
+        Map<String, String> result = super.getCoreProperties();
+        try
+        {
+            result.put(CORE_PROPERTY_PULSE_DATABASE_URL, getDatabaseConfig().getUrl());
+        }
+        catch (IOException e)
+        {
+            LOG.warning(e);
+        }
+
+        return result;
     }
 }

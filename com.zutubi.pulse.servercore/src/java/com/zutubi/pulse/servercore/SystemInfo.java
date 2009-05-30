@@ -3,13 +3,13 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
-import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.util.Constants;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -17,7 +17,7 @@ import java.util.Properties;
 public class SystemInfo
 {
     private Properties systemProperties;
-    private Properties paths;
+    private Map<String, String> coreProperties;
     private Version version;
     private long totalMemory;
     private long usedMemory;
@@ -29,19 +29,7 @@ public class SystemInfo
         DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss z");
 
         SystemInfo info = new SystemInfo();
-        info.paths = new Properties();
-
-        EnvConfig envConfig = configurationManager.getEnvConfig();
-        String pulseHome = envConfig.getPulseHome();
-        if(pulseHome != null)
-        {
-            info.paths.put("pulse.homeDir.field", pulseHome);
-        }
-
-        // TODO: show the pulse config path details... and while we are at it, show the system config details as well.
-        //info.paths.put("pulse.config.field", envConfig.getPulseConfig());
-
-        info.paths.put("pulse.dataDir.field", configurationManager.getUserPaths().getData());
+        info.coreProperties = configurationManager.getCoreProperties();
 
         Properties properties = System.getProperties();
         info.systemProperties = new Properties();
@@ -88,9 +76,9 @@ public class SystemInfo
         return systemProperties;
     }
 
-    public Properties getPaths()
+    public Map<String, String> getCoreProperties()
     {
-        return paths;
+        return coreProperties;
     }
 
     public Version getVersion()

@@ -112,6 +112,10 @@ public class SubversionClient implements ScmClient
      */
     private void initialiseRepository(String url) throws ScmException
     {
+        // Workaround for CIB-1978, SvnKit bug 238:
+        // http://svnkit.com/tracker/bug_view_advanced_page.php?bug_id=283
+        System.setProperty("svnkit.http.methods", "Negotiate,Digest,Basic,NTLM");
+
         // Initialise SVN library
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();

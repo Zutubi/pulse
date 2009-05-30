@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.Pair;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -47,7 +48,7 @@ public class PersonalBuildClient
 
         try
         {
-            PulseXmlRpcClient rpc = new PulseXmlRpcClient(config.getPulseUrl());
+            PulseXmlRpcClient rpc = new PulseXmlRpcClient(config.getPulseUrl(), config.getProxyHost(), config.getProxyPort());
 
             checkVersion(rpc);
 
@@ -284,9 +285,17 @@ public class PersonalBuildClient
     public long sendRequest(Revision revision, File patchFile) throws PersonalBuildException
     {
         HttpClient client = new HttpClient();
-
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getPulseUser(), getPassword());
-        client.getState().setCredentials(new AuthScope(null, -1), credentials);
+        final AuthScope authScope = new AuthScope(null, -1);
+
+        String proxyHost = config.getProxyHost();
+        if (TextUtils.stringSet(proxyHost))
+        {
+            client.getHostConfiguration().setProxy(proxyHost, config.getProxyPort());
+            client.getState().setProxyCredentials(authScope, credentials);
+        }
+
+        client.getState().setCredentials(authScope, credentials);
         client.getParams().setAuthenticationPreemptive(true);
 
         PostMethod post = new PostMethod(config.getPulseUrl() + "/personal/personalBuild.action");

@@ -14,6 +14,8 @@ public class PersonalBuildConfig implements Config
     public static final String PROPERTY_PULSE_URL = "pulse.url";
     public static final String PROPERTY_PULSE_USER = "pulse.user";
     public static final String PROPERTY_PULSE_PASSWORD = "pulse.password";
+    public static final String PROPERTY_PROXY_HOST = "proxy.host";
+    public static final String PROPERTY_PROXY_PORT = "proxy.port";
     public static final String PROPERTY_PROJECT = "project";
 
     public static final String PROPERTY_CHECK_REPOSITORY = "check.repository";
@@ -105,6 +107,16 @@ public class PersonalBuildConfig implements Config
     public String getPulsePassword()
     {
         return config.getProperty(PROPERTY_PULSE_PASSWORD);
+    }
+
+    public String getProxyHost()
+    {
+        return config.getProperty(PROPERTY_PROXY_HOST);
+    }
+
+    public Integer getProxyPort()
+    {
+        return config.getInteger(PROPERTY_PROXY_PORT, 80);
     }
 
     public String getProject()

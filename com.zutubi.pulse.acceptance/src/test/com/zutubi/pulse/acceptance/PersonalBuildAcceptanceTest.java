@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.dev.personal.PersonalBuildClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
@@ -17,6 +18,10 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
+import org.mortbay.http.HttpContext;
+import org.mortbay.http.handler.ProxyHandler;
+import org.mortbay.jetty.Server;
+import org.mortbay.util.InetAddrPort;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
@@ -84,6 +89,60 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(true)));
         // Make sure this view is not decorated (CIB-1711).
         assertTextNotPresent("logout");
+    }
+
+    public void testPersonalBuildViaProxy() throws Exception
+    {
+        final int PROXY_PORT = 8754;
+
+        final Server server = setupProxyServer(PROXY_PORT);
+        Thread thread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    server.start();
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        thread.start();
+        TestUtils.waitForServer(PROXY_PORT);
+
+        try
+        {
+            checkout(Constants.TRIVIAL_ANT_REPOSITORY);
+            makeChangeToBuildFile();
+            createConfigFile(PROJECT_NAME, "localhost", PROXY_PORT);
+
+            loginAsAdmin();
+            ensureProject(PROJECT_NAME);
+            editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
+            long buildNumber = runPersonalBuild("failure");
+            verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
+        }
+        finally
+        {
+            server.stop(true);
+            thread.join();
+        }
+    }
+
+    private Server setupProxyServer(int port) throws IOException
+    {
+        HttpContext context = new HttpContext();
+        context.setContextPath("/");
+        context.addHandler(new ProxyHandler());
+
+        Server server = new Server();
+        server.addListener(new InetAddrPort(port));
+        server.addContext(context);
+        return server;
     }
 
     public void testPersonalBuildChangesImportedFile() throws Exception
@@ -252,12 +311,22 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private void createConfigFile(String projectName) throws IOException
     {
+        createConfigFile(projectName, null, 0);
+    }
+
+    private void createConfigFile(String projectName, String proxyHost, int proxyPort) throws IOException
+    {
         File configFile = new File(workingCopyDir, PersonalBuildConfig.PROPERTIES_FILENAME);
         Properties config = new Properties();
         config.put(PersonalBuildConfig.PROPERTY_PULSE_URL, baseUrl);
         config.put(PersonalBuildConfig.PROPERTY_PULSE_USER, "admin");
         config.put(PersonalBuildConfig.PROPERTY_PULSE_PASSWORD, "admin");
         config.put(PersonalBuildConfig.PROPERTY_PROJECT, projectName);
+        if (proxyHost != null)
+        {
+            config.put(PersonalBuildConfig.PROPERTY_PROXY_HOST, proxyHost);
+            config.put(PersonalBuildConfig.PROPERTY_PROXY_PORT, Integer.toString(proxyPort));
+        }
 
         FileOutputStream os = null;
         try
