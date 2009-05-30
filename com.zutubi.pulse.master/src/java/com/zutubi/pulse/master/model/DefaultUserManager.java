@@ -286,9 +286,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
             throw new UsernameNotFoundException("Unknown user");
         }
 
-        AcegiUser principle = new AcegiUser(user, groupsByUser.get(user.getConfig()));
-        principle.addGroup(allUsersGroup);
-        return principle;
+        return getPrinciple(user);
     }
 
     public void setPassword(UserConfiguration user, String rawPassword)

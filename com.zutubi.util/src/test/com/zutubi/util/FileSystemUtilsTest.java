@@ -12,6 +12,8 @@ import java.util.List;
 
 public class FileSystemUtilsTest extends ZutubiTestCase
 {
+    private static final String TEST_FILE_CONTENT = "content";
+
     private File tmpDir;
     private Copier[] copiers;
 
@@ -154,12 +156,12 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testFilesMatchSameContent() throws IOException
     {
-        filesMatchHelper("content", "content", true);
+        filesMatchHelper(TEST_FILE_CONTENT, TEST_FILE_CONTENT, true);
     }
 
     public void testFilesMatchSameLength() throws IOException
     {
-        filesMatchHelper("content", "CONTENT", false);
+        filesMatchHelper(TEST_FILE_CONTENT, "CONTENT", false);
     }
 
     public void testFilesMatchLongFiles() throws IOException
@@ -625,13 +627,11 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         if (FileSystemUtils.LN_AVAILABLE)
         {
-            final String CONTENT = "content";
-
-            File link = createSymlink(CONTENT);
+            File link = createSymlink(TEST_FILE_CONTENT);
             File dest = new File(tmpDir, "dest");
 
             FileSystemUtils.copy(dest, link);
-            assertSymlinkContentCopied(dest, CONTENT);
+            assertSymlinkContentCopied(dest, TEST_FILE_CONTENT);
         }
     }
 
@@ -639,15 +639,13 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         if (FileSystemUtils.LN_AVAILABLE)
         {
-            final String CONTENT = "content";
-
-            File link = createSymlink(CONTENT);
+            File link = createSymlink(TEST_FILE_CONTENT);
             File destDir = new File(tmpDir, "dest");
             File dest = new File(destDir, link.getName());
             assertTrue(destDir.mkdir());
             
             FileSystemUtils.copy(destDir, link);
-            assertSymlinkContentCopied(dest, CONTENT);
+            assertSymlinkContentCopied(dest, TEST_FILE_CONTENT);
         }
     }
 
@@ -969,6 +967,75 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             assertTrue(FileSystemUtils.rmdir(dir));
             assertFalse(dir.exists());
         }
+    }
+
+    public void testRobustRename() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+
+        assertTrue(FileSystemUtils.robustRename(src, dest));
+
+        assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
+    }
+
+    public void testRobustRenameSrcDoesntExist() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+
+        assertFalse(FileSystemUtils.robustRename(src, dest));
+    }
+
+    public void testRobustRenameDestExists() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+        assertTrue(dest.mkdir());
+
+        assertFalse(FileSystemUtils.robustRename(src, dest));
+    }
+
+    public void testRename() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+
+        assertTrue(FileSystemUtils.rename(src, dest, false));
+
+        assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
+    }
+
+    public void testRenameSrcDoesntExist() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+
+        assertFalse(FileSystemUtils.rename(src, dest, true));
+    }
+
+    public void testRobustRenameDestExistsNonForced() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+        assertTrue(dest.mkdir());
+
+        assertFalse(FileSystemUtils.rename(src, dest, false));
+    }
+
+    public void testRobustRenameDestExistsForced() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+        assertTrue(dest.mkdir());
+
+        assertTrue(FileSystemUtils.rename(src, dest, true));
+        assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
     }
 
     private void createDirectoryLayout(File dir) throws IOException

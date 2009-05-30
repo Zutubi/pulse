@@ -158,7 +158,7 @@ public class ProjectLogger
                 LOG.warning("Unable to remove old file '" + lastFile.getAbsolutePath() + "'");
             }
 
-            if (!currentFile.renameTo(lastFile))
+            if (!FileSystemUtils.robustRename(currentFile, lastFile))
             {
                 LOG.warning("Unable to rename log file '" + currentFile.getAbsolutePath() + "' to '" + lastFile.getAbsolutePath() + "'");
             }

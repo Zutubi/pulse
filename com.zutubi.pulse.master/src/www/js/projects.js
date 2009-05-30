@@ -254,6 +254,7 @@ ZUTUBI.ConcreteProject.prototype = {
         for (var i = 0; i < this.rows.length; i++)
         {
             this.rows[i].select('a').removeAllListeners();
+            this.rows[i].select('span').removeAllListeners();
         }
 
         for (var key in this.renderedMenus)
@@ -524,6 +525,22 @@ Ext.extend(ZUTUBI.ProjectGroup, ZUTUBI.ProjectContainer, {
             spacerClass += ' project-group-last';
         }
         return parentEl.createChild({tag: 'tr', cls: spacerClass, children: [{ tag: 'td', colspan: '6', html: '&nbsp;'}]});
+    },
+
+    cleanupHandler: function(prefix)
+    {
+        var el = Ext.get(prefix + this.data.id);
+        if (el)
+        {
+            el.dom.onclick = null;
+        }
+    },
+
+    destroy: function()
+    {
+        ZUTUBI.ProjectGroup.superclass.destroy.call(this);
+        this.cleanupHandler('rss.builds.');
+        this.cleanupHandler('hide.');
     }
 });
 
@@ -883,6 +900,7 @@ ZUTUBI.ChangesTable.prototype = {
 
     destroy: function() {
         this.containerEl.select('a').removeAllListeners();
+        this.containerEl.select('span').removeAllListeners();
 
         var key;
         for (key in this.renderedBuilds)

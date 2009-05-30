@@ -179,7 +179,7 @@ public class UpdateCommand implements Runnable
             checkUnversionedComponents(pulseHome, packageRoot, true);
             
             // This comes last: we only want to do this when we are happy to upgrade to this version!
-            if(!packageVersionDir.renameTo(versionDir))
+            if(!FileSystemUtils.robustRename(packageVersionDir, versionDir))
             {
                 throw new PulseRuntimeException("Unable to rename package version directory '" + packageVersionDir.getAbsolutePath() + "' into Pulse home '" + versionDir.getAbsolutePath() + "'");
             }

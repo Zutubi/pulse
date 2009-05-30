@@ -29,7 +29,8 @@ public interface SystemConfiguration
     public static final String SSL_KEY_PASSWORD = "ssl.keyPassword";
 
     /**
-     * @return the location of the user's config file (note the file may not exist)
+     * @return the location of the server config file (note the file may not
+     *         exist on agents)
      */
     String getConfigFilePath();
 

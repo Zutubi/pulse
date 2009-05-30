@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.local;
 
+import com.zutubi.util.FileSystemUtils;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.UriParser;
@@ -113,7 +114,7 @@ public class LocalFile extends AbstractFileObject implements FileObject
     {
         LocalFile newLocalFile = (LocalFile) FileObjectUtils.getAbstractFileObject(newfile);
 
-        if (!file.renameTo(newLocalFile.getLocalFile()))
+        if (!FileSystemUtils.robustRename(file, newLocalFile.getLocalFile()))
         {
             throw new FileSystemException("vfs.provider.local/rename-file.error",
                 new String[]{file.toString(), newfile.toString()});

@@ -143,7 +143,7 @@ public class SlaveAgentService implements AgentService
 
             zipFile.delete();
 
-            if(!tempDir.renameTo(destination))
+            if (!FileSystemUtils.rename(tempDir, destination, true))
             {
                 throw new BuildException("Unable to rename result directory to '" + destination.getAbsolutePath() + "'");
             }
@@ -158,7 +158,7 @@ public class SlaveAgentService implements AgentService
         {
             IOUtils.close(fos);
 
-            if(tempDir != null)
+            if (tempDir != null)
             {
                 FileSystemUtils.rmdir(tempDir);
             }

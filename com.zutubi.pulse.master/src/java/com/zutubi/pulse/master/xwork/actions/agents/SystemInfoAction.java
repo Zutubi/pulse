@@ -24,8 +24,6 @@ public class SystemInfoAction extends AgentActionBase
     private ConfigurationManager configurationManager;
     private StartupManager startupManager;
 
-    /**
-     */
     public String execute()
     {
         Agent agent = getAgent();
@@ -68,7 +66,7 @@ public class SystemInfoAction extends AgentActionBase
         return info;
     }
 
-    public List<String> getSortedKeys()
+    public List<String> getSortedSystemPropertyKeys()
     {
         List<String> keys = new LinkedList<String>();
         for (Object o: info.getSystemProperties().keySet())

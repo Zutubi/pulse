@@ -20,8 +20,7 @@ public class FileSystemUtils
 {
     private static final Logger LOG = Logger.getLogger(FileSystemUtils.class);
 
-    private static final int DELETE_RETRIES = 3;
-    private static final int RENAME_RETRIES = 3;
+    private static final int ROBUST_RETRIES = 3;
 
     private static final String PROPERTY_USE_EXTERNAL_COPY = "pulse.use.external.copy";
 
@@ -145,18 +144,20 @@ public class FileSystemUtils
         return robustDelete(dir);
     }
 
-    public static boolean robustDelete(File f)
+    private static boolean robustFn(File f, Predicate<File> fn)
     {
-        boolean deleted = false;
-        for (int i = 0; i < DELETE_RETRIES; i++)
+        boolean success = false;
+        for (int i = 0; i < ROBUST_RETRIES; i++)
         {
-            deleted = f.delete();
-            if (deleted)
+            success = fn.satisfied(f);
+            if (success)
             {
                 break;
             }
             else
             {
+                // Yes, this is obscene, but it works around bugs in some
+                // Windows JVMs.
                 System.gc();
                 try
                 {
@@ -170,7 +171,46 @@ public class FileSystemUtils
             }
         }
 
-        return deleted;
+        return success;
+    }
+
+    /**
+     * A more robust version of {@link File#delete} which retries a few times
+     * on failure.  Most useful on Windows where deleting can fail due to
+     * external forces beyond our control.
+     *
+     * @param f file to delete
+     * @return true iff the file was successfully deleted
+     */
+    public static boolean robustDelete(File f)
+    {
+        return robustFn(f, new Predicate<File>()
+        {
+            public boolean satisfied(File file)
+            {
+                return file.delete();
+            }
+        });
+    }
+
+    /**
+     * A more robust version of {@link File#renameTo} which retries a few times
+     * on failure.  Most useful on Windows where renaming can fail due to
+     * external forces beyond our control.
+     *
+     * @param src  source file to be renamed
+     * @param dest destination to rename the file to
+     * @return true iff the file was successfully renamed
+     */
+    public static boolean robustRename(File src, final File dest)
+    {
+        return robustFn(src, new Predicate<File>()
+        {
+            public boolean satisfied(File file)
+            {
+                return file.renameTo(dest);
+            }
+        });
     }
 
     public static void cleanOutputDir(File output) throws IOException
@@ -526,32 +566,7 @@ public class FileSystemUtils
             }
         }
 
-        for (int i = 0; i < RENAME_RETRIES; i++)
-        {
-            if (src.renameTo(dest))
-            {
-                return true;
-            }
-
-            // Yes, this is obscene, but it works around a bug in some Windows
-            // JVMs.
-            System.gc();
-            try
-            {
-                Thread.sleep(50);
-            }
-            catch (InterruptedException e)
-            {
-                // Ignore, we will not retry for long.
-            }
-        }
-
-        return false;
-    }
-
-    public static boolean rename(File src, File dest)
-    {
-        return rename(src, dest, false);
+        return robustRename(src, dest);
     }
 
     public static void createFile(File file, String data) throws IOException

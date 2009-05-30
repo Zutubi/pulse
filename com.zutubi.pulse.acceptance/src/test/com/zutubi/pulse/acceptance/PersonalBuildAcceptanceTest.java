@@ -1,11 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
+import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
-import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.dev.personal.PersonalBuildClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
@@ -18,10 +18,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.handler.ProxyHandler;
-import org.mortbay.jetty.Server;
-import org.mortbay.util.InetAddrPort;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
@@ -95,24 +91,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     {
         final int PROXY_PORT = 8754;
 
-        final Server server = setupProxyServer(PROXY_PORT);
-        Thread thread = new Thread(new Runnable()
-        {
-            public void run()
-            {
-                try
-                {
-                    server.start();
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        thread.start();
-        TestUtils.waitForServer(PROXY_PORT);
+        ProxyServer proxyServer = new ProxyServer(PROXY_PORT);
+        proxyServer.start();
 
         try
         {
@@ -128,21 +108,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         }
         finally
         {
-            server.stop(true);
-            thread.join();
+            proxyServer.stop();
         }
-    }
-
-    private Server setupProxyServer(int port) throws IOException
-    {
-        HttpContext context = new HttpContext();
-        context.setContextPath("/");
-        context.addHandler(new ProxyHandler());
-
-        Server server = new Server();
-        server.addListener(new InetAddrPort(port));
-        server.addContext(context);
-        return server;
     }
 
     public void testPersonalBuildChangesImportedFile() throws Exception
