@@ -1,5 +1,6 @@
 package com.zutubi.pulse.personal;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.*;
@@ -41,7 +42,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
 
         try
         {
-            PulseXmlRpcClient rpc = new PulseXmlRpcClient(config.getPulseUrl());
+            PulseXmlRpcClient rpc = new PulseXmlRpcClient(config.getPulseUrl(), config.getProxyHost(), config.getProxyPort());
 
             checkVersion(rpc);
 
@@ -306,9 +307,17 @@ public class PersonalBuildClient extends PersonalBuildSupport
     public long sendRequest(PatchArchive patch) throws PersonalBuildException
     {
         HttpClient client = new HttpClient();
-
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getPulseUser(), getPassword());
-        client.getState().setCredentials(new AuthScope(null, -1), credentials);
+        final AuthScope authScope = new AuthScope(null, -1);
+
+        String proxyHost = config.getProxyHost();
+        if (TextUtils.stringSet(proxyHost))
+        {
+            client.getHostConfiguration().setProxy(proxyHost, config.getProxyPort());
+            client.getState().setProxyCredentials(authScope, credentials);
+        }
+
+        client.getState().setCredentials(authScope, credentials);
         client.getParams().setAuthenticationPreemptive(true);
 
         PostMethod post = new PostMethod(config.getPulseUrl() + "/personal/personalBuild.action");
