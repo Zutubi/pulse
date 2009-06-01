@@ -63,7 +63,7 @@ public class SeleniumTestBase extends PulseTestCase
         urls = Urls.getBaselessInstance();
         random = getName() + "-" + RandomUtils.randomString(10);
 
-        String browser = SeleniumUtils.getSeleniumBrowserProperty();
+        String browser = "*firefox";//SeleniumUtils.getSeleniumBrowserProperty();
         
         selenium = new DefaultSelenium("localhost", 4446, browser, "http://localhost:" + port + "/");
         selenium.start();
