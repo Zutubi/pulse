@@ -157,7 +157,7 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     public Monitor getUpgradeMonitor()
     {
-        return runner.getMonitor();
+        return runner == null ? null : runner.getMonitor();
     }
 
     private class DelegateJobListener implements JobListener

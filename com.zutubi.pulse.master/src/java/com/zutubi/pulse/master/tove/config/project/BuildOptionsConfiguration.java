@@ -9,7 +9,7 @@ import com.zutubi.validation.annotations.Numeric;
  * Generic build options that don't warrant their own category.
  */
 @SymbolicName("zutubi.buildOptionsConfig")
-@Form(fieldOrder = {"isolateChangelists", "prompt", "retainWorkingCopy", "timeout"})
+@Form(fieldOrder = {"isolateChangelists", "prompt", "retainWorkingCopy", "timeout", "autoClearResponsibility"})
 public class BuildOptionsConfiguration extends AbstractConfiguration
 {
     public static final int TIMEOUT_NEVER = 0;
@@ -19,6 +19,7 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     @Numeric(min = 0)
     private int timeout = TIMEOUT_NEVER;
     private boolean prompt = false;
+    private boolean autoClearResponsibility = true;
 
     public boolean getIsolateChangelists()
     {
@@ -58,5 +59,15 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     public void setPrompt(boolean b)
     {
         this.prompt = b;
+    }
+
+    public boolean isAutoClearResponsibility()
+    {
+        return autoClearResponsibility;
+    }
+
+    public void setAutoClearResponsibility(boolean autoClearResponsibility)
+    {
+        this.autoClearResponsibility = autoClearResponsibility;
     }
 }
