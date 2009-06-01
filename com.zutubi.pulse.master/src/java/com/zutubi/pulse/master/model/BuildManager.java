@@ -176,6 +176,13 @@ public interface BuildManager
     @SecureParameter(action = AccessManager.ACTION_WRITE)
     void deleteAllBuilds(User user);
 
+    /**
+     * Delete the specified build result along with any persisted artifacts from the
+     * build.  This is equivalent to calling {@link #cleanup(BuildResult, BuildCleanupOptions)}
+     * with all of the cleanup options set to true.
+     *
+     * @param result    the build result to be deleted.
+     */
     @SecureParameter(action = AccessManager.ACTION_WRITE)
     void delete(BuildResult result);
 
@@ -197,7 +204,15 @@ public interface BuildManager
 
     Boolean canDecorateArtifact(long artifactId);
 
+    /**
+     * This method allows a build result to be cleaned up.  The details of exactly which
+     * portions of a build result are to be cleaned up is defined within the options parameter.
+     *
+     * @param result    the build result to be cleaned up.
+     * @param options   the options detailing exactly what is to be cleaned up.
+     *
+     * @see #delete(BuildResult)
+     */
     @SecureParameter(parameterType = BuildResult.class, action = AccessManager.ACTION_WRITE)
-
-    void process(BuildResult result, BuildCleanupOptions options);
+    void cleanup(BuildResult result, BuildCleanupOptions options);
 }

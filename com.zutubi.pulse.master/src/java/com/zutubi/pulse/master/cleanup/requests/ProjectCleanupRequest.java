@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.BuildCleanupOptions;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.core.dependency.DependencyManager;
 
 import java.util.LinkedList;
@@ -32,11 +33,11 @@ public class ProjectCleanupRequest extends EntityCleanupRequest
         this.project = project;
     }
 
-    public void process()
+    public void run()
     {
         ProjectConfiguration projectConfig = project.getConfig();
         @SuppressWarnings({"unchecked"})
-        Map<String, CleanupConfiguration> cleanupConfigs = (Map<String, CleanupConfiguration>) projectConfig.getExtensions().get("cleanup");
+        Map<String, CleanupConfiguration> cleanupConfigs = (Map<String, CleanupConfiguration>) projectConfig.getExtensions().get(MasterConfigurationRegistry.EXTENSION_PROJECT_CLEANUP);
 
         if (cleanupConfigs != null)
         {
@@ -49,18 +50,36 @@ public class ProjectCleanupRequest extends EntityCleanupRequest
 
                 for (BuildResult build : oldBuilds)
                 {
-                    if (rule.getWhat() == CleanupWhat.WORKING_DIRECTORIES_ONLY)
+                    BuildCleanupOptions options = new BuildCleanupOptions();
+                    if (rule.isCleanupAll())
                     {
-                        buildManager.process(build, BuildCleanupOptions.WORKD_DIR_ONLY);
-                    }
-                    else if (rule.getWhat() == CleanupWhat.BUILD_ARTIFACTS)
-                    {
-                        buildManager.process(build, BuildCleanupOptions.EXCEPT_DATABASE);
+                        options.setCleanBuildArtifacts(true);
+                        options.setCleanWorkDir(true);
+                        options.setCleanDatabase(true);
+                        options.setCleanRepositoryArtifacts(true);
                     }
                     else
                     {
-                        buildManager.process(build, BuildCleanupOptions.ALL);
+                        if (rule.getWhat() != null)
+                        {
+                            if (rule.getWhat().contains(CleanupWhat.WORKING_DIRECTORIES_ONLY))
+                            {
+                                options.setCleanWorkDir(true);
+                            }
+
+                            if (rule.getWhat().contains(CleanupWhat.BUILD_ARTIFACTS))
+                            {
+                                options.setCleanBuildArtifacts(true);
+                            }
+
+                            if (rule.getWhat().contains(CleanupWhat.REPOSITORY_ARTIFACTS))
+                            {
+                                options.setCleanRepositoryArtifacts(true);
+                            }
+                        }
                     }
+
+                    buildManager.cleanup(build, options);
                 }
             }
         }

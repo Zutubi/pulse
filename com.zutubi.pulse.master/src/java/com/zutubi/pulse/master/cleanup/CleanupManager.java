@@ -18,7 +18,7 @@ public class CleanupManager implements Stoppable
 
     private PulseThreadFactory threadFactory;
 
-    private LinkedBlockingQueue<CleanupRequest> queue = new LinkedBlockingQueue<CleanupRequest>();
+    private LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 
     private Thread cleanupThread;
     private boolean running;
@@ -39,8 +39,8 @@ public class CleanupManager implements Stoppable
                             return;
                         }
 
-                        CleanupRequest request = queue.take();
-                        request.process();
+                        Runnable request = queue.take();
+                        request.run();
                     }
                     catch (InterruptedException e)
                     {
@@ -77,11 +77,11 @@ public class CleanupManager implements Stoppable
      * Process the list of cleanup requests.
      *
      * @param requests  a list of cleanup requests.
-     * @see #process(CleanupRequest)
+     * @see #process(Runnable)
      */
-    public void process(List<CleanupRequest> requests)
+    public void process(List<Runnable> requests)
     {
-        for (CleanupRequest request : requests)
+        for (Runnable request : requests)
         {
             process(request);
         }
@@ -95,7 +95,7 @@ public class CleanupManager implements Stoppable
      * @return true if the request has been accepted for processing, false
      * if a similar request already exists and hence this one was not accepted.
      */
-    public boolean process(CleanupRequest request)
+    public boolean process(Runnable request)
     {
         if (!queue.contains(request))
         {

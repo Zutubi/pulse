@@ -2,6 +2,8 @@ package com.zutubi.validation.validators;
 
 import com.zutubi.validation.ValidationException;
 
+import java.util.Collection;
+
 /**
  * Used to ensure a field has a non-empty value.
  */
@@ -33,6 +35,15 @@ public class RequiredValidator extends FieldValidatorSupport
         {
             String str = ((String)fieldValue);
             if (str.length() == 0)
+            {
+                return false;
+            }
+        }
+
+        if (fieldValue instanceof Collection)
+        {
+            Collection c = (Collection) fieldValue;
+            if (c.size() == 0)
             {
                 return false;
             }

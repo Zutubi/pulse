@@ -215,7 +215,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 // Default cleanup rule to blow away working copy snapshots
                 CleanupConfiguration cleanupConfiguration = new CleanupConfiguration();
                 cleanupConfiguration.setName("default");
-                cleanupConfiguration.setWhat(CleanupWhat.WORKING_DIRECTORIES_ONLY);
+                cleanupConfiguration.setWhat(Arrays.asList(CleanupWhat.WORKING_DIRECTORIES_ONLY));
                 cleanupConfiguration.setRetain(10);
                 cleanupConfiguration.setUnit(CleanupUnit.BUILDS);
                 Map<String, CleanupConfiguration> cleanupMap = new HashMap<String, CleanupConfiguration>();

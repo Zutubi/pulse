@@ -76,7 +76,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public BuildResult findPreviousBuildResult(final BuildResult result)
     {
-        return (BuildResult)getHibernateTemplate().execute(new HibernateCallback()
+        return (BuildResult) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -154,12 +154,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             }
         });
 
-        if (results.size() > 1)
+        if(results.size() > 1)
         {
             LOG.warning("findByProjectNameAndNumber has returned " + results.size() +
                     " results when expecting at most one.");
         }
-        if (results.size() > 0)
+        if(results.size() > 0)
         {
             return (BuildResult) results.get(0);
         }
@@ -182,12 +182,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             }
         });
 
-        if (results.size() > 1)
+        if(results.size() > 1)
         {
             LOG.warning("findByUserAndNumber has returned " + results.size() +
                     " results when expecting at most one.");
         }
-        if (results.size() > 0)
+        if(results.size() > 0)
         {
             return (BuildResult) results.get(0);
         }
@@ -256,6 +256,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final long earliestStartTime, final long latestStartTime, final Boolean hasWorkDir, final int first, final int max, final boolean mostRecentFirst)
     {
+        return queryBuilds(projects, states, null, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
+    }
+
+    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final String[] statuses, final long earliestStartTime, final long latestStartTime, final Boolean hasWorkDir, final int first, final int max, final boolean mostRecentFirst)
+    {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
@@ -264,6 +269,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 criteria.add(Expression.isNull("user"));
                 addProjectsToCriteria(projects, criteria);
                 addStatesToCriteria(states, criteria);
+                addStatusesToCriteria(statuses, criteria);
                 addDatesToCriteria(earliestStartTime, latestStartTime, criteria);
 
                 if(hasWorkDir != null)
@@ -297,7 +303,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List<BuildResult> queryBuilds(final Project project, final ResultState[] states, final long lowestNumber, final long highestNumber, final int first, final int max, final boolean mostRecentFirst, boolean initialise)
     {
-        List<BuildResult> results =  (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        List<BuildResult> results = (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -332,7 +338,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
         if(initialise)
         {
-            for(BuildResult result: results)
+            for(BuildResult result : results)
             {
                 intialise(result);
             }
@@ -386,7 +392,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 {
                     criteria.setMaxResults(max);
                 }
-                
+
                 criteria.addOrder(Order.desc("number"));
 
                 return criteria.list();
@@ -409,13 +415,13 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> getOldestCompletedBuilds(final User user, final int limit)
+    public List<BuildResult> getOldestCompletedBuilds(final User user, final int offset)
     {
         int count = getCompletedResultCount(user);
-        if(count > limit)
+        if(count > offset)
         {
-            final int max = count - limit;
-            
+            final int max = count - offset;
+
             return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
             {
                 public Object doInHibernate(Session session) throws HibernateException
@@ -442,7 +448,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         if(total > limit)
         {
             // Clean out the difference
-            return queryBuilds(new Project[] { project }, states, 0, 0, hasWorkDir, 0, total - limit, false);
+            return queryBuilds(new Project[]{project}, states, 0, 0, hasWorkDir, 0, total - limit, false);
         }
 
         return Collections.emptyList();
@@ -505,7 +511,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             for(CommandResult command: recipe.getCommandResults())
             {
                 Hibernate.initialize(command.getFeatures());
-                for(StoredArtifact artifact: command.getArtifacts())
+                for(StoredArtifact artifact : command.getArtifacts())
                 {
                     Hibernate.initialize(artifact.getChildren());
                 }
@@ -521,7 +527,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             criteria.add(Expression.isNull("user"));
         }
 
-        if (project != null)
+        if(project != null)
         {
             criteria.add(Expression.eq("project", project));
         }
@@ -542,16 +548,24 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     private void addStatesToCriteria(ResultState[] states, Criteria criteria)
     {
-        if (states != null)
+        if(states != null)
         {
             criteria.add(Expression.in("stateName", getStateNames(states)));
+        }
+    }
+
+    private void addStatusesToCriteria(String[] statuses, Criteria criteria)
+    {
+        if(statuses != null)
+        {
+            criteria.add(Expression.in("status", statuses));
         }
     }
 
     private String[] getStateNames(ResultState[] states)
     {
         String[] stateNames = new String[states.length];
-        for (int i = 0; i < states.length; i++)
+        for(int i = 0; i < states.length; i++)
         {
             stateNames[i] = states[i].toString();
         }

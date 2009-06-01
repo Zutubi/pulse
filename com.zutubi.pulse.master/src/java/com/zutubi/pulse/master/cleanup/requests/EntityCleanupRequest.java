@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.cleanup.requests;
 
-import com.zutubi.pulse.master.cleanup.CleanupRequest;
 import com.zutubi.pulse.core.model.Entity;
 
 /**
@@ -8,7 +7,7 @@ import com.zutubi.pulse.core.model.Entity;
  * hashCode methods such that requests for the same entity are considered the
  * same. 
  */
-public abstract class EntityCleanupRequest implements CleanupRequest
+public abstract class EntityCleanupRequest implements Runnable
 {
     private Entity entity;
 

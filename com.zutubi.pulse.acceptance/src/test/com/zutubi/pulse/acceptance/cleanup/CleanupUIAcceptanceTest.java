@@ -1,9 +1,9 @@
-package com.zutubi.pulse.acceptance;
+package com.zutubi.pulse.acceptance.cleanup;
 
 import com.zutubi.pulse.acceptance.forms.admin.CleanupForm;
 import com.zutubi.pulse.acceptance.pages.admin.CleanupRulesPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
-import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
+import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
@@ -42,9 +42,9 @@ public class CleanupUIAcceptanceTest extends SeleniumTestBase
         CleanupForm cleanup = new CleanupForm(selenium);
         cleanup.waitFor();
         assertEquals("default", cleanup.getFieldValue("name"));
-        assertEquals("working directories only", cleanup.getFieldValue("what"));
+        assertEquals("WORKING_DIRECTORIES_ONLY", cleanup.getFieldValue("what"));
         assertEquals("10", cleanup.getFieldValue("retain"));
-        assertEquals("builds", cleanup.getFieldValue("unit"));
+        assertEquals("BUILDS", cleanup.getFieldValue("unit"));
     }
 
     public void testCreateNewCleanupRule()
@@ -61,7 +61,7 @@ public class CleanupUIAcceptanceTest extends SeleniumTestBase
 
         CleanupForm cleanup = new CleanupForm(selenium);
         cleanup.waitFor();
-        cleanup.finishNamedFormElements(asPair("name", "new rule"), asPair("retain", "1"), asPair("what", CleanupWhat.WHOLE_BUILDS.toString()));
+        cleanup.finishNamedFormElements(asPair("name", "new rule"), asPair("retain", "1"), asPair("cleanupAll", "true"));
 
         cleanupRulesPage.goTo();
         cleanupRulesPage.waitFor();

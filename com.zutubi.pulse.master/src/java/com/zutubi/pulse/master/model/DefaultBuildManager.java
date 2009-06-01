@@ -375,9 +375,17 @@ public class DefaultBuildManager implements BuildManager
         do
         {
             results = buildResultDao.findOldestByProject(project, null, 100, true);
+
+            // the build artifacts and working directory have already been cleaned up
+            // via the earlier scheduled cleanup of the projectDir.
+
+            BuildCleanupOptions options = new BuildCleanupOptions();
+            options.setCleanDatabase(true);
+            options.setCleanRepositoryArtifacts(true);
+
             for (BuildResult build : results)
             {
-                process(build, BuildCleanupOptions.DATABASE_ONLY);
+                cleanup(build, options);
             }
         }
         while (results.size() > 0);
@@ -389,16 +397,29 @@ public class DefaultBuildManager implements BuildManager
         File userDir = paths.getUserDir(user.getId());
         scheduleCleanup(userDir);
 
+        // the build artifacts have already been cleaned up via the earlier
+        // scheduled cleanup of the user directory.
+
+        BuildCleanupOptions options = new BuildCleanupOptions();
+        options.setCleanDatabase(true);
+        options.setCleanRepositoryArtifacts(true);
+
         List<BuildResult> builds = buildResultDao.findByUser(user);
         for (BuildResult build : builds)
         {
-            process(build, BuildCleanupOptions.DATABASE_ONLY);
+            cleanup(build, options);
         }
     }
 
     public void delete(BuildResult result)
     {
-        process(result, BuildCleanupOptions.ALL);
+        BuildCleanupOptions options = new BuildCleanupOptions();
+        options.setCleanDatabase(true);
+        options.setCleanRepositoryArtifacts(true);
+        options.setCleanWorkDir(true);
+        options.setCleanBuildArtifacts(true);
+
+        cleanup(result, options);
     }
 
     public List<BuildResult> abortUnfinishedBuilds(Project project, String message)
@@ -494,27 +515,11 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatestSuccessful();
     }
 
-    public void process(BuildResult build, BuildCleanupOptions request)
+    public void cleanup(BuildResult build, BuildCleanupOptions options)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
 
-        if (request.isCleanBuildDir())
-        {
-            File buildDir = paths.getBuildDir(build);
-            if (buildDir.exists())
-            {
-                scheduleCleanup(buildDir);
-            }
-        }
-
-        if (request.isCleanWorkDir())
-        {
-            build.setHasWorkDir(false);
-            buildResultDao.save(build);
-            cleanupWorkForNodes(paths, build, build.getRoot().getChildren());
-        }
-
-        if (request.isCleanDatabase())
+        if (options.isCleanDatabase()) // then we are cleaning up everything in the build directory.
         {
             if (build.isPersonal())
             {
@@ -523,18 +528,27 @@ public class DefaultBuildManager implements BuildManager
             }
             else
             {
-                // Remove records of this build from changelists
-                Revision revision = build.getRevision();
-                if (revision != null)
-                {
-                    List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId());
-                    for (PersistentChangelist change : changelists)
-                    {
-                        changelistDao.delete(change);
-                    }
-                }
+                cleanupBuildDirectory(build);
+            }
+        }
+        else // we are only cleaning up portions of the build directory. 
+        {
+            if (options.isCleanBuildArtifacts())
+            {
+                cleanupBuildArtifacts(build);
             }
 
+            if (options.isCleanWorkDir() && build.getHasWorkDir())
+            {
+                build.setHasWorkDir(false);
+                buildResultDao.save(build);
+
+                cleanupWorkDirectories(build);
+            }
+        }
+
+        if (options.isCleanRepositoryArtifacts())
+        {
             try
             {
                 // clean artifact repository artifacts for this build.
@@ -547,7 +561,23 @@ public class DefaultBuildManager implements BuildManager
             {
                 LOG.warning(e);
             }
+        }
 
+        if (options.isCleanDatabase())
+        {
+            if (!build.isPersonal())
+            {
+                // Remove records of this build from changelists
+                Revision revision = build.getRevision();
+                if (revision != null)
+                {
+                    List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId());
+                    for (PersistentChangelist change : changelists)
+                    {
+                        changelistDao.delete(change);
+                    }
+                }
+            }
             buildResultDao.delete(build);
         }
     }
@@ -607,22 +637,84 @@ public class DefaultBuildManager implements BuildManager
         }));
     }
 
-    private void cleanupWorkForNodes(MasterBuildPaths paths, BuildResult build, List<RecipeResultNode> nodes)
+    /**
+     * A simple callback interface used to aid the recipe cleanup process.  Implementations
+     * of this interface will clean up specific portions of a recipe.
+     */
+    private interface RecipeCleanup
+    {
+        /**
+         * Cleanup the specified recipe
+         *
+         * @param recipe    the recipe to be cleaned.
+         */
+        void cleanup(RecipeResult recipe);
+    }
+
+    /**
+     * Recurse over the list of nodes and there children, executing the recipe clean for each
+     * of the nodes.
+     *
+     * @param nodes     list of nodes to be traversed.
+     * @param cleanup   the cleanup process to be applied to each recipe result.
+     */
+    private void runCleanupForNodes(List<RecipeResultNode> nodes, RecipeCleanup cleanup)
     {
         for (RecipeResultNode node : nodes)
         {
-            File workDir = paths.getBaseDir(build, node.getResult().getId());
-            if (workDir.exists())
-            {
-                scheduleCleanup(workDir);
-            }
-            cleanupWorkForNodes(paths, build, node.getChildren());
+            cleanup.cleanup(node.getResult());
+            runCleanupForNodes(node.getChildren(), cleanup);
         }
+    }
+
+    /**
+     * Cleanup the work directories from each of the nodes.  That is, cleanup the 'base' directory
+     * from each of the built recipes.
+     * 
+     * @param build     the build for which all of the work directory snapshots will be cleaned.
+     */
+    private void cleanupWorkDirectories(final BuildResult build)
+    {
+        final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        runCleanupForNodes(build.getRoot().getChildren(), new RecipeCleanup()
+        {
+            public void cleanup(RecipeResult recipe)
+            {
+                scheduleCleanup(paths.getBaseDir(build, recipe.getId()));
+            }
+        });
+    }
+
+    /**
+     * Cleanup the output and features directories from each of the nodes.
+     *
+     * @param build     the build for which all of the artifact directories will be cleaned.
+     */
+    private void cleanupBuildArtifacts(final BuildResult build)
+    {
+        final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        runCleanupForNodes(build.getRoot().getChildren(), new RecipeCleanup()
+        {
+            public void cleanup(RecipeResult recipe)
+            {
+                scheduleCleanup(paths.getOutputDir(build, recipe.getId()));
+                scheduleCleanup(paths.getRecipeDir(build, recipe.getId()));
+            }
+        });
+    }
+
+    private void cleanupBuildDirectory(final BuildResult build)
+    {
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        scheduleCleanup(paths.getBuildDir(build));
     }
 
     private void scheduleCleanup(File dir)
     {
-        fileDeletionService.delete(dir);
+        if (dir != null && dir.exists())
+        {
+            fileDeletionService.delete(dir);
+        }
     }
 
     public void setChangelistDao(ChangelistDao changelistDao)

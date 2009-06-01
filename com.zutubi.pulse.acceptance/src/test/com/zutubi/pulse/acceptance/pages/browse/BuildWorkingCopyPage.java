@@ -29,4 +29,13 @@ public class BuildWorkingCopyPage extends SeleniumPage
     {
         return selenium.isElementPresent("wc.not.present");
     }
+
+    /**
+     * Test whether a working copy is present on the build working copy page.
+     * @return true if working copy details are available, false otherwise.
+     */
+    public boolean isWorkingCopyPresent()
+    {
+        return !isWorkingCopyNotPresent();
+    }
 }

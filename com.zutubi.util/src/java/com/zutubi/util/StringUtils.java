@@ -37,7 +37,7 @@ public class StringUtils
     }
 
     /**
-     * Equivalent to calling {@link #trimmedString(String, int, String)} with
+     * Equivalent to calling {@link #trimmedString(CharSequence, int, String)} with
      * the given string and length and a trim message of "...".
      *
      * @param s      the string to trim
@@ -45,7 +45,7 @@ public class StringUtils
      * @return the given string, trimmed if necessary
      * @throws IllegalArgumentException if length is negative
      */
-    public static String trimmedString(String s, int length)
+    public static String trimmedString(CharSequence s, int length)
     {
         return trimmedString(s, length, "...");
     }
@@ -64,7 +64,7 @@ public class StringUtils
      * @return the given string, trimmed if necessary
      * @throws IllegalArgumentException if length is negative
      */
-    public static String trimmedString(String s, int length, String trimMessage)
+    public static String trimmedString(CharSequence s, int length, String trimMessage)
     {
         if(length < 0)
         {
@@ -76,7 +76,7 @@ public class StringUtils
             int trimMessageLength = trimMessage.length();
             if (length >= trimMessageLength)
             {
-                return s.substring(0, length - trimMessageLength) + trimMessage;
+                return s.subSequence(0, length - trimMessageLength) + trimMessage;
             }
             else
             {
@@ -84,7 +84,7 @@ public class StringUtils
             }
         }
 
-        return s;
+        return s.toString();
     }
 
     public static String wrapString(String s, int lineLength, String prefix)

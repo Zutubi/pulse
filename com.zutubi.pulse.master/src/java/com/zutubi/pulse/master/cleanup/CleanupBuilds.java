@@ -22,16 +22,13 @@ public class CleanupBuilds implements Task
 
     public void execute(TaskExecutionContext context)
     {
-        List<CleanupRequest> requests = new LinkedList<CleanupRequest>();
+        List<Runnable> requests = new LinkedList<Runnable>();
         List<Project> projects = projectManager.getProjects(false);
         for (Project project : projects)
         {
             requests.add(createRequest(project));
         }
-        if (requests.size() > 0)
-        {
-            cleanupManager.process(requests);
-        }
+        cleanupManager.process(requests);
     }
 
     private ProjectCleanupRequest createRequest(Project project)

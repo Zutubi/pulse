@@ -25,12 +25,18 @@ public class UserCleanupRequest extends EntityCleanupRequest
         this.user = user;
     }
 
-    public void process()
+    public void run()
     {
         List<BuildResult> builds = buildResultDao.getOldestCompletedBuilds(user, user.getPreferences().getMyBuildsCount());
         for(BuildResult build: builds)
         {
-            buildManager.process(build, BuildCleanupOptions.ALL);
+            BuildCleanupOptions options = new BuildCleanupOptions();
+            options.setCleanBuildArtifacts(true);
+            options.setCleanRepositoryArtifacts(true);
+            options.setCleanDatabase(true);
+            options.setCleanWorkDir(true);
+            
+            buildManager.cleanup(build, options);
         }
     }
 

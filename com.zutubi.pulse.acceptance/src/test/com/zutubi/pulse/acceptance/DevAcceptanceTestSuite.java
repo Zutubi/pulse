@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.dependencies.DependenciesTestSuite;
+import com.zutubi.pulse.acceptance.cleanup.CleanupAcceptanceTest;
+import com.zutubi.pulse.acceptance.cleanup.CleanupUIAcceptanceTest;
 import junit.framework.TestSuite;
 
 public class DevAcceptanceTestSuite
@@ -52,6 +54,9 @@ public class DevAcceptanceTestSuite
 
         //--( 2.1: dependency tests)--
         suite.addTest(DependenciesTestSuite.suite());
+
+        suite.addTestSuite(CleanupAcceptanceTest.class);
+        suite.addTestSuite(CleanupUIAcceptanceTest.class);
 
         return suite;
     }

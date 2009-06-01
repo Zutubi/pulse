@@ -25,13 +25,58 @@ public class BuildArtifactsPage extends SeleniumPage
         return urls.buildArtifacts(projectName, Long.toString(buildId));
     }
 
+    /**
+     * Generate the xpath locator for the named command node on the build artifacts page.
+     *
+     * @param command   name of the command in question.
+     * @return the xpath locator for the command node
+     */
     public String getCommandLocator(String command)
     {
         return "link=*command*::*" + command + "*";
     }
 
-    public String getArtifactLocator(String artifactName)
+    /**
+     * Generate the xpath locator for a named artifact node on the build artifacts page.
+     *
+     * @param artifact  name of the artifact in question
+     *
+     * @return  the xpath locator for the artifact node.
+     */
+    public String getArtifactLocator(String artifact)
     {
-        return "link=" + artifactName;
+        return "link=" + artifact;
+    }
+
+    /**
+     * Indicates whether or not an artifact of the given name exists in this
+     * build.  Note, this does not imply that the artifact is available for
+     * download.
+     *
+     * @param artifactName  name of the artifact being tested.
+     * @return  true if the artifact exists, false otherwise.
+     *
+     * @see #isArtifactAvailable(String)
+     */
+    public boolean isArtifactExists(String artifactName)
+    {
+        return selenium.isElementPresent(getArtifactLocator(artifactName));
+    }
+
+    /**
+     * Indicates whether or not an artifact of the given name exists and was captured
+     * / is available for download.
+     *
+     * @param artifactName  name of the artifact being tested.
+     * @return  true if the artifact is available, false otherwise.
+     */
+    public boolean isArtifactAvailable(String artifactName)
+    {
+        // look up the icon, if it is the artifact broken icon, then the artifact is
+        // not available.  Is there a better way to test this via the UI?.
+        String id = selenium.getAttribute(getArtifactLocator(artifactName) + "@id");
+        int nodeNumber = Integer.valueOf(id.substring(11));
+        String clazz = selenium.getAttribute("id=ygtvfile" + nodeNumber + "@class");
+        return !clazz.equals("treeview_broken");
     }
 }

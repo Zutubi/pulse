@@ -26,6 +26,7 @@ public class BackgroundServiceSupport implements Stoppable
     private String serviceName;
 
     private ThreadFactory threadFactory;
+    private int maxThreadPoolSize;
 
     /**
      * Creates a new service with the given descriptive name.
@@ -35,7 +36,13 @@ public class BackgroundServiceSupport implements Stoppable
      */
     public BackgroundServiceSupport(String serviceName)
     {
+        this(serviceName, Integer.MAX_VALUE);
+    }
+
+    public BackgroundServiceSupport(String serviceName, int maxThreadPoolSize)
+    {
         this.serviceName = serviceName;
+        this.maxThreadPoolSize = maxThreadPoolSize;
     }
 
     /**
@@ -46,7 +53,7 @@ public class BackgroundServiceSupport implements Stoppable
     {
         executorService = new ThreadPoolExecutor(
                 0,
-                Integer.MAX_VALUE,
+                maxThreadPoolSize,
                 60L,
                 TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>(),

@@ -20,6 +20,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     void save(CommandResult result);
 
+    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] statuses, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
+
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
 
     List<BuildResult> queryBuildsWithMessages(Project[] projects, Feature.Level level, int max);
@@ -70,11 +72,11 @@ public interface BuildResultDao extends EntityDao<BuildResult>
      * returned by this method.
      *
      * @param user      that triggered the builds.
-     * @param limit     the number of the newest builds to skip from the resulting list.
+     * @param offset     the number of the newest builds to skip from the resulting list.
      *
      * @return a list of old personal build results. 
      */
-    List<BuildResult> getOldestCompletedBuilds(User user, int limit);
+    List<BuildResult> getOldestCompletedBuilds(User user, int offset);
 
     List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit);
 

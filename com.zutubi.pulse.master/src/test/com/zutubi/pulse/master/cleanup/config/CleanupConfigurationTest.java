@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.cleanup.config;
 
+import com.zutubi.pulse.core.dependency.DependencyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.EqualityAssertions;
-import com.zutubi.pulse.core.dependency.DependencyManager;
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.TriggerBuildReason;
@@ -12,7 +12,8 @@ import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.hibernate.MasterPersistenceTestCase;
 import com.zutubi.util.Constants;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.util.Arrays;
 import java.util.List;
@@ -57,20 +58,6 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         );
     }
 
-    protected void tearDown() throws Exception
-    {
-        projectDao = null;
-        buildResultDao = null;
-        p1 = null;
-        p2 = null;
-        b1 = null;
-        b2 = null;
-        b3 = null;
-        b4 = null;
-        dependencyManager = null;
-        super.tearDown();
-    }
-
     public void testWorkAfterBuilds()
     {
         CleanupConfiguration workBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_DIRECTORIES_ONLY, null, 2, CleanupUnit.BUILDS);
@@ -80,7 +67,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
 
     public void testAllAfterBuilds()
     {
-        CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, null, 2, CleanupUnit.BUILDS);
+        CleanupConfiguration allBuildsRule = new CleanupConfiguration(null, null, 2, CleanupUnit.BUILDS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b2, b3), results);
     }
@@ -94,28 +81,28 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
 
     public void testAllAfterDays()
     {
-        CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, null, 2, CleanupUnit.DAYS);
+        CleanupConfiguration allBuildsRule = new CleanupConfiguration(null, null, 2, CleanupUnit.DAYS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b2, b3, b4), results);
     }
 
     public void testStatesBuilds()
     {
-        CleanupConfiguration rule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.BUILDS);
+        CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.BUILDS);
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b3), results);
     }
 
     public void testStatesDays()
     {
-        CleanupConfiguration rule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
+        CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);
     }
 
     public void testSingleStatus()
     {
-        CleanupConfiguration rule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
+        CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
         rule.setStatuses(Arrays.asList(IvyManager.STATUS_INTEGRATION));
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b3), results);
@@ -123,7 +110,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
 
     public void testMultipleStatuses()
     {
-        CleanupConfiguration rule = new CleanupConfiguration(CleanupWhat.WHOLE_BUILDS, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
+        CleanupConfiguration rule = new CleanupConfiguration(null, Arrays.asList(ResultState.SUCCESS), 1, CleanupUnit.DAYS);
         rule.setStatuses(Arrays.asList(IvyManager.STATUS_INTEGRATION, IvyManager.STATUS_MILESTONE));
         List<BuildResult> results = rule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b1, b3, b4), results);

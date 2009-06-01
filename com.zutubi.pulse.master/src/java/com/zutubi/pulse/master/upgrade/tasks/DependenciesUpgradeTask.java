@@ -25,8 +25,8 @@ public class DependenciesUpgradeTask extends AbstractUpgradeTask
 
     private static final String DEPENDENCY_TRIGGER_NAME = "dependency trigger";
 
-    private static final String TYPE_DEPENDENCIES_CONFIGURATION = "";
-    private static final String TYPE_DEPENDENCY_TRIGGER = "";
+    private static final String TYPE_DEPENDENCIES_CONFIGURATION = "zutubi.dependenciesConfiguration";
+    private static final String TYPE_DEPENDENCY_TRIGGER = "zutubi.dependentBuildTriggerConfig";
 
     private RecordManager recordManager;
 

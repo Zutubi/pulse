@@ -71,12 +71,12 @@ public class CleanupSchedulerTest extends PulseTestCase
         callback.setProjectManager(projectManager);
 
         callback.execute(null);
-        verify(cleanupManager, times(0)).process(anyList());
+        verify(cleanupManager, times(1)).process(new LinkedList<Runnable>());
 
         Project projectA = createProject(1, "projectA");
         Project projectB = createProject(1, "projectA");
         callback.execute(null);
-        verify(cleanupManager, times(1)).process(Arrays.<CleanupRequest>asList(new ProjectCleanupRequest(projectA), new ProjectCleanupRequest(projectB)));
+        verify(cleanupManager, times(1)).process(Arrays.<Runnable>asList(new ProjectCleanupRequest(projectA), new ProjectCleanupRequest(projectB)));
     }
 
     private User createUser(int id, String name)

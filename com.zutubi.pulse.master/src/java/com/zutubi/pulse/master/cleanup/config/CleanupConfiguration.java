@@ -1,39 +1,40 @@
 package com.zutubi.pulse.master.cleanup.config;
 
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.dependency.DependencyManager;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.Constants;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.TextUtils;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Arrays;
 
 /**
- * The cleanup configuration defines the details for what and when a projects
- * build is cleaned up.
+ * The cleanup configuration defines how builds are cleaned up for a project.  This includes
+ * both when cleanup occurs, and what parts of the builds are cleaned up.
  */
 @SymbolicName("zutubi.cleanupConfig")
-@Form(fieldOrder = {"name", "what", "retain", "unit", "states", "statuses"})
+@Form(fieldOrder = {"name", "cleanupAll", "what", "retain", "unit", "states", "statuses"})
 @Table(columns = {"name", "what", "after", "states"})
 public class CleanupConfiguration extends AbstractNamedConfiguration
 {
+    @ControllingCheckbox(dependentFields = {"what"}, invert = true)
+    private boolean cleanupAll = true;
+
     @Required
     @Format("CleanupWhatColumnFormatter")
-    private CleanupWhat what;
+    private List<CleanupWhat> what;
 
-    @Numeric(min = 1)
-    private int retain = Integer.MIN_VALUE;
+    @Numeric(min = 0)
+    private int retain;
 
-    @Required
+    @Select(optionProvider = "com.zutubi.pulse.master.cleanup.config.CleanupUnitOptionProvider")
     private CleanupUnit unit;
 
     @Select(optionProvider = "com.zutubi.pulse.master.tove.CompletedResultStateOptionProvider")
@@ -45,7 +46,8 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
 
     public CleanupConfiguration(CleanupWhat what, List<ResultState> states, int count, CleanupUnit unit)
     {
-        this.what = what;
+        this.what = Arrays.asList(what);
+        this.cleanupAll = (this.what == null); 
         this.states = states;
         this.retain = count;
         this.unit = unit;
@@ -55,12 +57,12 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
     {
     }
 
-    public CleanupWhat getWhat()
+    public List<CleanupWhat> getWhat()
     {
         return what;
     }
 
-    public void setWhat(CleanupWhat what)
+    public void setWhat(List<CleanupWhat> what)
     {
         this.what = what;
     }
@@ -105,10 +107,20 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
         this.unit = unit;
     }
 
+    public boolean isCleanupAll()
+    {
+        return cleanupAll;
+    }
+
+    public void setCleanupAll(boolean cleanupAll)
+    {
+        this.cleanupAll = cleanupAll;
+    }
+
     public List<BuildResult> getMatchingResults(Project project, BuildResultDao dao, DependencyManager dependencyManager)
     {
         Boolean hasWorkDir = null;
-        if(what == CleanupWhat.WORKING_DIRECTORIES_ONLY)
+        if(what != null && what.size() == 1 && what.contains(CleanupWhat.WORKING_DIRECTORIES_ONLY))
         {
             hasWorkDir = true;
         }
@@ -123,14 +135,14 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
             allowedStates = ResultState.getCompletedStates();
         }
 
-        final List<String> allowedStatuses = new LinkedList<String>();
+        String[] allowedStatuses = null;
         if (statuses != null)
         {
-            allowedStatuses.addAll(statuses);
+            allowedStatuses = statuses.toArray(new String[statuses.size()]);
         }
-        if (allowedStatuses.size() == 0)
+        if (allowedStatuses == null || allowedStatuses.length == 0)
         {
-            allowedStatuses.addAll(dependencyManager.getStatuses());
+            allowedStatuses = dependencyManager.getStatuses().toArray(new String[dependencyManager.getStatuses().size()]);
         }
 
         List<BuildResult> results = new LinkedList<BuildResult>();
@@ -143,26 +155,14 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
             if(total > retain)
             {
                 // Clean out the difference
-                results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, 0, 0, hasWorkDir, 0, total - retain, false));
+                results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, 0, hasWorkDir, 0, total - retain, false));
             }
         }
         else
         {
             long startTime = System.currentTimeMillis() - retain * Constants.DAY;
-            results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, 0, startTime, hasWorkDir, -1, -1, false));
+            results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, startTime, hasWorkDir, -1, -1, false));
         }
-
-        return CollectionUtils.filter(results, new Predicate<BuildResult>()
-        {
-            public boolean satisfied(BuildResult buildResult)
-            {
-                String status = buildResult.getStatus();
-                if (!TextUtils.stringSet(status))
-                {
-                    status = "integration";
-                }
-                return allowedStatuses.contains(status);
-            }
-        });
+        return results;
     }
 }

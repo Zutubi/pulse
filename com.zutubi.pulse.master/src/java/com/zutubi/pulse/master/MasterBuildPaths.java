@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
@@ -12,7 +13,6 @@ import java.io.File;
  *
  *  PROJECTS_ROOT/ -
  *      \-- (project-id)
- *          \--  repo
  *          \--  builds/
  *              \-- (build number)
  *                  \-- (recipe number)
@@ -47,11 +47,6 @@ public class MasterBuildPaths
     public File getUserDir(long userId)
     {
         return new File(userRoot, Long.toString(userId));
-    }
-
-    public File getRepoDir(Project project)
-    {
-        return new File(getProjectDir(project), "repo");
     }
 
     public File getBuildsDir(long userId)
@@ -97,6 +92,11 @@ public class MasterBuildPaths
     public File getBaseDir(BuildResult result, long recipeId)
     {
         return new File(getRecipeDir(result, recipeId), "base");
+    }
+
+    public File getFeaturesDir(BuildResult result, long recipeId)
+    {
+        return FeaturePersister.getFeaturesDirectory(getRecipeDir(result, recipeId));
     }
 
     public File getUserPatchDir(long userId)

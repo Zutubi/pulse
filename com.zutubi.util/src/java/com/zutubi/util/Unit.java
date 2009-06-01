@@ -6,40 +6,40 @@ package com.zutubi.util;
 public enum Unit
 {
     DAY
-            {
-                public long toMilliseconds()
-                {
-                    return Constants.DAY;
-                }
-            },
+    {
+        public long toMilliseconds()
+        {
+            return Constants.DAY;
+        }
+    },
     HOUR
-            {
-                public long toMilliseconds()
-                {
-                    return Constants.HOUR;
-                }
-            },
+    {
+        public long toMilliseconds()
+        {
+            return Constants.HOUR;
+        }
+    },
     MINUTE
-            {
-                public long toMilliseconds()
-                {
-                    return Constants.MINUTE;
-                }
-            },
+    {
+        public long toMilliseconds()
+        {
+            return Constants.MINUTE;
+        }
+    },
     SECOND
-            {
-                public long toMilliseconds()
-                {
-                    return Constants.SECOND;
-                }
-            },
+    {
+        public long toMilliseconds()
+        {
+            return Constants.SECOND;
+        }
+    },
     MILLISECOND
-            {
-                public long toMilliseconds()
-                {
-                    return Constants.MILLISECOND;
-                }
-            };
+    {
+        public long toMilliseconds()
+        {
+            return Constants.MILLISECOND;
+        }
+    };
 
     /**
      * @return the number of milliseconds that this unit of time represents.
@@ -63,8 +63,8 @@ public enum Unit
      * getUnit(key, null)
      * </code></blockquote>
      *
-     * @param key   the system property name
-     * @return  the interpreted Unit value, or null.
+     * @param key the system property name
+     * @return the interpreted Unit value, or null.
      */
     public static Unit getUnit(String key)
     {
@@ -83,10 +83,10 @@ public enum Unit
      * have the correct format, then the default value is returned.
      * <p/>
      *
-     * @param key           the system property name
-     * @param defaultUnit   the value returned if no value can be
-     * interpreted from the given key.
-     * @return  the interpreted Unit value, or the default value.
+     * @param key         the system property name
+     * @param defaultUnit the value returned if no value can be
+     *                    interpreted from the given key.
+     * @return the interpreted Unit value, or the default value.
      */
     public static Unit getUnit(String key, Unit defaultUnit)
     {
@@ -95,18 +95,17 @@ public enum Unit
 
     /**
      * Parse the given string value, returning the equivalent unit object.
-     * <p>
+     * <p/>
      * Valid values are those that are a case insensitive match to the Unit
      * enumerations string representations.
      *
+     * @param str string to be parsed.
+     * @return a Unit object equivalent to the string.
      * @see #MILLISECOND
      * @see #MINUTE
      * @see #SECOND
      * @see #HOUR
      * @see #DAY
-     *
-     * @param str     string to be parsed.
-     * @return  a Unit object equivalent to the string.
      */
     public static Unit parse(String str)
     {
@@ -119,20 +118,19 @@ public enum Unit
 
     /**
      * Parse the given string value, returning the equivalent unit object.
-     * <p>
+     * <p/>
      * If the string value for some reason can not be interpreted into a Unit
      * object, the specified default value will be returned.
      *
+     * @param str         string to be parsed.
+     * @param defaultUnit the value returned if the str value can not be
+     *                    interpreted into a Unit value.
+     * @return a Unit object equivalent to the string.
      * @see #MILLISECOND
      * @see #MINUTE
      * @see #SECOND
      * @see #HOUR
      * @see #DAY
-     *
-     * @param str               string to be parsed.
-     * @param defaultUnit       the value returned if the str value can not be
-     * interpreted into a Unit value.
-     * @return  a Unit object equivalent to the string.
      */
     public static Unit parse(String str, Unit defaultUnit)
     {

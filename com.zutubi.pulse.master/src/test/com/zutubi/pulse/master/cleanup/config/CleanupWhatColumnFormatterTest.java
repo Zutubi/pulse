@@ -16,6 +16,5 @@ public class CleanupWhatColumnFormatterTest extends PulseTestCase
     public void testFormatting()
     {
         assertEquals("build artifacts", formatter.format(CleanupWhat.BUILD_ARTIFACTS));
-        assertEquals("whole builds", formatter.format(CleanupWhat.WHOLE_BUILDS));
     }
 }

@@ -24,26 +24,21 @@ public class ProjectCleanupRequestTest extends PulseTestCase
         buildManager = mock(BuildManager.class);
     }
 
-    public void testWhatToOptionMappings()
-    {
-        assertWhatToOptionsMapping(CleanupWhat.BUILD_ARTIFACTS, BuildCleanupOptions.EXCEPT_DATABASE);
-        assertWhatToOptionsMapping(CleanupWhat.WHOLE_BUILDS, BuildCleanupOptions.ALL);
-        assertWhatToOptionsMapping(CleanupWhat.WORKING_DIRECTORIES_ONLY, BuildCleanupOptions.WORKD_DIR_ONLY);
-    }
-
     public void testMultipleMatchingBuilds()
     {
         Project project = createProject("project");
         BuildResult resultA = createResult(project, 1);
         BuildResult resultB = createResult(project, 2);
-        addCleanupRule(project, "a", CleanupWhat.WHOLE_BUILDS, resultA, resultB);
+        addCleanupRule(project, "a", null, resultA, resultB);
 
         ProjectCleanupRequest request = new ProjectCleanupRequest(project);
         request.setBuildManager(buildManager);
-        request.process();
+        request.run();
 
-        verify(buildManager, times(1)).process(resultA, BuildCleanupOptions.ALL);
-        verify(buildManager, times(1)).process(resultB, BuildCleanupOptions.ALL);
+        BuildCleanupOptions options = new BuildCleanupOptions(true, true, true, true);
+
+        verify(buildManager, times(1)).cleanup(resultA, options);
+        verify(buildManager, times(1)).cleanup(resultB, options);
     }
 
     public void testMultipleCleanupRules()
@@ -55,23 +50,10 @@ public class ProjectCleanupRequestTest extends PulseTestCase
 
         ProjectCleanupRequest request = new ProjectCleanupRequest(project);
         request.setBuildManager(buildManager);
-        request.process();
+        request.run();
 
-        verify(buildManager, times(1)).process(resultA, BuildCleanupOptions.WORKD_DIR_ONLY);
-        verify(buildManager, times(1)).process(resultA, BuildCleanupOptions.EXCEPT_DATABASE);
-    }
-
-    private void assertWhatToOptionsMapping(CleanupWhat what, BuildCleanupOptions options)
-    {
-        Project project = createProject("project");
-        BuildResult result = createResult(project, 1);
-        addCleanupRule(project, "a", what, result);
-
-        ProjectCleanupRequest request = new ProjectCleanupRequest(project);
-        request.setBuildManager(buildManager);
-        request.process();
-
-        verify(buildManager, times(1)).process(result, options);
+        verify(buildManager, times(1)).cleanup(resultA, new BuildCleanupOptions(true, false, false, false));
+        verify(buildManager, times(1)).cleanup(resultA, new BuildCleanupOptions(false, true, false, false));
     }
 
     private void addCleanupRule(Project project, String name, CleanupWhat what, BuildResult... results)
@@ -84,7 +66,15 @@ public class ProjectCleanupRequestTest extends PulseTestCase
         HashMap<String, CleanupConfiguration> cleanups = (HashMap<String, CleanupConfiguration>) config.getExtensions().get("cleanup");
 
         CleanupConfiguration cleanupConfig = mock(CleanupConfiguration.class);
-        stub(cleanupConfig.getWhat()).toReturn(what);
+        if (what != null)
+        {
+            stub(cleanupConfig.getWhat()).toReturn(Arrays.asList(what));
+            stub(cleanupConfig.isCleanupAll()).toReturn(false);
+        }
+        else
+        {
+            stub(cleanupConfig.isCleanupAll()).toReturn(true);
+        }
         stub(cleanupConfig.getName()).toReturn(name);
         stub(cleanupConfig.getMatchingResults((Project)anyObject(), (BuildResultDao)anyObject(), (DependencyManager)anyObject())).toReturn(Arrays.asList(results));
         cleanups.put(name, cleanupConfig);

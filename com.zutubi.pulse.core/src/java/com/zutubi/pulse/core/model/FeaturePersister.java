@@ -37,15 +37,20 @@ public class FeaturePersister
         XMLUtils.writeDocument(featuresFile, doc);
     }
 
-    private File getFeaturesFile(CommandResult result, File recipeDir)
+    private File getFeaturesFile(CommandResult result, File recipeDir) throws IOException
     {
-        File featuresDir = new File(recipeDir, "features");
-        if(!featuresDir.exists())
+        File featuresDir = getFeaturesDirectory(recipeDir);
+        if(!featuresDir.exists() && !featuresDir.mkdirs())
         {
-            featuresDir.mkdir();
+            throw new IOException("Failed to create new directory: '" + featuresDir.getAbsolutePath() + "'");
         }
 
         return new File(featuresDir, result.getCommandName() + ".xml");
+    }
+
+    public static File getFeaturesDirectory(File recipeDir)
+    {
+        return new File(recipeDir, "features");
     }
 
     private void addArtifacts(Element root, CommandResult result)

@@ -302,7 +302,7 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void process(BuildResult result, BuildCleanupOptions options)
+    public void cleanup(BuildResult result, BuildCleanupOptions options)
     {
         throw new RuntimeException("Method not implemented.");
     }

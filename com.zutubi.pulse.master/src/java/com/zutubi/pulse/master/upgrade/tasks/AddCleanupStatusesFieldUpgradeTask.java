@@ -22,7 +22,7 @@ public class AddCleanupStatusesFieldUpgradeTask extends AbstractRecordProperties
 
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_STATUSES, ""));
+        return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_STATUSES, new String[0]));
     }
 
     public boolean haltOnFailure()
