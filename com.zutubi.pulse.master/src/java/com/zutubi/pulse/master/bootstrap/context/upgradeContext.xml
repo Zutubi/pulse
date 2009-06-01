@@ -58,6 +58,7 @@
                 <ref local="gitInactivityTimeout"/>
                 <ref local="agentPriority"/>
                 <ref local="gitTrackSelectedBranch"/>
+                <ref local="autoClearResponsibility"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -215,5 +216,9 @@
 
     <bean id="gitTrackSelectedBranch" class="com.zutubi.pulse.master.upgrade.tasks.GitTrackSelectedBranchUpgradeTask">
         <property name="buildNumber" value="200029004"/>
+    </bean>
+
+    <bean id="autoClearResponsibility" class="com.zutubi.pulse.master.upgrade.tasks.AutoClearResponsibilityUpgradeTask">
+        <property name="buildNumber" value="200030001"/>
     </bean>
 </beans>

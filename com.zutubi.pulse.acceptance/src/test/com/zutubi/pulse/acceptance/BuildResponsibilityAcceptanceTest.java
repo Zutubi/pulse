@@ -3,6 +3,10 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.type.record.PathUtils;
+
+import java.net.URL;
+import java.util.Hashtable;
 
 /**
  * Acceptance tests for taking/clearing responsibility for a build.
@@ -27,7 +31,13 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.ensureUser(TEST_USER);
         ensureBuild(TEST_PROJECT);
         xmlRpcHelper.clearResponsibility(TEST_PROJECT);
+    }
+
+    @Override
+    protected void tearDown() throws Exception
+    {
         xmlRpcHelper.logout();
+        super.tearDown();
     }
 
     public void testTakeResponsibility()
@@ -77,7 +87,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
     public void testClearResponsibility() throws Exception
     {
-        takeResponsibility();
+        takeResponsibility(TEST_PROJECT);
 
         login(TEST_USER, "");
 
@@ -90,7 +100,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         assertNobodyResponsible(homePage);
 
         // Clear on the build summary tab
-        takeResponsibility();
+        takeResponsibility(TEST_PROJECT);
 
         BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, TEST_PROJECT, 1);
         summaryPage.goTo();
@@ -100,7 +110,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         selenium.waitForPageToLoad(LOAD_TIMEOUT);
         assertNobodyResponsible(summaryPage);
 
-        takeResponsibility();
+        takeResponsibility(TEST_PROJECT);
 
         // Clear on the dashboard
         DashboardPage dashboardPage = new DashboardPage(selenium, urls);
@@ -113,9 +123,9 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
     public void testOtherUserResponsible() throws Exception
     {
-        takeResponsibility();
+        takeResponsibility(TEST_PROJECT);
 
-        insertUser(random);     
+        xmlRpcHelper.insertTrivialUser(random);
         login(random, "");
 
         ProjectHomePage homePage = new ProjectHomePage(selenium, urls, TEST_PROJECT);
@@ -136,19 +146,6 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         assertFalse(dashboardPage.hasResponsibilities());
     }
 
-    private void insertUser(String login) throws Exception
-    {
-        xmlRpcHelper.loginAsAdmin();
-        try
-        {
-            xmlRpcHelper.insertTrivialUser(login);
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
-    }
-
     public void testAdminCanClearResponsibility() throws Exception
     {
         adminClearHelper(new ProjectHomePage(selenium, urls, TEST_PROJECT));
@@ -161,7 +158,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
     private void adminClearHelper(ResponsibilityPage page) throws Exception
     {
-        takeResponsibility();
+        takeResponsibility(TEST_PROJECT);
 
         loginAsAdmin();
         page.goTo();
@@ -170,6 +167,55 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         page.clickClearResponsible();
         selenium.waitForPageToLoad(LOAD_TIMEOUT);
         assertNobodyResponsible(page);
+    }
+
+    public void testAutoClearResponsibility() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        takeResponsibility(random);
+
+        login(TEST_USER, "");
+        ProjectHomePage homePage = new ProjectHomePage(selenium, urls, random);
+        homePage.goTo();
+        assertSelfResponsible(homePage);
+
+        // Modify the config so the build fails.
+        String antPath = PathUtils.getPath(projectPath, Constants.Project.TYPE);
+        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        antConfig.put(Constants.Project.AntType.TARGETS, "nosuchtarget");
+        xmlRpcHelper.saveConfig(antPath, antConfig, false);
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        homePage.goTo();
+        assertSelfResponsible(homePage);
+
+        // Fix the build, so responsibility should clear.
+        antConfig.put(Constants.Project.AntType.TARGETS, "");
+        xmlRpcHelper.saveConfig(antPath, antConfig, false);
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        homePage.goTo();
+        assertNobodyResponsible(homePage);
+    }
+
+    public void testAutoClearResponsibilityDisabled() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        takeResponsibility(random);
+
+        String optionsPath = PathUtils.getPath(projectPath, Constants.Project.OPTIONS);
+        Hashtable<String, Object> optionsConfig = xmlRpcHelper.getConfig(optionsPath);
+        optionsConfig.put(Constants.Project.Options.AUTO_CLEAR_RESPONSIBILITY, false);
+        xmlRpcHelper.saveConfig(optionsPath, optionsConfig, false);
+
+        login(TEST_USER, "");
+        ProjectHomePage homePage = new ProjectHomePage(selenium, urls, random);
+        homePage.goTo();
+        assertSelfResponsible(homePage);
+
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        assertSelfResponsible(homePage);
     }
 
     private void assertNobodyResponsible(ResponsibilityPage page)
@@ -193,17 +239,18 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         assertFalse(page.isClearResponsibilityPresent());
     }
 
-    private void takeResponsibility() throws Exception
+    private void takeResponsibility(String project) throws Exception
     {
-        xmlRpcHelper.login(TEST_USER, "");
+        XmlRpcHelper helper = new XmlRpcHelper(new URL(baseUrl + "xmlrpc"));
+        helper.login(TEST_USER, "");
         try
         {
-            xmlRpcHelper.takeResponsibility(TEST_PROJECT, TEST_COMMENT);
+            helper.takeResponsibility(project, TEST_COMMENT);
 
         }
         finally
         {
-            xmlRpcHelper.logout();
+            helper.logout();
         }
     }
 

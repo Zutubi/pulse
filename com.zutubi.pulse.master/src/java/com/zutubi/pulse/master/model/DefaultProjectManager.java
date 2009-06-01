@@ -882,6 +882,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     if (buildResult.succeeded())
                     {
                         project.setSuccessCount(project.getSuccessCount() + 1);
+                        if (project.getConfig().getOptions().isAutoClearResponsibility())
+                        {
+                            clearResponsibility(project);
+                        }
                     }
 
                     projectDao.save(project);

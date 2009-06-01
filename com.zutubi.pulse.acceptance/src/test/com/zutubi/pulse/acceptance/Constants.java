@@ -47,6 +47,7 @@ public class Constants
         public static final String STAGES = "stages";
         public static final String SCM = "scm";
         public static final String TYPE = "type";
+        public static final String OPTIONS = "options";
 
         /**
          * Property names in the ant type class.
@@ -87,6 +88,14 @@ public class Constants
         public static class Stage
         {
             public static final String RECIPE = "recipe";
+        }
+
+        /**
+         * Generic build options.
+         */
+        public class Options
+        {
+            public static final String AUTO_CLEAR_RESPONSIBILITY = "autoClearResponsibility";
         }
     }
 
