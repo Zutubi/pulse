@@ -698,7 +698,7 @@ public class DefaultBuildManager implements BuildManager
             public void cleanup(RecipeResult recipe)
             {
                 scheduleCleanup(paths.getOutputDir(build, recipe.getId()));
-                scheduleCleanup(paths.getRecipeDir(build, recipe.getId()));
+                scheduleCleanup(paths.getFeaturesDir(build, recipe.getId()));
             }
         });
     }

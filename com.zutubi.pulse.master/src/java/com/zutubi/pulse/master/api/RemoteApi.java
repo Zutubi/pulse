@@ -2862,9 +2862,9 @@ public class RemoteApi
 
     private boolean doProjectStateTransition(String token, String projectName, Project.Transition transition)
     {
+        tokenManager.loginUser(token);
         try
         {
-            tokenManager.loginUser(token);
             Project project = internalGetProject(projectName, true);
             return projectManager.makeStateTransition(project.getId(), transition);
         }

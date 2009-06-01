@@ -4,6 +4,8 @@ import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
 
+import java.util.Vector;
+
 /**
  * The set of acceptance tests for the projects cleanup configuration.
  */
@@ -42,15 +44,16 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
         utils.setRetainWorkingCopy(projectName, true);
         utils.addCleanupRule(projectName, "working_directory", CleanupWhat.WORKING_DIRECTORIES_ONLY);
+        utils.deleteCleanupRule(projectName, "default");
 
         xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-        pause(5); // give cleanup a change to trigger asyncrhonously.
+        waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuildWorkingCopy(projectName, 1));
         assertTrue(utils.isBuildPresentViaUI(projectName, 1));
 
         xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-        pause(5); // give cleanup a change to trigger asyncrhonously.
+        waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.isBuildPresentViaUI(projectName, 2));
         assertTrue(utils.hasBuildWorkingCopy(projectName, 2));
@@ -66,31 +69,36 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public void testCleanupBuildArtifacts() throws Exception
     {
-        String name = random;
-        xmlRpcHelper.insertSimpleProject(name, ProjectManager.GLOBAL_PROJECT_NAME, false);
+        String projectName = random;
+        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
-        utils.setRetainWorkingCopy(name, true);
+        utils.setRetainWorkingCopy(projectName, true);
+        utils.addCleanupRule(projectName, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
+        utils.deleteCleanupRule(projectName, "default");
 
-        utils.addCleanupRule(name, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
+        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        waitForCleanupToRunAsynchronously();
 
-        xmlRpcHelper.runBuild(name, BUILD_TIMEOUT);
-        pause(5); // give cleanup a change to trigger asyncrhonously.
+        assertTrue(utils.hasBuildDirectory(projectName, 1));
+        assertTrue(utils.hasBuildWorkingCopy(projectName, 1));
 
-        assertTrue(utils.hasBuildDirectory(name, 1));
+        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        waitForCleanupToRunAsynchronously();
 
-        xmlRpcHelper.runBuild(name, BUILD_TIMEOUT);
-        pause(5); // give cleanup a change to trigger asyncrhonously.
+        assertTrue(utils.hasBuildDirectory(projectName, 2));
 
-        assertTrue(utils.hasBuildDirectory(name, 2));
+        assertTrue(utils.hasBuildDirectory(projectName, 1));
+        assertTrue(utils.hasBuildWorkingCopy(projectName, 1));
+        assertFalse(utils.hasBuildOutputDirectory(projectName, 1));
+        assertFalse(utils.hasBuildFeaturesDirectory(projectName, 1));
 
-        assertTrue(utils.hasBuildDirectory(name, 1));
-        assertTrue(utils.hasBuildWorkingCopy(name, 1));
-        assertFalse(utils.hasBuildOutputDirectory(name, 1));
-        assertFalse(utils.hasBuildFeaturesDirectory(name, 1));
+        assertTrue(utils.isBuildPulseFilePresentViaUI(projectName, 1));
+        assertTrue(utils.isBuildLogsPresentViaUI(projectName, 1));
+        assertFalse(utils.isBuildArtifactsPresentViaUI(projectName, 1));
 
-        assertTrue(utils.isBuildPulseFilePresentViaUI(name, 1));
-        assertTrue(utils.isBuildLogsPresentViaUI(name, 1));
-        assertFalse(utils.isBuildArtifactsPresentViaUI(name, 1));
+        // the remote api returns artifacts based on what is in the database.
+        Vector artifactsInBuild = xmlRpcHelper.getArtifactsInBuild(projectName, 1);
+        assertEquals(3, artifactsInBuild.size());
     }
 
     public void testCleanupAll() throws Exception
@@ -99,30 +107,40 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         utils.setRetainWorkingCopy(projectName, true);
-
         utils.addCleanupRule(projectName, "everything");
+        utils.deleteCleanupRule(projectName, "default");
 
         xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-        pause(5); // give cleanup a change to trigger asyncrhonously.
+        waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuild(projectName, 1));
         assertTrue(utils.isBuildPresentViaUI(projectName, 1));
 
         xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-        pause(5); // give cleanup a change to trigger asyncrhonously.
+        waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuild(projectName, 2));
         assertTrue(utils.isBuildPresentViaUI(projectName, 2));
 
         assertFalse(utils.hasBuild(projectName, 1));
         assertFalse(utils.isBuildPresentViaUI(projectName, 1));
+
+        // Unknown build '1' for project 'testCleanupAll-8KHqy3jjGJ'
+        try
+        {
+            xmlRpcHelper.getArtifactsInBuild(projectName, 1);
+        }
+        catch(Exception e)
+        {
+            assertTrue(e.getMessage().contains("Unknown build '1' for project '"+projectName+"'"));
+        }
     }
 
-    private void pause(int seconds)
+    private void waitForCleanupToRunAsynchronously()
     {
         try
         {
-            Thread.sleep(com.zutubi.util.Constants.SECOND * seconds);
+            Thread.sleep(com.zutubi.util.Constants.SECOND * 5);
         }
         catch (InterruptedException e)
         {

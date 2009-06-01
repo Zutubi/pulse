@@ -42,6 +42,12 @@ public class CleanupTestUtils
         xmlRpcHelper.saveConfig(optionsPath, data, false);
     }
 
+    public void deleteCleanupRule(String projectName, String name) throws Exception
+    {
+        String cleanupPath = "projects/" + projectName + "/cleanup/" + name;
+        xmlRpcHelper.deleteConfig(cleanupPath);
+    }
+
     public void addCleanupRule(String projectName, String name, CleanupWhat... whats) throws Exception
     {
         Hashtable<String, Object> data = xmlRpcHelper.createDefaultConfig(CleanupConfiguration.class);
