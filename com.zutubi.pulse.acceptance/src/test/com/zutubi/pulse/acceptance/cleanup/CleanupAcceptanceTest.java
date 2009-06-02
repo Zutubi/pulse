@@ -1,8 +1,11 @@
 package com.zutubi.pulse.acceptance.cleanup;
 
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.util.Condition;
+import static com.zutubi.util.Constants.SECOND;
 
 import java.util.Vector;
 
@@ -11,7 +14,8 @@ import java.util.Vector;
  */
 public class CleanupAcceptanceTest extends SeleniumTestBase
 {
-    private static final long BUILD_TIMEOUT = 90000;
+    private static final long CLEANUP_TIMEOUT = SECOND * 10;
+    private static final long BUILD_TIMEOUT = SECOND * 9;
 
     private CleanupTestUtils utils;
 
@@ -39,7 +43,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public void testCleanupWorkingDirectories() throws Exception
     {
-        String projectName = random;
+        final String projectName = random;
         xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         utils.setRetainWorkingCopy(projectName, true);
@@ -53,7 +57,13 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         assertTrue(utils.isBuildPresentViaUI(projectName, 1));
 
         xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-        waitForCleanupToRunAsynchronously();
+        waitForCleanupToRunAsynchronously(new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasBuildWorkingCopy(projectName, 1);
+            }
+        });
 
         assertTrue(utils.isBuildPresentViaUI(projectName, 2));
         assertTrue(utils.hasBuildWorkingCopy(projectName, 2));
@@ -69,7 +79,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public void testCleanupBuildArtifacts() throws Exception
     {
-        String projectName = random;
+        final String projectName = random;
         xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         utils.setRetainWorkingCopy(projectName, true);
@@ -83,7 +93,19 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         assertTrue(utils.hasBuildWorkingCopy(projectName, 1));
 
         xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-        waitForCleanupToRunAsynchronously();
+        waitForCleanupToRunAsynchronously(new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasBuildOutputDirectory(projectName, 1);
+            }
+        }, new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasBuildFeaturesDirectory(projectName, 1);
+            }
+        });
 
         assertTrue(utils.hasBuildDirectory(projectName, 2));
 
@@ -103,7 +125,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public void testCleanupAll() throws Exception
     {
-        String projectName = random;
+        final String projectName = random;
         xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         utils.setRetainWorkingCopy(projectName, true);
@@ -117,7 +139,13 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         assertTrue(utils.isBuildPresentViaUI(projectName, 1));
 
         xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-        waitForCleanupToRunAsynchronously();
+        waitForCleanupToRunAsynchronously(new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasBuild(projectName, 1);
+            }
+        });
 
         assertTrue(utils.hasBuild(projectName, 2));
         assertTrue(utils.isBuildPresentViaUI(projectName, 2));
@@ -136,15 +164,44 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         }
     }
 
-    private void waitForCleanupToRunAsynchronously()
+    private void waitForCleanupToRunAsynchronously(Condition... conditions)
     {
-        try
+        if (conditions.length > 0)
         {
-            Thread.sleep(com.zutubi.util.Constants.SECOND * 5);
+            int i = 0;
+            for (Condition c : conditions)
+            {
+                i++;
+                AcceptanceTestUtils.waitForCondition(c, CLEANUP_TIMEOUT, "condition("+i+") to be satisfied.");
+            }
         }
-        catch (InterruptedException e)
+        else
         {
-            // noop.
+            try
+            {
+                Thread.sleep(CLEANUP_TIMEOUT);
+            }
+            catch (InterruptedException e)
+            {
+                // noop.
+            }
         }
+    }
+
+    private abstract class InvertedCondition implements Condition
+    {
+        public boolean satisfied()
+        {
+            try
+            {
+                return !notSatisfied();
+            }
+            catch(Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public abstract boolean notSatisfied() throws Exception;
     }
 }
