@@ -150,9 +150,13 @@ public class DefaultRestoreManager implements RestoreManager
                 backedupArchive = new File(backupRoot, String.format("restored-%s.zip", sdf.format(System.currentTimeMillis())));
                 if(!backedupArchive.exists())
                 {
-                    if(!FileSystemUtils.robustRename(source, backedupArchive))
+                    try
                     {
-                        LOG.severe("Unable to backup restore archive to '" + backedupArchive.getAbsolutePath() + "'");
+                        FileSystemUtils.robustRename(source, backedupArchive);
+                    }
+                    catch (IOException e)
+                    {
+                        LOG.severe("Backing up restore archive: " + e.getMessage(), e);
                     }
                 }
                 else

@@ -140,10 +140,7 @@ public class ArtifactArchive extends AbstractArchiveableComponent implements Fee
             }
 
             File newBuildDir = new File(mappedProjectDir, buildNumber);
-            if (!FileSystemUtils.robustRename(buildDir, newBuildDir))
-            {
-                throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
-            }
+            FileSystemUtils.robustRename(buildDir, newBuildDir);
         }
     }
 

@@ -115,9 +115,13 @@ public class MasterAgentService implements AgentService
         ServerRecipePaths recipePaths = new ServerRecipePaths(project, recipeId, configurationManager.getUserPaths().getData(), incremental);
         File outputDir = recipePaths.getOutputDir();
 
-        if (!FileSystemUtils.rename(outputDir, outputDest, true))
+        try
         {
-            throw new BuildException("Unable to rename output directory '" + outputDir.getAbsolutePath() + "' to '" + outputDest.getAbsolutePath() + "'");
+            FileSystemUtils.rename(outputDir, outputDest, true);
+        }
+        catch (IOException e)
+        {
+            throw new BuildException("Renaming output directory: " + e.getMessage(), e);
         }
 
         if (workDest != null)
@@ -136,9 +140,13 @@ public class MasterAgentService implements AgentService
             }
             else
             {
-                if (!FileSystemUtils.rename(workDir, workDest, true))
+                try
                 {
-                    throw new BuildException("Unable to rename work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "'");
+                    FileSystemUtils.rename(workDir, workDest, true);
+                }
+                catch (IOException e)
+                {
+                    throw new BuildException("Renaming work directory: " + e.getMessage(), e);
                 }
             }
         }

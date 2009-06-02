@@ -197,17 +197,33 @@ public class FileSystemUtils
      *
      * @param src  source file to be renamed
      * @param dest destination to rename the file to
-     * @return true iff the file was successfully renamed
+     * @throws java.io.IOException if the rename fails
      */
-    public static boolean robustRename(File src, final File dest)
+    public static void robustRename(File src, final File dest) throws IOException
     {
-        return robustFn(src, new Predicate<File>()
+        boolean success = robustFn(src, new Predicate<File>()
         {
             public boolean satisfied(File file)
             {
                 return file.renameTo(dest);
             }
         });
+
+        if (!success)
+        {
+            String message = "Unable to rename '" + src.getAbsolutePath() + "' to '" + dest.getAbsolutePath() + "'";
+            if (!src.exists())
+            {
+                message += ": source does not exist";
+            }
+
+            if (dest.exists())
+            {
+                message += ": destination already exists";
+            }
+
+            throw new IOException(message);
+        }
     }
 
     public static void cleanOutputDir(File output) throws IOException
@@ -531,9 +547,9 @@ public class FileSystemUtils
      * @param dest  detination file
      * @param force if true, delete the destination if it already exists
      *              before renaming
-     * @return true if the rename was successful, false otherwise.
+     * @throws java.io.IOException f the rename fails
      */
-    public static boolean rename(File src, File dest, boolean force)
+    public static void rename(File src, File dest, boolean force) throws IOException
     {
         if (force && dest.exists())
         {
@@ -547,7 +563,7 @@ public class FileSystemUtils
             }
         }
 
-        return robustRename(src, dest);
+        robustRename(src, dest);
     }
 
     public static void createFile(File file, String data) throws IOException

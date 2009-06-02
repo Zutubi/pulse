@@ -969,15 +969,64 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         }
     }
 
+    public void testRename() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+
+        FileSystemUtils.rename(src, dest, false);
+
+        assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
+    }
+
+    public void testRenameDirectory() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+        assertTrue(src.mkdir());
+
+        FileSystemUtils.rename(src, dest, false);
+
+        assertTrue(dest.isDirectory());
+    }
+
+    public void testRenameSrcDoesntExist() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+
+        try
+        {
+            FileSystemUtils.rename(src, dest, true);
+            fail("Shouldn't be able to rename non-existant source");
+        }
+        catch (IOException e)
+        {
+            assertTrue(e.getMessage().contains("source does not exist"));
+        }
+    }
+
     public void testRobustRename() throws IOException
     {
         File src = new File(tmpDir, "src");
         File dest = new File(tmpDir, "dest");
         FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
 
-        assertTrue(FileSystemUtils.robustRename(src, dest));
+        FileSystemUtils.robustRename(src, dest);
 
         assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
+    }
+
+    public void testRobustRenameDirectory() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+        assertTrue(src.mkdir());
+
+        FileSystemUtils.robustRename(src, dest);
+
+        assertTrue(dest.isDirectory());
     }
 
     public void testRobustRenameSrcDoesntExist() throws IOException
@@ -985,7 +1034,15 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         File src = new File(tmpDir, "src");
         File dest = new File(tmpDir, "dest");
 
-        assertFalse(FileSystemUtils.robustRename(src, dest));
+        try
+        {
+            FileSystemUtils.robustRename(src, dest);
+            fail("Shouldn't be able to rename non-existant source");
+        }
+        catch (IOException e)
+        {
+            assertTrue(e.getMessage().contains("source does not exist"));
+        }
     }
 
     public void testRobustRenameDestExists() throws IOException
@@ -995,26 +1052,15 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
         assertTrue(dest.mkdir());
 
-        assertFalse(FileSystemUtils.robustRename(src, dest));
-    }
-
-    public void testRename() throws IOException
-    {
-        File src = new File(tmpDir, "src");
-        File dest = new File(tmpDir, "dest");
-        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
-
-        assertTrue(FileSystemUtils.rename(src, dest, false));
-
-        assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
-    }
-
-    public void testRenameSrcDoesntExist() throws IOException
-    {
-        File src = new File(tmpDir, "src");
-        File dest = new File(tmpDir, "dest");
-
-        assertFalse(FileSystemUtils.rename(src, dest, true));
+        try
+        {
+            FileSystemUtils.robustRename(src, dest);
+            fail("Shouldn't be able to rename onto existing dir");
+        }
+        catch (IOException e)
+        {
+            assertTrue(e.getMessage().contains("destination already exists"));
+        }
     }
 
     public void testRobustRenameDestExistsNonForced() throws IOException
@@ -1024,9 +1070,35 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
         assertTrue(dest.mkdir());
 
-        assertFalse(FileSystemUtils.rename(src, dest, false));
+        try
+        {
+            FileSystemUtils.rename(src, dest, false);
+            fail("Shouldn't be able to rename non-forced over existing dir");
+        }
+        catch (IOException e)
+        {
+            assertTrue(e.getMessage().contains("destination already exists"));
+        }
     }
 
+    public void testRobustRenameDirectoryDestExistsNonForced() throws IOException
+    {
+        File src = new File(tmpDir, "src");
+        File dest = new File(tmpDir, "dest");
+        assertTrue(src.mkdir());
+        assertTrue(dest.createNewFile());
+
+        try
+        {
+            FileSystemUtils.rename(src, dest, false);
+            fail("Shouldn't be able to rename non-forced over existing dir");
+        }
+        catch (IOException e)
+        {
+            assertTrue(e.getMessage().contains("destination already exists"));
+        }
+    }
+    
     public void testRobustRenameDestExistsForced() throws IOException
     {
         File src = new File(tmpDir, "src");
@@ -1034,7 +1106,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
         assertTrue(dest.mkdir());
 
-        assertTrue(FileSystemUtils.rename(src, dest, true));
+        FileSystemUtils.rename(src, dest, true);
         assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
     }
 

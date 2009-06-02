@@ -1032,10 +1032,14 @@ public class PluginManager
             IOUtils.close(os);
         }
 
-        if (!FileSystemUtils.rename(tmpFile, downloadedFile, true))
+        try
+        {
+            FileSystemUtils.rename(tmpFile, downloadedFile, true);
+        }
+        catch (IOException e)
         {
             tmpFile.delete();
-            throw new PluginException("Unable to rename plugin temp file '" + tmpFile.getAbsolutePath() + "' to '" + downloadedFile.getAbsolutePath() + "'");
+            throw new PluginException("Renaming plugin temp file: " + e.getMessage(), e);
         }
 
         return downloadedFile;

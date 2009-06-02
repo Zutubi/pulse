@@ -222,11 +222,13 @@ public class BackupManager
                 if (cleanupTarget.exists())
                 {
                     File renamedCleanupTarget = new File(cleanupTarget.getParentFile(), cleanupTarget.getName() + DELETE_FILE_SUFFIX);
-                    if (!FileSystemUtils.robustRename(cleanupTarget, renamedCleanupTarget))
+                    try
                     {
-                        LOG.warning("Failed to rename " + cleanupTarget.getAbsolutePath() + " to " +
-                                renamedCleanupTarget.getAbsolutePath() + ". This is causing a " +
-                                "problem with cleaning up backups.");
+                        FileSystemUtils.robustRename(cleanupTarget, renamedCleanupTarget);
+                    }
+                    catch (IOException e)
+                    {
+                        LOG.warning("Cleaning up backups: " + e.getMessage(), e);
                     }
                 }
             }
