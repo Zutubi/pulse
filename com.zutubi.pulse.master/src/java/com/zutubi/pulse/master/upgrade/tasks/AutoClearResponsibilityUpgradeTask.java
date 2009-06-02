@@ -13,7 +13,7 @@ public class AutoClearResponsibilityUpgradeTask extends AbstractRecordProperties
 
     public boolean haltOnFailure()
     {
-        return false;
+        return true;
     }
 
     protected RecordLocator getRecordLocator()
