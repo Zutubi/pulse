@@ -1,5 +1,11 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
+
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Arrays;
+
 /**
  * A configuration object that allows you to fine tune exactly which portion of
  * a build is cleaned up.
@@ -9,21 +15,24 @@ package com.zutubi.pulse.master.model;
  */
 public class BuildCleanupOptions
 {
-    private boolean cleanWorkDir;
-    private boolean cleanBuildArtifacts;
-    private boolean cleanRepositoryArtifacts;
-    private boolean cleanDatabase;
+    private boolean cleanupAll;
 
-    public BuildCleanupOptions()
+    private List<CleanupWhat> whats = new LinkedList<CleanupWhat>();
+
+    public BuildCleanupOptions(boolean cleanupAll)
     {
+        this.cleanupAll = cleanupAll;
     }
 
-    public BuildCleanupOptions(boolean cleanWorkDir, boolean cleanBuildArtifacts, boolean cleanRepositoryArtifacts, boolean cleanDatabase)
+    public BuildCleanupOptions(CleanupWhat... what)
     {
-        this.cleanWorkDir = cleanWorkDir;
-        this.cleanBuildArtifacts = cleanBuildArtifacts;
-        this.cleanRepositoryArtifacts = cleanRepositoryArtifacts;
-        this.cleanDatabase = cleanDatabase;
+        this(Arrays.asList(what));
+    }
+
+    public BuildCleanupOptions(List<CleanupWhat> what)
+    {
+        this.cleanupAll = false;
+        whats.addAll(what);
     }
 
     /**
@@ -35,12 +44,7 @@ public class BuildCleanupOptions
      */
     public boolean isCleanWorkDir()
     {
-        return cleanWorkDir;
-    }
-
-    public void setCleanWorkDir(boolean cleanWorkDir)
-    {
-        this.cleanWorkDir = cleanWorkDir;
+        return isCleanup(CleanupWhat.WORKING_COPY_SNAPSHOT);
     }
 
     /**
@@ -52,12 +56,7 @@ public class BuildCleanupOptions
      */
     public boolean isCleanBuildArtifacts()
     {
-        return cleanBuildArtifacts;
-    }
-
-    public void setCleanBuildArtifacts(boolean cleanBuildArtifacts)
-    {
-        this.cleanBuildArtifacts = cleanBuildArtifacts;
+        return isCleanup(CleanupWhat.BUILD_ARTIFACTS);
     }
 
     /**
@@ -69,28 +68,17 @@ public class BuildCleanupOptions
      */
     public boolean isCleanRepositoryArtifacts()
     {
-        return cleanRepositoryArtifacts;
+        return isCleanup(CleanupWhat.REPOSITORY_ARTIFACTS);
     }
 
-    public void setCleanRepositoryArtifacts(boolean cleanRepositoryArtifacts)
+    public boolean isCleanup(CleanupWhat what)
     {
-        this.cleanRepositoryArtifacts = cleanRepositoryArtifacts;
+        return this.cleanupAll || whats.contains(what);
     }
 
-    /**
-     * Indicates whether or not the build should be removed from the database.  Once removed
-     * from the database, the build will no longer appear in reports and listings.
-     *
-     * @return true if the build should be removed from the database.
-     */
-    public boolean isCleanDatabase()
+    public boolean isCleanupAll()
     {
-        return cleanDatabase;
-    }
-
-    public void setCleanDatabase(boolean cleanDatabase)
-    {
-        this.cleanDatabase = cleanDatabase;
+        return cleanupAll;
     }
 
     @Override
@@ -99,12 +87,10 @@ public class BuildCleanupOptions
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BuildCleanupOptions that = (BuildCleanupOptions) o;
+        BuildCleanupOptions that = (BuildCleanupOptions)o;
 
-        if (cleanBuildArtifacts != that.cleanBuildArtifacts) return false;
-        if (cleanDatabase != that.cleanDatabase) return false;
-        if (cleanRepositoryArtifacts != that.cleanRepositoryArtifacts) return false;
-        if (cleanWorkDir != that.cleanWorkDir) return false;
+        if (cleanupAll != that.cleanupAll) return false;
+        if (whats != null ? !whats.equals(that.whats) : that.whats != null) return false;
 
         return true;
     }
@@ -112,10 +98,8 @@ public class BuildCleanupOptions
     @Override
     public int hashCode()
     {
-        int result = (cleanWorkDir ? 1 : 0);
-        result = 31 * result + (cleanBuildArtifacts ? 1 : 0);
-        result = 31 * result + (cleanRepositoryArtifacts ? 1 : 0);
-        result = 31 * result + (cleanDatabase ? 1 : 0);
+        int result = (cleanupAll ? 1 : 0);
+        result = 31 * result + (whats != null ? whats.hashCode() : 0);
         return result;
     }
 }

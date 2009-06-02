@@ -14,10 +14,7 @@ public class AddCleanupStatusesFieldUpgradeTask extends AbstractRecordProperties
 
     protected RecordLocator getRecordLocator()
     {
-         return RecordLocators.newTypeFilter(
-                RecordLocators.newPathPattern(PathUtils.getPath("projects", PathUtils.WILDCARD_ANY_ELEMENT, "cleanup", PathUtils.WILDCARD_ANY_ELEMENT)),
-                "zutubi.cleanupConfig"
-        );
+         return RecordLocators.newPathPattern("projects/*/cleanup/*");
     }
 
     protected List<RecordUpgrader> getRecordUpgraders()

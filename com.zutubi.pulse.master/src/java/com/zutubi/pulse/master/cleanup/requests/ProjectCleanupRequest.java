@@ -1,17 +1,15 @@
 package com.zutubi.pulse.master.cleanup.requests;
 
+import com.zutubi.pulse.core.dependency.DependencyManager;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
-import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
+import com.zutubi.pulse.master.model.BuildCleanupOptions;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.BuildCleanupOptions;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.core.dependency.DependencyManager;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,40 +40,22 @@ public class ProjectCleanupRequest extends EntityCleanupRequest
         if (cleanupConfigs != null)
         {
             // if cleanup rules are specified.  Maybe we should always have at least an empty map?
-            List<CleanupConfiguration> rules = new LinkedList<CleanupConfiguration>(cleanupConfigs.values());
-
-            for (CleanupConfiguration rule : rules)
+            for (CleanupConfiguration rule : cleanupConfigs.values())
             {
                 List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao, dependencyManager);
 
                 for (BuildResult build : oldBuilds)
                 {
-                    BuildCleanupOptions options = new BuildCleanupOptions();
+                    BuildCleanupOptions options = new BuildCleanupOptions(false);
                     if (rule.isCleanupAll())
                     {
-                        options.setCleanBuildArtifacts(true);
-                        options.setCleanWorkDir(true);
-                        options.setCleanDatabase(true);
-                        options.setCleanRepositoryArtifacts(true);
+                        options = new BuildCleanupOptions(true);
                     }
                     else
                     {
                         if (rule.getWhat() != null)
                         {
-                            if (rule.getWhat().contains(CleanupWhat.WORKING_DIRECTORIES_ONLY))
-                            {
-                                options.setCleanWorkDir(true);
-                            }
-
-                            if (rule.getWhat().contains(CleanupWhat.BUILD_ARTIFACTS))
-                            {
-                                options.setCleanBuildArtifacts(true);
-                            }
-
-                            if (rule.getWhat().contains(CleanupWhat.REPOSITORY_ARTIFACTS))
-                            {
-                                options.setCleanRepositoryArtifacts(true);
-                            }
+                            options = new BuildCleanupOptions(rule.getWhat());
                         }
                     }
 

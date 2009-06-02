@@ -9,7 +9,7 @@ public enum CleanupWhat
     /**
      * Cleanup the working directories if retained.
      */
-    WORKING_DIRECTORIES_ONLY,
+    WORKING_COPY_SNAPSHOT,
     
     /**
      * Cleanup the build directories and captured artifacts.

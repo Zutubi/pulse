@@ -47,7 +47,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         utils.setRetainWorkingCopy(projectName, true);
-        utils.addCleanupRule(projectName, "working_directory", CleanupWhat.WORKING_DIRECTORIES_ONLY);
+        utils.addCleanupRule(projectName, "working_directory", CleanupWhat.WORKING_COPY_SNAPSHOT);
         utils.deleteCleanupRule(projectName, "default");
 
         xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);

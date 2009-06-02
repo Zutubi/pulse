@@ -39,8 +39,7 @@ public class RequiredValidator extends FieldValidatorSupport
                 return false;
             }
         }
-
-        if (fieldValue instanceof Collection)
+        else if (fieldValue instanceof Collection)
         {
             Collection c = (Collection) fieldValue;
             if (c.size() == 0)

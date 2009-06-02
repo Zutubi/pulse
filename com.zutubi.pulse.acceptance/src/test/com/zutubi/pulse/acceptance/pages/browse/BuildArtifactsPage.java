@@ -26,10 +26,10 @@ public class BuildArtifactsPage extends SeleniumPage
     }
 
     /**
-     * Generate the xpath locator for the named command node on the build artifacts page.
+     * Generate the selenium locator for the named command node on the build artifacts page.
      *
      * @param command   name of the command in question.
-     * @return the xpath locator for the command node
+     * @return the selenium locator for the command node
      */
     public String getCommandLocator(String command)
     {
@@ -37,11 +37,11 @@ public class BuildArtifactsPage extends SeleniumPage
     }
 
     /**
-     * Generate the xpath locator for a named artifact node on the build artifacts page.
+     * Generate the selenium locator for a named artifact node on the build artifacts page.
      *
      * @param artifact  name of the artifact in question
      *
-     * @return  the xpath locator for the artifact node.
+     * @return  the selenium locator for the artifact node.
      */
     public String getArtifactLocator(String artifact)
     {
@@ -58,7 +58,7 @@ public class BuildArtifactsPage extends SeleniumPage
      *
      * @see #isArtifactAvailable(String)
      */
-    public boolean isArtifactExists(String artifactName)
+    public boolean artifactExists(String artifactName)
     {
         return selenium.isElementPresent(getArtifactLocator(artifactName));
     }

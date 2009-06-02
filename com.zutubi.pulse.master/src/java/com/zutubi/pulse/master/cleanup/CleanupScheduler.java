@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scheduling.SimpleTrigger;
@@ -17,6 +18,9 @@ import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.util.Constants;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The cleanup scheduler is responsible for the 'WHEN' of the cleanup processing within
@@ -41,6 +45,7 @@ public class CleanupScheduler implements Stoppable
     private Scheduler scheduler;
     private ObjectFactory objectFactory;
     private CleanupManager cleanupManager;
+    private ProjectManager projectManager;
 
     public void init()
     {
@@ -74,6 +79,27 @@ public class CleanupScheduler implements Stoppable
         eventManager.register(eventListener);
     }
 
+    public void scheduleProjectCleanup()
+    {
+        List<Runnable> requests = new LinkedList<Runnable>();
+        List<Project> projects = projectManager.getProjects(false);
+        for (Project project : projects)
+        {
+            requests.add(createRequest(project));
+        }
+        cleanupManager.process(requests);
+    }
+
+    private ProjectCleanupRequest createRequest(Project project)
+    {
+        return objectFactory.buildBean(ProjectCleanupRequest.class, new Class[]{Project.class}, new Object[]{project});
+    }
+
+    private UserCleanupRequest createRequest(User user)
+    {
+        return objectFactory.buildBean(UserCleanupRequest.class, new Class[]{User.class}, new Object[]{user});
+    }
+
     public void stop(boolean force)
     {
         eventManager.unregister(eventListener);
@@ -99,6 +125,11 @@ public class CleanupScheduler implements Stoppable
         this.objectFactory = objectFactory;
     }
 
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
     /**
      * Listen for build completed events, triggering each completed builds projects
      * cleanup routines.
@@ -118,16 +149,6 @@ public class CleanupScheduler implements Stoppable
             {
                 cleanupManager.process(createRequest(result.getProject()));
             }
-        }
-
-        private ProjectCleanupRequest createRequest(Project project)
-        {
-            return objectFactory.buildBean(ProjectCleanupRequest.class, new Class[]{Project.class}, new Object[]{project});
-        }
-
-        private UserCleanupRequest createRequest(User user)
-        {
-            return objectFactory.buildBean(UserCleanupRequest.class, new Class[]{User.class}, new Object[]{user});
         }
 
         public Class[] getHandledEvents()

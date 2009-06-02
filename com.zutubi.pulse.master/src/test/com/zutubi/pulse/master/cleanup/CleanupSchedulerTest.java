@@ -41,6 +41,7 @@ public class CleanupSchedulerTest extends PulseTestCase
         scheduler.setEventManager(eventManager);
         scheduler.setCleanupManager(cleanupManager);
         scheduler.setObjectFactory(objectFactory);
+        scheduler.setProjectManager(projectManager);
         scheduler.initEventScheduling();
 
         objectFactory.initProperties(this);
@@ -66,9 +67,7 @@ public class CleanupSchedulerTest extends PulseTestCase
     public void testScheduledCallback()
     {
         CleanupBuilds callback = new CleanupBuilds();
-        callback.setObjectFactory(objectFactory);
-        callback.setCleanupManager(cleanupManager);
-        callback.setProjectManager(projectManager);
+        callback.setCleanupScheduler(scheduler);
 
         callback.execute(null);
         verify(cleanupManager, times(1)).process(new LinkedList<Runnable>());
@@ -77,6 +76,24 @@ public class CleanupSchedulerTest extends PulseTestCase
         Project projectB = createProject(1, "projectA");
         callback.execute(null);
         verify(cleanupManager, times(1)).process(Arrays.<Runnable>asList(new ProjectCleanupRequest(projectA), new ProjectCleanupRequest(projectB)));
+    }
+
+    public void testScheduleProjectCleanupNoProjects()
+    {
+        stub(projectManager.getProjects(false)).toReturn(new LinkedList<Project>());
+        scheduler.scheduleProjectCleanup();
+
+        verify(cleanupManager, times(1)).process(new LinkedList<Runnable>());
+    }
+
+    public void testScheduleProjectCleanupSomeProjects()
+    {
+        Project projectA = createProject(1, "a");
+        Project projectB = createProject(2, "b");
+        stub(projectManager.getProjects(false)).toReturn(Arrays.asList(projectA, projectB));
+        scheduler.scheduleProjectCleanup();
+
+        verify(cleanupManager, times(1)).process(Arrays.asList((Runnable)new ProjectCleanupRequest(projectA), new ProjectCleanupRequest(projectB)));
     }
 
     private User createUser(int id, String name)

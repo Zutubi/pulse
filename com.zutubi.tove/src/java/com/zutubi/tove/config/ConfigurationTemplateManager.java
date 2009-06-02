@@ -1373,7 +1373,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 // Type check of incoming record.
                 if (!existingRecord.getSymbolicName().equals(record.getSymbolicName()))
                 {
-                    throw new IllegalArgumentException("Saved record has type '" + record.getSymbolicName() + "' which does not match existing type '" + existingRecord.getSymbolicName() + "' at path '"+path+"'");
+                    throw new IllegalArgumentException("Saved record has type '" + record.getSymbolicName() + "' which does not match existing type '" + existingRecord.getSymbolicName() + "' at path '" + path + "'");
                 }
 
                 String newPath = path;

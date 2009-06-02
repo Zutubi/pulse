@@ -47,7 +47,7 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
     public CleanupConfiguration(CleanupWhat what, List<ResultState> states, int count, CleanupUnit unit)
     {
         this.what = Arrays.asList(what);
-        this.cleanupAll = (this.what == null); 
+        this.cleanupAll = (what == null); 
         this.states = states;
         this.retain = count;
         this.unit = unit;
@@ -119,10 +119,14 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
 
     public List<BuildResult> getMatchingResults(Project project, BuildResultDao dao, DependencyManager dependencyManager)
     {
-        Boolean hasWorkDir = null;
-        if(what != null && what.size() == 1 && what.contains(CleanupWhat.WORKING_DIRECTORIES_ONLY))
+        // The build query allows us to filter on builds that have working directories or not.  If
+        // the cleanup rule is only for builds with working directories, we can make use of this filter
+        // to optimise the query.  If things other than the working directories are being cleaned, then
+        // we can not make use of the filter.
+        Boolean filterHasWorkDir = null;
+        if(what != null && what.size() == 1 && what.contains(CleanupWhat.WORKING_COPY_SNAPSHOT))
         {
-            hasWorkDir = true;
+            filterHasWorkDir = true;
         }
 
         ResultState[] allowedStates = null;
@@ -151,17 +155,17 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
             // See if there are too many builds of our states.  We assume here
             // we are called from within the build manager (so these two dao
             // calls are within the same transaction).
-            int total = dao.getBuildCount(project, allowedStates, hasWorkDir);
+            int total = dao.getBuildCount(project, allowedStates, filterHasWorkDir);
             if(total > retain)
             {
                 // Clean out the difference
-                results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, 0, hasWorkDir, 0, total - retain, false));
+                results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, 0, filterHasWorkDir, 0, total - retain, false));
             }
         }
         else
         {
             long startTime = System.currentTimeMillis() - retain * Constants.DAY;
-            results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, startTime, hasWorkDir, -1, -1, false));
+            results.addAll(dao.queryBuilds(new Project[] { project }, allowedStates, allowedStatuses, 0, startTime, filterHasWorkDir, -1, -1, false));
         }
         return results;
     }

@@ -4,10 +4,8 @@ import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 
-/**
- * <class-comment/>
- */
 public class RequiredValidatorTest extends FieldValidatorTestCase
 {
     public RequiredValidatorTest(String testName)
@@ -51,6 +49,18 @@ public class RequiredValidatorTest extends FieldValidatorTestCase
     public void testSomeString() throws ValidationException
     {
         validator.validate(new FieldProvider("asdfasf"));
+        assertFalse(validationAware.hasErrors());
+    }
+
+    public void testEmptyCollection() throws ValidationException
+    {
+        validator.validate(new FieldProvider(Arrays.asList()));
+        assertTrue(validationAware.hasErrors());
+    }
+
+    public void testNonEmptyCollection() throws ValidationException
+    {
+        validator.validate(new FieldProvider(Arrays.asList("blah")));
         assertFalse(validationAware.hasErrors());
     }
 

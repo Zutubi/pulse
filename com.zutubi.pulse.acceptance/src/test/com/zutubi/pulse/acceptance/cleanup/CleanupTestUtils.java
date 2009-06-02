@@ -181,7 +181,8 @@ public class CleanupTestUtils
         selenium.open(page.getUrl());
         try
         {
-            SeleniumUtils.waitForElementId(selenium, page.getId(), 5000);
+            selenium.waitForPageToLoad("5000");
+            SeleniumUtils.waitForElementId(selenium, page.getId());
             return true;
         }
         catch (RuntimeException e)

@@ -35,7 +35,7 @@ public class ProjectCleanupRequestTest extends PulseTestCase
         request.setBuildManager(buildManager);
         request.run();
 
-        BuildCleanupOptions options = new BuildCleanupOptions(true, true, true, true);
+        BuildCleanupOptions options = new BuildCleanupOptions(true);
 
         verify(buildManager, times(1)).cleanup(resultA, options);
         verify(buildManager, times(1)).cleanup(resultB, options);
@@ -46,14 +46,14 @@ public class ProjectCleanupRequestTest extends PulseTestCase
         Project project = createProject("project");
         BuildResult resultA = createResult(project, 1);
         addCleanupRule(project, "a", CleanupWhat.BUILD_ARTIFACTS, resultA);
-        addCleanupRule(project, "b", CleanupWhat.WORKING_DIRECTORIES_ONLY, resultA);
+        addCleanupRule(project, "b", CleanupWhat.WORKING_COPY_SNAPSHOT, resultA);
 
         ProjectCleanupRequest request = new ProjectCleanupRequest(project);
         request.setBuildManager(buildManager);
         request.run();
 
-        verify(buildManager, times(1)).cleanup(resultA, new BuildCleanupOptions(true, false, false, false));
-        verify(buildManager, times(1)).cleanup(resultA, new BuildCleanupOptions(false, true, false, false));
+        verify(buildManager, times(1)).cleanup(resultA, new BuildCleanupOptions(CleanupWhat.BUILD_ARTIFACTS));
+        verify(buildManager, times(1)).cleanup(resultA, new BuildCleanupOptions(CleanupWhat.WORKING_COPY_SNAPSHOT));
     }
 
     private void addCleanupRule(Project project, String name, CleanupWhat what, BuildResult... results)

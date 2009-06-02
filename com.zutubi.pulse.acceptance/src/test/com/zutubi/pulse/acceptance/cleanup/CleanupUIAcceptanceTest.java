@@ -42,7 +42,7 @@ public class CleanupUIAcceptanceTest extends SeleniumTestBase
         CleanupForm cleanup = new CleanupForm(selenium);
         cleanup.waitFor();
         assertEquals("default", cleanup.getFieldValue("name"));
-        assertEquals("WORKING_DIRECTORIES_ONLY", cleanup.getFieldValue("what"));
+        assertEquals("WORKING_COPY_SNAPSHOT", cleanup.getFieldValue("what"));
         assertEquals("10", cleanup.getFieldValue("retain"));
         assertEquals("BUILDS", cleanup.getFieldValue("unit"));
     }

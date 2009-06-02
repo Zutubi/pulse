@@ -154,12 +154,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             }
         });
 
-        if(results.size() > 1)
+        if (results.size() > 1)
         {
             LOG.warning("findByProjectNameAndNumber has returned " + results.size() +
                     " results when expecting at most one.");
         }
-        if(results.size() > 0)
+        if (results.size() > 0)
         {
             return (BuildResult) results.get(0);
         }
@@ -182,12 +182,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             }
         });
 
-        if(results.size() > 1)
+        if (results.size() > 1)
         {
             LOG.warning("findByUserAndNumber has returned " + results.size() +
                     " results when expecting at most one.");
         }
-        if(results.size() > 0)
+        if (results.size() > 0)
         {
             return (BuildResult) results.get(0);
         }
@@ -229,7 +229,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, project, states, false);
-                if(hasWorkDir != null)
+                if (hasWorkDir != null)
                 {
                     criteria.add(Expression.eq("hasWorkDir", hasWorkDir));
                 }
@@ -272,22 +272,22 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 addStatusesToCriteria(statuses, criteria);
                 addDatesToCriteria(earliestStartTime, latestStartTime, criteria);
 
-                if(hasWorkDir != null)
+                if (hasWorkDir != null)
                 {
                     criteria.add(Expression.eq("hasWorkDir", hasWorkDir));
                 }
 
-                if(first >= 0)
+                if (first >= 0)
                 {
                     criteria.setFirstResult(first);
                 }
 
-                if(max >= 0)
+                if (max >= 0)
                 {
                     criteria.setMaxResults(max);
                 }
 
-                if(mostRecentFirst)
+                if (mostRecentFirst)
                 {
                     criteria.addOrder(Order.desc("id"));
                 }
@@ -313,17 +313,17 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 addStatesToCriteria(states, criteria);
                 addNumbersToCriteria(lowestNumber, highestNumber, criteria);
 
-                if(first >= 0)
+                if (first >= 0)
                 {
                     criteria.setFirstResult(first);
                 }
 
-                if(max >= 0)
+                if (max >= 0)
                 {
                     criteria.setMaxResults(max);
                 }
 
-                if(mostRecentFirst)
+                if (mostRecentFirst)
                 {
                     criteria.addOrder(Order.desc("number"));
                 }
@@ -336,9 +336,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             }
         });
 
-        if(initialise)
+        if (initialise)
         {
-            for(BuildResult result : results)
+            for (BuildResult result : results)
             {
                 intialise(result);
             }
@@ -358,7 +358,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 addProjectsToCriteria(projects, criteria);
                 criteria.add(Expression.gt(level.toString().toLowerCase() + "FeatureCount", 0));
 
-                if(max >= 0)
+                if (max >= 0)
                 {
                     criteria.setMaxResults(max);
                 }
@@ -388,7 +388,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                     criteria.add(Expression.in("stateName", getStateNames(states)));
                 }
 
-                if(max > 0)
+                if (max > 0)
                 {
                     criteria.setMaxResults(max);
                 }
@@ -418,7 +418,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     public List<BuildResult> getOldestCompletedBuilds(final User user, final int offset)
     {
         int count = getCompletedResultCount(user);
-        if(count > offset)
+        if (count > offset)
         {
             final int max = count - offset;
 
@@ -429,7 +429,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                     Query queryObject = session.createQuery("from BuildResult model where model.user = :user and model.stateName in (:stateNames) order by model.number asc");
                     queryObject.setEntity("user", user);
                     queryObject.setParameterList("stateNames", getStateNames(ResultState.getCompletedStates()));
-                    if(max > 0)
+                    if (max > 0)
                     {
                         queryObject.setMaxResults(max);
                     }
@@ -445,7 +445,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     public List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit)
     {
         int total = getBuildCount(project, states, hasWorkDir);
-        if(total > limit)
+        if (total > limit)
         {
             // Clean out the difference
             return queryBuilds(new Project[]{project}, states, 0, 0, hasWorkDir, 0, total - limit, false);
@@ -493,25 +493,25 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public BuildResult findLatestSuccessfulByProject(Project project)
     {
-        return (BuildResult)findFirstByNamedQuery("findLatestSuccessfulByProject", "project", project, false);
+        return (BuildResult) findFirstByNamedQuery("findLatestSuccessfulByProject", "project", project, false);
     }
 
     public BuildResult findLatestSuccessful()
     {
-        return (BuildResult)findFirstByNamedQuery("findLatestSuccessful", false);
+        return (BuildResult) findFirstByNamedQuery("findLatestSuccessful", false);
     }
 
     public static void intialise(final BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());
-        for(RecipeResultNode node: result)
+        for (RecipeResultNode node : result)
         {
             RecipeResult recipe = node.getResult();
             Hibernate.initialize(recipe.getFeatures());
-            for(CommandResult command: recipe.getCommandResults())
+            for (CommandResult command : recipe.getCommandResults())
             {
                 Hibernate.initialize(command.getFeatures());
-                for(StoredArtifact artifact : command.getArtifacts())
+                for (StoredArtifact artifact : command.getArtifacts())
                 {
                     Hibernate.initialize(artifact.getChildren());
                 }
@@ -522,12 +522,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     private Criteria getBuildResultCriteria(Session session, Project project, ResultState[] states, boolean includePersonal)
     {
         Criteria criteria = session.createCriteria(BuildResult.class);
-        if(!includePersonal)
+        if (!includePersonal)
         {
             criteria.add(Expression.isNull("user"));
         }
 
-        if(project != null)
+        if (project != null)
         {
             criteria.add(Expression.eq("project", project));
         }
@@ -540,7 +540,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     private void addProjectsToCriteria(Project[] projects, Criteria criteria)
     {
-        if(projects != null)
+        if (projects != null)
         {
             criteria.add(Expression.in("project", projects));
         }
@@ -548,7 +548,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     private void addStatesToCriteria(ResultState[] states, Criteria criteria)
     {
-        if(states != null)
+        if (states != null)
         {
             criteria.add(Expression.in("stateName", getStateNames(states)));
         }
@@ -556,7 +556,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     private void addStatusesToCriteria(String[] statuses, Criteria criteria)
     {
-        if(statuses != null)
+        if (statuses != null)
         {
             criteria.add(Expression.in("status", statuses));
         }
@@ -565,7 +565,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     private String[] getStateNames(ResultState[] states)
     {
         String[] stateNames = new String[states.length];
-        for(int i = 0; i < states.length; i++)
+        for (int i = 0; i < states.length; i++)
         {
             stateNames[i] = states[i].toString();
         }
@@ -574,12 +574,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     private void addDatesToCriteria(long earliestStartTime, long latestStartTime, Criteria criteria)
     {
-        if(earliestStartTime > 0)
+        if (earliestStartTime > 0)
         {
             criteria.add(Expression.ge("stamps.startTime", earliestStartTime));
         }
 
-        if(latestStartTime > 0)
+        if (latestStartTime > 0)
         {
             // CIB-446: Don't accept timestamps that are uninitialised
             criteria.add(Expression.ge("stamps.startTime", 0L));
@@ -589,12 +589,12 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     private void addNumbersToCriteria(long lowestNumber, long highestNumber, Criteria criteria)
     {
-        if(lowestNumber > 0)
+        if (lowestNumber > 0)
         {
             criteria.add(Expression.ge("number", lowestNumber));
         }
 
-        if(highestNumber > 0)
+        if (highestNumber > 0)
         {
             criteria.add(Expression.le("number", highestNumber));
         }

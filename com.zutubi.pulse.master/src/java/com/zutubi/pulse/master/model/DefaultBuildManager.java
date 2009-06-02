@@ -379,9 +379,7 @@ public class DefaultBuildManager implements BuildManager
             // the build artifacts and working directory have already been cleaned up
             // via the earlier scheduled cleanup of the projectDir.
 
-            BuildCleanupOptions options = new BuildCleanupOptions();
-            options.setCleanDatabase(true);
-            options.setCleanRepositoryArtifacts(true);
+            BuildCleanupOptions options = new BuildCleanupOptions(true);
 
             for (BuildResult build : results)
             {
@@ -400,9 +398,7 @@ public class DefaultBuildManager implements BuildManager
         // the build artifacts have already been cleaned up via the earlier
         // scheduled cleanup of the user directory.
 
-        BuildCleanupOptions options = new BuildCleanupOptions();
-        options.setCleanDatabase(true);
-        options.setCleanRepositoryArtifacts(true);
+        BuildCleanupOptions options = new BuildCleanupOptions(true);
 
         List<BuildResult> builds = buildResultDao.findByUser(user);
         for (BuildResult build : builds)
@@ -413,13 +409,7 @@ public class DefaultBuildManager implements BuildManager
 
     public void delete(BuildResult result)
     {
-        BuildCleanupOptions options = new BuildCleanupOptions();
-        options.setCleanDatabase(true);
-        options.setCleanRepositoryArtifacts(true);
-        options.setCleanWorkDir(true);
-        options.setCleanBuildArtifacts(true);
-
-        cleanup(result, options);
+        cleanup(result, new BuildCleanupOptions(true));
     }
 
     public List<BuildResult> abortUnfinishedBuilds(Project project, String message)
@@ -519,7 +509,7 @@ public class DefaultBuildManager implements BuildManager
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
 
-        if (options.isCleanDatabase()) // then we are cleaning up everything in the build directory.
+        if (options.isCleanupAll()) // then we are cleaning up everything in the build directory.
         {
             if (build.isPersonal())
             {
@@ -563,7 +553,7 @@ public class DefaultBuildManager implements BuildManager
             }
         }
 
-        if (options.isCleanDatabase())
+        if (options.isCleanupAll())
         {
             if (!build.isPersonal())
             {

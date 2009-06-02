@@ -60,7 +60,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
 
     public void testWorkAfterBuilds()
     {
-        CleanupConfiguration workBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_DIRECTORIES_ONLY, null, 2, CleanupUnit.BUILDS);
+        CleanupConfiguration workBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_COPY_SNAPSHOT, null, 2, CleanupUnit.BUILDS);
         List<BuildResult> results = workBuildsRule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b3), results);
     }
@@ -74,7 +74,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
 
     public void testWorkAfterDays()
     {
-        CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_DIRECTORIES_ONLY, null, 2, CleanupUnit.DAYS);
+        CleanupConfiguration allBuildsRule = new CleanupConfiguration(CleanupWhat.WORKING_COPY_SNAPSHOT, null, 2, CleanupUnit.DAYS);
         List<BuildResult> results = allBuildsRule.getMatchingResults(p1, buildResultDao, dependencyManager);
         EqualityAssertions.assertEquals(Arrays.asList(b3, b4), results);
     }
