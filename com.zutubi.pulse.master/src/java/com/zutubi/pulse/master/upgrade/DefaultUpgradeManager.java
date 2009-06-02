@@ -128,7 +128,6 @@ public class DefaultUpgradeManager implements UpgradeManager
         runner.getMonitor().add(job);
         runner.run(job);
 
-
         for (UpgradeTaskGroup group : groups)
         {
             boolean abort = false;
@@ -155,7 +154,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         }
     }
 
-    public Monitor getUpgradeMonitor()
+    public Monitor getMonitor()
     {
         return runner == null ? null : runner.getMonitor();
     }

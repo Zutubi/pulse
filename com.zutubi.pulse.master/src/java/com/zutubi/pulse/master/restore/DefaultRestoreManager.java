@@ -48,7 +48,7 @@ public class DefaultRestoreManager implements RestoreManager
         archiveableComponents = new LinkedList<ArchiveableComponent>(components);
     }
 
-    public Monitor getTaskMonitor()
+    public Monitor getMonitor()
     {
         return jobManager.getMonitor(ARCHIVE_JOB_KEY);
     }

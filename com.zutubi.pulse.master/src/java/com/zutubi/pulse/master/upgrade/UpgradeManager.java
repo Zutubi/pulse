@@ -43,5 +43,5 @@ public interface UpgradeManager
      *
      * @return a progress monitor for the currenly active upgrade, or null if no upgrade is in progress.
      */
-    Monitor getUpgradeMonitor();
+    Monitor getMonitor();
 }

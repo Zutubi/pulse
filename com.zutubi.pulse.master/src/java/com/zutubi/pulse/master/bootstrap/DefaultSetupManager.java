@@ -632,11 +632,7 @@ public class DefaultSetupManager implements SetupManager
     {
         // check for the existance of a PULSE_DATA/restore/archive.zip
         File archive = getArchiveFile();
-        if (archive == null)
-        {
-            return false;
-        }
-        return true;
+        return archive != null;
     }
 
     /**
@@ -722,6 +718,11 @@ public class DefaultSetupManager implements SetupManager
         }
 
         requestRestoreComplete(false);
+    }
+
+    public void doRestorationInProgress()
+    {
+        
     }
 
     public void doCancelRestorationRequest() throws IOException

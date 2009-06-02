@@ -34,15 +34,16 @@ public class ExecuteRestoreAction extends RestoreActionSupport
     
     public Monitor getMonitor()
     {
-        return restoreManager.getTaskMonitor();
+        return restoreManager.getMonitor();
     }
 
     public String execute() throws Exception
     {
         // Ensure that we behave correctly if this action is triggered a second time.
-        Monitor monitor = restoreManager.getTaskMonitor();
+        Monitor monitor = restoreManager.getMonitor();
         if (monitor.isFinished())
         {
+            backedUpArchive = restoreManager.postRestore();
             return SUCCESS;
         }
 
@@ -54,7 +55,6 @@ public class ExecuteRestoreAction extends RestoreActionSupport
         }
 
         backedUpArchive = restoreManager.postRestore();
-
         return SUCCESS;
     }
 }

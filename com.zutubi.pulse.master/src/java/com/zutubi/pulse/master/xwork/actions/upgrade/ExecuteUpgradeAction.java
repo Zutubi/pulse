@@ -12,7 +12,7 @@ public class ExecuteUpgradeAction extends UpgradeActionSupport
 {
     public Monitor getMonitor()
     {
-        return upgradeManager.getUpgradeMonitor();
+        return upgradeManager.getMonitor();
     }
 
     public List<UpgradeTaskGroup> getOrderedTaskGroups()
