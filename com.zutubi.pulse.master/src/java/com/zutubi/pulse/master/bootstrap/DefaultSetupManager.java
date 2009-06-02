@@ -720,11 +720,6 @@ public class DefaultSetupManager implements SetupManager
         requestRestoreComplete(false);
     }
 
-    public void doRestorationInProgress()
-    {
-        
-    }
-
     public void doCancelRestorationRequest() throws IOException
     {
         requestRestoreComplete(false);
@@ -787,7 +782,7 @@ public class DefaultSetupManager implements SetupManager
         this.eventManager = eventManager;
     }
 
-    public void setArchiveManager(RestoreManager restoreManager)
+    public void setRestoreManager(RestoreManager restoreManager)
     {
         this.restoreManager = restoreManager;
     }

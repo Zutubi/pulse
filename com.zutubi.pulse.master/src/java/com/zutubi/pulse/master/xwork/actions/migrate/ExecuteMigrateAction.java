@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.xwork.actions.migrate;
 
 import com.zutubi.pulse.master.util.monitor.Monitor;
+import com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor;
 
 /**
- *
- *
+ * Start the migration process.
  */
 public class ExecuteMigrateAction extends MigrateActionSupport
 {
@@ -21,15 +21,15 @@ public class ExecuteMigrateAction extends MigrateActionSupport
         monitor = migrationManager.getMonitor();
         if (monitor.isFinished())
         {
-            return "success";
+            return SUCCESS;
         }
         if (monitor.isStarted())
         {
-            return "wait";
+            return ExecuteAndWaitInterceptor.WAIT;
         }
 
         migrationManager.runMigration();
 
-        return "success";
+        return SUCCESS;
     }
 }

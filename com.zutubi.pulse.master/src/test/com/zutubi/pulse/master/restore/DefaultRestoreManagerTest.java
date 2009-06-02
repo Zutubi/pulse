@@ -67,7 +67,7 @@ public class DefaultRestoreManagerTest extends PulseTestCase
         TaskFeedback feedback = monitor.getProgress(task);
         assertTrue(feedback.isFinished());
 
-        manager.postRestore();
+        manager.getBackedupArchive();
     }
 
     public void testFailedRestore() throws ArchiveException
@@ -96,7 +96,7 @@ public class DefaultRestoreManagerTest extends PulseTestCase
         assertTrue(monitor.isFinished());
         assertTrue(monitor.isFailed());
 
-        manager.postRestore();
+        manager.getBackedupArchive();
     }
 
     public void testDoesNotRestoreNonExistant() throws ArchiveException

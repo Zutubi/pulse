@@ -4,8 +4,8 @@ import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 
 /**
- *
- *
+ * The post restoration continue action, handles continuing setup once
+ * the restoration process is complete.
  */
 public class PostRestoreAction extends RestoreActionSupport
 {
@@ -21,5 +21,4 @@ public class PostRestoreAction extends RestoreActionSupport
     {
         this.setupManager = setupManager;
     }
-
 }
