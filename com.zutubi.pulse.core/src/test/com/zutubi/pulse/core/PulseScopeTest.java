@@ -573,6 +573,22 @@ public class PulseScopeTest extends PulseTestCase
         assertSame(scope.getParent(), child.getAncestor("parent"));
     }
 
+    // CIB-1976
+    public void testOverridingOfEnvironmentVariables()
+    {
+        String name = "NUMBER_OF_PROCESSORS";
+
+        PulseScope scope = new PulseScope();
+        scope.addEnvironmentProperty(name, "1");
+
+        assertEquals("1", scope.getReferenceValue("env." + name, String.class));
+
+        ResourceProperty prop = new ResourceProperty(name, "3", true, false, false);
+        scope.add(prop);
+
+        assertEquals("3", scope.getReferenceValue("env." + name, String.class));
+    }
+
     private String getValue(String name)
     {
         Reference reference = scope.getReference(name);

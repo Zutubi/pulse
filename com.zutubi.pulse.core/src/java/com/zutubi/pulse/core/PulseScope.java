@@ -164,17 +164,14 @@ public class PulseScope implements Scope
 
         if(name.startsWith("env."))
         {
-            // If we didn't find it via direct-lookup, try dynamic env.*
-            // lookup on the environment.
+            // Lets see if there is a property value that overrides the default environment variable.
+            // This override is the behaviour we see when actually running a Pulse command.
             String envName = name.substring(4);
-            if (result == null)
+            Map<String, String> environment = getEnvironment();
+            String value = environment.get(envName);
+            if(value != null)
             {
-                Map<String, String> environment = getEnvironment();
-                String value = environment.get(envName);
-                if(value != null)
-                {
-                    result = new GenericReference<String>(name, value);
-                }
+                result = new GenericReference<String>(name, value);
             }
 
             // Special case PATH to add the prefix
@@ -217,6 +214,14 @@ public class PulseScope implements Scope
         }
 
         add(reference);
+    }
+
+    public void add(PulseScope other)
+    {
+        for (ReferenceInfo info: other.merge().values())
+        {
+            references.put(info.reference.getName(), info);
+        }
     }
 
     public void add(Reference reference)
