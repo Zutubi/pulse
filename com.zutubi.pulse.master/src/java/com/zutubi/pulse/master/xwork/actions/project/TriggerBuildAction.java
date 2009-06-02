@@ -1,11 +1,9 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.actions.ActionManager;
 
 /**
  * Manually trigger a project build.
@@ -15,19 +13,21 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
  */
 public class TriggerBuildAction extends ProjectActionBase
 {
+    private ActionManager actionManager;
+
     public String execute()
     {
         Project project = getRequiredProject();
-        accessManager.ensurePermission(ProjectConfigurationActions.ACTION_TRIGGER, project);
-
         ProjectConfiguration projectConfig = project.getConfig();
+
+        actionManager.ensurePermission(projectConfig.getConfigurationPath(), ProjectConfigurationActions.ACTION_TRIGGER);
+
         if(projectConfig.getOptions().getPrompt())
         {
             return "prompt";
         }
         
-        TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), ProjectManager.TRIGGER_CATEGORY_MANUAL);
-        getProjectManager().triggerBuild(projectConfig, options, null);
+        actionManager.execute(ProjectConfigurationActions.ACTION_TRIGGER, projectConfig, null);
 
         try
         {
@@ -40,5 +40,10 @@ public class TriggerBuildAction extends ProjectActionBase
         }
 
         return SUCCESS;
+    }
+
+    public void setActionManager(ActionManager actionManager)
+    {
+        this.actionManager = actionManager;
     }
 }

@@ -146,11 +146,13 @@
                 #if($act.action == "trigger")
                             href="$base/triggerBuild.action?projectName=$u_projectName"
                 #elseif($act.action == "takeResponsibility")
-                        href="#" onclick="takeResponsibility('$project.id'); return false"
+                        href="#" onclick="takeResponsibility('$project.id'); return false;"
                 #elseif($act.action == "clearResponsibility")
-                        href="#" onclick="clearResponsibility('$project.id'); return false"
+                        href="#" onclick="clearResponsibility('$project.id'); return false;"
+                #elseif($act.action == "clean")
+                        href="#" onclick="markForClean('$u_projectName'); return false;"
                 #else
-                            href="$urls.projectAction($project, $act.action)"
+                        href="$urls.projectAction($project, $act.action)"
                 #end
                         >$act.label</a>
                     </td>
