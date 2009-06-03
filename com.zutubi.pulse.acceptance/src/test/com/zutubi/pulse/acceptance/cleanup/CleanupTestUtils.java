@@ -2,10 +2,12 @@ package com.zutubi.pulse.acceptance.cleanup;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
+import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Options.RETAIN_WORKING_COPY;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
-import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
@@ -38,7 +40,7 @@ public class CleanupTestUtils
     {
         String optionsPath = "projects/" + projectName + "/options";
         Hashtable<String, Object> data = xmlRpcHelper.getConfig(optionsPath);
-        data.put("retainWorkingCopy", b);
+        data.put(RETAIN_WORKING_COPY, b);
         xmlRpcHelper.saveConfig(optionsPath, data, false);
     }
 
@@ -51,9 +53,9 @@ public class CleanupTestUtils
     public void addCleanupRule(String projectName, String name, CleanupWhat... whats) throws Exception
     {
         Hashtable<String, Object> data = xmlRpcHelper.createDefaultConfig(CleanupConfiguration.class);
-        data.put("name", name);
-        data.put("retain", 1);
-        data.put("unit", CleanupUnit.BUILDS.toString());
+        data.put(NAME, name);
+        data.put(RETAIN, 1);
+        data.put(UNIT, CleanupUnit.BUILDS.toString());
         if (whats != null && whats.length > 0)
         {
             Vector<String> vector = new Vector<String>();
@@ -61,12 +63,12 @@ public class CleanupTestUtils
             {
                 vector.add(w.toString());
             }
-            data.put("what", vector);
-            data.put("cleanupAll", false);
+            data.put(WHAT, vector);
+            data.put(CLEANUP_ALL, false);
         }
         else
         {
-            data.put("cleanupAll", true);
+            data.put(CLEANUP_ALL, true);
         }
 
         String cleanupPath = "projects/" + projectName + "/cleanup";
@@ -80,7 +82,7 @@ public class CleanupTestUtils
 
     public File getBuildDirectory(String projectName, int buildNumber) throws Exception
     {
-        Hashtable<String, Object> projectConfig = xmlRpcHelper.call("getProject", projectName);
+        Hashtable<String, Object> projectConfig = xmlRpcHelper.getProject(projectName);
         long projectId = Long.parseLong((String) projectConfig.get("id"));
 
         File data = AcceptanceTestUtils.getDataDirectory();

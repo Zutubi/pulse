@@ -8,6 +8,7 @@ import com.zutubi.util.Condition;
 import static com.zutubi.util.Constants.SECOND;
 
 import java.util.Vector;
+import java.io.File;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.

@@ -232,6 +232,11 @@ public class XmlRpcHelper
         return call("getAllUserLogins");
     }
 
+    public Hashtable<String, Object> getProject(String name) throws Exception
+    {
+        return call("getProject", name);
+    }
+    
     public int getProjectCount() throws Exception
     {
         return (Integer) call("getProjectCount");

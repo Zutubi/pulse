@@ -143,6 +143,16 @@ public class Constants
         public class Options
         {
             public static final String AUTO_CLEAR_RESPONSIBILITY = "autoClearResponsibility";
+            public static final String RETAIN_WORKING_COPY = "retainWorkingCopy";
+        }
+
+        public class Cleanup
+        {
+            public static final String NAME = "name";
+            public static final String RETAIN = "retain";
+            public static final String UNIT = "unit";
+            public static final String WHAT = "what";
+            public static final String CLEANUP_ALL = "cleanupAll";
         }
     }
 }

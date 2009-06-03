@@ -46,8 +46,16 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
 
     public CleanupConfiguration(CleanupWhat what, List<ResultState> states, int count, CleanupUnit unit)
     {
-        this.what = Arrays.asList(what);
-        this.cleanupAll = (what == null); 
+        this.what = new LinkedList<CleanupWhat>();
+        if (what != null)
+        {
+            this.what.add(what);
+            this.cleanupAll = false;
+        }
+        else
+        {
+            this.cleanupAll = true;
+        }
         this.states = states;
         this.retain = count;
         this.unit = unit;
