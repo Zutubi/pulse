@@ -66,6 +66,7 @@
                 <ref local="addPropagateStatusField"/>
                 <ref local="addCleanupStatusesField"/>
                 <ref local="refactorCleanupWhatField"/>
+                <ref local="addDependenciesVersionField"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -273,8 +274,13 @@
     <bean id="addCleanupStatusesField" class="com.zutubi.pulse.master.upgrade.tasks.AddCleanupStatusesFieldUpgradeTask">
         <property name="buildNumber" value="200999010"/>
     </bean>
+
     <bean id="refactorCleanupWhatField" class="com.zutubi.pulse.master.upgrade.tasks.RefactorCleanupWhatFieldUpgradeTask">
         <property name="buildNumber" value="200999011"/>
+    </bean>
+
+    <bean id="addDependenciesVersionField" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyVersionFieldUpgradeTask">
+        <property name="buildNumber" value="200999012"/>
     </bean>
 
 </beans>

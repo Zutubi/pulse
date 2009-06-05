@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.util.TextUtils;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -21,13 +21,6 @@ public class TriggerOptions
      * The reason the build was triggered.
      */
     private final BuildReason reason;
-
-    /**
-     * The revision to build, or null if the revision is not fixed
-     * (in which case changelist isolation may result in multiple build
-     * requests).
-     */
-    private Revision revision;
 
     /**
      * A freeform source for the trigger, used to identify related
@@ -51,6 +44,11 @@ public class TriggerOptions
      * The dependency status associated with this build request.
      */
     private String status = null;
+
+    /**
+     * The version string to be used for the build request.
+     */
+    private String version;
 
     public TriggerOptions(TriggerOptions other)
     {
@@ -125,6 +123,21 @@ public class TriggerOptions
 
     public boolean hasStatus()
     {
-        return this.status != null;
+        return TextUtils.stringSet(this.status);
+    }
+
+    public String getVersion()
+    {
+        return version;
+    }
+
+    public void setVersion(String version)
+    {
+        this.version = version;
+    }
+
+    public boolean hasVersion()
+    {
+        return TextUtils.stringSet(this.version);
     }
 }

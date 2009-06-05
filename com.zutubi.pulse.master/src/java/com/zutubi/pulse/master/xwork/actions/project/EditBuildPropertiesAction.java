@@ -49,6 +49,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String revision;
     private List<ResourcePropertyConfiguration> properties;
     private String status;
+    private String version;
     private boolean ajax;
     private ConfigurationPanel newPanel;
     private ConfigurationResponse configurationResponse;
@@ -93,6 +94,16 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         this.status = status;
     }
 
+    public String getVersion()
+    {
+        return version;
+    }
+
+    public void setVersion(String version)
+    {
+        this.version = version;
+    }
+
     public void setPath(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
@@ -135,11 +146,9 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         field.setValue(getProjectName());
         form.add(field);
 
-        field = new Field(FieldType.TEXT, "revision");
-        field.setLabel("revision");
-        field.setValue(revision);
-        addLatestAction(field, project, project.getConfig());
-
+        field = new Field(FieldType.TEXT, "version");
+        field.setLabel("version");
+        field.setValue(project.getConfig().getDependencies().getVersion());
         form.add(field);
 
         OptionFieldDescriptor statusFieldDescriptor = new OptionFieldDescriptor();
@@ -149,6 +158,12 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         MutableRecord r = new MutableRecordImpl();
         r.put("status", project.getConfig().getDependencies().getStatus());
         form.add(statusFieldDescriptor.instantiate(null, r));
+
+        field = new Field(FieldType.TEXT, "revision");
+        field.setLabel("revision");
+        field.setValue(revision);
+        addLatestAction(field, project, project.getConfig());
+        form.add(field);
 
         for(ResourcePropertyConfiguration property: properties)
         {
@@ -268,6 +283,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), ProjectManager.TRIGGER_CATEGORY_MANUAL);
             options.setProperties(mapProperties(project.getConfig()));
             options.setStatus(status);
+            options.setVersion(version);
             projectManager.triggerBuild(project.getConfig(), options, r);
         }
         catch (Exception e)

@@ -159,6 +159,16 @@ public class BuildController implements EventListener
         {
             buildContext.add(requestProperty);
         }
+        
+        String version = projectConfig.getDependencies().getVersion();
+        TriggerOptions options = request.getOptions();
+        if (options.hasVersion())
+        {
+            version = options.getVersion();
+        }
+        String resolvedVersion = buildContext.resolveReferences(version);
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, resolvedVersion);
+        buildResult.setVersion(resolvedVersion);
 
         activateBuildAuthenticationToken();
 
@@ -965,7 +975,15 @@ public class BuildController implements EventListener
             ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
             ivy.resolve(descriptor);
 
-            ivy.publishIvy(descriptor, Long.toString(buildResult.getNumber()));
+            String buildNumber = Long.toString(buildResult.getNumber());
+            ivy.publishIvy(descriptor, buildNumber);
+
+            // could possibly use the build result version here for 'magic' maven support..
+            String version = buildContext.getString(PROPERTY_BUILD_VERSION);
+            if (!buildNumber.equals(version))
+            {
+                ivy.publishIvy(descriptor, version);
+            }
         }
         catch (Exception e)
         {

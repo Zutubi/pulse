@@ -42,7 +42,7 @@ public class CreateRepositoryDirectoryHandlerTest extends PulseTestCase
     {
         String pathInContext = "/some/path.txt";
         File file = new File(baseDir, pathInContext);
-        stub(context.getResource(pathInContext)).toReturn(Resource.newResource(file.toURL()));
+        stub(context.getResource(pathInContext)).toReturn(Resource.newResource(file.toURI().toURL()));
         stub(request.getMethod()).toReturn(HttpRequest.__PUT);
 
         assertFalse(file.getParentFile().isDirectory());

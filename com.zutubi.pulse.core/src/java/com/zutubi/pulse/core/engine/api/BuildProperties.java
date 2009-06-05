@@ -78,6 +78,13 @@ public class BuildProperties
      */
     public static final String PROPERTY_BUILD_TRIGGER           = "build.trigger";
     /**
+     * The resolved version string for this build, used to indentify this build.  It
+     * differs from the build number in that the build number is a programatic identifier,
+     * where as the build version is a human readable identifier.
+     */
+    public static final String PROPERTY_BUILD_VERSION           = "build.version";
+
+    /**
      * Set to "true" if the build has been explicitly marked as a clean
      * build, "false" otherwise. Any incremental build artifacts will be
      * deleted before such a build is commenced.

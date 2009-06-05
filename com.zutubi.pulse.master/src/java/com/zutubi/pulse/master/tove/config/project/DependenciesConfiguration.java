@@ -16,7 +16,7 @@ import org.apache.ivy.core.module.status.StatusManager;
  * The manually configured dependencies.
  */
 @SymbolicName("zutubi.dependenciesConfiguration")
-@Form(fieldOrder = {"publicationPattern", "retrievalPattern", "status"})
+@Form(fieldOrder = {"version", "status", "publicationPattern", "retrievalPattern"})
 public class DependenciesConfiguration extends AbstractConfiguration
 {
     private List<DependencyConfiguration> dependencies = new LinkedList<DependencyConfiguration>();
@@ -33,6 +33,9 @@ public class DependenciesConfiguration extends AbstractConfiguration
     @Constraint("com.zutubi.pulse.core.dependency.StatusValidator")
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
     private String status = StatusManager.getCurrent().getDefaultStatus();
+
+    @Required
+    private String version = "${build.number}";
 
     private List<PublicationConfiguration> publications = new LinkedList<PublicationConfiguration>();
 
@@ -84,5 +87,15 @@ public class DependenciesConfiguration extends AbstractConfiguration
     public void setStatus(String status)
     {
         this.status = status;
+    }
+
+    public String getVersion()
+    {
+        return version;
+    }
+
+    public void setVersion(String version)
+    {
+        this.version = version;
     }
 }

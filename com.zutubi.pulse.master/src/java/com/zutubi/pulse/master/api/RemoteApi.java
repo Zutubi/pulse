@@ -74,7 +74,7 @@ public class RemoteApi
     /**
      * Retrieves the version number of this Pulse installation.  The number is of the form:
      * <p/>
-     *     &lt;major&gt;&lt;minor&gt;&lt;build&gt;&lt;patch&gt;
+     * &lt;major&gt;&lt;minor&gt;&lt;build&gt;&lt;patch&gt;
      * <p/>
      * where &lt;major&gt; and &lt;minor&gt; are two digits and &lt;build&gt; and &lt;patch&gt; are
      * three digits.  The value of &lt;patch&gt; will always be 000 in regular builds.  For example,
@@ -94,14 +94,13 @@ public class RemoteApi
      * for 30 minutes or until explicitly invalidated by a call to
      * {@link #logout(String)}.
      *
-     * @see #logout(String)
-     *
      * @param username login of the user to authenticate as
      * @param password password of the user
      * @return an authentication token that can be used as credentials for
      *         other method calls
      * @throws AuthenticationException if the user does not exist or the
-     *         password does not match
+     *                                 password does not match
+     * @see #logout(String)
      */
     public String login(String username, String password)
     {
@@ -112,10 +111,9 @@ public class RemoteApi
      * Explicitly invalidates the given authentication token, such that it
      * cannot be used for further method calls.
      *
-     * @see #login(String, String)
-     * 
      * @param token the token to invalidate
      * @return true if the given token was valid before this call
+     * @see #login(String, String)
      */
     public boolean logout(String token)
     {
@@ -176,7 +174,7 @@ public class RemoteApi
 
     private void copyProperty(Properties from, Hashtable<String, String> to, String key)
     {
-        String name = (String) from.get(key);
+        String name = (String)from.get(key);
         if (name != null)
         {
             to.put(key, name);
@@ -188,7 +186,7 @@ public class RemoteApi
      * the logged in user.
      *
      * @param token authentication token (see {@link #login})
-     * @param path the path to test, e.g. "projects/my project"
+     * @param path  the path to test, e.g. "projects/my project"
      * @return true iff the given configuration path exists and is visible to
      *         the logged in user
      * @access available to all users
@@ -213,7 +211,7 @@ public class RemoteApi
      * logged in user are filtered out.
      *
      * @param token authentication token (see {@link #login})
-     * @param path the path to list the sub paths of
+     * @param path  the path to list the sub paths of
      * @return all sub paths of the given path that are visible to the logged
      *         in user
      * @throws IllegalArgumentException if the given path is invalid
@@ -235,7 +233,7 @@ public class RemoteApi
                 Type type = configurationTemplateManager.getType(path);
                 if (type instanceof CollectionType)
                 {
-                    CollectionType collectionType = (CollectionType) type;
+                    CollectionType collectionType = (CollectionType)type;
                     if (collectionType.getCollectionType() instanceof ComplexType)
                     {
                         Record record = configurationTemplateManager.getRecord(path);
@@ -248,7 +246,7 @@ public class RemoteApi
                 }
                 else
                 {
-                    CompositeType compositeType = (CompositeType) type;
+                    CompositeType compositeType = (CompositeType)type;
                     result = new Vector<String>(compositeType.getNestedPropertyNames());
                 }
             }
@@ -272,7 +270,7 @@ public class RemoteApi
      * @return the key of the template parent for the given path or the empty
      *         string if the path refers to the template root
      * @throws IllegalArgumentException if the given path does not refer to
-     *         an element of a templated collection
+     *                                  an element of a templated collection
      * @access available to users with view permission for the given path
      */
     public String getTemplateParent(String token, String path)
@@ -300,9 +298,9 @@ public class RemoteApi
      * @return the keys of all template children for the given path that are
      *         visible to the logged-in user
      * @throws IllegalArgumentException if the given path does not refer to
-     *         an element of a templated collection
+     *                                  an element of a templated collection
      * @access available to users with view permission for the path; paths
-     *         not visible to the user are filtered out of the result
+     * not visible to the user are filtered out of the result
      */
     public Vector<String> getTemplateChildren(String token, String path)
     {
@@ -332,7 +330,7 @@ public class RemoteApi
     {
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
         TemplateNode node = configurationTemplateManager.getTemplateNode(path);
-        if(node == null)
+        if (node == null)
         {
             throw new IllegalArgumentException("Invalid path '" + path + "': path does not refer to a member of a templated collection");
         }
@@ -349,7 +347,7 @@ public class RemoteApi
      * @return {@xtype struct<[config|Remote API Configuration Objects]>}
      *         a default configuration object of the given type
      * @throws IllegalArgumentException if the given symbolic name is invalid
-     * @throws TypeException if there is an error constructing the object
+     * @throws TypeException            if there is an error constructing the object
      * @access available to all users
      */
     public Hashtable<String, Object> createDefaultConfig(String token, String symbolicName) throws TypeException
@@ -376,11 +374,11 @@ public class RemoteApi
      * Returns the configuration object at the given path.  Configuration paths use forward slashes
      * as a separator, and are split into a few main scopes:
      * <ul>
-     *   <li>projects</li>
-     *   <li>agents</li>
-     *   <li>users</li>
-     *   <li>groups</li>
-     *   <li>settings</li>
+     * <li>projects</li>
+     * <li>agents</li>
+     * <li>users</li>
+     * <li>groups</li>
+     * <li>settings</li>
      * </ul>
      * So, for example, to retrieve the SCM for a project named "my project", you would use the path
      * "projects/my project/scm".  To discover other paths, use
@@ -394,10 +392,10 @@ public class RemoteApi
      * @return {@xtype struct<[config|Remote API Configuration Objects]>} the object at the given
      *         path
      * @throws IllegalArgumentException if the given path does not exist
-     * @throws TypeException if there is an error processing the configuration object
+     * @throws TypeException            if there is an error processing the configuration object
      * @access available to users with view access for the path
      * @see #getConfigListing(String, String)
-     * @see #getRawConfig(String, String) 
+     * @see #getRawConfig(String, String)
      */
     public Object getConfig(String token, String path) throws TypeException
     {
@@ -456,7 +454,7 @@ public class RemoteApi
      * Retrieves the raw configuration object for the given path.  This may differ from the full
      * configuration returned by {@link #getConfig(String, String)} when the path refers to an
      * object in a templated scope.  No values inherited from template ancestors are included in the
-     *  result, only values defined directly at this path.  This information can be used to
+     * result, only values defined directly at this path.  This information can be used to
      * determine which values are inherited, overridden or introduced at this level in the template
      * hierarchy.
      *
@@ -465,9 +463,9 @@ public class RemoteApi
      * @return {@xtype struct<[config|Remote API Configuration Objects]>} the raw configuration
      *         (i.e. with no inherited values) at the given path
      * @throws IllegalArgumentException if the given path does not exist
-     * @throws TypeException if there is an error converting the object
+     * @throws TypeException            if there is an error converting the object
      * @access available to users with view access to the given path
-     * @see #getConfig(String, String) 
+     * @see #getConfig(String, String)
      */
     public Object getRawConfig(String token, String path) throws TypeException
     {
@@ -496,8 +494,8 @@ public class RemoteApi
      *
      * @param token authentication token (see {@link #login})
      * @param path  the configuration path to test
-     * @throws IllegalArgumentException if the given path does not exist
      * @return true if the given configuration object is marked permanent
+     * @throws IllegalArgumentException if the given path does not exist
      * @access available to users with view access for the given path
      */
     public boolean isConfigPermanent(String token, String path)
@@ -506,7 +504,7 @@ public class RemoteApi
         try
         {
             Configuration instance = configurationProvider.get(path, Configuration.class);
-            if(instance == null)
+            if (instance == null)
             {
                 throw new IllegalArgumentException("Path '" + path + "' does not exist");
             }
@@ -536,7 +534,7 @@ public class RemoteApi
         try
         {
             Configuration instance = configurationProvider.get(path, Configuration.class);
-            if(instance == null)
+            if (instance == null)
             {
                 throw new IllegalArgumentException("Path '" + path + "' does not exist");
             }
@@ -565,7 +563,7 @@ public class RemoteApi
      * <p/>
      * This function cannot be used to insert projects or agents, where more information regarding
      * the template hiearchy is required (see {@link #insertTemplatedConfig(String, String, java.util.Hashtable, boolean)}).
-     * 
+     *
      * @param token  authentication token (see {@link #login})
      * @param path   the path to insert into, either a collection (e.g. "projects/my project/properties"
      *               or the path of a not-yet-configured singular nested object (e.g.
@@ -574,9 +572,9 @@ public class RemoteApi
      *               object to insert
      * @return the path of the inserted configuration
      * @throws IllegalArgumentException if the given path does not refer to a path the may be
-     *         inserted into, or the the type of the given config does not match
-     * @throws TypeException if the given config is malformed
-     * @throws ValidationException if the given config fails validation
+     *                                  inserted into, or the the type of the given config does not match
+     * @throws TypeException            if the given config is malformed
+     * @throws ValidationException      if the given config fails validation
      * @access available to users with write permission for the given path
      * @see #insertTemplatedConfig(String, String, java.util.Hashtable, boolean)
      * @see #saveConfig(String, String, java.util.Hashtable, boolean)
@@ -588,7 +586,7 @@ public class RemoteApi
         try
         {
             ComplexType pathType = configurationTemplateManager.getType(path);
-            CompositeType expectedType = (CompositeType) pathType.getTargetType();
+            CompositeType expectedType = (CompositeType)pathType.getTargetType();
 
             String parentPath;
             String baseName;
@@ -651,9 +649,9 @@ public class RemoteApi
      *                           will be inserted as a concrete instance
      * @return the path of the inserted configuration
      * @throws IllegalArgumentException if the given template parent path does not refer to an
-     *         existing template, or the given config is of a different type
-     * @throws TypeException if the given config is malformed
-     * @throws ValidationException if the given config fails validation
+     *                                  existing template, or the given config is of a different type
+     * @throws TypeException            if the given config is malformed
+     * @throws ValidationException      if the given config fails validation
      * @access requires the server create permission for either projects or agents as appropriate
      * @see #insertConfig(String, String, java.util.Hashtable)
      * @see #saveConfig(String, String, java.util.Hashtable, boolean)
@@ -675,7 +673,7 @@ public class RemoteApi
                 throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': parent path '" + insertPath + "' is not a templated collection, use insertConfig instead");
             }
 
-            TemplateRecord templateParent = (TemplateRecord) configurationTemplateManager.getRecord(templateParentPath);
+            TemplateRecord templateParent = (TemplateRecord)configurationTemplateManager.getRecord(templateParentPath);
             if (templateParent == null)
             {
                 throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': template parent does not exist");
@@ -686,7 +684,7 @@ public class RemoteApi
                 throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': template parent is concrete and thus cannot be inherited from");
             }
 
-            CompositeType expectedType = (CompositeType) templateParent.getType();
+            CompositeType expectedType = (CompositeType)templateParent.getType();
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(config);
             CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
@@ -742,9 +740,9 @@ public class RemoteApi
      * @return the path of the saved configuration (may differ from the path passed in if the
      *         configuration is renamed)
      * @throws IllegalArgumentException if the path does not exist, the path refers to a collection,
-     *         or the type of the given config does not match
-     * @throws TypeException if the given config is malformed
-     * @throws ValidationException if the given config fails validation
+     *                                  or the type of the given config does not match
+     * @throws TypeException            if the given config is malformed
+     * @throws ValidationException      if the given config fails validation
      * @access requires write permission for the given path
      * @see #insertConfig(String, String, java.util.Hashtable)
      * @see #deleteConfig(String, String)
@@ -799,7 +797,7 @@ public class RemoteApi
      * @param path  path to test
      * @return true if the given path exists and is cloneable
      * @access available to all users, but will always return false for users that cannot clone the
-     *         path (be that because it does not exist or otherwise)
+     * path (be that because it does not exist or otherwise)
      * @see #cloneConfig(String, String, java.util.Hashtable)
      */
     public boolean canCloneConfig(String token, String path)
@@ -857,7 +855,7 @@ public class RemoteApi
      * @return true
      * @throws IllegalArgumentException if a given path or key is invalid
      * @access requires write permission for the map path, or server create
-     *         permission for projects or agents when cloning in those scopes
+     * permission for projects or agents when cloning in those scopes
      * @see #canCloneConfig(String, String)
      * @see #smartClone(String, String, String, String, java.util.Hashtable)
      */
@@ -895,11 +893,11 @@ public class RemoteApi
      *                              mapping for rootKey)
      * @return the path of the smart clone
      * @throws IllegalArgumentException if the parentPath is not a templated
-     *         collection; rootKey is not a member of the collection;
-     *         parentKey or any clone key is not unique in the collection;
-     *         originalKeyToCloneKey does not contain a mapping for rootKey
+     *                                  collection; rootKey is not a member of the collection;
+     *                                  parentKey or any clone key is not unique in the collection;
+     *                                  originalKeyToCloneKey does not contain a mapping for rootKey
      * @access requires write permission for the map path, or server create
-     *         permission for projects or agents when cloning in those scopes
+     * permission for projects or agents when cloning in those scopes
      * @see #canCloneConfig(String, String)
      * @see #cloneConfig(String, String, java.util.Hashtable)
      */
@@ -916,7 +914,7 @@ public class RemoteApi
             tokenManager.logoutUser();
         }
     }
-    
+
     /**
      * Deletes the configuration object at the given path, if one exists.  If the object is complex,
      * all nested objects will be deleted with it.  Further cleanup actions (e.g. deleting all build
@@ -932,16 +930,16 @@ public class RemoteApi
      * (and all descendent paths), but the item will still exist in the template ancestor and may
      * later be restored using {@link #restoreConfig(String, String)}.  Note that in this case
      * cleanup actions may still be run, and those actions are not undone by restoration.
-     * 
+     *
      * @param token authentication token (see {@link #login})
      * @param path  path of the configuration object to delete
      * @return true if the path existed and was deleted, false of the path did not exist
      * @access requires write access to the parent path, or the server delete permission for
-     *         projects or agents when deleting those objects
+     * projects or agents when deleting those objects
      * @see #insertConfig(String, String, java.util.Hashtable)
      * @see #saveConfig(String, String, java.util.Hashtable, boolean)
      * @see #restoreConfig(String, String)
-     * @see #deleteAllConfigs(String, String) 
+     * @see #deleteAllConfigs(String, String)
      */
     public boolean deleteConfig(String token, String path)
     {
@@ -1040,7 +1038,7 @@ public class RemoteApi
      * @param order array of item keys in the desired order
      * @return true
      * @throws IllegalArgumentException if the path does not refer to an ordered collection, or any
-     *         of the keys is invalid
+     *                                  of the keys is invalid
      * @access requires write access to the given path
      * @see #getConfigHandle(String, String)
      * @see #getConfigListing(String, String)
@@ -1066,14 +1064,14 @@ public class RemoteApi
      * <p/>
      * Available actions can depend on the state of the configuration, for example only a disabled
      * agent may be enabled.
-     * 
+     *
      * @param token authentication token (see {@link #login})
      * @param path  path of the configuration to retrieve the actions for
      * @return available actions for the given configuration path
      * @access available to all users, but the returned actions are filtered based on the actions
-     *         the user has permission to perform
+     * the user has permission to perform
      * @see #doConfigAction(String, String, String)
-     * @see #doConfigActionWithArgument(String, String, String, java.util.Hashtable)  
+     * @see #doConfigActionWithArgument(String, String, String, java.util.Hashtable)
      */
     public Vector<String> getConfigActions(String token, String path)
     {
@@ -1100,10 +1098,10 @@ public class RemoteApi
      * @param action the action to perform
      * @return true
      * @throws IllegalArgumentException if the given path does not exist, the given action does not
-     *         apply to the path, or the action requires an argument
+     *                                  apply to the path, or the action requires an argument
      * @access Permissions are controlled on an action-by-action basis.  Generally if a permission
-     *         with the same name as the action (or inverse action) exists that permission applies.
-     *         Otherwise, the normal default is write access to the path.
+     * with the same name as the action (or inverse action) exists that permission applies.
+     * Otherwise, the normal default is write access to the path.
      * @see #doConfigActionWithArgument(String, String, String, java.util.Hashtable)
      * @see #getConfigActions(String, String)
      */
@@ -1144,13 +1142,13 @@ public class RemoteApi
      *                 to the action
      * @return true
      * @throws IllegalArgumentException if the given path does not exist, the given action does not
-     *         apply to the path, or the action does not accept an argument
-     * @throws TypeException if the given argument object is malformed
-     * @throws ValidationException if the given argument object fails validation
+     *                                  apply to the path, or the action does not accept an argument
+     * @throws TypeException            if the given argument object is malformed
+     * @throws ValidationException      if the given argument object fails validation
      * @access Permissions are controlled on an action-by-action basis.  Generally if a permission
-     *         with the same name as the action (or inverse action) exists that permission applies.
-     *         Otherwise, the normal default is write access to the path.
-     * @see #doConfigAction(String, String, String) 
+     * with the same name as the action (or inverse action) exists that permission applies.
+     * Otherwise, the normal default is write access to the path.
+     * @see #doConfigAction(String, String, String)
      * @see #getConfigActions(String, String)
      */
     public boolean doConfigActionWithArgument(String token, String path, String action, Hashtable argument) throws TypeException, ValidationException
@@ -1168,7 +1166,7 @@ public class RemoteApi
             CompositeType type = typeRegistry.getType(symbolicName);
             MutableRecord record = type.fromXmlRpc(argument);
             Configuration arg = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, true, true);
-            if(!type.isValid(arg))
+            if (!type.isValid(arg))
             {
                 throw new ValidationException(type, arg);
             }
@@ -1185,12 +1183,10 @@ public class RemoteApi
     }
 
     /**
-     * @internal
-     * Writes an error message to the log for testing.
-     *
      * @param token   authentication token
      * @param message message to write
      * @return true
+     * @internal Writes an error message to the log for testing.
      */
     public boolean logError(String token, String message)
     {
@@ -1200,12 +1196,10 @@ public class RemoteApi
     }
 
     /**
-     * @internal
-     * Writes a warning message to the log for testing.
-     *
      * @param token   authentication token
      * @param message message to write
      * @return true
+     * @internal Writes a warning message to the log for testing.
      */
     public boolean logWarning(String token, String message)
     {
@@ -1242,7 +1236,7 @@ public class RemoteApi
      * @param token authentication token, see {@link #login}
      * @return an array with the logins of all users on this server
      * @access requires server administration permission
-     * @see #getUserCount(String) 
+     * @see #getUserCount(String)
      */
     public Vector<String> getAllUserLogins(String token)
     {
@@ -1272,7 +1266,7 @@ public class RemoteApi
      * @param token authentication token, see {@link #login}
      * @return the total number of concrete projects visible to the calling user
      * @access available to all users, although the result is affected by the visibility of projects
-     *         to the calling user
+     * to the calling user
      * @see #getAllProjectNames(String)
      */
     public int getProjectCount(String token)
@@ -1295,7 +1289,7 @@ public class RemoteApi
      * @param token authentication token, see {@link #login}
      * @return the names of all concrete projects visible to the calling user
      * @access available to all users, although the result is filtered according to the visibility
-     *         of projects to the user
+     * of projects to the user
      * @see #getProjectCount(String)
      * @see #getMyProjectNames(String)
      */
@@ -1383,7 +1377,7 @@ public class RemoteApi
      * @param token authentication token, see {@link #login}
      * @return the names of all project groups visible to the calling user
      * @access available to all users, the results are filtered according to project visibility
-     * @see #getProjectGroup(String, String) 
+     * @see #getProjectGroup(String, String)
      * @see #getAllProjectNames(String)
      */
     public Vector<String> getAllProjectGroups(String token)
@@ -1416,10 +1410,10 @@ public class RemoteApi
      *              categorises the projects)
      * @return {@xtype [RemoteApi.ProjectGroup]} the project group with the given name
      * @throws IllegalArgumentException if there is no group with the given name visible to the
-     *         calling user
+     *                                  calling user
      * @access available to all users, although the results are filtered based on visibility of
-     *         projects to the user
-     * @see #getAllProjectGroups(String) 
+     * projects to the user
+     * @see #getAllProjectGroups(String)
      */
     public Hashtable<String, Object> getProjectGroup(String token, String name) throws IllegalArgumentException
     {
@@ -1427,7 +1421,7 @@ public class RemoteApi
         try
         {
             ProjectGroup group = projectManager.getProjectGroup(name);
-            if(group == null)
+            if (group == null)
             {
                 throw new IllegalArgumentException(String.format("Unknown project group: '%s'", name));
             }
@@ -1465,7 +1459,7 @@ public class RemoteApi
      * @return the total number of concrete agents visible to the calling user
      * @throws AuthenticationException if the given token is invalid
      * @access available to all users, although the result is affected by the visibility of agents
-     *         to the user
+     * to the user
      * @see #getAllAgentNames(String)
      */
     public int getAgentCount(String token)
@@ -1488,8 +1482,8 @@ public class RemoteApi
      * @param token authentication token, see {@link #login}
      * @return the naames of all concrete projects visible to the calling user
      * @access available to all users, although the result is filtered based on the visibility of
-     *         agents to the calling user
-     * @see #getProjectCount(String) 
+     * agents to the calling user
+     * @see #getProjectCount(String)
      */
     public Vector<String> getAllAgentNames(String token)
     {
@@ -1532,7 +1526,7 @@ public class RemoteApi
      * @see #getPreviousBuild(String, String, int)
      * @see #getBuildRange(String, String, int, int)
      * @see #getLatestBuildForProject(String, String, boolean)
-     * @see #getLatestBuildsForProject(String, String, boolean, int) 
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      * @see #getPersonalBuild(String, int)
      */
@@ -1602,7 +1596,6 @@ public class RemoteApi
      * @return {@xtype struct} details of the responsibility for the project (as described above)
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires view permission for the given project
-     *
      * @see #takeResponsibility(String, String, String)
      * @see #clearResponsibility(String, String)
      */
@@ -1648,8 +1641,7 @@ public class RemoteApi
      * @return true
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires view permission for the given project; no other user can currently be
-     *         responsible for the project
-     *
+     * responsible for the project
      * @see #getResponsibilityInfo(String, String)
      * @see #clearResponsibility(String, String)
      */
@@ -1682,9 +1674,8 @@ public class RemoteApi
      *         was responsible to begin with
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires view permission for the project, and that the user represented by token is
-     *         the currently-responsible user for the project (if any), or has administration
-     *         privileges
-     *
+     * the currently-responsible user for the project (if any), or has administration
+     * privileges
      * @see #getResponsibilityInfo(String, String)
      * @see #takeResponsibility(String, String, String)
      */
@@ -1713,7 +1704,7 @@ public class RemoteApi
     /**
      * Finds and returns build results for the given project that meet the given criteria.  Paging
      * is supported using the firstResult and maxResults parameters.
-     * 
+     *
      * @param token           authentication token, see {@link #login}
      * @param projectName     name of the project to query the build results of; may be the name of
      *                        a project template in which case all concrete descendents of that
@@ -1733,7 +1724,7 @@ public class RemoteApi
      * @see #getPreviousBuild(String, String, int)
      * @see #getBuildRange(String, String, int, int)
      * @see #getLatestBuildForProject(String, String, boolean)
-     * @see #getLatestBuildsForProject(String, String, boolean, int) 
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
      */
     public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, Vector<String> resultStates, int firstResult, int maxResults, boolean mostRecentFirst)
     {
@@ -1785,7 +1776,7 @@ public class RemoteApi
             Project project = internalGetProject(projectName, true);
             List<BuildResult> buildRange = buildManager.queryBuilds(project, ResultState.getCompletedStates(), afterBuild + 1, toBuild, 0, -1, false, false);
             Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(buildRange.size());
-            for(BuildResult r: buildRange)
+            for (BuildResult r : buildRange)
             {
                 result.add(convertResult(r));
             }
@@ -1813,7 +1804,7 @@ public class RemoteApi
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires view permission for the given project
      * @see #getBuild(String, String, int)
-     * @see #getBuildRange(String, String, int, int) 
+     * @see #getBuildRange(String, String, int, int)
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
@@ -1827,7 +1818,7 @@ public class RemoteApi
             BuildResult buildResult = internalGetBuild(project, id);
             buildResult = buildManager.getPreviousBuildResult(buildResult);
             Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
-            if(buildResult != null)
+            if (buildResult != null)
             {
                 result.add(convertResult(buildResult));
             }
@@ -1842,11 +1833,11 @@ public class RemoteApi
 
     private ResultState[] mapStates(Vector<String> stateNames)
     {
-        if(stateNames.size() > 0)
+        if (stateNames.size() > 0)
         {
             ResultState[] states = new ResultState[stateNames.size()];
             int i = 0;
-            for(String stateName: stateNames)
+            for (String stateName : stateNames)
             {
                 states[i++] = ResultState.fromPrettyString(stateName);
             }
@@ -1875,7 +1866,7 @@ public class RemoteApi
         try
         {
             Project project = internalGetProject(projectName, true);
-            return (int) project.getNextBuildNumber();
+            return (int)project.getNextBuildNumber();
         }
         finally
         {
@@ -1953,7 +1944,7 @@ public class RemoteApi
      * @access requires view permission for the given project
      * @see #getBuild(String, String, int)
      * @see #getBuildRange(String, String, int, int)
-     * @see #getLatestBuildsForProject(String, String, boolean, int) 
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
      * @see #getPreviousBuild(String, String, int)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      */
@@ -2017,7 +2008,7 @@ public class RemoteApi
      *         empty array if no such build exists
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires view permission for the given project
-     * @see #getLatestBuildsWithWarnings(String, String, int) 
+     * @see #getLatestBuildsWithWarnings(String, String, int)
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
      */
@@ -2037,7 +2028,7 @@ public class RemoteApi
      * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the
      *         specified personal build, or an empty array if no such build exists
      * @access available to all users (users can only access their own personal builds)
-     * @see #getLatestPersonalBuilds(String, boolean, int) 
+     * @see #getLatestPersonalBuilds(String, boolean, int)
      */
     public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id)
     {
@@ -2072,7 +2063,7 @@ public class RemoteApi
      * @return {@xtype array<[RemoteApi.BuildResult]>} the latest personal build results for the
      *         calling user, ordered most recent first
      * @access available to all users (users can only access their own personal builds)
-     * @see #getPersonalBuild(String, int)  
+     * @see #getPersonalBuild(String, int)
      */
     public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, boolean completedOnly, int maxResults)
     {
@@ -2137,13 +2128,14 @@ public class RemoteApi
     private Hashtable<String, Object> convertResult(BuildResult build)
     {
         Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
-        buildDetails.put("id", (int) build.getNumber());
+        buildDetails.put("id", (int)build.getNumber());
         buildDetails.put("project", build.getProject().getName());
         buildDetails.put("revision", getBuildRevision(build));
+        buildDetails.put("version", getBuildVersion(build));
         addResultFields(build, buildDetails);
 
         Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();
-        for(RecipeResultNode rrn: build.getRoot().getChildren())
+        for (RecipeResultNode rrn : build.getRoot().getChildren())
         {
             stages.add(convertStage(rrn));
         }
@@ -2169,16 +2161,33 @@ public class RemoteApi
         return projectDetails;
     }
 
+    /**
+     * Extract the build version string from the build result, returning an
+     * empty string if no build version is available.
+     *
+     * @param build     from which the build version is being retrieved.
+     * @return  a string representing the build version, or an empty string if no
+     * build version is available.
+     */
+    private String getBuildVersion(BuildResult build)
+    {
+        if (build.getVersion() != null)
+        {
+            return build.getVersion();
+        }
+        return "";
+    }
+
     private String getBuildRevision(BuildResult build)
- 	{
+    {
         Revision revision = build.getRevision();
-        if(revision != null)
+        if (revision != null)
         {
             return revision.getRevisionString();
         }
 
-         return "";
- 	}
+        return "";
+    }
 
     private Hashtable<String, Object> convertStage(RecipeResultNode recipeResultNode)
     {
@@ -2222,10 +2231,10 @@ public class RemoteApi
      * @return {@xtype array<[RemoteApi.Changelist]>} all new code changes that participated in the
      *         given build
      * @throws IllegalArgumentException if the given project name is invalid, or the given build
-     *         does not exist
+     *                                  does not exist
      * @access requires view permission for the given project
      * @see #getBuild(String, String, int)
-     * @see #getLatestBuildForProject(String, String, boolean) 
+     * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
      */
     public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id)
@@ -2246,7 +2255,7 @@ public class RemoteApi
                 public Object process()
                 {
                     List<PersistentChangelist> changelists = buildManager.getChangesForBuild(build);
-                    for(PersistentChangelist change: changelists)
+                    for (PersistentChangelist change : changelists)
                     {
                         result.add(convertChangelist(change));
                     }
@@ -2265,25 +2274,25 @@ public class RemoteApi
     private Hashtable<String, Object> convertChangelist(PersistentChangelist change)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
-        if(change.getRevision() != null && change.getRevision().getRevisionString() != null)
+        if (change.getRevision() != null && change.getRevision().getRevisionString() != null)
         {
             result.put("revision", change.getRevision().getRevisionString());
         }
-        if(change.getAuthor() != null)
+        if (change.getAuthor() != null)
         {
             result.put("author", change.getAuthor());
         }
-        if(change.getDate() != null)
+        if (change.getDate() != null)
         {
             result.put("date", change.getDate());
         }
-        if(change.getComment() != null)
+        if (change.getComment() != null)
         {
             result.put("comment", change.getComment());
         }
 
         Vector<Hashtable<String, Object>> files = new Vector<Hashtable<String, Object>>(change.getChanges().size());
-        for(PersistentFileChange file: change.getChanges())
+        for (PersistentFileChange file : change.getChanges())
         {
             files.add(convertChange(file));
         }
@@ -2295,15 +2304,15 @@ public class RemoteApi
     private Hashtable<String, Object> convertChange(PersistentFileChange change)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
-        if(change.getFilename() != null)
+        if (change.getFilename() != null)
         {
             result.put("file", change.getFilename());
         }
-        if(change.getRevisionString() != null)
+        if (change.getRevisionString() != null)
         {
             result.put("revision", change.getRevisionString());
         }
-        if(change.getActionName() != null)
+        if (change.getActionName() != null)
         {
             result.put("action", change.getActionName().toLowerCase());
         }
@@ -2342,13 +2351,13 @@ public class RemoteApi
                         public void process(RecipeResultNode recipeResultNode)
                         {
                             RecipeResult recipeResult = recipeResultNode.getResult();
-                            if(recipeResult != null)
+                            if (recipeResult != null)
                             {
                                 String stage = recipeResultNode.getStageName();
-                                for(CommandResult commandResult: recipeResult.getCommandResults())
+                                for (CommandResult commandResult : recipeResult.getCommandResults())
                                 {
                                     String command = commandResult.getCommandName();
-                                    for(StoredArtifact artifact: commandResult.getArtifacts())
+                                    for (StoredArtifact artifact : commandResult.getArtifacts())
                                     {
                                         result.add(convertArtifact(artifact, projectName, build, stage, command));
                                     }
@@ -2408,7 +2417,7 @@ public class RemoteApi
                 {
                     final BuildResult build = internalGetBuild(project, id);
                     build.loadFeatures(configurationManager.getDataDirectory());
-                    for(PersistentFeature f: build.getFeatures())
+                    for (PersistentFeature f : build.getFeatures())
                     {
                         result.add(convertFeature(null, null, null, null, f));
                     }
@@ -2418,29 +2427,29 @@ public class RemoteApi
                         public void process(RecipeResultNode recipeResultNode)
                         {
                             RecipeResult recipeResult = recipeResultNode.getResult();
-                            if(recipeResult != null)
+                            if (recipeResult != null)
                             {
                                 String stage = recipeResultNode.getStageName();
-                                for(PersistentFeature f: recipeResult.getFeatures())
+                                for (PersistentFeature f : recipeResult.getFeatures())
                                 {
                                     result.add(convertFeature(stage, null, null, null, f));
                                 }
 
-                                for(CommandResult commandResult: recipeResult.getCommandResults())
+                                for (CommandResult commandResult : recipeResult.getCommandResults())
                                 {
                                     String command = commandResult.getCommandName();
-                                    for(PersistentFeature f: commandResult.getFeatures())
+                                    for (PersistentFeature f : commandResult.getFeatures())
                                     {
                                         result.add(convertFeature(stage, command, null, null, f));
                                     }
 
-                                    for(StoredArtifact artifact: commandResult.getArtifacts())
+                                    for (StoredArtifact artifact : commandResult.getArtifacts())
                                     {
                                         String artifactName = artifact.getName();
-                                        for(StoredFileArtifact fileArtifact: artifact.getChildren())
+                                        for (StoredFileArtifact fileArtifact : artifact.getChildren())
                                         {
                                             String artifactPath = fileArtifact.getPath();
-                                            for(PersistentFeature f: fileArtifact.getFeatures())
+                                            for (PersistentFeature f : fileArtifact.getFeatures())
                                             {
                                                 result.add(convertFeature(stage, command, artifactName, artifactPath, f));
                                             }
@@ -2530,10 +2539,10 @@ public class RemoteApi
         Vector<Hashtable<String, String>> result = getMessagesInBuild(token, projectName, id);
         Iterator<Hashtable<String, String>> it = result.iterator();
         String levelString = level.getPrettyString();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             Hashtable<String, String> feature = it.next();
-            if(!levelString.equals(feature.get("level")))
+            if (!levelString.equals(feature.get("level")))
             {
                 it.remove();
             }
@@ -2545,22 +2554,22 @@ public class RemoteApi
     private Hashtable<String, String> convertFeature(String stageName, String commandName, String artifactName, String artifactPath, PersistentFeature feature)
     {
         Hashtable<String, String> result = new Hashtable<String, String>();
-        if(stageName != null)
+        if (stageName != null)
         {
             result.put("stage", stageName);
         }
 
-        if(commandName != null)
+        if (commandName != null)
         {
             result.put("command", commandName);
         }
 
-        if(artifactName != null)
+        if (artifactName != null)
         {
             result.put("artifact", artifactName);
         }
 
-        if(artifactPath != null)
+        if (artifactPath != null)
         {
             result.put("path", artifactPath);
         }
@@ -2584,20 +2593,20 @@ public class RemoteApi
      */
     public boolean triggerBuild(String token, String projectName)
     {
-        return triggerBuild(token, projectName, null);
+        return triggerBuild(token, projectName, (String)null);
     }
 
     /**
      * Triggers a build of the given project at the given revision.  The revision will be verified
      * before requesting the build.  This function returns as soon as the request has been made.
-     * 
+     *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project to trigger
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
      *                    may be the empty string to indicate the latest revision should be used
      * @return true
      * @access requires trigger permission for the given project
-     * @see #triggerBuild(String, String) 
+     * @see #triggerBuild(String, String)
      * @see #triggerBuild(String, String, String, java.util.Hashtable)
      * @see #triggerBuild(String, String, String, String, java.util.Hashtable)
      */
@@ -2639,61 +2648,98 @@ public class RemoteApi
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
      *                    may be empty to indicate the latest revision should be used
      * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
-     * @param status      the dependency status associated with the build request 
+     * @param status      the dependency status associated with the build request
      * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String)
      * @see #triggerBuild(String, String, String)
-     * @see #triggerBuild(String, String, String, java.util.Hashtable) 
+     * @see #triggerBuild(String, String, String, java.util.Hashtable)
      */
     public boolean triggerBuild(String token, String projectName, final String revision, String status, Hashtable<String, String> properties)
+    {
+        Hashtable<String, Object> triggerOptions = new Hashtable<String, Object>();
+        if (TextUtils.stringSet(revision))
+        {
+            triggerOptions.put("revision", revision);
+        }
+        if (TextUtils.stringSet(status))
+        {
+            triggerOptions.put("status", status);
+        }
+        if (properties != null)
+        {
+            triggerOptions.put("properties", properties);
+        }
+        return triggerBuild(token, projectName, triggerOptions);
+    }
+
+    /**
+     * Triggers a build of the given project using the specified options.  The following options are supported:
+     * <ul>
+     * <li>revision (optional), the revision to build, in the SCM-specific format.  If not specified,
+     * the latest revision will be used.</li>
+     * <li>version (optional), the build version to be associated with this build request.  If not
+     * specified, the project's default will be used.</li>
+     * <li>properties (optional), {@xtype struct<string>} a mapping of proeprty names to property values</li>
+     * <li>status (optional), the dependency status associated with this build request.  If not specified,
+     * the project's default will be used.</li>
+     * <li>force (optional), indicates that a build should be triggered even if no unbuilt revision is
+     * available and changelist isolation is active for this project.
+     * <li>replaceable (optional), indicates that this build can be replaced by a subsequent build in the
+     * build queue.  This allows multiple builds for a single project to be triggered, but ensures that only
+     * the latest revision available at the start of the build is actually built. 
+     * </ul>
+     * @param token             authentication token, see {@link #login(String, String)}
+     * @param projectName       the name of the project to trigger
+     * @param triggerOptions    the set of options to be used to configure this build request
+     * @return true
+     */
+    public boolean triggerBuild(String token, String projectName, Hashtable<String, Object> triggerOptions)
     {
         User user = tokenManager.loginAndReturnUser(token);
         try
         {
             final Project project = internalGetProject(projectName, false);
 
-            Revision r = null;
-            if(TextUtils.stringSet(revision))
+            Revision revision = null;
+
+            // extract revision
+            if (triggerOptions.containsKey("revision"))
             {
-                try
-                {
-                    r = withScmClient(project.getConfig(), scmManager, new ScmContextualAction<Revision>()
-                    {
-                        public Revision process(ScmClient client, ScmContext context) throws ScmException
-                        {
-                            ScmContext c = (project.isInitialised()) ? context : null;
-                            if(client.getCapabilities(c).contains(ScmCapability.REVISIONS))
-                            {
-                                return client.parseRevision(context, revision);
-                            }
-                            else
-                            {
-                                throw new IllegalArgumentException("Attempt to specify a revision to build when SCM does not support revisions");
-                            }
-                        }
-                    });
-                }
-                catch (ScmException e)
-                {
-                    throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
-                }
+                revision = parseRevision((String)triggerOptions.get("revision"), project);
             }
 
-            List<ResourcePropertyConfiguration> resourceProperties = new LinkedList<ResourcePropertyConfiguration>();
-            if (properties != null)
+            // convert options
+            TriggerOptions options = new TriggerOptions(new RemoteTriggerBuildReason(user.getLogin()), "remote api");
+            if (triggerOptions.containsKey("replaceable"))
             {
-                for (Map.Entry<String, String> property: properties.entrySet())
+                options.setReplaceable(Boolean.valueOf((String)triggerOptions.get("replaceable")));
+            }
+            if (triggerOptions.containsKey("force"))
+            {
+                options.setForce(Boolean.valueOf((String)triggerOptions.get("force")));
+            }
+            if (triggerOptions.containsKey("properties"))
+            {
+                List<ResourcePropertyConfiguration> resourceProperties = new LinkedList<ResourcePropertyConfiguration>();
+                @SuppressWarnings({"unchecked"})
+                Hashtable<String, String> properties = (Hashtable<String, String>)triggerOptions.get("properties");
+                for (Map.Entry<String, String> property : properties.entrySet())
                 {
                     resourceProperties.add(new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
                 }
+                options.setProperties(resourceProperties);
             }
-            TriggerOptions options = new TriggerOptions(new RemoteTriggerBuildReason(user.getLogin()), "remote api");
-            options.setReplaceable(false);
-            options.setForce(true);
-            options.setProperties(resourceProperties);
-            options.setStatus(status);
-            projectManager.triggerBuild(project.getConfig(), options, r);
+            if (triggerOptions.containsKey("status"))
+            {
+                options.setStatus((String)triggerOptions.get("status"));
+            }
+            if (triggerOptions.containsKey("version"))
+            {
+                options.setVersion((String)triggerOptions.get("version"));
+            }
+
+            projectManager.triggerBuild(project.getConfig(), options, revision);
             return true;
         }
         finally
@@ -2701,7 +2747,33 @@ public class RemoteApi
             tokenManager.logoutUser();
         }
     }
-    
+
+    private Revision parseRevision(final String revision, final Project project)
+    {
+        try
+        {
+            return withScmClient(project.getConfig(), scmManager, new ScmContextualAction<Revision>()
+            {
+                public Revision process(ScmClient client, ScmContext context) throws ScmException
+                {
+                    ScmContext c = (project.isInitialised()) ? context : null;
+                    if (client.getCapabilities(c).contains(ScmCapability.REVISIONS))
+                    {
+                        return client.parseRevision(context, revision);
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Attempt to specify a revision to build when SCM does not support revisions");
+                    }
+                }
+            });
+        }
+        catch (ScmException e)
+        {
+            throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
+        }
+    }
+
     /**
      * Request that the given active build is cancelled.  This function returns when the request is
      * made, which is likely to be before the build is cancelled (if indeed it is cancelled).
@@ -2769,18 +2841,16 @@ public class RemoteApi
     }
 
     /**
-     * @internal
-     * Performs checks before a personal build is requested.
-     *
      * @param token       authentication token (see {@link #login})
      * @param projectName name of the projec that the user wishes to run a personal build of
      * @return SCM configuration details for the project
      * @throws ScmException if there is an error retrieving SCM details
+     * @internal Performs checks before a personal build is requested.
      */
     public Hashtable<String, String> preparePersonalBuild(String token, String projectName) throws ScmException
     {
         User user = tokenManager.loginAndReturnUser(token);
-        if(!accessManager.hasPermission(userManager.getPrinciple(user), ServerPermission.PERSONAL_BUILD.toString(), null))
+        if (!accessManager.hasPermission(userManager.getPrinciple(user), ServerPermission.PERSONAL_BUILD.toString(), null))
         {
             throw new AccessDeniedException("User does not have authority to submit personal build requests.");
         }
@@ -2878,8 +2948,8 @@ public class RemoteApi
      * Retrieves the given project.  These details include the name, description
      * url, state and database id of the project.
      *
-     * @param token        authentication token (see {@link #login})
-     * @param projectName  name of the project to retrieve
+     * @param token       authentication token (see {@link #login})
+     * @param projectName name of the project to retrieve
      * @return the project details
      * @throws IllegalArgumentException if the project name is invalid
      * @access requires view permission for the project
@@ -2901,22 +2971,22 @@ public class RemoteApi
     /**
      * Returns the state of the given agent as a simple string.  Possible states are:
      * <ul>
-     *   <li>awaiting ping</li>
-     *   <li>building</li>
-     *   <li>building invalid</li>
-     *   <li>disabled</li>
-     *   <li>idle</li>
-     *   <li>initial</li>
-     *   <li>invalid master</li>
-     *   <li>offline</li>
-     *   <li>post recipe</li>
-     *   <li>recipe assigned</li>
-     *   <li>token mismatch</li>
-     *   <li>version mismatch</li>
+     * <li>awaiting ping</li>
+     * <li>building</li>
+     * <li>building invalid</li>
+     * <li>disabled</li>
+     * <li>idle</li>
+     * <li>initial</li>
+     * <li>invalid master</li>
+     * <li>offline</li>
+     * <li>post recipe</li>
+     * <li>recipe assigned</li>
+     * <li>token mismatch</li>
+     * <li>version mismatch</li>
      * </ul>
      *
      * @param token authentication token (see {@link #login})
-     * @param name the name of the agent to retrieve the state for
+     * @param name  the name of the agent to retrieve the state for
      * @return the current state of the given agent
      * @throws IllegalArgumentException if the given agent does not exist
      * @access available to users with view permission for the given agent
@@ -3031,11 +3101,9 @@ public class RemoteApi
     }
 
     /**
-     * @internal
-     * Shutdown function used by the service wrapper.
-     *
      * @param token authentication token (see {@link #login})
      * @return true
+     * @internal Shutdown function used by the service wrapper.
      */
     public boolean stopService(String token)
     {
