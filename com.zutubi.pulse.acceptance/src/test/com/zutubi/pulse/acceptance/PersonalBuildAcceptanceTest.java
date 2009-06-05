@@ -78,8 +78,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         long buildNumber = runPersonalBuild("failure");
         verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
 
-        PersonalEnvironmentArtifactPage envPage = new PersonalEnvironmentArtifactPage(selenium, urls, PROJECT_NAME, buildNumber, "default", "build");
-        envPage.goTo();
+        PersonalEnvironmentArtifactPage envPage = browser.openAndWaitFor(PersonalEnvironmentArtifactPage.class, PROJECT_NAME, buildNumber, "default", "build");
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(true)));
@@ -122,8 +121,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild("error");
-        PersonalBuildSummaryPage summaryPage = new PersonalBuildSummaryPage(selenium, urls, buildNumber);
-        summaryPage.goTo();
+        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTextPresent("Unknown child element 'notrecognised'");
     }
 
@@ -194,13 +192,11 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild("failure");
 
-        PersonalBuildSummaryPage page = new PersonalBuildSummaryPage(selenium, urls, buildNumber);
-        page.goTo();
-
+        PersonalBuildSummaryPage page = browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTrue(page.isHookPresent(HOOK_NAME));
         page.clickHook(HOOK_NAME);
-        
-        SeleniumUtils.waitForVisible(selenium, "status-message");
+
+        browser.waitForVisible("status-message");
         assertTextPresent("triggered hook '" + HOOK_NAME + "'");
     }
 
@@ -215,9 +211,12 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private String getLogText(String url)
     {
-        selenium.open(url);
-        selenium.waitForPageToLoad(Long.toString(SeleniumUtils.DEFAULT_TIMEOUT));
-        return selenium.getText("panel");
+        browser.goTo(url);
+//        selenium.open(url);
+        browser.waitForPageToLoad();
+//        selenium.waitForPageToLoad(Long.toString(SeleniumUtils.DEFAULT_TIMEOUT));
+        return browser.getText("panel");
+//        return selenium.getText("panel");
     }
 
     private void checkout(String url) throws SVNException
@@ -268,11 +267,10 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTrue("Patch not accepted given status:\n" + StringUtils.join("\n", statuses), ui.isPatchAccepted());
 
         long buildNumber = ui.getBuildNumber();
-        MyBuildsPage myBuildsPage = new MyBuildsPage(selenium, urls);
-        myBuildsPage.goTo();
-        SeleniumUtils.refreshUntilElement(selenium, MyBuildsPage.getBuildNumberId(buildNumber));
+        browser.openAndWaitFor(MyBuildsPage.class);
+        SeleniumUtils.refreshUntilElement(browser.getSelenium(), MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
-        SeleniumUtils.refreshUntilText(selenium, MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus, BUILD_TIMEOUT);
+        SeleniumUtils.refreshUntilText(browser.getSelenium(), MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus, BUILD_TIMEOUT);
         return buildNumber;
     }
 
@@ -285,7 +283,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     {
         File configFile = new File(workingCopyDir, PersonalBuildConfig.PROPERTIES_FILENAME);
         Properties config = new Properties();
-        config.put(PersonalBuildConfig.PROPERTY_PULSE_URL, baseUrl);
+        config.put(PersonalBuildConfig.PROPERTY_PULSE_URL, browser.getBaseUrl());
         config.put(PersonalBuildConfig.PROPERTY_PULSE_USER, "admin");
         config.put(PersonalBuildConfig.PROPERTY_PULSE_PASSWORD, "admin");
         config.put(PersonalBuildConfig.PROPERTY_PROJECT, projectName);
@@ -322,41 +320,39 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     private void verifyPersonalBuildTabs(long buildNumber, String agent)
     {
         // Verify each tab in turn
-        PersonalBuildSummaryPage summaryPage = new PersonalBuildSummaryPage(selenium, urls, buildNumber);
-        summaryPage.goTo();
+        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTextPresent("nosuchcommand");
-        SeleniumUtils.assertText(selenium, IDs.stageAgentCell(PROJECT_NAME, buildNumber, "default"), agent);
+        SeleniumUtils.assertText(browser.getSelenium(), IDs.stageAgentCell(PROJECT_NAME, buildNumber, "default"), agent);
 
-        selenium.click(IDs.buildDetailsTab());
-        PersonalBuildDetailedViewPage detailedViewPage = new PersonalBuildDetailedViewPage(selenium, urls, buildNumber);
+        browser.click(IDs.buildDetailsTab());
+        PersonalBuildDetailedViewPage detailedViewPage = browser.create(PersonalBuildDetailedViewPage.class, buildNumber);
         detailedViewPage.waitFor();
         detailedViewPage.clickCommand("default", "build");
         assertTextPresent("nosuchcommand");
 
-        selenium.click(IDs.buildChangesTab());
-        PersonalBuildChangesPage changesPage = new PersonalBuildChangesPage(selenium, urls, buildNumber);
+        browser.click(IDs.buildChangesTab());
+        PersonalBuildChangesPage changesPage = browser.create(PersonalBuildChangesPage.class, buildNumber);
         changesPage.waitFor();
         assertTrue(Long.parseLong(changesPage.getCheckedOutRevision()) >= 2);
         assertEquals("build.xml", changesPage.getChangedFile(0));
 
-        selenium.click(IDs.buildTestsTab());
-        PersonalBuildTestsPage testsPage = new PersonalBuildTestsPage(selenium, urls, buildNumber);
+        browser.click(IDs.buildTestsTab());
+        PersonalBuildTestsPage testsPage = browser.create(PersonalBuildTestsPage.class, buildNumber);
         testsPage.waitFor();
         assertTrue(testsPage.isBuildComplete());
         assertFalse(testsPage.hasTests());
 
-        selenium.click(IDs.buildFileTab());
-        PersonalBuildFilePage filePage = new PersonalBuildFilePage(selenium, urls, buildNumber);
+        browser.click(IDs.buildFileTab());
+        PersonalBuildFilePage filePage = browser.create(PersonalBuildFilePage.class, buildNumber);
         filePage.waitFor();
         assertTrue(filePage.isHighlightedFilePresent());
         assertTextPresent("<ant");
 
-        PersonalBuildArtifactsPage artifactsPage = new PersonalBuildArtifactsPage(selenium, urls, buildNumber);
-        artifactsPage.goTo();
-        SeleniumUtils.waitForLocator(selenium, artifactsPage.getCommandLocator("build"));
+        PersonalBuildArtifactsPage artifactsPage = browser.openAndWaitFor(PersonalBuildArtifactsPage.class, buildNumber);
+        browser.waitForLocator(artifactsPage.getCommandLocator("build"));
 
-        selenium.click(IDs.buildWorkingCopyTab());
-        PersonalBuildWorkingCopyPage wcPage = new PersonalBuildWorkingCopyPage(selenium, urls, buildNumber);
+        browser.click(IDs.buildWorkingCopyTab());
+        PersonalBuildWorkingCopyPage wcPage = browser.create(PersonalBuildWorkingCopyPage.class, buildNumber);
         wcPage.waitFor();
         assertTrue(wcPage.isWorkingCopyNotPresent());
     }

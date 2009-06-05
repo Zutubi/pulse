@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.FileSystemUtils;
+import static com.zutubi.util.Constants.SECOND;
 
 import java.io.File;
 import java.util.Hashtable;
@@ -36,12 +37,12 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseViewDescendentsBuilding() throws Exception
     {
-        descendentsBuildingHelper(new BrowsePage(selenium, urls));
+        descendentsBuildingHelper(browser.create(BrowsePage.class));
     }
 
     public void testDashboardDescendentsBuilding() throws Exception
     {
-        descendentsBuildingHelper(new DashboardPage(selenium, urls));
+        descendentsBuildingHelper(browser.create(DashboardPage.class));
     }
 
     private void descendentsBuildingHelper(ProjectsSummaryPage summaryPage) throws Exception
@@ -61,23 +62,26 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
         try
         {
             loginAsAdmin();
-            summaryPage.goTo();
+            summaryPage.openAndWaitFor();
             assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
 
             triggerAndWaitForBuildToCommence(childProject);
-            selenium.refresh();
-            selenium.waitForPageToLoad("30000");
+            browser.refresh();
+            browser.waitForPageToLoad(30 * SECOND);
             assertEquals(STATUS_ONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
 
             FileSystemUtils.createFile(waitFile, "test");
-            xmlRpcHelper.waitForBuildToComplete(childProject, 1, BUILD_TIMEOUT);
-            selenium.refresh();
-            selenium.waitForPageToLoad("30000");
+            xmlRpcHelper.waitForBuildToComplete(childProject, 1);
+            browser.refresh();
+            browser.waitForPageToLoad(30 * SECOND);
             assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
         }
         finally
         {
-            waitFile.delete();
+            if (waitFile.exists() && !waitFile.delete())
+            {
+                waitFile.deleteOnExit();
+            }
             xmlRpcHelper.cancelBuild(childProject, 1);
         }
     }

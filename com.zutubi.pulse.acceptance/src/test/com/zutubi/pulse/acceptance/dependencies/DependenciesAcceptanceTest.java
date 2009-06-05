@@ -2,18 +2,19 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
+import static com.zutubi.pulse.acceptance.Constants.Project.Dependencies.*;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_MILESTONE;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_RELEASE;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.PublicationConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
@@ -29,10 +30,6 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private static final String PROPERTY_EXPECTED_LIST = "expected.list";
     private static final String PROPERTY_NOT_EXPECTED_LIST = "not.expected.list";
 
-    /**
-     * Timeout waiting for a build to reach the expected state.
-     */
-    private static final int BUILD_TIMEOUT = 90000;
     /**
      * Timeout waiting for an artifact to appear in the repository.
      */
@@ -479,7 +476,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         buildA.addFileToCreate("build/artifact.jar");
         triggerSuccessfulBuild(projectA, buildA);
 
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1, BUILD_TIMEOUT);
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
     }
 
     public void testDependentBuild_PropagateStatus() throws Exception
@@ -499,7 +496,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         buildA.addFileToCreate("build/artifact.jar");
         triggerSuccessfulBuild(projectA, buildA);
 
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1, BUILD_TIMEOUT);
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
         assertIvyStatus(STATUS_RELEASE, projectB.getName(), 1);
     }
@@ -536,7 +533,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         triggerBuildCommon(project, build);
 
-        return xmlRpcHelper.runBuild(project.getName(), status, BUILD_TIMEOUT);
+        return xmlRpcHelper.runBuild(project.getName(), asPair("status", (Object)status));
     }
 
     private int triggerBuild(Project project, AntBuildConfiguration build) throws Exception
@@ -544,7 +541,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // for each stage, set the necessary build properties.
         triggerBuildCommon(project, build);
 
-        return xmlRpcHelper.runBuild(project.getName(), BUILD_TIMEOUT);
+        return xmlRpcHelper.runBuild(project.getName());
     }
 
     private void triggerBuildCommon(Project project, AntBuildConfiguration build) throws Exception
@@ -635,7 +632,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         if (!xmlRpcHelper.configPathExists(stagePath))
         {
             Hashtable<String, Object> stage = xmlRpcHelper.createDefaultConfig(BuildStageConfiguration.class);
-            stage.put("name", stageName);
+            stage.put(Constants.Project.Stage.NAME, stageName);
 
             xmlRpcHelper.insertConfig("projects/" + projectName + "/stages", stage);
         }
@@ -646,11 +643,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // configure the default stage.
         String dependenciesPath = "projects/" + project.getName() + "/dependencies";
         Hashtable<String, Object> dependencies = xmlRpcHelper.getConfig(dependenciesPath);
-        dependencies.put("publicationPattern", project.publicationPattern);
-        dependencies.put("retrievalPattern", project.retrievalPattern);
+        dependencies.put(PUBLICATION_PATTERN, project.publicationPattern);
+        dependencies.put(RETRIEVAL_PATTERN, project.retrievalPattern);
         if (TextUtils.stringSet(project.status))
         {
-            dependencies.put("status", project.status);
+            dependencies.put(STATUS, project.status);
         }
         xmlRpcHelper.saveConfig(dependenciesPath, dependencies, false);
     }
@@ -691,10 +688,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private Hashtable<String, Object> createPublication(String artifact)
     {
-        Hashtable<String, Object> jar = new Hashtable<String, Object>();
+        Hashtable<String, Object> jar = xmlRpcHelper.createEmptyConfig(PublicationConfiguration.class);
         jar.put("name", artifact.substring(0, artifact.lastIndexOf(".")));
         jar.put("ext", artifact.substring(artifact.lastIndexOf(".") + 1));
-        jar.put("meta.symbolicName", "zutubi.publication");
         return jar;
     }
 
@@ -712,13 +708,12 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> dependencies = (Vector<Hashtable<String, Object>>) projectDependencies.get("dependencies");
 
-        Hashtable<String, Object> dependency = new Hashtable<String, Object>();
+        Hashtable<String, Object> dependency = xmlRpcHelper.createEmptyConfig(DependencyConfiguration.class);
         dependency.put("project", "projects/" + projectDependency.project.getName());
         dependency.put("revision", projectDependency.revision);
         dependency.put("allStages", (projectDependency.stage == null));
         dependency.put("stages", asStagePaths(projectDependency));
         dependency.put("transitive", projectDependency.transitive);
-        dependency.put("meta.symbolicName", "zutubi.dependency");
         dependencies.add(dependency);
 
         xmlRpcHelper.saveConfig(projectDependenciesPath, projectDependencies, true);

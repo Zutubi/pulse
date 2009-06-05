@@ -24,8 +24,7 @@ public class ConfigLinksAcceptanceTest extends SeleniumTestBase
         }
 
         loginAsAdmin();
-        ProjectConfigPage projectConfigPage = new ProjectConfigPage(selenium, urls, random, false);
-        projectConfigPage.goTo();
+        ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         assertTrue(projectConfigPage.isLinksBoxPresent());
         assertTrue(projectConfigPage.isLinkPresent("home"));
         assertTrue(projectConfigPage.isLinkPresent("reports"));
@@ -33,15 +32,14 @@ public class ConfigLinksAcceptanceTest extends SeleniumTestBase
         assertTrue(projectConfigPage.isLinkPresent("log"));
 
         projectConfigPage.clickLink("home");
-        ProjectHomePage homePage = new ProjectHomePage(selenium, urls, random);
+        ProjectHomePage homePage = browser.create(ProjectHomePage.class, random);
         homePage.waitFor();
     }
 
     public void testLinksNotShownForTemplate() throws Exception
     {
         loginAsAdmin();
-        ProjectConfigPage projectConfigPage = new ProjectConfigPage(selenium, urls, GLOBAL_PROJECT_NAME, true);
-        projectConfigPage.goTo();
+        ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, GLOBAL_PROJECT_NAME, true);
         assertFalse(projectConfigPage.isLinksBoxPresent());
         assertFalse(projectConfigPage.isLinkPresent("home"));
     }
@@ -49,8 +47,7 @@ public class ConfigLinksAcceptanceTest extends SeleniumTestBase
     public void testLinksNotShownForTypeWithNoLinks() throws Exception
     {
         loginAsAdmin();
-        CompositePage compositePage = new CompositePage(selenium, urls, GlobalConfiguration.SCOPE_NAME);
-        compositePage.goTo();
+        CompositePage compositePage = browser.openAndWaitFor(CompositePage.class, GlobalConfiguration.SCOPE_NAME);
         assertFalse(compositePage.isLinksBoxPresent());
     }
 }

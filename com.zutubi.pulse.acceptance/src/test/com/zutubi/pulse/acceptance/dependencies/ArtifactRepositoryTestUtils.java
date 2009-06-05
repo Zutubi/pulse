@@ -52,7 +52,12 @@ public class ArtifactRepositoryTestUtils
      */
     public static String ivyPath(String projectName, int buildNumber)
     {
-        return projectName + "/ivy-" + buildNumber + ".xml";
+        return ivyPath(projectName, Integer.toString(buildNumber));
+    }
+
+    public static String ivyPath(String projectName, String version)
+    {
+        return projectName + "/ivy-" + version + ".xml";
     }
 
     /**

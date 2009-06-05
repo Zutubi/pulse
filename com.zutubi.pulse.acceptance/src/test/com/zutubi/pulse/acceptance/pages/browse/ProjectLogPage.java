@@ -42,4 +42,9 @@ public class ProjectLogPage extends SeleniumPage
     {
         return selenium.getText("project-log-" + projectName);
     }
+
+    public boolean logContains(String text)
+    {
+        return getLog().contains(text);
+    }
 }

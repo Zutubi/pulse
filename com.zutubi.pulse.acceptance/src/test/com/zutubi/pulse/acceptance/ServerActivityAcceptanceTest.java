@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
+import com.thoughtworks.selenium.Selenium;
 
 import java.io.File;
 import java.util.HashMap;
@@ -54,9 +55,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
     public void testEmptyActivityTables()
     {
-        ServerActivityPage page = new ServerActivityPage(selenium, urls);
-        page.goTo();
-
+        browser.openAndWaitFor(ServerActivityPage.class);
         assertEmptyTable(ID_BUILD_QUEUE_TABLE, "build queue", BuildQueueTable.EMPTY_MESSAGE);
         assertEmptyTable(ID_ACTIVITY_TABLE, "active builds", ActiveBuildsTable.EMPTY_MESSAGE);
         assertEmptyTable(ID_RECIPE_QUEUE_TABLE, "recipe queue", "no recipe requests queued");
@@ -67,7 +66,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         // we use contains here since the recipe queue table header gets merged with the
         // pause action when returned by selenium.
         assertTrue(new Table(id).getHeader().contains(header));
-        assertEquals(message, SeleniumUtils.getCellContents(selenium, id, 2, 0));
+        assertEquals(message, SeleniumUtils.getCellContents(browser.getSelenium(), id, 2, 0));
     }
 
     /**
@@ -82,8 +81,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     {
         createAndTriggerProjectBuild();
 
-        ServerActivityPage page = new ServerActivityPage(selenium, urls);
-        page.goTo();
+        browser.openAndWaitFor(ServerActivityPage.class);
 
         ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
         assertEquals(1, activeBuildsTable.getRowCount());
@@ -102,15 +100,13 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     {
         createAndTriggerProjectBuild();
 
-        ServerActivityPage page = new ServerActivityPage(selenium, urls);
-        page.goTo();
+        browser.openAndWaitFor(ServerActivityPage.class);
 
         ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
         activeBuildsTable.clickCancel(random, 1);
 
-        xmlRpcHelper.waitForBuildToComplete(random, 1, TIMEOUT);
-        BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, random, 1);
-        summaryPage.goTo();
+        xmlRpcHelper.waitForBuildToComplete(random, 1);
+        browser.openAndWaitFor(BuildSummaryPage.class, random, 1L);
         assertTextPresent("Forceful termination requested by 'admin'");
     }
 
@@ -129,8 +125,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         // build 2 goes into the build queue.
         triggerBuild(false);
 
-        ServerActivityPage page = new ServerActivityPage(selenium, urls);
-        page.goTo();
+        browser.openAndWaitFor(ServerActivityPage.class);
 
         ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
         waitForQueueCount(activeBuildsTable, 1);
@@ -183,7 +178,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
     private void waitForQueueCount(final Table queueTable, final int count)
     {
-        SeleniumUtils.refreshUntil(selenium, TIMEOUT, new Condition()
+        SeleniumUtils.refreshUntil(browser.getSelenium(), TIMEOUT, new Condition()
         {
             public boolean satisfied()
             {
@@ -200,7 +195,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
             FileSystemUtils.createFile(waitFile, "test");
         }
 
-        xmlRpcHelper.waitForBuildToComplete(random, buildId, TIMEOUT);
+        xmlRpcHelper.waitForBuildToComplete(random, buildId);
     }
 
     private String getFileArgument()
@@ -213,20 +208,23 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         protected String id;
         protected String emptyMessage;
 
+        protected Selenium selenium;
+
         public Table(String id)
         {
-            this.id = id;
+            this(id, null);
         }
 
         public Table(String id, String emptyMessage)
         {
             this.id = id;
             this.emptyMessage = emptyMessage;
+            this.selenium = browser.getSelenium();
         }
 
         public String getHeader()
         {
-            return SeleniumUtils.getCellContents(selenium, id, 0, 0);
+            return SeleniumUtils.getCellContents(this.selenium, id, 0, 0);
         }
 
         /**
@@ -239,7 +237,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         {
             try
             {
-                return SeleniumUtils.getCellContents(selenium, id, row + 1, column - 1);
+                return SeleniumUtils.getCellContents(this.selenium, id, row + 1, column - 1);
             }
             catch (Exception e)
             {
@@ -254,7 +252,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
             {
                 try
                 {
-                    SeleniumUtils.getCellContents(selenium, id, count + 2, 0);
+                    SeleniumUtils.getCellContents(this.selenium, id, count + 2, 0);
                     count++;
                 }
                 catch (Exception e)
@@ -357,7 +355,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
         public void clickCancel(String owner, long number)
         {
-            selenium.click("cancel.active." + owner + "." + Long.toString(number));
+            this.selenium.click("cancel.active." + owner + "." + Long.toString(number));
         }
     }
 }

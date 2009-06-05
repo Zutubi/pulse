@@ -11,9 +11,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
     public void testServerMessages() throws Exception
     {
         loginAsAdmin();
-        ServerMessagesPage page = new ServerMessagesPage(selenium, urls);
-        page.goTo();
-
+        browser.openAndWaitFor(ServerMessagesPage.class);
         assertTextPresent("messages found");
     }
 
@@ -33,8 +31,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
         }
 
         loginAsAdmin();
-        ServerMessagesPage page = new ServerMessagesPage(selenium, urls);
-        page.goTo();
+        ServerMessagesPage page = browser.openAndWaitFor(ServerMessagesPage.class);
 
         assertEquals("100 messages found", page.getMessagesCountText());
         assertPagingLinks(page, 10);
@@ -47,9 +44,7 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
     public void testServerInfo() throws Exception
     {
         loginAsAdmin();
-        ServerInfoPage page = new ServerInfoPage(selenium, urls);
-        page.goTo();
-
+        browser.openAndWaitFor(ServerInfoPage.class);
         assertTextPresent("system information");
         assertTextPresent("java vm");
         assertTextPresent("version information");
@@ -67,34 +62,34 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
             String pageId = page.getPageId(i);
             if(i == page.getPageNumber())
             {
-                assertFalse(selenium.isElementPresent(pageId));
+                assertFalse(browser.isElementPresent(pageId));
             }
             else
             {
-                assertTrue(selenium.isElementPresent(pageId));
+                assertTrue(browser.isElementPresent(pageId));
             }
         }
 
         if(page.getPageNumber() == 1)
         {
-            assertFalse(selenium.isElementPresent("page.latest"));
-            assertFalse(selenium.isElementPresent("page.previous"));
+            assertFalse(browser.isElementPresent("page.latest"));
+            assertFalse(browser.isElementPresent("page.previous"));
         }
         else
         {
-            assertTrue(selenium.isElementPresent("page.latest"));
-            assertTrue(selenium.isElementPresent("page.previous"));
+            assertTrue(browser.isElementPresent("page.latest"));
+            assertTrue(browser.isElementPresent("page.previous"));
         }
 
         if(page.getPageNumber() == pageCount)
         {
-            assertFalse(selenium.isElementPresent("page.oldest"));
-            assertFalse(selenium.isElementPresent("page.next"));
+            assertFalse(browser.isElementPresent("page.oldest"));
+            assertFalse(browser.isElementPresent("page.next"));
         }
         else
         {
-            assertTrue(selenium.isElementPresent("page.oldest"));
-            assertTrue(selenium.isElementPresent("page.next"));
+            assertTrue(browser.isElementPresent("page.oldest"));
+            assertTrue(browser.isElementPresent("page.next"));
         }
     }
 }

@@ -5,12 +5,14 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
@@ -22,9 +24,11 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
+import com.zutubi.util.Pair;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -40,6 +44,18 @@ public class XmlRpcHelper
 
     protected XmlRpcClient xmlRpcClient;
     protected String token = null;
+
+    private static final long BUILD_TIMEOUT = 90000;
+
+    public XmlRpcHelper() throws MalformedURLException
+    {
+        this(new URL("http", "localhost", AcceptanceTestUtils.getPulsePort(), "/xmlrpc"));
+    }
+
+    public XmlRpcHelper(String url) throws MalformedURLException
+    {
+        this(new URL(url));
+    }
 
     public XmlRpcHelper(URL url)
     {
@@ -303,9 +319,14 @@ public class XmlRpcHelper
         return call("getAllAgentNames");
     }
 
-    public Vector<Hashtable<String, Object>> getArtifactsInBuild(String project, int buildNumber) throws Exception
+    public Vector<Hashtable<String, Object>> getArtifactsInBuild(String project, long buildNumber) throws Exception
     {
-        return call("getArtifactsInBuild", project, buildNumber);
+        return call("getArtifactsInBuild", project, (int)buildNumber);
+    }
+
+    public String insertSimpleProject(String name) throws Exception
+    {
+        return insertSimpleProject(name, false);
     }
 
     public String insertSimpleProject(String name, boolean template) throws Exception
@@ -351,7 +372,7 @@ public class XmlRpcHelper
         Hashtable<String, Object> stages = new Hashtable<String, Object>();
         stages.put("default", stage);
 
-        Hashtable<String, Object> project = createEmptyConfig("zutubi.projectConfig");
+        Hashtable<String, Object> project = createEmptyConfig(ProjectConfiguration.class);
         project.put("name", name);
         if (scm != null)
         {
@@ -374,7 +395,7 @@ public class XmlRpcHelper
 
     public Hashtable<String, Object> getSubversionConfig(String url)
     {
-        Hashtable<String, Object> scm = createEmptyConfig("zutubi.subversionConfig");
+        Hashtable<String, Object> scm = createEmptyConfig(SubversionConfiguration.class);
         scm.put("url", url);
         scm.put("checkoutScheme", "CLEAN_CHECKOUT");
         scm.put("monitor", false);
@@ -469,6 +490,7 @@ public class XmlRpcHelper
         Hashtable<String, Object> properties = getConfig(propertiesPath);
         if (properties.containsKey(name))
         {
+            @SuppressWarnings({"unchecked"})
             Hashtable<String, Object> property = (Hashtable<String, Object>) properties.get(name);
             property.put("value", value);
             return saveConfig(getPath(propertiesPath, name), property, false);
@@ -527,6 +549,18 @@ public class XmlRpcHelper
         }
 
         return hook;
+    }
+
+    public void enableBuildPrompting(String projectName) throws Exception
+    {
+        Hashtable<String, Object> config = getConfig(getOptionsPath(projectName));
+        config.put("prompt", Boolean.TRUE);
+        saveConfig(getOptionsPath(projectName), config, false);
+    }
+
+    private String getOptionsPath(String projectName)
+    {
+        return "projects/" + projectName + "/options";
     }
 
     public String insertSimpleAgent(String name) throws Exception
@@ -646,6 +680,29 @@ public class XmlRpcHelper
     }
 
     /**
+     * Triggers a build of the given project and waits for the default amount of
+     * time for it to complete.
+     *
+     * @param projectName   name of the project to trigger
+     * @param options       the key value pairs describing the build options
+     * @return  the build number
+     * @throws Exception    on error.
+     */
+    public int runBuild(String projectName, Pair<String, Object>... options) throws Exception
+    {
+        Hashtable<String, Object> triggerOptions = new Hashtable<String, Object>();
+        for (Pair<String, Object> option: options)
+        {
+            triggerOptions.put(option.getFirst(), option.getSecond());
+        }
+        
+        int number = getNextBuildNumber(projectName);
+        call("triggerBuild", projectName, triggerOptions);
+        waitForBuildToComplete(projectName, number);
+        return number;
+    }
+
+    /**
      * Triggers a build of the given project and waits for up to timeout
      * milliseconds for it to complete.
      *
@@ -710,6 +767,11 @@ public class XmlRpcHelper
         }, timeout, "build " + number + " of project " + projectName + " to become in progress");
     }
 
+    public void waitForBuildToComplete(final String projectName, final int number) throws Exception
+    {
+        waitForBuildToComplete(projectName, number, BUILD_TIMEOUT);    
+    }
+
     /**
      * Waits for a project build to finish.
      *
@@ -769,7 +831,7 @@ public class XmlRpcHelper
 
     public static void main(String[] argv) throws Exception
     {
-        XmlRpcHelper helper = new XmlRpcHelper(new URL("http://localhost:8080/xmlrpc"));
+        XmlRpcHelper helper = new XmlRpcHelper("http://localhost:8080/xmlrpc");
         helper.loginAsAdmin();
         try
         {

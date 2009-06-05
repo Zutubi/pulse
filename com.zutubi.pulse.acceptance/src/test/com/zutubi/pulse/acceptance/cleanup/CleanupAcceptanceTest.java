@@ -1,14 +1,15 @@
 package com.zutubi.pulse.acceptance.cleanup;
 
-import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
+import com.zutubi.pulse.acceptance.SeleniumTestBase;
+import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 import static com.zutubi.util.Constants.SECOND;
 
 import java.util.Vector;
-import java.io.File;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.
@@ -16,7 +17,6 @@ import java.io.File;
 public class CleanupAcceptanceTest extends SeleniumTestBase
 {
     private static final long CLEANUP_TIMEOUT = SECOND * 10;
-    private static final long BUILD_TIMEOUT = SECOND * 9;
 
     private CleanupTestUtils utils;
 
@@ -29,7 +29,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.loginAsAdmin();
 
-        utils = new CleanupTestUtils(xmlRpcHelper, selenium, urls);
+        utils = new CleanupTestUtils(xmlRpcHelper);
     }
 
     @Override
@@ -51,13 +51,13 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         utils.addCleanupRule(projectName, "working_directory", CleanupWhat.WORKING_COPY_SNAPSHOT);
         utils.deleteCleanupRule(projectName, "default");
 
-        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuildWorkingCopy(projectName, 1));
-        assertTrue(utils.isBuildPresentViaUI(projectName, 1));
+        assertTrue(isBuildPresentViaUI(projectName, 1));
 
-        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
             public boolean notSatisfied() throws Exception
@@ -66,7 +66,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        assertTrue(utils.isBuildPresentViaUI(projectName, 2));
+        assertTrue(isBuildPresentViaUI(projectName, 2));
         assertTrue(utils.hasBuildWorkingCopy(projectName, 2));
 
         assertFalse(utils.hasBuildWorkingCopy(projectName, 1));
@@ -74,8 +74,8 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         // verify that the UI is as expected - the working copy tab exists and displays the
         // appropriate messages.
 
-        assertFalse(utils.isWorkingCopyPresentViaUI(projectName, 1));
-        assertTrue(utils.isWorkingCopyPresentViaUI(projectName, 2));
+        assertFalse(isWorkingCopyPresentViaUI(projectName, 1));
+        assertTrue(isWorkingCopyPresentViaUI(projectName, 2));
     }
 
     public void testCleanupBuildArtifacts() throws Exception
@@ -87,13 +87,13 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         utils.addCleanupRule(projectName, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
         utils.deleteCleanupRule(projectName, "default");
 
-        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuildDirectory(projectName, 1));
         assertTrue(utils.hasBuildWorkingCopy(projectName, 1));
 
-        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
             public boolean notSatisfied() throws Exception
@@ -115,9 +115,9 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         assertFalse(utils.hasBuildOutputDirectory(projectName, 1));
         assertFalse(utils.hasBuildFeaturesDirectory(projectName, 1));
 
-        assertTrue(utils.isBuildPulseFilePresentViaUI(projectName, 1));
-        assertTrue(utils.isBuildLogsPresentViaUI(projectName, 1));
-        assertFalse(utils.isBuildArtifactsPresentViaUI(projectName, 1));
+        assertTrue(isBuildPulseFilePresentViaUI(projectName, 1));
+        assertTrue(isBuildLogsPresentViaUI(projectName, 1));
+        assertFalse(isBuildArtifactsPresentViaUI(projectName, 1));
 
         // the remote api returns artifacts based on what is in the database.
         Vector artifactsInBuild = xmlRpcHelper.getArtifactsInBuild(projectName, 1);
@@ -133,13 +133,13 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         utils.addCleanupRule(projectName, "everything");
         utils.deleteCleanupRule(projectName, "default");
 
-        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuild(projectName, 1));
-        assertTrue(utils.isBuildPresentViaUI(projectName, 1));
+        assertTrue(isBuildPresentViaUI(projectName, 1));
 
-        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
             public boolean notSatisfied() throws Exception
@@ -149,10 +149,10 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         });
 
         assertTrue(utils.hasBuild(projectName, 2));
-        assertTrue(utils.isBuildPresentViaUI(projectName, 2));
+        assertTrue(isBuildPresentViaUI(projectName, 2));
 
         assertFalse(utils.hasBuild(projectName, 1));
-        assertFalse(utils.isBuildPresentViaUI(projectName, 1));
+        assertFalse(isBuildPresentViaUI(projectName, 1));
 
         // Unknown build '1' for project 'testCleanupAll-8KHqy3jjGJ'
         try
@@ -186,6 +186,66 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
             {
                 // noop.
             }
+        }
+    }
+
+    public boolean isWorkingCopyPresentViaUI(String projectName, long buildNumber)
+    {
+        BuildWorkingCopyPage page = browser.openAndWaitFor(BuildWorkingCopyPage.class, projectName, buildNumber);
+        return page.isWorkingCopyPresent();
+    }
+
+    public boolean isBuildPresentViaUI(String projectName, long buildNumber)
+    {
+        BuildSummaryPage page = browser.create(BuildSummaryPage.class, projectName, buildNumber);
+        return canOpenPage(page);
+    }
+
+    public boolean isBuildPulseFilePresentViaUI(String projectName, long buildNumber)
+    {
+        BuildFilePage page = browser.create(BuildFilePage.class, projectName, buildNumber);
+        return canOpenPage(page);
+    }
+
+    public boolean isBuildLogsPresentViaUI(String projectName, long buildNumber)
+    {
+        BuildDetailedViewPage page = browser.create(BuildDetailedViewPage.class, projectName, buildNumber);
+        if (!canOpenPage(page))
+        {
+            return false;
+        }
+        if (!page.isBuildLogLinkPresent())
+        {
+            return false;
+        }
+        page.clickBuildLogLink();
+        return browser.isTextPresent("tail of build log");
+    }
+
+    public boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)
+    {
+        BuildArtifactsPage page = browser.create(BuildArtifactsPage.class, projectName, buildNumber);
+        if (!canOpenPage(page))
+        {
+            return false;
+        }
+
+        // if artifacts are available, we should have the build command open in the tree.
+        browser.waitForLocator(page.getArtifactLocator("environment"));
+        return page.isArtifactAvailable("environment");
+    }
+
+    private boolean canOpenPage(SeleniumPage page)
+    {
+        try
+        {
+            page.openAndWaitFor();
+            return true;
+        }
+        catch (RuntimeException e)
+        {
+            // failed to load, should see: Unknown build [buildNumber] for project [projectName]
+            return false;
         }
     }
 

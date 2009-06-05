@@ -13,7 +13,6 @@ import static org.mockito.Mockito.*;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

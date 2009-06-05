@@ -1,7 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.thoughtworks.selenium.DefaultSelenium;
-import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.ProjectTypeSelectState;
@@ -22,7 +20,6 @@ import junit.framework.TestCase;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
@@ -41,12 +38,11 @@ public class SeleniumTestBase extends PulseTestCase
      */
     protected static final String AGENT_NAME = "localhost";
 
-    protected Selenium selenium;
     protected Urls urls;
-    protected String port;
-    protected String baseUrl;
     protected String random;
     protected XmlRpcHelper xmlRpcHelper;
+
+    protected SeleniumBrowser browser;
 
     public SeleniumTestBase()
     {
@@ -57,36 +53,24 @@ public class SeleniumTestBase extends PulseTestCase
     {
         super.setUp();
 
-        port = System.getProperty("pulse.port", "8080");
-        xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", Integer.parseInt(port), "/xmlrpc"));
-        baseUrl = "http://localhost:" + port + "/";
-        urls = Urls.getBaselessInstance();
+        xmlRpcHelper = new XmlRpcHelper();
         random = getName() + "-" + RandomUtils.randomString(10);
 
-        String browser = SeleniumUtils.getSeleniumBrowserProperty();
-        
-        selenium = new DefaultSelenium("localhost", 4446, browser, "http://localhost:" + port + "/");
-        selenium.start();
+        browser = new SeleniumBrowser();
+        browser.newSession();
+
+        urls = browser.getUrls();
     }
 
     protected void tearDown() throws Exception
     {
-        selenium.stop();
-        selenium = null;
-        xmlRpcHelper = null;
+        browser.stop();
         super.tearDown();
-    }
-
-    protected void newSession()
-    {
-        selenium.stop();
-        selenium.start();
     }
 
     protected void login(String username, String password)
     {
-        LoginPage page = new LoginPage(selenium, urls);
-        page.goTo();
+        LoginPage page = browser.openAndWaitFor(LoginPage.class);
         page.login(username, password);
     }
 
@@ -97,53 +81,38 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void logout()
     {
-        selenium.click("logout");
-        selenium.waitForPageToLoad("30000");
+        browser.click("logout");
+        browser.waitForPageToLoad();
     }
     
-    protected void goTo(String location)
-    {
-        selenium.open(StringUtils.join("/", true, baseUrl, location));
-    }
-
     protected void assertElementPresent(String id)
     {
-        SeleniumUtils.assertElementPresent(selenium, id);
+        assertTrue("No element with id '" + id + "' found", browser.isElementPresent(id));
     }
 
     protected void assertElementNotPresent(String id)
     {
-        SeleniumUtils.assertElementNotPresent(selenium, id);
+        assertFalse("Unexpected element with id '" + id + "' found", browser.isElementPresent(id));
     }
 
     protected void assertTextPresent(String text)
     {
-        SeleniumUtils.assertTextPresent(selenium, text);
+        assertTrue(browser.isTextPresent(text));
     }
 
     protected void assertTextNotPresent(String text)
     {
-        SeleniumUtils.assertTextNotPresent(selenium, text);
+        assertFalse(browser.isTextPresent(text));
     }
 
     protected void assertLinkPresent(String id)
     {
-        SeleniumUtils.assertLinkPresent(selenium, id);
+        assertTrue(browser.isLinkPresent(id));
     }
 
     protected void assertFormFieldNotEmpty(String id)
     {
-        SeleniumUtils.assertFormFieldNotEmpty(selenium, id);
-    }
-
-    protected void waitForElement(String id)
-    {
-        SeleniumUtils.waitForElementId(selenium, id);
-    }
-
-    protected void waitForElement(String id, long timeout)
-    {
-        SeleniumUtils.waitForElementId(selenium, id, timeout);
+        SeleniumUtils.assertFormFieldNotEmpty(browser.getSelenium(), id);
     }
 
     protected void assertGenericError(String message)
@@ -154,18 +123,18 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void waitForStatus(String message)
     {
-        SeleniumUtils.refreshUntilElement(selenium, IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
+        SeleniumUtils.refreshUntilElement(browser.getSelenium(), IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
 
         // now we wait for the element to contain a message.
         AcceptanceTestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
-                return TextUtils.stringSet(selenium.getText(IDs.STATUS_MESSAGE));
+                return TextUtils.stringSet(browser.getSelenium().getText(IDs.STATUS_MESSAGE));
             }
         }, STATUS_TIMEOUT, "status message to be set.");
 
-        String text = selenium.getText(IDs.STATUS_MESSAGE);
+        String text = browser.getSelenium().getText(IDs.STATUS_MESSAGE);
         assertThat(text, containsString(message));        
     }
 
@@ -191,7 +160,7 @@ public class SeleniumTestBase extends PulseTestCase
         {
             runAddProjectWizard(new DefaultProjectWizardDriver(parentName, name, template));
 
-            ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, name, template);
+            ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, name, template);
             hierarchyPage.waitFor();
 
             if (!template)
@@ -281,8 +250,7 @@ public class SeleniumTestBase extends PulseTestCase
      */
     public AddProjectWizard.CommandState runAddProjectWizard(ProjectWizardDriver driver)
     {
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, driver.getParentName(), true);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, driver.getParentName(), true);
         if (driver.isTemplate())
         {
             hierarchyPage.clickAddTemplate();
@@ -292,12 +260,12 @@ public class SeleniumTestBase extends PulseTestCase
             hierarchyPage.clickAdd();
         }
 
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser.getSelenium());
         projectState.waitFor();
 
         driver.projectState(projectState);
 
-        SelectTypeState scmTypeState = new SelectTypeState(selenium);
+        SelectTypeState scmTypeState = new SelectTypeState(browser.getSelenium());
         scmTypeState.waitFor();
         scmTypeState.nextFormElements(driver.selectScm());
 
@@ -308,7 +276,7 @@ public class SeleniumTestBase extends PulseTestCase
 
         String type = driver.selectType();
 
-        ProjectTypeSelectState projectTypeState = new ProjectTypeSelectState(selenium);
+        ProjectTypeSelectState projectTypeState = new ProjectTypeSelectState(browser.getSelenium());
         projectTypeState.waitFor();
         if (type.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))
         {
@@ -336,7 +304,7 @@ public class SeleniumTestBase extends PulseTestCase
     {
         if (s.equals(ProjectTypeSelectionConfiguration.TYPE_CUSTOM))
         {
-            return new AddProjectWizard.CustomTypeState(selenium);
+            return new AddProjectWizard.CustomTypeState(browser.getSelenium());
         }
         else
         {
@@ -348,15 +316,15 @@ public class SeleniumTestBase extends PulseTestCase
     {
         if (s.equals("zutubi.antCommandConfig"))
         {
-            return new AddProjectWizard.AntState(selenium);
+            return new AddProjectWizard.AntState(browser.getSelenium());
         }
         else if (s.equals("zutubi.mavenCommandConfig"))
         {
-            return new AddProjectWizard.MavenState(selenium);
+            return new AddProjectWizard.MavenState(browser.getSelenium());
         }
         else if (s.equals("zutubi.maven2CommandConfig"))
         {
-            return new AddProjectWizard.Maven2State(selenium);
+            return new AddProjectWizard.Maven2State(browser.getSelenium());
         }
         else
         {
@@ -368,11 +336,11 @@ public class SeleniumTestBase extends PulseTestCase
     {
         if (s.equals("zutubi.subversionConfig"))
         {
-            return new AddProjectWizard.SubversionState(selenium);
+            return new AddProjectWizard.SubversionState(browser.getSelenium());
         }
         else if (s.equals("zutubi.gitConfig"))
         {
-            return new AddProjectWizard.GitState(selenium);
+            return new AddProjectWizard.GitState(browser.getSelenium());
         }
         else
         {
@@ -554,7 +522,7 @@ public class SeleniumTestBase extends PulseTestCase
     {
         if (page.getTitle() != null)
         {
-            String gotTitle = selenium.getTitle();
+            String gotTitle = browser.getSelenium().getTitle();
             if(gotTitle.startsWith(SeleniumPage.TITLE_PREFIX))
             {
                 gotTitle = gotTitle.substring(SeleniumPage.TITLE_PREFIX.length());

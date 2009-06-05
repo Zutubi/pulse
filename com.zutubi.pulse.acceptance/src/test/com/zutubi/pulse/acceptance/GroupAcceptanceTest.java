@@ -23,8 +23,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
 
-        GroupsPage groupsPage = new GroupsPage(selenium, urls);
-        groupsPage.goTo();
+        GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
         assertTrue(groupsPage.isGroupPresent("administrators"));
         assertTrue(groupsPage.isGroupPresent("all users"));
@@ -37,13 +36,12 @@ public class GroupAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
 
-        GroupsPage groupsPage = new GroupsPage(selenium, urls);
-        groupsPage.goTo();
+        GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
         GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, null, null);
 
-        waitForElement(getGroupPath(random));
+        browser.waitForElement(getGroupPath(random));
         assertTrue(form.isFormPresent());
         assertFormElements(form, random, "", "");
     }
@@ -65,26 +63,24 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         }
 
         login(login, "");
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
-        globalPage.goTo();
+        ProjectHierarchyPage globalPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(globalPage.isAddPresent());
         logout();
 
         loginAsAdmin();
-        GroupsPage groupsPage = new GroupsPage(selenium, urls);
-        groupsPage.goTo();
+        GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
         GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, null, ServerPermission.CREATE_PROJECT.toString());
-        waitForElement(getGroupPath(random));
+        browser.waitForElement(getGroupPath(random));
         form.waitFor();
         form.applyFormElements(null, userHandle, null);
         form.waitFor();
         logout();
 
         login(login, "");
-        globalPage.goTo();
-        SeleniumUtils.waitForElementId(selenium, HierarchyPage.LINK_ADD);
+        globalPage.openAndWaitFor();
+        browser.waitForElement(HierarchyPage.LINK_ADD);
         logout();
     }
 
@@ -105,29 +101,27 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         }
 
         loginAsAdmin();
-        GroupsPage groupsPage = new GroupsPage(selenium, urls);
-        groupsPage.goTo();
+        GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
         GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, userHandle, null);
-        waitForElement(getGroupPath(random));
+        browser.waitForElement(getGroupPath(random));
         logout();
 
         login(login, "");
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
-        globalPage.goTo();
+        ProjectHierarchyPage globalPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(globalPage.isAddPresent());
         logout();
 
         loginAsAdmin();
-        goTo(urls.adminGroup(random));
+        browser.goTo(urls.adminGroup(random));
         form.waitFor();
         form.applyFormElements(null, null, ServerPermission.CREATE_PROJECT.toString());
         form.waitFor();
         logout();
 
         login(login, "");
-        globalPage.goTo();
+        globalPage.openAndWaitFor();
         assertTrue(globalPage.isAddPresent());
         logout();
     }
@@ -136,8 +130,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
 
-        GroupsPage groupsPage = new GroupsPage(selenium, urls);
-        groupsPage.goTo();
+        GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
         BuiltinGroupForm form = groupsPage.clickViewBuiltinGroupAndWait(ANONYMOUS_USERS_GROUP_ID);
 
@@ -160,8 +153,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
 
-        GroupsPage groupsPage = new GroupsPage(selenium, urls);
-        groupsPage.goTo();
+        GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
         // a) ensure only view link is available for all users group.
         assertFalse(groupsPage.isActionLinkPresent(groupName, "clone"));

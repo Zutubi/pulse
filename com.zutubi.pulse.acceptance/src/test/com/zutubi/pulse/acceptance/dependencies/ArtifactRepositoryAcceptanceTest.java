@@ -9,8 +9,6 @@ import java.util.Hashtable;
 
 public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
-    private static final int BUILD_TIMEOUT = 90000;
-
     private String random = null;
 
     protected void setUp() throws Exception
@@ -64,6 +62,6 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         antConfig.put("targets", target);
         
         xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.IVY_ANT_REPOSITORY), antConfig);
-        return xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        return xmlRpcHelper.runBuild(random);
     }
 }

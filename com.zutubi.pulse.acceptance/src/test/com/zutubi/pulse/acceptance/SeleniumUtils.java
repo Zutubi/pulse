@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
 import com.zutubi.pulse.core.test.TestUtils;
@@ -17,6 +18,14 @@ import java.io.StringWriter;
 public class SeleniumUtils
 {
     public static final int DEFAULT_TIMEOUT = 30000;
+
+    public static Selenium newInstance()
+    {
+        int port = AcceptanceTestUtils.getPulsePort();
+        String browser = SeleniumUtils.getSeleniumBrowserProperty();
+
+        return new DefaultSelenium("localhost", 4446, browser, "http://localhost:" + port + "/");
+    }
 
     private static File captureFailure(Selenium selenium)
     {
@@ -214,30 +223,10 @@ public class SeleniumUtils
         selenium.click(id);
     }
 
-    public static void assertElementPresent(Selenium selenium, String id)
-    {
-        Assert.assertTrue("No element with id '" + id + "' found", selenium.isElementPresent(StringUtils.toValidHtmlName(id)));
-    }
-
-    public static void assertElementNotPresent(Selenium selenium, String id)
-    {
-        Assert.assertFalse("Unexpected element with id '" + id + "' found", selenium.isElementPresent(StringUtils.toValidHtmlName(id)));
-    }
-
     public static void assertText(Selenium selenium, String id, String expectedText)
     {
         String actualText = selenium.getText(StringUtils.toValidHtmlName(id));
         Assert.assertEquals(expectedText, actualText);
-    }
-
-    public static void assertTextPresent(Selenium selenium, String text)
-    {
-        Assert.assertTrue(selenium.isTextPresent(text));
-    }
-
-    public static void assertTextNotPresent(Selenium selenium, String text)
-    {
-        Assert.assertFalse(selenium.isTextPresent(text));
     }
 
     public static boolean isLinkPresent(Selenium selenium, String id)

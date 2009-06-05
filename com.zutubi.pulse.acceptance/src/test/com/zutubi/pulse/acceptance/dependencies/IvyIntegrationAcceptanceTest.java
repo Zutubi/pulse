@@ -37,18 +37,16 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
 
         tmp = FileSystemUtils.createTempDir();
 
-        repository = new Repository(tmp);//ArtifactRepositoryTestUtils.getArtifactRepository());
+        repository = new Repository(tmp);
 
         Map<String, String> variables = new HashMap<String, String>();
-        variables.put("repository.base", tmp.toURI().toString());//"http://localhost:8080/repository");//tmp.toURI().toString());
+        variables.put("repository.base", tmp.toURI().toString());
 
         String artifactPattern = repository.getArtifactPattern();
         String ivyPattern = repository.getIvyPattern();
 
         DefaultIvyClientFactory icf = new DefaultIvyClientFactory(artifactPattern, ivyPattern);
         core = icf.createClient(variables);
-
-//        CredentialsStore.INSTANCE.addCredentials("Pulse", "localhost", "admin", "admin");
     }
 
     protected void tearDown() throws Exception

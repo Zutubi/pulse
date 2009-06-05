@@ -1,11 +1,11 @@
 package com.zutubi.pulse.acceptance.forms.admin;
 
-import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
+import com.zutubi.util.Pair;
 
-import java.util.List;
 import java.util.LinkedList;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * The form that is presented to the user when they manually trigger a build and have
@@ -18,10 +18,14 @@ public class TriggerBuildForm extends SeleniumForm
      */
     private List<String> propertyNames = new LinkedList<String>();
 
-    public TriggerBuildForm(Selenium selenium, String... propertyNames)
+    public TriggerBuildForm(Selenium selenium)
     {
         super(selenium, false);
-        this.propertyNames = Arrays.asList(propertyNames);
+    }
+
+    public void addProperty(String name)
+    {
+        propertyNames.add(name);
     }
 
     public String getFormName()
@@ -33,6 +37,7 @@ public class TriggerBuildForm extends SeleniumForm
     {
         List<String> fieldNames = new LinkedList<String>();
         fieldNames.add("revision");
+        fieldNames.add("version");
         fieldNames.add("status");
         for (String propertyName : propertyNames)
         {
@@ -44,10 +49,11 @@ public class TriggerBuildForm extends SeleniumForm
 
     public int[] getFieldTypes()
     {
-        int[] types = new int[propertyNames.size() + 2];
+        int[] types = new int[propertyNames.size() + 3];
         types[0] = TEXTFIELD;
-        types[1] = ITEM_PICKER;
-        for (int i = 2; i < types.length; i++)
+        types[1] = TEXTFIELD;
+        types[2] = ITEM_PICKER;
+        for (int i = 3; i < types.length; i++)
         {
             types[i] = TEXTFIELD;
         }
@@ -60,8 +66,8 @@ public class TriggerBuildForm extends SeleniumForm
      * 
      * @param args the argument values
      */
-    public void triggerFormElements(String... args)
+    public void triggerFormElements(Pair<String, String>... args)
     {
-        submitFormElements("trigger", args);
+        submitNamedFormElements("trigger", args);
     }
 }

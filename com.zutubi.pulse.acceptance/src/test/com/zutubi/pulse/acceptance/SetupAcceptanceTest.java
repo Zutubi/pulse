@@ -33,7 +33,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     public void testSetupProcess() throws InterruptedException, IOException, SAXException
     {
         // first we deal with the pulse home property configuration.
-        goTo("setup/setupData!input.action");
+        browser.goTo("setup/setupData!input.action");
 
         // step one. setting the pulse home variable.
         checkSetPulseData();
@@ -47,7 +47,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
     protected void checkPostPulseData()
     {
-        goTo("/");
+        browser.goTo("/");
         _checkPostPulseData();
     }
 
@@ -66,7 +66,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         checkServerSettings();
 
         assertTextPresent("system setup");
-        waitForElement("welcome.heading", 60000);
+        browser.waitForElement("welcome.heading", 60000);
 
         // one complete, we should see the home page, and it should contain the following:
         assertTextPresent(":: welcome ::");
@@ -78,7 +78,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        SetPulseDataForm form = new SetPulseDataForm(selenium);
+        SetPulseDataForm form = browser.create(SetPulseDataForm.class);
         assertTrue(form.isFormPresent());
         assertFormFieldNotEmpty("zfid.data");
 
@@ -103,7 +103,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        SetupDatabaseTypeForm form = new SetupDatabaseTypeForm(selenium);
+        SetupDatabaseTypeForm form = browser.create(SetupDatabaseTypeForm.class);
         assertTrue(form.isFormPresent());
         assertFalse("Detail fields should be disabled for embedded database", form.isEditable("host"));
         form.nextFormElements("EMBEDDED", null, null, null, null, null, null);
@@ -113,7 +113,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        PulseLicenseForm licenseForm = new PulseLicenseForm(selenium);
+        PulseLicenseForm licenseForm = browser.create(PulseLicenseForm.class);
 
         assertTrue(licenseForm.isFormPresent());
 
@@ -144,7 +144,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        CreateAdminForm createAdminForm = new CreateAdminForm(selenium);
+        CreateAdminForm createAdminForm = browser.create(CreateAdminForm.class);
 
         // create admin.
         assertTrue(createAdminForm.isFormPresent());
@@ -155,7 +155,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        ServerSettingsForm settingsForm = new ServerSettingsForm(selenium);
+        ServerSettingsForm settingsForm = browser.create(ServerSettingsForm.class);
         assertTrue(settingsForm.isFormPresent());
         settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
     }

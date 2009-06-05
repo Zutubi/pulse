@@ -42,11 +42,10 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     public void testNoAnonymousAccess() throws Exception
     {
         ensureSetting(KEY_ANONYMOUS_ACCESS, false);
-        goTo(urls.projects());
+        browser.open(BrowsePage.class);
 
         // We should be denied access and redirected to the login page.
-        LoginPage loginPage = new LoginPage(selenium, urls);
-        loginPage.waitFor();
+        LoginPage loginPage = browser.create(LoginPage.class);
         assertTitle(loginPage);
     }
 
@@ -55,15 +54,14 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         ensureSetting(KEY_ANONYMOUS_ACCESS, false);
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
 
-        LoginPage loginPage = new LoginPage(selenium, urls);
-        loginPage.goTo();
+        LoginPage loginPage = browser.open(LoginPage.class);
         loginPage.waitForSignup();
 
         SignupForm form = loginPage.clickSignup();
         form.waitFor();
         form.saveFormElements("login_" + random, "name_" + random, "password", "password");
 
-        WelcomePage welcomePage = new WelcomePage(selenium, urls);
+        WelcomePage welcomePage = browser.create(WelcomePage.class);
         assertTrue(welcomePage.isPresent());
         assertTitle(welcomePage);
         assertTextPresent("name_" + random);
@@ -76,11 +74,10 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     public void testAnonymousSignupDisabled() throws Exception
     {
         ensureSetting(KEY_ANONYMOUS_SIGNUP, false);
-        LoginPage loginPage = new LoginPage(selenium, urls);
-        loginPage.goTo();
+        LoginPage loginPage = browser.open(LoginPage.class);
         assertFalse(loginPage.isSignupPresent());
-        goTo(SIGNUP_INPUT_ACTION);
-        SignupForm form = new SignupForm(selenium);
+        browser.goTo(SIGNUP_INPUT_ACTION);
+        SignupForm form = browser.create(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "", "");
         assertTextPresent("Anonymous signup is not enabled");
@@ -89,8 +86,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     public void testAnonymousSingupPasswordMismatch() throws Exception
     {
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
-        goTo(SIGNUP_INPUT_ACTION);
-        SignupForm form = new SignupForm(selenium);
+        browser.goTo(SIGNUP_INPUT_ACTION);
+        SignupForm form = browser.create(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "p1", "p2");
         assertTrue(form.isFormPresent());
@@ -100,8 +97,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     public void testAnonymousSingupExistingUser() throws Exception
     {
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
-        goTo(SIGNUP_INPUT_ACTION);
-        SignupForm form = new SignupForm(selenium);
+        browser.goTo(SIGNUP_INPUT_ACTION);
+        SignupForm form = browser.create(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements("admin", "name", "p", "p");
         assertTrue(form.isFormPresent());
@@ -111,9 +108,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     public void testAnonymousAccess() throws Exception
     {
         ensureSetting(KEY_ANONYMOUS_ACCESS, true);
-        goTo(urls.projects());
 
-        BrowsePage browsePage = new BrowsePage(selenium, urls);
+        BrowsePage browsePage = browser.open(BrowsePage.class);
         assertTrue(browsePage.isPresent());
         assertTitle(browsePage);
         assertElementPresent(ID_LOGIN);
@@ -131,17 +127,17 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         group.put("serverPermissions", new Vector(0));
         xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
 
-        newSession();
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
-        hierarchyPage.goTo();
+        browser.newSession();
+        
+        ProjectHierarchyPage hierarchyPage = browser.open(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(hierarchyPage.isAddPresent());
 
         group.put("serverPermissions", new Vector<String>(Arrays.asList(ServerPermission.CREATE_PROJECT.toString())));
         xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
         
-        newSession();
-        hierarchyPage.goTo();
-        waitForElement(ProjectHierarchyPage.LINK_ADD);
+        browser.newSession();
+        hierarchyPage.openAndWaitFor();
+        browser.waitForElement(ProjectHierarchyPage.LINK_ADD);
     }
 
     private void ensureSetting(String key, boolean enabled) throws Exception
@@ -151,7 +147,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         {
             general.put(key, enabled);
             xmlRpcHelper.saveConfig(GlobalConfiguration.SCOPE_NAME, general, false);
-            newSession();
+            browser.newSession();
         }
     }
 }

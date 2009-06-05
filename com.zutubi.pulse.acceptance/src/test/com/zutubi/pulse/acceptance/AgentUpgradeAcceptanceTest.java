@@ -1,12 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
 import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.SupportUtils;
+import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.Constants;
+import static com.zutubi.util.Constants.MINUTE;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
 import static com.zutubi.util.FileSystemUtils.createTempDir;
 import com.zutubi.util.NullUnaryProcedure;
@@ -15,7 +16,6 @@ import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Hashtable;
 
 public class AgentUpgradeAcceptanceTest extends PulseTestCase
@@ -88,7 +88,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         String agentUrl = agent.getServerUrl();
         agentUrl = agentUrl + "/xmlrpc";
 
-        XmlRpcHelper agentXmlRpc = new XmlRpcHelper(new URL(agentUrl));
+        XmlRpcHelper agentXmlRpc = new XmlRpcHelper(agentUrl);
         Integer agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
         assertEquals(200000000, agentBuild.intValue());
 
@@ -101,13 +101,13 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
         String masterUrl = master.getServerUrl();
         masterUrl = masterUrl + "/xmlrpc";
-        XmlRpcHelper masterXmlRpc = new XmlRpcHelper(new URL(masterUrl));
+        XmlRpcHelper masterXmlRpc = new XmlRpcHelper(masterUrl);
         masterXmlRpc.loginAsAdmin();
 
         masterXmlRpc.insertTemplatedConfig("agents/global agent template", agentConfig, false);
 
-        long endTime = System.currentTimeMillis() + 5 * Constants.MINUTE;
-        Thread.sleep(5 * Constants.SECOND);
+        long endTime = System.currentTimeMillis() + 5 * MINUTE;
+        Thread.sleep(5 * SECOND);
 
         while (System.currentTimeMillis() < endTime)
         {
@@ -142,7 +142,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         // - piggy back of the existing acceptance test.
         try
         {
-            System.setProperty("pulse.port", "7688");
+            AcceptanceTestUtils.setPulsePort(7688);
             SetupAcceptanceTest setup = new SetupAcceptanceTest();
             setup.setUp();
             // we can not run the usual test since that attempts to specify the data directory.

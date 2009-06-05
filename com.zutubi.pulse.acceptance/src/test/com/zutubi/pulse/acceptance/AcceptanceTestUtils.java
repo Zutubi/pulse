@@ -23,6 +23,31 @@ public class AcceptanceTestUtils
      */
     protected static final String PROPERTY_AGENT_PACKAGE = "agent.package";
 
+    /**
+     * The acceptance test system property for the pulse startup port.
+     */
+    public static final String PROPERTY_PULSE_PORT = "pulse.port";
+
+    /**
+     * The acceptance test system property for the agent startup port.
+     */
+    public static final String PROPERTY_AGENT_PORT = "agent.port";
+
+    public static int getPulsePort()
+    {
+        return Integer.getInteger(PROPERTY_PULSE_PORT, 8080);
+    }
+
+    public static void setPulsePort(int port)
+    {
+        System.setProperty(PROPERTY_PULSE_PORT, Integer.toString(port));
+    }
+
+    public static int getAgentPort()
+    {
+        return Integer.getInteger(PROPERTY_AGENT_PORT, 8890);
+    }
+
     public static File getWorkingDirectory()
     {
         // from IDEA, the working directory is located in the same directory as where the projects are run.

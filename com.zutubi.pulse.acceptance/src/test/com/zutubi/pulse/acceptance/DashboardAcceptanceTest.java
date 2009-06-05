@@ -8,6 +8,7 @@ import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.CollectionUtils.asVector;
 import com.zutubi.util.Pair;
 import com.zutubi.util.RandomUtils;
+import static com.zutubi.util.Constants.SECOND;
 
 import java.util.Hashtable;
 
@@ -42,9 +43,9 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
     public void testNoTrailingSlash() throws Exception
     {
         // See CIB-1715.
-        goTo("dashboard");
-        selenium.waitForPageToLoad("3000");
-        DashboardPage page = new DashboardPage(selenium, urls);
+        browser.goTo("dashboard");
+        browser.waitForPageToLoad(3 * SECOND);
+        DashboardPage page = browser.create(DashboardPage.class);
         assertTrue(page.isPresent());
         assertTitle(page);
     }
@@ -59,8 +60,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
         addLabel(projectPath, group);
 
-        DashboardPage dashboard = new DashboardPage(selenium, urls);
-        dashboard.goTo();
+        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isGroupPresent(group));
         assertTrue(dashboard.isProjectPresent(group, project));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
@@ -78,8 +78,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         addLabel(projectPath, group1);
         addLabel(projectPath, group2);
 
-        DashboardPage dashboard = new DashboardPage(selenium, urls);
-        dashboard.goTo();
+        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isGroupPresent(group1));
         assertTrue(dashboard.isProjectPresent(group1, project));
         assertFalse(dashboard.isGroupPresent(group2));
@@ -99,8 +98,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         addLabel(projectPath, group1);
         addLabel(projectPath, group2);
 
-        DashboardPage dashboard = new DashboardPage(selenium, urls);
-        dashboard.goTo();
+        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isGroupPresent(group1));
         assertTrue(dashboard.isGroupPresent(group2));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
@@ -124,8 +122,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
 
         setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, false), asPair(SHOWN_PROJECTS, asVector(project1Path)));
 
-        DashboardPage dashboard = new DashboardPage(selenium, urls);
-        dashboard.goTo();
+        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isUngroupedProjectPresent(project1));
         assertFalse(dashboard.isUngroupedProjectPresent(project2));
     }
@@ -140,8 +137,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(project1, false);
         xmlRpcHelper.insertSimpleProject(project2, false);
 
-        DashboardPage dashboard = new DashboardPage(selenium, urls);
-        dashboard.goTo();
+        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isUngroupedProjectPresent(project1));
         assertTrue(dashboard.isUngroupedProjectPresent(project2));
 

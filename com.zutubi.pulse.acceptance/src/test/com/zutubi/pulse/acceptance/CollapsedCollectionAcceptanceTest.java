@@ -46,7 +46,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
     {
         addProjectAndNavigateToType();
 
-        ListPage listPage = new ListPage(selenium, urls, getRecipesPath(random));
+        ListPage listPage = browser.create(ListPage.class, getRecipesPath(random));
         listPage.clickView(RECIPE_DEFAULT);
         waitForRecipePage(random, RECIPE_DEFAULT);
     }
@@ -56,10 +56,10 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
         final String RECIPE = "new recipe";
 
         addProjectAndNavigateToType();
-        ListPage listPage = new ListPage(selenium, urls, getRecipesPath(random));
+        ListPage listPage = browser.create(ListPage.class, getRecipesPath(random));
         listPage.clickAdd();
 
-        ConfigurationForm recipeForm = new ConfigurationForm(selenium, RecipeConfiguration.class, true);
+        ConfigurationForm recipeForm = browser.create(ConfigurationForm.class, RecipeConfiguration.class, true);
         recipeForm.waitFor();
         recipeForm.finishNamedFormElements(asPair("name", RECIPE));
 
@@ -70,7 +70,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
     {
         ConfigPage typePage = addProjectAndNavigateToType();
 
-        ListPage listPage = new ListPage(selenium, urls, getRecipesPath(random));
+        ListPage listPage = browser.create(ListPage.class, getRecipesPath(random));
         DeleteConfirmPage confirmPage = listPage.clickDelete(RECIPE_DEFAULT);
         confirmPage.waitFor();
         confirmPage.clickDelete();
@@ -85,18 +85,16 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
 
         String recipePath = getRecipePath(random, RECIPE_DEFAULT);
-        CompositePage recipePage = new CompositePage(selenium, urls, recipePath);
-        recipePage.goTo();
+        CompositePage recipePage = browser.openAndWaitFor(CompositePage.class, recipePath);
 
         recipePage.clickAction(AccessManager.ACTION_DELETE);
-        DeleteConfirmPage confirmPage = new DeleteConfirmPage(selenium, urls, recipePath, false);
+        DeleteConfirmPage confirmPage = browser.create(DeleteConfirmPage.class, recipePath, false);
         confirmPage.waitFor();
         confirmPage.clickDelete();
 
-        ConfigPage typePage = new CompositePage(selenium, urls, PathUtils.getPath(projectPath, Constants.Project.TYPE));
-        typePage.waitFor();
+        browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(projectPath, Constants.Project.TYPE));
 
-        ListPage listPage = new ListPage(selenium, urls, getRecipesPath(random));
+        ListPage listPage = browser.create(ListPage.class, getRecipesPath(random));
         assertFalse(listPage.isItemPresent(RECIPE_DEFAULT));
     }
 
@@ -105,10 +103,10 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
         final String CLONE_NAME = "new recipe";
 
         addProjectAndNavigateToType();
-        ListPage listPage = new ListPage(selenium, urls, getRecipesPath(random));
+        ListPage listPage = browser.create(ListPage.class, getRecipesPath(random));
         listPage.clickClone(RECIPE_DEFAULT);
 
-        CloneForm cloneForm = new CloneForm(selenium, false);
+        CloneForm cloneForm = browser.create(CloneForm.class, false);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(CLONE_NAME);
 
@@ -124,10 +122,9 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
 
         String recipePath = getRecipePath(random, RECIPE_DEFAULT);
-        CompositePage recipePage = new CompositePage(selenium, urls, recipePath);
-        recipePage.goTo();
+        browser.openAndWaitFor(CompositePage.class, recipePath);
 
-        ConfigurationForm recipeForm = new ConfigurationForm(selenium, RecipeConfiguration.class, true);
+        ConfigurationForm recipeForm = browser.create(ConfigurationForm.class, RecipeConfiguration.class, true);
         recipeForm.waitFor();
         recipeForm.applyFormElements(NEW_NAME, null);
         
@@ -144,30 +141,28 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
 
         loginAsAdmin();
-        CompositePage typePage = new CompositePage(selenium, urls, PathUtils.getPath(projectPath, Constants.Project.TYPE));
-        typePage.goTo();
-
+        CompositePage typePage = browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(projectPath, Constants.Project.TYPE));
         assertTrue(typePage.isConfigureLinkPresent());
         typePage.clickConfigure();
 
-        SelectTypeState state = new SelectTypeState(selenium);
+        SelectTypeState state = new SelectTypeState(browser.getSelenium());
         state.waitFor();
         state.nextFormElements("zutubi.multiRecipeTypeConfig");
 
         typePage.waitFor();
         assertTrue(typePage.isCollapsedCollectionPresent());
 
-        ListPage listPage = new ListPage(selenium, urls, getRecipesPath(random));
+        ListPage listPage = browser.create(ListPage.class, getRecipesPath(random));
         listPage.clickAdd();
 
-        ConfigurationForm recipeForm = new ConfigurationForm(selenium, RecipeConfiguration.class, true);
+        ConfigurationForm recipeForm = browser.create(ConfigurationForm.class, RecipeConfiguration.class, true);
         recipeForm.waitFor();
         recipeForm.finishNamedFormElements(asPair("name", RECIPE_DEFAULT));
 
         CompositePage recipePage = waitForRecipePage(random, RECIPE_DEFAULT);
         recipePage.clickAction(AccessManager.ACTION_DELETE);
 
-        DeleteConfirmPage confirmPage = new DeleteConfirmPage(selenium, urls, getRecipePath(random, RECIPE_DEFAULT), false);
+        DeleteConfirmPage confirmPage = browser.create(DeleteConfirmPage.class, getRecipePath(random, RECIPE_DEFAULT), false);
         confirmPage.waitFor();
         confirmPage.clickDelete();
         
@@ -181,16 +176,12 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        ConfigPage configPage = new CompositePage(selenium, urls, PathUtils.getPath(projectPath, Constants.Project.TYPE));
-        configPage.goTo();
-        return configPage;
+        return browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(projectPath, Constants.Project.TYPE));
     }
 
     private CompositePage waitForRecipePage(String project, String recipeName)
     {
-        CompositePage recipePage = new CompositePage(selenium, urls, getRecipePath(project, recipeName));
-        recipePage.waitFor();
-        return recipePage;
+        return browser.openAndWaitFor(CompositePage.class, getRecipePath(project, recipeName));
     }
 
     private String getRecipePath(String project, String recipeName)

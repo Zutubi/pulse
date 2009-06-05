@@ -23,7 +23,7 @@ public abstract class ConfigurationPanePage extends SeleniumPage
 
     public void waitFor()
     {
-        SeleniumUtils.waitForElementId(selenium, getId());
+        super.waitFor();
         waitForActionToComplete();
     }
 

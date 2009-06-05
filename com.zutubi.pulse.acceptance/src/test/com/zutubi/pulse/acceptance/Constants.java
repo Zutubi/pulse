@@ -134,6 +134,7 @@ public class Constants
          */
         public static class Stage
         {
+            public static final String NAME = "name";
             public static final String RECIPE = "recipe";
         }
 
@@ -153,6 +154,13 @@ public class Constants
             public static final String UNIT = "unit";
             public static final String WHAT = "what";
             public static final String CLEANUP_ALL = "cleanupAll";
+        }
+
+        public class Dependencies
+        {
+            public static final String PUBLICATION_PATTERN = "publicationPattern";
+            public static final String RETRIEVAL_PATTERN = "retrievalPattern";
+            public static final String STATUS = "status";
         }
     }
 }

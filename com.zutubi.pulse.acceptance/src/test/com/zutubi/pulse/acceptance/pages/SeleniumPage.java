@@ -47,12 +47,31 @@ public abstract class SeleniumPage
         return id;
     }
 
-    public void goTo()
+    /**
+     * A convenience method that opens and then waits for this page.
+     *
+     * @see #open()
+     * @see #waitFor() 
+     */
+    public void openAndWaitFor()
     {
-        selenium.open(getUrl());
+        open();
         waitFor();
     }
 
+    /**
+     * Open selenium at the page represented by this page instance
+     */
+    public void open()
+    {
+        selenium.open(getUrl());
+    }
+
+    /**
+     * Wait for this page to finish loading.
+     *
+     * @throws RuntimeException if this request times out.
+     */
     public void waitFor()
     {
         SeleniumUtils.waitForElementId(selenium, id);

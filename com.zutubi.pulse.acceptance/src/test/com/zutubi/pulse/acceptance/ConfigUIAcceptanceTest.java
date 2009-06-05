@@ -50,8 +50,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // single select should have an empty option added.
         loginAsAdmin();
         addProject(random, true, GLOBAL_PROJECT_NAME, false);
-        goTo(urls.adminProject(random) + "scm/");
-        SubversionForm form = new SubversionForm(selenium);
+        browser.goTo(urls.adminProject(random) + "scm/");
+        SubversionForm form = browser.create(SubversionForm.class);
         form.waitFor();
         String[] options = form.getComboBoxOptions("checkoutScheme");
         assertEquals("", options[0]);
@@ -66,11 +66,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String labelsPath = PathUtils.getPath(childPath, "labels");
 
         loginAsAdmin();
-        ListPage labelsPage = new ListPage(selenium, urls, labelsPath);
-        labelsPage.goTo();
+        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, labelsPath);
         labelsPage.clickAdd();
 
-        LabelForm labelForm = new LabelForm(selenium);
+        LabelForm labelForm = browser.create(LabelForm.class);
         labelForm.waitFor();
         labelForm.finishFormElements("my-label");
 
@@ -89,11 +88,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
 
         loginAsAdmin();
-        ListPage labelsPage = new ListPage(selenium, urls, PathUtils.getPath(projectPath, "labels"));
-        labelsPage.goTo();
+        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(projectPath, "labels"));
         labelsPage.clickAdd();
 
-        LabelForm labelForm = new LabelForm(selenium);
+        LabelForm labelForm = browser.create(LabelForm.class);
         labelForm.waitFor();
         labelForm.cancelFormElements("my-label");
 
@@ -107,11 +105,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String labelBaseName = insertLabel(projectPath);
 
         loginAsAdmin();
-        ListPage labelsPage = new ListPage(selenium, urls, PathUtils.getPath(projectPath, "labels"));
-        labelsPage.goTo();
+        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(projectPath, "labels"));
         labelsPage.clickView(labelBaseName);
 
-        LabelForm labelForm = new LabelForm(selenium);
+        LabelForm labelForm = browser.create(LabelForm.class);
         labelForm.waitFor();
         labelForm.cancelFormElements("");
 
@@ -130,8 +127,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
-        goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
-        SubversionForm form = new SubversionForm(selenium);
+        browser.goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
+        SubversionForm form = browser.create(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "svn://localhost:3088/");
         CheckForm checkForm = new CheckForm(form);
@@ -144,8 +141,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
-        goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
-        SubversionForm form = new SubversionForm(selenium);
+        browser.goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
+        SubversionForm form = browser.create(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "svn://localhost:9999/foo");
         CheckForm checkForm = new CheckForm(form);
@@ -158,8 +155,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
-        goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
-        SubversionForm form = new SubversionForm(selenium);
+        browser.goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
+        SubversionForm form = browser.create(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "");
         CheckForm checkForm = new CheckForm(form);
@@ -172,8 +169,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testCheckFormCheckFieldValidationFailure() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.admin() + "settings/email/");
-        EmailSettingsForm form = new EmailSettingsForm(selenium);
+        browser.goTo(urls.admin() + "settings/email/");
+        EmailSettingsForm form = browser.create(EmailSettingsForm.class);
         form.waitFor();
         EmailSettingsCheckForm checkForm = new EmailSettingsCheckForm(form);
         checkForm.checkFormElementsAndWait("");
@@ -185,18 +182,17 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testCheckFormInWizard() throws Exception
     {
         loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, GLOBAL_PROJECT_NAME, false);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, false);
         hierarchyPage.clickAdd();
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser.getSelenium());
         projectState.waitFor();
         projectState.nextFormElements(random, null, null);
 
-        SelectTypeState scmTypeState = new SelectTypeState(selenium);
+        SelectTypeState scmTypeState = new SelectTypeState(browser.getSelenium());
         scmTypeState.waitFor();
         scmTypeState.nextFormElements("zutubi.subversionConfig");
 
-        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(browser.getSelenium());
         subversionState.waitFor();
 
         subversionState.setFieldValue("url", "svn://localhost:3088/");
@@ -213,22 +209,21 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ensureProject(random);
 
         loginAsAdmin();
-        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
-        configPage.goTo();
+        ProjectConfigPage configPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         ListPage listPage = configPage.clickCollection("permissions", "permissions");
         listPage.waitFor();
         assertEquals("[view]", listPage.getCellContent(0, 1));
 
-        selenium.click("link=view");
-        ProjectAclForm form = new ProjectAclForm(selenium);
+        browser.click("link=view");
+        ProjectAclForm form = browser.create(ProjectAclForm.class);
         form.waitFor();
         assertFormElements(form, "all users", "view");
         form.saveFormElements(null, "");
         listPage.waitFor();
 
         assertEquals("[]", listPage.getCellContent(0, 1));
-        selenium.click("link=view");
-        form = new ProjectAclForm(selenium);
+        browser.click("link=view");
+        form = browser.create(ProjectAclForm.class);
         form.waitFor();
         assertFormElements(form, "all users", "");
     }
@@ -237,8 +232,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
 
-        goTo(urls.adminGroup(UserManager.ANONYMOUS_USERS_GROUP_NAME));
-        BuiltinGroupForm groupForm = new BuiltinGroupForm(selenium);
+        browser.goTo(urls.adminGroup(UserManager.ANONYMOUS_USERS_GROUP_NAME));
+        BuiltinGroupForm groupForm = browser.create(BuiltinGroupForm.class);
         groupForm.waitFor();
         groupForm.applyFormElements(null, ServerPermission.PERSONAL_BUILD.toString());
         groupForm.waitFor();
@@ -256,11 +251,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         insertProperty(projectPath);
 
         loginAsAdmin();
-        ListPage propertiesPage = new ListPage(selenium, urls, propertiesPath);
-        propertiesPage.goTo();
+        ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, propertiesPath);
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
+        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -275,11 +269,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String childPath = xmlRpcHelper.insertTrivialProject(random + "-child", parentName, false);
 
         loginAsAdmin();
-        ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(childPath));
-        propertiesPage.goTo();
+        ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(childPath));
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
+        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -295,12 +288,11 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         insertProperty(childPath);
 
         loginAsAdmin();
-        ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(parentPath));
-        propertiesPage.goTo();
+        ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(parentPath));
         assertFalse(propertiesPage.isItemPresent("p1"));
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
+        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -319,12 +311,11 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         insertProperty(child2Path);
 
         loginAsAdmin();
-        ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(parentPath));
-        propertiesPage.goTo();
+        ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(parentPath));
         assertFalse(propertiesPage.isItemPresent("p1"));
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
+        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -343,12 +334,11 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.deleteConfig(PathUtils.getPath(childPropertiesPath, "p1"));
 
         loginAsAdmin();
-        ListPage propertiesPage = new ListPage(selenium, urls, childPropertiesPath);
-        propertiesPage.goTo();
+        ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, childPropertiesPath);
         assertItemPresent(propertiesPage, "p1", ListPage.ANNOTATION_HIDDEN);
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = new ResourcePropertyForm(selenium);
+        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -364,8 +354,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         // At this point we should be allowed to configure in the parent
         loginAsAdmin();
-        CompositePage compositePage = new CompositePage(selenium, urls, PathUtils.getPath(parentPath, "changeViewer"));
-        compositePage.goTo();
+        CompositePage compositePage = browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(parentPath, "changeViewer"));
         assertTrue(compositePage.isConfigureLinkPresent());
 
         String childChangeViewerPath = PathUtils.getPath(childPath, "changeViewer");
@@ -375,7 +364,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         // Now the child exists we should no longer be able to configure
         // in the parent.
-        compositePage.goTo();
+        compositePage.openAndWaitFor();
         assertFalse(compositePage.isConfigureLinkPresent());
         assertTrue(compositePage.isConfiguredDescendentPresent(childName));
     }
@@ -385,8 +374,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String path = orderPrelude();
 
         loginAsAdmin();
-        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
-        listPage.goTo();
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertItemPresent(listPage, "p1", null, ACTION_DOWN);
         assertFalse(listPage.isActionLinkPresent("p1", ACTION_UP));
         assertItemPresent(listPage, "p2", null, ACTION_DOWN, ACTION_UP);
@@ -399,8 +387,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String path = orderPrelude();
 
         loginAsAdmin();
-        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
-        listPage.goTo();
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertEquals("p2", listPage.getCellContent(1, 0));
         assertEquals("p3", listPage.getCellContent(2, 0));
         listPage.clickUp("p3");
@@ -414,8 +401,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String path = orderPrelude();
 
         loginAsAdmin();
-        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
-        listPage.goTo();
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertEquals("p2", listPage.getCellContent(1, 0));
         assertEquals("p3", listPage.getCellContent(2, 0));
         listPage.clickDown("p2");
@@ -444,8 +430,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(triggersPath, trigger);
 
         loginAsAdmin();
-        ListPage listPage = new ListPage(selenium, urls, triggersPath);
-        listPage.goTo();
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, triggersPath);
         assertFalse(listPage.isOrderColumnPresent(2));
         assertItemPresent(listPage, "t1", null);
         assertItemPresent(listPage, "t2", null);
@@ -461,8 +446,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertTrivialUser(random);
         login(random, "");
-        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
-        listPage.goTo();
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertFalse(listPage.isOrderColumnPresent(2));
         assertItemPresent(listPage, "p1", null);
         assertItemPresent(listPage, "p2", null);
@@ -486,13 +470,12 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         insertProperty(parentPath, "p2");
         
         loginAsAdmin();
-        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(childPath));
-        listPage.goTo();
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(childPath));
         assertFalse(listPage.isOrderInheritedPresent());
         assertFalse(listPage.isOrderOverriddenPresent());
 
         xmlRpcHelper.setConfigOrder(getPropertiesPath(parentPath), "p2", "p1");
-        listPage.goTo();
+        listPage.openAndWaitFor();
         assertTrue(listPage.isOrderInheritedPresent());
         assertFalse(listPage.isOrderOverriddenPresent());
     }
@@ -511,8 +494,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.setConfigOrder(getPropertiesPath(childPath), "p1", "p2");
         
         loginAsAdmin();
-        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(childPath));
-        listPage.goTo();
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(childPath));
         assertFalse(listPage.isOrderInheritedPresent());
         assertTrue(listPage.isOrderOverriddenPresent());
     }
@@ -526,30 +508,29 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         addInheritingProject(parentName, childName);
 
-        ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, childName, false);
+        ProjectHierarchyPage childHierarchyPage = browser.create(ProjectHierarchyPage.class, childName, false);
         childHierarchyPage.waitFor();
         ProjectConfigPage configPage = childHierarchyPage.clickConfigure();
         configPage.waitFor();
-        SeleniumUtils.waitForLocator(selenium, configPage.getTreeLinkLocator("subversion configuration"));
+        browser.waitForLocator(configPage.getTreeLinkLocator("subversion configuration"));
         CompositePage scmPage = configPage.clickComposite("scm", "subversion configuration");
         scmPage.waitFor();
-        SubversionForm subversionForm = new SubversionForm(selenium);
+        SubversionForm subversionForm = browser.create(SubversionForm.class);
         subversionForm.waitFor();
         assertFormElements(subversionForm, Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     private void addInheritingProject(String parentName, String childName)
     {
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, parentName, true);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, parentName, true);
         hierarchyPage.clickAdd();
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser.getSelenium());
         projectState.waitFor();
         projectState.nextFormElements(childName, null, null);
-        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(browser.getSelenium());
         subversionState.waitFor();
         subversionState.nextFormElements(null, null, null, null, null, null);
-        AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
+        AddProjectWizard.AntState antState = new AddProjectWizard.AntState(browser.getSelenium());
         antState.waitFor();
         antState.finishFormElements(null, null, null, null, null, null);
     }
@@ -567,7 +548,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
+        ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, random, false);
         hierarchyPage.waitFor();
 
         String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
@@ -584,19 +565,18 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        ProjectHierarchyPage parentHierarchyPage = new ProjectHierarchyPage(selenium, urls, parent, true);
-        parentHierarchyPage.goTo();
+        ProjectHierarchyPage parentHierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, parent, true);
         parentHierarchyPage.clickAdd();
 
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser.getSelenium());
         projectState.waitFor();
         projectState.nextFormElements(child, null, null);
 
-        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(browser.getSelenium());
         subversionState.waitFor();
         subversionState.finishFormElements(subversionState.getUnchangedValues());
 
-        ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, child, false);
+        ProjectHierarchyPage childHierarchyPage = browser.create(ProjectHierarchyPage.class, child, false);
         childHierarchyPage.waitFor();
 
         String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
@@ -625,7 +605,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
+        ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, random, false);
         hierarchyPage.waitFor();
 
         String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
@@ -643,23 +623,22 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        ProjectHierarchyPage parentHierarchyPage = new ProjectHierarchyPage(selenium, urls, parent, true);
-        parentHierarchyPage.goTo();
+        ProjectHierarchyPage parentHierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, parent, true);
         parentHierarchyPage.clickAdd();
 
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser.getSelenium());
         projectState.waitFor();
         projectState.nextFormElements(child, null, null);
 
-        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(browser.getSelenium());
         subversionState.waitFor();
         subversionState.nextFormElements(subversionState.getUnchangedValues());
 
-        AddProjectWizard.CustomTypeState customTypeState = new AddProjectWizard.CustomTypeState(selenium);
+        AddProjectWizard.CustomTypeState customTypeState = new AddProjectWizard.CustomTypeState(browser.getSelenium());
         customTypeState.waitFor();
         customTypeState.finishFormElements(pulseFileString);
         
-        ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, child, false);
+        ProjectHierarchyPage childHierarchyPage = browser.create(ProjectHierarchyPage.class, child, false);
         childHierarchyPage.waitFor();
 
         String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
@@ -674,13 +653,12 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(parentName, true);
 
         loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, parentName, true);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, parentName, true);
         hierarchyPage.clickAdd();
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser.getSelenium());
         projectState.waitFor();
         projectState.nextFormElements(childName, null, null);
-        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(browser.getSelenium());
         subversionState.waitFor();
         subversionState.nextFormElements("", null, null, null, null, null);
         assertTrue(subversionState.isFormPresent());
@@ -692,12 +670,10 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         addProject(random, false);
 
-        ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "stages"));
-        listPage.goTo();
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "stages"));
         assertItemPresent(listPage, "default", null, "view", "delete");
 
-        listPage = new ListPage(selenium, urls, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "triggers"));
-        listPage.goTo();
+        listPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, "triggers"));
         assertItemPresent(listPage, "scm trigger", null, "view", "delete", "pause");
     }
 
@@ -710,33 +686,30 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         addProject(parentName, true, GLOBAL_PROJECT_NAME, false);
         addInheritingProject(parentName, childName);
 
-        ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));
-        listPage.goTo();
+        ListPage listPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));
         assertItemPresent(listPage, "default", ListPage.ANNOTATION_INHERITED, "view", "delete");
 
-        listPage = new ListPage(selenium, urls, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, "triggers"));
-        listPage.goTo();
+        listPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, childName, "triggers"));
         assertItemPresent(listPage, "scm trigger", ListPage.ANNOTATION_INHERITED, "view", "delete", "pause");
     }
 
     public void testValidationInWizard()
     {
         loginAsAdmin();
-        ProjectHierarchyPage projectsPage = new ProjectHierarchyPage(selenium, urls, GLOBAL_PROJECT_NAME, true);
-        projectsPage.goTo();
+        ProjectHierarchyPage projectsPage = browser.openAndWaitFor(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, true);
         projectsPage.clickAdd();
 
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser.getSelenium());
         projectState.waitFor();
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements(random, "", "");
 
-        SelectTypeState scmTypeState = new SelectTypeState(selenium);
+        SelectTypeState scmTypeState = new SelectTypeState(browser.getSelenium());
         scmTypeState.waitFor();
         scmTypeState.nextFormElements("zutubi.subversionConfig");
 
         // URL is required.
-        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(browser.getSelenium());
         subversionState.waitFor();
         assertTrue(subversionState.isMarkedRequired("url"));
         subversionState.nextFormElements("", null, null, null, null, "CLEAN_CHECKOUT");
@@ -748,13 +721,12 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testTemplateValidationInWizard()
     {
         loginAsAdmin();
-        ProjectHierarchyPage projectsPage = new ProjectHierarchyPage(selenium, urls, GLOBAL_PROJECT_NAME, true);
-        projectsPage.goTo();
+        ProjectHierarchyPage projectsPage = browser.openAndWaitFor(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, true);
         projectsPage.clickAddTemplate();
 
         // Despite the fact we are adding a template, we must specify the
         // name.
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser.getSelenium());
         projectState.waitFor();
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements("", "", "");
@@ -762,25 +734,25 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertTextPresent("name is a required field");
         projectState.nextFormElements(random, "", "");
 
-        SelectTypeState scmTypeState = new SelectTypeState(selenium);
+        SelectTypeState scmTypeState = new SelectTypeState(browser.getSelenium());
         scmTypeState.waitFor();
         scmTypeState.nextFormElements("zutubi.subversionConfig");
 
         // Here, we should get away without having a URL.
-        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(browser.getSelenium());
         subversionState.waitFor();
         assertFalse(subversionState.isMarkedRequired("url"));
         subversionState.nextFormElements("", null, null, null, null, "CLEAN_CHECKOUT");
 
-        ProjectTypeSelectState projectTypeState = new ProjectTypeSelectState(selenium);
+        ProjectTypeSelectState projectTypeState = new ProjectTypeSelectState(browser.getSelenium());
         projectTypeState.waitFor();
         projectTypeState.nextFormElements(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP, "zutubi.antCommandConfig");
 
-        AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
+        AddProjectWizard.AntState antState = new AddProjectWizard.AntState(browser.getSelenium());
         antState.waitFor();
         antState.finishFormElements("build", null, "build.xml", null, null, null);
 
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, true);
+        ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, random, true);
         hierarchyPage.waitFor();
     }
 
@@ -789,14 +761,13 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(random, false);
 
         loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
 
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
         configPage.waitFor();
         configPage.clickComposite("scm", "subversion configuration");
 
-        SubversionForm subversionForm = new SubversionForm(selenium);
+        SubversionForm subversionForm = browser.create(SubversionForm.class);
         subversionForm.waitFor();
         assertTrue(subversionForm.isMarkedRequired("url"));
         subversionForm.applyFormElements("", null, null, null, null, null, null, null, null, null, null, null, null);
@@ -809,15 +780,14 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(random, true);
 
         loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, true);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, true);
 
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
         String treeLink = configPage.getTreeLinkLocator("subversion configuration");
-        SeleniumUtils.waitForLocator(selenium, treeLink);
-        selenium.click(treeLink);
+        browser.waitForLocator(treeLink);
+        browser.click(treeLink);
 
-        SubversionForm subversionForm = new SubversionForm(selenium);
+        SubversionForm subversionForm = browser.create(SubversionForm.class);
         subversionForm.waitFor();
 
         subversionForm.applyFormElements("", null, null, null, null, null, null, null, null, null, null, null, null);
@@ -829,35 +799,35 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testInvalidPathNonExistantScope() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.admin() + "scopish/");
+        browser.goTo(urls.admin() + "scopish/");
         assertGenericError("Invalid path 'scopish': references non-existant root scope 'scopish'");
     }
 
     public void testInvalidPathNonExistantCollectionItem() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.adminUser("nosuchuser"));
+        browser.goTo(urls.adminUser("nosuchuser"));
         assertGenericError("Invalid path 'users/nosuchuser': references unknown child 'nosuchuser' of collection");
     }
 
     public void testInvalidPathNonExistantTemplateItem() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.adminProject("nosuchproject"));
+        browser.goTo(urls.adminProject("nosuchproject"));
         assertGenericError("Invalid path 'projects/nosuchproject': references unknown child 'nosuchproject' of collection");
     }
 
     public void testInvalidPathNonExistantProperty() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.adminProject(GLOBAL_PROJECT_NAME) + "nosuchproperty/");
+        browser.goTo(urls.adminProject(GLOBAL_PROJECT_NAME) + "nosuchproperty/");
         assertGenericError("Invalid path 'projects/global project template/nosuchproperty': references unknown property 'nosuchproperty' of type 'zutubi.projectConfig'");
     }
 
     public void testInvalidPathSimpleProperty() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.adminProject(GLOBAL_PROJECT_NAME) + "name/");
+        browser.goTo(urls.adminProject(GLOBAL_PROJECT_NAME) + "name/");
         assertGenericError("Invalid path 'projects/global project template/name': references non-complex type");
     }
 
@@ -865,16 +835,15 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
         loginAsAdmin();
-        CompositePage compositePage = new CompositePage(selenium, urls, projectPath);
-        compositePage.goTo();
+        browser.openAndWaitFor(CompositePage.class, projectPath);
         assertTextPresent("An SCM must be configured to complete this project.");
     }
 
     public void testSaveNoParentPath() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.adminSettings());
-        ServerSettingsForm form = new ServerSettingsForm(selenium);
+        browser.goTo(urls.adminSettings());
+        ServerSettingsForm form = browser.create(ServerSettingsForm.class);
         form.waitFor();
         String url = "http://somehelpurl.com/" + random;
         form.applyFormElements(null, null, url, null, null, null, null, null, null);
@@ -886,8 +855,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testCancelNoParentPath() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.adminSettings());
-        ServerSettingsForm form = new ServerSettingsForm(selenium);
+        browser.goTo(urls.adminSettings());
+        ServerSettingsForm form = browser.create(ServerSettingsForm.class);
         form.waitFor();
         String originalUrl = form.getFieldValue("baseHelpUrl");
         form.resetFormElements(null, null, "http://somehelpurl.com/" + random, null, null, null, null, null, null);
@@ -919,8 +888,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         addProject(punctuatedName, false);
 
         // Check the hierarchy, config and such.
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, punctuatedName, false);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, punctuatedName, false);
         assertTextNotPresent("invalid");
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
         configPage.waitFor();
@@ -930,9 +898,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     private void checkListedRecipes(String... expectedRecipes)
     {
         loginAsAdmin();
-        goTo(urls.adminProject(random) + Constants.Project.STAGES + "/" + ProjectConfigurationWizard.DEFAULT_STAGE + "/");
+        browser.goTo(urls.adminProject(random) + Constants.Project.STAGES + "/" + ProjectConfigurationWizard.DEFAULT_STAGE + "/");
 
-        BuildStageForm stageForm = new BuildStageForm(selenium, false);
+        BuildStageForm stageForm = browser.create(BuildStageForm.class, false);
         stageForm.waitFor();
         String[] stages = stageForm.getComboBoxOptions(Constants.Project.Stage.RECIPE);
         assertEquals(asList(expectedRecipes), asList(stages));

@@ -33,11 +33,10 @@ public class ProjectPermissionsAcceptanceTest extends SeleniumTestBase
         Vector<String> permissions = xmlRpcHelper.getConfigListing(permissionsPath);
 
         login(random, "");
-        ListPage permissionsPage = new ListPage(selenium, urls, permissionsPath);
-        permissionsPage.goTo();
+        ListPage permissionsPage = browser.openAndWaitFor(ListPage.class, permissionsPath);
         permissionsPage.clickAction(permissions.get(0), ListPage.ACTION_VIEW);
 
-        ProjectAclForm aclForm = new ProjectAclForm(selenium);
+        ProjectAclForm aclForm = browser.create(ProjectAclForm.class);
         aclForm.waitFor();
         String[] groups = aclForm.getComboBoxOptions("group");
         // Two options could just be the default plus the current value.  As

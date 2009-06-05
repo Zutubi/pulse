@@ -29,8 +29,6 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private static final String PROJECT_HIERARCHY_CHILD1 = PROJECT_HIERARCHY_PREFIX + "-child1";
     private static final String PROJECT_HIERARCHY_CHILD2 = PROJECT_HIERARCHY_PREFIX + "-child2";
 
-    private static final int BUILD_TIMEOUT = 90000;
-
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -180,6 +178,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> group = xmlRpcHelper.getProjectGroup(labelName);
         assertEquals(labelName, group.get("name"));
+        @SuppressWarnings({"unchecked"})
         Vector<String> projects = (Vector<String>) group.get("projects");
         assertEquals(1, projects.size());
         assertEquals(projectName, projects.get(0));
@@ -192,6 +191,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String testName = "something that does not exist";
         Hashtable<String, Object> group = xmlRpcHelper.getProjectGroup(testName);
         assertEquals(testName, group.get("name"));
+        @SuppressWarnings({"unchecked"})
         Vector<String> projects = (Vector<String>) group.get("projects");
         assertEquals(0, projects.size());
     }
@@ -224,7 +224,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         customType.put("pulseFileString", IOUtils.inputStreamToString(getInput("xml")));
 
         xmlRpcHelper.insertProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), customType);
-        int number = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        int number = xmlRpcHelper.runBuild(projectName);
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, number);
         assertNotNull(build);
@@ -262,7 +262,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String projectName = randomName();
         insertSimpleProject(projectName);
-        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        xmlRpcHelper.runBuild(projectName);
 
         assertTrue(xmlRpcHelper.deleteBuild(projectName, 1));
         assertNull(xmlRpcHelper.getBuild(projectName, 1));
@@ -300,7 +300,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         int number = xmlRpcHelper.getNextBuildNumber(projectName);
         xmlRpcHelper.triggerBuild(projectName, "", properties);
-        xmlRpcHelper.waitForBuildToComplete(projectName, number, BUILD_TIMEOUT);
+        xmlRpcHelper.waitForBuildToComplete(projectName, number);
 
         Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(projectName, number);
         Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
@@ -323,7 +323,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String projectName = randomName();
         insertSimpleProject(projectName);
-        int number = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        int number = xmlRpcHelper.runBuild(projectName);
 
         Vector<Hashtable<String, Object>> builds = xmlRpcHelper.getLatestBuildsForProject(projectName, true, 10);
         assertEquals(1, builds.size());
@@ -363,7 +363,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String projectName = randomName();
         insertSimpleProject(projectName);
-        int number = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        int number = xmlRpcHelper.runBuild(projectName);
 
         Vector<Hashtable<String, Object>> builds = xmlRpcHelper.queryBuildsForProject(projectName, new Vector<String>(), -1, 10, true);
         assertEquals(1, builds.size());
@@ -417,8 +417,8 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
             xmlRpcHelper.insertProject(PROJECT_HIERARCHY_CHILD1, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
             xmlRpcHelper.insertProject(PROJECT_HIERARCHY_CHILD2, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
 
-            xmlRpcHelper.runBuild(PROJECT_HIERARCHY_CHILD1, BUILD_TIMEOUT);
-            xmlRpcHelper.runBuild(PROJECT_HIERARCHY_CHILD2, BUILD_TIMEOUT);
+            xmlRpcHelper.runBuild(PROJECT_HIERARCHY_CHILD1);
+            xmlRpcHelper.runBuild(PROJECT_HIERARCHY_CHILD2);
         }
     }
 

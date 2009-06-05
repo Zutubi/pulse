@@ -5,7 +5,6 @@ import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import junit.framework.Assert;
 
 /**
  * The page shown when looking at the heirarchy view of a templated scope.
@@ -66,12 +65,15 @@ public class HierarchyPage extends ConfigurationPanePage
         return "link=" + baseName;
     }
 
-    public void goTo()
+    public void open()
     {
         selenium.open(getUrl());
         // Allow the initial page load.
         selenium.waitForPageToLoad("30000");
+    }
 
+    public void waitFor()
+    {
         // Wait for the default right panel to load.
         waitForActionToComplete();
 
@@ -79,7 +81,7 @@ public class HierarchyPage extends ConfigurationPanePage
         String linkLocator = getTreeItemLocator(baseName);
         SeleniumUtils.waitForLocator(selenium, linkLocator);
         selenium.click(linkLocator);
-        waitFor();
+        super.waitFor();
     }
 
     public boolean isTreeItemPresent(String baseName)

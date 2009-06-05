@@ -1,17 +1,12 @@
 package com.zutubi.pulse.acceptance.cleanup;
 
-import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.Options.RETAIN_WORKING_COPY;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
-import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
-import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -26,14 +21,10 @@ import java.util.Vector;
 public class CleanupTestUtils
 {
     private XmlRpcHelper xmlRpcHelper;
-    private Selenium selenium;
-    private Urls urls;
 
-    public CleanupTestUtils(XmlRpcHelper xmlRpcHelper, Selenium selenium, Urls urls)
+    public CleanupTestUtils(XmlRpcHelper xmlRpcHelper)
     {
         this.xmlRpcHelper = xmlRpcHelper;
-        this.selenium = selenium;
-        this.urls = urls;
     }
 
     public void setRetainWorkingCopy(String projectName, boolean b) throws Exception
@@ -129,68 +120,5 @@ public class CleanupTestUtils
                 return new File(file, directoryName).isDirectory();
             }
         });
-    }
-
-    public boolean isWorkingCopyPresentViaUI(String projectName, int buildNumber)
-    {
-        BuildWorkingCopyPage page = new BuildWorkingCopyPage(selenium, urls, projectName, buildNumber);
-        page.goTo();
-        return page.isWorkingCopyPresent();
-    }
-
-    public boolean isBuildPresentViaUI(String projectName, int buildNumber)
-    {
-        BuildSummaryPage page = new BuildSummaryPage(selenium, urls, projectName, buildNumber);
-        return openPage(page);
-    }
-
-    public boolean isBuildPulseFilePresentViaUI(String projectName, int buildNumber)
-    {
-        BuildFilePage page = new BuildFilePage(selenium, urls, projectName, buildNumber);
-        return openPage(page);
-    }
-
-    public boolean isBuildLogsPresentViaUI(String projectName, int buildNumber)
-    {
-        BuildDetailedViewPage page = new BuildDetailedViewPage(selenium, urls, projectName, buildNumber);
-        if (!openPage(page))
-        {
-            return false;
-        }
-        if (!page.isBuildLogLinkPresent())
-        {
-            return false;
-        }
-        page.clickBuildLogLink();
-        return selenium.isTextPresent("tail of build log");
-    }
-
-    public boolean isBuildArtifactsPresentViaUI(String projectName, int buildNumber)
-    {
-        BuildArtifactsPage page = new BuildArtifactsPage(selenium, urls, projectName, buildNumber);
-        if (!openPage(page))
-        {
-            return false;
-        }
-
-        // if artifacts are available, we should have the build command open in the tree.
-        SeleniumUtils.waitForLocator(selenium, page.getArtifactLocator("environment"));
-        return page.isArtifactAvailable("environment");
-    }
-
-    private boolean openPage(SeleniumPage page)
-    {
-        selenium.open(page.getUrl());
-        try
-        {
-            selenium.waitForPageToLoad("5000");
-            SeleniumUtils.waitForElementId(selenium, page.getId());
-            return true;
-        }
-        catch (RuntimeException e)
-        {
-            // failed to load, should see: Unknown build [buildNumber] for project [projectName]
-            return false;
-        }
     }
 }

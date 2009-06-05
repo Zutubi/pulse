@@ -34,12 +34,12 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     private void resetToPulseWindow()
     {
-        String[] titles = selenium.getAllWindowTitles();
+        String[] titles = browser.getAllWindowTitles();
         for (String title : titles)
         {
             if (title.startsWith(":: pulse ::"))
             {
-                selenium.selectWindow(title);
+                browser.selectWindow(title);
                 return;
             }
         }
@@ -195,8 +195,8 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     private AntCommandForm navigateToCommandConfig()
     {
-        goTo(urls.adminProject(random) + "/" + Constants.Project.TYPE + "/recipes/default/commands/build");
-        AntCommandForm antForm = new AntCommandForm(selenium);
+        browser.goTo(urls.adminProject(random) + "/" + Constants.Project.TYPE + "/recipes/default/commands/build");
+        AntCommandForm antForm = browser.create(AntCommandForm.class);
         antForm.waitFor();
         return antForm;
     }

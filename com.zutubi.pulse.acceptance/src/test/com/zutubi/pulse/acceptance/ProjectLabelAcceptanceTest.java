@@ -42,8 +42,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         insertLabel(p2, label1);
 
         loginAsAdmin();
-        BrowsePage browsePage = new BrowsePage(selenium, urls);
-        browsePage.goTo();
+        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, g1, p1, p2);
         assertGroupPresent(browsePage, g2, p1);
         assertGroupPresent(browsePage, null, p3);
@@ -68,8 +67,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         login(userLogin, "");
 
         // Default is group by label
-        BrowsePage browsePage = new BrowsePage(selenium, urls);
-        browsePage.goTo();
+        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, labelName, projectName);
         assertFalse(browsePage.isProjectPresent(null, projectName));
 
@@ -79,7 +77,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         browsePreferences.put("groupsShown", false);
         xmlRpcHelper.saveConfig(prefsPath, browsePreferences, false);
 
-        browsePage.goTo();
+        browsePage.openAndWaitFor();
         assertFalse(browsePage.isGroupPresent(labelName));
         assertTrue(browsePage.isProjectPresent(null, projectName));
     }
@@ -97,14 +95,13 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         insertLabel(p1, label1);
 
         loginAsAdmin();
-        BrowsePage browsePage = new BrowsePage(selenium, urls);
-        browsePage.goTo();
+        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1);
         assertFalse(browsePage.isProjectPresent(group, p2));
 
         insertLabel(p2, label1);
 
-        browsePage.goTo();
+        browsePage.openAndWaitFor();
         assertGroupPresent(browsePage, group, p1, p2);
     }
 
@@ -122,13 +119,12 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         String path = insertLabel(p2, label1);
 
         loginAsAdmin();
-        BrowsePage browsePage = new BrowsePage(selenium, urls);
-        browsePage.goTo();
+        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1, p2);
 
         xmlRpcHelper.call("deleteConfig", path);
 
-        browsePage.goTo();
+        browsePage.openAndWaitFor();
         assertGroupPresent(browsePage, group, p1);
         assertFalse(browsePage.isProjectPresent(group, p2));
     }
@@ -144,13 +140,12 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         String path = insertLabel(p1, label1);
 
         loginAsAdmin();
-        BrowsePage browsePage = new BrowsePage(selenium, urls);
-        browsePage.goTo();
+        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1);
 
         xmlRpcHelper.call("deleteConfig", path);
 
-        browsePage.goTo();
+        browsePage.openAndWaitFor();
         assertFalse(browsePage.isGroupPresent(group));
     }
 

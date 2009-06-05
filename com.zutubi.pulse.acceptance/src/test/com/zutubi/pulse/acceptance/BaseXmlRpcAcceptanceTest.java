@@ -8,9 +8,8 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.Vector;
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Helper base class for test cases that call the remote api.  Provides
@@ -37,16 +36,9 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
     {
         super.setUp();
 
-        int port = 8080;
-
-        String portProperty = System.getProperty("pulse.port");
-        if(portProperty != null)
-        {
-            port = Integer.parseInt(portProperty);
-        }
-
+        int port = AcceptanceTestUtils.getPulsePort();
         baseUrl = "http://localhost:" + port + "/";
-        xmlRpcHelper = new XmlRpcHelper(new URL(baseUrl + "xmlrpc"));
+        xmlRpcHelper = new XmlRpcHelper();
     }
 
     protected String randomName()

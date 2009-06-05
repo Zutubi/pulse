@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.user.ResponsibilityModel;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
+import static com.zutubi.util.Constants.SECOND;
 
 /**
  * The dashboard page shows a user's configurable dashboard.
@@ -29,7 +30,7 @@ public class DashboardPage extends ProjectsSummaryPage
     public void waitFor()
     {
         super.waitFor();
-        SeleniumUtils.waitForVariable(selenium, "view.initialised", 30000);
+        SeleniumUtils.waitForVariable(selenium, "view.initialised", 30 * SECOND);
     }
 
     public void hideGroupAndWait(String group)

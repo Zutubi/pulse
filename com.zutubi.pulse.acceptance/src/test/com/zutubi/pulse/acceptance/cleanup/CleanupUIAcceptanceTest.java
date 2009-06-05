@@ -34,13 +34,12 @@ public class CleanupUIAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         
-        ProjectConfigPage projectPage = new ProjectConfigPage(selenium, urls, random, false);
-        projectPage.goTo();        
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
 
         CleanupRulesPage cleanupRulesPage = projectPage.clickCleanupAndWait();
         cleanupRulesPage.clickView("default");
 
-        CleanupForm cleanup = new CleanupForm(selenium);
+        CleanupForm cleanup = browser.create(CleanupForm.class);
         cleanup.waitFor();
         assertEquals("default", cleanup.getFieldValue(NAME));
         assertEquals("WORKING_COPY_SNAPSHOT", cleanup.getFieldValue(WHAT));
@@ -54,17 +53,16 @@ public class CleanupUIAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        ProjectConfigPage projectPage = new ProjectConfigPage(selenium, urls, random, false);
-        projectPage.goTo();
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
 
         CleanupRulesPage cleanupRulesPage = projectPage.clickCleanupAndWait();
         cleanupRulesPage.clickAdd();
 
-        CleanupForm cleanup = new CleanupForm(selenium);
+        CleanupForm cleanup = browser.create(CleanupForm.class);
         cleanup.waitFor();
         cleanup.finishNamedFormElements(asPair(NAME, "new rule"), asPair(RETAIN, "1"), asPair(CLEANUP_ALL, "true"));
 
-        cleanupRulesPage.goTo();
+        cleanupRulesPage.openAndWaitFor();
         cleanupRulesPage.waitFor();
         assertTrue(cleanupRulesPage.isItemPresent("new rule"));
     }

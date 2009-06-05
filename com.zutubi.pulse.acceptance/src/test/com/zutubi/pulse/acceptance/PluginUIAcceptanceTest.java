@@ -42,8 +42,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
     public void testAllPlugins() throws Exception
     {
         loginAsAdmin();
-        PluginsPage pluginsPage = new PluginsPage(selenium, urls);
-        pluginsPage.goTo();
+        PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
         assertTrue(pluginsPage.isPluginPresent(ID_COMMANDS_CORE));
         assertFalse(pluginsPage.isActionPresent(ID_COMMANDS_CORE, ACTION_ENABLE));
         assertTrue(pluginsPage.isActionPresent(ID_COMMANDS_CORE, ACTION_DISABLE));
@@ -67,8 +66,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
     public void testCancelInstallPlugin() throws Exception
     {
         loginAsAdmin();
-        PluginsPage pluginsPage = new PluginsPage(selenium, urls);
-        pluginsPage.goTo();
+        PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
         InstallPluginForm form = pluginsPage.clickInstall();
         form.waitFor();
         form.cancel();
@@ -81,7 +79,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickDisable(id);
 
-        SeleniumUtils.waitForLocator(selenium, pluginsPage.getActionId(ACTION_ENABLE, id));
+        browser.waitForLocator(pluginsPage.getActionId(ACTION_ENABLE, id));
 
         assertEquals(STATE_DISABLING, pluginsPage.getPluginState(id));
         assertFalse(pluginsPage.isActionPresent(id, ACTION_DISABLE));
@@ -98,11 +96,11 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickDisable(id);
 
-        SeleniumUtils.waitForLocator(selenium, pluginsPage.getActionId(ACTION_ENABLE, id));
+        browser.waitForLocator(pluginsPage.getActionId(ACTION_ENABLE, id));
 
         pluginsPage.clickEnable(id);
 
-        SeleniumUtils.waitForLocator(selenium, pluginsPage.getActionId(ACTION_DISABLE, id));
+        browser.waitForLocator(pluginsPage.getActionId(ACTION_DISABLE, id));
 
         assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
         assertTrue(pluginsPage.isActionPresent(id, ACTION_DISABLE));
@@ -119,7 +117,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickUninstall(id);
 
-        SeleniumUtils.waitForLocator(selenium, pluginsPage.getActionId(ACTION_UNINSTALL, id), 30000, true);
+        browser.waitForLocator(pluginsPage.getActionId(ACTION_UNINSTALL, id), true);
 
         assertEquals(STATE_UNINSTALLING, pluginsPage.getPluginState(id));
         assertFalse(pluginsPage.isActionPresent(id, ACTION_ENABLE));
@@ -136,8 +134,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         File testPlugin = makeTestPlugin(id, getRandomName());
 
         loginAsAdmin();
-        PluginsPage pluginsPage = new PluginsPage(selenium, urls);
-        pluginsPage.goTo();
+        PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
         InstallPluginForm form = pluginsPage.clickInstall();
         form.waitFor();
         form.continueFormElements(testPlugin.getAbsolutePath());

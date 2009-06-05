@@ -22,7 +22,6 @@ import java.util.Vector;
  */
 public class MavenAcceptanceTest extends SeleniumTestBase
 {
-    private static final int BUILD_TIMEOUT = 90000;
     private static final String COMMAND_NAME = "build";
     private static final String JUNIT_PROCESSOR_NAME = "junit xml report processor";
 
@@ -74,14 +73,12 @@ public class MavenAcceptanceTest extends SeleniumTestBase
         int buildNumber = runBuild(random);
 
         // We expect the summary page to report that 1 test passed.
-        BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, random, buildNumber);
-        summaryPage.goTo();
+        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
         assertEquals("1 passed", summaryPage.getSummaryTestsColumnText());
 
         // We expect the artifacts page to contain an artifact called test reports.
-        BuildArtifactsPage artifactsPage = new BuildArtifactsPage(selenium, urls, random, buildNumber);
-        artifactsPage.goTo();
-        SeleniumUtils.waitForLocator(selenium, artifactsPage.getArtifactLocator("test reports"));
+        BuildArtifactsPage artifactsPage = browser.openAndWaitFor(BuildArtifactsPage.class, random, buildNumber);
+        browser.waitForLocator(artifactsPage.getArtifactLocator("test reports"));
     }
 
     private void assertDefaultRequirement(String projectName, String resourceName) throws Exception
@@ -145,13 +142,13 @@ public class MavenAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
+        ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, random, false);
         hierarchyPage.waitFor();
     }
 
     private int runBuild(String projectName) throws Exception
     {
-        return xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        return xmlRpcHelper.runBuild(projectName);
     }
 
     private Hashtable<String, Object> getCaptureConfiguration(String projectName, String artifactName) throws Exception

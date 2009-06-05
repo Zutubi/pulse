@@ -15,7 +15,6 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -24,7 +23,6 @@ import java.util.Vector;
 /**
  * Tests for deletion of various things: an area that is notorious for bugs!
  */
-@Test(dependsOnGroups = {"init.*"})
 public class DeleteAcceptanceTest extends SeleniumTestBase
 {
     private static final String ACTION_DELETE_RECORD = "delete record";
@@ -53,8 +51,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String labelPath = insertLabel(projectPath);
 
         loginAsAdmin();
-        ListPage labelList = new ListPage(selenium, urls, PathUtils.getParentPath(labelPath));
-        labelList.goTo();
+        ListPage labelList = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(labelPath));
         String baseName = PathUtils.getBaseName(labelPath);
         assertItemPresent(labelList, baseName, null, "view", "delete");
         DeleteConfirmPage confirmPage = labelList.clickDelete(baseName);
@@ -72,8 +69,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String labelPath = insertLabel(projectPath);
 
         loginAsAdmin();
-        ListPage labelList = new ListPage(selenium, urls, PathUtils.getParentPath(labelPath));
-        labelList.goTo();
+        ListPage labelList = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(labelPath));
         String baseName = PathUtils.getBaseName(labelPath);
         assertItemPresent(labelList, baseName, null, "view", "delete");
         DeleteConfirmPage confirmPage = labelList.clickDelete(baseName);
@@ -88,8 +84,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialProject(random, false);
         loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         confirmPage.clickCancel();
@@ -101,18 +96,16 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
 
         loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS);
         confirmPage.clickDelete();
-        ProjectHierarchyPage global = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        ProjectHierarchyPage global = browser.create(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         global.waitFor();
         assertElementNotPresent("link=" + random);
 
-        BrowsePage browsePage = new BrowsePage(selenium, urls);
-        browsePage.goTo();
+        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertFalse(browsePage.isProjectPresent(null, random));
     }
 
@@ -126,21 +119,18 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String triggerPath = insertBuildCompletedTrigger(refereePath, refererPath);
 
         loginAsAdmin();
-        ListPage triggersPage = new ListPage(selenium, urls, PathUtils.getParentPath(triggerPath));
-        triggersPage.goTo();
+        ListPage triggersPage = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(triggerPath));
         assertItemPresent(triggersPage, "test", null);
 
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, refereeName, false);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, refereeName, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         assertTasks(confirmPage, refereePath, ACTION_DELETE_RECORD, refereePath, ACTION_DELETE_BUILDS, triggerPath, ACTION_DELETE_RECORD);
         confirmPage.clickDelete();
 
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
-        globalPage.waitFor();
+        browser.waitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
 
-        triggersPage.goTo();
+        triggersPage.openAndWaitFor();
         assertFalse(triggersPage.isItemPresent("test"));
     }
 
@@ -165,8 +155,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.saveConfig(dashboardPath, dashboard, false);
 
         login(authLogin, "");
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
-        hierarchyPage.goTo();
+        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS, PathUtils.getPath(dashboardPath, "shownProjects", "0"), "remove reference");
@@ -176,14 +165,14 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         logout();
         
         login(noAuthLogin, "");
-        hierarchyPage.goTo();
+        hierarchyPage.openAndWaitFor();
         confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS);
         assertTextPresent("A further task is required that is not visible to you with your current permissions");
         confirmPage.clickDelete();
 
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        ProjectHierarchyPage globalPage = browser.create(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         globalPage.waitFor();
 
         dashboard = xmlRpcHelper.getConfig(dashboardPath);
@@ -198,15 +187,13 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
     {
         String path = xmlRpcHelper.insertSimpleAgent(random);
         loginAsAdmin();
-        AgentHierarchyPage hierarchyPage = new AgentHierarchyPage(selenium, urls, random, false);
-        hierarchyPage.goTo();
+        AgentHierarchyPage hierarchyPage = browser.openAndWaitFor(AgentHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         assertTasks(confirmPage, path, ACTION_DELETE_RECORD, path, "delete agent state");
         confirmPage.clickDelete();
 
-        AgentHierarchyPage globalPage = new AgentHierarchyPage(selenium, urls, AgentManager.GLOBAL_AGENT_NAME, true);
-        globalPage.waitFor();
+        browser.waitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
 
         assertFalse(xmlRpcHelper.configPathExists(path));
     }
@@ -225,14 +212,13 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String stagePath = xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "stages"), stage);
 
         loginAsAdmin();
-        AgentHierarchyPage hierarchyPage = new AgentHierarchyPage(selenium, urls, agentName, false);
-        hierarchyPage.goTo();
+        AgentHierarchyPage hierarchyPage = browser.openAndWaitFor(AgentHierarchyPage.class, agentName, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         assertTasks(confirmPage, agentPath, ACTION_DELETE_RECORD, agentPath, "delete agent state", PathUtils.getPath(stagePath, "agent"), "null out reference");
         confirmPage.clickDelete();
 
-        AgentHierarchyPage globalPage = new AgentHierarchyPage(selenium, urls, AgentManager.GLOBAL_AGENT_NAME, true);
+        AgentHierarchyPage globalPage = browser.create(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
         globalPage.waitFor();
         assertFalse(xmlRpcHelper.configPathExists(agentPath));
 
@@ -246,8 +232,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String path = xmlRpcHelper.insertTrivialUser(random);
         loginAsAdmin();
         
-        ListPage usersPage = new ListPage(selenium, urls, MasterConfigurationRegistry.USERS_SCOPE);
-        usersPage.goTo();
+        ListPage usersPage = browser.openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
         assertItemPresent(usersPage, random, null, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE, UserConfigurationActions.ACTION_SET_PASSWORD);
         DeleteConfirmPage confirmPage = usersPage.clickDelete(random);
         confirmPage.waitFor();
@@ -266,8 +251,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String cleanupsPath = PathUtils.getPath(projectPath, "cleanup");
         String cleanupPath = PathUtils.getPath(cleanupsPath, "default");
 
-        ListPage cleanupsPage = new ListPage(selenium, urls, cleanupsPath);
-        cleanupsPage.goTo();
+        ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupsPath);
         cleanupsPage.expandTreeNode(cleanupsPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
         assertTrue(cleanupsPage.isTreeLinkPresent("default"));
@@ -290,8 +274,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         String cleanupssPath = PathUtils.getPath(projectPath, "cleanup");
 
-        ListPage cleanupsPage = new ListPage(selenium, urls, cleanupssPath);
-        cleanupsPage.goTo();
+        ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupssPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
@@ -315,8 +298,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        ListPage cleanupsPage = new ListPage(selenium, urls, parentCleanupsPath);
-        cleanupsPage.goTo();
+        ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, parentCleanupsPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
@@ -346,8 +328,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        ListPage cleanupsPage = new ListPage(selenium, urls, parentCleanupsPath);
-        cleanupsPage.goTo();
+        ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, parentCleanupsPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
@@ -370,8 +351,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        ListPage cleanupsPage = new ListPage(selenium, urls, cleanupsPath);
-        cleanupsPage.goTo();
+        ListPage cleanupsPage = browser.openAndWaitFor(ListPage.class, cleanupsPath);
         assertItemPresent(cleanupsPage, "default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
         cleanupsPage.expandTreeNode(cleanupsPath);
         assertFalse(cleanupsPage.isTreeLinkPresent("default"));
@@ -401,8 +381,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        ListPage reqsPage = new ListPage(selenium, urls, childReqsPath);
-        reqsPage.goTo();
+        ListPage reqsPage = browser.openAndWaitFor(ListPage.class, childReqsPath);
         assertItemPresent(reqsPage, baseName, ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
         DeleteConfirmPage confirmPage = reqsPage.clickDelete(baseName);
         confirmPage.waitFor();
@@ -433,8 +412,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
 
-        ListPage reqsPage = new ListPage(selenium, urls, childReqsPath);
-        reqsPage.goTo();
+        ListPage reqsPage = browser.openAndWaitFor(ListPage.class, childReqsPath);
         assertItemPresent(reqsPage, baseName, ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
         reqsPage.clickRestore(baseName);
 
@@ -449,12 +427,11 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         String path = PathUtils.getPath(projectPath, "scm");
-        CompositePage subversionPage = new CompositePage(selenium, urls, path);
-        subversionPage.goTo();
+        CompositePage subversionPage = browser.openAndWaitFor(CompositePage.class, path);
         assertTrue(subversionPage.isActionPresent(AccessManager.ACTION_DELETE));
         subversionPage.clickAction(AccessManager.ACTION_DELETE);
 
-        DeleteConfirmPage confirmPage = new DeleteConfirmPage(selenium, urls, path, false);
+        DeleteConfirmPage confirmPage = browser.create(DeleteConfirmPage.class, path, false);
         confirmPage.waitFor();
         CompositePage projectPage = confirmPage.confirmDeleteSingleton();
         assertTrue(projectPage.isTreeLinkPresent("scm"));
@@ -485,11 +462,11 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         int i;
         for(i = 0; i < pathActionPairs.length / 2; i++)
         {
-            assertEquals(pathActionPairs[i * 2], SeleniumUtils.getCellContents(selenium, page.getId(), i + 1, 0));
-            assertEquals(pathActionPairs[i * 2 + 1], SeleniumUtils.getCellContents(selenium, page.getId(), i + 1, 1));
+            assertEquals(pathActionPairs[i * 2], SeleniumUtils.getCellContents(browser.getSelenium(), page.getId(), i + 1, 0));
+            assertEquals(pathActionPairs[i * 2 + 1], SeleniumUtils.getCellContents(browser.getSelenium(), page.getId(), i + 1, 1));
         }
 
-        String actionsCell = SeleniumUtils.getCellContents(selenium, page.getId(), i + 1, 0);
+        String actionsCell = SeleniumUtils.getCellContents(browser.getSelenium(), page.getId(), i + 1, 0);
         actionsCell = actionsCell.replaceAll(" +", " ");
         assertEquals((page.isHide() ? "hide" : "delete") + " cancel", actionsCell);
     }

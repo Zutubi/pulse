@@ -13,6 +13,7 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.Constants.SECOND;
 
 import java.util.Hashtable;
 
@@ -40,8 +41,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertSimpleProject(random, false);
         loginAsAdmin();
-        ProjectConfigPage projectConfigPage = new ProjectConfigPage(selenium, urls, random, false);
-        projectConfigPage.goTo();
+        ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         projectConfigPage.clickAction("clean");
         waitForStatus("the next build on each agent will be clean");
     }
@@ -50,7 +50,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         ListPage usersPage = customActionWithArgumentPrelude();
 
-        SetPasswordForm form = new SetPasswordForm(selenium);
+        SetPasswordForm form = browser.create(SetPasswordForm.class);
         form.waitFor();
         form.saveFormElements("testpw", "testpw");
 
@@ -59,8 +59,9 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         // Login with the new password
         login(random, "testpw");
-        selenium.waitForPageToLoad("30000");
-        WelcomePage welcomePage = new WelcomePage(selenium, urls);
+        browser.waitForPageToLoad(30 * SECOND);
+
+        WelcomePage welcomePage = browser.create(WelcomePage.class);
         assertTrue(welcomePage.isPresent());
         assertTitle(welcomePage);
     }
@@ -68,7 +69,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     public void testCustomActionWithArgumentValidation() throws Exception
     {
         customActionWithArgumentPrelude();
-        SetPasswordForm form = new SetPasswordForm(selenium);
+        SetPasswordForm form = browser.create(SetPasswordForm.class);
         form.waitFor();
         form.saveFormElements("one", "two");
         form.waitFor();
@@ -79,18 +80,18 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         customActionWithArgumentPrelude();
 
-        SetPasswordForm setPasswordForm = new SetPasswordForm(selenium);
+        SetPasswordForm setPasswordForm = browser.create(SetPasswordForm.class);
         setPasswordForm.waitFor();
         setPasswordForm.cancelFormElements("testpw", "testpw");
 
-        UserForm userForm = new UserForm(selenium, random);
+        UserForm userForm = browser.create(UserForm.class, random);
         userForm.waitFor();
         logout();
 
         // Check the password is unchanged
         login(random, "");
-        selenium.waitForPageToLoad("30000");
-        WelcomePage welcomePage = new WelcomePage(selenium, urls);
+        browser.waitForPageToLoad(30 * SECOND);
+        WelcomePage welcomePage = browser.create(WelcomePage.class);
         assertTrue(welcomePage.isPresent());
         assertTitle(welcomePage);
     }
@@ -100,8 +101,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialUser(random);
 
         loginAsAdmin();
-        ListPage usersPage = new ListPage(selenium, urls, MasterConfigurationRegistry.USERS_SCOPE);
-        usersPage.goTo();
+        ListPage usersPage = browser.openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
         usersPage.clickAction(random, "setPassword");
         return usersPage;
     }
@@ -110,7 +110,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         ProjectConfigPage projectPage = prepareActionPrelude();
 
-        CustomTypeForm form = new CustomTypeForm(selenium);
+        CustomTypeForm form = browser.create(CustomTypeForm.class);
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config
@@ -118,7 +118,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         form.saveFormElements(new String[]{null});
 
         projectPage.waitFor();
-        SeleniumUtils.waitForLocator(selenium, projectPage.getTreeLinkLocator("custom pulse file"));
+        browser.waitForLocator(projectPage.getTreeLinkLocator("custom pulse file"));
         projectPage.clickComposite("type", "custom pulse file");
 
         form.waitFor();
@@ -129,7 +129,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         ProjectConfigPage projectPage = prepareActionPrelude();
 
-        CustomTypeForm customForm = new CustomTypeForm(selenium);
+        CustomTypeForm customForm = browser.create(CustomTypeForm.class);
         customForm.waitFor();
         customForm.cancelFormElements(new String[]{null});
 
@@ -138,7 +138,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertTrue(projectPage.isTreeLinkPresent("recipes, commands and captures"));
 
         projectPage.clickComposite("type", "recipes, commands and captures");
-        MultiRecipeTypeForm typeForm = new MultiRecipeTypeForm(selenium);
+        MultiRecipeTypeForm typeForm = browser.create(MultiRecipeTypeForm.class);
         typeForm.waitFor();
     }
 
@@ -146,7 +146,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         prepareActionPrelude();
 
-        CustomTypeForm form = new CustomTypeForm(selenium);
+        CustomTypeForm form = browser.create(CustomTypeForm.class);
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config
@@ -162,8 +162,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(random, false);
 
         loginAsAdmin();
-        ProjectConfigPage projectPage = new ProjectConfigPage(selenium, urls, random, false);
-        projectPage.goTo();
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         projectPage.clickAction(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM);
         return projectPage;
     }
@@ -176,8 +175,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(childProject, parentProject, false);
 
         loginAsAdmin();
-        ProjectConfigPage projectPage = new ProjectConfigPage(selenium, urls, childProject, false);
-        projectPage.goTo();
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, childProject, false);
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
     }
@@ -190,8 +188,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         String childPath = xmlRpcHelper.insertTrivialProject(childProject, parentProject, false);
 
         loginAsAdmin();
-        ProjectConfigPage projectPage = new ProjectConfigPage(selenium, urls, parentProject, false);
-        projectPage.goTo();
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, parentProject, false);
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
 
@@ -200,7 +197,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         childType.put("defaultRecipe", "meoverridenow");
         xmlRpcHelper.saveConfig(childTypePath, childType, false);
 
-        projectPage.goTo();
+        projectPage.openAndWaitFor();
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
     }
@@ -208,16 +205,14 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     public void testActionsListedForAgent() throws Exception
     {
         loginAsAdmin();
-        AgentConfigPage agentPage = new AgentConfigPage(selenium, urls, AgentManager.MASTER_AGENT_NAME, false);
-        agentPage.goTo();
+        AgentConfigPage agentPage = browser.openAndWaitFor(AgentConfigPage.class, AgentManager.MASTER_AGENT_NAME, false);
         assertTrue(agentPage.isActionPresent(AgentConfigurationActions.ACTION_PING));
     }
 
     public void testActionsNotListedForTemplateAgent() throws Exception
     {
         loginAsAdmin();
-        AgentConfigPage agentPage = new AgentConfigPage(selenium, urls, AgentManager.GLOBAL_AGENT_NAME, false);
-        agentPage.goTo();
+        AgentConfigPage agentPage = browser.openAndWaitFor(AgentConfigPage.class, AgentManager.GLOBAL_AGENT_NAME, false);
         assertFalse(agentPage.isActionPresent(AgentConfigurationActions.ACTION_PING));
     }
 
@@ -226,8 +221,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(random, false);
 
         loginAsAdmin();
-        ProjectConfigPage projectPage = new ProjectConfigPage(selenium, urls, random, false);
-        projectPage.goTo();
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
     }
@@ -237,8 +231,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(random, true);
 
         loginAsAdmin();
-        ProjectConfigPage projectPage = new ProjectConfigPage(selenium, urls, random, false);
-        projectPage.goTo();
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));

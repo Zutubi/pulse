@@ -24,7 +24,6 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private static final String WORKSPACE_PREFIX = "pulse-";
 
-    private static final long BUILD_TIMEOUT = 90000;
     private static final long WORKSPACE_TIMEOUT = 30000;
 
     private PerforceCore core;
@@ -52,7 +51,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         String project = randomName();
         xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
-        int buildId = xmlRpcHelper.runBuild(project, BUILD_TIMEOUT);
+        int buildId = xmlRpcHelper.runBuild(project);
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(project, buildId);
         assertEquals("success", build.get("status"));
     }
@@ -63,7 +62,7 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         String project = randomName();
         String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, createPerforceConfig(), xmlRpcHelper.getAntConfig());
-        xmlRpcHelper.runBuild(project, BUILD_TIMEOUT);
+        xmlRpcHelper.runBuild(project);
 
         assertFalse(getAllPulseWorkspaces().isEmpty());
 

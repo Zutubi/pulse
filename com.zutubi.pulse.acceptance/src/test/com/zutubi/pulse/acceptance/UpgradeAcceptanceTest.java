@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.transfer.TransferAPI;
 import com.zutubi.pulse.master.transfer.TransferException;
 import com.zutubi.pulse.servercore.cli.ShutdownCommand;
 import com.zutubi.pulse.servercore.cli.StartCommand;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.ParseException;
@@ -39,8 +40,8 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
     protected void setUp() throws Exception
     {
-        System.setProperty("pulse.port", "8990");
-        
+        AcceptanceTestUtils.setPulsePort(8990);
+
         super.setUp();
 
         tmpDir = FileSystemUtils.createTempDir("UAT", "");
@@ -111,7 +112,10 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
         File configFile = new File(buildDir, "pulse.properties");
         File configDir = new File(tmpDir, "config");
-        configDir.mkdir();
+        if (!configDir.exists() && !configDir.mkdirs())
+        {
+            // is this a fatal issue?.
+        }
         FileSystemUtils.copy(configDir, configFile);
 
         restoreDatabase(buildDir);
@@ -197,7 +201,10 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         dumpProperties(propFile, props);
 
         File configDir = new File(tmpDir, "config");
-        configDir.mkdir();
+        if (!configDir.exists() && !configDir.mkdirs())
+        {
+            // is this a fatal issue?.
+        }
         propFile = new File(configDir, "database.properties");
         props = new Properties();
         props.put("jdbc.driverClassName", dataSource.getDriverClassName());
@@ -259,27 +266,27 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
         Thread.sleep(30000);
 
-        goTo("/");
+        browser.goTo("/");
 
-        SeleniumUtils.waitForElementId(selenium, "upgrade.preview", 120000);
+        browser.waitForElement("upgrade.preview", 120 * SECOND);
 
         // check that we have received the upgrade preview, and that the data is as expected.
         assertTextPresent("Upgrade Preview");
         assertTextPresent(build);
 
-        selenium.click("continue");
+        browser.click("continue");
 
-        SeleniumUtils.waitForElementId(selenium, "upgrade.progress", 120000);
+        browser.waitForElement("upgrade.progress", 120 * SECOND);
 
         // waiting..
         assertTextPresent("Upgrade Progress");
 
-        SeleniumUtils.waitForElementId(selenium, "upgrade.complete", 120000);
+        browser.waitForElement("upgrade.complete", 120 * SECOND);
 
         assertTextPresent("Upgrade Complete");
         assertTextPresent("The upgrade has been successful");
 
-        selenium.click("continue");
+        browser.click("continue");
 
         Thread.sleep(30000);
 
