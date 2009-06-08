@@ -124,6 +124,11 @@ public abstract class PostProcessorSupport extends SelfReference implements Post
             {
                 ppContext.addFeatureToCommand(feature);
             }
+
+            public void addCustomField(String name, String value)
+            {
+                ppContext.addCustomField(name, value);
+            }
         });
     }
 

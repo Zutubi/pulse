@@ -20,5 +20,7 @@
                         default-fragment="false" class="com.zutubi.pulse.core.commands.core.RegexTestPostProcessor"/>
         <post-processor name="regex.pp" display-name="Regular expression processor"
                         default-fragment="false" class="com.zutubi.pulse.core.commands.core.RegexPostProcessor"/>
+        <post-processor name="custom-fields.pp" display-name="Custom field processor"
+                        default-fragment="true" class="com.zutubi.pulse.core.commands.core.CustomFieldsPostProcessor"/>
     </extension>
 </plugin>

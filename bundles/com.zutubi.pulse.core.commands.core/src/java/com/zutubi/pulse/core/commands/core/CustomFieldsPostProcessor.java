@@ -1,0 +1,43 @@
+package com.zutubi.pulse.core.commands.core;
+
+import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorSupport;
+import com.zutubi.util.io.IOUtils;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+
+
+/**
+ * A post processor that does line-by-line searching with regular expressions
+ * to detect features.
+ */
+public class CustomFieldsPostProcessor extends PostProcessorSupport
+{
+    protected void processFile(File artifactFile, PostProcessorContext ppContext)
+    {
+        FileReader reader = null;
+        try
+        {
+            reader = new FileReader(artifactFile);
+            Properties properties = new Properties();
+            properties.load(reader);
+            for (Map.Entry<Object, Object> entry: properties.entrySet())
+            {
+                ppContext.addCustomField(entry.getKey().toString(), entry.getValue().toString());
+            }
+        }
+        catch (IOException e)
+        {
+            throw new BuildException(e);
+        }
+        finally
+        {
+            IOUtils.close(reader);
+        }
+    }
+}

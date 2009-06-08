@@ -177,16 +177,21 @@ public class TestResultSummary extends Entity
         return total > 0;
     }
 
-    public String getSuccessRate()
+    public double getSuccessPercent()
     {
-        // default the success rate to zero. If we have some tests (usually the case but not always),
-        // then determine the percentage. 
-        double rate = 0D;
+        double rate = 100D;
         if (hasTests())
         {
             rate = getPassed() * 100.0 / (total - skipped);
         }
-        return String.format("%.2f", rate);
+        return rate;
+    }
+
+    public String getSuccessRate()
+    {
+        // default the success rate to 100. If we have some tests (usually the case but not always),
+        // then determine the percentage.
+        return String.format("%.2f", getSuccessPercent());
     }
 
     public String format(Messages messages)

@@ -35,7 +35,7 @@ public abstract class ActionResolverSupport implements ActionResolver
         }
     }
 
-    protected void addParameter(String name, String value)
+    public void addParameter(String name, String value)
     {
         if(parameters == null)
         {

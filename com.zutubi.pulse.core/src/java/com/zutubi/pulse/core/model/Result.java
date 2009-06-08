@@ -11,8 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * Abstract base for all results (e.g. command results, build results).  Stores
+ * information about when the result was generated, its status and so on.
  */
 public abstract class Result extends Entity
 {
@@ -151,22 +151,15 @@ public abstract class Result extends Entity
 
     public void addFeature(Feature.Level level, String message)
     {
-        PersistentFeature feature = new PersistentFeature(level, message);
-        addFeature(feature);
+        addFeature(new PersistentFeature(level, message));
     }
 
     public void addFeature(PersistentFeature feature)
     {
-        // Eliminate duplicates
-        for (PersistentFeature f : features)
+        if (!features.contains(feature))
         {
-            if (feature.equals(f))
-            {
-                return;
-            }
+            features.add(feature);
         }
-
-        features.add(feature);
     }
 
     public void failure(String message)
@@ -273,11 +266,7 @@ public abstract class Result extends Entity
      */
     public File getAbsoluteOutputDir(File dataRoot)
     {
-        if (outputDir == null)
-        {
-            return null;
-        }
-        return new File(dataRoot, outputDir.getPath());
+        return outputDir == null ? null : new File(dataRoot, outputDir.getPath());
     }
 
     /**
@@ -305,14 +294,7 @@ public abstract class Result extends Entity
 
     public String getOutputDir()
     {
-        if (outputDir == null)
-        {
-            return null;
-        }
-        else
-        {
-            return outputDir.getPath();
-        }
+        return outputDir == null ? null : outputDir.getPath();
     }
 
     public void setOutputDir(String dir)

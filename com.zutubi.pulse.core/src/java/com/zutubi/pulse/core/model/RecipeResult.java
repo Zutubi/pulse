@@ -11,8 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 
- *
+ * Stores the result of running a single recipe (sequence of commands).
  */
 public class RecipeResult extends Result
 {
@@ -23,8 +22,8 @@ public class RecipeResult extends Result
 
     private String recipeName;
     private List<CommandResult> results = new LinkedList<CommandResult>();
-    private PersistentTestSuiteResult failedTestResults;
     private TestResultSummary testSummary = new TestResultSummary();
+    private PersistentTestSuiteResult failedTestResults;
 
     public RecipeResult()
     {

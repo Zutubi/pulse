@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.postprocessors;
 
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RESULTS;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
@@ -9,6 +8,8 @@ import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+
+import java.util.Map;
 
 /**
  * Holds contextual information for the post processing of a single artifact
@@ -82,6 +83,13 @@ public class DefaultPostProcessorContext implements PostProcessorContext
     public void addFeatureToCommand(Feature feature)
     {
         commandResult.addFeature(convertFeature(feature));
+    }
+
+    public void addCustomField(String name, String value)
+    {
+        @SuppressWarnings({"unchecked"})
+        Map<String, String> fields = executionContext.getValue(NAMESPACE_INTERNAL, PROPERTY_CUSTOM_FIELDS, Map.class);
+        fields.put(name, value);
     }
 
     private PersistentFeature convertFeature(Feature feature)

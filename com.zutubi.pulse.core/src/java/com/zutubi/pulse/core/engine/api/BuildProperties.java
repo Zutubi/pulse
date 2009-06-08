@@ -153,6 +153,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_BASE_DIR                = "base.dir";
     /**
+     * Internal property used to collect custom field values for a recipe.
+     */
+    public static final String PROPERTY_CUSTOM_FIELDS           = "custom.fields";
+    /**
      * An internal property used by agents to locate files needed during the
      * build.
      */

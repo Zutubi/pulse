@@ -73,7 +73,7 @@ public interface ConfigurationProvider
 
     /**
      * Retrieves all descendents of a given path, which should all be of the specified type.  If the
-     * path is within a templated scope, all instances that descdend from the given path are
+     * path is within a templated scope, all instances that descend from the given path are
      * returned, potentially including the instance at that path (see the {@code strict} parameter).
      * If the path is not in a templated scope, either the empty set is returned (strict) or a set
      * containing the instance at the path (non-strict).  If the path does not exist, the empty set

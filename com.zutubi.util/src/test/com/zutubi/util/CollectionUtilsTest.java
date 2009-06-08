@@ -1,8 +1,9 @@
 package com.zutubi.util;
 
 import com.zutubi.util.junit.ZutubiTestCase;
+import com.zutubi.util.math.IntegerAddition;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class CollectionUtilsTest extends ZutubiTestCase
 
     public void testUniqueStrings()
     {
-        assertUnique(Arrays.asList("a", "b", "c"), Arrays.asList("a", "b", "b", "c"));
+        assertUnique(asList("a", "b", "c"), asList("a", "b", "b", "c"));
     }
 
     public void testUniqueEmpty()
@@ -82,12 +83,12 @@ public class CollectionUtilsTest extends ZutubiTestCase
 
     public void testUniqueContainsNull()
     {
-        assertUnique(Arrays.asList("a", null, "c"), Arrays.asList("a", null, null, "c"));
+        assertUnique(asList("a", null, "c"), asList("a", null, null, "c"));
     }
 
     public void testUniqueOrderMaintained()
     {
-        assertUnique(Arrays.asList("c", "1", "a", "5", "2", "x", "n"), Arrays.asList("c", "1", "a", "c", "1", "5", "2", "x", "n", "a"));
+        assertUnique(asList("c", "1", "a", "5", "2", "x", "n"), asList("c", "1", "a", "c", "1", "5", "2", "x", "n", "a"));
     }
 
     private <T> void assertUnique(List<T> expected, List<T> test)
@@ -138,16 +139,36 @@ public class CollectionUtilsTest extends ZutubiTestCase
 
     public void testCountAllMatch()
     {
-        assertEquals(3, CollectionUtils.count(Arrays.asList(1, 2, 3), new TruePredicate<Integer>()));
+        assertEquals(3, CollectionUtils.count(asList(1, 2, 3), new TruePredicate<Integer>()));
     }
 
     public void testCountNoneMatch()
     {
-        assertEquals(0, CollectionUtils.count(Arrays.asList(1, 2, 3), new FalsePredicate<Integer>()));
+        assertEquals(0, CollectionUtils.count(asList(1, 2, 3), new FalsePredicate<Integer>()));
     }
 
     public void testCountSomeMatch()
     {
-        assertEquals(1, CollectionUtils.count(Arrays.asList(1, 2, 3), new EqualsPredicate<Integer>(2)));
+        int result = CollectionUtils.count(asList(1, 2, 3), new EqualsPredicate<Integer>(2));
+        assertEquals(1, result);
     }
+
+    public void testReduceEmpty()
+    {
+        int result = CollectionUtils.reduce(Collections.<Integer>emptyList(), 4, new IntegerAddition());
+        assertEquals(4, result);
+    }
+
+    public void testReduceSingle()
+    {
+        int result = CollectionUtils.reduce(asList(2), 4, new IntegerAddition());
+        assertEquals(6, result);
+    }
+
+    public void testReduceMultiple()
+    {
+        int result = CollectionUtils.reduce(asList(1, 2, 3), 4, new IntegerAddition());
+        assertEquals(10, result);
+    }
+
 }
