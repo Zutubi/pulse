@@ -1,10 +1,11 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,10 +45,12 @@ public class RecipeCustomFields
             File customFile = new File(recipeOutputDir, CUSTOM_FIELDS_FILE);
             if (customFile.exists())
             {
+                FileInputStream inputStream = null;
                 try
                 {
+                    inputStream = new FileInputStream(customFile);
                     Properties p = new Properties();
-                    p.load(new FileReader(customFile));
+                    p.load(inputStream);
                     for (Map.Entry<Object, Object> entry: p.entrySet())
                     {
                         customFields.put(entry.getKey().toString(), entry.getValue().toString());
@@ -57,6 +60,10 @@ public class RecipeCustomFields
                 catch (IOException e)
                 {
                     LOG.severe("Unable to load custom fields: " + e.getMessage(), e);
+                }
+                finally
+                {
+                    IOUtils.close(inputStream);
                 }
             }
         }
@@ -75,13 +82,19 @@ public class RecipeCustomFields
         Properties properties = new Properties();
         properties.putAll(customFields);
         File customFile = new File(recipeOutputDir, CUSTOM_FIELDS_FILE);
+        FileOutputStream outputStream = null;
         try
         {
-            properties.store(new FileWriter(customFile), "Custom Fields");
+            outputStream = new FileOutputStream(customFile);
+            properties.store(outputStream, "Custom Fields");
         }
         catch (IOException e)
         {
             LOG.severe("Unable to write out custom fields to file '" + customFile.getAbsolutePath() + "': " + e.getMessage(), e);
+        }
+        finally
+        {
+            IOUtils.close(outputStream);
         }
     }
 }
