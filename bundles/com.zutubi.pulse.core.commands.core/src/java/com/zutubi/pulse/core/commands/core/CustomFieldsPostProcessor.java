@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorSupport;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
@@ -20,12 +20,12 @@ public class CustomFieldsPostProcessor extends PostProcessorSupport
 {
     protected void processFile(File artifactFile, PostProcessorContext ppContext)
     {
-        FileReader reader = null;
+        FileInputStream inputStream = null;
         try
         {
-            reader = new FileReader(artifactFile);
+            inputStream = new FileInputStream(artifactFile);
             Properties properties = new Properties();
-            properties.load(reader);
+            properties.load(inputStream);
             for (Map.Entry<Object, Object> entry: properties.entrySet())
             {
                 ppContext.addCustomField(entry.getKey().toString(), entry.getValue().toString());
@@ -37,7 +37,7 @@ public class CustomFieldsPostProcessor extends PostProcessorSupport
         }
         finally
         {
-            IOUtils.close(reader);
+            IOUtils.close(inputStream);
         }
     }
 }
