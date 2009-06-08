@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.tove.table;
 
 import com.zutubi.tove.ConventionSupport;
-import com.zutubi.tove.config.api.Formatter;
 import com.zutubi.tove.annotations.Format;
+import com.zutubi.tove.config.api.Formatter;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.bean.BeanUtils;
+import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 
 import java.lang.reflect.Method;
 
@@ -101,6 +101,12 @@ public class FormattingWrapper
                             name, type.getClazz(), Formatter.class);
                 }
             }
+        }
+
+        // Default formatting for enum constants.
+        if (fieldValue.getClass().isEnum())
+        {
+            return fieldValue.toString().toLowerCase().replace('_', ' ');
         }
         
         return fieldValue;

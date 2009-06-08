@@ -252,4 +252,9 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     {
         this.reportGroups = reportGroups;
     }
+
+    public void addReportGroup(ReportGroupConfiguration reportGroup)
+    {
+        reportGroups.put(reportGroup.getName(), reportGroup);
+    }
 }

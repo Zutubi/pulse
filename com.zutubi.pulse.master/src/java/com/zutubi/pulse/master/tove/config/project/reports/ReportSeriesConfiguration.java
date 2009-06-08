@@ -19,6 +19,24 @@ public abstract class ReportSeriesConfiguration extends AbstractNamedConfigurati
     @Constraint("ColourValidator")
     private String customColour;
 
+    protected ReportSeriesConfiguration()
+    {
+    }
+
+    protected ReportSeriesConfiguration(String name, boolean successfulOnly)
+    {
+        super(name);
+        this.successfulOnly = successfulOnly;
+    }
+
+    protected ReportSeriesConfiguration(String name, boolean successfulOnly, String customColour)
+    {
+        super(name);
+        this.successfulOnly = successfulOnly;
+        this.useCustomColour = true;
+        this.customColour = customColour;
+    }
+
     public boolean isSuccessfulOnly()
     {
         return successfulOnly;

@@ -7,7 +7,7 @@ import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.validation.annotations.Numeric;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -22,7 +22,16 @@ public class ReportGroupConfiguration extends AbstractNamedConfiguration
     private int defaultTimeFrame = 45;
     private ReportTimeUnit defaultTimeUnit = ReportTimeUnit.DAYS;
     @Ordered
-    private Map<String, ReportConfiguration> reports = new HashMap<String, ReportConfiguration>();
+    private Map<String, ReportConfiguration> reports = new LinkedHashMap<String, ReportConfiguration>();
+
+    public ReportGroupConfiguration()
+    {
+    }
+
+    public ReportGroupConfiguration(String name)
+    {
+        super(name);
+    }
 
     public int getDefaultTimeFrame()
     {
@@ -52,5 +61,10 @@ public class ReportGroupConfiguration extends AbstractNamedConfiguration
     public void setReports(Map<String, ReportConfiguration> reports)
     {
         this.reports = reports;
+    }
+
+    public void addReport(ReportConfiguration report)
+    {
+        reports.put(report.getName(), report);
     }
 }

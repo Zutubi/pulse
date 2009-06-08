@@ -1,16 +1,16 @@
 package com.zutubi.pulse.master.tove.table;
 
-import com.zutubi.util.junit.ZutubiTestCase;
-import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.bean.DefaultObjectFactory;
-import com.zutubi.util.RandomUtils;
 import com.zutubi.tove.annotations.Format;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.Formatter;
 import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.TypeException;
-import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 public class FormattingWrapperTest extends ZutubiTestCase
 {
@@ -32,6 +32,11 @@ public class FormattingWrapperTest extends ZutubiTestCase
     public void testDefaultFormatting() throws Exception
     {
         assertFormatting(value, "a");
+    }
+
+    public void testEnumFormatting() throws Exception
+    {
+        assertFormatting("test constant", "enum");
     }
 
     public void testReturnFormatting() throws Exception
@@ -80,6 +85,11 @@ public class FormattingWrapperTest extends ZutubiTestCase
         return wrapper;
     }
 
+    public enum TestEnum
+    {
+        TEST_CONSTANT
+    }
+
     @SymbolicName("sample")
     public static class Sample extends AbstractConfiguration
     {
@@ -99,6 +109,11 @@ public class FormattingWrapperTest extends ZutubiTestCase
             return value;
         }
 
+        public TestEnum getEnum()
+        {
+            return TestEnum.TEST_CONSTANT;
+        }
+        
         @Format("StringFormatter")
         public String getB()
         {
