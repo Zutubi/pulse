@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.util.Predicate;
+import com.zutubi.util.UnaryProcedure;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -57,6 +58,16 @@ public class ScopeHierarchy
     public Node findNodeByPredicate(Predicate<Node> predicate)
     {
         return root.findByPredicate(predicate);
+    }
+
+    /**
+     * Runs a procedure over all nodes in the hierarchy.
+     *
+     * @param p the procedure to run
+     */
+    public void forEach(UnaryProcedure<Node> p)
+    {
+        root.forEach(p);
     }
 
     /**
@@ -138,6 +149,20 @@ public class ScopeHierarchy
             }
 
             return found;
+        }
+
+        /**
+         * Runs a procedure over this and every descendent node.
+         *
+         * @param p the procedure to run
+         */
+        void forEach(UnaryProcedure<Node> p)
+        {
+            p.process(this);
+            for (Node child: children)
+            {
+                child.forEach(p);
+            }
         }
     }
 }

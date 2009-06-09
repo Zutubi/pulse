@@ -59,6 +59,7 @@
                 <ref local="agentPriority"/>
                 <ref local="gitTrackSelectedBranch"/>
                 <ref local="autoClearResponsibility"/>
+                <ref local="globalReports"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -220,5 +221,9 @@
 
     <bean id="autoClearResponsibility" class="com.zutubi.pulse.master.upgrade.tasks.AutoClearResponsibilityUpgradeTask">
         <property name="buildNumber" value="200030001"/>
+    </bean>
+
+    <bean id="globalReports" class="com.zutubi.pulse.master.upgrade.tasks.GlobalReportsUpgradeTask">
+        <property name="buildNumber" value="200031001"/>
     </bean>
 </beans>
