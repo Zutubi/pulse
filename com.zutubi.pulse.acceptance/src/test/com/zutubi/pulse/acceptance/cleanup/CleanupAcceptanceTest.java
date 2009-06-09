@@ -197,19 +197,19 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public boolean isBuildPresentViaUI(String projectName, long buildNumber)
     {
-        BuildSummaryPage page = browser.create(BuildSummaryPage.class, projectName, buildNumber);
+        BuildSummaryPage page = browser.createPage(BuildSummaryPage.class, projectName, buildNumber);
         return canOpenPage(page);
     }
 
     public boolean isBuildPulseFilePresentViaUI(String projectName, long buildNumber)
     {
-        BuildFilePage page = browser.create(BuildFilePage.class, projectName, buildNumber);
+        BuildFilePage page = browser.createPage(BuildFilePage.class, projectName, buildNumber);
         return canOpenPage(page);
     }
 
     public boolean isBuildLogsPresentViaUI(String projectName, long buildNumber)
     {
-        BuildDetailedViewPage page = browser.create(BuildDetailedViewPage.class, projectName, buildNumber);
+        BuildDetailedViewPage page = browser.createPage(BuildDetailedViewPage.class, projectName, buildNumber);
         if (!canOpenPage(page))
         {
             return false;
@@ -224,7 +224,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)
     {
-        BuildArtifactsPage page = browser.create(BuildArtifactsPage.class, projectName, buildNumber);
+        BuildArtifactsPage page = browser.createPage(BuildArtifactsPage.class, projectName, buildNumber);
         if (!canOpenPage(page))
         {
             return false;

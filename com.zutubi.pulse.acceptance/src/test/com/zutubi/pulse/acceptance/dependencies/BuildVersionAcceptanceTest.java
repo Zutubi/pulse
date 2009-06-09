@@ -103,7 +103,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
             home.triggerBuild();
 
             // we should be prompted for a revision and a pname value.
-            TriggerBuildForm form = browser.create(TriggerBuildForm.class);
+            TriggerBuildForm form = browser.createForm(TriggerBuildForm.class);
             form.waitFor();
             assertTrue(form.isFormPresent());
 

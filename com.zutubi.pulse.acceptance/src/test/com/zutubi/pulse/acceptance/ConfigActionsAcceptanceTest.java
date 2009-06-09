@@ -50,7 +50,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         ListPage usersPage = customActionWithArgumentPrelude();
 
-        SetPasswordForm form = browser.create(SetPasswordForm.class);
+        SetPasswordForm form = browser.createForm(SetPasswordForm.class);
         form.waitFor();
         form.saveFormElements("testpw", "testpw");
 
@@ -61,7 +61,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         login(random, "testpw");
         browser.waitForPageToLoad(30 * SECOND);
 
-        WelcomePage welcomePage = browser.create(WelcomePage.class);
+        WelcomePage welcomePage = browser.createPage(WelcomePage.class);
         assertTrue(welcomePage.isPresent());
         assertTitle(welcomePage);
     }
@@ -69,7 +69,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     public void testCustomActionWithArgumentValidation() throws Exception
     {
         customActionWithArgumentPrelude();
-        SetPasswordForm form = browser.create(SetPasswordForm.class);
+        SetPasswordForm form = browser.createForm(SetPasswordForm.class);
         form.waitFor();
         form.saveFormElements("one", "two");
         form.waitFor();
@@ -80,18 +80,18 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         customActionWithArgumentPrelude();
 
-        SetPasswordForm setPasswordForm = browser.create(SetPasswordForm.class);
+        SetPasswordForm setPasswordForm = browser.createForm(SetPasswordForm.class);
         setPasswordForm.waitFor();
         setPasswordForm.cancelFormElements("testpw", "testpw");
 
-        UserForm userForm = browser.create(UserForm.class, random);
+        UserForm userForm = browser.createForm(UserForm.class, random);
         userForm.waitFor();
         logout();
 
         // Check the password is unchanged
         login(random, "");
         browser.waitForPageToLoad(30 * SECOND);
-        WelcomePage welcomePage = browser.create(WelcomePage.class);
+        WelcomePage welcomePage = browser.createPage(WelcomePage.class);
         assertTrue(welcomePage.isPresent());
         assertTitle(welcomePage);
     }
@@ -110,7 +110,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         ProjectConfigPage projectPage = prepareActionPrelude();
 
-        CustomTypeForm form = browser.create(CustomTypeForm.class);
+        CustomTypeForm form = browser.createForm(CustomTypeForm.class);
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config
@@ -129,7 +129,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         ProjectConfigPage projectPage = prepareActionPrelude();
 
-        CustomTypeForm customForm = browser.create(CustomTypeForm.class);
+        CustomTypeForm customForm = browser.createForm(CustomTypeForm.class);
         customForm.waitFor();
         customForm.cancelFormElements(new String[]{null});
 
@@ -138,7 +138,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertTrue(projectPage.isTreeLinkPresent("recipes, commands and captures"));
 
         projectPage.clickComposite("type", "recipes, commands and captures");
-        MultiRecipeTypeForm typeForm = browser.create(MultiRecipeTypeForm.class);
+        MultiRecipeTypeForm typeForm = browser.createForm(MultiRecipeTypeForm.class);
         typeForm.waitFor();
     }
 
@@ -146,7 +146,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         prepareActionPrelude();
 
-        CustomTypeForm form = browser.create(CustomTypeForm.class);
+        CustomTypeForm form = browser.createForm(CustomTypeForm.class);
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config

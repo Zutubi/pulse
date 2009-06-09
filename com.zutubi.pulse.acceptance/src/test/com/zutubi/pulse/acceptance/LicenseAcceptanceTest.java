@@ -146,7 +146,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         // Adding an agent should fail
         AgentHierarchyPage hierarchyPage = browser.openAndWaitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
         hierarchyPage.clickAdd();
-        AgentForm form = browser.create(AgentForm.class);
+        AgentForm form = browser.createForm(AgentForm.class);
         form.waitFor();
         form.finishNamedFormElements(asPair("name", random), asPair("host", "localhost"));
         form.waitFor();
@@ -164,7 +164,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         // Adding a user should fail
         UsersPage usersPage = browser.openAndWaitFor(UsersPage.class);
         usersPage.clickAdd();
-        AddUserForm form = browser.create(AddUserForm.class);
+        AddUserForm form = browser.createForm(AddUserForm.class);
         form.waitFor();
         form.finishNamedFormElements(asPair("login", random), asPair("name", random));
         form.waitFor();
@@ -195,7 +195,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.create(CloneForm.class, false);
+        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + "clone");
         cloneForm.waitFor();
@@ -226,7 +226,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
     private LicenseForm setLicenseViaUI(String license)
     {
-        LicenseForm form = browser.create(LicenseForm.class);
+        LicenseForm form = browser.createForm(LicenseForm.class);
         form.waitFor();
         form.applyFormElements(license);
         return form;

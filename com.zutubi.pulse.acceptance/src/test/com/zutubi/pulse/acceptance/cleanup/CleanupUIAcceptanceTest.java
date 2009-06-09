@@ -39,7 +39,7 @@ public class CleanupUIAcceptanceTest extends SeleniumTestBase
         CleanupRulesPage cleanupRulesPage = projectPage.clickCleanupAndWait();
         cleanupRulesPage.clickView("default");
 
-        CleanupForm cleanup = browser.create(CleanupForm.class);
+        CleanupForm cleanup = browser.createForm(CleanupForm.class);
         cleanup.waitFor();
         assertEquals("default", cleanup.getFieldValue(NAME));
         assertEquals("WORKING_COPY_SNAPSHOT", cleanup.getFieldValue(WHAT));
@@ -58,7 +58,7 @@ public class CleanupUIAcceptanceTest extends SeleniumTestBase
         CleanupRulesPage cleanupRulesPage = projectPage.clickCleanupAndWait();
         cleanupRulesPage.clickAdd();
 
-        CleanupForm cleanup = browser.create(CleanupForm.class);
+        CleanupForm cleanup = browser.createForm(CleanupForm.class);
         cleanup.waitFor();
         cleanup.finishNamedFormElements(asPair(NAME, "new rule"), asPair(RETAIN, "1"), asPair(CLEANUP_ALL, "true"));
 

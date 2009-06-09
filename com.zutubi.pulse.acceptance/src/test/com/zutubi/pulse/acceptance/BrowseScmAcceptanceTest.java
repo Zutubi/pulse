@@ -196,7 +196,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     private AntCommandForm navigateToCommandConfig()
     {
         browser.goTo(urls.adminProject(random) + "/" + Constants.Project.TYPE + "/recipes/default/commands/build");
-        AntCommandForm antForm = browser.create(AntCommandForm.class);
+        AntCommandForm antForm = browser.createForm(AntCommandForm.class);
         antForm.waitFor();
         return antForm;
     }

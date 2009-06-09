@@ -101,7 +101,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         confirmPage.waitFor();
         assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS);
         confirmPage.clickDelete();
-        ProjectHierarchyPage global = browser.create(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        ProjectHierarchyPage global = browser.createPage(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         global.waitFor();
         assertElementNotPresent("link=" + random);
 
@@ -172,7 +172,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         assertTextPresent("A further task is required that is not visible to you with your current permissions");
         confirmPage.clickDelete();
 
-        ProjectHierarchyPage globalPage = browser.create(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        ProjectHierarchyPage globalPage = browser.createPage(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         globalPage.waitFor();
 
         dashboard = xmlRpcHelper.getConfig(dashboardPath);
@@ -218,7 +218,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         assertTasks(confirmPage, agentPath, ACTION_DELETE_RECORD, agentPath, "delete agent state", PathUtils.getPath(stagePath, "agent"), "null out reference");
         confirmPage.clickDelete();
 
-        AgentHierarchyPage globalPage = browser.create(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
+        AgentHierarchyPage globalPage = browser.createPage(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
         globalPage.waitFor();
         assertFalse(xmlRpcHelper.configPathExists(agentPath));
 
@@ -431,7 +431,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         assertTrue(subversionPage.isActionPresent(AccessManager.ACTION_DELETE));
         subversionPage.clickAction(AccessManager.ACTION_DELETE);
 
-        DeleteConfirmPage confirmPage = browser.create(DeleteConfirmPage.class, path, false);
+        DeleteConfirmPage confirmPage = browser.createPage(DeleteConfirmPage.class, path, false);
         confirmPage.waitFor();
         CompositePage projectPage = confirmPage.confirmDeleteSingleton();
         assertTrue(projectPage.isTreeLinkPresent("scm"));

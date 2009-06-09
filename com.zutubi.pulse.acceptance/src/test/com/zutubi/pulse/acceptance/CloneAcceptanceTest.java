@@ -114,7 +114,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         cloneForm.waitFor();
         cloneForm.cloneFormElements(CLONE_PROPERTY_NAME);
 
-        ResourcePropertyForm propertyForm = browser.create(ResourcePropertyForm.class);
+        ResourcePropertyForm propertyForm = browser.createForm(ResourcePropertyForm.class);
         propertyForm.waitFor();
         assertFormElements(propertyForm, CLONE_PROPERTY_NAME, TEST_PROPERTY_VALUE, "", "false", "false", "false");
 
@@ -169,7 +169,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.create(CloneForm.class, false);
+        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME);
         
@@ -184,7 +184,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.create(CloneForm.class, false);
+        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
         cloneForm.waitFor();
 
         cloneForm.cloneFormElements("");
@@ -203,12 +203,12 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.create(CloneForm.class, false);
+        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
         cloneForm.addDescendent(childName);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(parentName + CLONE_PROPERTY_NAME, "false", null);
 
-        ProjectHierarchyPage cloneHierarchyPage = browser.create(ProjectHierarchyPage.class, parentName + CLONE_PROPERTY_NAME, true);
+        ProjectHierarchyPage cloneHierarchyPage = browser.createPage(ProjectHierarchyPage.class, parentName + CLONE_PROPERTY_NAME, true);
         cloneHierarchyPage.waitFor();
 
         assertEquals(0, xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentName + CLONE_PROPERTY_NAME)).size());
@@ -221,14 +221,14 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.create(CloneForm.class, false);
+        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
         cloneForm.addDescendent(childName);
         cloneForm.waitFor();
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         String childCloneName = childName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, "true", childCloneName);
 
-        ProjectHierarchyPage cloneHierarchyPage = browser.create(ProjectHierarchyPage.class, parentCloneName, true);
+        ProjectHierarchyPage cloneHierarchyPage = browser.createPage(ProjectHierarchyPage.class, parentCloneName, true);
         cloneHierarchyPage.waitFor();
 
         assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
@@ -246,7 +246,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.create(CloneForm.class, false);
+        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
         cloneForm.addDescendent(childName);
         cloneForm.waitFor();
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
@@ -280,7 +280,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickSmartClone();
 
-        CloneForm cloneForm = browser.create(CloneForm.class, true);
+        CloneForm cloneForm = browser.createForm(CloneForm.class, true);
         cloneForm.waitFor();
 
         cloneForm.cloneFormElements("", random + PARENT_PROPERTY_NAME);
@@ -307,7 +307,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
         hierarchyPage.clickSmartClone();
 
-        CloneForm cloneForm = browser.create(CloneForm.class, true);
+        CloneForm cloneForm = browser.createForm(CloneForm.class, true);
         cloneForm.addDescendent(childName);
         cloneForm.waitFor();
         String parentTemplateName = parentName + PARENT_PROPERTY_NAME;
@@ -315,7 +315,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         String childCloneName = childName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, parentTemplateName, "true", childCloneName);
 
-        ProjectHierarchyPage cloneHierarchyPage = browser.create(ProjectHierarchyPage.class, parentCloneName, true);
+        ProjectHierarchyPage cloneHierarchyPage = browser.createPage(ProjectHierarchyPage.class, parentCloneName, true);
         cloneHierarchyPage.waitFor();
 
         assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
@@ -335,7 +335,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         doSmartClone();
 
         browser.goTo(urls.adminProject(random) + Constants.Project.HOOKS + "/stagey");
-        ConfigurationForm hookForm = browser.create(ConfigurationForm.class, PostStageHookConfiguration.class);
+        ConfigurationForm hookForm = browser.createForm(ConfigurationForm.class, PostStageHookConfiguration.class);
         hookForm.waitFor();
 
         assertTrue("Stages field should have been pulled up to extracted template", hookForm.isInherited("stages"));
@@ -347,11 +347,11 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickSmartClone();
 
-        CloneForm cloneForm = browser.create(CloneForm.class, true);
+        CloneForm cloneForm = browser.createForm(CloneForm.class, true);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random + PARENT_PROPERTY_NAME);
 
-        ProjectHierarchyPage cloneHierarchyPage = browser.create(ProjectHierarchyPage.class, random + CLONE_PROPERTY_NAME, false);
+        ProjectHierarchyPage cloneHierarchyPage = browser.createPage(ProjectHierarchyPage.class, random + CLONE_PROPERTY_NAME, false);
         cloneHierarchyPage.waitFor();
         return cloneHierarchyPage;
     }

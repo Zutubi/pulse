@@ -32,7 +32,7 @@ public class ConfigLinksAcceptanceTest extends SeleniumTestBase
         assertTrue(projectConfigPage.isLinkPresent("log"));
 
         projectConfigPage.clickLink("home");
-        ProjectHomePage homePage = browser.create(ProjectHomePage.class, random);
+        ProjectHomePage homePage = browser.createPage(ProjectHomePage.class, random);
         homePage.waitFor();
     }
 

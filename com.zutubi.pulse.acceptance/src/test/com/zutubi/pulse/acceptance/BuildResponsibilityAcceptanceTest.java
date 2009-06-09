@@ -45,7 +45,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
     public void testTakeResponsibility()
     {
-        takeResponsibilityHelper(browser.create(ProjectHomePage.class, TEST_PROJECT));
+        takeResponsibilityHelper(browser.createPage(ProjectHomePage.class, TEST_PROJECT));
 
         // Build pages for this project should show the responsibility.
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, 1L);
@@ -64,7 +64,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
     public void testTakeResponsibilityOnBuildPage()
     {
-        takeResponsibilityHelper(browser.create(BuildSummaryPage.class, TEST_PROJECT, 1L));
+        takeResponsibilityHelper(browser.createPage(BuildSummaryPage.class, TEST_PROJECT, 1L));
     }
 
     private void takeResponsibilityHelper(ResponsibilityPage page)
@@ -140,12 +140,12 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
     public void testAdminCanClearResponsibility() throws Exception
     {
-        adminClearHelper(browser.create(ProjectHomePage.class, TEST_PROJECT));
+        adminClearHelper(browser.createPage(ProjectHomePage.class, TEST_PROJECT));
     }
 
     public void testAdminCanClearResponsibilityOnBuildPage() throws Exception
     {
-        adminClearHelper(browser.create(BuildSummaryPage.class, TEST_PROJECT, 1L));
+        adminClearHelper(browser.createPage(BuildSummaryPage.class, TEST_PROJECT, 1L));
     }
 
     private void adminClearHelper(ResponsibilityPage page) throws Exception

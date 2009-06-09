@@ -36,7 +36,7 @@ public class ProjectPermissionsAcceptanceTest extends SeleniumTestBase
         ListPage permissionsPage = browser.openAndWaitFor(ListPage.class, permissionsPath);
         permissionsPage.clickAction(permissions.get(0), ListPage.ACTION_VIEW);
 
-        ProjectAclForm aclForm = browser.create(ProjectAclForm.class);
+        ProjectAclForm aclForm = browser.createForm(ProjectAclForm.class);
         aclForm.waitFor();
         String[] groups = aclForm.getComboBoxOptions("group");
         // Two options could just be the default plus the current value.  As

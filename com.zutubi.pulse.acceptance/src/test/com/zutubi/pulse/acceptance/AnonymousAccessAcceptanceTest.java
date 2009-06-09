@@ -45,7 +45,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         browser.open(BrowsePage.class);
 
         // We should be denied access and redirected to the login page.
-        LoginPage loginPage = browser.create(LoginPage.class);
+        LoginPage loginPage = browser.createPage(LoginPage.class);
         assertTitle(loginPage);
     }
 
@@ -61,7 +61,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.saveFormElements("login_" + random, "name_" + random, "password", "password");
 
-        WelcomePage welcomePage = browser.create(WelcomePage.class);
+        WelcomePage welcomePage = browser.createPage(WelcomePage.class);
         assertTrue(welcomePage.isPresent());
         assertTitle(welcomePage);
         assertTextPresent("name_" + random);
@@ -77,7 +77,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         LoginPage loginPage = browser.open(LoginPage.class);
         assertFalse(loginPage.isSignupPresent());
         browser.goTo(SIGNUP_INPUT_ACTION);
-        SignupForm form = browser.create(SignupForm.class);
+        SignupForm form = browser.createForm(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "", "");
         assertTextPresent("Anonymous signup is not enabled");
@@ -87,7 +87,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     {
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
         browser.goTo(SIGNUP_INPUT_ACTION);
-        SignupForm form = browser.create(SignupForm.class);
+        SignupForm form = browser.createForm(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "p1", "p2");
         assertTrue(form.isFormPresent());
@@ -98,7 +98,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     {
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
         browser.goTo(SIGNUP_INPUT_ACTION);
-        SignupForm form = browser.create(SignupForm.class);
+        SignupForm form = browser.createForm(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements("admin", "name", "p", "p");
         assertTrue(form.isFormPresent());

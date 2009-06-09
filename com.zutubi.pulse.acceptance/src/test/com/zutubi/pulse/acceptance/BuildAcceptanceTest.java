@@ -233,7 +233,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         stagesPage.waitFor();
         stagesPage.clickView("default");
 
-        BuildStageForm stageForm = browser.create(BuildStageForm.class, true);
+        BuildStageForm stageForm = browser.createForm(BuildStageForm.class, true);
         stageForm.waitFor();
 
         stageForm.applyFormElements("", agentHandle);
@@ -447,7 +447,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         home.triggerBuild();
 
         // we should be prompted for a revision and a pname value.
-        TriggerBuildForm form = browser.create(TriggerBuildForm.class);
+        TriggerBuildForm form = browser.createForm(TriggerBuildForm.class);
         form.waitFor();
         assertTrue(form.isFormPresent());
 
@@ -480,7 +480,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         home.triggerBuild();
 
         // we should be prompted for a revision and a pname value.
-        TriggerBuildForm form = browser.create(TriggerBuildForm.class);
+        TriggerBuildForm form = browser.createForm(TriggerBuildForm.class);
         form.addProperty("pname");
         form.waitFor();
         // leave the revision blank, update pname to qvalue.
@@ -509,7 +509,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
 
-        TriggerBuildForm triggerBuildForm = browser.create(TriggerBuildForm.class);
+        TriggerBuildForm triggerBuildForm = browser.createForm(TriggerBuildForm.class);
         triggerBuildForm.waitFor();
         triggerBuildForm.triggerFormElements(asPair("status", STATUS_RELEASE));
 

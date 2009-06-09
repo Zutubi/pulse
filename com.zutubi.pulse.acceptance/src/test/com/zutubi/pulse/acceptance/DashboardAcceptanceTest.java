@@ -45,7 +45,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         // See CIB-1715.
         browser.goTo("dashboard");
         browser.waitForPageToLoad(3 * SECOND);
-        DashboardPage page = browser.create(DashboardPage.class);
+        DashboardPage page = browser.createPage(DashboardPage.class);
         assertTrue(page.isPresent());
         assertTitle(page);
     }

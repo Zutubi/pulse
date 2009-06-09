@@ -325,25 +325,25 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         SeleniumUtils.assertText(browser.getSelenium(), IDs.stageAgentCell(PROJECT_NAME, buildNumber, "default"), agent);
 
         browser.click(IDs.buildDetailsTab());
-        PersonalBuildDetailedViewPage detailedViewPage = browser.create(PersonalBuildDetailedViewPage.class, buildNumber);
+        PersonalBuildDetailedViewPage detailedViewPage = browser.createPage(PersonalBuildDetailedViewPage.class, buildNumber);
         detailedViewPage.waitFor();
         detailedViewPage.clickCommand("default", "build");
         assertTextPresent("nosuchcommand");
 
         browser.click(IDs.buildChangesTab());
-        PersonalBuildChangesPage changesPage = browser.create(PersonalBuildChangesPage.class, buildNumber);
+        PersonalBuildChangesPage changesPage = browser.createPage(PersonalBuildChangesPage.class, buildNumber);
         changesPage.waitFor();
         assertTrue(Long.parseLong(changesPage.getCheckedOutRevision()) >= 2);
         assertEquals("build.xml", changesPage.getChangedFile(0));
 
         browser.click(IDs.buildTestsTab());
-        PersonalBuildTestsPage testsPage = browser.create(PersonalBuildTestsPage.class, buildNumber);
+        PersonalBuildTestsPage testsPage = browser.createPage(PersonalBuildTestsPage.class, buildNumber);
         testsPage.waitFor();
         assertTrue(testsPage.isBuildComplete());
         assertFalse(testsPage.hasTests());
 
         browser.click(IDs.buildFileTab());
-        PersonalBuildFilePage filePage = browser.create(PersonalBuildFilePage.class, buildNumber);
+        PersonalBuildFilePage filePage = browser.createPage(PersonalBuildFilePage.class, buildNumber);
         filePage.waitFor();
         assertTrue(filePage.isHighlightedFilePresent());
         assertTextPresent("<ant");
@@ -352,7 +352,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         browser.waitForLocator(artifactsPage.getCommandLocator("build"));
 
         browser.click(IDs.buildWorkingCopyTab());
-        PersonalBuildWorkingCopyPage wcPage = browser.create(PersonalBuildWorkingCopyPage.class, buildNumber);
+        PersonalBuildWorkingCopyPage wcPage = browser.createPage(PersonalBuildWorkingCopyPage.class, buildNumber);
         wcPage.waitFor();
         assertTrue(wcPage.isWorkingCopyNotPresent());
     }

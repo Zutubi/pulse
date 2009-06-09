@@ -37,12 +37,12 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseViewDescendentsBuilding() throws Exception
     {
-        descendentsBuildingHelper(browser.create(BrowsePage.class));
+        descendentsBuildingHelper(browser.createPage(BrowsePage.class));
     }
 
     public void testDashboardDescendentsBuilding() throws Exception
     {
-        descendentsBuildingHelper(browser.create(DashboardPage.class));
+        descendentsBuildingHelper(browser.createPage(DashboardPage.class));
     }
 
     private void descendentsBuildingHelper(ProjectsSummaryPage summaryPage) throws Exception

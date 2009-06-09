@@ -51,7 +51,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         addProject(random, true, GLOBAL_PROJECT_NAME, false);
         browser.goTo(urls.adminProject(random) + "scm/");
-        SubversionForm form = browser.create(SubversionForm.class);
+        SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         String[] options = form.getComboBoxOptions("checkoutScheme");
         assertEquals("", options[0]);
@@ -69,7 +69,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ListPage labelsPage = browser.openAndWaitFor(ListPage.class, labelsPath);
         labelsPage.clickAdd();
 
-        LabelForm labelForm = browser.create(LabelForm.class);
+        LabelForm labelForm = browser.createForm(LabelForm.class);
         labelForm.waitFor();
         labelForm.finishFormElements("my-label");
 
@@ -91,7 +91,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(projectPath, "labels"));
         labelsPage.clickAdd();
 
-        LabelForm labelForm = browser.create(LabelForm.class);
+        LabelForm labelForm = browser.createForm(LabelForm.class);
         labelForm.waitFor();
         labelForm.cancelFormElements("my-label");
 
@@ -108,7 +108,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(projectPath, "labels"));
         labelsPage.clickView(labelBaseName);
 
-        LabelForm labelForm = browser.create(LabelForm.class);
+        LabelForm labelForm = browser.createForm(LabelForm.class);
         labelForm.waitFor();
         labelForm.cancelFormElements("");
 
@@ -128,7 +128,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
         browser.goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
-        SubversionForm form = browser.create(SubversionForm.class);
+        SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "svn://localhost:3088/");
         CheckForm checkForm = new CheckForm(form);
@@ -142,7 +142,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
         browser.goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
-        SubversionForm form = browser.create(SubversionForm.class);
+        SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "svn://localhost:9999/foo");
         CheckForm checkForm = new CheckForm(form);
@@ -156,7 +156,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
         browser.goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
-        SubversionForm form = browser.create(SubversionForm.class);
+        SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "");
         CheckForm checkForm = new CheckForm(form);
@@ -170,7 +170,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         browser.goTo(urls.admin() + "settings/email/");
-        EmailSettingsForm form = browser.create(EmailSettingsForm.class);
+        EmailSettingsForm form = browser.createForm(EmailSettingsForm.class);
         form.waitFor();
         EmailSettingsCheckForm checkForm = new EmailSettingsCheckForm(form);
         checkForm.checkFormElementsAndWait("");
@@ -215,7 +215,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertEquals("[view]", listPage.getCellContent(0, 1));
 
         browser.click("link=view");
-        ProjectAclForm form = browser.create(ProjectAclForm.class);
+        ProjectAclForm form = browser.createForm(ProjectAclForm.class);
         form.waitFor();
         assertFormElements(form, "all users", "view");
         form.saveFormElements(null, "");
@@ -223,7 +223,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         assertEquals("[]", listPage.getCellContent(0, 1));
         browser.click("link=view");
-        form = browser.create(ProjectAclForm.class);
+        form = browser.createForm(ProjectAclForm.class);
         form.waitFor();
         assertFormElements(form, "all users", "");
     }
@@ -233,7 +233,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
 
         browser.goTo(urls.adminGroup(UserManager.ANONYMOUS_USERS_GROUP_NAME));
-        BuiltinGroupForm groupForm = browser.create(BuiltinGroupForm.class);
+        BuiltinGroupForm groupForm = browser.createForm(BuiltinGroupForm.class);
         groupForm.waitFor();
         groupForm.applyFormElements(null, ServerPermission.PERSONAL_BUILD.toString());
         groupForm.waitFor();
@@ -254,7 +254,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, propertiesPath);
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
+        ResourcePropertyForm form = browser.createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -272,7 +272,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(childPath));
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
+        ResourcePropertyForm form = browser.createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -292,7 +292,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertFalse(propertiesPage.isItemPresent("p1"));
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
+        ResourcePropertyForm form = browser.createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -315,7 +315,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertFalse(propertiesPage.isItemPresent("p1"));
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
+        ResourcePropertyForm form = browser.createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -338,7 +338,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertItemPresent(propertiesPage, "p1", ListPage.ANNOTATION_HIDDEN);
         propertiesPage.clickAdd();
 
-        ResourcePropertyForm form = browser.create(ResourcePropertyForm.class);
+        ResourcePropertyForm form = browser.createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null, null);
         assertTrue(form.isFormPresent());
@@ -508,14 +508,14 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         addInheritingProject(parentName, childName);
 
-        ProjectHierarchyPage childHierarchyPage = browser.create(ProjectHierarchyPage.class, childName, false);
+        ProjectHierarchyPage childHierarchyPage = browser.createPage(ProjectHierarchyPage.class, childName, false);
         childHierarchyPage.waitFor();
         ProjectConfigPage configPage = childHierarchyPage.clickConfigure();
         configPage.waitFor();
         browser.waitForLocator(configPage.getTreeLinkLocator("subversion configuration"));
         CompositePage scmPage = configPage.clickComposite("scm", "subversion configuration");
         scmPage.waitFor();
-        SubversionForm subversionForm = browser.create(SubversionForm.class);
+        SubversionForm subversionForm = browser.createForm(SubversionForm.class);
         subversionForm.waitFor();
         assertFormElements(subversionForm, Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null);
     }
@@ -548,7 +548,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, random, false);
+        ProjectHierarchyPage hierarchyPage = browser.createPage(ProjectHierarchyPage.class, random, false);
         hierarchyPage.waitFor();
 
         String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
@@ -576,7 +576,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         subversionState.waitFor();
         subversionState.finishFormElements(subversionState.getUnchangedValues());
 
-        ProjectHierarchyPage childHierarchyPage = browser.create(ProjectHierarchyPage.class, child, false);
+        ProjectHierarchyPage childHierarchyPage = browser.createPage(ProjectHierarchyPage.class, child, false);
         childHierarchyPage.waitFor();
 
         String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
@@ -605,7 +605,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, random, false);
+        ProjectHierarchyPage hierarchyPage = browser.createPage(ProjectHierarchyPage.class, random, false);
         hierarchyPage.waitFor();
 
         String projectTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.TYPE);
@@ -638,7 +638,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         customTypeState.waitFor();
         customTypeState.finishFormElements(pulseFileString);
         
-        ProjectHierarchyPage childHierarchyPage = browser.create(ProjectHierarchyPage.class, child, false);
+        ProjectHierarchyPage childHierarchyPage = browser.createPage(ProjectHierarchyPage.class, child, false);
         childHierarchyPage.waitFor();
 
         String childTypePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, Constants.Project.TYPE);
@@ -752,7 +752,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         antState.waitFor();
         antState.finishFormElements("build", null, "build.xml", null, null, null);
 
-        ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, random, true);
+        ProjectHierarchyPage hierarchyPage = browser.createPage(ProjectHierarchyPage.class, random, true);
         hierarchyPage.waitFor();
     }
 
@@ -767,7 +767,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         configPage.waitFor();
         configPage.clickComposite("scm", "subversion configuration");
 
-        SubversionForm subversionForm = browser.create(SubversionForm.class);
+        SubversionForm subversionForm = browser.createForm(SubversionForm.class);
         subversionForm.waitFor();
         assertTrue(subversionForm.isMarkedRequired("url"));
         subversionForm.applyFormElements("", null, null, null, null, null, null, null, null, null, null, null, null);
@@ -787,7 +787,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         browser.waitForLocator(treeLink);
         browser.click(treeLink);
 
-        SubversionForm subversionForm = browser.create(SubversionForm.class);
+        SubversionForm subversionForm = browser.createForm(SubversionForm.class);
         subversionForm.waitFor();
 
         subversionForm.applyFormElements("", null, null, null, null, null, null, null, null, null, null, null, null);
@@ -843,7 +843,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         browser.goTo(urls.adminSettings());
-        ServerSettingsForm form = browser.create(ServerSettingsForm.class);
+        ServerSettingsForm form = browser.createForm(ServerSettingsForm.class);
         form.waitFor();
         String url = "http://somehelpurl.com/" + random;
         form.applyFormElements(null, null, url, null, null, null, null, null, null);
@@ -856,7 +856,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         browser.goTo(urls.adminSettings());
-        ServerSettingsForm form = browser.create(ServerSettingsForm.class);
+        ServerSettingsForm form = browser.createForm(ServerSettingsForm.class);
         form.waitFor();
         String originalUrl = form.getFieldValue("baseHelpUrl");
         form.resetFormElements(null, null, "http://somehelpurl.com/" + random, null, null, null, null, null, null);
@@ -900,7 +900,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         browser.goTo(urls.adminProject(random) + Constants.Project.STAGES + "/" + ProjectConfigurationWizard.DEFAULT_STAGE + "/");
 
-        BuildStageForm stageForm = browser.create(BuildStageForm.class, false);
+        BuildStageForm stageForm = browser.createForm(BuildStageForm.class, false);
         stageForm.waitFor();
         String[] stages = stageForm.getComboBoxOptions(Constants.Project.Stage.RECIPE);
         assertEquals(asList(expectedRecipes), asList(stages));

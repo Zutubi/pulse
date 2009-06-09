@@ -142,7 +142,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, random, false);
+        ProjectHierarchyPage hierarchyPage = browser.createPage(ProjectHierarchyPage.class, random, false);
         hierarchyPage.waitFor();
     }
 

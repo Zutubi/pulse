@@ -160,7 +160,7 @@ public class SeleniumTestBase extends PulseTestCase
         {
             runAddProjectWizard(new DefaultProjectWizardDriver(parentName, name, template));
 
-            ProjectHierarchyPage hierarchyPage = browser.create(ProjectHierarchyPage.class, name, template);
+            ProjectHierarchyPage hierarchyPage = browser.createPage(ProjectHierarchyPage.class, name, template);
             hierarchyPage.waitFor();
 
             if (!template)

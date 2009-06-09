@@ -78,7 +78,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        SetPulseDataForm form = browser.create(SetPulseDataForm.class);
+        SetPulseDataForm form = browser.createForm(SetPulseDataForm.class);
         assertTrue(form.isFormPresent());
         assertFormFieldNotEmpty("zfid.data");
 
@@ -103,7 +103,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        SetupDatabaseTypeForm form = browser.create(SetupDatabaseTypeForm.class);
+        SetupDatabaseTypeForm form = browser.createForm(SetupDatabaseTypeForm.class);
         assertTrue(form.isFormPresent());
         assertFalse("Detail fields should be disabled for embedded database", form.isEditable("host"));
         form.nextFormElements("EMBEDDED", null, null, null, null, null, null);
@@ -113,7 +113,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        PulseLicenseForm licenseForm = browser.create(PulseLicenseForm.class);
+        PulseLicenseForm licenseForm = browser.createForm(PulseLicenseForm.class);
 
         assertTrue(licenseForm.isFormPresent());
 
@@ -144,7 +144,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        CreateAdminForm createAdminForm = browser.create(CreateAdminForm.class);
+        CreateAdminForm createAdminForm = browser.createForm(CreateAdminForm.class);
 
         // create admin.
         assertTrue(createAdminForm.isFormPresent());
@@ -155,7 +155,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         assertPulseTabsNotVisible();
 
-        ServerSettingsForm settingsForm = browser.create(ServerSettingsForm.class);
+        ServerSettingsForm settingsForm = browser.createForm(ServerSettingsForm.class);
         assertTrue(settingsForm.isFormPresent());
         settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
     }

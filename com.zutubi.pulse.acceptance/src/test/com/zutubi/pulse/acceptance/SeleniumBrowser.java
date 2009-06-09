@@ -84,7 +84,7 @@ public class SeleniumBrowser
         return selenium;
     }
 
-    public <T extends SeleniumForm> T create(Class<T> formType, Object... extraArgs)
+    public <T extends SeleniumForm> T createForm(Class<T> formType, Object... extraArgs)
     {
         if (extraArgs == null)
         {
@@ -106,7 +106,7 @@ public class SeleniumBrowser
         return createInstance(formType, types, args);
     }
 
-    public <T extends SeleniumPage> T create(Class<T> pageType, Object... extraArgs)
+    public <T extends SeleniumPage> T createPage(Class<T> pageType, Object... extraArgs)
     {
         if (extraArgs == null)
         {
@@ -158,21 +158,21 @@ public class SeleniumBrowser
 
     public <T extends SeleniumPage> T open(Class<T> pageType, Object... extraArgs)
     {
-        T page = create(pageType, extraArgs);
+        T page = createPage(pageType, extraArgs);
         page.open();
         return page;
     }
 
     public <T extends SeleniumPage> T waitFor(Class<T> pageType, Object... extraArgs)
     {
-        T page = create(pageType, extraArgs);
+        T page = createPage(pageType, extraArgs);
         page.waitFor();
         return page;
     }
 
     public <T extends SeleniumPage> T openAndWaitFor(Class<T> pageType, Object... extraArgs)
     {
-        T page = create(pageType, extraArgs);
+        T page = createPage(pageType, extraArgs);
         page.open();
         page.waitFor();
         return page;
