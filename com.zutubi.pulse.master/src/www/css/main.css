@@ -466,8 +466,14 @@ td.image {
     text-align: center;
 }
 
+table.chart {
+    margin: 20px;
+}
+
 table.chart td {
     padding: 20px;
+    border: 1px solid #bbb;
+    border-collapse:collapse;
 }
 
 td.expand, td.collapse {
