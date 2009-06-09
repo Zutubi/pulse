@@ -1110,9 +1110,9 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
     }
 
-    public void testRobustRenameSourceParentNotReadable() throws IOException
+    public void testRenameSourceParentNotReadable() throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS)
+        if (!SystemUtils.IS_WINDOWS && notRoot())
         {
             File src = new File(tmpDir, "src");
             File dest = new File(tmpDir, "dest");
@@ -1135,9 +1135,9 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         }
     }
 
-    public void testRobustRenameDestParentNotWritable() throws IOException
+    public void testRenameDestParentNotWritable() throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS)
+        if (!SystemUtils.IS_WINDOWS && notRoot())
         {
             File src = new File(tmpDir, "src");
             File dest = new File(tmpDir, "dest");
@@ -1159,6 +1159,11 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             }
         }
 
+    }
+
+    private boolean notRoot()
+    {
+        return !"root".equals(System.getProperty("user.name"));
     }
 
     private void createDirectoryLayout(File dir) throws IOException
