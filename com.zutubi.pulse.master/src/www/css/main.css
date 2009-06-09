@@ -466,9 +466,8 @@ td.image {
     text-align: center;
 }
 
-td.chart {
-    padding-top: 20px;
-    padding-bottom: 20px;    
+table.chart td {
+    padding: 20px;
 }
 
 td.expand, td.collapse {
