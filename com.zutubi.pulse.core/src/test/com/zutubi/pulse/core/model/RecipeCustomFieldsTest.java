@@ -45,6 +45,20 @@ public class RecipeCustomFieldsTest extends PulseTestCase
         roundTrip(asMap(asPair("field", PUNCTUATION)));
     }
 
+    public void testLoadAfterUpdate()
+    {
+        recipeCustomFields.store(asMap(asPair("field1", "original value")));
+        Map<String, String> fields = recipeCustomFields.load();
+        assertEquals(1, fields.size());
+        assertEquals("original value", fields.get("field1"));
+
+        recipeCustomFields.store(asMap(asPair("field1", "new value"), asPair("field2", "value")));
+        fields = recipeCustomFields.load();
+        assertEquals(2, fields.size());
+        assertEquals("new value", fields.get("field1"));
+        assertEquals("value", fields.get("field2"));
+    }
+
     private void roundTrip(Map<String, String> fields)
     {
         recipeCustomFields.store(fields);

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.reports;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.validation.ValidationException;
 
 import java.awt.*;
 
@@ -36,6 +37,23 @@ public class ColourValidatorTest extends PulseTestCase
         assertEquals(255, color.getRed());
         assertEquals(32, color.getGreen());
         assertEquals(24, color.getBlue());
+    }
+
+    public void testValidate() throws ValidationException
+    {
+        ColourValidator validator = new ColourValidator();
+        validator.validateField("");
+        validator.validateField("black");
+        validator.validateField("0x000000");
+        validator.validateField("0");
+        try
+        {
+            validator.validateField("no such colour");
+            fail();
+        }
+        catch (ValidationException e)
+        {
+        }
     }
 
     private void errorHelper(String colour)

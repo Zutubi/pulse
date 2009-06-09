@@ -2,18 +2,16 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.charting.build.DefaultCustomFieldSource;
-import com.zutubi.pulse.master.charting.render.ByBuildChart;
-import com.zutubi.pulse.master.charting.render.ByDayChart;
-import com.zutubi.pulse.master.charting.render.Chart;
 import com.zutubi.pulse.master.charting.render.ChartUtils;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
-import com.zutubi.pulse.master.tove.config.project.reports.*;
+import com.zutubi.pulse.master.tove.config.project.reports.CustomFieldSource;
+import com.zutubi.pulse.master.tove.config.project.reports.ReportConfiguration;
+import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
 import com.zutubi.util.TextUtils;
 
-import java.io.IOException;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -112,14 +110,20 @@ public class ViewReportsAction extends ProjectActionBase
                 timeunit = config.getDefaultTimeUnit().name().toLowerCase();
             }
 
-            List<BuildResult> builds = getBuilds(project);
+            if (timeframe <= 0)
+            {
+                // Ignore nonsense timeframes by applying default.
+                timeframe = DEFAULT_TIME_FRAME;
+            }
+
+            List<BuildResult> builds = ChartUtils.getBuilds(project, timeframe, convertUnits(timeunit), buildResultDao);
             buildCount = builds.size();
             if (buildCount > 0)
             {
                 CustomFieldSource fieldSource = new DefaultCustomFieldSource(configurationManager.getDataDirectory());
                 for (ReportConfiguration report: config.getReports().values())
                 {
-                    reports.add(render(report, builds, fieldSource));
+                    reports.add(ChartUtils.renderForWeb(report, builds, fieldSource));
                 }
             }
         }
@@ -127,44 +131,16 @@ public class ViewReportsAction extends ProjectActionBase
         return SUCCESS;
     }
 
-    private List<BuildResult> getBuilds(Project project)
+    private ReportTimeUnit convertUnits(String timeunit)
     {
-        if (timeframe <= 0)
-        {
-            // Ignore nonsense timeframes by applying default.
-            timeframe = DEFAULT_TIME_FRAME;
-        }
-
         if (ReportTimeUnit.BUILDS.toString().equalsIgnoreCase(timeunit))
         {
-            return buildResultDao.findLatestCompleted(project, 0, timeframe);
+            return ReportTimeUnit.BUILDS;
         }
         else
         {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DAY_OF_YEAR, -timeframe);
-            cal.set(Calendar.HOUR, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-
-            return buildResultDao.findSinceByProject(project, cal.getTime());
+            return ReportTimeUnit.DAYS;
         }
-    }
-
-    private Map render(ReportConfiguration config, List<BuildResult> builds, CustomFieldSource customFieldSource) throws IOException
-    {
-        Chart chart;
-        if (config.getDomainUnits() == DomainUnit.BUILD_IDS)
-        {
-            chart = new ByBuildChart(config, builds, customFieldSource);
-        }
-        else
-        {
-            chart = new ByDayChart(config, builds, customFieldSource);
-        }
-
-        return ChartUtils.renderForWeb(chart.render(), config.getWidth(), config.getHeight());
     }
 
     public void setBuildResultDao(BuildResultDao buildResultDao)
