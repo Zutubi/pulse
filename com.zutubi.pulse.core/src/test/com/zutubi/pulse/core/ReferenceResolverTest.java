@@ -21,6 +21,8 @@ public class ReferenceResolverTest extends ZutubiTestCase
         scope.add(new Property("bar", "baz"));
         scope.add(new Property("a\\b", "slashed"));
         scope.add(new Property("empty", ""));
+        scope.add(new Property("a{b}c", "braced"));
+        scope.add(new Property("a(b)c", "parened"));
     }
 
     private void errorTest(String input, String expectedError)
@@ -66,7 +68,7 @@ public class ReferenceResolverTest extends ZutubiTestCase
 
     public void testDollarEOI()
     {
-        errorTest("ladida $", "Syntax error: unexpected end of input looking for '{'");
+        errorTest("ladida $", "Syntax error: unexpected end of input looking for '{' or '('");
     }
 
     public void testDollarBraceEOI()
@@ -74,9 +76,14 @@ public class ReferenceResolverTest extends ZutubiTestCase
         errorTest("ladida ${", "Syntax error: unexpected end of input looking for '}'");
     }
 
-    public void testDollarNoBrace()
+    public void testDollarParenEOI()
     {
-        errorTest("$e", "Syntax error: expecting '{', got 'e'");
+        errorTest("ladida $(", "Syntax error: unexpected end of input looking for ')'");
+    }
+
+    public void testDollarNoBraceOrParen()
+    {
+        errorTest("$e", "Syntax error: expecting '{' or '(', got 'e'");
     }
 
     public void testHalfEscape()
@@ -89,14 +96,29 @@ public class ReferenceResolverTest extends ZutubiTestCase
         errorTest("${}", "Syntax error: empty reference");
     }
 
+    public void testParenEmptyReference()
+    {
+        errorTest("$()", "Syntax error: empty reference");
+    }
+
     public void testUnknownReference()
     {
         errorTest("${greebo}", "Unknown reference 'greebo'");
     }
 
+    public void testParenUnknownReference()
+    {
+        errorTest("$(greebo)", "Unknown reference 'greebo'");
+    }
+
     public void testSimpleSubstitution() throws Exception
     {
         successTest("${foo}", "foo");
+    }
+
+    public void testParentSimpleSubstitution() throws Exception
+    {
+        successTest("$(foo)", "foo");
     }
 
     public void testSimpleSubstitution2() throws Exception
@@ -109,14 +131,29 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successTest("leading text ${bar}", "leading text baz");
     }
 
+    public void testParenSubstitutionLeading() throws Exception
+    {
+        successTest("leading text $(bar)", "leading text baz");
+    }
+
     public void testSubstitutionTrailing() throws Exception
     {
         successTest("${bar} trailing text", "baz trailing text");
     }
 
+    public void testParenSubstitutionTrailing() throws Exception
+    {
+        successTest("$(bar) trailing text", "baz trailing text");
+    }
+
     public void testSubstitutionTwice() throws Exception
     {
         successTest("${foo}${bar}", "foobaz");
+    }
+
+    public void testParenSubstitutionTwice() throws Exception
+    {
+        successTest("$(foo)$(bar)", "foobaz");
     }
 
     public void testSimpleEscape() throws Exception
@@ -149,6 +186,11 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successTest("${a\\b}", "slashed");
     }
 
+    public void testParenSlashInReference() throws Exception
+    {
+        successTest("$(a\\b)", "slashed");
+    }
+
     public void testNestedReference() throws Exception
     {
         scope.add(new Property("a", "${foo}"));
@@ -158,6 +200,11 @@ public class ReferenceResolverTest extends ZutubiTestCase
     public void testSpacesPreserved() throws Exception
     {
         successTest("in space  two   three ${bar} vars", "in space  two   three baz vars");
+    }
+
+    public void testParenSpacesPreserved() throws Exception
+    {
+        successTest("in space  two   three $(bar) vars", "in space  two   three baz vars");
     }
 
     public void testQuote() throws Exception
@@ -235,14 +282,29 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successSplitTest("${bar}", "baz");
     }
 
+    public void testSplitParenSingleReference() throws Exception
+    {
+        successSplitTest("$(bar)", "baz");
+    }
+
     public void testSplitAroundMultipleReferences() throws Exception
     {
         successSplitTest("${foo} and ${bar}", "foo", "and", "baz");
     }
 
+    public void testSplitParenAroundMultipleReferences() throws Exception
+    {
+        successSplitTest("$(foo) and $(bar)", "foo", "and", "baz");
+    }
+
     public void testSplitReferenceInQuotes() throws Exception
     {
         successSplitTest("quotes \"around ${bar}\"", "quotes", "around baz");
+    }
+
+    public void testSplitParenReferenceInQuotes() throws Exception
+    {
+        successSplitTest("quotes \"around $(bar)\"", "quotes", "around baz");
     }
 
     public void testSplitQuotesInReference() throws Exception
@@ -251,10 +313,22 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successSplitTest("odd ${a\"b} ref", "odd", "val", "ref");
     }
 
+    public void testSplitParenQuotesInReference() throws Exception
+    {
+        scope.add(new Property("a\"b", "val"));
+        successSplitTest("odd $(a\"b) ref", "odd", "val", "ref");
+    }
+
     public void testSplitSpaceInReference() throws Exception
     {
         scope.add(new Property("space invader", "val"));
         successSplitTest("odd ${space invader} ref", "odd", "val", "ref");
+    }
+
+    public void testSplitParenSpaceInReference() throws Exception
+    {
+        scope.add(new Property("space invader", "val"));
+        successSplitTest("odd $(space invader) ref", "odd", "val", "ref");
     }
 
     public void testSplitSpaceAtStart() throws Exception
@@ -297,9 +371,19 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successSplitTest("${empty}");
     }
 
+    public void testSplitParenEmptyReference() throws Exception
+    {
+        successSplitTest("$(empty)");
+    }
+
     public void testSplitQuotedEmptyReference() throws Exception
     {
         successSplitTest("\"${empty}\"", "");
+    }
+
+    public void testSplitParenQuotedEmptyReference() throws Exception
+    {
+        successSplitTest("\"$(empty)\"", "");
     }
 
     public void testSplitEmptyReferenceAdjacent() throws Exception
@@ -307,8 +391,66 @@ public class ReferenceResolverTest extends ZutubiTestCase
         successSplitTest("adjacent${empty} ref", "adjacent", "ref");
     }
 
+    public void testSplitParenEmptyReferenceAdjacent() throws Exception
+    {
+        successSplitTest("adjacent$(empty) ref", "adjacent", "ref");
+    }
+
     public void testSplitUnterminatedQuotes() throws Exception
     {
         errorSplitTest("\"unterminated", "Syntax error: unexpected end of input looking for closing quotes (\")");
+    }
+
+    public void testDefaultReferenceDefined() throws Exception
+    {
+        successTest("$(bar?def)", "baz");
+    }
+
+    public void testDefaultReferenceDefinedButEmpty() throws Exception
+    {
+        successTest("$(empty?def)", "");
+    }
+
+    public void testDefaultReferenceNotDefined() throws Exception
+    {
+        successTest("$(undefined?def)", "def");
+    }
+
+    public void testDefaultEmpty() throws Exception
+    {
+        successTest("$(undefined?)", "");
+    }
+
+    public void testDefaultSingleReference() throws Exception
+    {
+        assertEquals("def", ReferenceResolver.resolveReference("$(undefined?def)", scope));
+    }
+
+    public void testMixedBracketsBraceParen()
+    {
+        errorTest("${foo)", "Syntax error: unexpected end of input looking for '}'");
+    }
+
+    public void testMixedBracketsParenBrace()
+    {
+        errorTest("$(foo}", "Syntax error: unexpected end of input looking for ')'");
+    }
+
+    public void testBraceInExtendedName() throws Exception
+    {
+        successTest("$(a{b}c)", "braced");
+    }
+
+    public void testParenInName() throws Exception
+    {
+        successTest("${a(b)c}", "parened");
+    }
+
+    public void testReservedCharactersInExtendedName() throws Exception
+    {
+        for (Character c: Arrays.asList('!', '%', '#', '&', '/', ':', ';', '/'))
+        {
+            errorTest("$(a" + c + "b)", "Syntax error: '" + c + "' is reserved and may not be used in an extended reference name");
+        }
     }
 }
