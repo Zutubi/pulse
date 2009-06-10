@@ -27,10 +27,10 @@ public class ProjectLogAcceptanceTest extends SeleniumTestBase
 
         assertTrue(page.isDownloadLinkAvailable());
 
-        if (isBrowserFirefox())
+        if (browser.isFirefox())
         {
             page.clickDownloadLink();
-            assertTrue(browser.bodyTextContains("Project initialisation succeeded"));
+            assertTrue(browser.getBodyText().contains("Project initialisation succeeded"));
         }
     }
 }

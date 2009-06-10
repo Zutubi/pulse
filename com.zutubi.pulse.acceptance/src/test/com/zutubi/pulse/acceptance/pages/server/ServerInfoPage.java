@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.server;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -9,9 +9,9 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class ServerInfoPage extends SeleniumPage
 {
-    public ServerInfoPage(Selenium selenium, Urls urls)
+    public ServerInfoPage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, "server.info", "server info");
+        super(browser, urls, "server.info", "server info");
     }
 
     public String getUrl()

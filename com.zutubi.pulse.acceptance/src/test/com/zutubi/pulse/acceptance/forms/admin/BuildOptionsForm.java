@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
 
 /**
@@ -9,9 +10,9 @@ import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
  */
 public class BuildOptionsForm extends ConfigurationForm
 {
-    public BuildOptionsForm(Selenium selenium)
+    public BuildOptionsForm(SeleniumBrowser browser)
     {
-        super(selenium, BuildOptionsConfiguration.class);
+        super(browser, BuildOptionsConfiguration.class);
     }
 
     public int[] getFieldTypes()

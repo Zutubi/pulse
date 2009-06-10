@@ -114,7 +114,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         logout();
 
         loginAsAdmin();
-        browser.goTo(urls.adminGroup(random));
+        browser.open(urls.adminGroup(random));
         form.waitFor();
         form.applyFormElements(null, null, ServerPermission.CREATE_PROJECT.toString());
         form.waitFor();

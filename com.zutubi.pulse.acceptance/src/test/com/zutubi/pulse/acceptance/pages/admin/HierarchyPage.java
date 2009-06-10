@@ -1,10 +1,8 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
 
 /**
  * The page shown when looking at the heirarchy view of a templated scope.
@@ -22,9 +20,9 @@ public class HierarchyPage extends ConfigurationPanePage
     protected String baseName;
     protected boolean template;
 
-    public HierarchyPage(Selenium selenium, Urls urls, String scope, String baseName, boolean template)
+    public HierarchyPage(SeleniumBrowser browser, Urls urls, String scope, String baseName, boolean template)
     {
-        super(selenium, urls, PathUtils.getPath(scope, baseName));
+        super(browser, urls, PathUtils.getPath(scope, baseName));
         this.scope = scope;
         this.baseName = baseName;
         this.template = template;
@@ -52,7 +50,7 @@ public class HierarchyPage extends ConfigurationPanePage
     
     protected boolean isLinkPresent(String link)
     {
-        return CollectionUtils.contains(selenium.getAllLinks(), link);
+        return browser.isLinkPresent(link);
     }
 
     public String getUrl()
@@ -67,9 +65,9 @@ public class HierarchyPage extends ConfigurationPanePage
 
     public void open()
     {
-        selenium.open(getUrl());
+        browser.open(getUrl());
         // Allow the initial page load.
-        selenium.waitForPageToLoad("30000");
+        browser.waitForPageToLoad();
     }
 
     public void waitFor()
@@ -79,54 +77,54 @@ public class HierarchyPage extends ConfigurationPanePage
 
         // Choose our panel and wait for it.
         String linkLocator = getTreeItemLocator(baseName);
-        SeleniumUtils.waitForLocator(selenium, linkLocator);
-        selenium.click(linkLocator);
+        browser.waitForLocator(linkLocator);
+        browser.click(linkLocator);
         super.waitFor();
     }
 
     public boolean isTreeItemPresent(String baseName)
     {
-        return selenium.isElementPresent(getTreeItemLocator(baseName));
+        return browser.isElementPresent(getTreeItemLocator(baseName));
     }
 
     public boolean isTreeItemVisible(String baseName)
     {
-        return selenium.isVisible(getTreeItemLocator(baseName));
+        return browser.isVisible(getTreeItemLocator(baseName));
     }
 
     public void expandTreeItem(String baseName)
     {
-        selenium.doubleClick(getTreeItemLocator(baseName));
+        browser.doubleClick(getTreeItemLocator(baseName));
     }
 
     public boolean isAddPresent()
     {
-        return selenium.isElementPresent(LINK_ADD);
+        return browser.isElementIdPresent(LINK_ADD);
     }
 
     public void clickAdd()
     {
-        SeleniumUtils.waitAndClickId(selenium, LINK_ADD);
+        browser.waitAndClick(LINK_ADD);
     }
 
     public void clickAddTemplate()
     {
-        SeleniumUtils.waitAndClickId(selenium, LINK_ADD_TEMPLATE);
+        browser.waitAndClick(LINK_ADD_TEMPLATE);
     }
 
     public boolean isClonePresent()
     {
-        return selenium.isElementPresent(LINK_CLONE);
+        return browser.isElementIdPresent(LINK_CLONE);
     }
 
     public void clickClone()
     {
-        SeleniumUtils.waitAndClickId(selenium, LINK_CLONE);
+        browser.waitAndClick(LINK_CLONE);
     }
 
     public void clickSmartClone()
     {
-        SeleniumUtils.waitAndClickId(selenium, LINK_SMART_CLONE);
+        browser.waitAndClick(LINK_SMART_CLONE);
     }
 
     public void setTemplate(boolean template)
@@ -136,7 +134,7 @@ public class HierarchyPage extends ConfigurationPanePage
 
     public DeleteConfirmPage clickDelete()
     {
-        SeleniumUtils.waitAndClickId(selenium, LINK_DELETE);
-        return new DeleteConfirmPage(selenium, urls, getId(), false);
+        browser.waitAndClick(LINK_DELETE);
+        return browser.createPage(DeleteConfirmPage.class, getId(), false);
     }
 }

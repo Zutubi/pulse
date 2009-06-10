@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 
 /**
@@ -9,8 +10,8 @@ import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
  */
 public class CleanupForm extends ConfigurationForm
 {
-    public CleanupForm(Selenium selenium)
+    public CleanupForm(SeleniumBrowser browser)
     {
-        super(selenium, CleanupConfiguration.class);
+        super(browser, CleanupConfiguration.class);
     }
 }

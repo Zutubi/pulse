@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 
 /**
@@ -9,9 +10,9 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
  */
 public class ResourcePropertyForm extends ConfigurationForm
 {
-    public ResourcePropertyForm(Selenium selenium)
+    public ResourcePropertyForm(SeleniumBrowser browser)
     {
-        super(selenium, ResourcePropertyConfiguration.class, true, false);
+        super(browser, ResourcePropertyConfiguration.class, true, false);
     }
 
     public int[] getFieldTypes()

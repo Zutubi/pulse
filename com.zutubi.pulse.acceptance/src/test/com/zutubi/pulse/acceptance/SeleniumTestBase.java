@@ -57,7 +57,7 @@ public class SeleniumTestBase extends PulseTestCase
         random = getName() + "-" + RandomUtils.randomString(10);
 
         browser = new SeleniumBrowser();
-        browser.newSession();
+        browser.start();
 
         urls = browser.getUrls();
     }
@@ -87,12 +87,12 @@ public class SeleniumTestBase extends PulseTestCase
     
     protected void assertElementPresent(String id)
     {
-        assertTrue("No element with id '" + id + "' found", browser.isElementPresent(id));
+        assertTrue("No element with id '" + id + "' found", browser.isElementIdPresent(id));
     }
 
     protected void assertElementNotPresent(String id)
     {
-        assertFalse("Unexpected element with id '" + id + "' found", browser.isElementPresent(id));
+        assertFalse("Unexpected element with id '" + id + "' found", browser.isElementIdPresent(id));
     }
 
     protected void assertTextPresent(String text)
@@ -112,7 +112,9 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void assertFormFieldNotEmpty(String id)
     {
-        SeleniumUtils.assertFormFieldNotEmpty(browser.getSelenium(), id);
+        String value = browser.getValue(StringUtils.toValidHtmlName(id));
+        assertNotNull(value);
+        assertTrue(value.length() > 0);
     }
 
     protected void assertGenericError(String message)
@@ -123,18 +125,18 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void waitForStatus(String message)
     {
-        SeleniumUtils.refreshUntilElement(browser.getSelenium(), IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
+        browser.refreshUntilElement(IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
 
         // now we wait for the element to contain a message.
         AcceptanceTestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
-                return TextUtils.stringSet(browser.getSelenium().getText(IDs.STATUS_MESSAGE));
+                return TextUtils.stringSet(browser.getText(IDs.STATUS_MESSAGE));
             }
         }, STATUS_TIMEOUT, "status message to be set.");
 
-        String text = browser.getSelenium().getText(IDs.STATUS_MESSAGE);
+        String text = browser.getText(IDs.STATUS_MESSAGE);
         assertThat(text, containsString(message));        
     }
 
@@ -260,12 +262,12 @@ public class SeleniumTestBase extends PulseTestCase
             hierarchyPage.clickAdd();
         }
 
-        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser.getSelenium());
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(browser);
         projectState.waitFor();
 
         driver.projectState(projectState);
 
-        SelectTypeState scmTypeState = new SelectTypeState(browser.getSelenium());
+        SelectTypeState scmTypeState = new SelectTypeState(browser);
         scmTypeState.waitFor();
         scmTypeState.nextFormElements(driver.selectScm());
 
@@ -276,7 +278,7 @@ public class SeleniumTestBase extends PulseTestCase
 
         String type = driver.selectType();
 
-        ProjectTypeSelectState projectTypeState = new ProjectTypeSelectState(browser.getSelenium());
+        ProjectTypeSelectState projectTypeState = new ProjectTypeSelectState(browser);
         projectTypeState.waitFor();
         if (type.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))
         {
@@ -304,7 +306,7 @@ public class SeleniumTestBase extends PulseTestCase
     {
         if (s.equals(ProjectTypeSelectionConfiguration.TYPE_CUSTOM))
         {
-            return new AddProjectWizard.CustomTypeState(browser.getSelenium());
+            return new AddProjectWizard.CustomTypeState(browser);
         }
         else
         {
@@ -316,15 +318,15 @@ public class SeleniumTestBase extends PulseTestCase
     {
         if (s.equals("zutubi.antCommandConfig"))
         {
-            return new AddProjectWizard.AntState(browser.getSelenium());
+            return new AddProjectWizard.AntState(browser);
         }
         else if (s.equals("zutubi.mavenCommandConfig"))
         {
-            return new AddProjectWizard.MavenState(browser.getSelenium());
+            return new AddProjectWizard.MavenState(browser);
         }
         else if (s.equals("zutubi.maven2CommandConfig"))
         {
-            return new AddProjectWizard.Maven2State(browser.getSelenium());
+            return new AddProjectWizard.Maven2State(browser);
         }
         else
         {
@@ -336,21 +338,16 @@ public class SeleniumTestBase extends PulseTestCase
     {
         if (s.equals("zutubi.subversionConfig"))
         {
-            return new AddProjectWizard.SubversionState(browser.getSelenium());
+            return new AddProjectWizard.SubversionState(browser);
         }
         else if (s.equals("zutubi.gitConfig"))
         {
-            return new AddProjectWizard.GitState(browser.getSelenium());
+            return new AddProjectWizard.GitState(browser);
         }
         else
         {
             throw new IllegalArgumentException("Unknown scm config: " + s);
         }
-    }
-
-    protected boolean isBrowserFirefox()
-    {
-        return SeleniumUtils.getSeleniumBrowserProperty().contains("firefox");
     }
 
     /**
@@ -522,7 +519,7 @@ public class SeleniumTestBase extends PulseTestCase
     {
         if (page.getTitle() != null)
         {
-            String gotTitle = browser.getSelenium().getTitle();
+            String gotTitle = browser.getTitle();
             if(gotTitle.startsWith(SeleniumPage.TITLE_PREFIX))
             {
                 gotTitle = gotTitle.substring(SeleniumPage.TITLE_PREFIX.length());

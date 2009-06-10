@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 
@@ -15,9 +15,9 @@ public class BuildTestsPage extends AbstractTestsPage
     private String projectName;
     private long buildId;
 
-    public BuildTestsPage(Selenium selenium, Urls urls, String projectName, long buildId)
+    public BuildTestsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(selenium, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests", "build " + buildId);
+        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
@@ -29,19 +29,17 @@ public class BuildTestsPage extends AbstractTestsPage
 
     public boolean isBuildComplete()
     {
-        return !selenium.isElementPresent(ID_BUILD_INCOMPLETE);
+        return !browser.isElementIdPresent(ID_BUILD_INCOMPLETE);
     }
 
     public boolean hasTests()
     {
-        return isBuildComplete() && !selenium.isElementPresent(ID_NO_TESTS) && selenium.isElementPresent(ID_TEST_SUMMARY);
+        return isBuildComplete() && !browser.isElementIdPresent(ID_NO_TESTS) && browser.isElementIdPresent(ID_TEST_SUMMARY);
     }
 
     public StageTestsPage clickStageAndWait(String stage)
     {
-        selenium.click("stage-" + stage);
-        StageTestsPage stagePage = new StageTestsPage(selenium, urls, projectName, buildId, stage);
-        stagePage.waitFor();
-        return stagePage;
+        browser.click("stage-" + stage);
+        return browser.waitFor(StageTestsPage.class, projectName, buildId, stage);
     }
 }

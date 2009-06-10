@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -13,9 +13,9 @@ public class PluginPage extends SeleniumPage
     
     private String pluginId;
 
-    public PluginPage(Selenium selenium, Urls urls, String pluginId)
+    public PluginPage(SeleniumBrowser browser, Urls urls, String pluginId)
     {
-        super(selenium, urls, "details:" + pluginId);
+        super(browser, urls, "details:" + pluginId);
         this.pluginId = pluginId;
     }
 
@@ -26,16 +26,16 @@ public class PluginPage extends SeleniumPage
 
     public String getState()
     {
-        return selenium.getText("plugin.status");
+        return browser.getText("plugin.status");
     }
 
     public boolean isErrorMessagePresent()
     {
-        return selenium.isElementPresent(ID_PLUGIN_ERROR);
+        return browser.isElementIdPresent(ID_PLUGIN_ERROR);
     }
 
     public String getErrorMessage()
     {
-        return selenium.getText(ID_PLUGIN_ERROR);
+        return browser.getText(ID_PLUGIN_ERROR);
     }
 }

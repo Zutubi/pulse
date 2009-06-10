@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -11,9 +10,9 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class BrowsePage extends ProjectsSummaryPage
 {
-    public BrowsePage(Selenium selenium, Urls urls)
+    public BrowsePage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, "projects", "projects");
+        super(browser, urls, "projects", "projects");
     }
 
     public String getUrl()
@@ -25,6 +24,6 @@ public class BrowsePage extends ProjectsSummaryPage
     public void waitFor()
     {
         super.waitFor();
-        SeleniumUtils.waitForVariable(selenium, "view.initialised", SeleniumUtils.DEFAULT_TIMEOUT);
+        browser.waitForVariable("view.initialised");
     }
 }

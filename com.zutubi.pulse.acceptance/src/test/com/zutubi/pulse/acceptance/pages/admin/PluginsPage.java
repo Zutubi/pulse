@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -10,9 +10,9 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class PluginsPage extends SeleniumPage
 {
-    public PluginsPage(Selenium selenium, Urls urls)
+    public PluginsPage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, "all.plugins", "plugins");
+        super(browser, urls, "all.plugins", "plugins");
     }
 
     public String getUrl()
@@ -22,44 +22,44 @@ public class PluginsPage extends SeleniumPage
 
     public boolean isPluginPresent(String id)
     {
-        return selenium.isElementPresent("plugin:" + id);
+        return browser.isElementIdPresent("plugin:" + id);
     }
 
     public boolean isActionPresent(String id, String action)
     {
-        return selenium.isElementPresent(getActionId(action, id));
+        return browser.isElementIdPresent(getActionId(action, id));
     }
     
     public String getPluginState(String id)
     {
-        return selenium.getText("status:" + id);
+        return browser.getText("status:" + id);
     }
 
     public PluginPage clickPlugin(String id)
     {
-        selenium.click("select:" + id);
-        return new PluginPage(selenium, urls, id);
+        browser.click("select:" + id);
+        return browser.createPage(PluginPage.class, id);
     }
 
     public InstallPluginForm clickInstall()
     {
-        selenium.click("plugin.add");
-        return new InstallPluginForm(selenium);
+        browser.click("plugin.add");
+        return new InstallPluginForm(browser);
     }
 
     public void clickDisable(String id)
     {
-        selenium.click(getActionId("disable", id));
+        browser.click(getActionId("disable", id));
     }
 
     public void clickEnable(String id)
     {
-        selenium.click(getActionId("enable", id));
+        browser.click(getActionId("enable", id));
     }
 
     public void clickUninstall(String id)
     {
-        selenium.click(getActionId("uninstall", id));
+        browser.click(getActionId("uninstall", id));
     }
 
     public String getActionId(String action, String id)

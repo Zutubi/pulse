@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.admin.BuildOptionsForm;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -15,9 +15,9 @@ public class ProjectConfigPage extends CompositePage
     private String project;
     private boolean template;
 
-    public ProjectConfigPage(Selenium selenium, Urls urls, String project, boolean template)
+    public ProjectConfigPage(SeleniumBrowser browser, Urls urls, String project, boolean template)
     {
-        super(selenium, urls, getPath(project));
+        super(browser, urls, getPath(project));
         this.project = project;
         this.template = template;
     }
@@ -39,27 +39,23 @@ public class ProjectConfigPage extends CompositePage
 
     public ProjectHierarchyPage clickHierarchy()
     {
-        selenium.click(super.getHierarchyLocator());
-        return new ProjectHierarchyPage(selenium, urls, project, template);
+        browser.click(super.getHierarchyLocator());
+        return browser.createPage(ProjectHierarchyPage.class, project, template);
     }
 
     public BuildOptionsForm clickBuildOptionsAndWait()
     {
         clickComposite("options", "build options");
 
-        BuildOptionsForm form = new BuildOptionsForm(selenium);
+        BuildOptionsForm form = browser.createForm(BuildOptionsForm.class);
         form.waitFor();
-        
         return form;
     }
 
     public CleanupRulesPage clickCleanupAndWait()
     {
         ListPage listPage = clickCollection("cleanup", "cleanup rules");
-
-        CleanupRulesPage page = new CleanupRulesPage(selenium, urls, listPage.getPath());
-        page.waitFor();
-        return page;
+        return browser.waitFor(CleanupRulesPage.class, listPage.getPath());
     }
 
 }

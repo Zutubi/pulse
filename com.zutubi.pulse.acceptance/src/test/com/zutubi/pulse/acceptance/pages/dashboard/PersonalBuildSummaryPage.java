@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.dashboard;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -11,9 +11,9 @@ public class PersonalBuildSummaryPage extends BuildSummaryPage
 {
     private long buildId;
 
-    public PersonalBuildSummaryPage(Selenium selenium, Urls urls, long buildId)
+    public PersonalBuildSummaryPage(SeleniumBrowser browser, Urls urls, long buildId)
     {
-        super(selenium, urls, "personal", buildId);
+        super(browser, urls, "personal", buildId);
         this.buildId = buildId;
     }
 

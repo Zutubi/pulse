@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 
@@ -12,9 +12,9 @@ public class ProjectHomePage extends ResponsibilityPage
 {
     private String projectName;
 
-    public ProjectHomePage(Selenium selenium, Urls urls, String projectName)
+    public ProjectHomePage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        super(selenium, urls, "project-home-" + StringUtils.uriComponentEncode(projectName), StringUtils.uriComponentEncode(projectName));
+        super(browser, urls, "project-home-" + StringUtils.uriComponentEncode(projectName), StringUtils.uriComponentEncode(projectName));
         this.projectName = projectName;
     }
 

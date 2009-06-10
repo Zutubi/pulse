@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 
 /**
@@ -9,9 +10,9 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
  */
 public class BuildStageForm extends ConfigurationForm
 {
-    public BuildStageForm(Selenium selenium, boolean inherited)
+    public BuildStageForm(SeleniumBrowser browser, boolean inherited)
     {
-        super(selenium, BuildStageConfiguration.class, true, inherited);
+        super(browser, BuildStageConfiguration.class, true, inherited);
     }
 
     public int[] getFieldTypes()

@@ -9,6 +9,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.AnnotationUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -30,21 +31,21 @@ public class ConfigurationForm extends SeleniumForm
     private static final Logger LOG = Logger.getLogger(ConfigurationForm.class);
     private Class<? extends Configuration> configurationClass;
 
-    public ConfigurationForm(Selenium selenium, Class<? extends Configuration> configurationClass)
+    public ConfigurationForm(SeleniumBrowser browser, Class<? extends Configuration> configurationClass)
     {
-        super(selenium);
+        super(browser);
         this.configurationClass = configurationClass;
     }
 
-    public ConfigurationForm(Selenium selenium, Class<? extends Configuration> configurationClass, boolean ajax)
+    public ConfigurationForm(SeleniumBrowser browser, Class<? extends Configuration> configurationClass, boolean ajax)
     {
-        super(selenium, ajax);
+        super(browser, ajax);
         this.configurationClass = configurationClass;
     }
 
-    public ConfigurationForm(Selenium selenium, Class<? extends Configuration> configurationClass, boolean ajax, boolean inherited)
+    public ConfigurationForm(SeleniumBrowser browser, Class<? extends Configuration> configurationClass, boolean ajax, boolean inherited)
     {
-        super(selenium, ajax, inherited);
+        super(browser, ajax, inherited);
         this.configurationClass = configurationClass;
     }
 

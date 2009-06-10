@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.forms.admin;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
 import com.zutubi.pulse.acceptance.windows.BrowseScmWindow;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
@@ -13,9 +13,9 @@ public class AntCommandForm extends ConfigurationForm
     private static final String FIELD_WORKING_DIR = "workingDir";
     private static final String FIELD_BUILD_FILE = "buildFile";
 
-    public AntCommandForm(Selenium selenium)
+    public AntCommandForm(SeleniumBrowser browser)
     {
-        super(selenium, AntCommandConfiguration.class);
+        super(browser, AntCommandConfiguration.class);
     }
 
     public int[] getFieldTypes()
@@ -35,26 +35,26 @@ public class AntCommandForm extends ConfigurationForm
 
     public boolean isBrowseWorkingDirectoryLinkPresent()
     {
-        return selenium.isElementPresent(getBrowseLinkId(FIELD_WORKING_DIR));
+        return browser.isElementIdPresent(getBrowseLinkId(FIELD_WORKING_DIR));
     }
 
     public boolean isBrowseBuildFileLinkPresent()
     {
-        return selenium.isElementPresent(getBrowseLinkId(FIELD_BUILD_FILE));
+        return browser.isElementIdPresent(getBrowseLinkId(FIELD_BUILD_FILE));
     }
 
     public BrowseScmWindow clickBrowseWorkingDirectory()
     {
-        selenium.click(getBrowseLinkId(FIELD_WORKING_DIR));
-        BrowseScmWindow window = new BrowseScmWindow(selenium);
+        browser.click(getBrowseLinkId(FIELD_WORKING_DIR));
+        BrowseScmWindow window = new BrowseScmWindow(browser);
         window.selectWindow();
         return window;
     }
 
     public BrowseScmWindow clickBrowseBuildFile()
     {
-        selenium.click(getBrowseLinkId(FIELD_BUILD_FILE));
-        BrowseScmWindow window = new BrowseScmWindow(selenium);
+        browser.click(getBrowseLinkId(FIELD_BUILD_FILE));
+        BrowseScmWindow window = new BrowseScmWindow(browser);
         window.selectWindow();
         return window;
     }

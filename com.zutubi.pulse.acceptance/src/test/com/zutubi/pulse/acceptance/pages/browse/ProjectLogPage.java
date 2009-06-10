@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
-import com.thoughtworks.selenium.Selenium;
 
 /**
  * The browse project log page.
@@ -12,9 +12,9 @@ public class ProjectLogPage extends SeleniumPage
 {
     private String projectName;
 
-    public ProjectLogPage(Selenium selenium, Urls urls, String projectName)
+    public ProjectLogPage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        super(selenium, urls, "project-log-" + StringUtils.uriComponentEncode(projectName));
+        super(browser, urls, "project-log-" + StringUtils.uriComponentEncode(projectName));
         this.projectName = projectName;
     }
 
@@ -25,12 +25,12 @@ public class ProjectLogPage extends SeleniumPage
 
     public boolean isDownloadLinkAvailable()
     {
-        return selenium.isElementPresent("link=full log");
+        return browser.isElementIdPresent("link=full log");
     }
 
     public void clickDownloadLink()
     {
-        selenium.click("link=full log");
+        browser.click("link=full log");
     }
 
     /**
@@ -40,7 +40,7 @@ public class ProjectLogPage extends SeleniumPage
      */
     public String getLog()
     {
-        return selenium.getText("project-log-" + projectName);
+        return browser.getText("project-log-" + projectName);
     }
 
     public boolean logContains(String text)

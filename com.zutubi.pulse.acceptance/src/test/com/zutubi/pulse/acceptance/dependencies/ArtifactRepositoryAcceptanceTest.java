@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
+import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
 import com.zutubi.pulse.master.model.ProjectManager;
 
 import java.util.Hashtable;

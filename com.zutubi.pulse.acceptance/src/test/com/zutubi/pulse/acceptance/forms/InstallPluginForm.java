@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.forms;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
 /**
  */
@@ -11,32 +10,32 @@ public class InstallPluginForm
     private static final String ID_CONTINUE   = "zfid.continue";
     private static final String ID_CANCEL     = "zfid.cancel";
 
-    private Selenium selenium;
+    private SeleniumBrowser browser;
 
-    public InstallPluginForm(Selenium selenium)
+    public InstallPluginForm(SeleniumBrowser browser)
     {
-        this.selenium = selenium;
+        this.browser = browser;
     }
 
     public boolean isFormPresent()
     {
-        return selenium.isElementPresent(ID_PATH_FIELD);
+        return browser.isElementIdPresent(ID_PATH_FIELD);
     }
 
     public void waitFor()
     {
-        SeleniumUtils.waitForElementId(selenium, ID_PATH_FIELD);
+        browser.waitForElement(ID_PATH_FIELD);
     }
 
     public void cancel()
     {
-        selenium.click(ID_CANCEL);
+        browser.click(ID_CANCEL);
     }
     
     public void continueFormElements(String path)
     {
-        selenium.type(ID_PATH_FIELD, path);
-        selenium.click(ID_CONTINUE);
-        selenium.waitForPageToLoad("30000");
+        browser.type(ID_PATH_FIELD, path);
+        browser.click(ID_CONTINUE);
+        browser.waitForPageToLoad();
     }
 }

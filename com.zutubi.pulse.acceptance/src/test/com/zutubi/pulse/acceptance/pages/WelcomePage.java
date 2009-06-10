@@ -1,15 +1,15 @@
 package com.zutubi.pulse.acceptance.pages;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 
 /**
  */
 public class WelcomePage extends SeleniumPage
 {
-    public WelcomePage(Selenium selenium, Urls urls)
+    public WelcomePage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, "welcome.heading", "welcome");
+        super(browser, urls, "welcome.heading", "welcome");
     }
 
     public String getUrl()

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
@@ -13,9 +13,9 @@ public class BuildWorkingCopyPage extends SeleniumPage
     private String projectName;
     private long buildId;
 
-    public BuildWorkingCopyPage(Selenium selenium, Urls urls, String projectName, long buildId)
+    public BuildWorkingCopyPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(selenium, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-wc", "build " + buildId);
+        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-wc", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
@@ -27,7 +27,7 @@ public class BuildWorkingCopyPage extends SeleniumPage
 
     public boolean isWorkingCopyNotPresent()
     {
-        return selenium.isElementPresent("wc.not.present");
+        return browser.isElementIdPresent("wc.not.present");
     }
 
     /**

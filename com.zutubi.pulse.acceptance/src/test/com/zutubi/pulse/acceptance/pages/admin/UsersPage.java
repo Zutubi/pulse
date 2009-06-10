@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -9,8 +9,8 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class UsersPage extends ListPage
 {
-    public UsersPage(Selenium selenium, Urls urls)
+    public UsersPage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, MasterConfigurationRegistry.USERS_SCOPE);
+        super(browser, urls, MasterConfigurationRegistry.USERS_SCOPE);
     }
 }

@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 
 /**
@@ -9,8 +10,8 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
  */
 public class ServerSettingsForm extends ConfigurationForm
 {
-    public ServerSettingsForm(Selenium selenium)
+    public ServerSettingsForm(SeleniumBrowser browser)
     {
-        super(selenium, GlobalConfiguration.class);
+        super(browser, GlobalConfiguration.class);
     }
 }

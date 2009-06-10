@@ -33,7 +33,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     public void testSetupProcess() throws InterruptedException, IOException, SAXException
     {
         // first we deal with the pulse home property configuration.
-        browser.goTo("setup/setupData!input.action");
+        browser.open("setup/setupData!input.action");
 
         // step one. setting the pulse home variable.
         checkSetPulseData();
@@ -47,7 +47,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
     protected void checkPostPulseData()
     {
-        browser.goTo("/");
+        browser.open("/");
         _checkPostPulseData();
     }
 

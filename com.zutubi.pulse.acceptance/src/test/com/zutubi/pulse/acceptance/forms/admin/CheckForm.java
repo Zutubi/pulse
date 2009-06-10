@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.forms.admin;
 
-import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 
 /**
@@ -33,18 +32,18 @@ public class CheckForm extends SeleniumForm
 
     public boolean isResultOk()
     {
-        String checkOK = SeleniumUtils.evalVariable(selenium, "checkOK");
+        String checkOK = browser.evalVariable("checkOK");
         return Boolean.valueOf(checkOK);
     }
 
     public String getResultMessage()
     {
-        return selenium.getText("check.result");
+        return browser.getText("check.result");
     }
 
     public void waitForCheck()
     {
-        SeleniumUtils.waitForVariable(selenium, "checkComplete", 30000);
+        browser.waitForVariable("checkComplete");
     }
 
     public void checkFormElementsAndWait(String... args)

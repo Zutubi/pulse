@@ -237,16 +237,9 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     private boolean canOpenPage(SeleniumPage page)
     {
-        try
-        {
-            page.openAndWaitFor();
-            return true;
-        }
-        catch (RuntimeException e)
-        {
-            // failed to load, should see: Unknown build [buildNumber] for project [projectName]
-            return false;
-        }
+        page.open();
+        browser.waitForPageToLoad();
+        return page.isPresent();
     }
 
     private abstract class InvertedCondition implements Condition

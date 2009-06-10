@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 
 /**
@@ -9,9 +10,9 @@ import com.zutubi.pulse.master.license.config.LicenseConfiguration;
  */
 public class LicenseForm extends ConfigurationForm
 {
-    public LicenseForm(Selenium selenium)
+    public LicenseForm(SeleniumBrowser browser)
     {
-        super(selenium, LicenseConfiguration.class);
+        super(browser, LicenseConfiguration.class);
     }
 
     public String[] getFieldNames()

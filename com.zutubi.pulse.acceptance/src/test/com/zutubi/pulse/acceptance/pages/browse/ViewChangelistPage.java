@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
@@ -25,9 +24,9 @@ public class ViewChangelistPage extends SeleniumPage
     private long buildId;
     private long changeId;
 
-    public ViewChangelistPage(Selenium selenium, Urls urls, String projectName, long buildId, long changeId, String revisionString)
+    public ViewChangelistPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, long changeId, String revisionString)
     {
-        super(selenium, urls, "changelist." + revisionString, "changelist " + revisionString);
+        super(browser, urls, "changelist." + revisionString, "changelist " + revisionString);
         this.projectName = projectName;
         this.buildId = buildId;
         this.changeId = changeId;
@@ -45,23 +44,23 @@ public class ViewChangelistPage extends SeleniumPage
 
     public String getRevision()
     {
-        return SeleniumUtils.getCellContents(selenium, ID_DETAILS_TABLE, 1, 1);
+        return browser.getCellContents(ID_DETAILS_TABLE, 1, 1);
     }
 
     public String getAuthor()
     {
-        return SeleniumUtils.getCellContents(selenium, ID_DETAILS_TABLE, 2, 1);
+        return browser.getCellContents(ID_DETAILS_TABLE, 2, 1);
     }
 
     public String getComment()
     {
-        return SeleniumUtils.getCellContents(selenium, ID_DETAILS_TABLE, 4, 1);
+        return browser.getCellContents(ID_DETAILS_TABLE, 4, 1);
     }
 
     public int getFilesCount()
     {
         int count = 1;
-        while (selenium.isElementPresent(getChangelistFileId(count)))
+        while (browser.isElementIdPresent(getChangelistFileId(count)))
         {
             count++;
         }
@@ -76,9 +75,9 @@ public class ViewChangelistPage extends SeleniumPage
         for (int i = 0; i < filesCount; i++)
         {
             fileChanges.add(new FileChange(
-                    SeleniumUtils.getCellContents(selenium, ID_FILES_TABLE, i + 2, 0),
-                    new Revision(SeleniumUtils.getCellContents(selenium, ID_FILES_TABLE, i + 2, 1)),
-                    FileChange.Action.fromString(SeleniumUtils.getCellContents(selenium, ID_FILES_TABLE, i + 2, 2))
+                    browser.getCellContents(ID_FILES_TABLE, i + 2, 0),
+                    new Revision(browser.getCellContents(ID_FILES_TABLE, i + 2, 1)),
+                    FileChange.Action.fromString(browser.getCellContents(ID_FILES_TABLE, i + 2, 2))
             ));
         }
 

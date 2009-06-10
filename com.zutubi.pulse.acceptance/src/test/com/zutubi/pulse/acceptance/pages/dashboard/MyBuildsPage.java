@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.dashboard;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -9,9 +9,9 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class MyBuildsPage extends SeleniumPage
 {
-    public MyBuildsPage(Selenium selenium, Urls urls)
+    public MyBuildsPage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, "personal-builds", "my");
+        super(browser, urls, "personal-builds", "my");
     }
 
     public String getUrl()

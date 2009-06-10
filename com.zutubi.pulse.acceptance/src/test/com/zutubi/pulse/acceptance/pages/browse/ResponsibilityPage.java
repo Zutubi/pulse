@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -14,26 +14,26 @@ public abstract class ResponsibilityPage extends SeleniumPage
     private static final String ID_RESPONSIBLE_CLEAR = "responsible-clear";
     private static final String ID_RESPONSIBLE_COMMENT = "responsible-comment";
 
-    public ResponsibilityPage(Selenium selenium, Urls urls, String id, String title)
+    public ResponsibilityPage(SeleniumBrowser browser, Urls urls, String id, String title)
     {
-        super(selenium, urls, id, title);
+        super(browser, urls, id, title);
     }
 
     public boolean hasResponsibleUser()
     {
-        return selenium.isElementPresent(ID_RESPONSIBLE_PANEL);
+        return browser.isElementIdPresent(ID_RESPONSIBLE_PANEL);
     }
 
     public String getResponsibleMessage()
     {
-        return selenium.getText(ID_RESPONSIBLE_MESSAGE);
+        return browser.getText(ID_RESPONSIBLE_MESSAGE);
     }
 
     public String getResponsibleComment()
     {
-        if (selenium.isElementPresent(ID_RESPONSIBLE_COMMENT))
+        if (browser.isElementIdPresent(ID_RESPONSIBLE_COMMENT))
         {
-            return selenium.getText(ID_RESPONSIBLE_COMMENT);
+            return browser.getText(ID_RESPONSIBLE_COMMENT);
         }
         else
         {
@@ -43,12 +43,12 @@ public abstract class ResponsibilityPage extends SeleniumPage
 
     public void clickClearResponsible()
     {
-        selenium.click(ID_RESPONSIBLE_CLEAR);
+        browser.click(ID_RESPONSIBLE_CLEAR);
     }
 
     public boolean isClearResponsibilityPresent()
     {
-        return selenium.isElementPresent(ID_RESPONSIBLE_CLEAR);
+        return browser.isElementIdPresent(ID_RESPONSIBLE_CLEAR);
     }
 
     private String getActionId(String actionName)
@@ -58,11 +58,11 @@ public abstract class ResponsibilityPage extends SeleniumPage
 
     public boolean isActionPresent(String actionName)
     {
-        return selenium.isElementPresent(getActionId(actionName));
+        return browser.isElementIdPresent(getActionId(actionName));
     }
 
     public void clickAction(String actionName)
     {
-        selenium.click(getActionId(actionName));
+        browser.click(getActionId(actionName));
     }
 }

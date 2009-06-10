@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 
 /**
@@ -9,9 +10,9 @@ import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
  */
 public class ProjectAclForm extends ConfigurationForm
 {
-    public ProjectAclForm(Selenium selenium)
+    public ProjectAclForm(SeleniumBrowser browser)
     {
-        super(selenium, ProjectAclConfiguration.class);
+        super(browser, ProjectAclConfiguration.class);
     }
 
     public int[] getFieldTypes()

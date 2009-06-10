@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
@@ -13,9 +13,9 @@ public class BuildFilePage extends SeleniumPage
     private String projectName;
     private long buildId;
 
-    public BuildFilePage(Selenium selenium, Urls urls, String projectName, long buildId)
+    public BuildFilePage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(selenium, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-file", "build " + buildId);
+        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-file", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
@@ -27,11 +27,11 @@ public class BuildFilePage extends SeleniumPage
 
     public boolean isHighlightedFilePresent()
     {
-        return selenium.isElementPresent("highlighted.file");
+        return browser.isElementIdPresent("highlighted.file");
     }
 
     public void clickDownload()
     {
-        selenium.click("download.file");
+        browser.click("download.file");
     }
 }

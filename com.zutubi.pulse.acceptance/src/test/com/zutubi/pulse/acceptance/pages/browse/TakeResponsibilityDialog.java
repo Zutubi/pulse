@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
 /**
  * Represents the popup prompt show when taking responsibilty for a build.
@@ -11,25 +10,25 @@ public class TakeResponsibilityDialog
     private static final String LOCATOR_COMMENT = "css=input.ext-mb-input";
     private static final String LOCATOR_OK = "css=button:contains('OK')";
 
-    private Selenium selenium;
+    private SeleniumBrowser browser;
 
-    public TakeResponsibilityDialog(Selenium selenium)
+    public TakeResponsibilityDialog(SeleniumBrowser browser)
     {
-        this.selenium = selenium;
+        this.browser = browser;
     }
 
     public void waitFor()
     {
-        SeleniumUtils.waitForLocator(selenium, LOCATOR_COMMENT);
+        browser.waitForLocator(LOCATOR_COMMENT);
     }
 
     public void typeComment(String comment)
     {
-        selenium.type(LOCATOR_COMMENT, comment);
+        browser.type(LOCATOR_COMMENT, comment);
     }
 
     public void clickOk()
     {
-        selenium.click(LOCATOR_OK);
+        browser.click(LOCATOR_OK);
     }
 }

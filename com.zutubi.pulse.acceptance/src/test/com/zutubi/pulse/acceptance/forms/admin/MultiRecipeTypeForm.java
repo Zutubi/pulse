@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 
 /**
@@ -9,8 +10,8 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
  */
 public class MultiRecipeTypeForm extends ConfigurationForm
 {
-    public MultiRecipeTypeForm(Selenium selenium)
+    public MultiRecipeTypeForm(SeleniumBrowser browser)
     {
-        super(selenium, MultiRecipeTypeConfiguration.class);
+        super(browser, MultiRecipeTypeConfiguration.class);
     }
 }

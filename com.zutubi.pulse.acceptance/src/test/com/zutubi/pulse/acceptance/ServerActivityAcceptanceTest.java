@@ -5,7 +5,6 @@ import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
-import com.thoughtworks.selenium.Selenium;
 
 import java.io.File;
 import java.util.HashMap;
@@ -66,7 +65,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         // we use contains here since the recipe queue table header gets merged with the
         // pause action when returned by selenium.
         assertTrue(new Table(id).getHeader().contains(header));
-        assertEquals(message, SeleniumUtils.getCellContents(browser.getSelenium(), id, 2, 0));
+        assertEquals(message, browser.getCellContents(id, 2, 0));
     }
 
     /**
@@ -178,7 +177,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
     private void waitForQueueCount(final Table queueTable, final int count)
     {
-        SeleniumUtils.refreshUntil(browser.getSelenium(), TIMEOUT, new Condition()
+        browser.refreshUntil(TIMEOUT, new Condition()
         {
             public boolean satisfied()
             {
@@ -208,8 +207,6 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         protected String id;
         protected String emptyMessage;
 
-        protected Selenium selenium;
-
         public Table(String id)
         {
             this(id, null);
@@ -219,12 +216,11 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         {
             this.id = id;
             this.emptyMessage = emptyMessage;
-            this.selenium = browser.getSelenium();
         }
 
         public String getHeader()
         {
-            return SeleniumUtils.getCellContents(this.selenium, id, 0, 0);
+            return browser.getCellContents(id, 0, 0);
         }
 
         /**
@@ -237,7 +233,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         {
             try
             {
-                return SeleniumUtils.getCellContents(this.selenium, id, row + 1, column - 1);
+                return browser.getCellContents(id, row + 1, column - 1);
             }
             catch (Exception e)
             {
@@ -252,7 +248,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
             {
                 try
                 {
-                    SeleniumUtils.getCellContents(this.selenium, id, count + 2, 0);
+                    browser.getCellContents(id, count + 2, 0);
                     count++;
                 }
                 catch (Exception e)
@@ -355,7 +351,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
         public void clickCancel(String owner, long number)
         {
-            this.selenium.click("cancel.active." + owner + "." + Long.toString(number));
+            browser.click("cancel.active." + owner + "." + Long.toString(number));
         }
     }
 }

@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 
 /**
@@ -9,8 +10,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfigura
  */
 public class ProjectTypeSelectState extends ConfigurationForm
 {
-    public ProjectTypeSelectState(Selenium selenium)
+    public ProjectTypeSelectState(SeleniumBrowser browser)
     {
-        super(selenium, ProjectTypeSelectionConfiguration.class);
+        super(browser, ProjectTypeSelectionConfiguration.class);
     }
 }

@@ -76,7 +76,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         ensureSetting(KEY_ANONYMOUS_SIGNUP, false);
         LoginPage loginPage = browser.open(LoginPage.class);
         assertFalse(loginPage.isSignupPresent());
-        browser.goTo(SIGNUP_INPUT_ACTION);
+        browser.open(SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "", "");
@@ -86,7 +86,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     public void testAnonymousSingupPasswordMismatch() throws Exception
     {
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
-        browser.goTo(SIGNUP_INPUT_ACTION);
+        browser.open(SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements(random, random, "p1", "p2");
@@ -97,7 +97,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     public void testAnonymousSingupExistingUser() throws Exception
     {
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
-        browser.goTo(SIGNUP_INPUT_ACTION);
+        browser.open(SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
         assertTrue(form.isFormPresent());
         form.saveFormElements("admin", "name", "p", "p");

@@ -1,9 +1,10 @@
 package com.zutubi.pulse.acceptance.pages;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.master.webwork.Urls;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  */
@@ -11,9 +12,9 @@ public class LoginPage extends SeleniumPage
 {
     private static final String SIGNUP_ID = "signup";
 
-    public LoginPage(Selenium selenium, Urls urls)
+    public LoginPage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, "login-logo", "login");
+        super(browser, urls, "login-logo", "login");
     }
 
     public String getUrl()
@@ -23,26 +24,25 @@ public class LoginPage extends SeleniumPage
 
     public void login(String username, String password)
     {
-        selenium.type("zfid.j_username", username);
-        selenium.type("zfid.j_password", password);
-        selenium.click("zfid.login");
-        selenium.waitForPageToLoad("30000");
+        LoginForm form = browser.createForm(LoginForm.class);
+        form.submitNamedFormElements("login", asPair("j_username", username), asPair("j_password", password));
+        browser.waitForPageToLoad();
     }
 
     public boolean isSignupPresent()
     {
-        return selenium.isElementPresent(SIGNUP_ID);
+        return browser.isElementIdPresent(SIGNUP_ID);
     }
 
     public void waitForSignup()
     {
-        SeleniumUtils.waitForElementId(selenium, SIGNUP_ID);
+        browser.waitForElement(SIGNUP_ID);
     }
 
     public SignupForm clickSignup()
     {
-        selenium.click(SIGNUP_ID);
-        selenium.waitForPageToLoad("30000");
-        return new SignupForm(selenium);
+        browser.click(SIGNUP_ID);
+        browser.waitForPageToLoad();
+        return browser.createForm(SignupForm.class);
     }
 }

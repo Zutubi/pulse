@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 
 /**
@@ -9,9 +10,9 @@ import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
  */
 public class BuiltinGroupForm extends ConfigurationForm
 {
-    public BuiltinGroupForm(Selenium selenium)
+    public BuiltinGroupForm(SeleniumBrowser browser)
     {
-        super(selenium, BuiltinGroupConfiguration.class);
+        super(browser, BuiltinGroupConfiguration.class);
     }
 
     public int[] getFieldTypes()

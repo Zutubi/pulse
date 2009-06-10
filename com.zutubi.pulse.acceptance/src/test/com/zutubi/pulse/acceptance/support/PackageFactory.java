@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.support;
 
-import java.io.File;
 import java.io.Closeable;
+import java.io.File;
 
 /**
  * A factory for PulsePackage instances.

@@ -1,12 +1,10 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.IDs;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.StringUtils;
 
 /**
  * A page in the admin UI that displays a list of composites.  The list is
@@ -28,9 +26,9 @@ public class ListPage extends ConfigPage
     
     private String path;
 
-    public ListPage(Selenium selenium, Urls urls, String path)
+    public ListPage(SeleniumBrowser browser, Urls urls, String path)
     {
-        super(selenium, urls, "map:path:" + path);
+        super(browser, urls, "map:path:" + path);
         this.path = path;
     }
 
@@ -46,22 +44,22 @@ public class ListPage extends ConfigPage
 
     public boolean isItemPresent(String baseName)
     {
-        return selenium.isElementPresent(StringUtils.toValidHtmlName(getItemId(baseName)));
+        return browser.isElementIdPresent(getItemId(baseName));
     }
 
     public boolean isAnnotationPresent(String baseName, String annotation)
     {
-        return selenium.isElementPresent(StringUtils.toValidHtmlName(annotation + ":" + baseName));
+        return browser.isElementIdPresent(annotation + ":" + baseName);
     }
 
     public boolean isActionLinkPresent(String baseName, String action)
     {
-        return SeleniumUtils.isLinkPresent(selenium, getActionId(action, baseName));
+        return browser.isLinkPresent(getActionId(action, baseName));
     }
 
     public String getCellContent(int itemIndex, int columnIndex)
     {
-        return SeleniumUtils.getCellContents(selenium, IDs.COLLECTION_TABLE, itemIndex + 2, columnIndex);
+        return browser.getCellContents(IDs.COLLECTION_TABLE, itemIndex + 2, columnIndex);
     }
 
     private String getItemId(String baseName)
@@ -76,12 +74,12 @@ public class ListPage extends ConfigPage
 
     public void clickAdd()
     {
-        selenium.click(ADD_LINK);
+        browser.click(ADD_LINK);
     }
 
     public void clickAction(String baseName, String action)
     {
-        selenium.click(getActionId(action, baseName));
+        browser.click(getActionId(action, baseName));
     }
 
     public void clickView(String baseName)
@@ -92,15 +90,15 @@ public class ListPage extends ConfigPage
     public CloneForm clickClone(String baseName)
     {
         clickAction(baseName, ACTION_CLONE);
-        return new CloneForm(selenium, false);
+        return browser.createForm(CloneForm.class, false);
     }
 
     public DeleteConfirmPage clickDelete(String baseName)
     {
         String actionId = getActionId("delete", baseName);
-        boolean isHide = "hide".equals(selenium.getText(actionId));
-        selenium.click(actionId);
-        return new DeleteConfirmPage(selenium, urls, PathUtils.getPath(path, baseName), isHide);
+        boolean isHide = "hide".equals(browser.getText(actionId));
+        browser.click(actionId);
+        return browser.createPage(DeleteConfirmPage.class, PathUtils.getPath(path, baseName), isHide);
     }
 
     public void clickRestore(String baseName)
@@ -112,7 +110,7 @@ public class ListPage extends ConfigPage
     {
         // The order column comes directly after the summary columns if
         // present, so its index is the same as the summary column count.
-        return HEADER_ORDER.equals(SeleniumUtils.getCellContents(selenium, IDs.COLLECTION_TABLE, 1, summaryColumnCount));
+        return HEADER_ORDER.equals(browser.getCellContents(IDs.COLLECTION_TABLE, 1, summaryColumnCount));
     }
 
     public void clickUp(String baseName)
@@ -127,17 +125,17 @@ public class ListPage extends ConfigPage
 
     private void clickRefreshingAction(String baseName, String action)
     {
-        selenium.click(getActionId(action, baseName));
-        SeleniumUtils.waitForVariable(selenium, "actionInProgress", SeleniumUtils.DEFAULT_TIMEOUT, true);
+        browser.click(getActionId(action, baseName));
+        browser.waitForVariable("actionInProgress", true);
     }
 
     public boolean isOrderInheritedPresent()
     {
-        return selenium.isElementPresent("order-inherited");
+        return browser.isElementIdPresent("order-inherited");
     }
 
     public boolean isOrderOverriddenPresent()
     {
-        return selenium.isElementPresent("order-overridden");
+        return browser.isElementIdPresent("order-overridden");
     }
 }

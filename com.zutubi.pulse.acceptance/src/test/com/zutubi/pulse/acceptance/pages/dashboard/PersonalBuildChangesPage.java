@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.dashboard;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -11,9 +11,9 @@ public class PersonalBuildChangesPage extends SeleniumPage
 {
     private long buildId;
 
-    public PersonalBuildChangesPage(Selenium selenium, Urls urls, long buildId)
+    public PersonalBuildChangesPage(SeleniumBrowser browser, Urls urls, long buildId)
     {
-        super(selenium, urls, "personal-build-" + Long.toString(buildId) + "-changes", "build " + buildId);
+        super(browser, urls, "personal-build-" + Long.toString(buildId) + "-changes", "build " + buildId);
         this.buildId = buildId;
     }
 
@@ -24,7 +24,7 @@ public class PersonalBuildChangesPage extends SeleniumPage
 
     public String getCheckedOutRevision()
     {
-        String text = selenium.getText("checked.out.revision");
+        String text = browser.getText("checked.out.revision");
         text = text.trim();
         String[] pieces = text.split(" ");
         return pieces[pieces.length - 1];
@@ -32,6 +32,6 @@ public class PersonalBuildChangesPage extends SeleniumPage
 
     public String getChangedFile(int index)
     {
-        return selenium.getTable(getId() + "." + (index + 2) + ".0");
+        return browser.getCellContents(getId(), index + 2, 0);
     }
 }

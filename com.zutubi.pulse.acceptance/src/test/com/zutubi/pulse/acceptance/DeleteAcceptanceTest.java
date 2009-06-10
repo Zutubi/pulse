@@ -462,11 +462,11 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         int i;
         for(i = 0; i < pathActionPairs.length / 2; i++)
         {
-            assertEquals(pathActionPairs[i * 2], SeleniumUtils.getCellContents(browser.getSelenium(), page.getId(), i + 1, 0));
-            assertEquals(pathActionPairs[i * 2 + 1], SeleniumUtils.getCellContents(browser.getSelenium(), page.getId(), i + 1, 1));
+            assertEquals(pathActionPairs[i * 2], browser.getCellContents(page.getId(), i + 1, 0));
+            assertEquals(pathActionPairs[i * 2 + 1], browser.getCellContents(page.getId(), i + 1, 1));
         }
 
-        String actionsCell = SeleniumUtils.getCellContents(browser.getSelenium(), page.getId(), i + 1, 0);
+        String actionsCell = browser.getCellContents(page.getId(), i + 1, 0);
         actionsCell = actionsCell.replaceAll(" +", " ");
         assertEquals((page.isHide() ? "hide" : "delete") + " cancel", actionsCell);
     }

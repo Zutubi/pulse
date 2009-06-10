@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.forms.admin;
 
-import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven.MavenCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
@@ -19,9 +19,9 @@ public class AddProjectWizard
 {
     public static class ProjectState extends SeleniumForm
     {
-        public ProjectState(Selenium selenium)
+        public ProjectState(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
 
         public String getFormName()
@@ -42,17 +42,17 @@ public class AddProjectWizard
 
     public abstract static class ScmState extends SeleniumForm
     {
-        public ScmState(Selenium selenium)
+        public ScmState(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
     }
 
     public static class SubversionState extends ScmState
     {
-        public SubversionState(Selenium selenium)
+        public SubversionState(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
 
         public String getFormName()
@@ -73,9 +73,9 @@ public class AddProjectWizard
 
     public static class GitState extends ScmState
     {
-        public GitState(Selenium selenium)
+        public GitState(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
 
         public String getFormName()
@@ -96,17 +96,17 @@ public class AddProjectWizard
 
     public abstract static class TypeState extends SeleniumForm
     {
-        public TypeState(Selenium selenium)
+        public TypeState(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
     }
 
     public static class CustomTypeState extends TypeState
     {
-        public CustomTypeState(Selenium selenium)
+        public CustomTypeState(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
 
         public String getFormName()
@@ -122,9 +122,9 @@ public class AddProjectWizard
 
     public abstract static class CommandState extends SeleniumForm
     {
-        protected CommandState(Selenium selenium)
+        protected CommandState(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
 
         public void cancel()
@@ -149,15 +149,15 @@ public class AddProjectWizard
 
         protected boolean isBrowseFieldAvailable(String fieldName)
         {
-            return selenium.isElementPresent("zfid."+fieldName+".browse");
+            return browser.isElementIdPresent("zfid."+fieldName+".browse");
         }
     }
 
     public static class AntState extends CommandState
     {
-        public AntState(Selenium selenium)
+        public AntState(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
 
         public String getFormName()
@@ -188,9 +188,9 @@ public class AddProjectWizard
 
     public static class MavenState extends CommandState
     {
-        public MavenState(Selenium selenium)
+        public MavenState(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
 
         public String getFormName()
@@ -216,9 +216,9 @@ public class AddProjectWizard
 
     public static class Maven2State extends CommandState
     {
-        public Maven2State(Selenium selenium)
+        public Maven2State(SeleniumBrowser browser)
         {
-            super(selenium);
+            super(browser);
         }
 
         public String getFormName()

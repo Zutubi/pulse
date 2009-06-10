@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 
 /**
@@ -9,9 +10,9 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
  */
 public class CustomTypeForm extends ConfigurationForm
 {
-    public CustomTypeForm(Selenium selenium)
+    public CustomTypeForm(SeleniumBrowser browser)
     {
-        super(selenium, CustomTypeConfiguration.class);
+        super(browser, CustomTypeConfiguration.class);
     }
 
     public String[] getFieldNames()

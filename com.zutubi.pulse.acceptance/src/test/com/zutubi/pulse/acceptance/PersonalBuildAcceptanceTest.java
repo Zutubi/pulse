@@ -211,12 +211,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private String getLogText(String url)
     {
-        browser.goTo(url);
-//        selenium.open(url);
+        browser.open(url);
         browser.waitForPageToLoad();
-//        selenium.waitForPageToLoad(Long.toString(SeleniumUtils.DEFAULT_TIMEOUT));
         return browser.getText("panel");
-//        return selenium.getText("panel");
     }
 
     private void checkout(String url) throws SVNException
@@ -268,9 +265,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         long buildNumber = ui.getBuildNumber();
         browser.openAndWaitFor(MyBuildsPage.class);
-        SeleniumUtils.refreshUntilElement(browser.getSelenium(), MyBuildsPage.getBuildNumberId(buildNumber));
+        browser.refreshUntilElement(MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
-        SeleniumUtils.refreshUntilText(browser.getSelenium(), MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus, BUILD_TIMEOUT);
+        browser.refreshUntilText(MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus, BUILD_TIMEOUT);
         return buildNumber;
     }
 
@@ -322,7 +319,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         // Verify each tab in turn
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTextPresent("nosuchcommand");
-        SeleniumUtils.assertText(browser.getSelenium(), IDs.stageAgentCell(PROJECT_NAME, buildNumber, "default"), agent);
+        assertEquals(agent, browser.getText(IDs.stageAgentCell(PROJECT_NAME, buildNumber, "default")));
 
         browser.click(IDs.buildDetailsTab());
         PersonalBuildDetailedViewPage detailedViewPage = browser.createPage(PersonalBuildDetailedViewPage.class, buildNumber);

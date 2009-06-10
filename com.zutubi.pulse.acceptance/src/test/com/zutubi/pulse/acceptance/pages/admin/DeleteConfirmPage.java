@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 
@@ -15,9 +15,9 @@ public class DeleteConfirmPage extends ConfigurationPanePage
     private String path;
     private boolean hide;
 
-    public DeleteConfirmPage(Selenium selenium, Urls urls, String path, boolean hide)
+    public DeleteConfirmPage(SeleniumBrowser browser, Urls urls, String path, boolean hide)
     {
-        super(selenium, urls, "delete:" + path);
+        super(browser, urls, "delete:" + path);
         this.path = path;
         this.hide = hide;
     }
@@ -35,33 +35,23 @@ public class DeleteConfirmPage extends ConfigurationPanePage
 
     public void clickDelete()
     {
-        selenium.click(CONFIRM_LINK);
+        browser.click(CONFIRM_LINK);
     }
 
     public void clickCancel()
     {
-        selenium.click(CANCEL_LINK);
+        browser.click(CANCEL_LINK);
     }
 
     public ListPage confirmDeleteListItem()
     {
         clickDelete();
-        ListPage listPage = new ListPage(selenium, urls, PathUtils.getParentPath(path));
-        listPage.waitFor();
-        return listPage;
+        return browser.waitFor(ListPage.class, PathUtils.getParentPath(path));
     }
 
     public CompositePage confirmDeleteSingleton()
     {
         clickDelete();
-        CompositePage compositePage = new CompositePage(selenium, urls, PathUtils.getParentPath(path));
-        compositePage.waitFor();
-        return compositePage;
-    }
-
-    public ListPage cancel()
-    {
-        selenium.click(CANCEL_LINK);
-        return new ListPage(selenium, urls, PathUtils.getParentPath(path));        
+        return browser.waitFor(CompositePage.class, PathUtils.getParentPath(path));
     }
 }

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 
 /**
@@ -12,24 +11,24 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
 {
     public static final String ACTION_HIDE = "hide";
 
-    public ProjectsSummaryPage(Selenium selenium, Urls urls, String id, String title)
+    public ProjectsSummaryPage(SeleniumBrowser browser, Urls urls, String id, String title)
     {
-        super(selenium, urls, id, title);
+        super(browser, urls, id, title);
     }
 
     public boolean isUngroupedProjectPresent(String name)
     {
-        return selenium.isElementPresent(getProjectRowId(null, name));
+        return browser.isElementIdPresent(getProjectRowId(null, name));
     }
 
     public boolean isProjectPresent(String group, String name)
     {
-        return selenium.isElementPresent(getProjectRowId(group, name));
+        return browser.isElementIdPresent(getProjectRowId(group, name));
     }
 
     public boolean isGroupPresent(String group)
     {
-        return selenium.isElementPresent(getGroupId(group));
+        return browser.isElementIdPresent(getGroupId(group));
     }
 
     public String getProjectMenuId(String group, String project)
@@ -44,8 +43,8 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
 
     public void clickProjectAction(String group, String project, String action)
     {
-        selenium.click(getProjectMenuId(group, project) + "_link");
-        SeleniumUtils.waitAndClickId(selenium, getProjectActionId(group, project, action));
+        browser.click(getProjectMenuId(group, project) + "_link");
+        browser.waitAndClick(getProjectActionId(group, project, action));
     }
 
     public String getGroupActionId(String group, String action)
@@ -55,12 +54,12 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
 
     public boolean isGroupActionPresent(String group, String action)
     {
-        return selenium.isElementPresent(getGroupActionId(group, action));
+        return browser.isElementIdPresent(getGroupActionId(group, action));
     }
 
     public void clickGroupAction(String group, String action)
     {
-        selenium.click(getGroupActionId(group, action));
+        browser.click(getGroupActionId(group, action));
     }
 
     public String getGroupId(String group)
@@ -93,12 +92,12 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
     public String getBuildingSummary(String group, String templateName)
     {
         String id = getProjectRowId(group, templateName) + ".building";
-        SeleniumUtils.waitForElementId(selenium, id);
-        return selenium.getText(id);
+        browser.waitForElement(id);
+        return browser.getText(id);
     }
 
     public boolean isResponsibilityPresent(String group, String project)
     {
-        return selenium.isElementPresent(getProjectRowId(group, project) + "_fixing");
+        return browser.isElementIdPresent(getProjectRowId(group, project) + "_fixing");
     }
 }

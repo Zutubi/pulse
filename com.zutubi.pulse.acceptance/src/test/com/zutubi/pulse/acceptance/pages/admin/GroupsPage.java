@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.admin.BuiltinGroupForm;
 import com.zutubi.pulse.acceptance.forms.admin.GroupForm;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -11,15 +11,15 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class GroupsPage extends ListPage
 {
-    public GroupsPage(Selenium selenium, Urls urls)
+    public GroupsPage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, MasterConfigurationRegistry.GROUPS_SCOPE);
+        super(browser, urls, MasterConfigurationRegistry.GROUPS_SCOPE);
     }
 
     public GroupForm clickAddGroupAndWait()
     {
-        selenium.click(ADD_LINK);
-        GroupForm form = new GroupForm(selenium);
+        browser.click(ADD_LINK);
+        GroupForm form = browser.createForm(GroupForm.class);
         form.waitFor();
         return form;
     }
@@ -27,7 +27,7 @@ public class GroupsPage extends ListPage
     public GroupForm clickViewGroupAndWait(String baseName)
     {
         clickView(baseName);
-        GroupForm form = new GroupForm(selenium);
+        GroupForm form = browser.createForm(GroupForm.class);
         form.waitFor();
         return form;
     }
@@ -35,7 +35,7 @@ public class GroupsPage extends ListPage
     public BuiltinGroupForm clickViewBuiltinGroupAndWait(String baseName)
     {
         clickView(baseName);
-        BuiltinGroupForm form = new BuiltinGroupForm(selenium);
+        BuiltinGroupForm form = browser.createForm(BuiltinGroupForm.class);
         form.waitFor();
         return form;
     }

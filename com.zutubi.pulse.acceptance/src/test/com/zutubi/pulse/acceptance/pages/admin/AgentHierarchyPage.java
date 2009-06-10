@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -9,8 +9,8 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class AgentHierarchyPage extends HierarchyPage
 {
-    public AgentHierarchyPage(Selenium selenium, Urls urls, String agent, boolean template)
+    public AgentHierarchyPage(SeleniumBrowser browser, Urls urls, String agent, boolean template)
     {
-        super(selenium, urls, MasterConfigurationRegistry.AGENTS_SCOPE, agent, template);
+        super(browser, urls, MasterConfigurationRegistry.AGENTS_SCOPE, agent, template);
     }
 }

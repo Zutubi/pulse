@@ -1,8 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.IDs;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 
@@ -12,35 +11,35 @@ import com.zutubi.tove.type.record.PathUtils;
  */
 public abstract class ConfigPage extends ConfigurationPanePage
 {
-    public ConfigPage(Selenium selenium, Urls urls, String id)
+    public ConfigPage(SeleniumBrowser browser, Urls urls, String id)
     {
-        super(selenium, urls, id);
+        super(browser, urls, id);
     }
 
-    public ConfigPage(Selenium selenium, Urls urls, String id, String title)
+    public ConfigPage(SeleniumBrowser browser, Urls urls, String id, String title)
     {
-        super(selenium, urls, id, title);
+        super(browser, urls, id, title);
     }
 
     public abstract String getPath();
 
     public CompositePage clickComposite(String relativePath, String displayName)
     {
-        selenium.click(getTreeLinkLocator(displayName));
-        return new CompositePage(selenium, urls, PathUtils.getPath(getPath(), relativePath));
+        browser.click(getTreeLinkLocator(displayName));
+        return browser.createPage(CompositePage.class, PathUtils.getPath(getPath(), relativePath));
     }
 
     public ListPage clickCollection(String baseName, String displayName)
     {
-        selenium.click(getTreeLinkLocator(displayName));
-        return new ListPage(selenium, urls, PathUtils.getPath(getId(), baseName));
+        browser.click(getTreeLinkLocator(displayName));
+        return browser.createPage(ListPage.class, PathUtils.getPath(getId(), baseName));
     }
 
     public void expandTreeNode(String path)
     {
         String nodeExpression = "selenium.browserbot.getCurrentWindow().configTree.getNodeByConfigPath('" + path + "')";
-        selenium.getEval(nodeExpression + ".expand(false, false);");
-        SeleniumUtils.waitForCondition(selenium, nodeExpression + ".isExpanded();", SeleniumUtils.DEFAULT_TIMEOUT);
+        browser.evalExpression(nodeExpression + ".expand(false, false);");
+        browser.waitForCondition(nodeExpression + ".isExpanded();");
     }
 
     public String getTreeLinkLocator(String displayName)
@@ -50,7 +49,7 @@ public abstract class ConfigPage extends ConfigurationPanePage
 
     public boolean isTreeLinkPresent(String displayName)
     {
-        return selenium.isElementPresent(getTreeLinkLocator(displayName));
+        return browser.isElementPresent(getTreeLinkLocator(displayName));
     }
 
     protected String getHierarchyLocator()
@@ -60,11 +59,11 @@ public abstract class ConfigPage extends ConfigurationPanePage
 
     public boolean isCollapsedCollectionPresent()
     {
-        return selenium.isElementPresent(IDs.COLLECTION_TABLE);
+        return browser.isElementIdPresent(IDs.COLLECTION_TABLE);
     }
 
     public boolean isLinksBoxPresent()
     {
-        return selenium.isElementPresent(IDs.LINKS_BOX);
+        return browser.isElementIdPresent(IDs.LINKS_BOX);
     }
 }

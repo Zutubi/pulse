@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.StringUtils.toValidHtmlName;
@@ -16,9 +16,9 @@ public class TestSuitePage extends AbstractTestsPage
     private String suitePath;
     private long buildId;
 
-    public TestSuitePage(Selenium selenium, Urls urls, String projectName, long buildId, String stageName, String suitePath)
+    public TestSuitePage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, String stageName, String suitePath)
     {
-        super(selenium, urls, toValidHtmlName(uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests-" + uriComponentEncode(stageName) + "-" + suitePath), "build " + buildId);
+        super(browser, urls, toValidHtmlName(uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests-" + uriComponentEncode(stageName) + "-" + suitePath), "build " + buildId);
         this.projectName = projectName;
         this.stageName = stageName;
         this.suitePath = suitePath;
@@ -33,8 +33,6 @@ public class TestSuitePage extends AbstractTestsPage
     public TestSuitePage clickSuiteAndWait(String suiteName)
     {
         clickSuiteLink(suiteName);
-        TestSuitePage page = new TestSuitePage(selenium, urls, projectName, buildId, stageName, PathUtils.getPath(suitePath, suiteName));
-        page.waitFor();
-        return page;
+        return browser.waitFor(TestSuitePage.class, projectName, buildId, stageName, PathUtils.getPath(suitePath, suiteName));
     }
 }

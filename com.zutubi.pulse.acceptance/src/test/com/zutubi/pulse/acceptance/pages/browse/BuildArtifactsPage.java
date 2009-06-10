@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
@@ -13,9 +13,9 @@ public class BuildArtifactsPage extends SeleniumPage
     private String projectName;
     private long buildId;
 
-    public BuildArtifactsPage(Selenium selenium, Urls urls, String projectName, long buildId)
+    public BuildArtifactsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(selenium, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-artifacts", "build " + buildId);
+        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-artifacts", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
@@ -60,7 +60,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public boolean artifactExists(String artifactName)
     {
-        return selenium.isElementPresent(getArtifactLocator(artifactName));
+        return browser.isElementPresent(getArtifactLocator(artifactName));
     }
 
     /**
@@ -74,9 +74,9 @@ public class BuildArtifactsPage extends SeleniumPage
     {
         // look up the icon, if it is the artifact broken icon, then the artifact is
         // not available.  Is there a better way to test this via the UI?.
-        String id = selenium.getAttribute(getArtifactLocator(artifactName) + "@id");
+        String id = browser.getAttribute(getArtifactLocator(artifactName) + "@id");
         int nodeNumber = Integer.valueOf(id.substring(11));
-        String clazz = selenium.getAttribute("id=ygtvfile" + nodeNumber + "@class");
+        String clazz = browser.getAttribute("id=ygtvfile" + nodeNumber + "@class");
         return !clazz.equals("treeview_broken");
     }
 }

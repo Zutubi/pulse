@@ -2,15 +2,16 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
 /**
  * The Subversion SCM form.
  */
 public class SubversionForm extends SeleniumForm
 {
-    public SubversionForm(Selenium selenium)
+    public SubversionForm(SeleniumBrowser browser)
     {
-        super(selenium);
+        super(browser);
     }
 
     public String getFormName()

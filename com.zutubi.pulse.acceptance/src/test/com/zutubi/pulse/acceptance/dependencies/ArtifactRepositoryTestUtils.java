@@ -1,11 +1,11 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
+import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * A test utilities class that provides access to the internal artifact

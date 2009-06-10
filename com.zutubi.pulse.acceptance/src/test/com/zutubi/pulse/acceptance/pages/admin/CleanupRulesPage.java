@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 
 /**
@@ -9,8 +9,8 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class CleanupRulesPage extends ListPage
 {
-    public CleanupRulesPage(Selenium selenium, Urls urls, String path)
+    public CleanupRulesPage(SeleniumBrowser browser, Urls urls, String path)
     {
-        super(selenium, urls, path);
+        super(browser, urls, path);
     }
 }

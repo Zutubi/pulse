@@ -62,34 +62,34 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
             String pageId = page.getPageId(i);
             if(i == page.getPageNumber())
             {
-                assertFalse(browser.isElementPresent(pageId));
+                assertFalse(browser.isElementIdPresent(pageId));
             }
             else
             {
-                assertTrue(browser.isElementPresent(pageId));
+                assertTrue(browser.isElementIdPresent(pageId));
             }
         }
 
         if(page.getPageNumber() == 1)
         {
-            assertFalse(browser.isElementPresent("page.latest"));
-            assertFalse(browser.isElementPresent("page.previous"));
+            assertFalse(browser.isElementIdPresent("page.latest"));
+            assertFalse(browser.isElementIdPresent("page.previous"));
         }
         else
         {
-            assertTrue(browser.isElementPresent("page.latest"));
-            assertTrue(browser.isElementPresent("page.previous"));
+            assertTrue(browser.isElementIdPresent("page.latest"));
+            assertTrue(browser.isElementIdPresent("page.previous"));
         }
 
         if(page.getPageNumber() == pageCount)
         {
-            assertFalse(browser.isElementPresent("page.oldest"));
-            assertFalse(browser.isElementPresent("page.next"));
+            assertFalse(browser.isElementIdPresent("page.oldest"));
+            assertFalse(browser.isElementIdPresent("page.next"));
         }
         else
         {
-            assertTrue(browser.isElementPresent("page.oldest"));
-            assertTrue(browser.isElementPresent("page.next"));
+            assertTrue(browser.isElementIdPresent("page.oldest"));
+            assertTrue(browser.isElementIdPresent("page.next"));
         }
     }
 }

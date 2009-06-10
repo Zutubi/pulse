@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 
@@ -12,9 +12,9 @@ public class BuildSummaryPage extends ResponsibilityPage
     private String projectName;
     private long buildId;
 
-    public BuildSummaryPage(Selenium selenium, Urls urls, String projectName, long buildId)
+    public BuildSummaryPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(selenium, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-summary", "build " + buildId);
+        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-summary", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
@@ -31,12 +31,12 @@ public class BuildSummaryPage extends ResponsibilityPage
 
     public boolean isHookPresent(String hookName)
     {
-        return selenium.isElementPresent(getHookId(hookName));
+        return browser.isElementIdPresent(getHookId(hookName));
     }
 
     public void clickHook(String hookName)
     {
-        selenium.click(getHookId(hookName));
+        browser.click(getHookId(hookName));
     }
 
     public boolean hasTests()
@@ -46,6 +46,6 @@ public class BuildSummaryPage extends ResponsibilityPage
 
     public String getSummaryTestsColumnText()
     {
-        return selenium.getText("id="+projectName+".build."+buildId+".test");
+        return browser.getText("id="+projectName+".build."+buildId+".test");
     }
 }

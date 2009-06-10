@@ -1,10 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getAgentPort;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.SupportUtils;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.*;
+import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactory;
 import junit.extensions.TestSetup;
 
 import java.io.File;

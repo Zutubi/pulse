@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.dependencies.DependenciesTestSuite;
 import com.zutubi.pulse.acceptance.cleanup.CleanupAcceptanceTest;
 import com.zutubi.pulse.acceptance.cleanup.CleanupUIAcceptanceTest;
+import com.zutubi.pulse.acceptance.dependencies.DependenciesTestSuite;
 import junit.framework.TestSuite;
 
 public class DevAcceptanceTestSuite
@@ -11,7 +11,7 @@ public class DevAcceptanceTestSuite
     {
         TestSuite suite = new TestSuite();
         // need to run this one first as it runs through the installation setup.
-        suite.addTestSuite(SetupAcceptanceTest.class);
+//        suite.addTestSuite(SetupAcceptanceTest.class);
 
         // now we can run the rest of the tests.
 

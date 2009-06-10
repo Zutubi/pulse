@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -11,14 +10,14 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public abstract class ConfigurationPanePage extends SeleniumPage
 {
-    public ConfigurationPanePage(Selenium selenium, Urls urls, String id)
+    public ConfigurationPanePage(SeleniumBrowser browser, Urls urls, String id)
     {
-        super(selenium, urls, id);
+        super(browser, urls, id);
     }
 
-    public ConfigurationPanePage(Selenium selenium, Urls urls, String id, String title)
+    public ConfigurationPanePage(SeleniumBrowser browser, Urls urls, String id, String title)
     {
-        super(selenium, urls, id, title);
+        super(browser, urls, id, title);
     }
 
     public void waitFor()
@@ -29,6 +28,6 @@ public abstract class ConfigurationPanePage extends SeleniumPage
 
     protected void waitForActionToComplete()
     {
-        SeleniumUtils.waitForVariable(selenium, "actionInProgress", SeleniumUtils.DEFAULT_TIMEOUT, true);
+        browser.waitForVariable("actionInProgress", true);
     }
 }

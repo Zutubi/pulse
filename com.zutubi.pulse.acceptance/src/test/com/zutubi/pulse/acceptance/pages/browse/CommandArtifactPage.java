@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -16,9 +16,9 @@ public class CommandArtifactPage extends SeleniumPage
     private String commandName;
     private String artifactPath;
 
-    public CommandArtifactPage(Selenium selenium, Urls urls, String projectName, long buildId, String stageName, String commandName, String artifactPath)
+    public CommandArtifactPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, String stageName, String commandName, String artifactPath)
     {
-        super(selenium, urls, "decorated", "artifact " + artifactPath);
+        super(browser, urls, "decorated", "artifact " + artifactPath);
         this.projectName = projectName;
         this.buildId = buildId;
         this.stageName = stageName;

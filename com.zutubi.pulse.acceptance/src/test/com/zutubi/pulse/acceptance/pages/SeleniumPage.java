@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 
@@ -13,7 +12,7 @@ public abstract class SeleniumPage
 {
     public static final String TITLE_PREFIX = ":: pulse :: ";
 
-    protected Selenium selenium;
+    protected SeleniumBrowser browser;
     /**
      * Used to determine urls for the page.
      */
@@ -29,14 +28,14 @@ public abstract class SeleniumPage
      */
     private String title;
 
-    public SeleniumPage(Selenium selenium, Urls urls, String id)
+    public SeleniumPage(SeleniumBrowser browser, Urls urls, String id)
     {
-        this(selenium, urls, id, null);
+        this(browser, urls, id, null);
     }
 
-    public SeleniumPage(Selenium selenium, Urls urls, String id, String title)
+    public SeleniumPage(SeleniumBrowser browser, Urls urls, String id, String title)
     {
-        this.selenium = selenium;
+        this.browser = browser;
         this.urls = urls;
         this.title = title;
         this.id = id;
@@ -64,7 +63,7 @@ public abstract class SeleniumPage
      */
     public void open()
     {
-        selenium.open(getUrl());
+        browser.open(getUrl());
     }
 
     /**
@@ -74,12 +73,12 @@ public abstract class SeleniumPage
      */
     public void waitFor()
     {
-        SeleniumUtils.waitForElementId(selenium, id);
+        browser.waitForElement(id);
     }
 
     public boolean isPresent()
     {
-        return selenium.isElementPresent("id=" + StringUtils.toValidHtmlName(id));
+        return browser.isElementPresent("id=" + StringUtils.toValidHtmlName(id));
     }
 
     public String getTitle()

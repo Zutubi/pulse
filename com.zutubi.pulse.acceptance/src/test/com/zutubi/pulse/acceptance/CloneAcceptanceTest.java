@@ -104,7 +104,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(path));
         String baseName = PathUtils.getBaseName(path);
         assertTrue(labelsPage.isItemPresent(baseName));
-        assertEquals(expectedAvailable, browser.isElementPresent(labelsPage.getActionId(ListPage.ACTION_CLONE, baseName)));
+        assertEquals(expectedAvailable, browser.isElementIdPresent(labelsPage.getActionId(ListPage.ACTION_CLONE, baseName)));
     }
 
     public void testCloneMapItem() throws Exception
@@ -334,7 +334,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         doSmartClone();
 
-        browser.goTo(urls.adminProject(random) + Constants.Project.HOOKS + "/stagey");
+        browser.open(urls.adminProject(random) + Constants.Project.HOOKS + "/stagey");
         ConfigurationForm hookForm = browser.createForm(ConfigurationForm.class, PostStageHookConfiguration.class);
         hookForm.waitFor();
 

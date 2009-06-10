@@ -339,7 +339,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         ListPage hooksPage = browser.openAndWaitFor(ListPage.class, getHooksPath(projectName));
         hooksPage.clickAdd();
 
-        SelectTypeState hookType = new SelectTypeState(browser.getSelenium());
+        SelectTypeState hookType = new SelectTypeState(browser);
         hookType.waitFor();
         assertEquals(Arrays.asList("zutubi.manualBuildHookConfig", "zutubi.postBuildHookConfig", "zutubi.postStageHookConfig", "zutubi.preBuildHookConfig"), hookType.getSortedOptionList());
         hookType.nextFormElements(symbolicName);
@@ -353,7 +353,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     private void selectFromAllTasks()
     {
-        SelectTypeState taskType = new SelectTypeState(browser.getSelenium());
+        SelectTypeState taskType = new SelectTypeState(browser);
         taskType.waitFor();
         assertEquals(Arrays.asList("zutubi.emailCommittersTaskConfig", "zutubi.runExecutableTaskConfig", "zutubi.tagTaskConfig"), taskType.getSortedOptionList());
         taskType.nextFormElements("zutubi.runExecutableTaskConfig");
@@ -361,7 +361,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     private void selectFromStageTasks()
     {
-        SelectTypeState taskType = new SelectTypeState(browser.getSelenium());
+        SelectTypeState taskType = new SelectTypeState(browser);
         taskType.waitFor();
         assertEquals(Arrays.asList("zutubi.runExecutableTaskConfig", "zutubi.tagTaskConfig"), taskType.getSortedOptionList());
         taskType.nextFormElements("zutubi.runExecutableTaskConfig");

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import com.zutubi.pulse.acceptance.plugins.PluginUpgradeManagerAcceptanceTest;
 import com.zutubi.pulse.acceptance.plugins.PostProcessorPluginAcceptanceTest;
 import com.zutubi.pulse.acceptance.support.jython.JythonPackageFactoryTest;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Collection of all acceptance tests, mainly required to ensure the setup

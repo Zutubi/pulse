@@ -75,7 +75,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
         page.clickAction(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY);
 
-        TakeResponsibilityDialog dialog = new TakeResponsibilityDialog(browser.getSelenium());
+        TakeResponsibilityDialog dialog = new TakeResponsibilityDialog(browser);
         dialog.waitFor();
         dialog.typeComment(TEST_COMMENT);
         dialog.clickOk();

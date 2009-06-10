@@ -1,8 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 
@@ -14,9 +13,9 @@ public class BuildDetailedViewPage extends SeleniumPage
     private String projectName;
     private long buildId;
     
-    public BuildDetailedViewPage(Selenium selenium, Urls urls, String projectName, long buildId)
+    public BuildDetailedViewPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(selenium, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-detailed", StringUtils.uriComponentEncode(projectName));
+        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-detailed", StringUtils.uriComponentEncode(projectName));
         this.projectName = projectName;
         this.buildId = buildId;
     }
@@ -28,7 +27,7 @@ public class BuildDetailedViewPage extends SeleniumPage
 
     public void clickCommand(String stageName, String commandName)
     {
-        selenium.click("xpath=//li[@id='stage-" + stageName + "-command-" + commandName + "']/a");
+        browser.click("xpath=//li[@id='stage-" + stageName + "-command-" + commandName + "']/a");
     }
 
     /**
@@ -38,14 +37,13 @@ public class BuildDetailedViewPage extends SeleniumPage
      */
     public boolean isBuildLogLinkPresent()
     {
-        String logLinkId = getLogLinkId();
-        return SeleniumUtils.isLinkPresent(selenium, logLinkId);
+        return browser.isLinkPresent(getLogLinkId());
     }
 
     public void clickBuildLogLink()
     {
-        selenium.click("id=" + getLogLinkId());
-        selenium.waitForPageToLoad("10000");
+        browser.click("id=" + getLogLinkId());
+        browser.waitForPageToLoad();
     }
 
     private String getLogLinkId()

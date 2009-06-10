@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
 
@@ -16,9 +15,9 @@ public class CompositePage extends ConfigPage
 
     private String path;
 
-    public CompositePage(Selenium selenium, Urls urls, String path)
+    public CompositePage(SeleniumBrowser browser, Urls urls, String path)
     {
-        super(selenium, urls, path);
+        super(browser, urls, path);
         this.path = path;
     }
 
@@ -34,17 +33,17 @@ public class CompositePage extends ConfigPage
 
     public boolean isConfigureLinkPresent()
     {
-        return SeleniumUtils.isLinkPresent(selenium, CONFIGURE_LINK);
+        return browser.isLinkPresent(CONFIGURE_LINK);
     }
 
     public boolean isConfiguredDescendentPresent(String descendent)
     {
-        return selenium.isElementPresent(StringUtils.toValidHtmlName("cd-" + descendent));
+        return browser.isElementIdPresent(StringUtils.toValidHtmlName("cd-" + descendent));
     }
 
     public void clickConfigure()
     {
-        selenium.click(CONFIGURE_LINK);
+        browser.click(CONFIGURE_LINK);
     }
 
     public String getActionId(String action)
@@ -54,18 +53,18 @@ public class CompositePage extends ConfigPage
 
     public boolean isActionPresent(String action)
     {
-        return selenium.isElementPresent(getActionId(action));
+        return browser.isElementIdPresent(getActionId(action));
     }
 
     public void clickAction(String action)
     {
-        selenium.click(getActionId(action));
+        browser.click(getActionId(action));
     }
 
     public void clickActionAndWait(String action)
     {
         clickAction(action);
-        SeleniumUtils.waitForVariable(selenium, "actionInProgress", SeleniumUtils.DEFAULT_TIMEOUT, true);
+        browser.waitForVariable("actionInProgress", true);
         waitFor();
     }
 
@@ -76,7 +75,7 @@ public class CompositePage extends ConfigPage
 
     public boolean isStatePresent()
     {
-        return selenium.isElementPresent(getStateId());
+        return browser.isElementIdPresent(getStateId());
     }
 
     public String getStateFieldId(String name)
@@ -86,12 +85,12 @@ public class CompositePage extends ConfigPage
 
     public boolean isStateFieldPresent(String field)
     {
-        return selenium.isElementPresent(getStateFieldId(field));
+        return browser.isElementIdPresent(getStateFieldId(field));
     }
 
     public String getStateField(String name)
     {
-        return selenium.getText(getStateFieldId(name));
+        return browser.getText(getStateFieldId(name));
     }
 
     public String getErrorsId()
@@ -101,22 +100,22 @@ public class CompositePage extends ConfigPage
 
     public boolean areNestedErrorsPresent()
     {
-        return selenium.isElementPresent(getErrorsId());
+        return browser.isElementIdPresent(getErrorsId());
     }
 
     public boolean isLinksBoxPresent()
     {
-        return selenium.isElementPresent("config.links");
+        return browser.isElementIdPresent("config.links");
     }
 
     public boolean isLinkPresent(String name)
     {
-        return selenium.isElementPresent(getLinkId(name));
+        return browser.isElementIdPresent(getLinkId(name));
     }
 
     public void clickLink(String name)
     {
-        selenium.click(getLinkId(name));
+        browser.click(getLinkId(name));
     }
 
     private String getLinkId(String name)

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.dashboard;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.browse.EnvironmentArtifactPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -9,9 +9,9 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class PersonalEnvironmentArtifactPage extends EnvironmentArtifactPage
 {
-    public PersonalEnvironmentArtifactPage(Selenium selenium, Urls urls, String projectName, long buildId, String stageName, String commandName)
+    public PersonalEnvironmentArtifactPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, String stageName, String commandName)
     {
-        super(selenium, urls, projectName, buildId, stageName, commandName);
+        super(browser, urls, projectName, buildId, stageName, commandName);
     }
 
     public String getUrl()

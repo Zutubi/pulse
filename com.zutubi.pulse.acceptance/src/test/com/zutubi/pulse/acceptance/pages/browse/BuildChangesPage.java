@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
@@ -34,9 +33,9 @@ public class BuildChangesPage extends SeleniumPage
     private String projectName;
     private long buildId;
 
-    public BuildChangesPage(Selenium selenium, Urls urls, String projectName, long buildId)
+    public BuildChangesPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(selenium, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-changes", "build " + buildId);
+        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-changes", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
@@ -53,12 +52,12 @@ public class BuildChangesPage extends SeleniumPage
 
     public boolean hasChanges()
     {
-        return selenium.isElementPresent(ID_CHANGELIST_TABLE);
+        return browser.isElementIdPresent(ID_CHANGELIST_TABLE);
     }
 
     public String getChangesHeader()
     {
-        return SeleniumUtils.getCellContents(selenium, ID_CHANGELIST_TABLE, 0, 0);
+        return browser.getCellContents(ID_CHANGELIST_TABLE, 0, 0);
     }
 
     private String getChangelistRowId(int changeNumber)
@@ -74,7 +73,7 @@ public class BuildChangesPage extends SeleniumPage
     public int getChangeCount()
     {
         int count = 1;
-        while (selenium.isElementPresent(getChangelistRowId(count)))
+        while (browser.isElementIdPresent(getChangelistRowId(count)))
         {
             count++;
         }
@@ -85,7 +84,7 @@ public class BuildChangesPage extends SeleniumPage
     public int getFilesCount(int changeNumber)
     {
         int count = 1;
-        while (selenium.isElementPresent(getChangelistFileId(changeNumber, count)))
+        while (browser.isElementIdPresent(getChangelistFileId(changeNumber, count)))
         {
             count++;
         }
@@ -95,7 +94,7 @@ public class BuildChangesPage extends SeleniumPage
 
     public List<Long> getChangeIds()
     {
-        List<String> viewIdStrings = CollectionUtils.filter(selenium.getAllLinks(), new Predicate<String>()
+        List<String> viewIdStrings = CollectionUtils.filter(browser.getAllLinks(), new Predicate<String>()
         {
             public boolean satisfied(String s)
             {
@@ -122,7 +121,7 @@ public class BuildChangesPage extends SeleniumPage
             int filesCount = getFilesCount(i + 1);
             for (int j = 0; j < filesCount; j++)
             {
-                String fileString = selenium.getText(getChangelistFileId(i + 1, j + 1));
+                String fileString = browser.getText(getChangelistFileId(i + 1, j + 1));
                 Matcher matcher = FILE_CHANGE_PATTERN.matcher(fileString);
                 if (!matcher.matches())
                 {
@@ -135,10 +134,10 @@ public class BuildChangesPage extends SeleniumPage
 
             int row = i * 3 + 2;
             Changelist changelist = new Changelist(
-                    new Revision(SeleniumUtils.getCellContents(selenium, ID_CHANGELIST_TABLE, row, 0)),
+                    new Revision(browser.getCellContents(ID_CHANGELIST_TABLE, row, 0)),
                     0,
-                    SeleniumUtils.getCellContents(selenium, ID_CHANGELIST_TABLE, row, 1),
-                    SeleniumUtils.getCellContents(selenium, ID_CHANGELIST_TABLE, row, 3),
+                    browser.getCellContents(ID_CHANGELIST_TABLE, row, 1),
+                    browser.getCellContents(ID_CHANGELIST_TABLE, row, 3),
                     fileChanges
             );
 

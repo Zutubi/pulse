@@ -1,13 +1,11 @@
 package com.zutubi.pulse.acceptance.pages.dashboard;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.user.ResponsibilityModel;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
-import static com.zutubi.util.Constants.SECOND;
 
 /**
  * The dashboard page shows a user's configurable dashboard.
@@ -16,9 +14,9 @@ public class DashboardPage extends ProjectsSummaryPage
 {
     private static final String ID_RESPONSIBILITIES = "responsibilities";
 
-    public DashboardPage(Selenium selenium, Urls urls)
+    public DashboardPage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, "dashboard-content", "dashboard");
+        super(browser, urls, "dashboard-content", "dashboard");
     }
 
     public String getUrl()
@@ -30,7 +28,7 @@ public class DashboardPage extends ProjectsSummaryPage
     public void waitFor()
     {
         super.waitFor();
-        SeleniumUtils.waitForVariable(selenium, "view.initialised", 30 * SECOND);
+        browser.waitForVariable("view.initialised");
     }
 
     public void hideGroupAndWait(String group)
@@ -41,13 +39,13 @@ public class DashboardPage extends ProjectsSummaryPage
         // continue to test the link itself on non-Windows systems.
         if (SystemUtils.IS_WINDOWS)
         {
-            selenium.open(urls.base() + "user/hideDashboardGroup.action?groupName=" + StringUtils.formUrlEncode(group));
+            browser.open(urls.base() + "user/hideDashboardGroup.action?groupName=" + StringUtils.formUrlEncode(group));
         }
         else
         {
             clickGroupAction(group, ACTION_HIDE);
         }
-        selenium.waitForPageToLoad("30000");
+        browser.waitForPageToLoad();
         waitFor();
     }
 
@@ -56,34 +54,34 @@ public class DashboardPage extends ProjectsSummaryPage
         // As above, a workaround for Selenium/IE issues.
         if (SystemUtils.IS_WINDOWS)
         {
-            selenium.open(urls.base() + "user/hideDashboardProject.action?projectName=" + StringUtils.formUrlEncode(project));
+            browser.open(urls.base() + "user/hideDashboardProject.action?projectName=" + StringUtils.formUrlEncode(project));
         }
         else
         {
             clickProjectAction(group, project, ACTION_HIDE);
         }
-        selenium.waitForPageToLoad("30000");
+        browser.waitForPageToLoad();
         waitFor();
     }
 
     public boolean hasResponsibilities()
     {
-        return selenium.isElementPresent(ID_RESPONSIBILITIES);
+        return browser.isElementIdPresent(ID_RESPONSIBILITIES);
     }
 
     public boolean hasResponsibility(String project)
     {
-        return selenium.isElementPresent(ResponsibilityModel.getResponsibilityId(project));
+        return browser.isElementIdPresent(ResponsibilityModel.getResponsibilityId(project));
     }
 
     public void clearResponsibility(String project)
     {
-        selenium.click(getClearResponsibilityId(project));
+        browser.click(getClearResponsibilityId(project));
     }
 
     public boolean isClearResponsibilityPresent(String project)
     {
-        return selenium.isElementPresent(getClearResponsibilityId(project));
+        return browser.isElementIdPresent(getClearResponsibilityId(project));
     }
 
     private String getClearResponsibilityId(String project)

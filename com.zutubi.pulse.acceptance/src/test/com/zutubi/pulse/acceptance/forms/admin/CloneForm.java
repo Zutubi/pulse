@@ -2,10 +2,11 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.webwork.CloneAction;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Form used for cloning map items and template collection items.
@@ -15,9 +16,9 @@ public class CloneForm extends SeleniumForm
     private boolean smart;
     private List<String> descendents = new LinkedList<String>();
 
-    public CloneForm(Selenium selenium, boolean smart)
+    public CloneForm(SeleniumBrowser browser, boolean smart)
     {
-        super(selenium);
+        super(browser);
         this.smart = smart;
     }
 

@@ -2,10 +2,11 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.Sort;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A form for a type selection state in a wizard.
@@ -14,9 +15,9 @@ public class SelectTypeState extends SeleniumForm
 {
     private static final String FIELD_NAME_SELECT = "wizard.select";
 
-    public SelectTypeState(Selenium selenium)
+    public SelectTypeState(SeleniumBrowser browser)
     {
-        super(selenium);
+        super(browser);
     }
 
     public String getFormName()

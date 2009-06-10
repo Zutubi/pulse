@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.server;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -14,14 +13,14 @@ public class ServerMessagesPage extends SeleniumPage
 
     private int page = 1;
 
-    public ServerMessagesPage(Selenium selenium, Urls urls)
+    public ServerMessagesPage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, "server.messages.0", "server messages");
+        super(browser, urls, "server.messages.0", "server messages");
     }
 
-    public ServerMessagesPage(Selenium selenium, Urls urls, int page)
+    public ServerMessagesPage(SeleniumBrowser browser, Urls urls, int page)
     {
-        super(selenium, urls, "server.messages." + Integer.toString(page - 1), "server messages");
+        super(browser, urls, "server.messages." + Integer.toString(page - 1), "server messages");
         this.page = page;
     }
 
@@ -49,13 +48,13 @@ public class ServerMessagesPage extends SeleniumPage
 
     public ServerMessagesPage clickPage(int page)
     {
-        selenium.click(getPageId(page));
-        return new ServerMessagesPage(selenium, urls, page);
+        browser.click(getPageId(page));
+        return browser.createPage(ServerMessagesPage.class, page);
     }
 
     public String getMessagesCountText()
     {
-        SeleniumUtils.waitForElementId(selenium, ID_MESSAGES_COUNT);
-        return selenium.getText(ID_MESSAGES_COUNT);
+        browser.waitForElement(ID_MESSAGES_COUNT);
+        return browser.getText(ID_MESSAGES_COUNT);
     }
 }

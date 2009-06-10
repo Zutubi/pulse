@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
@@ -11,9 +12,9 @@ public class UserForm extends ConfigurationForm
 {
     private String user;
 
-    public UserForm(Selenium selenium, String user)
+    public UserForm(SeleniumBrowser browser, String user)
     {
-        super(selenium, UserConfiguration.class);
+        super(browser, UserConfiguration.class);
         this.user = user;
     }
 

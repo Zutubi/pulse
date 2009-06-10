@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.forms;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;
@@ -22,31 +22,32 @@ public abstract class SeleniumForm
     public static final int MULTI_SELECT   = 8;
     public static final int ITEM_PICKER    = 9;
 
+    protected SeleniumBrowser browser;
     protected Selenium selenium;
     protected boolean inherited = false;
     protected boolean ajax = true;
 
-    protected SeleniumForm(Selenium selenium)
+    protected SeleniumForm(SeleniumBrowser browser)
     {
-        this.selenium = selenium;
+        this.browser = browser;
     }
 
-    protected SeleniumForm(Selenium selenium, boolean ajax)
+    protected SeleniumForm(SeleniumBrowser browser, boolean ajax)
     {
-        this.selenium = selenium;
+        this.browser = browser;
         this.ajax = ajax;
     }
 
-    public SeleniumForm(Selenium selenium, boolean ajax, boolean inherited)
+    public SeleniumForm(SeleniumBrowser browser, boolean ajax, boolean inherited)
     {
-        this.selenium = selenium;
+        this.browser = browser;
         this.ajax = ajax;
         this.inherited = inherited;
     }
 
-    public Selenium getSelenium()
+    public SeleniumBrowser getSelenium()
     {
-        return selenium;
+        return browser;
     }
 
     public boolean isAjax()
@@ -58,12 +59,12 @@ public abstract class SeleniumForm
     {
         // Wait for the last field as the forms are lazily rendered
         String[] fields = getActualFieldNames();
-        SeleniumUtils.waitForElementId(selenium, getFieldId(fields[fields.length - 1]));
+        browser.waitForElement(getFieldId(fields[fields.length - 1]));
     }
 
     public boolean isFormPresent()
     {
-        return selenium.isElementPresent(getFormName());
+        return browser.isElementIdPresent(getFormName());
     }
 
     public String getFieldId(String name)
@@ -73,12 +74,12 @@ public abstract class SeleniumForm
 
     public boolean isAnnotationPresent(String fieldName, String annotation)
     {
-        return selenium.isElementPresent(getFieldId(fieldName) + "." + annotation);
+        return browser.isElementIdPresent(getFieldId(fieldName) + "." + annotation);
     }
 
     public boolean isEditable(String fieldName)
     {
-        return selenium.isEditable(getFieldId(fieldName));
+        return browser.isEditable(getFieldId(fieldName));
     }
 
     public boolean isMarkedRequired(String fieldName)
@@ -104,7 +105,7 @@ public abstract class SeleniumForm
 
     public String[] getSelectOptions(String name)
     {
-        return selenium.getSelectOptions(getFieldId(name));
+        return browser.getSelectOptions(getFieldId(name));
     }
 
     public String[] getComboBoxOptions(String name)
@@ -116,7 +117,7 @@ public abstract class SeleniumForm
                         "return values; " +
                     "}(); " +
                     "result";
-        return selenium.getEval(js).split(",");
+        return browser.evalExpression(js).split(",");
     }
 
     public void submitNamedFormElements(String submitValue, Pair<String, String>... fieldValues)
@@ -195,14 +196,14 @@ public abstract class SeleniumForm
 
     private void submit(String id)
     {
-        selenium.click("zfid." + id);
+        browser.click("zfid." + id);
         if (ajax)
         {
-            SeleniumUtils.waitForVariable(selenium, "formSubmitting", SeleniumUtils.DEFAULT_TIMEOUT, true);
+            browser.waitForVariable("formSubmitting", true);
         }
         else
         {
-            selenium.waitForPageToLoad("60000");
+            browser.waitForPageToLoad();
         }
     }
 
@@ -225,9 +226,9 @@ public abstract class SeleniumForm
         {
             case ITEM_PICKER:
             case MULTI_SELECT:
-                return selenium.getEval("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(name) + "').getValue();");
+                return browser.evalExpression("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(name) + "').getValue();");
             default:
-                return selenium.getValue(getFieldId(name));
+                return browser.getValue(getFieldId(name));
         }
     }
 
@@ -245,7 +246,7 @@ public abstract class SeleniumForm
             switch (type)
             {
                 case TEXTFIELD:
-                    selenium.type(id, value);
+                    browser.type(id, value);
                     break;
                 case COMBOBOX:
                     setComponentValue(id, "'" + value + "'");
@@ -279,7 +280,7 @@ public abstract class SeleniumForm
         // Custom Ext widgets are tricky to manage.  Since we are
         // not testing the widgets themselves, just go direct to
         // the setValue method.
-        selenium.getEval("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "'); field.setValue(" + value + "); field.form.updateButtons()");
+        browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "'); field.setValue(" + value + "); field.form.updateButtons()");
     }
 
     private int getFieldType(String name)
@@ -314,7 +315,7 @@ public abstract class SeleniumForm
         // selenium doesn't work :|.
         if (names.length > 0)
         {
-            selenium.getEval("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(names[0]) + "'); field.form.updateButtons()");
+            browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(names[0]) + "'); field.form.updateButtons()");
         }
     }
 
@@ -339,7 +340,7 @@ public abstract class SeleniumForm
         String fieldLocator = getFieldId(name);
         for(String value: set)
         {
-            selenium.addSelection(fieldLocator, "value=" + value);
+            browser.addSelection(fieldLocator, "value=" + value);
         }
     }
 

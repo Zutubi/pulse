@@ -1,18 +1,14 @@
 package com.zutubi.pulse.acceptance.support.jython;
 
 import com.sun.script.jython.JythonScriptEngine;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
+import com.zutubi.util.io.IOUtils;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 
 /**
  * A jython implementation of the PackageFactory interface that returns handles that

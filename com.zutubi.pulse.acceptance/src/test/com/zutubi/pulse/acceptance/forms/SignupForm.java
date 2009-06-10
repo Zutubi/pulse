@@ -2,15 +2,16 @@ package com.zutubi.pulse.acceptance.forms;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
 /**
  * Anonymous self-signup form.
  */
 public class SignupForm extends SeleniumForm
 {
-    public SignupForm(Selenium selenium)
+    public SignupForm(SeleniumBrowser browser)
     {
-        super(selenium, false);
+        super(browser, false);
     }
 
     public String getFormName()

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.server;
 
-import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -9,9 +9,9 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class ServerActivityPage extends SeleniumPage
 {
-    public ServerActivityPage(Selenium selenium, Urls urls)
+    public ServerActivityPage(SeleniumBrowser browser, Urls urls)
     {
-        super(selenium, urls, "server.activity", "server activity");
+        super(browser, urls, "server.activity", "server activity");
     }
 
     public String getUrl()

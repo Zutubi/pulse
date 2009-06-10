@@ -1,84 +1,73 @@
 package com.zutubi.pulse.acceptance.windows;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.SeleniumUtils;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
-import com.zutubi.util.Condition;
-
-import java.util.Arrays;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
 /**
  * The browse scm popup window.
  */
 public class BrowseScmWindow
 {
-    private Selenium selenium;
+    private SeleniumBrowser browser;
     private String windowName = "Browse SCM";
     private String originalWindow = null;
 
-    public BrowseScmWindow(Selenium selenium)
+    public BrowseScmWindow(SeleniumBrowser browser)
     {
-        this.selenium = selenium;
+        this.browser = browser;
     }
 
     public boolean isWindowPresent()
     {
-        return Arrays.asList(selenium.getAllWindowTitles()).contains(windowName);
+        return browser.isWindowPresent(windowName);
     }
 
     public void waitForWindow()
     {
-        waitForCondition(new Condition()
-        {
-            public boolean satisfied()
-            {
-                return isWindowPresent();
-            }
-        }, SeleniumUtils.DEFAULT_TIMEOUT, "Timeout waiting for " + windowName + " window.");
+        browser.waitForWindow(windowName);
     }
 
     public void selectWindow()
     {
         waitForWindow();
 
-        originalWindow = selenium.getTitle();
-        selenium.selectWindow(windowName);
+        originalWindow = browser.getTitle();
+        browser.selectWindow(windowName);
     }
 
     public void clickOkay()
     {
         // would be quicker if we add an id to the field?
-        selenium.click("//form[@name='form']//input[@value='okay']");
-        selenium.selectWindow(originalWindow);
+        browser.click("//form[@name='form']//input[@value='okay']");
+        browser.selectWindow(originalWindow);
         originalWindow = null;
     }
 
     public void clickCancel()
     {
         // would be quicker if we add an id to the field? 
-        selenium.click("//form[@name='form']//input[@value='cancel']");
-        selenium.selectWindow(originalWindow);
+        browser.click("//form[@name='form']//input[@value='cancel']");
+        browser.selectWindow(originalWindow);
         originalWindow = null;
     }
 
     public void selectNode(String path)
     {
-        selenium.click(toSelector(path));
+        browser.click(toSelector(path));
     }
 
     public void waitForNode(String path)
     {
-        SeleniumUtils.waitForLocator(selenium, toSelector(path));
+        browser.waitForLocator(toSelector(path));
     }
 
     public boolean isNodePresent(String path)
     {
-        return selenium.isElementPresent(toSelector(path));
+        return browser.isElementPresent(toSelector(path));
     }
 
     public void doubleClickNode(String path)
     {
-        selenium.doubleClick(toSelector(path));
+        browser.doubleClick(toSelector(path));
     }
 
     public void expandPath(String... path)

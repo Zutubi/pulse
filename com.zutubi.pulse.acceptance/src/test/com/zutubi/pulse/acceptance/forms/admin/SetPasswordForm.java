@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 
 /**
@@ -9,8 +10,8 @@ import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
  */
 public class SetPasswordForm extends ConfigurationForm
 {
-    public SetPasswordForm(Selenium selenium)
+    public SetPasswordForm(SeleniumBrowser browser)
     {
-        super(selenium, SetPasswordConfiguration.class);
+        super(browser, SetPasswordConfiguration.class);
     }
 }

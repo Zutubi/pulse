@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.util.Constants.SECOND;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.CAPTURES;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryOutput.BASE;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Output.POSTPROCESSORS;
@@ -12,8 +11,6 @@ import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static com.zutubi.pulse.acceptance.Constants.*;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.getIvyFile;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_RELEASE;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -23,6 +20,8 @@ import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Changelist;
@@ -39,11 +38,9 @@ import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTrigge
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.TextUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.Constants.SECOND;
+import com.zutubi.util.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import org.tmatesoft.svn.core.SVNCommitInfo;
@@ -64,6 +61,8 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import junit.framework.*;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -425,10 +424,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTrue(permalink.contains("/downloads/"));
 
         loginAsAdmin();
-        browser.goTo(permalink + "/output.txt");
+        browser.open(permalink + "/output.txt");
         browser.waitForPageToLoad(30 * SECOND);
 
-        assertTrue(browser.bodyTextContains("BUILD SUCCESSFUL"));
+        assertTrue(browser.getBodyText().contains("BUILD SUCCESSFUL"));
     }
 
     public void testManualTriggerBuildWithPrompt() throws Exception
@@ -687,8 +686,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         browser.openAndWaitFor(ProjectHomePage.class, projectName);
 
         String statusId = IDs.buildStatusCell(projectName, 1);
-        SeleniumUtils.refreshUntilElement(browser.getSelenium(), statusId, BUILD_TIMEOUT);
-        SeleniumUtils.refreshUntilText(browser.getSelenium(), statusId, "success", BUILD_TIMEOUT);
-        SeleniumUtils.assertText(browser.getSelenium(), IDs.stageAgentCell(projectName, 1, "default"), agent);
+        browser.refreshUntilElement(statusId, BUILD_TIMEOUT);
+        browser.refreshUntilText(statusId, "success", BUILD_TIMEOUT);
+
+        assertEquals(agent, browser.getText(StringUtils.toValidHtmlName(IDs.stageAgentCell(projectName, 1, "default"))));
     }
 }

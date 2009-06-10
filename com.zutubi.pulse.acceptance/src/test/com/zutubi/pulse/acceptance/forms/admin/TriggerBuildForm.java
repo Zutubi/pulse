@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.Pair;
 
 import java.util.LinkedList;
@@ -18,9 +19,9 @@ public class TriggerBuildForm extends SeleniumForm
      */
     private List<String> propertyNames = new LinkedList<String>();
 
-    public TriggerBuildForm(Selenium selenium)
+    public TriggerBuildForm(SeleniumBrowser browser)
     {
-        super(selenium, false);
+        super(browser, false);
     }
 
     public void addProperty(String name)

@@ -145,7 +145,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
         assertTrue(typePage.isConfigureLinkPresent());
         typePage.clickConfigure();
 
-        SelectTypeState state = new SelectTypeState(browser.getSelenium());
+        SelectTypeState state = new SelectTypeState(browser);
         state.waitFor();
         state.nextFormElements("zutubi.multiRecipeTypeConfig");
 

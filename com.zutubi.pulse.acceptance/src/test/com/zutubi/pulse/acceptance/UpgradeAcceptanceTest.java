@@ -114,7 +114,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         File configDir = new File(tmpDir, "config");
         if (!configDir.exists() && !configDir.mkdirs())
         {
-            // is this a fatal issue?.
+            fail("Failed to create config directory: " + configDir);
         }
         FileSystemUtils.copy(configDir, configFile);
 
@@ -203,7 +203,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         File configDir = new File(tmpDir, "config");
         if (!configDir.exists() && !configDir.mkdirs())
         {
-            // is this a fatal issue?.
+            fail("Failed to create config directory: " + configDir);
         }
         propFile = new File(configDir, "database.properties");
         props = new Properties();
@@ -266,7 +266,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
         Thread.sleep(30000);
 
-        browser.goTo("/");
+        browser.open("/");
 
         browser.waitForElement("upgrade.preview", 120 * SECOND);
 
