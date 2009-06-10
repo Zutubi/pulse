@@ -1883,6 +1883,7 @@ public class RemoteApi
      * @return the ID that will be assigned to the next build of the given project
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires view permission for the given project
+     * @see #setNextBuildNumber(String, String, String) 
      */
     public int getNextBuildNumber(String token, String projectName)
     {
@@ -1896,6 +1897,54 @@ public class RemoteApi
         {
             tokenManager.logoutUser();
         }
+    }
+
+    /**
+     * Sets the next build number for the given project.  This number will be used for the next
+     * build of the project, and the numbers will continue to increment from there.  Note that the
+     * number cannot be decreased - build numbers for later builds must always be higher than those
+     * for earlier builds.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project to set the next build number for
+     * @param number      the next build number to set - must be greater than the largest build ID
+     *                    used by the project so far
+     * @return true
+     * @throws IllegalArgumentException if the given project name is invalid or the given number is
+     *                                  not greater than the largest id for the project
+     * @throws NumberFormatException    if the given number string cannot be parsed as a number
+     * @access requires write permission for the given project
+     * @see #getNextBuildNumber(String, String)
+     */
+    public boolean setNextBuildNumber(String token, String projectName, String number)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long n = Long.parseLong(number);
+            Project project = internalGetProject(projectName, true);
+            projectManager.lockProjectState(project.getId());
+            try
+            {
+                if (project.getNextBuildNumber() > n)
+                {
+                    throw new IllegalArgumentException("The given build number '" + number + "' is not large enough (build numbers must always increase)");
+                }
+
+                project.setNextBuildNumber(n);
+                projectManager.save(project);
+            }
+            finally
+            {
+                projectManager.unlockProjectState(project.getId());
+            }
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+
+        return true;
     }
 
     /**

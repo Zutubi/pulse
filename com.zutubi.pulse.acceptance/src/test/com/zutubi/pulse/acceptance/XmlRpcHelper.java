@@ -535,7 +535,12 @@ public class XmlRpcHelper
     {
         return (Integer) call("getNextBuildNumber", projectName);
     }
-    
+
+    public void setNextBuildNumber(String projectName, long number) throws Exception
+    {
+        call("setNextBuildNumber", projectName, Long.toString(number));
+    }
+
     public void triggerBuild(String projectName) throws Exception
     {
         call("triggerBuild", projectName);
