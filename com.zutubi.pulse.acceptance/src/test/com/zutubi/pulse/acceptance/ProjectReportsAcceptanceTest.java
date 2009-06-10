@@ -81,7 +81,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
 
         Hashtable<String, Object> artifact = xmlRpcHelper.createEmptyConfig(FileArtifactConfiguration.class);
         artifact.put(Constants.FileArtifact.NAME, "fields");
-        artifact.put(Constants.FileArtifact.FILE, propertiesFile.getAbsolutePath());
+        artifact.put(Constants.FileArtifact.FILE, propertiesFile.getAbsolutePath().replace('\\', '/'));
         artifact.put(Constants.FileArtifact.POSTPROCESSORS, new Vector<String>(asList("custom-fields")));
 
         xmlRpcHelper.insertConfig(artifactsPath, artifact);
