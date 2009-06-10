@@ -7,9 +7,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 /**
  * Manages custom fields related to a recipe result.
@@ -41,7 +41,8 @@ public class RecipeCustomFields
     {
         if (customFields == null)
         {
-            customFields = new HashMap<String, String>();
+            // Use a tree map to sort properties.
+            customFields = new TreeMap<String, String>();
             File customFile = new File(recipeOutputDir, CUSTOM_FIELDS_FILE);
             if (customFile.exists())
             {

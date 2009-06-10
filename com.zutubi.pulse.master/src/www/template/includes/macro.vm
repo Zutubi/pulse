@@ -1206,7 +1206,7 @@
     #end
 
     #if($showArtifactLink)
-        <a class="unadorned" href="downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="$base/images/compress.gif"></a>
+        <a class="unadorned" href="$base/downloadDirectoryArtifact.action?commandId=$result.id&amp;id=$artifact.id"><img alt="archive" src="$base/images/compress.gif"></a>
     #end
 
     #if(!$hasIndex)

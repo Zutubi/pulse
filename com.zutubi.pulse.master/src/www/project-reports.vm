@@ -30,6 +30,7 @@
                             width: 100
                         }],
                 buttons: [{
+                            id: 'apply.button',
                             text: 'apply',
                             listeners: {
                                 click: function() {
@@ -50,8 +51,10 @@
 <body>
     #projectTabs("reports")
 
+<div id='#id("project-reports-${projectName}-${group}")'>
+
 #if($groupNames.size() > 0)
-    <table id='#id("${result.ownerName}-build-${result.number}-detailed")' class="twopane">
+    <table class="twopane">
         <tr>
             <td class="leftpane">
                 <ul class="panenav">
@@ -96,5 +99,7 @@
         No report groups defined.
     </p>
 #end
+
+</div>
 </body>
 </html>

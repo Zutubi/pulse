@@ -60,7 +60,8 @@ public abstract class SeleniumPage
 
     public boolean isPresent()
     {
-        return selenium.isElementPresent("id=" + StringUtils.toValidHtmlName(id));
+        String id = "id=" + StringUtils.toValidHtmlName(this.id);
+        return selenium.isElementPresent(id);
     }
 
     public String getTitle()

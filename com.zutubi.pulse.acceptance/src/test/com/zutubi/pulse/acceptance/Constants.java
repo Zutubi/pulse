@@ -48,11 +48,20 @@ public class Constants
         public static final String SCM = "scm";
         public static final String TYPE = "type";
         public static final String OPTIONS = "options";
+        public static final String REPORT_GROUPS = "reportGroups";
+
+        /**
+         * Property names shared by template types.
+         */
+        public static class TemplateType
+        {
+            public static final String ARTIFACTS = "artifacts";
+        }
 
         /**
          * Property names in the ant type class.
          */
-        public static class AntType
+        public static class AntType extends TemplateType
         {
             public static final String ARGUMENTS = "args";
             public static final String TARGETS = "target";
@@ -106,6 +115,14 @@ public class Constants
     {
         public static final String NAME = "name";
         public static final String POSTPROCESSORS = "postprocessors";
+    }
+
+    /**
+     * Property names in the FileArtifactConfiguration class.
+     */
+    public static class FileArtifact extends Artifact
+    {
+        public static final String FILE = "file";
     }
 
     /**
