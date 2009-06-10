@@ -14,13 +14,36 @@ public class ProjectReportsPage extends ResponsibilityPage
 
     public ProjectReportsPage(Selenium selenium, Urls urls, String projectName, String group)
     {
-        super(selenium, urls, "project-reports-" + projectName + "-" + group, uriComponentEncode(projectName));
+        super(selenium, urls, getId(projectName, group), uriComponentEncode(projectName));
         this.projectName = projectName;
         this.group = group;
     }
 
+    private static String getId(String projectName, String group)
+    {
+        String id = "project-reports-" + projectName;
+        if (group != null)
+        {
+            id += "-" + group;
+        }
+
+        return id;
+    }
+
     public String getUrl()
     {
-        return urls.projectReports(projectName, group);
+        if (group == null)
+        {
+            return urls.projectReports(projectName);
+        }
+        else
+        {
+            return urls.projectReports(projectName, group);
+        }
+    }
+
+    public void clickApply()
+    {
+        selenium.click("apply.button");
     }
 }
