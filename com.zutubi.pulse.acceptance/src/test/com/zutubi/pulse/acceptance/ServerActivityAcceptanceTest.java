@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Acceptance tests for the server/activity page.
@@ -124,6 +125,8 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         // build 2 goes into the build queue.
         triggerProjectBuild();
 
+        verifyQueuedBuildViaRemoteApi();
+
         ServerActivityPage page = new ServerActivityPage(selenium, urls);
         page.goTo();
 
@@ -145,6 +148,51 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         assertEquals(1, activeBuildsTable.getRowCount());
 
         waitForBuildToComplete(2);
+    }
+
+    public void testCancelQueuedBuildViaRemoteApi() throws Exception
+    {
+        createAndTriggerProjectBuild();
+        xmlRpcHelper.triggerBuild(random);
+
+        String id = verifyQueuedBuildViaRemoteApi();
+        xmlRpcHelper.cancelQueuedBuildRequest(id);
+        assertEquals(0, xmlRpcHelper.getBuildQueueSnapshot().size());
+        
+        waitForBuildToComplete(1);
+    }
+
+    private String verifyQueuedBuildViaRemoteApi() throws Exception
+    {
+        int size;
+        long startTime = System.currentTimeMillis();
+        Vector<Hashtable<String, Object>> queueSnapshot;
+        do
+        {
+            if (System.currentTimeMillis() - startTime > TIMEOUT)
+            {
+                fail("Timed out waiting for queued build request");
+            }
+
+            queueSnapshot = xmlRpcHelper.getBuildQueueSnapshot();
+            size = queueSnapshot.size();
+            Thread.sleep(100);
+        }
+        while (size != 1);
+
+        Hashtable<String, Object> request = queueSnapshot.get(0);
+        assertNotNull(request.get("queuedTime"));
+        assertEquals(random, request.get("owner"));
+        assertEquals(random, request.get("project"));
+        assertEquals(false, request.get("isPersonal"));
+        assertEquals(false, request.get("isReplaceable"));
+        assertEquals("", request.get("revision"));
+        assertEquals("trigger via remote api by admin", request.get("reason"));
+        assertEquals("remote api", request.get("requestSource"));
+
+        String id = (String) request.get("id");
+        assertNotNull(id);
+        return id;
     }
 
     private void createAndTriggerProjectBuild() throws Exception

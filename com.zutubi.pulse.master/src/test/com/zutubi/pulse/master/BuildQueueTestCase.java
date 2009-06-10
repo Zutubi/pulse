@@ -4,7 +4,7 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.engine.PulseFileSource;
-import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -132,7 +132,7 @@ public class BuildQueueTestCase extends PulseTestCase
         BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, new PulseFileSource("pulse file"), false);
         return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), Collections.<ResourcePropertyConfiguration>emptyList(), null, source, replaceable)
         {
-            public Entity getOwner()
+            public NamedEntity getOwner()
             {
                 return owner;
             }

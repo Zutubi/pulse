@@ -685,6 +685,16 @@ public class XmlRpcHelper
         return call("queryBuildsForProject", project, resultStates, firstResult, maxResults, mostRecentFirst);
     }
 
+    public Vector<Hashtable<String, Object>> getBuildQueueSnapshot() throws Exception
+    {
+        return call("getBuildQueueSnapshot");
+    }
+
+    public boolean cancelQueuedBuildRequest(String id) throws Exception
+    {
+        return (Boolean) call("cancelQueuedBuildRequest", id);
+    }
+
     public Hashtable<String, Object> getReportData(String projectName, String reportGroup, String report, int timeFrame, String timeUnit) throws Exception
     {
         return call("getReportData", projectName, reportGroup, report, timeFrame, timeUnit);

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -26,7 +26,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
         this.patch = patch;
     }
 
-    public Entity getOwner()
+    public NamedEntity getOwner()
     {
         return user;
     }

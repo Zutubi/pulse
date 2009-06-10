@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.model.BuildReason;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -17,7 +17,7 @@ import java.util.Collection;
  * Base class for build requests.  Specific subclasses are used to
  * differentiate project and personal build requests.
  */
-public abstract class AbstractBuildRequestEvent extends Event
+public abstract class AbstractBuildRequestEvent extends Event implements Comparable
 {
     private BuildRevision revision;
     private long queued;
@@ -55,7 +55,7 @@ public abstract class AbstractBuildRequestEvent extends Event
         this.replaceable = replaceable;
     }
 
-    public abstract Entity getOwner();
+    public abstract NamedEntity getOwner();
     public abstract boolean isPersonal();
     public abstract BuildResult createResult(ProjectManager projectManager, UserManager userManager);
 
@@ -114,5 +114,22 @@ public abstract class AbstractBuildRequestEvent extends Event
     public boolean isReplaceable()
     {
         return replaceable;
+    }
+
+    public int compareTo(Object o)
+    {
+        AbstractBuildRequestEvent other = (AbstractBuildRequestEvent) o;
+        if (queued > other.queued)
+        {
+            return 1;
+        }
+        else if (queued < other.queued)
+        {
+            return -1;
+        }
+        else
+        {
+            return 0;
+        }
     }
 }

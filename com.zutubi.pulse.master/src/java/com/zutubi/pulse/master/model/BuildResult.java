@@ -323,7 +323,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         return user != null;
     }
 
-    public Entity getOwner()
+    public NamedEntity getOwner()
     {
         if (user == null)
         {

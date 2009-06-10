@@ -76,7 +76,7 @@ public class ViewServerQueuesAction extends ActionSupport
                 BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
                 for (Map.Entry<Entity, List<AbstractBuildRequestEvent>>  entityQueue: snapshot.getQueuedBuilds().entrySet())
                 {
-                    buildQueue.addAll( entityQueue.getValue());
+                    buildQueue.addAll(entityQueue.getValue());
                 }
 
                 for (List<EntityBuildQueue.ActiveBuild> activeForEntity: snapshot.getActiveBuilds().values())
@@ -125,13 +125,7 @@ public class ViewServerQueuesAction extends ActionSupport
 
     private void sortBuilds()
     {
-        Collections.sort(buildQueue, new Comparator<AbstractBuildRequestEvent>()
-        {
-            public int compare(AbstractBuildRequestEvent o1, AbstractBuildRequestEvent o2)
-            {
-                return (int) (o1.getQueued() - o2.getQueued());
-            }
-        });
+        Collections.sort(buildQueue);
 
         Collections.sort(executingBuilds, new Comparator<BuildResult>()
         {

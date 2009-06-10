@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.postprocessors.api.Feature;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.master.BuildQueue;
 import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -21,6 +22,7 @@ import com.zutubi.pulse.master.charting.model.SeriesData;
 import com.zutubi.pulse.master.charting.render.ChartUtils;
 import com.zutubi.pulse.master.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
+import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
@@ -2612,6 +2614,110 @@ public class RemoteApi
         result.put("level", feature.getLevel().getPrettyString());
         result.put("message", feature.getSummary());
         return result;
+    }
+
+    /**
+     * Returns an array of all queued build requests.  These build requests
+     * may be cancelled without affecting the build history for the project.
+     * Note that this list does not include "active" builds even if they have
+     * not yet commenced - such builds are available via other queries.
+     * <p/>
+     * The returned array is filtered: requests queued for projects that you do
+     * not have permission to view are not returned.
+     *
+     * @param token authentication token, see {@link #login(String, String)}
+     * @return {@xtype array<[RemoteApi.QueuedBuild]>} all queued build
+     *         requests that youhave permission to view
+     * @access available to all users, though the result is filtered by project
+     *         view permission
+     * @see #cancelQueuedBuildRequest(String, String)
+     */
+    public Vector<Hashtable<String, Object>> getBuildQueueSnapshot(String token)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
+            List<AbstractBuildRequestEvent> filteredQueue = new LinkedList<AbstractBuildRequestEvent>();
+            for (List<AbstractBuildRequestEvent> entityQueue: snapshot.getQueuedBuilds().values())
+            {
+                CollectionUtils.filter(entityQueue, new Predicate<AbstractBuildRequestEvent>()
+                {
+                    public boolean satisfied(AbstractBuildRequestEvent e)
+                    {
+                        return accessManager.hasPermission(AccessManager.ACTION_VIEW, e.getOwner());
+                    }
+                }, filteredQueue);
+            }
+
+            return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<AbstractBuildRequestEvent, Hashtable<String, Object>>()
+            {
+                public Hashtable<String, Object> map(AbstractBuildRequestEvent e)
+                {
+                    return convertBuildRequestEvent(e);
+                }
+            }));
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Hashtable<String, Object> convertBuildRequestEvent(AbstractBuildRequestEvent event)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("id", Long.toString(event.getId()));
+        result.put("project", event.getProjectConfig().getName());
+        result.put("owner", event.getOwner().getName());
+        result.put("isPersonal", event.isPersonal());
+        result.put("requestSource", event.getRequestSource());
+        result.put("isReplaceable", event.isReplaceable());
+        result.put("queuedTime", Long.toString(event.getQueued()));
+        result.put("reason", event.getReason().getSummary());
+
+        Revision revision = event.getRevision().getRevision();
+        String revisionString;
+        if (revision == null)
+        {
+            revisionString = "";
+        }
+        else
+        {
+            revisionString = revision.getRevisionString();
+        }
+        result.put("revision", revisionString);
+
+        return result;
+    }
+
+    /**
+     * Cancels a queued build request, if it is found in the queue.  Note that
+     * this method cannot be used to cancel an active build (which has left the
+     * queue) - instead {@link #cancelBuild(String, String, int)} should be
+     * used.
+     *
+     * @param token authentication token, see {@link #login(String, String)}
+     * @param id    identifier of the queued request - available in the
+     *              structures returned by {@link #getBuildQueueSnapshot(String)}
+     * @return true if the build request was found and cancelled; false if it
+     *         was not found (the build may have been activated)
+     * @access requires "cancel build" action for the project owning the,
+     *         request or that you are the requestor for a personal build
+     *         request
+     * @see #getBuildQueueSnapshot(String) 
+     */
+    public boolean cancelQueuedBuildRequest(String token, String id)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return fatController.cancelQueuedBuild(Long.parseLong(id));
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     /**
