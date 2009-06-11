@@ -114,10 +114,14 @@ public class LocalFile extends AbstractFileObject implements FileObject
     {
         LocalFile newLocalFile = (LocalFile) FileObjectUtils.getAbstractFileObject(newfile);
 
-        if (!FileSystemUtils.robustRename(file, newLocalFile.getLocalFile()))
+        try
+        {
+            FileSystemUtils.robustRename(file, newLocalFile.getLocalFile());
+        }
+        catch (IOException e)
         {
             throw new FileSystemException("vfs.provider.local/rename-file.error",
-                new String[]{file.toString(), newfile.toString()});
+                new String[]{file.toString(), newfile.toString()}, e);
         }
     }
 

@@ -93,11 +93,7 @@ public class DriverRegistry
                 String uniqueFilename = jar.getName() + RandomUtils.randomString(5);
 
                 FileSystemUtils.copy(driverDir, jar);
-                if (!FileSystemUtils.robustRename(new File(driverDir, jar.getName()), new File(driverDir, uniqueFilename)))
-                {
-                    LOG.warning("Rename failed?");
-                }
-                
+                FileSystemUtils.robustRename(new File(driverDir, jar.getName()), new File(driverDir, uniqueFilename));
                 jar = new File(driverDir, uniqueFilename);
             }
             // else do not want to try to copy a file into directory if it is already there.

@@ -158,9 +158,13 @@ public class ProjectLogger
                 LOG.warning("Unable to remove old file '" + lastFile.getAbsolutePath() + "'");
             }
 
-            if (!FileSystemUtils.robustRename(currentFile, lastFile))
+            try
             {
-                LOG.warning("Unable to rename log file '" + currentFile.getAbsolutePath() + "' to '" + lastFile.getAbsolutePath() + "'");
+                FileSystemUtils.robustRename(currentFile, lastFile);
+            }
+            catch (IOException e)
+            {
+                LOG.warning("Rotating project logs: " + e.getMessage(), e);
             }
         }
     }

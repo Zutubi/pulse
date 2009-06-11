@@ -143,9 +143,13 @@ public class SlaveAgentService implements AgentService
 
             zipFile.delete();
 
-            if (!FileSystemUtils.rename(tempDir, destination, true))
+            try
             {
-                throw new BuildException("Unable to rename result directory to '" + destination.getAbsolutePath() + "'");
+                FileSystemUtils.rename(tempDir, destination, true);
+            }
+            catch (IOException e)
+            {
+                throw new BuildException("Renaming result directory: " + e.getMessage(), e);
             }
         }
         catch (IOException e)

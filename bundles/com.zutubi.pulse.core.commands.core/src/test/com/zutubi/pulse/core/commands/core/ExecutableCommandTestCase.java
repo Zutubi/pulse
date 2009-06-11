@@ -32,7 +32,7 @@ public abstract class ExecutableCommandTestCase extends OutputProducingCommandTe
     protected File copyBuildFile(String name, String extension, String toName) throws IOException
     {
         File buildFile = copyInputToDirectory(name, extension, baseDir);
-        assertTrue(FileSystemUtils.robustRename(buildFile, new File(baseDir, toName)));
+        FileSystemUtils.robustRename(buildFile, new File(baseDir, toName));
         return buildFile;
     }
 }
