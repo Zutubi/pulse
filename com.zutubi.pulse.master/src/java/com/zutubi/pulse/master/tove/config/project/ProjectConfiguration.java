@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -23,7 +24,7 @@ import java.util.*;
  * Pulse project for a nightly build and another for a continuous build.
  */
 @Form(fieldOrder = {"name", "organisation", "url", "description"})
-@Listing(order = {"type", "requirements", "properties", "stages", "options", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "permissions"})
+@Listing(order = {"type", "requirements", "properties", "stages", "options", "triggers", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "permissions", "reportGroups", "cleanupRules"})
 @Table(columns = {"name"})
 @SymbolicName("zutubi.projectConfig")
 public class ProjectConfiguration extends AbstractConfiguration implements Extendable, NamedConfiguration
@@ -75,6 +76,9 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private Map<String, CommitMessageTransformerConfiguration> commitMessageTransformers = new LinkedHashMap<String, CommitMessageTransformerConfiguration>();
 
     private ChangeViewerConfiguration changeViewer;
+
+    @Ordered
+    private Map<String, ReportGroupConfiguration> reportGroups = new LinkedHashMap<String, ReportGroupConfiguration>();
 
     public ProjectConfiguration()
     {
@@ -294,5 +298,15 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     public void setOrganisation(String organisation)
     {
         this.organisation = organisation;
+    }
+
+    public Map<String, ReportGroupConfiguration> getReportGroups()
+    {
+        return reportGroups;
+    }
+
+    public void setReportGroups(Map<String, ReportGroupConfiguration> reportGroups)
+    {
+        this.reportGroups = reportGroups;
     }
 }

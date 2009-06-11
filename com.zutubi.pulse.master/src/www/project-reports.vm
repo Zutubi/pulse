@@ -1,106 +1,100 @@
 #helpTag("Projects")
 #authorisationTags($principle)
 #projectTags($project)
-#macro(render $chart)
-    ${chart.imageMap}
-    <img style="border:none" src="${base}/chart?filename=${chart.location}" border="1" height="${chart.height}" width="${chart.width}" usemap="${chart.imageMapName}"/>
-#end
 <html>
 <head>
     <title>$h_projectName</title>
+#if($groupNames.size() > 0)
     <script type="text/javascript">
         Ext.onReady(function() {
             var form = new Ext.form.FormPanel({
-                labelWidth: 150,
-                labelAlign: 'right',
                 method: 'POST',
                 border: false,
+                hideLabels: true,
                 items: [{
-                    layout: 'column',
-                    border: false,
-                    items: [{
-                        columnWidth: .5,
-                        layout: 'form',
-                        border: false,
-                        items: [{
                             xtype: 'combo',
                             name: 'timeframe',
-                            fieldLabel: '$action.getText("chart.timeframe")',
+                            editable: true,
+                            triggerAction: 'all',
+                            store: ['15', '30', '45', '90'],
+                            value: '$timeframe',
+                            width: 100
+                        }, {
+                            xtype: 'combo',
+                            name: 'timeunit',
                             editable: false,
                             forceSelection: true,
                             triggerAction: 'all',
-                            store: ['15', '30', '45', '90'],
-                            value: '$timeframe'
-                        }]
-                    }, {
-                        columnWidth: .25,
-                        layout: 'form',
-                        border: false,
-                        items: [{
-                            xtype: 'checkbox',
-                            name: 'zoom',
-                            inputValue: 'true',
-                            width: 14,
-                            fieldLabel: '$action.getText("chart.zoom")'
-#if($zoom)
-                            , checked: true
-#end
-                        }]
-                    }, {
-                        columnWidth: .25,
-                        xtype: 'panel',
-                        border: false,
-                        items: [{
-                            xtype: 'button',
-                            text: '$action.getText("refresh.name")',
-                            anchor: '95%',
+                            store: ['builds', 'days'],
+                            value: '$timeunit',
+                            width: 100
+                        }],
+                buttons: [{
+                            text: 'apply',
                             listeners: {
                                 click: function() {
                                     form.getForm().el.dom.submit();
                                 }
                             }
                         }]
-                    }]
-                }]
             });
 
             form.on('afterlayout', function() {
-                this.getForm().el.dom.action = '${urls.projectReports($u_projectName)}';
+                this.getForm().el.dom.action = '${urls.projectReports($u_projectName)}#uce($group)/';
             }, form, {single: true});
             form.render('params-form');
         });
     </script>
+#end
 </head>
 <body>
     #projectTabs("reports")
 
-<table>
-    <tr>
-        <td class="chart">
-            #render($buildResultsChart)
-        </td>
-        <td class="chart">
-            #render($testCountChart)
-        </td>
-    </tr>
-    <tr>
-        <td class="chart">
-            #render($buildTimesChart)
-        </td>
-        <td class="chart">
-            #render($stageTimesChart)
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2" style="padding-left: 30px">
-            <div class="config-panel">
-                <h3 class="config-header config-header-small">$action.getText("chart.parameters")</h3>
-                <div class="config-container" id="params-form">
+#if($groupNames.size() > 0)
+    <table id='#id("${result.ownerName}-build-${result.number}-detailed")' class="twopane">
+        <tr>
+            <td class="leftpane">
+                <ul class="panenav">
+    #foreach($groupName in $groupNames)
+                    <li>
+                        <a href="$urls.projectReports($u_projectName)#uce($groupName)/" #if($groupName == $group) class="active" #end>#html($groupName)</a>
+                    </li>
+    #end
+                </ul>
+                <div class="config-panel" style="margin-right: 16px">
+                    <h3 class="config-header config-header-small">time frame</h3>
+                    <div class="config-container" id="params-form">
                 </div>
             </div>
-        </td>
-    </tr>
-</table>
-
+            </td>
+            <td class="rightpane">
+    #if($buildCount > 0)
+                <table>
+        #foreach($report in $reports)
+            #if($velocityCount % 2 == 1)
+                    <tr>
+            #end
+                        <td class="chart">
+                            ${report.imageMap}
+                            <img style="border:none" src="${base}/chart?filename=${report.location}" border="1" height="${report.height}" width="${report.width}" usemap="${report.imageMapName}"/>
+                        </td>
+            #if($velocityCount % 2 == 0)
+                    </tr>
+            #end
+        #end
+                </table>
+    #else
+                <p style="margin: 16px;">
+                    No builds found.
+                </p>
+    #end
+            </td>
+        </tr>
+    </table>
+#else
+    <p>
+        No report groups defined.
+    </p>
+#end
 </body>
 </html>

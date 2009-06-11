@@ -24,10 +24,7 @@ import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.marshal.LocalFileResolver;
 import com.zutubi.pulse.core.marshal.RelativeFileResolver;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.TestSuitePersister;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -40,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -74,13 +72,14 @@ public class RecipeProcessor
         recipeResult.commence();
 
         PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
+        Map<String, String> customFields = new HashMap<String, String>();
 
         runningRecipe = recipeResult.getId();
         eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeResult.getStartTime()));
 
         PulseExecutionContext context = request.getContext();
         long recipeStartTime = recipeResult.getStartTime();
-        pushRecipeContext(context, request, testResults, recipeStartTime);
+        pushRecipeContext(context, request, testResults, customFields, recipeStartTime);
         try
         {
             executeRequest(request);
@@ -96,13 +95,9 @@ public class RecipeProcessor
         }
         finally
         {
-            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing test results..."));
-
             RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
-            writeTestResults(paths, testResults);
-            recipeResult.setTestSummary(testResults.getSummary());
-            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Test results stored."));
-
+            storeTestResults(paths, recipeResult, testResults);
+            storeCustomFields(paths, customFields);
             compressResults(paths, context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, false), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_WORKING_DIR, false));
 
             recipeResult.complete();
@@ -220,8 +215,9 @@ public class RecipeProcessor
         }
     }
 
-    private void writeTestResults(RecipePaths paths, PersistentTestSuiteResult testResults)
+    private void storeTestResults(RecipePaths paths, RecipeResult recipeResult, PersistentTestSuiteResult testResults)
     {
+        eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing test results..."));
         try
         {
             TestSuitePersister persister = new TestSuitePersister();
@@ -233,15 +229,29 @@ public class RecipeProcessor
         {
             LOG.severe("Unable to write out test results", e);
         }
+        recipeResult.setTestSummary(testResults.getSummary());
+        eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Test results stored."));
     }
 
-    private void pushRecipeContext(PulseExecutionContext context, RecipeRequest request, PersistentTestSuiteResult testResults, long recipeStartTime)
+    private void storeCustomFields(RecipePaths paths, Map<String, String> customFields)
+    {
+        if (customFields.size() > 0)
+        {
+            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing custom fields..."));
+            RecipeCustomFields recipeCustomFields = new RecipeCustomFields(paths.getOutputDir());
+            recipeCustomFields.store(customFields);
+            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Custom fields stored."));
+        }
+    }
+
+    private void pushRecipeContext(PulseExecutionContext context, RecipeRequest request, PersistentTestSuiteResult testResults, Map<String, String> customFields, long recipeStartTime)
     {
         context.push();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(recipeStartTime)));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_CUSTOM_FIELDS, customFields);
 
         if (context.getString(NAMESPACE_INTERNAL, PROPERTY_RECIPE) == null)
         {

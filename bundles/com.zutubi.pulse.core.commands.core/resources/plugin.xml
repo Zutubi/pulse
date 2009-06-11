@@ -19,5 +19,7 @@
         <post-processor name="junit-summary.pp" display-name="junit summary output processor"
                         default-processor="true" class="com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessorConfiguration"/>
         <post-processor name="post-processor" class="com.zutubi.pulse.core.commands.core.PostProcessorGroupConfiguration"/>
+        <post-processor name="custom-fields.pp" display-name="custom field processor"
+                        default-processor="true" class="com.zutubi.pulse.core.commands.core.CustomFieldsPostProcessorConfiguration"/>
     </extension>
 </plugin>

@@ -89,4 +89,6 @@ public interface PostProcessorContext
      * @param feature feature to add to the command result
      */
     void addFeatureToCommand(Feature feature);
+
+    void addCustomField(String name, String value);
 }

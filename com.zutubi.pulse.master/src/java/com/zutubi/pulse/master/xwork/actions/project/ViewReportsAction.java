@@ -1,29 +1,50 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.master.charting.*;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.charting.build.DefaultCustomFieldSource;
+import com.zutubi.pulse.master.charting.render.ByBuildChart;
+import com.zutubi.pulse.master.charting.render.ByDayChart;
+import com.zutubi.pulse.master.charting.render.Chart;
+import com.zutubi.pulse.master.charting.render.ChartUtils;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
+import com.zutubi.pulse.master.tove.config.project.reports.*;
+import com.zutubi.util.TextUtils;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Action for viewing project reports (e.g. build time trend graph).
  */
 public class ViewReportsAction extends ProjectActionBase
 {
-    private static final int WIDTH = 400;
-    private static final int HEIGHT = 300;
+    private static final int DEFAULT_TIME_FRAME = 45;
 
-    private Map buildResultsChart;
-    private Map testCountChart;
-    private Map buildTimesChart;
-    private Map stageTimesChart;
+    private String group;
+    private int timeframe = DEFAULT_TIME_FRAME;
+    private String timeunit = null;
 
-    private int timeframe = 45;
-    private boolean zoom = false;
+    private List<String> groupNames;
+    private int buildCount;
+    private List<Map> reports = new LinkedList<Map>();
 
     private BuildResultDao buildResultDao;
+    private MasterConfigurationManager configurationManager;
+
+    public String getGroup()
+    {
+        return group;
+    }
+
+    public void setGroup(String group)
+    {
+        this.group = group;
+    }
 
     public int getTimeframe()
     {
@@ -35,14 +56,29 @@ public class ViewReportsAction extends ProjectActionBase
         this.timeframe = timeframe;
     }
 
-    public boolean isZoom()
+    public String getTimeunit()
     {
-        return zoom;
+        return timeunit;
     }
 
-    public void setZoom(boolean zoom)
+    public void setTimeunit(String timeunit)
     {
-        this.zoom = zoom;
+        this.timeunit = timeunit;
+    }
+
+    public List<String> getGroupNames()
+    {
+        return groupNames;
+    }
+
+    public int getBuildCount()
+    {
+        return buildCount;
+    }
+
+    public List<Map> getReports()
+    {
+        return reports;
     }
 
     public String doInput() throws Exception
@@ -50,69 +86,94 @@ public class ViewReportsAction extends ProjectActionBase
         return execute();
     }
 
-    public Map getTimeframes()
-    {
-        Map<Integer, String> timeframes = new TreeMap<Integer, String>();
-        timeframes.put(15, "15");
-        timeframes.put(30, "30");
-        timeframes.put(45, "45");
-        timeframes.put(90, "90");
-        return timeframes;
-    }
-
     public String execute() throws Exception
     {
         Project project = getRequiredProject();
-        
-        DBBuildResultsDataSource dataSource = new DBBuildResultsDataSource();
-        dataSource.setProject(project);
-        dataSource.setBuildResultDao(buildResultDao);
 
-        TimeBasedChartData chartData = new TimeBasedChartData();
-        chartData.setSource(dataSource);
-        chartData.setTimeframe(timeframe);
+        Map<String, ReportGroupConfiguration> reportGroups = project.getConfig().getReportGroups();
+        if (reportGroups.size() > 0)
+        {
+            groupNames = new LinkedList<String>(reportGroups.keySet());
+            if (!TextUtils.stringSet(group))
+            {
+                group = groupNames.get(0);
+            }
 
-        BuildResultsChart chart = new BuildResultsChart();
-        chart.setData(chartData);
-        this.buildResultsChart = ChartUtils.renderForWeb(chart.render(), WIDTH, HEIGHT);
+            ReportGroupConfiguration config = reportGroups.get(group);
+            if (config == null)
+            {
+                throw new IllegalArgumentException("Unknown report group '" + group + "'");
+            }
 
-        BuildTimesChart btChart = new BuildTimesChart(false, zoom);
-        btChart.setData(chartData);
-        this.buildTimesChart = ChartUtils.renderForWeb(btChart.render(), WIDTH, HEIGHT);
+            if (timeunit == null)
+            {
+                // Time period not specified by form POST, use default.
+                timeframe = config.getDefaultTimeFrame();
+                timeunit = config.getDefaultTimeUnit().name().toLowerCase();
+            }
 
-        BuildTimesChart stChart = new BuildTimesChart(true, zoom);
-        stChart.setData(chartData);
-        this.stageTimesChart = ChartUtils.renderForWeb(stChart.render(), WIDTH, HEIGHT);
-
-        TestCountChart tcChart = new TestCountChart(zoom);
-        tcChart.setData(chartData);
-        this.testCountChart = ChartUtils.renderForWeb(tcChart.render(), WIDTH, HEIGHT);
+            List<BuildResult> builds = getBuilds(project);
+            buildCount = builds.size();
+            if (buildCount > 0)
+            {
+                CustomFieldSource fieldSource = new DefaultCustomFieldSource(configurationManager.getDataDirectory());
+                for (ReportConfiguration report: config.getReports().values())
+                {
+                    reports.add(render(report, builds, fieldSource));
+                }
+            }
+        }
 
         return SUCCESS;
     }
 
-    public Map getBuildResultsChart()
+    private List<BuildResult> getBuilds(Project project)
     {
-        return buildResultsChart;
+        if (timeframe <= 0)
+        {
+            // Ignore nonsense timeframes by applying default.
+            timeframe = DEFAULT_TIME_FRAME;
+        }
+
+        if (ReportTimeUnit.BUILDS.toString().equalsIgnoreCase(timeunit))
+        {
+            return buildResultDao.findLatestCompleted(project, 0, timeframe);
+        }
+        else
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_YEAR, -timeframe);
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+
+            return buildResultDao.findSinceByProject(project, cal.getTime());
+        }
     }
 
-    public Map getTestCountChart()
+    private Map render(ReportConfiguration config, List<BuildResult> builds, CustomFieldSource customFieldSource) throws IOException
     {
-        return testCountChart;
-    }
+        Chart chart;
+        if (config.getDomainUnits() == DomainUnit.BUILD_IDS)
+        {
+            chart = new ByBuildChart(config, builds, customFieldSource);
+        }
+        else
+        {
+            chart = new ByDayChart(config, builds, customFieldSource);
+        }
 
-    public Map getBuildTimesChart()
-    {
-        return buildTimesChart;
-    }
-
-    public Map getStageTimesChart()
-    {
-        return stageTimesChart;
+        return ChartUtils.renderForWeb(chart.render(), config.getWidth(), config.getHeight());
     }
 
     public void setBuildResultDao(BuildResultDao buildResultDao)
     {
         this.buildResultDao = buildResultDao;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

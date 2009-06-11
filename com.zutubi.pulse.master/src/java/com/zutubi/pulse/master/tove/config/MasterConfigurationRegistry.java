@@ -19,6 +19,8 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.*;
 import com.zutubi.pulse.master.tove.config.project.commit.CustomTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
+import com.zutubi.pulse.master.tove.config.project.reports.BuildReportSeriesConfiguration;
+import com.zutubi.pulse.master.tove.config.project.reports.StageReportSeriesConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.*;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
@@ -134,7 +136,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(PollableScmConfiguration.class);
 
             // Triggers
-            CompositeType triggerConfig = registerConfigurationType(TriggerConfiguration.class);
+            registerConfigurationType(TriggerConfiguration.class);
             registerConfigurationType(BuildCompletedTriggerConfiguration.class);
             registerConfigurationType(CronBuildTriggerConfiguration.class);
             registerConfigurationType(ScmBuildTriggerConfiguration.class);
@@ -153,7 +155,11 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(PostBuildHookConfiguration.class);
             registerConfigurationType(PostStageHookConfiguration.class);
             registerConfigurationType(RunExecutableTaskConfiguration.class);
-            
+
+            // report series types
+            registerConfigurationType(BuildReportSeriesConfiguration.class);
+            registerConfigurationType(StageReportSeriesConfiguration.class);
+
             // define the root level scope.
             TemplatedMapType projectCollection = new TemplatedMapType(projectConfig, typeRegistry);
             configurationPersistenceManager.register(PROJECTS_SCOPE, projectCollection);

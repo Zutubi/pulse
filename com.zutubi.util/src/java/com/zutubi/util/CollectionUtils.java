@@ -321,7 +321,7 @@ public class CollectionUtils
     }
 
     /**
-     * Return a copy of the list c that has duplicates.
+     * Return a copy of the list c that has no duplicates.
      *
      * @param l the list from which duplicates will be removed.
      *
@@ -399,4 +399,28 @@ public class CollectionUtils
         }
         return result;
     }
+    
+    /**
+     * Collapses a collection down to a single value by successive applications
+     * of the given binary function.  The function is applied to the current
+     * result and each item of the collection in turn.
+     *
+     * @param c       input collection
+     * @param initial initial value for the result
+     * @param fn      function to apply to combine the current result with an
+     *                item
+     * @param <T>     type of the collection items
+     * @return the result of reducing the collection using the given function
+     */
+    public static <T> T reduce(Collection<T> c, T initial, BinaryFunction<T, T, T> fn)
+    {
+        T result = initial;
+        for (T t: c)
+        {
+            result = fn.process(result, t);
+        }
+
+        return result;
+    }
+
 }

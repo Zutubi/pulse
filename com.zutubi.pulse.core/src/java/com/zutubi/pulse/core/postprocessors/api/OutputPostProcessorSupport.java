@@ -87,6 +87,11 @@ public abstract class OutputPostProcessorSupport extends PostProcessorSupport
             {
                 ppContext.addFeatureToCommand(feature);
             }
+
+            public void addCustomField(String name, String value)
+            {
+                ppContext.addCustomField(name, value);
+            }
         });
     }
 

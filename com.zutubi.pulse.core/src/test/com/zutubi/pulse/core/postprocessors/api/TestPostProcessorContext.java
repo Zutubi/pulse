@@ -4,9 +4,7 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * An implementation of {@link com.zutubi.pulse.core.postprocessors.api.PostProcessorContext}
@@ -22,6 +20,7 @@ public class TestPostProcessorContext implements PostProcessorContext
     private TestSuiteResult testSuiteResult = new TestSuiteResult(null);
     private List<Feature> features = new LinkedList<Feature>();
     private List<Feature> commandFeatures = new LinkedList<Feature>();
+    private Map<String, String> customFields = new HashMap<String, String>();
 
     /**
      * Creates a context that contains the given execution context and has the
@@ -118,5 +117,21 @@ public class TestPostProcessorContext implements PostProcessorContext
     public void addFeatureToCommand(Feature feature)
     {
         commandFeatures.add(feature);
+    }
+
+    /**
+     * Returns all custom fields collected so far.  These are fields added by
+     * {@link #addCustomField(String, String)}.
+     *
+     * @return all custom fields added to the recipe result so far
+     */
+    public Map<String, String> getCustomFields()
+    {
+        return customFields;
+    }
+
+    public void addCustomField(String name, String value)
+    {
+        customFields.put(name, value);
     }
 }
