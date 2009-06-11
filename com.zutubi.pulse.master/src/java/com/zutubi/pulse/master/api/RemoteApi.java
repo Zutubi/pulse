@@ -174,7 +174,7 @@ public class RemoteApi
 
     private void copyProperty(Properties from, Hashtable<String, String> to, String key)
     {
-        String name = (String)from.get(key);
+        String name = (String) from.get(key);
         if (name != null)
         {
             to.put(key, name);
@@ -233,7 +233,7 @@ public class RemoteApi
                 Type type = configurationTemplateManager.getType(path);
                 if (type instanceof CollectionType)
                 {
-                    CollectionType collectionType = (CollectionType)type;
+                    CollectionType collectionType = (CollectionType) type;
                     if (collectionType.getCollectionType() instanceof ComplexType)
                     {
                         Record record = configurationTemplateManager.getRecord(path);
@@ -246,7 +246,7 @@ public class RemoteApi
                 }
                 else
                 {
-                    CompositeType compositeType = (CompositeType)type;
+                    CompositeType compositeType = (CompositeType) type;
                     result = new Vector<String>(compositeType.getNestedPropertyNames());
                 }
             }
@@ -586,7 +586,7 @@ public class RemoteApi
         try
         {
             ComplexType pathType = configurationTemplateManager.getType(path);
-            CompositeType expectedType = (CompositeType)pathType.getTargetType();
+            CompositeType expectedType = (CompositeType) pathType.getTargetType();
 
             String parentPath;
             String baseName;
@@ -673,7 +673,7 @@ public class RemoteApi
                 throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': parent path '" + insertPath + "' is not a templated collection, use insertConfig instead");
             }
 
-            TemplateRecord templateParent = (TemplateRecord)configurationTemplateManager.getRecord(templateParentPath);
+            TemplateRecord templateParent = (TemplateRecord) configurationTemplateManager.getRecord(templateParentPath);
             if (templateParent == null)
             {
                 throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': template parent does not exist");
@@ -684,7 +684,7 @@ public class RemoteApi
                 throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': template parent is concrete and thus cannot be inherited from");
             }
 
-            CompositeType expectedType = (CompositeType)templateParent.getType();
+            CompositeType expectedType = (CompositeType) templateParent.getType();
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(config);
             CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
@@ -1183,10 +1183,10 @@ public class RemoteApi
     }
 
     /**
+     * @internal Writes an error message to the log for testing.
      * @param token   authentication token
      * @param message message to write
      * @return true
-     * @internal Writes an error message to the log for testing.
      */
     public boolean logError(String token, String message)
     {
@@ -1196,10 +1196,10 @@ public class RemoteApi
     }
 
     /**
+     * @internal Writes a warning message to the log for testing.
      * @param token   authentication token
      * @param message message to write
      * @return true
-     * @internal Writes a warning message to the log for testing.
      */
     public boolean logWarning(String token, String message)
     {
@@ -1866,7 +1866,7 @@ public class RemoteApi
         try
         {
             Project project = internalGetProject(projectName, true);
-            return (int)project.getNextBuildNumber();
+            return (int) project.getNextBuildNumber();
         }
         finally
         {
@@ -2128,7 +2128,7 @@ public class RemoteApi
     private Hashtable<String, Object> convertResult(BuildResult build)
     {
         Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
-        buildDetails.put("id", (int)build.getNumber());
+        buildDetails.put("id", (int) build.getNumber());
         buildDetails.put("project", build.getProject().getName());
         buildDetails.put("revision", getBuildRevision(build));
         buildDetails.put("version", getBuildVersion(build));
@@ -2165,9 +2165,9 @@ public class RemoteApi
      * Extract the build version string from the build result, returning an
      * empty string if no build version is available.
      *
-     * @param build     from which the build version is being retrieved.
-     * @return  a string representing the build version, or an empty string if no
-     * build version is available.
+     * @param build from which the build version is being retrieved.
+     * @return a string representing the build version, or an empty string if no
+     *         build version is available.
      */
     private String getBuildVersion(BuildResult build)
     {
@@ -2593,7 +2593,7 @@ public class RemoteApi
      */
     public boolean triggerBuild(String token, String projectName)
     {
-        return triggerBuild(token, projectName, (String)null);
+        return triggerBuild(token, projectName, (String) null);
     }
 
     /**
@@ -2625,7 +2625,7 @@ public class RemoteApi
      * @param projectName the name of the project to trigger
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
      *                    may be empty to indicate the latest revision should be used
-     * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
+     * @param properties  {@xtype struct<string>} a mapping of property names to property values
      * @return true
      * @access requires trigger permission for the given project
      * @see #triggerBuild(String, String)
@@ -2647,7 +2647,7 @@ public class RemoteApi
      * @param projectName the name of the project to trigger
      * @param revision    the revision to build, in SCM-specific format (e.g. a revision number),
      *                    may be empty to indicate the latest revision should be used
-     * @param properties  {@xtype struct<string>} a mapping of proeprty names to property values
+     * @param properties  {@xtype struct<string>} a mapping of property names to property values
      * @param status      the dependency status associated with the build request
      * @return true
      * @access requires trigger permission for the given project
@@ -2680,18 +2680,21 @@ public class RemoteApi
      * the latest revision will be used.</li>
      * <li>version (optional), the build version to be associated with this build request.  If not
      * specified, the project's default will be used.</li>
-     * <li>properties (optional), {@xtype struct<string>} a mapping of proeprty names to property values</li>
+     * <li>properties (optional), {@xtype struct<string>} a mapping of property names to property values</li>
      * <li>status (optional), the dependency status associated with this build request.  If not specified,
      * the project's default will be used.</li>
      * <li>force (optional), indicates that a build should be triggered even if no unbuilt revision is
-     * available and changelist isolation is active for this project.
+     * available and changelist isolation is active for this project.</li>
      * <li>replaceable (optional), indicates that this build can be replaced by a subsequent build in the
      * build queue.  This allows multiple builds for a single project to be triggered, but ensures that only
-     * the latest revision available at the start of the build is actually built. 
+     * the latest revision available at the start of the build is actually built.</li>
+     * <li>resolveVersion (optional), indicates whether the version string should have any property references
+     * resolved, defaults to true</li>
      * </ul>
-     * @param token             authentication token, see {@link #login(String, String)}
-     * @param projectName       the name of the project to trigger
-     * @param triggerOptions    the set of options to be used to configure this build request
+     *
+     * @param token          authentication token, see {@link #login(String, String)}
+     * @param projectName    the name of the project to trigger
+     * @param triggerOptions the set of options to be used to configure this build request
      * @return true
      */
     public boolean triggerBuild(String token, String projectName, Hashtable<String, Object> triggerOptions)
@@ -2706,24 +2709,24 @@ public class RemoteApi
             // extract revision
             if (triggerOptions.containsKey("revision"))
             {
-                revision = parseRevision((String)triggerOptions.get("revision"), project);
+                revision = parseRevision((String) triggerOptions.get("revision"), project);
             }
 
             // convert options
             TriggerOptions options = new TriggerOptions(new RemoteTriggerBuildReason(user.getLogin()), "remote api");
             if (triggerOptions.containsKey("replaceable"))
             {
-                options.setReplaceable(Boolean.valueOf((String)triggerOptions.get("replaceable")));
+                options.setReplaceable(Boolean.valueOf((String) triggerOptions.get("replaceable")));
             }
             if (triggerOptions.containsKey("force"))
             {
-                options.setForce(Boolean.valueOf((String)triggerOptions.get("force")));
+                options.setForce(Boolean.valueOf((String) triggerOptions.get("force")));
             }
             if (triggerOptions.containsKey("properties"))
             {
                 List<ResourcePropertyConfiguration> resourceProperties = new LinkedList<ResourcePropertyConfiguration>();
                 @SuppressWarnings({"unchecked"})
-                Hashtable<String, String> properties = (Hashtable<String, String>)triggerOptions.get("properties");
+                Hashtable<String, String> properties = (Hashtable<String, String>) triggerOptions.get("properties");
                 for (Map.Entry<String, String> property : properties.entrySet())
                 {
                     resourceProperties.add(new ResourcePropertyConfiguration(property.getKey(), property.getValue()));
@@ -2732,11 +2735,15 @@ public class RemoteApi
             }
             if (triggerOptions.containsKey("status"))
             {
-                options.setStatus((String)triggerOptions.get("status"));
+                options.setStatus((String) triggerOptions.get("status"));
             }
             if (triggerOptions.containsKey("version"))
             {
-                options.setVersion((String)triggerOptions.get("version"));
+                options.setVersion((String) triggerOptions.get("version"));
+            }
+            if (triggerOptions.containsKey("resolveVersion"))
+            {
+                options.setResolveVersion(Boolean.valueOf((String) triggerOptions.get("resolveVersion")));
             }
 
             projectManager.triggerBuild(project.getConfig(), options, revision);
@@ -2812,16 +2819,16 @@ public class RemoteApi
     /**
      * Retrieves the state of the given project.  Possible states include:
      * <ul>
-     *   <li>initialising</li>
-     *   <li>idle</li>
-     *   <li>building</li>
-     *   <li>paused</li>
-     *   <li>initialise on idle</li>
-     *   <li>pause on idle</li>
+     * <li>initialising</li>
+     * <li>idle</li>
+     * <li>building</li>
+     * <li>paused</li>
+     * <li>initialise on idle</li>
+     * <li>pause on idle</li>
      * </ul>
      *
-     * @param token        authentication token (see {@link #login})
-     * @param projectName  name of the project to retrieve the state for
+     * @param token       authentication token (see {@link #login})
+     * @param projectName name of the project to retrieve the state for
      * @return the current project state
      * @throws IllegalArgumentException if the project name is invalid
      * @access requires view permission for the project
@@ -2841,11 +2848,11 @@ public class RemoteApi
     }
 
     /**
+     * @internal Performs checks before a personal build is requested.
      * @param token       authentication token (see {@link #login})
      * @param projectName name of the projec that the user wishes to run a personal build of
      * @return SCM configuration details for the project
      * @throws ScmException if there is an error retrieving SCM details
-     * @internal Performs checks before a personal build is requested.
      */
     public Hashtable<String, String> preparePersonalBuild(String token, String projectName) throws ScmException
     {
@@ -3101,9 +3108,9 @@ public class RemoteApi
     }
 
     /**
+     * @internal Shutdown function used by the service wrapper.
      * @param token authentication token (see {@link #login})
      * @return true
-     * @internal Shutdown function used by the service wrapper.
      */
     public boolean stopService(String token)
     {

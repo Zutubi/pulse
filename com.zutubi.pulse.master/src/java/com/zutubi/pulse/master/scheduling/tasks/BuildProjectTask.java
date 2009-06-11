@@ -39,6 +39,12 @@ public class BuildProjectTask implements Task
      */
     public static final String PARAM_STATUS = "status";
 
+    /**
+     * Indicates if this build project task is triggered as a result of
+     * a dependency relationship by the completion of a dependent projects build.
+     */
+    public static final String PARAM_DEPENDENT = "dependent";
+
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
 
     private ProjectManager projectManager;
@@ -52,6 +58,9 @@ public class BuildProjectTask implements Task
         Boolean replaceableValue = (Boolean) context.get(PARAM_REPLACEABLE);
         boolean replaceable = replaceableValue == null || replaceableValue;
         String status = (String) context.get(PARAM_STATUS);
+
+        Boolean dependentValue = (Boolean) context.get(PARAM_DEPENDENT);
+        boolean dependent = dependentValue != null && dependentValue;
 
         ProjectConfiguration project = projectManager.getProjectConfig(projectId, false);
         if (project != null)
@@ -75,6 +84,7 @@ public class BuildProjectTask implements Task
             options.setForce(false);
             options.setProperties(properties);
             options.setStatus(status);
+            options.setResolveVersion(!dependent);
             projectManager.triggerBuild(project, options, revision);
         }
         else

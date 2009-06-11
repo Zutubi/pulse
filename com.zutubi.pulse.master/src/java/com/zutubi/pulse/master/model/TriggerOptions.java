@@ -50,6 +50,13 @@ public class TriggerOptions
      */
     private String version;
 
+    /**
+     * Indicates whether or not the version string needs to have any variables
+     * resolved.  This will be true for all new builds, but false if the version
+     * is being cascaded from a dependent build.
+     */
+    private boolean resolveVersion = true;
+
     public TriggerOptions(TriggerOptions other)
     {
         this.properties.addAll(other.properties);
@@ -139,5 +146,15 @@ public class TriggerOptions
     public boolean hasVersion()
     {
         return TextUtils.stringSet(this.version);
+    }
+
+    public boolean isResolveVersion()
+    {
+        return resolveVersion;
+    }
+
+    public void setResolveVersion(boolean resolveVersion)
+    {
+        this.resolveVersion = resolveVersion;
     }
 }

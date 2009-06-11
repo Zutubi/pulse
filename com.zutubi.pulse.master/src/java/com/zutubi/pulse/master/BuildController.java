@@ -166,9 +166,12 @@ public class BuildController implements EventListener
         {
             version = options.getVersion();
         }
-        String resolvedVersion = buildContext.resolveReferences(version);
-        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, resolvedVersion);
-        buildResult.setVersion(resolvedVersion);
+        if (options.isResolveVersion())
+        {
+            version = buildContext.resolveReferences(version);
+        }
+        buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, version);
+        buildResult.setVersion(version);
 
         activateBuildAuthenticationToken();
 
