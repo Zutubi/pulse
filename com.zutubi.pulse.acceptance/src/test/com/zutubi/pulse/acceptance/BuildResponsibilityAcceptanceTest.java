@@ -175,7 +175,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> antConfig = xmlRpcHelper.getConfig(antPath);
         antConfig.put(Constants.Project.AntCommand.TARGETS, "nosuchtarget");
         xmlRpcHelper.saveConfig(antPath, antConfig, false);
-        xmlRpcHelper.runBuild(random);
+        runBuild(random, false);
 
         homePage.openAndWaitFor();
         assertSelfResponsible(homePage);
@@ -183,7 +183,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         // Fix the build, so responsibility should clear.
         antConfig.put(Constants.Project.AntCommand.TARGETS, "");
         xmlRpcHelper.saveConfig(antPath, antConfig, false);
-        xmlRpcHelper.runBuild(random);
+        runBuild(random, true);
 
         homePage.openAndWaitFor();
         assertNobodyResponsible(homePage);
@@ -203,9 +203,16 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
         assertSelfResponsible(homePage);
 
-        xmlRpcHelper.runBuild(random);
+        runBuild(random, true);
 
         assertSelfResponsible(homePage);
+    }
+
+    private void runBuild(String project, Boolean expectedSuccess) throws Exception
+    {
+        int buildId = xmlRpcHelper.runBuild(project);
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project, buildId);
+        assertEquals(expectedSuccess, build.get("succeeded"));
     }
 
     private void assertNobodyResponsible(ResponsibilityPage page)
