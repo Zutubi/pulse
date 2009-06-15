@@ -3,7 +3,7 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
@@ -354,9 +354,9 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         {
             AbstractBuildRequestEvent request = new AbstractBuildRequestEvent(null, null, null, null)
             {
-                public Entity getOwner()
+                public NamedEntity getOwner()
                 {
-                    return new Entity();
+                    return new Project();
                 }
 
                 public boolean isPersonal()

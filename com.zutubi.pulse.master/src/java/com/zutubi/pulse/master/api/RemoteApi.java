@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.master.BuildQueue;
 import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -21,6 +22,7 @@ import com.zutubi.pulse.master.charting.model.SeriesData;
 import com.zutubi.pulse.master.charting.render.ChartUtils;
 import com.zutubi.pulse.master.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
+import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
@@ -1870,6 +1872,7 @@ public class RemoteApi
      * @return the ID that will be assigned to the next build of the given project
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires view permission for the given project
+     * @see #setNextBuildNumber(String, String, String) 
      */
     public int getNextBuildNumber(String token, String projectName)
     {
@@ -1883,6 +1886,54 @@ public class RemoteApi
         {
             tokenManager.logoutUser();
         }
+    }
+
+    /**
+     * Sets the next build number for the given project.  This number will be used for the next
+     * build of the project, and the numbers will continue to increment from there.  Note that the
+     * number cannot be decreased - build numbers for later builds must always be higher than those
+     * for earlier builds.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project to set the next build number for
+     * @param number      the next build number to set - must be greater than the largest build ID
+     *                    used by the project so far
+     * @return true
+     * @throws IllegalArgumentException if the given project name is invalid or the given number is
+     *                                  not greater than the largest id for the project
+     * @throws NumberFormatException    if the given number string cannot be parsed as a number
+     * @access requires write permission for the given project
+     * @see #getNextBuildNumber(String, String)
+     */
+    public boolean setNextBuildNumber(String token, String projectName, String number)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long n = Long.parseLong(number);
+            Project project = internalGetProject(projectName, true);
+            projectManager.lockProjectState(project.getId());
+            try
+            {
+                if (project.getNextBuildNumber() > n)
+                {
+                    throw new IllegalArgumentException("The given build number '" + number + "' is not large enough (build numbers must always increase)");
+                }
+
+                project.setNextBuildNumber(n);
+                projectManager.save(project);
+            }
+            finally
+            {
+                projectManager.unlockProjectState(project.getId());
+            }
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+
+        return true;
     }
 
     /**
@@ -2588,6 +2639,110 @@ public class RemoteApi
         result.put("level", feature.getLevel().getPrettyString());
         result.put("message", feature.getSummary());
         return result;
+    }
+
+    /**
+     * Returns an array of all queued build requests.  These build requests
+     * may be cancelled without affecting the build history for the project.
+     * Note that this list does not include "active" builds even if they have
+     * not yet commenced - such builds are available via other queries.
+     * <p/>
+     * The returned array is filtered: requests queued for projects that you do
+     * not have permission to view are not returned.
+     *
+     * @param token authentication token, see {@link #login(String, String)}
+     * @return {@xtype array<[RemoteApi.QueuedBuild]>} all queued build
+     *         requests that youhave permission to view
+     * @access available to all users, though the result is filtered by project
+     *         view permission
+     * @see #cancelQueuedBuildRequest(String, String)
+     */
+    public Vector<Hashtable<String, Object>> getBuildQueueSnapshot(String token)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
+            List<AbstractBuildRequestEvent> filteredQueue = new LinkedList<AbstractBuildRequestEvent>();
+            for (List<AbstractBuildRequestEvent> entityQueue: snapshot.getQueuedBuilds().values())
+            {
+                CollectionUtils.filter(entityQueue, new Predicate<AbstractBuildRequestEvent>()
+                {
+                    public boolean satisfied(AbstractBuildRequestEvent e)
+                    {
+                        return accessManager.hasPermission(AccessManager.ACTION_VIEW, e.getOwner());
+                    }
+                }, filteredQueue);
+            }
+
+            return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<AbstractBuildRequestEvent, Hashtable<String, Object>>()
+            {
+                public Hashtable<String, Object> map(AbstractBuildRequestEvent e)
+                {
+                    return convertBuildRequestEvent(e);
+                }
+            }));
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Hashtable<String, Object> convertBuildRequestEvent(AbstractBuildRequestEvent event)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("id", Long.toString(event.getId()));
+        result.put("project", event.getProjectConfig().getName());
+        result.put("owner", event.getOwner().getName());
+        result.put("isPersonal", event.isPersonal());
+        result.put("requestSource", event.getRequestSource());
+        result.put("isReplaceable", event.isReplaceable());
+        result.put("queuedTime", Long.toString(event.getQueued()));
+        result.put("reason", event.getReason().getSummary());
+
+        Revision revision = event.getRevision().getRevision();
+        String revisionString;
+        if (revision == null)
+        {
+            revisionString = "";
+        }
+        else
+        {
+            revisionString = revision.getRevisionString();
+        }
+        result.put("revision", revisionString);
+
+        return result;
+    }
+
+    /**
+     * Cancels a queued build request, if it is found in the queue.  Note that
+     * this method cannot be used to cancel an active build (which has left the
+     * queue) - instead {@link #cancelBuild(String, String, int)} should be
+     * used.
+     *
+     * @param token authentication token, see {@link #login(String, String)}
+     * @param id    identifier of the queued request - available in the
+     *              structures returned by {@link #getBuildQueueSnapshot(String)}
+     * @return true if the build request was found and cancelled; false if it
+     *         was not found (the build may have been activated)
+     * @access requires "cancel build" action for the project owning the,
+     *         request or that you are the requestor for a personal build
+     *         request
+     * @see #getBuildQueueSnapshot(String) 
+     */
+    public boolean cancelQueuedBuildRequest(String token, String id)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return fatController.cancelQueuedBuild(Long.parseLong(id));
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     /**

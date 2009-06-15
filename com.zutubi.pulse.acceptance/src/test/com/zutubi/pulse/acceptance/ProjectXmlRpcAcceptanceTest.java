@@ -1,5 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -118,6 +121,36 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projects = call("getConfigListing", "projects");
         assertEquals(sizeBefore + 1, projects.size());
         assertTrue(projects.contains(name));
+    }
+
+    public void testSetNextBuildNumber() throws Exception
+    {
+        String projectName = randomName();
+        insertSimpleProject(projectName);
+
+        try
+        {
+            xmlRpcHelper.call("setNextBuildNumber", projectName, "haha");
+            fail("Can't use invalid build number");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("NumberFormatException: For input string: \"haha\""));
+        }
+
+        try
+        {
+            xmlRpcHelper.setNextBuildNumber(projectName, 0);
+            fail("Can't decrease build number");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("The given build number '0' is not large enough (build numbers must always increase)"));
+        }
+
+        xmlRpcHelper.setNextBuildNumber(projectName, 22);
+        int id = xmlRpcHelper.runBuild(projectName);
+        assertEquals(22, id);
     }
 
     private void assertProject(Hashtable<String, Object> struct, String name)

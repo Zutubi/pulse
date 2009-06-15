@@ -5,7 +5,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.engine.PulseFileSource;
-import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -13,8 +13,8 @@ import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
+import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
@@ -138,7 +138,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         options.setReplaceable(replaceable);
         return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), options)
         {
-            public Entity getOwner()
+            public NamedEntity getOwner()
             {
                 return owner;
             }

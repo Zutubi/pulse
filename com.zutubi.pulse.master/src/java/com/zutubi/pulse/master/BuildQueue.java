@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -23,7 +24,7 @@ public class BuildQueue
      * Map from entity to a specific queue for that entity.  The entity is
      * either a project or a user (for personal builds).
      */
-    private Map<Entity, EntityBuildQueue> entityQueues = new HashMap<Entity, EntityBuildQueue>();
+    private Map<NamedEntity, EntityBuildQueue> entityQueues = new HashMap<NamedEntity, EntityBuildQueue>();
     private boolean stopped = false;
 
     private ObjectFactory objectFactory;
@@ -49,12 +50,12 @@ public class BuildQueue
      * @param owner   owner (project or user) of the build
      * @param buildId the build result id (<strong>not</strong> the number)
      */
-    public void buildCompleted(Entity owner, long buildId)
+    public void buildCompleted(NamedEntity owner, long buildId)
     {
         lookupQueueForOwner(owner).handleBuildCompleted(buildId);
     }
 
-    private EntityBuildQueue lookupQueueForOwner(Entity owner)
+    private EntityBuildQueue lookupQueueForOwner(NamedEntity owner)
     {
         EntityBuildQueue queue = entityQueues.get(owner);
         if (queue == null)
@@ -72,7 +73,7 @@ public class BuildQueue
      * @param owner the entity to look up by
      * @return the number of active builds for the given entity
      */
-    public int getActiveBuildCount(Entity owner)
+    public int getActiveBuildCount(NamedEntity owner)
     {
         return lookupQueueForOwner(owner).getActiveBuildCount();
     }

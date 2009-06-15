@@ -58,7 +58,8 @@ public class ReferenceResolver
     {
         SPACE,
         TEXT,
-        REFERENCE
+        REFERENCE,
+        DEFAULT_VALUE
     }
 
     /**
@@ -70,7 +71,9 @@ public class ReferenceResolver
         INITIAL,
         ESCAPED,
         DOLLAR,
-        REFERENCE_NAME
+        REFERENCE_NAME,
+        EXTENDED_REFERENCE_NAME,
+        DEFAULT_VALUE
     }
 
     /**
@@ -188,9 +191,14 @@ public class ReferenceResolver
                             state = LexerState.REFERENCE_NAME;
                             break;
                         }
+                        case '(':
+                        {
+                            state = LexerState.EXTENDED_REFERENCE_NAME;
+                            break;
+                        }
                         default:
                         {
-                            throw new ResolutionException("Syntax error: expecting '{', got '" + inputChar + "'");
+                            throw new ResolutionException("Syntax error: expecting '{' or '(', got '" + inputChar + "'");
                         }
                     }
                     break;
@@ -217,8 +225,70 @@ public class ReferenceResolver
                             break;
                         }
                     }
+                    break;
                 }
-                break;
+                case EXTENDED_REFERENCE_NAME:
+                {
+                    switch (inputChar)
+                    {
+                        case ')':
+                        case '?':
+                        {
+                            if (current.length() == 0)
+                            {
+                                throw new ResolutionException("Syntax error: empty reference");
+                            }
+
+                            result.add(new Token(TokenType.REFERENCE, current.toString()));
+                            current.delete(0, current.length());
+                            if (inputChar == ')')
+                            {
+                                state = LexerState.INITIAL;
+                            }
+                            else
+                            {
+                                state = LexerState.DEFAULT_VALUE;
+                            }
+                            break;
+                        }
+                        case '!':
+                        case '%':
+                        case '#':
+                        case '&':
+                        case '/':
+                        case ':':
+                        case ';':
+                        case '|':
+                        {
+                            throw new ResolutionException("Syntax error: '" + inputChar + "' is reserved and may not be used in an extended reference name");
+                        }
+                        default:
+                        {
+                            current.append(inputChar);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case DEFAULT_VALUE:
+                {
+                    switch (inputChar)
+                    {
+                        case ')':
+                        {
+                            result.add(new Token(TokenType.DEFAULT_VALUE, current.toString()));
+                            state = LexerState.INITIAL;
+                            current.delete(0, current.length());
+                            break;
+                        }
+                        default:
+                        {
+                            current.append(inputChar);
+                            break;
+                        }
+                    }
+                    break;
+                }
             }
         }
 
@@ -240,11 +310,16 @@ public class ReferenceResolver
             }
             case DOLLAR:
             {
-                throw new ResolutionException("Syntax error: unexpected end of input looking for '{'");
+                throw new ResolutionException("Syntax error: unexpected end of input looking for '{' or '('");
             }
             case REFERENCE_NAME:
             {
                 throw new ResolutionException("Syntax error: unexpected end of input looking for '}'");
+            }
+            case EXTENDED_REFERENCE_NAME:
+            case DEFAULT_VALUE:
+            {
+                throw new ResolutionException("Syntax error: unexpected end of input looking for ')'");
             }
         }
 
@@ -258,6 +333,77 @@ public class ReferenceResolver
             result.add(new Token(TokenType.TEXT, current.toString()));
             current.delete(0, current.length());
         }
+    }
+
+    private enum ParseElementType
+    {
+        TEXT,
+        SPACE,
+        REFERENCE
+    }
+
+    /**
+     * Base for parse elements: we don't use a full-blown tree, we just compose
+     * related tokens into single elements of specific types.
+     */
+    private static abstract class ParseElement
+    {
+        private ParseElementType type;
+
+        protected ParseElement(ParseElementType type)
+        {
+            this.type = type;
+        }
+    }
+
+    private static class SimpleElement extends ParseElement
+    {
+        private String value;
+
+        private SimpleElement(ParseElementType type, String value)
+        {
+            super(type);
+            this.value = value;
+        }
+    }
+
+    private static class ReferenceElement extends ParseElement
+    {
+        private String name;
+        private String defaultValue;
+
+        private ReferenceElement(ParseElementType type, String name)
+        {
+            super(type);
+            this.name = name;
+        }
+    }
+
+    private static List<ParseElement> parse(String input, boolean split) throws ResolutionException
+    {
+        List<ParseElement> parseElements = new LinkedList<ParseElement>();
+        List<Token> tokens = tokenise(input, split);
+        for (Token token: tokens)
+        {
+            switch (token.type)
+            {
+                case TEXT:
+                    parseElements.add(new SimpleElement(ParseElementType.TEXT, token.value));
+                    break;
+                case SPACE:
+                    parseElements.add(new SimpleElement(ParseElementType.SPACE, token.value));
+                    break;
+                case REFERENCE:
+                    parseElements.add(new ReferenceElement(ParseElementType.REFERENCE, token.value));
+                    break;
+                case DEFAULT_VALUE:
+                    ReferenceElement reference = (ReferenceElement) parseElements.get(parseElements.size() - 1);
+                    reference.defaultValue = token.value;
+                    break;
+            }
+        }
+
+        return parseElements;
     }
 
     public static boolean containsReference(String input) throws ResolutionException
@@ -276,18 +422,23 @@ public class ReferenceResolver
 
     public static Object resolveReference(String input, ReferenceMap references) throws ResolutionException
     {
-        List<Token> tokens = tokenise(input, false);
-        if (tokens.size() != 1 || tokens.get(0).type != TokenType.REFERENCE)
+        List<ParseElement> elements = parse(input, false);
+        if (elements.size() != 1 || elements.get(0).type != ParseElementType.REFERENCE)
         {
             throw new ResolutionException("Expected single reference. Instead found '" + input + "'");
         }
-        Token token = tokens.get(0);
-        Reference ref = references.getReference(token.value);
+        ReferenceElement element = (ReferenceElement) elements.get(0);
+        Reference ref = references.getReference(element.name);
         if (ref != null)
         {
             return ref.getValue();
         }
-        throw new ResolutionException("Unknown reference '" + token.value + "'");
+        else if (element.defaultValue != null)
+        {
+            return element.defaultValue;
+        }
+
+        throw new ResolutionException("Unknown reference '" + element.name + "'");
     }
 
     public static String resolveReferences(String input, ReferenceMap references) throws ResolutionException
@@ -299,20 +450,19 @@ public class ReferenceResolver
     {
         StringBuilder result = new StringBuilder();
 
-        List<Token> tokens = tokenise(input, false);
-
-        for (Token token : tokens)
+        List<ParseElement> elements = parse(input, false);
+        for (ParseElement element : elements)
         {
-            switch (token.type)
+            switch (element.type)
             {
                 case TEXT:
                 {
-                    result.append(token.value);
+                    result.append(((SimpleElement) element).value);
                     break;
                 }
                 case REFERENCE:
                 {
-                    result.append(resolveReference(references, token, resolutionStrategy));
+                    result.append(resolveReference(references, (ReferenceElement) element, resolutionStrategy));
                     break;
                 }
             }
@@ -326,11 +476,11 @@ public class ReferenceResolver
         StringBuilder current = new StringBuilder();
         boolean haveData = false;
 
-        List<Token> tokens = tokenise(input, true);
+        List<ParseElement> elements = parse(input, true);
 
-        for (Token token : tokens)
+        for (ParseElement element : elements)
         {
-            switch (token.type)
+            switch (element.type)
             {
                 case SPACE:
                 {
@@ -344,13 +494,13 @@ public class ReferenceResolver
                 }
                 case TEXT:
                 {
-                    current.append(token.value);
+                    current.append(((SimpleElement) element).value);
                     haveData = true;
                     break;
                 }
                 case REFERENCE:
                 {
-                    String value = resolveReference(references, token, resolutionStrategy);
+                    String value = resolveReference(references, (ReferenceElement) element, resolutionStrategy);
                     if(value.length() > 0)
                     {
                         current.append(value);
@@ -369,22 +519,26 @@ public class ReferenceResolver
         return result;
     }
 
-    private static String resolveReference(ReferenceMap references, Token token, ResolutionStrategy resolutionStrategy) throws ResolutionException
+    private static String resolveReference(ReferenceMap references, ReferenceElement element, ResolutionStrategy resolutionStrategy) throws ResolutionException
     {
-        if(resolutionStrategy.resolve())
+        if (resolutionStrategy.resolve())
         {
-            Reference reference = references.getReference(token.value);
+            Reference reference = references.getReference(element.name);
             if (reference != null && reference.getValue() != null)
             {
                 return reference.getValue().toString();
             }
+            else if (element.defaultValue != null)
+            {
+                return element.defaultValue;
+            }
             else if(resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
             {
-                throw new ResolutionException("Unknown reference '" + token.value + "'");
+                throw new ResolutionException("Unknown reference '" + element.name + "'");
             }
         }
 
-        return "${" + token.value + "}";
+        return "${" + element.name + "}";
     }
 
 }

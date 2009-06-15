@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 
@@ -10,7 +11,7 @@ import java.util.Set;
 /**
  * Holds the state for a user account.
  */
-public class User extends Entity
+public class User extends Entity implements NamedEntity
 {
     public static int REFRESH_DISABLED = 0;
 

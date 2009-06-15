@@ -51,7 +51,7 @@
 <body>
     #projectTabs("reports")
 
-<div id='#id("project-reports-${projectName}-${group}")'>
+<div id='#id("project-reports-${projectName}")'>
 
 #if($groupNames.size() > 0)
     <table class="twopane">
@@ -70,14 +70,14 @@
                 </div>
             </div>
             </td>
-            <td class="rightpane">
+            <td class="rightpane" id ='#id("project-reports-${projectName}-${group}")'>
     #if($buildCount > 0)
                 <table class="chart">
         #foreach($report in $reports)
             #if($velocityCount % 2 == 1)
                     <tr>
             #end
-                        <td class="chart">
+                        <td>
                             ${report.imageMap}
                             <img style="border:none" src="${base}/chart?filename=${report.location}" border="1" height="${report.height}" width="${report.width}" usemap="${report.imageMapName}"/>
                         </td>

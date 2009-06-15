@@ -631,7 +631,12 @@ public class XmlRpcHelper
     {
         return (Integer) call("getNextBuildNumber", projectName);
     }
-    
+
+    public void setNextBuildNumber(String projectName, long number) throws Exception
+    {
+        call("setNextBuildNumber", projectName, Long.toString(number));
+    }
+
     public void triggerBuild(String projectName) throws Exception
     {
         call("triggerBuild", projectName);
@@ -827,6 +832,16 @@ public class XmlRpcHelper
     public Vector<Hashtable<String, Object>> queryBuildsForProject(String project, Vector<String> resultStates, int firstResult, int maxResults, boolean mostRecentFirst) throws Exception
     {
         return call("queryBuildsForProject", project, resultStates, firstResult, maxResults, mostRecentFirst);
+    }
+
+    public Vector<Hashtable<String, Object>> getBuildQueueSnapshot() throws Exception
+    {
+        return call("getBuildQueueSnapshot");
+    }
+
+    public boolean cancelQueuedBuildRequest(String id) throws Exception
+    {
+        return (Boolean) call("cancelQueuedBuildRequest", id);
     }
 
     public Hashtable<String, Object> getReportData(String projectName, String reportGroup, String report, int timeFrame, String timeUnit) throws Exception

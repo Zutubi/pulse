@@ -115,18 +115,15 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
 
         // Check no groups.
-        browser.open(urls.projectReports(random));
-        browser.waitForPageToLoad();
+        ProjectReportsPage reportsPage = browser.openAndWaitFor(ProjectReportsPage.class, random);
         assertTextPresent(MESSAGE_NO_GROUPS);
 
         xmlRpcHelper.restoreConfig(buildTrendsPath);
         xmlRpcHelper.restoreConfig(testTrendsPath);
 
         // No group name in the url leads to the first group
-        browser.open(urls.projectReports(random));
-        browser.waitForPageToLoad();
-
-        ProjectReportsPage reportsPage = browser.createPage(ProjectReportsPage.class, random, REPORT_GROUP_BUILD_TRENDS);
+        reportsPage.openAndWaitFor();
+        reportsPage = browser.createPage(ProjectReportsPage.class, random, REPORT_GROUP_BUILD_TRENDS);
         assertTrue(reportsPage.isPresent());
 
         // Go away and come back to the full url (with group), check handling of
@@ -145,7 +142,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         reportsPage = browser.openAndWaitFor(ProjectReportsPage.class, random, REPORT_GROUP_TEST_TRENDS);
 
         // Check that clicking apply preserves the visible group.
-        browser.click("apply.button");
+        reportsPage.clickApply();
         reportsPage.waitFor();
     }
 
