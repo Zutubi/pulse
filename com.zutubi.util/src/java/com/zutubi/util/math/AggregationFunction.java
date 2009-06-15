@@ -6,7 +6,7 @@ import com.zutubi.util.CollectionUtils;
 import java.util.Collection;
 
 /**
- * Functions that cna be used to combine a collection of numbers into a single
+ * Functions that can be used to combine a collection of numbers into a single
  * number.
  */
 public enum AggregationFunction

@@ -54,6 +54,7 @@
                 <ref local="agentPriority"/>
                 <ref local="gitTrackSelectedBranch"/>
                 <ref local="autoClearResponsibility"/>
+                <ref local="globalReports"/>
                 <ref local="resourceRequirementOptional"/>
                 <ref local="triggerProperties"/>
                 <ref local="globalPostProcessors"/>
@@ -230,6 +231,10 @@
         <property name="buildNumber" value="200030001"/>
     </bean>
 
+    <bean id="globalReports" class="com.zutubi.pulse.master.upgrade.tasks.GlobalReportsUpgradeTask">
+        <property name="buildNumber" value="200031001"/>
+    </bean>
+    
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">
         <property name="buildNumber" value="200999001"/>
     </bean>
@@ -282,5 +287,4 @@
     <bean id="addDependenciesVersionField" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyVersionFieldUpgradeTask">
         <property name="buildNumber" value="200999012"/>
     </bean>
-
 </beans>

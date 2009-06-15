@@ -1110,6 +1110,62 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
     }
 
+    public void testRenameSourceParentNotReadable() throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS && notRoot())
+        {
+            File src = new File(tmpDir, "src");
+            File dest = new File(tmpDir, "dest");
+            assertTrue(src.createNewFile());
+            FileSystemUtils.setPermissions(tmpDir, FileSystemUtils.PERMISSION_OWNER_WRITE);
+
+            try
+            {
+                FileSystemUtils.rename(src, dest, false);
+                fail("Shouldn't be able to rename when source parent is not readable");
+            }
+            catch (IOException e)
+            {
+                assertTrue(e.getMessage().contains("source's parent directory is not readable"));
+            }
+            finally
+            {
+                FileSystemUtils.setPermissions(tmpDir, FileSystemUtils.PERMISSION_OWNER_FULL);
+            }
+        }
+    }
+
+    public void testRenameDestParentNotWritable() throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS && notRoot())
+        {
+            File src = new File(tmpDir, "src");
+            File dest = new File(tmpDir, "dest");
+            assertTrue(src.createNewFile());
+            FileSystemUtils.setPermissions(tmpDir, FileSystemUtils.PERMISSION_ALL_READ);
+
+            try
+            {
+                FileSystemUtils.rename(src, dest, false);
+                fail("Shouldn't be able to rename when destination parent is not writable");
+            }
+            catch (IOException e)
+            {
+                assertTrue(e.getMessage().contains("destination's parent directory is not writeable"));
+            }
+            finally
+            {
+                FileSystemUtils.setPermissions(tmpDir, FileSystemUtils.PERMISSION_OWNER_FULL);
+            }
+        }
+
+    }
+
+    private boolean notRoot()
+    {
+        return !"root".equals(System.getProperty("user.name"));
+    }
+
     private void createDirectoryLayout(File dir) throws IOException
     {
         File file1 = new File(dir, "f1");

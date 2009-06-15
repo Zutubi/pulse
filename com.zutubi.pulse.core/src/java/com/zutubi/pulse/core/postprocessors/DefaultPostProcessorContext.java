@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+import com.zutubi.util.TextUtils;
 
 import java.util.Map;
 
@@ -87,6 +88,11 @@ public class DefaultPostProcessorContext implements PostProcessorContext
 
     public void addCustomField(String name, String value)
     {
+        if (!TextUtils.stringSet(name))
+        {
+            throw new IllegalArgumentException("Name must be specified");
+        }
+        
         @SuppressWarnings({"unchecked"})
         Map<String, String> fields = executionContext.getValue(NAMESPACE_INTERNAL, PROPERTY_CUSTOM_FIELDS, Map.class);
         fields.put(name, value);

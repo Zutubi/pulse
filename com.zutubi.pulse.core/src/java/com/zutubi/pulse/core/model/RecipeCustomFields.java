@@ -16,7 +16,7 @@ import java.util.Properties;
  */
 public class RecipeCustomFields
 {
-    public static final String CUSTOM_FIELDS_FILE = "custom.properties";
+    public static final String CUSTOM_FIELDS_FILE = "fields.properties";
 
     private static final Logger LOG = Logger.getLogger(RecipeCustomFields.class);
 
@@ -79,6 +79,9 @@ public class RecipeCustomFields
      */
     public void store(Map<String, String> customFields)
     {
+        // Clear cached fields.
+        this.customFields = null;
+
         Properties properties = new Properties();
         properties.putAll(customFields);
         File customFile = new File(recipeOutputDir, CUSTOM_FIELDS_FILE);

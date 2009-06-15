@@ -78,3 +78,4 @@ public abstract class AbstractPredefinedRecordsUpgradeTask extends AbstractUpgra
         this.recordManager = recordManager;
     }
 }
+

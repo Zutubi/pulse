@@ -217,14 +217,31 @@ public class FileSystemUtils
             String message = "Unable to rename '" + src.getAbsolutePath() + "' to '" + dest.getAbsolutePath() + "'";
             if (!src.exists())
             {
-                message += ": source does not exist";
+                // It may exist but just be invisible to us.
+                File sourceParent = src.getParentFile();
+                if (sourceParent != null && sourceParent.exists() && !sourceParent.canRead())
+                {
+                    message += ": source's parent directory is not readable";
+                }
+                else
+                {
+                    message += ": source does not exist";
+                }
             }
 
             if (dest.exists())
             {
                 message += ": destination already exists";
             }
-
+            else
+            {
+                File destParent = dest.getParentFile();
+                if (destParent != null && !destParent.canWrite())
+                {
+                    message += ": destination's parent directory is not writeable";
+                }
+            }
+            
             throw new IOException(message);
         }
     }

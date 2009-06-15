@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.project.reports;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.util.BinaryFunction;
 import com.zutubi.util.Constants;
+import com.zutubi.util.logging.Logger;
 
 /**
  * Metrics that can be extracted from individual build stages.
@@ -230,7 +231,8 @@ public enum StageMetric
             {
                 public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
                 {
-                    String fieldValue = recipeFields.getFieldValue(recipeResult, config.getField());
+                    String fieldName = config.getField();
+                    String fieldValue = recipeFields.getFieldValue(recipeResult, fieldName);
                     if (fieldValue != null)
                     {
                         try
@@ -239,7 +241,7 @@ public enum StageMetric
                         }
                         catch (NumberFormatException e)
                         {
-                            // Fall through to return null.
+                            LOG.warning("Unable to parse value of field '" + fieldName + "' (" + fieldValue + ") as a number for reporting");
                         }
                     }
 
@@ -248,6 +250,7 @@ public enum StageMetric
             };
         }
     };
+    private static final Logger LOG = Logger.getLogger(StageMetric.class);
 
     /**
      * Returns a function that can extract a value for this metric from a

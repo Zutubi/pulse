@@ -90,5 +90,13 @@ public interface PostProcessorContext
      */
     void addFeatureToCommand(Feature feature);
 
+    /**
+     * Adds a custom field to the recipe result.  Custom fields can be used to
+     * attach extra data to a recipe result.  If the field with the same name
+     * has already been added, it is updated to this value.
+     *
+     * @param name  name of the field to add, must not be empty
+     * @param value value of the field
+     */
     void addCustomField(String name, String value);
 }
