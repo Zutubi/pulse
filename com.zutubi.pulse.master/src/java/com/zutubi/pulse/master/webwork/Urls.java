@@ -163,6 +163,11 @@ public class Urls
         return project(project) + "reports/";
     }
 
+    public String projectReports(Object project, String groupName)
+    {
+        return projectReports(project) + groupName + "/";
+    }
+
     private String projectBuilds(Object project)
     {
         return project(project) + "builds/";

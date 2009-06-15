@@ -25,6 +25,11 @@ public class BuildDetailedViewPage extends SeleniumPage
         return urls.buildDetails(projectName, Long.toString(buildId));
     }
 
+    public void clickStage(String stageName)
+    {
+        browser.click("xpath=//li[@id='stage-" + stageName + "']/a");
+    }
+
     public void clickCommand(String stageName, String commandName)
     {
         browser.click("xpath=//li[@id='stage-" + stageName + "-command-" + commandName + "']/a");
@@ -49,5 +54,15 @@ public class BuildDetailedViewPage extends SeleniumPage
     private String getLogLinkId()
     {
         return "log-" + projectName + "-" + buildId;
+    }
+
+    public String getCustomFieldsId(String stageName)
+    {
+        return "custom.fields." + stageName;
+    }
+
+    public String getCustomFieldValue(String stageName, int index)
+    {
+        return browser.getCellContents(getCustomFieldsId(stageName), index + 1, 1);
     }
 }

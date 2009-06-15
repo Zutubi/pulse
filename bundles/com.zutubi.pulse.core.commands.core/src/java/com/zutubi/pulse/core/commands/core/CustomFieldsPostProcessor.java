@@ -18,7 +18,7 @@ import java.util.Properties;
  */
 public class CustomFieldsPostProcessor extends PostProcessorSupport
 {
-    protected CustomFieldsPostProcessor(CustomFieldsPostProcessorConfiguration config)
+    public CustomFieldsPostProcessor(CustomFieldsPostProcessorConfiguration config)
     {
         super(config);
     }

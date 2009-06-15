@@ -829,6 +829,11 @@ public class XmlRpcHelper
         return call("queryBuildsForProject", project, resultStates, firstResult, maxResults, mostRecentFirst);
     }
 
+    public Hashtable<String, Object> getReportData(String projectName, String reportGroup, String report, int timeFrame, String timeUnit) throws Exception
+    {
+        return call("getReportData", projectName, reportGroup, report, timeFrame, timeUnit);
+    }
+
     public static void main(String[] argv) throws Exception
     {
         XmlRpcHelper helper = new XmlRpcHelper("http://localhost:8080/xmlrpc");

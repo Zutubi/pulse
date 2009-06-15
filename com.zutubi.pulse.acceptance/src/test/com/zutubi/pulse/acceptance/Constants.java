@@ -59,6 +59,7 @@ public class Constants
         public static final String SCM = "scm";
         public static final String TYPE = "type";
         public static final String OPTIONS = "options";
+        public static final String REPORT_GROUPS = "reportGroups";
 
         /**
          * Property names in the multi recipe type class.
@@ -97,11 +98,20 @@ public class Constants
              */
             public static class Output
             {
+                public static final String NAME = "name";
                 public static final String POSTPROCESSORS = "postProcessors";
             }
 
             /**
-             * The constants for the property names in the DirectoryArtifactConfiguration class.
+             * The constants for the property names in the FileOutputConfiguration class.
+             */
+            public static class FileOutput extends Output
+            {
+                public static final String FILE = "file";
+            }
+
+            /**
+             * The constants for the property names in the DirectoryOutputConfiguration class.
              */
             public static class DirectoryOutput extends Output
             {
@@ -162,5 +172,29 @@ public class Constants
             public static final String RETRIEVAL_PATTERN = "retrievalPattern";
             public static final String STATUS = "status";
         }
-    }
+
+        public static class Artifact
+        {
+
+        }
+
+        /**
+         * Property names in the FileArtifactConfiguration class.
+         */
+        public static class FileArtifact extends Artifact
+        {
+            public static final String FILE = "file";
+        }
+
+        /**
+         * The constants for the property names in the DirectoryArtifactConfiguration class.
+         */
+        public static class DirectoryArtifact extends Artifact
+        {
+            public static final String BASE = "base";
+            public static final String INCLUDES = "includes";
+            public static final String EXCLUDES = "excludes";
+            public static final String MIME_TYPE = "type";
+        }
+    }   
 }

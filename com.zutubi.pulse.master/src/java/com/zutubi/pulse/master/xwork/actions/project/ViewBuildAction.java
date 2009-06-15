@@ -3,6 +3,8 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
+import com.zutubi.pulse.core.model.RecipeCustomFields;
+import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -19,10 +21,7 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  *
@@ -74,6 +73,12 @@ public class ViewBuildAction extends CommandActionBase
             summaryColumns = new BuildColumns(u == null ? UserPreferencesConfiguration.defaultProjectColumns() : u.getPreferences().getProjectSummaryColumns(), accessManager);
         }
         return summaryColumns;
+    }
+
+    public Map<String, String> getCustomFields(RecipeResult recipe)
+    {
+        RecipeCustomFields customFields = new RecipeCustomFields(recipe.getAbsoluteOutputDir(configurationManager.getDataDirectory()));
+        return customFields.load();
     }
 
     public static int getFailureLimit()
@@ -180,11 +185,12 @@ public class ViewBuildAction extends CommandActionBase
         // Initialise detail down to the command level (optional)
         getCommandResult();
 
-        result.loadFeatures(configurationManager.getDataDirectory());
+        File dataDir = configurationManager.getDataDirectory();
+        result.loadFeatures(dataDir);
 
         if(result.completed())
         {
-            result.loadFailedTestResults(configurationManager.getDataDirectory(), getFailureLimit());
+            result.loadFailedTestResults(dataDir, getFailureLimit());
         }
 
         return SUCCESS;

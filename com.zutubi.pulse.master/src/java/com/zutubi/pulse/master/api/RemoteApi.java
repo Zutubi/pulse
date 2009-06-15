@@ -13,15 +13,25 @@ import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.charting.build.DefaultCustomFieldSource;
+import com.zutubi.pulse.master.charting.build.ReportBuilder;
+import com.zutubi.pulse.master.charting.model.DataPoint;
+import com.zutubi.pulse.master.charting.model.ReportData;
+import com.zutubi.pulse.master.charting.model.SeriesData;
+import com.zutubi.pulse.master.charting.render.ChartUtils;
 import com.zutubi.pulse.master.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.reports.ReportConfiguration;
+import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
@@ -66,6 +76,7 @@ public class RemoteApi
     private UserManager userManager;
     private ScmManager scmManager;
     private FatController fatController;
+    private BuildResultDao buildResultDao;
 
     public RemoteApi()
     {
@@ -2580,6 +2591,90 @@ public class RemoteApi
     }
 
     /**
+     * Generates and returns the report data for the given project report over the given time frame.
+     * This is the raw series data that is used to render reports in the web interface.  This data
+     * could be fed into other charting/reporting software to generate render the report in a
+     * graphical form.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName name of the project to retrieve report data for
+     * @param reportGroup name of the report group the report is part of
+     * @param report      name of the report to generate the data for
+     * @param timeFrame   magnitude of the time frame to report over, measured in timeUnit's, must
+     *                    be positive
+     * @param timeUnit    unit of the time to report over, one of "builds" or "days"
+     *                    (case-insensitive)
+     * @return {@xtype [RemoteApi.ReportData]} the raw report data for the given report
+     * @throws IllegalArgumentException if the given project, report group or report does not exist;
+     *                                  if the time frame is not positive
+     * @access requires view permission for the given project
+     */
+    public Hashtable<String, Object> getReportData(String token, String projectName, String reportGroup, String report, int timeFrame, String timeUnit)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Project project = internalGetProject(projectName, false);
+            ReportGroupConfiguration reportGroupConfig = project.getConfig().getReportGroups().get(reportGroup);
+            if (reportGroupConfig == null)
+            {
+                throw new IllegalArgumentException("Unknown report group '" + reportGroup + "' for project '" + projectName + "'");
+            }
+
+            ReportConfiguration reportConfig = reportGroupConfig.getReports().get(report);
+            if (reportConfig == null)
+            {
+                throw new IllegalArgumentException("Unknown report '" + report + "' for group '" + reportGroup + "' in project '" + projectName + "'");
+            }
+
+            if (timeFrame <= 0)
+            {
+                throw new IllegalArgumentException("Time frame must be positive (got " + timeFrame + ")");
+            }
+
+            ReportTimeUnit resolvedTimeUnit = ReportTimeUnit.valueOf(timeUnit.toUpperCase());
+            ReportBuilder builder = new ReportBuilder(reportConfig, new DefaultCustomFieldSource(configurationManager.getDataDirectory()));
+            ReportData data = builder.build(ChartUtils.getBuilds(project, timeFrame, resolvedTimeUnit, buildResultDao));
+            return convertReportData(report, data);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Hashtable<String, Object> convertReportData(String name, ReportData data)
+    {
+        Vector<Hashtable<String, Object>> series = new Vector<Hashtable<String, Object>>();
+        for (SeriesData seriesData: data.getSeriesList())
+        {
+            series.add(convertSeriesData(seriesData));
+        }
+
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("name", name);
+        result.put("series", series);
+        return result;
+    }
+
+    private Hashtable<String, Object> convertSeriesData(SeriesData seriesData)
+    {
+        Vector<String> labels = new Vector<String>();
+        Vector<Double> values = new Vector<Double>();
+        for (DataPoint point: seriesData.getPoints())
+        {
+            labels.add(Long.toString(point.getX()));
+            values.add(point.getY().doubleValue());
+        }
+
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("name", seriesData.getName());
+        result.put("labels", labels);
+        result.put("values", values);
+        return result;
+    }
+
+    /**
      * Triggers a build of the given project at a floating revision.  The revision will be fixed as
      * laate as possible.  This function returns as soon as the request has been made.
      *
@@ -3256,5 +3351,10 @@ public class RemoteApi
     public void setTransactionContext(TransactionContext context)
     {
         this.transactionContext = context;
+    }
+
+    public void setBuildResultDao(BuildResultDao buildResultDao)
+    {
+        this.buildResultDao = buildResultDao;
     }
 }

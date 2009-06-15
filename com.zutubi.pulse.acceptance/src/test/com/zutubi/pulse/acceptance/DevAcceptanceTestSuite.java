@@ -43,6 +43,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ServerSectionAcceptanceTest.class);
         suite.addTestSuite(ServerActivityAcceptanceTest.class);
         suite.addTestSuite(BrowseScmAcceptanceTest.class);
+        suite.addTestSuite(ProjectReportsAcceptanceTest.class);
 
         //---( build tests )---
         suite.addTestSuite(BuildAcceptanceTest.class);

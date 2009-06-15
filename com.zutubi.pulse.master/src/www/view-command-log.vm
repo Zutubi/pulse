@@ -32,7 +32,7 @@
     #if($result.root.children.size() > 0)
                         <ul>
         #foreach($node in $result.root.children)
-                            <li>
+                            <li id='#id("stage-${node.stageName}")'>
                                 <a href="#" id="nav_$node.id" onclick="selectNode('$node.id'); return false;">
                                     #statusImage($node.result false)
                                     $!webwork.htmlEncode($node.stageName)
@@ -70,12 +70,26 @@
                 <div id="node_$node.id" style="display: none">
                     <div class="panecontent">
                         <table class="content">
-                            #headingRow("build.stage.summary" 10)
+                            #headingRow("build.stage.summary" 11)
                             #recipeSummaryHeader()
                             #recipeSummary($node $result true false)
-                            #directMessages($node.result 10)
+                            #directMessages($node.result 11)
                         </table>
                         #recipeCommands($node $result)
+
+        #set($customFields = $action.getCustomFields($recipeResult))
+        #if($customFields.size() > 0)
+                        <table class="content" id='#id("custom.fields.${node.stageName}")'>
+                            #headingRow("build.stage.custom.fields" 2)
+                            <tr>
+                                #contentHeading("custom.field.name" 1)
+                                #contentHeading("custom.field.value" 1)
+                            </tr>
+            #foreach($customField in $customFields.entrySet())
+                            #propertyRow($customField)
+            #end
+                        </table>
+        #end
                     </div>
                 </div>
 
