@@ -5,9 +5,14 @@ package com.zutubi.pulse.master.tove.config.project.reports;
  */
 public enum ChartColours
 {
-    BROKEN(0xeb5a5a),
-    SUCCESS(0x96eb96),
-    NEUTRAL(0x325aa0);
+    BROKEN_FILL(0xeb5a5a),
+    FAIL_FILL(0xffdddd),
+    SUCCESS_FILL(0x96eb96),
+    WARNING_FILL(0xffffce),
+    NOTHING_FILL(0xe0e0e0),
+    NEUTRAL_LINE(0x325aa0),
+    ERROR_LINE(0xc00000),
+    WARNING_LINE(0xf0c000);
 
     private int value;
 
@@ -15,7 +20,6 @@ public enum ChartColours
     {
         this.value = value;
     }
-
 
     @Override
     public String toString()

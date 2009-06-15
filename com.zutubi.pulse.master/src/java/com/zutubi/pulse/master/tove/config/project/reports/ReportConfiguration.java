@@ -9,7 +9,7 @@ import com.zutubi.util.math.AggregationFunction;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -33,7 +33,21 @@ public class ReportConfiguration extends AbstractNamedConfiguration
     private int width = 400;
     @Required @Numeric(min = 200)
     private int height = 300;
-    private Map<String, ReportSeriesConfiguration> seriesMap = new HashMap<String, ReportSeriesConfiguration>();
+    private Map<String, ReportSeriesConfiguration> seriesMap = new LinkedHashMap<String, ReportSeriesConfiguration>();
+
+    public ReportConfiguration()
+    {
+    }
+
+    public ReportConfiguration(String name, ChartType type, boolean zoomRange, DomainUnit domainUnits, AggregationFunction aggregationFunction, String rangeLabel)
+    {
+        super(name);
+        this.type = type;
+        this.zoomRange = zoomRange;
+        this.domainUnits = domainUnits;
+        this.aggregationFunction = aggregationFunction;
+        this.rangeLabel = rangeLabel;
+    }
 
     public ChartType getType()
     {

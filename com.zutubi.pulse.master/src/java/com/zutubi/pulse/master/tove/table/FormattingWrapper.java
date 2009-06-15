@@ -109,6 +109,12 @@ public class FormattingWrapper
                 fieldValue = fieldValue.toString().toLowerCase().replace('_', ' ');
             }
         }
+
+        // Default formatting for enum constants.
+        if (fieldValue.getClass().isEnum())
+        {
+            return fieldValue.toString().toLowerCase().replace('_', ' ');
+        }
         
         return fieldValue;
     }

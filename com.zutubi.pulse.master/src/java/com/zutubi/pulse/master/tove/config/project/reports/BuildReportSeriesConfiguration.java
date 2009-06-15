@@ -12,6 +12,22 @@ public class BuildReportSeriesConfiguration extends ReportSeriesConfiguration
 {
     private BuildMetric metric;
 
+    public BuildReportSeriesConfiguration()
+    {
+    }
+
+    public BuildReportSeriesConfiguration(String name, BuildMetric metric, boolean successfulOnly)
+    {
+        super(name, successfulOnly);
+        this.metric = metric;
+    }
+
+    public BuildReportSeriesConfiguration(String name, BuildMetric metric, boolean successfulOnly, String customColour)
+    {
+        super(name, successfulOnly, customColour);
+        this.metric = metric;
+    }
+
     public BuildMetric getMetric()
     {
         return metric;

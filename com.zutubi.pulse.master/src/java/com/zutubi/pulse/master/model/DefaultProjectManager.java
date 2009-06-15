@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.model;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
@@ -38,6 +39,7 @@ import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.reports.*;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
@@ -54,6 +56,7 @@ import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.math.AggregationFunction;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,6 +66,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
+    private static final Messages I18N = Messages.getInstance(DefaultProjectManager.class);
 
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
@@ -222,6 +226,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 cleanupMap.put("default", cleanupConfiguration);
                 globalProject.addExtension("cleanup", cleanupMap);
 
+                addDefaultReports(globalProject);
+
                 CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
                 MutableRecord globalTemplate = projectType.unstantiate(globalProject);
                 configurationTemplateManager.markAsTemplate(globalTemplate);
@@ -232,6 +238,251 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 LOG.severe("Unable to create global project template: " + e.getMessage(), e);
             }
         }
+    }
+
+    private void addDefaultReports(ProjectConfiguration globalProject)
+    {
+        ReportGroupConfiguration buildTrendsGroup = new ReportGroupConfiguration(I18N.format("report.group.build.trends"));
+        buildTrendsGroup.addReport(createBuildResultReport());
+        buildTrendsGroup.addReport(createBuildTimeReport());
+        buildTrendsGroup.addReport(createErrorCountReport());
+        buildTrendsGroup.addReport(createWarningCountReport());
+        globalProject.addReportGroup(buildTrendsGroup);
+
+        ReportGroupConfiguration testTrendsGroup = new ReportGroupConfiguration(I18N.format("report.group.test.trends"));
+        testTrendsGroup.setDefaultTimeFrame(30);
+        testTrendsGroup.setDefaultTimeUnit(ReportTimeUnit.BUILDS);
+        testTrendsGroup.addReport(createTestsRunReport());
+        testTrendsGroup.addReport(createTestSuccessRateReport());
+        testTrendsGroup.addReport(createBuildTestBreakdownReport());
+        testTrendsGroup.addReport(createStageTestBreakdownReport());
+        globalProject.addReportGroup(testTrendsGroup);
+    }
+
+    private ReportConfiguration createBuildResultReport()
+    {
+        ReportConfiguration reportConfig = new ReportConfiguration(
+                I18N.format("report.build.results"),
+                ChartType.STACKED_BAR_CHART,
+                false,
+                DomainUnit.DAYS,
+                AggregationFunction.SUM,
+                I18N.format("report.build.results.range"));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.build.results.series.succeeded"),
+                BuildMetric.SUCCESS_COUNT,
+                false,
+                ChartColours.SUCCESS_FILL.toString()
+        ));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.build.results.series.broken"),
+                BuildMetric.BROKEN_COUNT,
+                false,
+                ChartColours.BROKEN_FILL.toString()
+        ));
+        return reportConfig;
+    }
+
+    private ReportConfiguration createBuildTimeReport()
+    {
+        ReportConfiguration reportConfig = new ReportConfiguration(
+                I18N.format("report.build.time"),
+                ChartType.LINE_CHART,
+                false,
+                DomainUnit.DAYS,
+                AggregationFunction.MEAN,
+                I18N.format("report.build.time.range"));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.build.time.series.builds"),
+                BuildMetric.ELAPSED_TIME,
+                true
+        ));
+
+        reportConfig.addSeries(new StageReportSeriesConfiguration(
+                I18N.format("report.build.time.series.stages"),
+                StageMetric.ELAPSED_TIME,
+                true,
+                AggregationFunction.MEAN
+        ));
+        return reportConfig;
+    }
+
+    private ReportConfiguration createErrorCountReport()
+    {
+        ReportConfiguration reportConfig = new ReportConfiguration(
+                I18N.format("report.error.count"),
+                ChartType.LINE_CHART,
+                false,
+                DomainUnit.DAYS,
+                AggregationFunction.MEAN,
+                I18N.format("report.error.count.range"));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.error.count.series"),
+                BuildMetric.ERROR_COUNT,
+                false,
+                ChartColours.ERROR_LINE.toString()
+        ));
+        return reportConfig;
+    }
+
+    private ReportConfiguration createWarningCountReport()
+    {
+        ReportConfiguration reportConfig = new ReportConfiguration(
+                I18N.format("report.warning.count"),
+                ChartType.LINE_CHART,
+                false,
+                DomainUnit.DAYS,
+                AggregationFunction.MEAN,
+                I18N.format("report.warning.count.range"));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.warning.count.series"),
+                BuildMetric.WARNING_COUNT,
+                false,
+                ChartColours.WARNING_LINE.toString()
+        ));
+        return reportConfig;
+    }
+
+    private ReportConfiguration createTestsRunReport()
+    {
+        ReportConfiguration reportConfig = new ReportConfiguration(
+                I18N.format("report.tests.run"),
+                ChartType.LINE_CHART,
+                false,
+                DomainUnit.BUILD_IDS,
+                null,
+                I18N.format("report.tests.run.range"));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.tests.run.series.builds"),
+                BuildMetric.TEST_TOTAL_COUNT,
+                true
+        ));
+
+        reportConfig.addSeries(new StageReportSeriesConfiguration(
+                I18N.format("report.tests.run.series.stages"),
+                StageMetric.TEST_TOTAL_COUNT,
+                true,
+                AggregationFunction.MEAN
+        ));
+        return reportConfig;
+    }
+
+    private ReportConfiguration createTestSuccessRateReport()
+    {
+        ReportConfiguration reportConfig = new ReportConfiguration(
+                I18N.format("report.tests.success"),
+                ChartType.STACKED_AREA_CHART,
+                false,
+                DomainUnit.BUILD_IDS,
+                null,
+                I18N.format("report.tests.success.range"));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.tests.success.series.passed"),
+                BuildMetric.TEST_SUCCESS_PERCENTAGE,
+                false,
+                ChartColours.SUCCESS_FILL.toString()
+        ));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.tests.success.series.broken"),
+                BuildMetric.TEST_BROKEN_PERCENTAGE,
+                false,
+                ChartColours.BROKEN_FILL.toString()
+        ));
+        return reportConfig;
+    }
+
+    private ReportConfiguration createBuildTestBreakdownReport()
+    {
+        ReportConfiguration reportConfig = new ReportConfiguration(
+                I18N.format("report.test.breakdown.builds"),
+                ChartType.STACKED_BAR_CHART,
+                false,
+                DomainUnit.BUILD_IDS,
+                null,
+                I18N.format("report.test.breakdown.builds.range"));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.builds.series.pass"),
+                BuildMetric.TEST_PASS_COUNT,
+                false,
+                ChartColours.SUCCESS_FILL.toString()
+        ));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.builds.series.skipped"),
+                BuildMetric.TEST_SKIPPED_COUNT,
+                false,
+                ChartColours.NOTHING_FILL.toString()
+        ));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.builds.series.failure"),
+                BuildMetric.TEST_FAIL_COUNT,
+                false,
+                ChartColours.FAIL_FILL.toString()
+        ));
+
+        reportConfig.addSeries(new BuildReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.builds.series.error"),
+                BuildMetric.TEST_ERROR_COUNT,
+                false,
+                ChartColours.BROKEN_FILL.toString()
+        ));
+
+        return reportConfig;
+    }
+
+    private ReportConfiguration createStageTestBreakdownReport()
+    {
+        ReportConfiguration reportConfig = new ReportConfiguration(
+                I18N.format("report.test.breakdown.stages"),
+                ChartType.STACKED_BAR_CHART,
+                false,
+                DomainUnit.BUILD_IDS,
+                null,
+                I18N.format("report.test.breakdown.builds.range"));
+
+        reportConfig.addSeries(new StageReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.stages.series.pass"),
+                StageMetric.TEST_PASS_COUNT,
+                false,
+                ChartColours.SUCCESS_FILL.toString(),
+                AggregationFunction.MEAN
+        ));
+
+        reportConfig.addSeries(new StageReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.stages.series.skipped"),
+                StageMetric.TEST_SKIPPED_COUNT,
+                false,
+                ChartColours.NOTHING_FILL.toString(),
+                AggregationFunction.MEAN
+        ));
+
+        reportConfig.addSeries(new StageReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.stages.series.failure"),
+                StageMetric.TEST_FAIL_COUNT,
+                false,
+                ChartColours.FAIL_FILL.toString(),
+                AggregationFunction.MEAN
+        ));
+
+        reportConfig.addSeries(new StageReportSeriesConfiguration(
+                I18N.format("report.test.breakdown.stages.series.error"),
+                StageMetric.TEST_ERROR_COUNT,
+                false,
+                ChartColours.BROKEN_FILL.toString(),
+                AggregationFunction.MEAN
+        ));
+
+        return reportConfig;
     }
 
     public long createState(ProjectConfiguration instance)

@@ -21,6 +21,38 @@ public class StageReportSeriesConfiguration extends ReportSeriesConfiguration
     private boolean combineStages;
     private AggregationFunction aggregationFunction;
 
+    public StageReportSeriesConfiguration()
+    {
+    }
+
+    public StageReportSeriesConfiguration(String name, StageMetric metric, boolean successfulOnly)
+    {
+        super(name, successfulOnly);
+        this.metric = metric;
+    }
+
+    public StageReportSeriesConfiguration(String name, StageMetric metric, boolean successfulOnly, String customColour)
+    {
+        super(name, successfulOnly, customColour);
+        this.metric = metric;
+    }
+
+    public StageReportSeriesConfiguration(String name, StageMetric metric, boolean successfulOnly, AggregationFunction aggregationFunction)
+    {
+        super(name, successfulOnly);
+        this.metric = metric;
+        this.combineStages = true;
+        this.aggregationFunction = aggregationFunction;
+    }
+
+    public StageReportSeriesConfiguration(String name, StageMetric metric, boolean successfulOnly, String customColour, AggregationFunction aggregationFunction)
+    {
+        super(name, successfulOnly, customColour);
+        this.metric = metric;
+        this.combineStages = true;
+        this.aggregationFunction = aggregationFunction;
+    }
+
     public StageMetric getMetric()
     {
         return metric;
