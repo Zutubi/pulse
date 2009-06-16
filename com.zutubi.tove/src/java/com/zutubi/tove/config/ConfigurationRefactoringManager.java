@@ -1087,14 +1087,22 @@ public class ConfigurationRefactoringManager
 
         private String pullUp(String value)
         {
-            String path = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, Long.parseLong(value));
-            if (path.startsWith(fromOwnerPath))
+            long originalHandle = Long.parseLong(value);
+            if (originalHandle == 0)
             {
-                path = templateOwnerPath + path.substring(fromOwnerPath.length());
+                return "0";
             }
+            else
+            {
+                String path = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, originalHandle);
+                if (path.startsWith(fromOwnerPath))
+                {
+                    path = templateOwnerPath + path.substring(fromOwnerPath.length());
+                }
 
-            long handle = configurationReferenceManager.getReferenceHandleForPath(path);
-            return Long.toString(handle);
+                long upHandle = configurationReferenceManager.getReferenceHandleForPath(path);
+                return Long.toString(upHandle);
+            }
         }
     }
 
@@ -1126,9 +1134,17 @@ public class ConfigurationRefactoringManager
 
         private String canonicaliseReference(String value)
         {
-            String path = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, Long.parseLong(value));
-            long handle = configurationReferenceManager.getReferenceHandleForPath(path);
-            return Long.toString(handle);
+            long originalHandle = Long.parseLong(value);
+            if (originalHandle == 0)
+            {
+                return "0";
+            }
+            else
+            {
+                String path = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, originalHandle);
+                long canonicalisedHandle = configurationReferenceManager.getReferenceHandleForPath(path);
+                return Long.toString(canonicalisedHandle);
+            }
         }
     }
 

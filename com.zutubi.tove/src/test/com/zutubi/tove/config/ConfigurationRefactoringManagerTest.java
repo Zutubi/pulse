@@ -638,6 +638,17 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals(PathUtils.getBaseName(extractedPath), ((TemplateRecord) configurationTemplateManager.getRecord(extractedPath)).getOwner("listOfRefs"));
     }
 
+    public void testExtractParentTemplateNullReference() throws TypeException
+    {
+        MockA a = createAInstance("a");
+        a.getBmap().put("b", new MockB("b"));
+        insertTemplateAInstance(rootPath, a, false);
+        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), "extracted");
+
+        MockA extracted = configurationTemplateManager.getInstance(extractedPath, MockA.class);
+        assertNull(extracted.getBmap().get("b").getRefToRef());
+    }
+
     private void assertAllValuesExtracted(String key)
     {
         String path = getPath(TEMPLATE_SCOPE, key);
@@ -835,6 +846,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     public static class MockB extends AbstractNamedConfiguration
     {
         private int y;
+        @Reference
+        private Referee refToRef;
 
         public MockB()
         {
@@ -853,6 +866,16 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         public void setY(int y)
         {
             this.y = y;
+        }
+
+        public Referee getRefToRef()
+        {
+            return refToRef;
+        }
+
+        public void setRefToRef(Referee refToRef)
+        {
+            this.refToRef = refToRef;
         }
     }
 

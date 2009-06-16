@@ -1,7 +1,9 @@
 package com.zutubi.tove.type;
 
+import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
@@ -13,10 +15,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-/**
- *
- *
- */
 public class CompositeTypeTest extends TypeTestCase
 {
     private CompositeType basicType;
@@ -28,6 +26,7 @@ public class CompositeTypeTest extends TypeTestCase
     private CompositeType grandparentType;
     private CompositeType parentType;
     private CompositeType childType;
+    private CompositeType refType;
 
     protected void setUp() throws Exception
     {
@@ -45,6 +44,7 @@ public class CompositeTypeTest extends TypeTestCase
         grandparentType = typeRegistry.register(GrandparentConfig.class);
         parentType = typeRegistry.register(ParentConfig.class);
         childType = typeRegistry.register(ChildConfig.class);
+        refType = typeRegistry.register(RefConfig.class);
     }
 
     protected void tearDown() throws Exception
@@ -172,6 +172,14 @@ public class CompositeTypeTest extends TypeTestCase
         assertEquals("typeA", ht.get("meta.symbolicName"));
         assertNotNull(ht.get("a"));
         assertNull(ht.get("b"));
+    }
+
+    public void testToXmlRpcNullReference() throws TypeException
+    {
+        RefConfig config = new RefConfig();
+        Record record = refType.unstantiate(config);
+        Hashtable rpcForm = refType.toXmlRpc(null, record);
+        assertFalse(rpcForm.containsKey("ref"));
     }
 
     public void testFromXmlRpc() throws TypeException
@@ -992,6 +1000,28 @@ public class CompositeTypeTest extends TypeTestCase
     @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     private static @interface ChildAnnotation
+    {
+    }
+
+    @SymbolicName("ref")
+    public static class RefConfig extends AbstractConfiguration
+    {
+        @Reference
+        private EeConfig ref;
+
+        public EeConfig getRef()
+        {
+            return ref;
+        }
+
+        public void setRef(EeConfig ref)
+        {
+            this.ref = ref;
+        }
+    }
+
+    @SymbolicName("ee")
+    public static class EeConfig extends AbstractNamedConfiguration
     {
     }
 }

@@ -152,6 +152,11 @@ public class MapType extends CollectionType
 
     public MutableRecord unstantiate(Object instance) throws TypeException
     {
+        if (instance == null)
+        {
+            return null;
+        }
+
         typeCheck(instance, Map.class);
         return convertToRecord((Map) instance, new UnstantiateToRecord());
     }
