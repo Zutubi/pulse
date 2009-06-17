@@ -27,6 +27,15 @@ public abstract class FileSystemOutputConfigurationSupport extends OutputConfigu
     @Reference @Addable(value = "process", attribute = "processor")
     private List<PostProcessorConfiguration> postProcessors = new LinkedList<PostProcessorConfiguration>();
 
+    protected FileSystemOutputConfigurationSupport()
+    {
+    }
+
+    protected FileSystemOutputConfigurationSupport(String name)
+    {
+        super(name);
+    }
+
     public boolean isFailIfNotPresent()
     {
         return failIfNotPresent;

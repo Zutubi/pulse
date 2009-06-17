@@ -16,6 +16,16 @@ public class FileOutputConfiguration extends FileSystemOutputConfigurationSuppor
     @Required
     private String file;
 
+    public FileOutputConfiguration()
+    {
+    }
+
+    public FileOutputConfiguration(String name, String file)
+    {
+        super(name);
+        this.file = file;
+    }
+
     public String getFile()
     {
         return file;

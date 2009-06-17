@@ -9,4 +9,12 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 @SymbolicName("zutubi.outputConfigSupport")
 public abstract class OutputConfigurationSupport extends AbstractNamedConfiguration implements OutputConfiguration
 {
+    protected OutputConfigurationSupport()
+    {
+    }
+
+    protected OutputConfigurationSupport(String name)
+    {
+        super(name);
+    }
 }

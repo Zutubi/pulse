@@ -36,7 +36,7 @@ public class FileOutput extends FileSystemOutputSupport
             if (captureFile.isFile())
             {
                 // excellent, we have the file, we can capture it and continue.
-                captureFile(new File(toDir, file), captureFile, context);
+                captureFile(new File(toDir, captureFile.getName()), captureFile, context);
                 return;
             }
 
