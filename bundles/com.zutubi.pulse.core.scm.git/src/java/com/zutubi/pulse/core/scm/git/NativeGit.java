@@ -87,9 +87,19 @@ public class NativeGit
         return show(REVISION_HEAD, file);
     }
 
-    public InputStream show(String revision, String file) throws GitException
+    public InputStream show(String revision, String object) throws GitException
     {
-        String[] commands = {getGitCommand(), COMMAND_SHOW, revision + ":" + file};
+        List<String> commands = new LinkedList<String>();
+        commands.add(getGitCommand());
+        commands.add(COMMAND_SHOW);
+        if (revision == null)
+        {
+            commands.add(object);
+        }
+        else
+        {
+            commands.add(revision + ":" + object);
+        }
 
         final StringBuffer buffer = new StringBuffer();
         OutputHandlerAdapter handler = new OutputHandlerAdapter()
@@ -100,7 +110,7 @@ public class NativeGit
             }
         };
 
-        runWithHandler(handler, null, commands);
+        runWithHandler(handler, null, commands.toArray(new String[commands.size()]));
 
         return new ByteArrayInputStream(buffer.toString().getBytes());
     }
@@ -196,6 +206,23 @@ public class NativeGit
     public void lsRemote(OutputHandler handler, String repository, String branch) throws GitException
     {
         runWithHandler(handler, null, getGitCommand(), COMMAND_LS_REMOTE, repository, branch);
+    }
+
+    public void tag(Revision revision, String name, boolean force) throws GitException
+    {
+        if (force)
+        {
+            run(getGitCommand(), COMMAND_TAG, FLAG_FORCE, name, revision.getRevisionString());
+        }
+        else
+        {
+            run(getGitCommand(), COMMAND_TAG, name, revision.getRevisionString());
+        }
+    }
+
+    public void push(String repository, String refspec) throws GitException
+    {
+        run(getGitCommand(), COMMAND_PUSH, repository, refspec);
     }
 
     protected void run(String... commands) throws GitException

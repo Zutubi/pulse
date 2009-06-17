@@ -29,6 +29,8 @@ public class GitConstants
     public static final String COMMAND_INIT = "init";
     public static final String COMMAND_REMOTE = "remote";
     public static final String COMMAND_MERGE = "merge";
+    public static final String COMMAND_TAG = "tag";
+    public static final String COMMAND_PUSH = "push";
 
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_FORCE = "-f";
