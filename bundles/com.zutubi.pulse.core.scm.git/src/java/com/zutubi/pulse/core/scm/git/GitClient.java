@@ -536,12 +536,12 @@ public class GitClient implements ScmClient
 
     public void tag(ScmContext scmContext, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
-        scmContext.lock();
+        scmContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
             NativeGit nativeGit = new NativeGit(inactivityTimeout);
             nativeGit.setWorkingDirectory(scmContext.getPersistentWorkingDir());
-            nativeGit.tag(revision, name, moveExisting);
+            nativeGit.tag(revision, name, "[pulse] applying tag", moveExisting);
             nativeGit.push("origin", name);
         }
         finally

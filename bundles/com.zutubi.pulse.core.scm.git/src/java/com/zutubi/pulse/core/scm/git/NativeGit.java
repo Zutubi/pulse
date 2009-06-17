@@ -208,16 +208,21 @@ public class NativeGit
         runWithHandler(handler, null, getGitCommand(), COMMAND_LS_REMOTE, repository, branch);
     }
 
-    public void tag(Revision revision, String name, boolean force) throws GitException
+    public void tag(Revision revision, String name, String message, boolean force) throws GitException
     {
+        List<String> commands = new LinkedList<String>();
+        commands.add(getGitCommand());
+        commands.add(COMMAND_TAG);
         if (force)
         {
-            run(getGitCommand(), COMMAND_TAG, FLAG_FORCE, name, revision.getRevisionString());
+            commands.add(FLAG_FORCE);
         }
-        else
-        {
-            run(getGitCommand(), COMMAND_TAG, name, revision.getRevisionString());
-        }
+        commands.add(FLAG_MESSAGE);
+        commands.add(message);
+        commands.add(name);
+        commands.add(revision.getRevisionString());
+
+        run(commands.toArray(new String[commands.size()]));
     }
 
     public void push(String repository, String refspec) throws GitException

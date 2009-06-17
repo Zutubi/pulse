@@ -44,6 +44,7 @@ public class GitConstants
     public static final String FLAG_FETCH = "-f";
     public static final String FLAG_TRACK = "-t";
     public static final String FLAG_SET_HEAD = "-m";
+    public static final String FLAG_MESSAGE = "-m";
 
     public static final String ARG_ADD = "add";
     public static final String ARG_ORIGIN = "origin";
