@@ -1928,9 +1928,10 @@ public class RemoteApi
             projectManager.lockProjectState(project.getId());
             try
             {
-                if (project.getNextBuildNumber() > n)
+                long next = project.getNextBuildNumber();
+                if (next > n)
                 {
-                    throw new IllegalArgumentException("The given build number '" + number + "' is not large enough (build numbers must always increase)");
+                    throw new IllegalArgumentException("The existing next build number '" + next + "' is larger than the given number '" + number + "' (build numbers must always increase)");
                 }
 
                 project.setNextBuildNumber(n);
