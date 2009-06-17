@@ -49,6 +49,7 @@ public class GitClientTest extends PulseTestCase
     private PulseExecutionContext context;
     private RecordingScmFeedbackHandler handler;
     private ScmContextImpl scmContext;
+    private File repositoryBase;
 
     protected void setUp() throws Exception
     {
@@ -59,8 +60,7 @@ public class GitClientTest extends PulseTestCase
         URL url = getClass().getResource("GitClientTest.zip");
         PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
 
-        File repositoryBase = new File(tmp, "repo");
-
+        repositoryBase = new File(tmp, "repo");
         repository = "file://" + repositoryBase.getCanonicalPath();
 
         client = new GitClient(repository, "master", 0, false);
@@ -451,6 +451,35 @@ public class GitClientTest extends PulseTestCase
         {
             assertThat(e.getMessage(), containsString("Branch 'nosuchbranch' does not exist"));
         }
+    }
+
+    public void testTagRevision() throws ScmException, IOException
+    {
+        final String TAG_NAME = "test-tag";
+
+        client.init(scmContext, new ScmFeedbackAdapter());
+        client.tag(scmContext, context, new Revision(REVISION_INITIAL), TAG_NAME, false);
+
+        NativeGit nativeGit = new NativeGit(0);
+        nativeGit.setWorkingDirectory(repositoryBase);
+        String info = IOUtils.inputStreamToString(nativeGit.show(null, TAG_NAME));
+        assertThat(info, containsString(REVISION_INITIAL));
+        assertThat(info, containsString("initial commit"));
+    }
+
+    public void testMoveExistingTag() throws ScmException, IOException
+    {
+        final String TAG_NAME = "test-tag";
+
+        client.init(scmContext, new ScmFeedbackAdapter());
+        client.tag(scmContext, context, new Revision(REVISION_INITIAL), TAG_NAME, false);
+        client.tag(scmContext, context, new Revision(REVISION_MASTER_LATEST), TAG_NAME, true);
+
+        NativeGit nativeGit = new NativeGit(0);
+        nativeGit.setWorkingDirectory(repositoryBase);
+        String info = IOUtils.inputStreamToString(nativeGit.show(null, TAG_NAME));
+        assertThat(info, containsString(REVISION_MASTER_LATEST));
+        assertThat(info, containsString("Edit, add and remove on master"));
     }
 
     private void assertHeadCheckedOut()

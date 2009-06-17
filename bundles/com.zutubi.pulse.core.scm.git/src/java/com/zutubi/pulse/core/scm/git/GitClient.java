@@ -55,6 +55,7 @@ public class GitClient implements ScmClient
         CAPABILITIES.add(ScmCapability.POLL);
         CAPABILITIES.add(ScmCapability.REVISIONS);
         CAPABILITIES.add(ScmCapability.BROWSE);
+        CAPABILITIES.add(ScmCapability.TAG);
     }
 
     private static final Map<String, FileChange.Action> LOG_ACTION_MAPPINGS = new HashMap<String, FileChange.Action>();
@@ -536,7 +537,18 @@ public class GitClient implements ScmClient
 
     public void tag(ScmContext scmContext, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
-        // not yet implemented.
+        scmContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        try
+        {
+            NativeGit nativeGit = new NativeGit(inactivityTimeout);
+            nativeGit.setWorkingDirectory(scmContext.getPersistentWorkingDir());
+            nativeGit.tag(revision, name, "[pulse] applying tag", moveExisting);
+            nativeGit.push("origin", name);
+        }
+        finally
+        {
+            scmContext.unlock();
+        }
     }
 
     public Revision parseRevision(ScmContext context, String revision) throws ScmException

@@ -145,7 +145,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
         catch (Exception e)
         {
-            assertThat(e.getMessage(), containsString("The given build number '0' is not large enough (build numbers must always increase)"));
+            assertThat(e.getMessage(), containsString("The existing next build number '1' is larger than the given number '0' (build numbers must always increase)"));
         }
 
         xmlRpcHelper.setNextBuildNumber(projectName, 22);
