@@ -82,9 +82,9 @@ public class ReferenceType extends SimpleType implements Type
 
     public Object unstantiate(Object instance) throws TypeException
     {
-        if(instance == null)
+        if (instance == null)
         {
-            return 0;
+            return "0";
         }
         else
         {
@@ -117,9 +117,16 @@ public class ReferenceType extends SimpleType implements Type
 
     public Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
-        // We return references via the remote api as paths so that the
-        // caller can use the value in subsequent calls.
-        return getReferencedPath(templateOwnerPath, data);
+        if (data == null)
+        {
+            return null;
+        }
+        else
+        {
+            // We return references via the remote api as paths so that the
+            // caller can use the value in subsequent calls.
+            return getReferencedPath(templateOwnerPath, data);
+        }
     }
 
     public String fromXmlRpc(Object data) throws TypeException

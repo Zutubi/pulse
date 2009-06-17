@@ -474,8 +474,12 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public MutableRecord unstantiate(Object instance) throws TypeException
     {
-        MutableRecord result;
+        if (instance == null)
+        {
+            return null;
+        }
 
+        MutableRecord result;
         CompositeType actualType = typeRegistry.getType(instance.getClass());
         if (actualType == null)
         {
@@ -540,9 +544,10 @@ public class CompositeType extends AbstractType implements ComplexType
     private void propertyToXmlRpc(Map.Entry<String, TypeProperty> entry, String templateOwnerPath, Record record, Hashtable<String, Object> result) throws TypeException
     {
         Object propertyValue = record.get(entry.getKey());
-        if (propertyValue != null)
+        Object value = entry.getValue().getType().toXmlRpc(templateOwnerPath, propertyValue);
+        if (value != null)
         {
-            result.put(entry.getKey(), entry.getValue().getType().toXmlRpc(templateOwnerPath, propertyValue));
+            result.put(entry.getKey(), value);
         }
     }
 
@@ -640,9 +645,10 @@ public class CompositeType extends AbstractType implements ComplexType
         try
         {
             Object value = property.getValue(instance);
-            if (value != null)
+            Object unstantiatedValue = property.getType().unstantiate(value);
+            if (unstantiatedValue != null)
             {
-                result.put(property.getName(), property.getType().unstantiate(value));
+                result.put(property.getName(), unstantiatedValue);
             }
         }
         catch (Exception e)

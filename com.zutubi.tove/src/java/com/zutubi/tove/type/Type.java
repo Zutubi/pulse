@@ -49,8 +49,9 @@ public interface Type
      * Converts from an instance back to record form (i.e. records, strings,
      * etc).  The inverse of {@link #instantiate}.
      *
-     * @param instance the instance to convert
-     * @return record form of the instance
+     * @param instance the instance to convert, may be null
+     * @return record form of the instance, may be null if there is no
+     *         representation for the given instance
      * @throws TypeException in the event of an error
      */
     Object unstantiate(Object instance) throws TypeException;

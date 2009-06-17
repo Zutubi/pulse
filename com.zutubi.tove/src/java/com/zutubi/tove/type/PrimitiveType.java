@@ -77,6 +77,11 @@ public class PrimitiveType extends SimpleType implements Type
 
     public String unstantiate(Object instance) throws TypeException
     {
+        if (instance == null)
+        {
+            return null;
+        }
+        
         try
         {
             return squeezer.squeeze(instance);
@@ -89,7 +94,7 @@ public class PrimitiveType extends SimpleType implements Type
 
     public Object toXmlRpc(String templateOwnerPath, Object data) throws TypeException
     {
-        if(data == null)
+        if (data == null)
         {
             return null;
         }

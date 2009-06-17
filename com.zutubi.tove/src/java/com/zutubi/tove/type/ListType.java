@@ -142,6 +142,11 @@ public class ListType extends CollectionType
 
     public Object unstantiate(Object instance) throws TypeException
     {
+        if (instance == null)
+        {
+            return null;
+        }
+
         typeCheck(instance, List.class);
 
         List list = (List) instance;
