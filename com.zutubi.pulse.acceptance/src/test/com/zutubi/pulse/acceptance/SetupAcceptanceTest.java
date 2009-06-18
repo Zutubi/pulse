@@ -34,6 +34,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     {
         // first we deal with the pulse home property configuration.
         browser.open("setup/setupData!input.action");
+        browser.waitForPageToLoad();
 
         // step one. setting the pulse home variable.
         checkSetPulseData();
