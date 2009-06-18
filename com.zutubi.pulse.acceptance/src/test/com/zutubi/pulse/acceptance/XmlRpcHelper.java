@@ -9,7 +9,7 @@ import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -610,7 +610,7 @@ public class XmlRpcHelper
 
     public String insertGroup(String name, List<String> memberPaths, String... serverPermissions) throws Exception
     {
-        Hashtable<String, Object> group = createDefaultConfig(GroupConfiguration.class);
+        Hashtable<String, Object> group = createDefaultConfig(UserGroupConfiguration.class);
         group.put("name", name);
         group.put("members", new Vector<String>(memberPaths));
         group.put("serverPermissions", new Vector<String>(Arrays.asList(serverPermissions)));

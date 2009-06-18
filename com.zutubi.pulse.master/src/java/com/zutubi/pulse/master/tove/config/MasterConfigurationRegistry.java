@@ -6,9 +6,9 @@ import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
-import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
 import com.zutubi.pulse.master.tove.config.misc.TransientConfiguration;
@@ -194,8 +194,8 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
 
             // group configuration .
 
-            CompositeType groupConfig = registerConfigurationType(AbstractGroupConfiguration.class);
-            registerConfigurationType(GroupConfiguration.class);
+            CompositeType groupConfig = registerConfigurationType(GroupConfiguration.class);
+            registerConfigurationType(UserGroupConfiguration.class);
             registerConfigurationType(BuiltinGroupConfiguration.class);
 
             MapType groupCollection = new MapType(groupConfig, typeRegistry);

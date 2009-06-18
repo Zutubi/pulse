@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.security.AcegiUser;
 import org.acegisecurity.userdetails.UserDetailsService;
@@ -60,7 +60,7 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
 
     long getNextBuildNumber(User user);
 
-    GroupConfiguration getGroupConfig(String name);
+    UserGroupConfiguration getGroupConfig(String name);
 
     /**
      * Insert a new user.

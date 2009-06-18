@@ -68,6 +68,7 @@
                 <ref local="addCleanupStatusesField"/>
                 <ref local="refactorCleanupWhatField"/>
                 <ref local="addDependenciesVersionField"/>
+                <ref local="addRepositoryConfiguration"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -286,5 +287,8 @@
 
     <bean id="addDependenciesVersionField" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyVersionFieldUpgradeTask">
         <property name="buildNumber" value="200999012"/>
+    </bean>
+    <bean id="addRepositoryConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddRepositoryConfigurationToSettingsUpgradeTask">
+        <property name="buildNumber" value="200999013"/>
     </bean>
 </beans>

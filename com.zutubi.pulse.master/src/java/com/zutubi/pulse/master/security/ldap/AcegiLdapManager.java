@@ -8,7 +8,7 @@ import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
-import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
@@ -260,8 +260,8 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
             {
                 try
                 {
-                    List<GroupConfiguration> groups = getLdapGroups(details, populator);
-                    for(GroupConfiguration group: groups)
+                    List<UserGroupConfiguration> groups = getLdapGroups(details, populator);
+                    for(UserGroupConfiguration group: groups)
                     {
                         LOG.debug("Adding user '" + details.getUsername() + "' to group '" + group.getName() + "' via LDAP");
                         user.addGroup(group);
@@ -275,13 +275,13 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
     }
 
-    private List<GroupConfiguration> getLdapGroups(LdapUserDetails details, DefaultLdapAuthoritiesPopulator populator)
+    private List<UserGroupConfiguration> getLdapGroups(LdapUserDetails details, DefaultLdapAuthoritiesPopulator populator)
     {
-        List<GroupConfiguration> groups = new LinkedList<GroupConfiguration>();
+        List<UserGroupConfiguration> groups = new LinkedList<UserGroupConfiguration>();
         GrantedAuthority[] ldapAuthorities = populator.getGrantedAuthorities(details);
         for (GrantedAuthority authority : ldapAuthorities)
         {
-            GroupConfiguration group = userManager.getGroupConfig(authority.getAuthority());
+            UserGroupConfiguration group = userManager.getGroupConfig(authority.getAuthority());
             if (group != null)
             {
                 groups.add(group);
@@ -346,7 +346,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return enabled && initialised && autoAdd && LicenseHolder.hasAuthorization("canAddUser");
     }
 
-    public List<GroupConfiguration> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword)
+    public List<UserGroupConfiguration> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword)
     {
         DefaultInitialDirContextFactory contextFactory = createContextFactory(configuration.getLdapUrl(), configuration.getBaseDn(), configuration.getManagerDn(), configuration.getManagerPassword(), configuration.getFollowReferrals(), configuration.getEscapeSpaceCharacters());
         contextFactory.newInitialDirContext();

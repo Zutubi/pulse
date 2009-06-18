@@ -20,7 +20,7 @@ import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AG
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
@@ -135,12 +135,12 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 globalAgent.setPermanent(true);
                 
                 // All users can view all agents by default.
-                AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(GROUPS_SCOPE, ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                GroupConfiguration group = configurationProvider.get(PathUtils.getPath(GROUPS_SCOPE, ALL_USERS_GROUP_NAME), GroupConfiguration.class);
                 globalAgent.addPermission(new AgentAclConfiguration(group, ACTION_VIEW));
 
                 // Anonymous users can view all agents by default (but only
                 // when anonymous access is explicitly enabled).
-                group = configurationProvider.get(PathUtils.getPath(GROUPS_SCOPE, ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                group = configurationProvider.get(PathUtils.getPath(GROUPS_SCOPE, ANONYMOUS_USERS_GROUP_NAME), GroupConfiguration.class);
                 globalAgent.addPermission(new AgentAclConfiguration(group, ACTION_VIEW));
 
                 CompositeType agentType = typeRegistry.getType(AgentConfiguration.class);

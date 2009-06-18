@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.security.ldap;
 
 import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
-import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 import java.util.List;
@@ -21,6 +21,6 @@ public interface LdapManager
 
     String getStatusMessage();
 
-    List<GroupConfiguration> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword);
+    List<UserGroupConfiguration> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword);
 
 }

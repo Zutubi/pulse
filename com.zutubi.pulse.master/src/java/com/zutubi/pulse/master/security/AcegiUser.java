@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.security;
 
 import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.security.Actor;
 import org.acegisecurity.userdetails.UserDetails;
@@ -33,13 +33,13 @@ public class AcegiUser implements Actor, UserDetails
         this.ldapAuthentication = true;
     }
 
-    public AcegiUser(User user, List<GroupConfiguration> groups)
+    public AcegiUser(User user, List<UserGroupConfiguration> groups)
     {
         this(user.getConfig(), groups);
         enabled = user.isEnabled();
     }
 
-    public AcegiUser(UserConfiguration config, List<GroupConfiguration> groups)
+    public AcegiUser(UserConfiguration config, List<UserGroupConfiguration> groups)
     {
         username = config.getLogin();
         password = config.getPassword();
@@ -58,21 +58,21 @@ public class AcegiUser implements Actor, UserDetails
         return false;
     }
 
-    private synchronized void initAuthorities(UserConfiguration config, List<GroupConfiguration> groups)
+    private synchronized void initAuthorities(UserConfiguration config, List<UserGroupConfiguration> groups)
     {
         authoritySet = new HashSet<String>();
         authoritySet.addAll(Arrays.asList(config.getGrantedAuthorities()));
 
         if (groups != null)
         {
-            for(GroupConfiguration g: groups)
+            for(UserGroupConfiguration g: groups)
             {
                 addGroupAuthorities(g);
             }
         }
     }
 
-    private void addGroupAuthorities(AbstractGroupConfiguration g)
+    private void addGroupAuthorities(GroupConfiguration g)
     {
         authoritySet.addAll(Arrays.asList(g.getGrantedAuthorities()));
     }
@@ -127,7 +127,7 @@ public class AcegiUser implements Actor, UserDetails
         return ldapAuthentication;
     }
 
-    public synchronized void addGroup(AbstractGroupConfiguration group)
+    public synchronized void addGroup(GroupConfiguration group)
     {
         addGroupAuthorities(group);
         authorities = null;

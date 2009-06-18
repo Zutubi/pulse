@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
-import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.util.Sort;
@@ -32,7 +32,7 @@ public class AcegiUserTest extends PulseTestCase
 
     public void testAuthoritiesGroupAdditional()
     {
-        GroupConfiguration g = new GroupConfiguration("g1");
+        UserGroupConfiguration g = new UserGroupConfiguration("g1");
         g.addServerPermission(ServerPermission.CREATE_PROJECT);
         AcegiUser a = new AcegiUser(newUser("a", "b"), Arrays.asList(g));
         assertAuthorities(a, "group:g1", ServerPermission.CREATE_PROJECT.toString());
@@ -41,7 +41,7 @@ public class AcegiUserTest extends PulseTestCase
     public void testAuthoritiesTransient()
     {
         User u = newUser("a", "b");
-        AcegiUser a = new AcegiUser(u, Collections.<GroupConfiguration>emptyList());
+        AcegiUser a = new AcegiUser(u, Collections.<UserGroupConfiguration>emptyList());
         a.addGroup(new BuiltinGroupConfiguration("test", "tran"));
         assertAuthorities(a, "tran");
     }
@@ -49,7 +49,7 @@ public class AcegiUserTest extends PulseTestCase
     public void testAuthoritiesMultiple()
     {
         User u = newUser("a", "b");
-        GroupConfiguration g = new GroupConfiguration("g1");
+        UserGroupConfiguration g = new UserGroupConfiguration("g1");
         g.setHandle(1);
         g.addServerPermission(ServerPermission.CREATE_PROJECT);
         AcegiUser a = new AcegiUser(u, Arrays.asList(g));
@@ -67,7 +67,7 @@ public class AcegiUserTest extends PulseTestCase
 
     private void assertAuthorities(User u, String... expected)
     {
-        AcegiUser acegiUser = new AcegiUser(u, Collections.<GroupConfiguration>emptyList());
+        AcegiUser acegiUser = new AcegiUser(u, Collections.<UserGroupConfiguration>emptyList());
         assertAuthorities(acegiUser, expected);
     }
 

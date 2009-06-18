@@ -12,8 +12,7 @@ import javax.servlet.ServletException;
  */
 public class HttpSessionContextIntegrationFilter extends org.acegisecurity.context.HttpSessionContextIntegrationFilter
 {
-    public HttpSessionContextIntegrationFilter()
-            throws ServletException
+    public HttpSessionContextIntegrationFilter() throws ServletException
     {
         setForceEagerSessionCreation(true);
     }

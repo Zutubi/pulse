@@ -4,9 +4,9 @@ import com.zutubi.pulse.master.model.GrantedAuthority;
 
 /**
  */
-public class AbstractGroupConfigurationFormatter
+public class GroupConfigurationFormatter
 {
-    public String getMembers(AbstractGroupConfiguration group)
+    public String getMembers(GroupConfiguration group)
     {
         if(group instanceof BuiltinGroupConfiguration)
         {
@@ -20,9 +20,9 @@ public class AbstractGroupConfigurationFormatter
                 return "all users";
             }
         }
-        else if(group instanceof GroupConfiguration)
+        else if(group instanceof UserGroupConfiguration)
         {
-            int size = ((GroupConfiguration) group).getMembers().size();
+            int size = ((UserGroupConfiguration) group).getMembers().size();
             return String.format("%d user%s", size, size == 1 ? "" : "s");
         }
 

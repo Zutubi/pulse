@@ -8,7 +8,7 @@ import com.zutubi.tove.annotations.*;
 @SymbolicName("zutubi.builtinGroupConfig")
 @Classification(single = "group")
 @Form(fieldOrder = {"name", "serverPermissions"})
-public class BuiltinGroupConfiguration extends AbstractGroupConfiguration
+public class BuiltinGroupConfiguration extends GroupConfiguration
 {
     @Internal
     private String role;

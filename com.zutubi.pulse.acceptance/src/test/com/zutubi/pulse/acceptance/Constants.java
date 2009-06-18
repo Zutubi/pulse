@@ -197,4 +197,15 @@ public class Constants
             public static final String MIME_TYPE = "type";
         }
     }   
+
+    public class Settings
+    {
+        public class Repository
+        {
+            public static final String PATH = "settings/repository";
+
+            public static final String READ_ACCESS = "readAccess";
+            public static final String WRITE_ACCESS = "writeAccess";
+        }
+    }
 }

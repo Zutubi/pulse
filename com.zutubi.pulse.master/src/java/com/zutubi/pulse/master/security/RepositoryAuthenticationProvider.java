@@ -22,7 +22,7 @@ public class RepositoryAuthenticationProvider implements AuthenticationProvider
     {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
         String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
-        if (isPulse(username))
+        if (accept(username))
         {
             return validateToken(auth);
         }
@@ -55,7 +55,7 @@ public class RepositoryAuthenticationProvider implements AuthenticationProvider
         activeTokens.remove(token);
     }
 
-    private boolean isPulse(String name)
+    private boolean accept(String name)
     {
         return name != null && name.compareTo(USERNAME) == 0;
     }

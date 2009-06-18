@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
@@ -19,7 +19,7 @@ public class ProjectAclConfiguration extends AbstractConfiguration
 {
     @Reference
     @Required
-    private AbstractGroupConfiguration group;
+    private GroupConfiguration group;
     @ItemPicker(optionProvider = "ProjectAuthorityProvider", allowReordering = false)
     private List<String> allowedActions = new LinkedList<String>();
 
@@ -27,18 +27,18 @@ public class ProjectAclConfiguration extends AbstractConfiguration
     {
     }
 
-    public ProjectAclConfiguration(AbstractGroupConfiguration group, String... allowedActions)
+    public ProjectAclConfiguration(GroupConfiguration group, String... allowedActions)
     {
         this.group = group;
         this.allowedActions.addAll(Arrays.asList(allowedActions));
     }
 
-    public AbstractGroupConfiguration getGroup()
+    public GroupConfiguration getGroup()
     {
         return group;
     }
 
-    public void setGroup(AbstractGroupConfiguration group)
+    public void setGroup(GroupConfiguration group)
     {
         this.group = group;
     }

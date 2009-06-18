@@ -73,8 +73,14 @@ The beans defined within the security subsystem need not be accessed by other co
     <bean name="artifactRepositorySecurityHandler" class="com.zutubi.pulse.servercore.jetty.FilteringHandler">
         <property name="filters">
             <list>
+                <!-- IMPORTANT NOTE:
+                 Because the repository is available outside of a web context, and
+                 because we are using the basic processing filter (which does not clear
+                 the context itself), the SecurityContextHolder needs to be cleared manually.
+                 This is usually handled by the httpSessionContextIntegrationFilter.
+                 -->
+                <ref local="clearContextFilter"/>
                 <ref local="basicProcessingFilter"/>
-                <ref local="rememberMeProcessingFilter"/>
                 <ref local="anonymousProcessingFilter"/>
             </list>
         </property>
@@ -86,13 +92,12 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="basicEntryPoint" ref="basicProcessingFilterEntryPoint"/>
     </bean>
 
-    <bean name="artifactRepositoryAuthorityProvider" class="com.zutubi.pulse.master.security.ArtifactRepositoryAuthorityProvider">
+    <bean name="repositoryAuthorityProvider" class="com.zutubi.pulse.master.security.RepositoryAuthorityProvider">
         <property name="accessManager" ref="accessManager"/>
-        <property name="definitions"><value>
-            /,ROLE_ANONYMOUS
-            /,ROLE_USER,GET,HEAD
-            /,ADMINISTER,GET,HEAD,PUT
-        </value></property>
+    </bean>
+
+    <!-- This filter is responsible for clearing the security context when each request is complete. -->
+    <bean id="clearContextFilter" class="com.zutubi.pulse.master.security.BasicClearContextFilter">
     </bean>
 
     <!--

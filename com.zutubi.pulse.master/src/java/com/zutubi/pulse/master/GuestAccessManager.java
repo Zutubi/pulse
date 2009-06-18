@@ -7,7 +7,7 @@ import com.zutubi.pulse.master.model.GrantedAuthority;
 import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -67,7 +67,7 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
         {
             configurationProvider = ((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider();
             configurationProvider.registerEventListener(this, true, false, GlobalConfiguration.class);
-            configurationProvider.registerEventListener(this, true, true, AbstractGroupConfiguration.class);
+            configurationProvider.registerEventListener(this, true, true, GroupConfiguration.class);
         }
         else
         {

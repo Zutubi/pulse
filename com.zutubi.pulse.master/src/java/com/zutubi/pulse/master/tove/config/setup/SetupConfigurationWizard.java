@@ -11,7 +11,7 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
-import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.wizard.AbstractChainableState;
@@ -85,7 +85,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             // we know the user has no external authorities
             User user = new User();
             user.setConfig(adminUser);
-            AcegiUtils.loginAs(new AcegiUser(user, Collections.<GroupConfiguration>emptyList()));
+            AcegiUtils.loginAs(new AcegiUser(user, Collections.<UserGroupConfiguration>emptyList()));
 
             try
             {
@@ -141,20 +141,20 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, anonymousUsersGroup);
             
             // create an administrators group (for convenience)
-            GroupConfiguration adminGroup = new GroupConfiguration(UserManager.ADMINS_GROUP_NAME);
+            UserGroupConfiguration adminGroup = new UserGroupConfiguration(UserManager.ADMINS_GROUP_NAME);
             adminGroup.addServerPermission(ServerPermission.ADMINISTER);
             adminGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
             configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, adminGroup);
 
             // and a project admins group that has admin access to all projects
-            GroupConfiguration projectAdmins = new GroupConfiguration(UserManager.PROJECT_ADMINS_GROUP_NAME);
+            UserGroupConfiguration projectAdmins = new UserGroupConfiguration(UserManager.PROJECT_ADMINS_GROUP_NAME);
             projectAdmins.addServerPermission(ServerPermission.PERSONAL_BUILD);
             projectAdmins.addServerPermission(ServerPermission.CREATE_PROJECT);
             projectAdmins.addServerPermission(ServerPermission.DELETE_PROJECT);
             configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, projectAdmins);
 
             // and a developers group that has personal build access (for convenience)
-            GroupConfiguration developersGroup = new GroupConfiguration(UserManager.DEVELOPERS_GROUP_NAME);
+            UserGroupConfiguration developersGroup = new UserGroupConfiguration(UserManager.DEVELOPERS_GROUP_NAME);
             developersGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
             configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, developersGroup);
 

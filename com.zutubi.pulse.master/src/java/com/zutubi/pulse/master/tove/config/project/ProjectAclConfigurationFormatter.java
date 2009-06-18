@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.util.Sort;
 
 import java.util.Collections;
@@ -12,7 +12,7 @@ public class ProjectAclConfigurationFormatter
 {
     public String getGroup(ProjectAclConfiguration configuration)
     {
-        AbstractGroupConfiguration group = configuration.getGroup();
+        GroupConfiguration group = configuration.getGroup();
         return group == null ? null : group.getName();
     }
 

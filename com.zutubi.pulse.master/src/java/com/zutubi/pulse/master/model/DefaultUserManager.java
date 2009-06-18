@@ -11,9 +11,9 @@ import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
-import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.config.*;
@@ -50,7 +50,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
      */
     private LdapManager ldapManager;
     private ConfigurationProvider configurationProvider;
-    private Map<UserConfiguration, List<GroupConfiguration>> groupsByUser;
+    private Map<UserConfiguration, List<UserGroupConfiguration>> groupsByUser;
     private Map<Long, UserConfiguration> userConfigsById = new HashMap<Long, UserConfiguration>();
     private BuiltinGroupConfiguration allUsersGroup;
 
@@ -128,22 +128,22 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     private void initGroupsByUser()
     {
-        groupsByUser = new HashMap<UserConfiguration, List<GroupConfiguration>>();
-        for(AbstractGroupConfiguration abstractGroup: configurationProvider.getAll(AbstractGroupConfiguration.class))
+        groupsByUser = new HashMap<UserConfiguration, List<UserGroupConfiguration>>();
+        for(GroupConfiguration group : configurationProvider.getAll(GroupConfiguration.class))
         {
-            if(abstractGroup instanceof GroupConfiguration)
+            if(group instanceof UserGroupConfiguration)
             {
-                GroupConfiguration group = (GroupConfiguration) abstractGroup;
-                for(UserConfiguration member: group.getMembers())
+                UserGroupConfiguration userGroup = (UserGroupConfiguration) group;
+                for(UserConfiguration member: userGroup.getMembers())
                 {
-                    List<GroupConfiguration> userGroups = groupsByUser.get(member);
+                    List<UserGroupConfiguration> userGroups = groupsByUser.get(member);
                     if(userGroups == null)
                     {
-                        userGroups = new LinkedList<GroupConfiguration>();
+                        userGroups = new LinkedList<UserGroupConfiguration>();
                         groupsByUser.put(member, userGroups);
                     }
 
-                    userGroups.add(group);
+                    userGroups.add(userGroup);
                 }
             }
         }
@@ -224,9 +224,9 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         return configurationProvider.get(insertedPath, UserConfiguration.class);
     }
 
-    public GroupConfiguration getGroupConfig(String name)
+    public UserGroupConfiguration getGroupConfig(String name)
     {
-        return configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, name), GroupConfiguration.class);
+        return configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, name), UserGroupConfiguration.class);
     }
 
     public Set<Project> getUserProjects(User user, final ProjectManager projectManager)

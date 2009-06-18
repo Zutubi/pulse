@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
-import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.tove.annotations.ItemPicker;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -21,7 +21,7 @@ public class AgentAclConfiguration extends AbstractConfiguration
 {
     @Reference
     @Required
-    private AbstractGroupConfiguration group;
+    private GroupConfiguration group;
     @ItemPicker(optionProvider = "AgentAuthorityProvider")
     private List<String> allowedActions = new LinkedList<String>();
 
@@ -29,18 +29,18 @@ public class AgentAclConfiguration extends AbstractConfiguration
     {
     }
 
-    public AgentAclConfiguration(AbstractGroupConfiguration group, String... actions)
+    public AgentAclConfiguration(GroupConfiguration group, String... actions)
     {
         this.group = group;
         this.allowedActions.addAll(Arrays.asList(actions));
     }
 
-    public AbstractGroupConfiguration getGroup()
+    public GroupConfiguration getGroup()
     {
         return group;
     }
 
-    public void setGroup(AbstractGroupConfiguration group)
+    public void setGroup(GroupConfiguration group)
     {
         this.group = group;
     }

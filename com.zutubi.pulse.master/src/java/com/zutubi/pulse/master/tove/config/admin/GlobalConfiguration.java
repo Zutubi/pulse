@@ -11,7 +11,7 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.TextUtils;
 
 /**
- * The global configuration scope, which holds server-wide configuration.
+ * The global configuration scope, which holds server-administration configuration.
  */
 @SymbolicName("zutubi.globalConfig")
 @Classification(single = "settings")
@@ -38,6 +38,7 @@ public class GlobalConfiguration extends AbstractConfiguration
     private JabberConfiguration jabber = new JabberConfiguration();
     private LicenseConfiguration license = new LicenseConfiguration();
     private BackupConfiguration backup = new BackupConfiguration();
+    private RepositoryConfiguration repository = new RepositoryConfiguration();
 
     public String getBaseUrl()
     {
@@ -192,5 +193,15 @@ public class GlobalConfiguration extends AbstractConfiguration
     public void setLicense(LicenseConfiguration license)
     {
         this.license = license;
+    }
+
+    public RepositoryConfiguration getRepository()
+    {
+        return repository;
+    }
+
+    public void setRepository(RepositoryConfiguration repository)
+    {
+        this.repository = repository;
     }
 }
