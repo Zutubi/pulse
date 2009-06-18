@@ -64,11 +64,12 @@
                 <ref local="dependencies"/>
                 <ref local="addStatusFieldToBuildResultTable"/>
                 <ref local="addDependencyStatusField"/>
-                <ref local="addPropagateStatusField"/>
+                <ref local="addBuildCompletedTriggerPropagateFields"/>
                 <ref local="addCleanupStatusesField"/>
                 <ref local="refactorCleanupWhatField"/>
                 <ref local="addDependenciesVersionField"/>
                 <ref local="addRepositoryConfiguration"/>
+                <ref local="addDependentTriggerPropagateFields"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -261,7 +262,7 @@
     </bean>
     
     <bean id="addStatusFieldToBuildResultTable" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
-        <property name="buildNumber" value="200999007"/>
+        <property name="buildNumber" value="201003001"/>
         <property name="mappings">
             <list>
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.0.99-patch-01.hbm.xml</value>
@@ -270,25 +271,29 @@
     </bean>
 
     <bean id="addDependencyStatusField" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyStatusFieldUpgradeTask">
-        <property name="buildNumber" value="200999008"/>
+        <property name="buildNumber" value="201003002"/>
     </bean>
 
-    <bean id="addPropagateStatusField" class="com.zutubi.pulse.master.upgrade.tasks.AddPropagateStatusFieldUpgradeTask">
-        <property name="buildNumber" value="200999009"/>
+    <bean id="addBuildCompletedTriggerPropagateFields" class="com.zutubi.pulse.master.upgrade.tasks.AddBuildCompletedTriggerPropagateFieldsUpgradeTask">
+        <property name="buildNumber" value="201003003"/>
     </bean>
 
     <bean id="addCleanupStatusesField" class="com.zutubi.pulse.master.upgrade.tasks.AddCleanupStatusesFieldUpgradeTask">
-        <property name="buildNumber" value="200999010"/>
+        <property name="buildNumber" value="201003004"/>
     </bean>
 
     <bean id="refactorCleanupWhatField" class="com.zutubi.pulse.master.upgrade.tasks.RefactorCleanupWhatFieldUpgradeTask">
-        <property name="buildNumber" value="200999011"/>
+        <property name="buildNumber" value="201003005"/>
     </bean>
 
     <bean id="addDependenciesVersionField" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyVersionFieldUpgradeTask">
-        <property name="buildNumber" value="200999012"/>
+        <property name="buildNumber" value="201003006"/>
     </bean>
     <bean id="addRepositoryConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddRepositoryConfigurationToSettingsUpgradeTask">
-        <property name="buildNumber" value="200999013"/>
+        <property name="buildNumber" value="201003007"/>
+    </bean>
+
+    <bean id="addDependentTriggerPropagateFields" class="com.zutubi.pulse.master.upgrade.tasks.AddDependentTriggerPropagateFieldsUpgradeTask">
+        <property name="buildNumber" value="201003008"/>
     </bean>
 </beans>

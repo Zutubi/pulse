@@ -62,8 +62,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import junit.framework.*;
-
 /**
  * An acceptance test that adds a very simple project and runs a build as a
  * sanity test.

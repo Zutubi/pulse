@@ -13,7 +13,6 @@ import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Arrays;
 
 /**
  * The cleanup configuration defines how builds are cleaned up for a project.  This includes

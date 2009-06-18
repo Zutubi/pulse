@@ -6,27 +6,22 @@ import java.util.List;
 import java.util.Arrays;
 
 /**
- * Upgrade task that adds the status field to the project/triggers
+ * Upgrade task that adds the status field to the project/dependencies
  */
 public class AddDependencyStatusFieldUpgradeTask extends AbstractRecordPropertiesUpgradeTask
 {
-    private static final String BUILD_COMPLETED_TRIGGER_SYMBOLIC_NAME = "zutubi.buildCompletedConfig";
+    private static final String PROPERTY_STATUS = "status";
 
-    private static final String PROPERTY_PROPAGATE_STATUS = "propagateStatus";
-    
-    private static final String DEFAULT_PROPAGATE_STATUS = "true";
+    private static final String DEFAULT_STATUS = "integration";
 
     protected RecordLocator getRecordLocator()
     {
-        return RecordLocators.newTypeFilter (
-                RecordLocators.newPathPattern(PathUtils.getPath("projects", PathUtils.WILDCARD_ANY_ELEMENT, "triggers")),
-                BUILD_COMPLETED_TRIGGER_SYMBOLIC_NAME
-        );
+        return RecordLocators.newPathPattern(PathUtils.getPath("projects", PathUtils.WILDCARD_ANY_ELEMENT, "dependencies"));
     }
 
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_PROPAGATE_STATUS, DEFAULT_PROPAGATE_STATUS));
+        return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_STATUS, DEFAULT_STATUS));
     }
 
     public boolean haltOnFailure()
