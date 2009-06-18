@@ -23,6 +23,7 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
     public static final String PARAM_PROPAGATE_REVISION = "propagate.revision";
     public static final String PARAM_REPLACEABLE        = "replaceable";
     public static final String PARAM_PROPAGATE_STATUS   = "propagate.status";
+    public static final String PARAM_PROPAGATE_VERSION  = "propagate.version";
     public static final String SEPARATOR = ",";
 
     public boolean accept(Trigger trigger, Event event, TaskExecutionContext context)
@@ -43,6 +44,11 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
             {
                 context.put(BuildProjectTask.PARAM_STATUS, bce.getBuildResult().getStatus());
             }
+            if (getBooleanParam(dataMap, PARAM_PROPAGATE_VERSION, false))
+            {
+                context.put(BuildProjectTask.PARAM_VERSION, bce.getBuildResult().getVersion());
+            }
+            context.put(BuildProjectTask.PARAM_DEPENDENT, true);
         }
         return accept;
     }

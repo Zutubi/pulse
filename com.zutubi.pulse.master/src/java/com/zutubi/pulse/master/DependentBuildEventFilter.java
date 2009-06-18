@@ -25,6 +25,7 @@ import java.util.Map;
 public class DependentBuildEventFilter implements EventTriggerFilter
 {
     public static final String PARAM_PROPAGATE_STATUS   = "propagate.status";
+    public static final String PARAM_PROPAGATE_VERSION   = "propagate.version";
 
     private ProjectManager projectManager;
 
@@ -60,6 +61,14 @@ public class DependentBuildEventFilter implements EventTriggerFilter
             context.put(BuildProjectTask.PARAM_STATUS, result.getStatus());
         }
 
+        boolean propagateVersion = getBooleanParam(trigger.getDataMap(), PARAM_PROPAGATE_VERSION, false);
+        if (propagateVersion)
+        {
+            context.put(BuildProjectTask.PARAM_VERSION, result.getVersion());
+        }
+
+        context.put(BuildProjectTask.PARAM_DEPENDENT, true);
+        
         final Project builtProject = result.getProject();
 
         // Return true iif the triggers project contains a dependency to the built project.

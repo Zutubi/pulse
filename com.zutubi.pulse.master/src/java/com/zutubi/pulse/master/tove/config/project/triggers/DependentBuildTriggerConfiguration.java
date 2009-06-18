@@ -2,13 +2,12 @@ package com.zutubi.pulse.master.tove.config.project.triggers;
 
 import com.zutubi.pulse.master.DependentBuildEventFilter;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.scheduling.BuildCompletedEventFilter;
 import com.zutubi.pulse.master.scheduling.EventTrigger;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 import java.io.Serializable;
@@ -17,7 +16,7 @@ import java.util.Map;
 /**
  * The trigger configuration for dependent build triggers.
  */
-@Form(fieldOrder = { "name", "propagateStatus" })
+@Form(fieldOrder = { "name", "propagateStatus", "propagateVersion" })
 @SymbolicName("zutubi.dependentBuildTriggerConfig")
 public class DependentBuildTriggerConfiguration extends TriggerConfiguration
 {
@@ -28,6 +27,12 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
      * of the completed build.
      */
     private boolean propagateStatus;
+
+    /**
+     * If true, build requests raised by this trigger will inherit the version
+     * of the completed build.
+     */
+    private boolean propagateVersion;
 
     public Trigger newTrigger()
     {
@@ -50,7 +55,8 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
 
     private void populateDataMap(Map<Serializable, Serializable> dataMap)
     {
-        dataMap.put(BuildCompletedEventFilter.PARAM_PROPAGATE_STATUS, propagateStatus);
+        dataMap.put(DependentBuildEventFilter.PARAM_PROPAGATE_STATUS, propagateStatus);
+        dataMap.put(DependentBuildEventFilter.PARAM_PROPAGATE_VERSION, propagateVersion);
     }
 
     public boolean isPropagateStatus()
@@ -61,6 +67,16 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
     public void setPropagateStatus(boolean propagateStatus)
     {
         this.propagateStatus = propagateStatus;
+    }
+
+    public boolean isPropagateVersion()
+    {
+        return propagateVersion;
+    }
+
+    public void setPropagateVersion(boolean propagateVersion)
+    {
+        this.propagateVersion = propagateVersion;
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)

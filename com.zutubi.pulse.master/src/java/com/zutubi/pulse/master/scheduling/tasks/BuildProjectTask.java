@@ -40,6 +40,11 @@ public class BuildProjectTask implements Task
     public static final String PARAM_STATUS = "status";
 
     /**
+     * The version to be used for the build.
+     */
+    public static final String PARAM_VERSION = "version";
+
+    /**
      * Indicates if this build project task is triggered as a result of
      * a dependency relationship by the completion of a dependent projects build.
      */
@@ -61,6 +66,8 @@ public class BuildProjectTask implements Task
 
         Boolean dependentValue = (Boolean) context.get(PARAM_DEPENDENT);
         boolean dependent = dependentValue != null && dependentValue;
+
+        String version = (String) context.get(PARAM_VERSION);
 
         ProjectConfiguration project = projectManager.getProjectConfig(projectId, false);
         if (project != null)
@@ -85,6 +92,7 @@ public class BuildProjectTask implements Task
             options.setProperties(properties);
             options.setStatus(status);
             options.setResolveVersion(!dependent);
+            options.setVersion(version);
             projectManager.triggerBuild(project, options, revision);
         }
         else

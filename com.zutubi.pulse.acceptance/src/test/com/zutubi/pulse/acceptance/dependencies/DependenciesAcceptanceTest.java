@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
 import static com.zutubi.pulse.acceptance.Constants.Project.Dependencies.*;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
+import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.ivyPath;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -501,6 +502,27 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertIvyStatus(STATUS_RELEASE, projectB.getName(), 1);
     }
 
+    public void testDependentBuild_PropagateVersion() throws Exception
+    {
+        Project projectA = new Project(randomName());
+        projectA.getDefaultStage().addArtifacts("artifact.jar");
+        projectA.setVersion("FIXED");
+        createProject(projectA);
+
+        Project projectB = new Project(randomName());
+        projectB.addDependency(projectA);
+        projectB.setPropagateVersion(true);
+        createProject(projectB);
+
+        AntBuildConfiguration buildA = new AntBuildConfiguration();
+        buildA.addFileToCreate("build/artifact.jar");
+        triggerSuccessfulBuild(projectA, buildA);
+
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+
+        assertInRepository(ivyPath(projectB.getName(), "FIXED"));
+    }
+
     public void testRepositoryFormat_OrgSpecified() throws Exception
     {
         Project project = new Project(randomName(), "org");
@@ -608,12 +630,9 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String triggersPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project.name, "triggers");
         Hashtable<String, Object> trigger = xmlRpcHelper.createEmptyConfig(DependentBuildTriggerConfiguration.class);
         trigger.put("name", "dependency trigger");
+        trigger.put("propagateStatus", project.isPropagateStatus());
+        trigger.put("propagateVersion", project.isPropagateVersion());
         xmlRpcHelper.insertConfig(triggersPath, trigger);
-
-        if (project.isPropagateStatus())
-        {
-            setPropagateStatusOnTrigger(project);
-        }
     }
 
     private void setProjectOrganisation(Project p) throws Exception
@@ -649,15 +668,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             dependencies.put(STATUS, project.status);
         }
+        if (TextUtils.stringSet(project.version))
+        {
+            dependencies.put(VERSION, project.version);
+        }
         xmlRpcHelper.saveConfig(dependenciesPath, dependencies, false);
-    }
-
-    public void setPropagateStatusOnTrigger(Project project) throws Exception
-    {
-        String triggerPath = "projects/" + project.getName() + "/triggers/dependency trigger";
-        Hashtable<String, Object> trigger = xmlRpcHelper.getConfig(triggerPath);
-        trigger.put("propagateStatus", project.isPropagateStatus());
-        xmlRpcHelper.saveConfig(triggerPath, trigger, false);
     }
 
     private void addPublication(String projectName, String stageName, String artifact) throws Exception
@@ -777,12 +792,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private String name;
         private String org;
         private String status;
+        private String version;
         private List<Dependency> dependencies = new LinkedList<Dependency>();
         private List<String> artifacts = new LinkedList<String>();
         private List<Stage> stages = new LinkedList<Stage>();
         private Stage defaultStage = new Stage("default");
 
         private boolean propagateStatus = false;
+        private boolean propagateVersion = false;
 
         private String publicationPattern = "build/[artifact].[ext]";
 
@@ -878,6 +895,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
             this.status = status;
         }
 
+        public void setVersion(String version)
+        {
+            this.version = version;
+        }
+
         public boolean isPropagateStatus()
         {
             return propagateStatus;
@@ -886,6 +908,16 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         public void setPropagateStatus(boolean propagateStatus)
         {
             this.propagateStatus = propagateStatus;
+        }
+
+        public boolean isPropagateVersion()
+        {
+            return propagateVersion;
+        }
+
+        public void setPropagateVersion(boolean b)
+        {
+            this.propagateVersion = b;
         }
     }
 

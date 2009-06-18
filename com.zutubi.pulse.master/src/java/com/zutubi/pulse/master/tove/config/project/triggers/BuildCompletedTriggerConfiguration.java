@@ -58,6 +58,12 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
      */
     private boolean propagateStatus;
 
+    /**
+     * If true, build requests raised by this trigger will inherit the version
+     * of the completed build.
+     */
+    private boolean propagateVersion;
+    
     @Transient
     private ConfigurationProvider configurationProvider;
 
@@ -115,6 +121,16 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
         this.propagateStatus = propagateStatus;
     }
 
+    public boolean isPropagateVersion()
+    {
+        return propagateVersion;
+    }
+
+    public void setPropagateVersion(boolean propagateVersion)
+    {
+        this.propagateVersion = propagateVersion;
+    }
+
     public Trigger newTrigger()
     {
         ProjectConfiguration project = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
@@ -136,6 +152,7 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
     {
         dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, this.project.getProjectId());
         dataMap.put(BuildCompletedEventFilter.PARAM_PROPAGATE_STATUS, propagateStatus);
+        dataMap.put(BuildCompletedEventFilter.PARAM_PROPAGATE_VERSION, propagateVersion);
         dataMap.put(BuildCompletedEventFilter.PARAM_PROPAGATE_REVISION, propagateRevision);
         dataMap.put(BuildCompletedEventFilter.PARAM_REPLACEABLE, supercedeQueued);
 
@@ -155,6 +172,7 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
         {
             dataMap.remove(BuildCompletedEventFilter.PARAM_STATES);
         }
+
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
