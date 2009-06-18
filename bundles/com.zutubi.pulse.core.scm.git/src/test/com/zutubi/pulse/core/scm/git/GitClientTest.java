@@ -69,8 +69,10 @@ public class GitClientTest extends PulseTestCase
         context = new PulseExecutionContext();
         context.setWorkingDir(workingDir);
 
+        File persistentWorkingDir = new File(tmp, "scm");
+        assertTrue(persistentWorkingDir.mkdir());
         scmContext = new ScmContextImpl();
-        scmContext.setPersistentWorkingDir(workingDir);
+        scmContext.setPersistentWorkingDir(persistentWorkingDir);
 
         handler = new RecordingScmFeedbackHandler();
     }
