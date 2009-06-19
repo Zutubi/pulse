@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.tove.config.group;
 
-import com.zutubi.pulse.master.model.GrantedAuthority;
-
 /**
+ * Provide formatting for group configurations.  For built in groups, simply
+ * the groups name is used.  For user groups, extra details such as the number
+ * of members of the group is used.
  */
 public class GroupConfigurationFormatter
 {
@@ -10,22 +11,13 @@ public class GroupConfigurationFormatter
     {
         if(group instanceof BuiltinGroupConfiguration)
         {
-            String role = group.getDefaultAuthority();
-            if(role.equals(GrantedAuthority.GUEST))
-            {
-                return "anonymous users";
-            }
-            else
-            {
-                return "all users";
-            }
+            return group.getName();
         }
         else if(group instanceof UserGroupConfiguration)
         {
             int size = ((UserGroupConfiguration) group).getMembers().size();
             return String.format("%d user%s", size, size == 1 ? "" : "s");
         }
-
         return "unknown";
     }
 }

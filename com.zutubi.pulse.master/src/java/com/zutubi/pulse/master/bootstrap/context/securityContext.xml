@@ -97,8 +97,7 @@ The beans defined within the security subsystem need not be accessed by other co
     </bean>
 
     <!-- This filter is responsible for clearing the security context when each request is complete. -->
-    <bean id="clearContextFilter" class="com.zutubi.pulse.master.security.BasicClearContextFilter">
-    </bean>
+    <bean id="clearContextFilter" class="com.zutubi.pulse.master.security.BasicClearContextFilter"/>
 
     <!--
     The AuthenticationProcessingFilter is responsible for handling the login request. It monitors for requests

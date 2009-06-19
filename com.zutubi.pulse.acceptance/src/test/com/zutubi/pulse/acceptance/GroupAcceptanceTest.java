@@ -6,8 +6,7 @@ import com.zutubi.pulse.acceptance.pages.admin.GroupsPage;
 import com.zutubi.pulse.acceptance.pages.admin.HierarchyPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.tove.type.record.PathUtils;
@@ -25,11 +24,11 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
         GroupsPage groupsPage = browser.openAndWaitFor(GroupsPage.class);
 
-        assertTrue(groupsPage.isGroupPresent("administrators"));
-        assertTrue(groupsPage.isGroupPresent("all users"));
-        assertTrue(groupsPage.isGroupPresent("anonymous users"));
-        assertTrue(groupsPage.isGroupPresent("developers"));
-        assertTrue(groupsPage.isGroupPresent("project administrators"));
+        assertTrue(groupsPage.isGroupPresent(ADMINS_GROUP_NAME));
+        assertTrue(groupsPage.isGroupPresent(ALL_USERS_GROUP_NAME));
+        assertTrue(groupsPage.isGroupPresent(ANONYMOUS_USERS_GROUP_NAME));
+        assertTrue(groupsPage.isGroupPresent(DEVELOPERS_GROUP_NAME));
+        assertTrue(groupsPage.isGroupPresent(PROJECT_ADMINS_GROUP_NAME));
     }
 
     public void testCreateEmptyGroup()

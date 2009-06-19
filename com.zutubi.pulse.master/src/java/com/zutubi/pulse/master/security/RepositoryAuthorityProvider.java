@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.tove.config.admin.RepositoryConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import static com.zutubi.tove.security.AccessManager.ACTION_WRITE;
@@ -14,6 +15,7 @@ import com.zutubi.tove.security.AuthorityProvider;
 import com.zutubi.tove.security.DefaultAccessManager;
 import static com.zutubi.tove.type.record.PathUtils.getPathElements;
 import com.zutubi.util.TextUtils;
+import com.zutubi.events.EventManager;
 import org.mortbay.http.HttpRequest;
 
 import static java.util.Arrays.asList;
@@ -25,21 +27,21 @@ import java.util.Set;
  * The repository authority provider determines the authorities that
  * are allowed to access a particular path within the pulse artifact
  * repository.
- *
+ * <p/>
  * There are two stages to the determination of the allowed authorities.
  * a) if the requested path can be mapped to a project, then the projects
- *    authorities are used.
+ * authorities are used.
  * b) otherwise, the default authorities configured via the settings/repository
- *    are applied.
+ * are applied.
  */
 public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvocation>
 {
     private static Set<String> NOT_ALLOWED = new HashSet<String>();
 
     private static final List<String> WRITE_METHODS = asList(
-        HttpRequest.__PUT
+            HttpRequest.__PUT
     );
-    
+
     private static final List<String> READ_METHODS = asList(
             HttpRequest.__GET, HttpRequest.__HEAD
     );
@@ -53,7 +55,7 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
         {
             return NOT_ALLOWED;
         }
-        
+
         String action = isWriteMethod(resource.getMethod()) ? ACTION_WRITE : ACTION_VIEW;
 
         HashSet<String> allowedAuthorities = new HashSet<String>();
@@ -63,18 +65,18 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
         // A) If we have a project, delegate to the project authority provider.
         if (project != null)
         {
-            if (getDelegateProvider() != null)
+            if (projectAuthorityProvider != null)
             {
-                allowedAuthorities.addAll(getDelegateProvider().getAllowedAuthorities(action, project));
+                allowedAuthorities.addAll(projectAuthorityProvider.getAllowedAuthorities(action, project));
             }
             // If we can not delegate, then we take the safe approach and disallow access.
         }
         else
         {
             // B) Use the configured defaults to determine the allowed authorities.
-            if (getConfigurationProvider() != null)
+            if (configurationProvider != null)
             {
-                RepositoryConfiguration repositoryConfiguration = getConfigurationProvider().get(RepositoryConfiguration.class);
+                RepositoryConfiguration repositoryConfiguration = configurationProvider.get(RepositoryConfiguration.class);
                 if (action.equals(ACTION_WRITE))
                 {
                     allowedAuthorities.addAll(getAuthorities(repositoryConfiguration.getWriteAccess()));
@@ -99,9 +101,9 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
      * Attempt to map the path to a project.  The implied path format is
      * /(organisation/)projectName/...., where the org component is optional.
      *
-     * @param path  the path that may identify a project.
-     * @return  a project configuraiton if the path can be mapped to a project,
-     * null otherwise.
+     * @param path the path that may identify a project.
+     * @return a project configuraiton if the path can be mapped to a project,
+     *         null otherwise.
      */
     private ProjectConfiguration lookupProject(String path)
     {
@@ -123,8 +125,8 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
     /**
      * Get the requested path, relative to the root of the repository.
      *
-     * @param resource  the requested resource
-     * @return  the path
+     * @param resource the requested resource
+     * @return the path
      */
     private String getRelativePath(HttpInvocation resource)
     {
@@ -156,30 +158,33 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
      * one that has been validated by Pulse.  Therefore we force a match on the organisation field
      * as well.
      *
-     * @param name      name of the project
-     * @param org       organisation of the project
-     * @return      a project configuration for the project with matching name and org, null otherwise.
+     * @param name name of the project
+     * @param org  organisation of the project
+     * @return a project configuration for the project with matching name and org, null otherwise.
      */
     private ProjectConfiguration getProject(String name, String org)
     {
-        ProjectConfiguration project = getConfigurationProvider().get(PROJECTS_SCOPE + "/" + name, ProjectConfiguration.class);
-        if (project == null)
+        if (configurationProvider != null)
         {
-            return null;
-        }
-
-        if (org != null)
-        {
-            if (org.equals(project.getOrganisation()))
+            ProjectConfiguration project = configurationProvider.get(PROJECTS_SCOPE + "/" + name, ProjectConfiguration.class);
+            if (project == null)
             {
-                return project;
+                return null;
             }
-        }
-        else
-        {
-            if (!TextUtils.stringSet(project.getOrganisation()))
+
+            if (org != null)
             {
-                return project;
+                if (org.equals(project.getOrganisation()))
+                {
+                    return project;
+                }
+            }
+            else
+            {
+                if (!TextUtils.stringSet(project.getOrganisation()))
+                {
+                    return project;
+                }
             }
         }
         return null;
@@ -189,7 +194,7 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
      * Check if the specified http method is one that this authority provider is able
      * to deal with.
      *
-     * @param method    the http method in question.
+     * @param method the http method in question.
      * @return true if the method is dealt with by this provider, false otherwise.
      */
     private boolean isMethodSupported(String method)
@@ -200,8 +205,8 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
     /**
      * Check if the specified http method represents a write method.
      *
-     * @param method    the http method in question
-     * @return  true if the method is a write method, false otherwise.
+     * @param method the http method in question
+     * @return true if the method is a write method, false otherwise.
      */
     private boolean isWriteMethod(String method)
     {
@@ -211,6 +216,11 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
     public void setAccessManager(DefaultAccessManager accessManager)
     {
         accessManager.registerAuthorityProvider(HttpInvocation.class, this);
+    }
+
+    public void systemStarted()
+    {
+
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
@@ -223,24 +233,17 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
         this.projectAuthorityProvider = projectAuthorityProvider;
     }
 
-    // The following two getters are required because the security system is initialised
-    // BEFORE the configuration system and therefore normal wiring fails.
-
-    private synchronized ConfigurationProvider getConfigurationProvider()
+    public void setEventManager(EventManager eventManager)
     {
-        if (this.configurationProvider == null)
+        // The two providers are not available when the security system is initialised and so
+        // need to be manually wired on system startup.
+        eventManager.register(new SystemStartedListener()
         {
-            this.configurationProvider = SpringComponentContext.getBean("configurationProvider");
-        }
-        return this.configurationProvider;
-    }
-
-    private synchronized ProjectConfigurationAuthorityProvider getDelegateProvider()
-    {
-        if (this.projectAuthorityProvider == null)
-        {
-            this.projectAuthorityProvider = SpringComponentContext.getBean("projectConfigurationAuthorityProvider");
-        }
-        return this.projectAuthorityProvider;
+            public void systemStarted()
+            {
+                setConfigurationProvider((ConfigurationProvider) SpringComponentContext.getBean("configurationProvider"));
+                setProjectConfigurationAuthorityProvider((ProjectConfigurationAuthorityProvider) SpringComponentContext.getBean("projectConfigurationAuthorityProvider"));
+            }
+        });
     }
 }

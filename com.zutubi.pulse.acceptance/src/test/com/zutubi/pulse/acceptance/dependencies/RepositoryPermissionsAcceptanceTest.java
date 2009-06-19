@@ -5,6 +5,9 @@ import com.zutubi.pulse.acceptance.Constants;
 import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
 import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.getArtifactRepository;
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
@@ -46,18 +49,6 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
         }
     }
 
-    /*
-
-    tests:
-    - check default access permissions
-    -- anonymous access disabled.
-    -- users can read
-    -- admins can write
-
-    - check variations of the configuration.
-    -- check anonymous access to a project
-     */
-
     public void testProject_AdminAccess() throws IOException
     {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
@@ -78,8 +69,6 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
 
     public void testProject_AnonymousAccess() throws IOException
     {
-        // remove the anonymous group permissions from this project.
-/* Need to fix mismatch between ROLE_GUEST and ROLE_ANONYMOUS */
         ensurePathExists(projectName);
         assertEquals(__200_OK, httpGet(projectName, null));
         assertEquals(__401_Unauthorized, httpPut(projectName + "/file.txt", null));
@@ -105,11 +94,16 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
         assertEquals(__403_Forbidden, httpPut(path + "/file.txt", credentials));
 
         // give users default read write access.
-        addReadAccess("groups/all users");
-        addWriteAccess("groups/all users");
+        addReadAccess(getGroupPath(ALL_USERS_GROUP_NAME));
+        addWriteAccess(getGroupPath(ALL_USERS_GROUP_NAME));
 
         assertEquals(__200_OK, httpGet(path, credentials));
         assertEquals(__201_Created, httpPut(path + "/file.txt", credentials));
+    }
+
+    private String getGroupPath(String name)
+    {
+        return GROUPS_SCOPE + "/" + name;
     }
 
     public void testDefault_AnonymousAccess() throws Exception
@@ -120,7 +114,7 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
         assertEquals(__401_Unauthorized, httpPut(path + "/file.txt", null));
 
         // give anonymous users default read access.
-        addReadAccess("groups/anonymous users");
+        addReadAccess(getGroupPath(ANONYMOUS_USERS_GROUP_NAME));
 
         assertEquals(__200_OK, httpGet(path, null));
         assertEquals(__401_Unauthorized, httpPut(path + "/file.txt", null));
@@ -138,26 +132,22 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
 
     private void addAccess(String accessList, String... paths) throws Exception
     {
-        String configPath = Constants.Settings.Repository.PATH;
-        
         xmlRpcHelper.loginAsAdmin();
-        Hashtable<String, Object> config = xmlRpcHelper.getConfig(configPath);
+        Hashtable<String, Object> config = xmlRpcHelper.getConfig(Constants.Settings.Repository.PATH);
         @SuppressWarnings("unchecked")
         Vector<String> g = (Vector<String>) config.get(accessList);
         g.addAll(asList(paths));
-        xmlRpcHelper.saveConfig(configPath, config, true);
+        xmlRpcHelper.saveConfig(Constants.Settings.Repository.PATH, config, true);
         xmlRpcHelper.logout();
     }
 
     private void resetDefaultAccess() throws Exception
     {
-        String path = Constants.Settings.Repository.PATH;
-
         xmlRpcHelper.loginAsAdmin();
-        Hashtable<String, Object> config = xmlRpcHelper.getConfig(path);
+        Hashtable<String, Object> config = xmlRpcHelper.getConfig(Constants.Settings.Repository.PATH);
         config.remove(READ_ACCESS);
         config.remove(WRITE_ACCESS);
-        xmlRpcHelper.saveConfig(path, config, true);
+        xmlRpcHelper.saveConfig(Constants.Settings.Repository.PATH, config, true);
         xmlRpcHelper.logout();
     }
 
@@ -173,41 +163,16 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
 
     private int httpGet(String path, Credentials credentials) throws IOException
     {
-        // try the path and check the reponse code for forbidden
-        HttpClient client = createHttpClient();
-
-        if (credentials != null)
-        {
-            client.getState().setCredentials(AuthScope.ANY, credentials);
-        }
-
         GetMethod method = new GetMethod(baseUrl + "repository/" + path);
         method.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
-        client.executeMethod(method);
-        method.releaseConnection();
-
-        debug(method);
-
-        return method.getStatusCode();
+        return executeMethod(method, credentials);
     }
 
     private int httpPut(String path, Credentials credentials) throws IOException
     {
-        HttpClient client = createHttpClient();
-
-        if (credentials != null)
-        {
-            client.getState().setCredentials(AuthScope.ANY, credentials);
-        }
-
         PutMethod method = new PutMethod(baseUrl + "repository/" + path);
         method.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
-        client.executeMethod(method);
-        method.releaseConnection();
-
-        debug(method);
-
-        return method.getStatusCode();
+        return executeMethod(method, credentials);
     }
 
     private Credentials createRandomUserCredentials() throws Exception
@@ -221,11 +186,21 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
         return new UsernamePasswordCredentials(user, "");
     }
 
-    private HttpClient createHttpClient()
+    private int executeMethod(HttpMethod method, Credentials credentials) throws IOException
     {
         HttpClient client = new HttpClient();
         client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
-        return client;
+        if (credentials != null)
+        {
+            client.getState().setCredentials(AuthScope.ANY, credentials);
+        }
+
+        client.executeMethod(method);
+        method.releaseConnection();
+
+        debug(method);
+
+        return method.getStatusCode();
     }
 
     private void debug(HttpMethod method) throws IOException
