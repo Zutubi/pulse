@@ -500,6 +500,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
         assertIvyStatus(STATUS_RELEASE, projectB.getName(), 1);
+        assertIvyRevision("1", projectB.getName(), "1");
     }
 
     public void testDependentBuild_PropagateVersion() throws Exception
@@ -521,6 +522,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
         assertInRepository(ivyPath(projectB.getName(), "FIXED"));
+        assertIvyRevision("FIXED", projectB.getName(), "FIXED");
     }
 
     public void testRepositoryFormat_OrgSpecified() throws Exception
@@ -744,9 +746,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         return v;
     }
 
-    private void assertIvyStatus(String status, String projectName, int buildNumber) throws IOException
+    private void assertIvyStatus(String expectedStatus, String projectName, int buildNumber) throws IOException
     {
-        assertThat(getIvyFile(projectName, buildNumber), containsString("status=\""+status+"\""));
+        assertThat(getIvyFile(projectName, buildNumber), containsString("status=\""+ expectedStatus +"\""));
+    }
+
+    private void assertIvyRevision(String expectedRevision, String projectName, String version) throws IOException
+    {
+        assertThat(getIvyFile(projectName, version), containsString("revision=\""+ expectedRevision +"\""));
     }
 
     private void assertIvyInRepository(String projectName, int buildNumber) throws IOException

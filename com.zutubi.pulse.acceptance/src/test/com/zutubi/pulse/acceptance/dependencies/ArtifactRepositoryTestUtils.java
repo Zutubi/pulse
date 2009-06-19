@@ -76,6 +76,13 @@ public class ArtifactRepositoryTestUtils
         return IOUtils.fileToString(ivyFile);
     }
 
+    public static String getIvyFile(String projectName, String version) throws IOException
+    {
+        String path = ivyPath(projectName, version);
+        File ivyFile = new File(getArtifactRepository(), path);
+        return IOUtils.fileToString(ivyFile);
+    }
+
     /**
      * Returns true if the specified path references a file that exists within the
      * artifact repository.
