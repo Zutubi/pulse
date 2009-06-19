@@ -176,6 +176,12 @@ public class LogManager
                 Logger l = Logger.getLogger(name);
                 l.setLevel(LogUtils.getLevel(config, propertyName, null));
             }
+            else if (propertyName.endsWith(".useParentHandlers"))
+            {
+                String name = propertyName.substring(0, propertyName.length() - 18);
+                Logger l = Logger.getLogger(name);
+                l.setUseParentHandlers(LogUtils.getBoolean(config, propertyName, true));
+            }
             else if (propertyName.endsWith(".handler"))
             {
                 String name = propertyName.substring(0, propertyName.length() - 8);

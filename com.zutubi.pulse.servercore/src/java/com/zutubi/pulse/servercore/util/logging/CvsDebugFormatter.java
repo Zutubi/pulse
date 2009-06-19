@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.cvs.client;
+package com.zutubi.pulse.servercore.util.logging;
 
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -8,16 +8,13 @@ import java.util.logging.LogRecord;
  */
 public class CvsDebugFormatter extends Formatter
 {
-    public static ThreadLocal<String> contextHolder = new ThreadLocal<String>();
-
     public String format(LogRecord record)
     {
         String msg = record.getMessage();
 
-        Object o = contextHolder.get();
-        if (o != null && msg.endsWith("\n"))
+        if (msg.endsWith("\n"))
         {
-            msg = String.format("%s%s: ", msg, o);
+            msg = String.format("%s: %s", Thread.currentThread().getId(), msg);
         }
         return msg;
     }

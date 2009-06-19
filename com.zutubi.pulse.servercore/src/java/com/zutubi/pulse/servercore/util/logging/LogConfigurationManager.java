@@ -26,7 +26,7 @@ public class LogConfigurationManager
     private LogManager logManager;
     private EventManager eventManager;
 
-    public void init()
+    public void reset()
     {
         logManager.reset();
 
@@ -34,6 +34,11 @@ public class LogConfigurationManager
         logManager.configure(new File(systemPaths.getConfigRoot(), "logging.properties"));
 
         applyConfig();
+    }
+
+    public void init()
+    {
+        reset();
 
         // Ensure that the logs directory exists, before handlers try to write there.
         File logRoot = systemPaths.getLogRoot();
