@@ -218,11 +218,6 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
         accessManager.registerAuthorityProvider(HttpInvocation.class, this);
     }
 
-    public void systemStarted()
-    {
-
-    }
-
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
