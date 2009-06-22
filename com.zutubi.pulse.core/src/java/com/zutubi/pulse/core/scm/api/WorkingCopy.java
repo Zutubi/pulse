@@ -36,6 +36,34 @@ public interface WorkingCopy
     boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException;
 
     /**
+     * Returns the latest revision committed to the remote repository that
+     * affects this working copy (i.e. later revisions affecting only files
+     * outside the scope of this working copy are not reported).
+     *
+     * @param context the context in which the operation is run, in particular
+     *                contains the base directory
+     * @return the latest revision within to the remote repository
+     * @throws ScmException on error
+     */
+    Revision getLatestRemoteRevision(WorkingCopyContext context) throws ScmException;
+
+    /**
+     * Returns a best guess of the have revision for this working copy.  This
+     * is the latest revision that the working copy has been updated to.  Note
+     * that for some SCMs this can be difficult to determine - and indeed
+     * impossible if the workspace has a mixture of revisions.  If no
+     * reasonable guess can be made, the implementation may just throw an
+     * {@link ScmException}.
+     *
+     * @param context the context in which the operation is run, in particular
+     *                contains the base directory
+     * @return a best guess of the last revision this workspace was updated to
+     * @throws ScmException on error, including when no reasonable guess is
+     *                      possible
+     */
+    Revision guessHaveRevision(WorkingCopyContext context) throws ScmException;
+
+    /**
      * Updates the working copy to the revision specified by synchronising with
      * changes in the SCM server.
      * <p/>
@@ -75,10 +103,10 @@ public interface WorkingCopy
      * implementation should implement {@link WorkingCopyStatusBuilder}, and
      * forward this method to {@link StandardPatchFileSupport#writePatchFile(WorkingCopyStatusBuilder, WorkingCopyContext, java.io.File, String[])}.
      * <p/>
-     * While dettermining the changes and creating the patch, the
+     * While determining the changes and creating the patch, the
      * implementation is encouraged to output status messages via the UI
      * available in the context.  For example, a line for each changed file and
-     * its status could be written while they are discovered.
+     * its status could be written as they are discovered.
      * <p/>
      * If the working copy is in an inconsistent state, for example there are
      * unresolved merge conflicts, then this method should report the error

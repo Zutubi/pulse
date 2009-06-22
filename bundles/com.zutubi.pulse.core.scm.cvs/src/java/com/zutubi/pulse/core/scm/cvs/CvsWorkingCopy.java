@@ -15,6 +15,7 @@ import static org.netbeans.lib.cvsclient.file.FileStatus.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 /**
  */
@@ -37,21 +38,37 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
         return loadLocalWorkingModule(context.getBase()).equals(pieces[1]);
     }
 
+    public Revision getLatestRemoteRevision(WorkingCopyContext context) throws ScmException
+    {
+        // Just fix it to the current time.
+        return CvsClient.convertRevision(new CvsRevision(null, getBranch(context), null, new Date()));
+    }
+
+    public Revision guessHaveRevision(WorkingCopyContext context) throws ScmException
+    {
+        throw new ScmException("Operation not supported");
+    }
+
     public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
     {
-        // updating to the latest repository version for the current configurations branch (or head).
+        if (revision == null)
+        {
+            revision = getLatestRemoteRevision(context);
+        }
+        
+        getCore(context).update(context.getBase(), CvsClient.convertRevision(revision), new UpdateHandler(context.getUI()));
+        return revision;
+    }
+
+    private String getBranch(WorkingCopyContext context)
+    {
         String branch = context.getConfig().getProperty(CvsConstants.BRANCH);
         if ("".equals(branch))
         {
             // slightly paranoid action. Ensure that we use a null if no branch is specified.
             branch = null;
         }
-
-        UpdateHandler updateHandler = new UpdateHandler(context.getUI());
-
-        CvsRevision cvsRevision = revision == null ? new CvsRevision(null, branch, null, null) : new CvsRevision(revision.getRevisionString());
-        getCore(context).update(context.getBase(), cvsRevision, updateHandler);
-        return CvsClient.convertRevision(cvsRevision);
+        return branch;
     }
 
     public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... scope) throws ScmException

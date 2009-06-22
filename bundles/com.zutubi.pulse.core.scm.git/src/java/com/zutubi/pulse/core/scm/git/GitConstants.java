@@ -31,6 +31,9 @@ public class GitConstants
     public static final String COMMAND_MERGE = "merge";
     public static final String COMMAND_TAG = "tag";
     public static final String COMMAND_PUSH = "push";
+    public static final String COMMAND_CONFIG = "config";
+    public static final String COMMAND_REVISION_PARSE = "rev-parse";
+    public static final String COMMAND_COMMIT = "commit";
 
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_FORCE = "-f";
@@ -45,9 +48,11 @@ public class GitConstants
     public static final String FLAG_TRACK = "-t";
     public static final String FLAG_SET_HEAD = "-m";
     public static final String FLAG_MESSAGE = "-m";
+    public static final String FLAG_ALL = "-a";
 
     public static final String ARG_ADD = "add";
-    public static final String ARG_ORIGIN = "origin";
+
+    public static final String REMOTE_ORIGIN = "origin";
 
     public static final String REVISION_HEAD = "HEAD";
 

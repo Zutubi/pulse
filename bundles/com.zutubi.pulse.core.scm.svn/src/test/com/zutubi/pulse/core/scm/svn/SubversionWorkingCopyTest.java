@@ -122,14 +122,16 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         ProcessControl.destroyProcess(svnProcess);
         svnProcess.waitFor();
-        svnProcess = null;
-        Thread.sleep(100);
+        int retries = 0;
+        while (!FileSystemUtils.rmdir(tempDir))
+        {
+            if (retries++ > 5)
+            {
+                throw new RuntimeException("Can't ramve temp directory '" + tempDir.getAbsolutePath() + "'");
+            }
 
-        FileSystemUtils.rmdir(tempDir);
-
-        updateClient = null;
-        client = null;
-        wc = null;
+            Thread.sleep(100);
+        }
     }
 
     public void testMatchesLocationMatches() throws ScmException
@@ -546,6 +548,53 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertEquals(Hunk.LineType.ADDED, line.getType());
     }
 
+    public void testGetLatestRemoteRevision() throws ScmException
+    {
+        assertEquals("7", wc.getLatestRemoteRevision(context).getRevisionString());
+    }
+
+    public void testGetLatestRemoteRevisionRestrictedToView() throws ScmException, IOException, SVNException
+    {
+        assertEquals(8L, branchEdit("file1"));
+        assertEquals("7", wc.getLatestRemoteRevision(context).getRevisionString());
+    }
+
+    public void testGetLatestRemoteRevisionSeesNewChanges() throws ScmException, IOException, SVNException
+    {
+        assertEquals(8L, doEdit("file1", base, true));
+        assertEquals("8", wc.getLatestRemoteRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionUpToDate() throws ScmException
+    {
+        assertEquals("7", wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionRestrictedToView() throws ScmException, IOException, SVNException
+    {
+        assertEquals(8L, branchEdit("file1"));
+        assertEquals(8L, updateClient.doUpdate(base, SVNRevision.HEAD, SVNDepth.INFINITY, false, false));
+        assertEquals("7", wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionOutOfDate() throws ScmException, IOException, SVNException
+    {
+        assertEquals(4L, updateClient.doUpdate(base, SVNRevision.create(4), SVNDepth.INFINITY, false, false));
+        assertEquals("2", wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionLatestCommitFromWC() throws ScmException, IOException, SVNException
+    {
+        assertEquals(8L, doEdit("file1", base, true));
+        assertEquals("8", wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionMixedRevisions() throws ScmException, IOException, SVNException
+    {
+        assertEquals(1L, updateClient.doUpdate(new File(base, "dir1"), SVNRevision.create(1), SVNDepth.INFINITY, false, false));
+        assertEquals("7", wc.guessHaveRevision(context).getRevisionString());
+    }
+
     private File edit(String path) throws IOException, SVNException
     {
         doEdit(path, base, false);
@@ -703,4 +752,83 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         FileStatus fs = wcs.getFileStatus(path);
         assertEquals(Boolean.toString(executable), fs.getProperty(FileStatus.PROPERTY_EXECUTABLE));
     }
+
+//    jsankey@caeser:~$ svn log svn://localhost/
+//    ------------------------------------------------------------------------
+//    r7 | (no author) | 2009-04-08 23:06:10 +0100 (Wed, 08 Apr 2009) | 1 line
+//    Changed paths:
+//       M /test/trunk/bin1
+//       A /test/trunk/bin2
+//
+//    binary files
+//    ------------------------------------------------------------------------
+//    r6 | (no author) | 2006-11-04 04:47:57 +0000 (Sat, 04 Nov 2006) | 1 line
+//    Changed paths:
+//       A /test/branches/2 (from /test/trunk:5)
+//
+//    branch 2
+//    ------------------------------------------------------------------------
+//    r5 | (no author) | 2006-11-04 04:46:40 +0000 (Sat, 04 Nov 2006) | 1 line
+//    Changed paths:
+//       A /test/trunk/dir3
+//       A /test/trunk/dir3/file1
+//       A /test/trunk/dir3/nested
+//       A /test/trunk/dir3/nested/file1
+//       A /test/trunk/dir3/nested/file2
+//
+//    Added nested directory.
+//    ------------------------------------------------------------------------
+//    r4 | (no author) | 2006-10-23 08:03:42 +0100 (Mon, 23 Oct 2006) | 2 lines
+//    Changed paths:
+//       A /test/branches/1 (from /test/trunk:3)
+//
+//    branched 1
+//
+//    ------------------------------------------------------------------------
+//    r3 | (no author) | 2006-10-23 08:03:31 +0100 (Mon, 23 Oct 2006) | 2 lines
+//    Changed paths:
+//       A /test/branches
+//
+//    added branches dir
+//
+//    ------------------------------------------------------------------------
+//    r2 | (no author) | 2006-10-23 08:02:28 +0100 (Mon, 23 Oct 2006) | 1 line
+//    Changed paths:
+//       M /test/trunk/bin1
+//       A /test/trunk/macfile1
+//       A /test/trunk/macfile2
+//       M /test/trunk/script1
+//       M /test/trunk/script2
+//       A /test/trunk/textfile1
+//       A /test/trunk/textfile2
+//       A /test/trunk/unixfile1
+//       A /test/trunk/unixfile2
+//       A /test/trunk/winfile1
+//       A /test/trunk/winfile2
+//
+//    Fun with properties
+//    ------------------------------------------------------------------------
+//    r1 | (no author) | 2006-10-23 07:58:31 +0100 (Mon, 23 Oct 2006) | 3 lines
+//    Changed paths:
+//       A /test
+//       A /test/trunk
+//       A /test/trunk/bin1
+//       A /test/trunk/dir1
+//       A /test/trunk/dir1/file1
+//       A /test/trunk/dir1/file2
+//       A /test/trunk/dir1/file3
+//       A /test/trunk/dir2
+//       A /test/trunk/dir2/file1
+//       A /test/trunk/dir2/file2
+//       A /test/trunk/file1
+//       A /test/trunk/file2
+//       A /test/trunk/file3
+//       A /test/trunk/file4
+//       A /test/trunk/script1
+//       A /test/trunk/script2
+//
+//    iinitial import
+//
+//
+//    ------------------------------------------------------------------------
 }

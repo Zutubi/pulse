@@ -15,10 +15,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.List;
 
 public class PerforceWorkingCopyTest extends PerforceTestBase
 {
+    private static final long REVISION_LATEST = 2;
+
     private static final String FILE_CHECKPOINT = "checkpoint.1";
 
     private static final String P4_COMMAND = "p4";
@@ -250,8 +253,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
     {
         openForEdit("file1");
 
-        otherCore.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
-        otherCore.submit("comment");
+        otherDelete("file1");
 
         WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "file1", FileStatus.State.MODIFIED, true);
@@ -409,6 +411,119 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         assertEquals(Hunk.LineType.ADDED, line.getType());
     }
 
+    public void testGetLatestRemoteRevision() throws ScmException
+    {
+        assertEquals(Long.toString(REVISION_LATEST), wc.getLatestRemoteRevision(context).getRevisionString());
+    }
+
+    public void testGetLatestRemoteRevisionPendingChange() throws ScmException
+    {
+        openForEdit("file1");
+        assertEquals(Long.toString(REVISION_LATEST), wc.getLatestRemoteRevision(context).getRevisionString());
+    }
+
+    public void testGetLatestRemoteRevisionRestrictedToView() throws ScmException, IOException
+    {
+        excludeBranchesFromClient();
+        assertEquals("1", wc.getLatestRemoteRevision(context).getRevisionString());
+    }
+
+    public void testGetLatestRemoteRevisionSeesNewChanges() throws ScmException, IOException
+    {
+        openForEdit("file1");
+        core.submit("trivial edit");
+        assertEquals(Long.toString(REVISION_LATEST + 1), wc.getLatestRemoteRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionUpToDate() throws ScmException
+    {
+        assertEquals(Long.toString(REVISION_LATEST), wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionPendingChange() throws ScmException
+    {
+        openForEdit("file1");
+        assertEquals(Long.toString(REVISION_LATEST), wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionRestrictedToView() throws ScmException, IOException
+    {
+        excludeBranchesFromClient();
+        core.runP4(null, P4_COMMAND, COMMAND_SYNC);
+        assertEquals("1", wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionOutOfDate() throws ScmException, IOException
+    {
+        otherEdit();
+        assertEquals(Long.toString(REVISION_LATEST), wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionLatestCommitFromWC() throws ScmException, IOException
+    {
+        openForEdit("file1");
+        core.submit("trivial edit");
+        assertEquals(Long.toString(REVISION_LATEST + 1), wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionMixedRevisions() throws ScmException, IOException
+    {
+        otherEditFiles("file1", "file2");
+        core.runP4(null, P4_COMMAND, COMMAND_SYNC, "file1");
+        try
+        {
+            wc.guessHaveRevision(context).getRevisionString();
+            fail();
+        }
+        catch (ScmException e)
+        {
+            assertEquals("Unable to guess have revision: tried [3]: is your client at a single changelist?", e.getMessage());
+        }
+    }
+
+    public void testGuessHaveRevisionLatestAreDeletes() throws ScmException, IOException
+    {
+        otherDelete("file1");
+        otherDelete("file2");
+        core.runP4(null, P4_COMMAND, COMMAND_SYNC);
+        assertEquals(Long.toString(REVISION_LATEST + 2), wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    public void testGuessHaveRevisionLatestAreDeletesSpreadChangelistNumbers() throws ScmException, IOException
+    {
+        final String EXTERNAL_FILE = "branches/1/file1";
+
+        // Simulate developers on other projects checking in to bump up
+        // changelist between our delete changelists.
+        excludeBranchesFromClient();
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+        otherDelete("file1");
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+        otherDelete("file2");
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+        otherDelete("file3"); // 15th change is last to affect our project
+        otherEditFiles(EXTERNAL_FILE);
+        otherEditFiles(EXTERNAL_FILE);
+
+        core.runP4(null, P4_COMMAND, COMMAND_SYNC);
+        assertEquals(Long.toString(REVISION_LATEST + 15), wc.guessHaveRevision(context).getRevisionString());
+    }
+
+    private void excludeBranchesFromClient() throws ScmException
+    {
+        PerforceWorkspace workspace = new PerforceWorkspace(CLIENT_NAME, clientRoot.getAbsolutePath(), Arrays.asList("//depot/... //" + CLIENT_NAME + "/...", "-//depot/branches/... //" + CLIENT_NAME + "/branches/..."));
+        core.runP4(workspace.toSpecification(), P4_COMMAND, COMMAND_CLIENT, FLAG_INPUT);
+    }
+
     private void openForEdit(String path) throws ScmException
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, path);
@@ -465,9 +580,24 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
 
     private void otherEdit() throws ScmException, IOException
     {
-        otherCore.runP4(null, P4_COMMAND, COMMAND_EDIT, "file1");
-        File other1 = new File(otherClientRoot, "file1");
-        FileSystemUtils.createFile(other1, "other");
+        otherEditFiles("file1");
+    }
+
+    private void otherEditFiles(String... paths) throws ScmException, IOException
+    {
+        for (String path: paths)
+        {
+            otherCore.runP4(null, P4_COMMAND, COMMAND_EDIT, path);
+            File other1 = new File(otherClientRoot, path);
+            FileSystemUtils.createFile(other1, "edited by " + getName());
+        }
+
+        otherCore.submit("comment");
+    }
+
+    private void otherDelete(String path) throws ScmException
+    {
+        otherCore.runP4(null, P4_COMMAND, COMMAND_DELETE, path);
         otherCore.submit("comment");
     }
 

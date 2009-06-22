@@ -141,6 +141,40 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
         }
     }
 
+    public Revision getLatestRemoteRevision(WorkingCopyContext context) throws ScmException
+    {
+        SVNWCClient wcClient = getClientManager(context, true).getWCClient();
+        try
+        {
+            SVNInfo svnInfo = wcClient.doInfo(context.getBase(), SVNRevision.HEAD);
+            return new Revision(svnInfo.getCommittedRevision().getNumber());
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+    }
+
+    public Revision guessHaveRevision(final WorkingCopyContext context) throws ScmException
+    {
+        // Note that there is no guarantee that the working copy is all updated
+        // to a single revision.  In this guess we assume the "normal" case,
+        // that the user has updated everything from the base of the working
+        // copy.
+        SVNWCClient wcClient = getClientManager(context, true).getWCClient();
+        GuessRevisionInfoHandler handler = new GuessRevisionInfoHandler();
+        try
+        {
+            wcClient.doInfo(context.getBase(), SVNRevision.UNDEFINED, SVNRevision.WORKING, SVNDepth.INFINITY, null, handler);
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+
+        return new Revision(handler.getRevision());
+    }
+
     public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
     {
         SVNClientManager clientManager = getClientManager(context, true);
@@ -591,6 +625,30 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
         */
         public void checkCancelled() throws SVNCancelException
         {
+        }
+    }
+
+    /**
+     * An info handler that extracts the highest revision from all entries it
+     * sees.  A warning is issued if different revisions are seen (i.e. a
+     * mixed revision working copy).
+     */
+    private static class GuessRevisionInfoHandler implements ISVNInfoHandler
+    {
+        private long highestCommittedRevision = 0;
+
+        public long getRevision()
+        {
+            return highestCommittedRevision;
+        }
+
+        public void handleInfo(SVNInfo svnInfo) throws SVNException
+        {
+            long committed = svnInfo.getCommittedRevision().getNumber();
+            if (committed > highestCommittedRevision)
+            {
+                highestCommittedRevision = committed;
+            }
         }
     }
 }

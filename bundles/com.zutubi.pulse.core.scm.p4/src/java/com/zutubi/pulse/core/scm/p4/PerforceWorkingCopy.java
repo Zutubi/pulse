@@ -3,12 +3,16 @@ package com.zutubi.pulse.core.scm.p4;
 import com.zutubi.diff.Patch;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
 
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * Implementation of {@link WorkingCopy} that interfaces with Perforce by
@@ -26,6 +30,8 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
     // Pulse-specific perforce configuration properties.
     public static final String PROPERTY_CONFIRM_RESOLVE = "p4.confirm.resolve";
     public static final String PROPERTY_PRE_2004_2 = "p4.pre.2004.2";
+
+    private static final int GUESS_REVISION_RETRIES = 5;
 
     public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException
     {
@@ -67,10 +73,100 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         return true;
     }
 
+    public Revision getLatestRemoteRevision(WorkingCopyContext context) throws ScmException
+    {
+        PerforceCore core = createCore(context);
+        return core.getLatestRevisionForFiles(null, "//" + getClientName(core) + "/...");
+    }
+
+    public Revision guessHaveRevision(WorkingCopyContext context) throws ScmException
+    {
+        PerforceCore core = createCore(context);
+        String client = getClientName(core);
+
+        // This technique is described here:
+        //   http://kb.perforce.com/UserTasks/ManagingFile..Changelists/DeterminingC..OfWorkspace
+        //
+        // Basically, p4 changes -m1 @<client name> *almost* does what we want,
+        // but:
+        //   1) It doesn't take into account changes submitted from this client
+        //      since it was last synced; and
+        //   2) If the latest changelist "sunc" to contains only deleted files,
+        //      it will not be reported.
+        //   3) It is possible that the client is not sunc to a single
+        //      revision, different files may be sunc to different revisions.
+        // To overcome this, we can do a dry-run sync to the given changelist
+        // and see if it would do anything.  While it reports that something
+        // would change, we increment the revision and keep trying - for a
+        // while.  We can't try forever due to 3) - so after a few attempts we
+        // guess that we have hit this case and bail.
+        PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_CHANGES), COMMAND_CHANGES, FLAG_MAXIMUM, "1", "@" + client);
+        Matcher matcher = PATTERN_CHANGES.matcher(result.stdout);
+        if (!matcher.find())
+        {
+            throw new ScmException("p4 changes did not return any changelists, expecting one");
+        }
+
+        long revision = Long.parseLong(matcher.group(1));
+        if (isSyncNonTrivial(core, revision))
+        {
+            // Looks like we hit a tricky case.  Get the next few changelists
+            // submitted for out project, and try them.
+            List<Long> tried = new LinkedList<Long>();
+            tried.add(revision);
+
+            result = core.runP4(null, getP4Command(COMMAND_CHANGES), COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + client + "/...@" + (revision + 1) + ",#head");
+            matcher = PATTERN_CHANGES.matcher(result.stdout);
+            int retries = 0;
+            boolean found = false;
+            while (!found && retries++ < GUESS_REVISION_RETRIES && matcher.find())
+            {
+                revision = Long.parseLong(matcher.group(1));
+                if (isSyncNonTrivial(core, revision))
+                {
+                    tried.add(revision);                    
+                }
+                else
+                {
+                    found = true;
+                }
+            }
+
+            if (!found)
+            {
+                throw new ScmException("Unable to guess have revision: tried " + tried + ": is your client at a single changelist?");
+            }
+        }
+
+        return new Revision(revision);
+    }
+
+    private String getClientName(PerforceCore core) throws ScmException
+    {
+        // Small optimisation: if the client is explicitly set, don't ask for it.
+        String client = core.getEnv().get(ENV_CLIENT);
+        if (!TextUtils.stringSet(client))
+        {
+            PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_OUTPUT);
+            PerforceWorkspace workspace = PerforceWorkspace.parseSpecification(result.stdout.toString());
+            client = workspace.getName();
+        }
+        return client;
+    }
+
+    private boolean isSyncNonTrivial(PerforceCore core, long revision) throws ScmException
+    {
+        PerforceCore.P4Result result = core.runP4(false, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, FLAG_PREVIEW, "@" + revision);
+        return result.stdout.length() > 0;
+    }
+
     public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
     {
         PerforceCore core = createCore(context);
-        revision = revision == null ? core.getLatestRevisionForFiles(null) : revision;
+        if (revision == null)
+        {
+            revision = getLatestRemoteRevision(context);
+        }
 
         PersonalBuildUI ui = context.getUI();
         PerforceSyncHandler syncHandler = new PerforceSyncHandler(ui);

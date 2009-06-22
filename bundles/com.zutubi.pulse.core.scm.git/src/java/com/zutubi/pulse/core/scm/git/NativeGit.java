@@ -110,7 +110,7 @@ public class NativeGit
             }
         };
 
-        runWithHandler(handler, null, commands.toArray(new String[commands.size()]));
+        runWithHandler(handler, null, true, commands.toArray(new String[commands.size()]));
 
         return new ByteArrayInputStream(buffer.toString().getBytes());
     }
@@ -151,7 +151,7 @@ public class NativeGit
 
         LogOutputHandler handler = new LogOutputHandler();
 
-        runWithHandler(handler, null, command.toArray(new String[command.size()]));
+        runWithHandler(handler, null, true, command.toArray(new String[command.size()]));
 
         return handler.getEntries();
     }
@@ -177,7 +177,7 @@ public class NativeGit
 
         BranchOutputHandler handler = new BranchOutputHandler();
 
-        runWithHandler(handler, null, command);
+        runWithHandler(handler, null, true, command);
 
         return handler.getBranches();
     }
@@ -203,9 +203,9 @@ public class NativeGit
         run(handler, command);
     }
 
-    public void lsRemote(OutputHandler handler, String repository, String branch) throws GitException
+    public void lsRemote(OutputHandler handler, String repository, String refs) throws GitException
     {
-        runWithHandler(handler, null, getGitCommand(), COMMAND_LS_REMOTE, repository, branch);
+        runWithHandler(handler, null, true, getGitCommand(), COMMAND_LS_REMOTE, repository, refs);
     }
 
     public void tag(Revision revision, String name, String message, boolean force) throws GitException
@@ -230,19 +230,72 @@ public class NativeGit
         run(getGitCommand(), COMMAND_PUSH, repository, refspec);
     }
 
-    protected void run(String... commands) throws GitException
+    public List<String> getConfig(String name) throws GitException
     {
-        run(null, commands);
+        OutputCapturingHandler handler = new OutputCapturingHandler();
+        runWithHandler(handler, null, false, getGitCommand(), COMMAND_CONFIG, name);
+        return handler.getOutputLines();
     }
 
-    protected void run(ScmFeedbackHandler scmHandler, String... commands) throws GitException
+    public String getSingleConfig(String name) throws GitException
+    {
+        List<String> lines = getConfig(name);
+        if (lines.size() == 0)
+        {
+            return null;
+        }
+        else if (lines.size() == 1)
+        {
+            String value = lines.get(0).trim();
+            if (value.length() == 0)
+            {
+                value = null;
+            }
+
+            return value;
+        }
+        else
+        {
+            throw new GitException("Expected a single value for config '" + name + "', got: " + lines);
+        }
+    }
+
+    public String getSingleConfig(String name, String defaultValue) throws GitException
+    {
+        String value = getSingleConfig(name);
+        if (value == null)
+        {
+            value = defaultValue;
+        }
+
+        return value;
+    }
+
+    public String revParse(String revision) throws GitException
+    {
+        OutputCapturingHandler handler = new OutputCapturingHandler();
+        runWithHandler(handler, null, true, getGitCommand(), COMMAND_REVISION_PARSE, revision);
+        List<String> lines = handler.getOutputLines();
+        if (lines.size() != 1)
+        {
+            throw new GitException("Expecting rev-parse to produce a single output line, got: " + lines);
+        }
+
+        return lines.get(0).trim();
+    }
+
+    protected int run(String... commands) throws GitException
+    {
+        return run(null, commands);
+    }
+
+    protected int run(ScmFeedbackHandler scmHandler, String... commands) throws GitException
     {
         OutputHandlerAdapter handler = new OutputHandlerAdapter(scmHandler);
-
-        runWithHandler(handler, null, commands);
+        return runWithHandler(handler, null, true, commands);
     }
 
-    protected void runWithHandler(final OutputHandler handler, String input, String... commands) throws GitException
+    protected int runWithHandler(final OutputHandler handler, String input, boolean checkExitCode, String... commands) throws GitException
     {
         String commandLine = StringUtils.join(" ", commands);
         handler.handleCommandLine(commandLine);
@@ -325,7 +378,7 @@ public class NativeGit
 
             handler.handleExitCode(exitCode);
 
-            if (exitCode != 0)
+            if (checkExitCode && exitCode != 0)
             {
                 String message = "Git command: '" + commandLine + "' exited with non-zero exit code: " + exitCode;
                 String error = stderr.toString().trim();
@@ -336,10 +389,12 @@ public class NativeGit
                 
                 throw new GitException(message);
             }
+
+            return exitCode;
         }
         catch (InterruptedException e)
         {
-            // Do nothing
+            throw new GitException("Interrupted running git process", e);
         }
         catch (IOException e)
         {
@@ -430,6 +485,47 @@ public class NativeGit
                     throw new GitOperationCancelledException(e);
                 }
             }
+        }
+    }
+
+    /**
+     * A simple output handler that just captures stdout and stderr line by line.
+     */
+    static class OutputCapturingHandler implements OutputHandler
+    {
+        private List<String> outputLines = new LinkedList<String>();
+        private List<String> errorLines = new LinkedList<String>();
+
+        public List<String> getOutputLines()
+        {
+            return outputLines;
+        }
+
+        public List<String> getErrorLines()
+        {
+            return errorLines;
+        }
+
+        public void handleCommandLine(String line)
+        {
+        }
+
+        public void handleStdout(String line)
+        {
+            outputLines.add(line);
+        }
+
+        public void handleStderr(String line)
+        {
+            errorLines.add(line);
+        }
+
+        public void handleExitCode(int code) throws GitException
+        {
+        }
+
+        public void checkCancelled() throws GitOperationCancelledException
+        {
         }
     }
 
@@ -631,7 +727,7 @@ public class NativeGit
                 System.out.println("========= Command output ============");
                 System.out.println(StringUtils.join(" ", argv));
             }
-            git.runWithHandler(outputHandler, null, argv);
+            git.runWithHandler(outputHandler, null, true, argv);
         }
         catch (GitException e)
         {

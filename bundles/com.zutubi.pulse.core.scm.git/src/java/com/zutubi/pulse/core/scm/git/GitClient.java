@@ -214,8 +214,8 @@ public class GitClient implements ScmClient
             // git remote add -f -t <branch> -m <branch> origin <repository>
             // git merge origin
             git.init(handler);
-            git.remoteAdd(handler, ARG_ORIGIN, repository, branch);
-            git.merge(handler, ARG_ORIGIN);
+            git.remoteAdd(handler, REMOTE_ORIGIN, repository, branch);
+            git.merge(handler, REMOTE_ORIGIN);
         }
         else
         {
@@ -225,7 +225,7 @@ public class GitClient implements ScmClient
             git.setWorkingDirectory(workingDir);
         }
 
-        git.checkout(handler, ARG_ORIGIN + "/" + branch, LOCAL_BRANCH_NAME);
+        git.checkout(handler, REMOTE_ORIGIN + "/" + branch, LOCAL_BRANCH_NAME);
 
         // if we are after a specific revision, check it out to a temporary branch.  This also updates
         // the working copy to that branch.
