@@ -12,13 +12,13 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.cleanup.FileDeletionService;
 import com.zutubi.pulse.master.database.DatabaseConsole;
+import com.zutubi.pulse.master.dependency.ivy.IvyModuleRevisionId;
 import com.zutubi.pulse.master.model.persistence.ArtifactDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -591,8 +591,7 @@ public class DefaultBuildManager implements BuildManager
             IvyClient ivy = ivyManager.createIvyClient(masterLocation + WebManager.REPOSITORY_PATH);
             ivy.addCredentials(host, "pulse", securityToken);
 
-            ProjectConfiguration project = build.getProject().getConfig();
-            ModuleRevisionId mrid = ModuleRevisionId.newInstance(project.getOrganisation(), project.getName(), String.valueOf(build.getNumber()));
+            ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(build);
 
             List<String> artifacts = ivy.getArtifactPaths(mrid);
             if (artifacts != null)

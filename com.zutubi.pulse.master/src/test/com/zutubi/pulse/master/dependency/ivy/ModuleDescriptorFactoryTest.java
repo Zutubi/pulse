@@ -9,10 +9,11 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.PublicationConfiguration;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 public class ModuleDescriptorFactoryTest extends PulseTestCase
 {
+    private int nexthandle = 1;
+
     private ModuleDescriptorFactory factory;
 
     @Override
@@ -25,30 +26,51 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
 
     public void testDefaultProjectConfiguration()
     {
-        ProjectConfiguration project = new ProjectConfiguration("organisation", "project");
-        
+        ProjectConfiguration project = newProject("organisation", "project");
+
         ModuleDescriptor descriptor = factory.createDescriptor(project);
         assertEquals(1, descriptor.getConfigurationsNames().length);
         assertEquals(0, descriptor.getAllArtifacts().length);
         assertEquals(0, descriptor.getDependencies().length);
 
-        assertEquals(ModuleRevisionId.newInstance("organisation", "project", null), descriptor.getModuleRevisionId());
+        assertEquals(IvyModuleRevisionId.newInstance(project, (String)null), descriptor.getModuleRevisionId());
+    }
+
+    private ProjectConfiguration newProject(String org, String name)
+    {
+        ProjectConfiguration project = new ProjectConfiguration(org, name);
+        project.setHandle(nexthandle++);
+        return project;
+    }
+
+    public BuildStageConfiguration addStage(ProjectConfiguration project, String stageName)
+    {
+        BuildStageConfiguration stage = new BuildStageConfiguration(stageName);
+        stage.setHandle(nexthandle++);
+        project.getStages().put(stage.getName(), stage);
+        return stage;
+    }
+
+    public PublicationConfiguration addArtifact(BuildStageConfiguration stage, String name, String ext)
+    {
+        PublicationConfiguration publication = new PublicationConfiguration();
+        publication.setName(name);
+        publication.setExt(ext);
+        publication.setHandle(nexthandle++);
+        stage.getPublications().add(publication);
+        return publication;
     }
 
     public void testBuildStage()
     {
-        BuildStageConfiguration stage = new BuildStageConfiguration("stage");
-        ProjectConfiguration project = new ProjectConfiguration("project");
-        project.getStages().put(stage.getName(), stage);
+        ProjectConfiguration project = newProject("", "project");
+        BuildStageConfiguration stage = addStage(project, "stage");
 
         ModuleDescriptor descriptor = factory.createDescriptor(project);
         assertEquals(1, descriptor.getConfigurationsNames().length);
 
         // stages only change the descriptor if they have publications.
-        PublicationConfiguration publication = new PublicationConfiguration();
-        publication.setName("artifact");
-        publication.setExt("jar");
-        stage.getPublications().add(publication);
+        addArtifact(stage, "artifact", "ext");
 
         descriptor = factory.createDescriptor(project);
         assertEquals(2, descriptor.getConfigurationsNames().length);
@@ -57,10 +79,9 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
 
     public void testBuildStageNameEncoding()
     {
-        BuildStageConfiguration stage = new BuildStageConfiguration("#$%*");
-        stage.getPublications().add(new PublicationConfiguration("artifact", "jar"));
-        ProjectConfiguration project = new ProjectConfiguration("project");
-        project.getStages().put(stage.getName(), stage);
+        ProjectConfiguration project = newProject("", "project");
+        BuildStageConfiguration stage = addStage(project, "#$%*");
+        addArtifact(stage, "artifact", "jar");
 
         ModuleDescriptor descriptor = factory.createDescriptor(project);
         assertNotNull(descriptor.getConfiguration(IvyUtils.ivyEncodeStageName(stage.getName())));
@@ -68,22 +89,22 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
 
     public void testDependencies()
     {
-        ProjectConfiguration dependentProject = new ProjectConfiguration("dependent");
+        ProjectConfiguration dependentProject = newProject("", "dependent");
         DependencyConfiguration dependency = new DependencyConfiguration();
         dependency.setProject(dependentProject);
 
-        ProjectConfiguration project = new ProjectConfiguration("project");
+        ProjectConfiguration project = newProject("", "project");
         project.getDependencies().getDependencies().add(dependency);
 
         ModuleDescriptor descriptor = factory.createDescriptor(project);
         assertEquals(1, descriptor.getDependencies().length);
         DependencyDescriptor dependencyDescriptor = descriptor.getDependencies()[0];
-        assertEquals(ModuleRevisionId.newInstance("", dependentProject.getName(), dependency.getRevision()), dependencyDescriptor.getDependencyRevisionId());
+        assertEquals(IvyModuleRevisionId.newInstance(dependency), dependencyDescriptor.getDependencyRevisionId());
     }
 
     public void testStatus()
     {
-        ProjectConfiguration project = new ProjectConfiguration("project");
+        ProjectConfiguration project = newProject("", "project");
 
         ModuleDescriptor descriptor = factory.createDescriptor(project);
         assertEquals(IvyManager.STATUS_INTEGRATION, descriptor.getStatus());

@@ -60,7 +60,8 @@ public class Constants
         public static final String TYPE = "type";
         public static final String OPTIONS = "options";
         public static final String REPORT_GROUPS = "reportGroups";
-
+        public static final String ORGANISATION = "organisation";
+        
         /**
          * Property names in the multi recipe type class.
          */

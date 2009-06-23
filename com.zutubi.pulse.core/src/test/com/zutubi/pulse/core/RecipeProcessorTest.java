@@ -13,6 +13,7 @@ import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
@@ -140,7 +141,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         PulseExecutionContext context = makeContext(1, "default");
 
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(ModuleRevisionId.newInstance("org", "module", null), STATUS_INTEGRATION, null);
+        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(IvyModuleRevisionId.newInstance("org", "module", null), STATUS_INTEGRATION, null);
 
         addArtifact(descriptor, "build", "artifact", "jar");
         addArtifact(descriptor, "build", "artifact", "txt");
@@ -160,7 +161,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         PulseExecutionContext context = makeContext(1, "default");
 
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(ModuleRevisionId.newInstance("org", "module", null), STATUS_INTEGRATION, null);
+        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(IvyModuleRevisionId.newInstance("org", "module", null), STATUS_INTEGRATION, null);
 
         addDependency(descriptor, "org", "projectA", "1.0");
         addDependency(descriptor, "org", "projectB", "1.0");
@@ -178,7 +179,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     private void addDependency(DefaultModuleDescriptor descriptor, String org, String module, String revision)
     {
-        ModuleRevisionId dependencyMrid = ModuleRevisionId.newInstance(org, module, revision);
+        ModuleRevisionId dependencyMrid = IvyModuleRevisionId.newInstance(org, module, revision);
         DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(dependencyMrid, true, false);
         depDesc.addDependencyConfiguration("build", "*");
         descriptor.addDependency(depDesc);

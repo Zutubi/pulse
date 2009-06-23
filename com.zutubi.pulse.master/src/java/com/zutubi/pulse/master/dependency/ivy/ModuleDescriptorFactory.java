@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.dependency.ivy;
 import org.apache.ivy.core.module.descriptor.*;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import com.zutubi.pulse.master.tove.config.project.*;
+import static com.zutubi.pulse.master.dependency.ivy.IvyModuleRevisionId.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.util.CollectionUtils;
@@ -20,7 +21,7 @@ import java.util.HashMap;
  */
 public class ModuleDescriptorFactory
 {
-    private static final String NAMESPACE_EXTRA_ATTRIBUTES = "e";
+    public static final String NAMESPACE_EXTRA_ATTRIBUTES = "e";
 
     /**
      * Create a descriptor based on the specified configuration.
@@ -41,9 +42,7 @@ public class ModuleDescriptorFactory
      */
     public DefaultModuleDescriptor createDescriptor(ProjectConfiguration project, String revision)
     {
-        String org = getProjectOrganisation(project);
-
-        ModuleRevisionId mrid = ModuleRevisionId.newInstance(org, project.getName(), revision);
+        ModuleRevisionId mrid = newInstance(project, revision);
 
         DependenciesConfiguration dependenciesConfiguration = project.getDependencies();
 
@@ -54,10 +53,7 @@ public class ModuleDescriptorFactory
 
         for (DependencyConfiguration dependency : dependenciesConfiguration.getDependencies())
         {
-            ProjectConfiguration dependentProject = dependency.getProject();
-            String projectOrg = getProjectOrganisation(dependentProject);
-
-            ModuleRevisionId dependencyMrid = ModuleRevisionId.newInstance(projectOrg, dependentProject.getName(), dependency.getRevision());
+            ModuleRevisionId dependencyMrid = newInstance(dependency);
             DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(descriptor, dependencyMrid, true, false, dependency.isTransitive());
 
             String stages = DependencyConfiguration.ALL_STAGES;
@@ -89,7 +85,7 @@ public class ModuleDescriptorFactory
                 for (PublicationConfiguration artifact : publications)
                 {
                     Map<String, String> extraAttributes = new HashMap<String, String>();
-                    extraAttributes.put(getExtraAttribKey("stage"), IvyUtils.ivyEncodeStageName(stage.getName()));
+                    extraAttributes.put(EXTRA_ATTRIBUTE_STAGE, IvyUtils.ivyEncodeStageName(stage.getName()));
                     MDArtifact ivyArtifact = new MDArtifact(descriptor, artifact.getName(), artifact.getExt(), artifact.getExt(), null, extraAttributes);
                     ivyArtifact.addConfiguration(confName);
                     descriptor.addArtifact(confName, ivyArtifact);
@@ -97,17 +93,5 @@ public class ModuleDescriptorFactory
             }
         }
         return descriptor;
-    }
-
-    private String getExtraAttribKey(String attributeName)
-    {
-        return NAMESPACE_EXTRA_ATTRIBUTES + ":" + attributeName;
-    }
-
-    private String getProjectOrganisation(ProjectConfiguration project)
-    {
-        String org = project.getOrganisation();
-        org = (org == null) ? "" : org.trim();
-        return org;
     }
 }

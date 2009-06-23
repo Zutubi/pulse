@@ -6,6 +6,8 @@ import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * A test utilities class that provides access to the internal artifact
@@ -159,5 +161,27 @@ public class ArtifactRepositoryTestUtils
     public static File getArtifactRepository() throws IOException
     {
         return new File(AcceptanceTestUtils.getDataDirectory(), "repository");
+    }
+
+    /**
+     * Get the contents of the specified attribute from the ivy xml file.
+     *
+     * @param attributeName     name of the field whose data is being retrieved.
+     * @param ivyFile           reference to the ivy xml file
+     *
+     * @return  the data, or null if the field was not located.
+     *
+     * @throws IOException on error
+     */
+    public static String getAttribute(String attributeName, File ivyFile) throws IOException
+    {
+        String content = IOUtils.fileToString(ivyFile);
+        Pattern pattern = Pattern.compile(".*"+attributeName+"=\"(.*)\".*", Pattern.DOTALL);
+        Matcher m = pattern.matcher(content);
+        if (m.matches())
+        {
+            return m.group(1);
+        }
+        return null;
     }
 }
