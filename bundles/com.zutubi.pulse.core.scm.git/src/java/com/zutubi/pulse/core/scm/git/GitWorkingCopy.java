@@ -28,7 +28,7 @@ public class GitWorkingCopy implements WorkingCopy
 
         // First we need to determine the name of the remote and the branch
         // corresponding to our local branch.
-        NativeGit git = new NativeGit(-1);
+        NativeGit git = new NativeGit();
         git.setWorkingDirectory(context.getBase());
 
         String branch = getLocalBranch(git);
@@ -43,11 +43,11 @@ public class GitWorkingCopy implements WorkingCopy
         return new Revision(pieces[0]);
     }
 
-    public Revision guessHaveRevision(WorkingCopyContext context) throws ScmException
+    public Revision guessLocalRevision(WorkingCopyContext context) throws ScmException
     {
         // $ git rev-parse <remote>/<remote branch>
         // 9f7eaea201b2f408d9effbf82f2731957e284adf
-        NativeGit git = new NativeGit(-1);
+        NativeGit git = new NativeGit();
         git.setWorkingDirectory(context.getBase());
 
         // Get the name of the remote and the remote branch.

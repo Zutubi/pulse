@@ -435,44 +435,44 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         assertEquals(Long.toString(REVISION_LATEST + 1), wc.getLatestRemoteRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionUpToDate() throws ScmException
+    public void testGuessLocalRevisionUpToDate() throws ScmException
     {
-        assertEquals(Long.toString(REVISION_LATEST), wc.guessHaveRevision(context).getRevisionString());
+        assertEquals(Long.toString(REVISION_LATEST), wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionPendingChange() throws ScmException
+    public void testGuessLocalRevisionPendingChange() throws ScmException
     {
         openForEdit("file1");
-        assertEquals(Long.toString(REVISION_LATEST), wc.guessHaveRevision(context).getRevisionString());
+        assertEquals(Long.toString(REVISION_LATEST), wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionRestrictedToView() throws ScmException, IOException
+    public void testGuessLocalRevisionRestrictedToView() throws ScmException, IOException
     {
         excludeBranchesFromClient();
         core.runP4(null, P4_COMMAND, COMMAND_SYNC);
-        assertEquals("1", wc.guessHaveRevision(context).getRevisionString());
+        assertEquals("1", wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionOutOfDate() throws ScmException, IOException
+    public void testGuessLocalRevisionOutOfDate() throws ScmException, IOException
     {
         otherEdit();
-        assertEquals(Long.toString(REVISION_LATEST), wc.guessHaveRevision(context).getRevisionString());
+        assertEquals(Long.toString(REVISION_LATEST), wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionLatestCommitFromWC() throws ScmException, IOException
+    public void testGuessLocalRevisionLatestCommitFromWC() throws ScmException, IOException
     {
         openForEdit("file1");
         core.submit("trivial edit");
-        assertEquals(Long.toString(REVISION_LATEST + 1), wc.guessHaveRevision(context).getRevisionString());
+        assertEquals(Long.toString(REVISION_LATEST + 1), wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionMixedRevisions() throws ScmException, IOException
+    public void testGuessLocalRevisionMixedRevisions() throws ScmException, IOException
     {
         otherEditFiles("file1", "file2");
         core.runP4(null, P4_COMMAND, COMMAND_SYNC, "file1");
         try
         {
-            wc.guessHaveRevision(context).getRevisionString();
+            wc.guessLocalRevision(context).getRevisionString();
             fail();
         }
         catch (ScmException e)
@@ -481,15 +481,15 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         }
     }
 
-    public void testGuessHaveRevisionLatestAreDeletes() throws ScmException, IOException
+    public void testGuessLocalRevisionLatestAreDeletes() throws ScmException, IOException
     {
         otherDelete("file1");
         otherDelete("file2");
         core.runP4(null, P4_COMMAND, COMMAND_SYNC);
-        assertEquals(Long.toString(REVISION_LATEST + 2), wc.guessHaveRevision(context).getRevisionString());
+        assertEquals(Long.toString(REVISION_LATEST + 2), wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionLatestAreDeletesSpreadChangelistNumbers() throws ScmException, IOException
+    public void testGuessLocalRevisionLatestAreDeletesSpreadChangelistNumbers() throws ScmException, IOException
     {
         final String EXTERNAL_FILE = "branches/1/file1";
 
@@ -515,7 +515,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         otherEditFiles(EXTERNAL_FILE);
 
         core.runP4(null, P4_COMMAND, COMMAND_SYNC);
-        assertEquals(Long.toString(REVISION_LATEST + 15), wc.guessHaveRevision(context).getRevisionString());
+        assertEquals(Long.toString(REVISION_LATEST + 15), wc.guessLocalRevision(context).getRevisionString());
     }
 
     private void excludeBranchesFromClient() throws ScmException

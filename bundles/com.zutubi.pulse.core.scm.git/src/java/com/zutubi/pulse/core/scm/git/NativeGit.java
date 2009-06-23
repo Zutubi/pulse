@@ -37,6 +37,20 @@ public class NativeGit
     private ProcessBuilder git;
     private int inactivityTimeout;
 
+    /**
+     * Creates a git command line wrapper with no inactivity timeout.
+     */
+    public NativeGit()
+    {
+        this(0);
+    }
+
+    /**
+     * Creates a git command line wrapper with the given inactivity timeout.
+     *
+     * @param inactivityTimeout number of seconds of inactivity (no output)
+     *                          after which to timeout a git subprocess 
+     */
     public NativeGit(int inactivityTimeout)
     {
         git = new ProcessBuilder();
@@ -710,7 +724,7 @@ public class NativeGit
 
         try
         {
-            NativeGit git = new NativeGit(0);
+            NativeGit git = new NativeGit();
             git.setWorkingDirectory(new File("."));
             System.out.println(new File(".").getCanonicalPath());
             if (!Boolean.getBoolean("skip.env"))

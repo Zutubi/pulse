@@ -155,7 +155,7 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
         }
     }
 
-    public Revision guessHaveRevision(final WorkingCopyContext context) throws ScmException
+    public Revision guessLocalRevision(final WorkingCopyContext context) throws ScmException
     {
         // Note that there is no guarantee that the working copy is all updated
         // to a single revision.  In this guess we assume the "normal" case,

@@ -48,12 +48,13 @@ public interface WorkingCopy
     Revision getLatestRemoteRevision(WorkingCopyContext context) throws ScmException;
 
     /**
-     * Returns a best guess of the have revision for this working copy.  This
+     * Returns a best guess of the local revision for this working copy.  This
      * is the latest revision that the working copy has been updated to.  Note
      * that for some SCMs this can be difficult to determine - and indeed
      * impossible if the workspace has a mixture of revisions.  If no
      * reasonable guess can be made, the implementation may just throw an
-     * {@link ScmException}.
+     * {@link ScmException}.  The implementation may also issue warnings via
+     * the UI in the context if it is uncertain of the returned guess.
      *
      * @param context the context in which the operation is run, in particular
      *                contains the base directory
@@ -61,7 +62,7 @@ public interface WorkingCopy
      * @throws ScmException on error, including when no reasonable guess is
      *                      possible
      */
-    Revision guessHaveRevision(WorkingCopyContext context) throws ScmException;
+    Revision guessLocalRevision(WorkingCopyContext context) throws ScmException;
 
     /**
      * Updates the working copy to the revision specified by synchronising with

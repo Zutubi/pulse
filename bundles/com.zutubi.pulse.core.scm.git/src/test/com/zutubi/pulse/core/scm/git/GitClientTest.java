@@ -462,7 +462,7 @@ public class GitClientTest extends PulseTestCase
         client.init(scmContext, new ScmFeedbackAdapter());
         client.tag(scmContext, context, new Revision(REVISION_INITIAL), TAG_NAME, false);
 
-        NativeGit nativeGit = new NativeGit(0);
+        NativeGit nativeGit = new NativeGit();
         nativeGit.setWorkingDirectory(repositoryBase);
         String info = IOUtils.inputStreamToString(nativeGit.show(null, TAG_NAME));
         assertThat(info, containsString(REVISION_INITIAL));
@@ -477,7 +477,7 @@ public class GitClientTest extends PulseTestCase
         client.tag(scmContext, context, new Revision(REVISION_INITIAL), TAG_NAME, false);
         client.tag(scmContext, context, new Revision(REVISION_MASTER_LATEST), TAG_NAME, true);
 
-        NativeGit nativeGit = new NativeGit(0);
+        NativeGit nativeGit = new NativeGit();
         nativeGit.setWorkingDirectory(repositoryBase);
         String info = IOUtils.inputStreamToString(nativeGit.show(null, TAG_NAME));
         assertThat(info, containsString(REVISION_MASTER_LATEST));

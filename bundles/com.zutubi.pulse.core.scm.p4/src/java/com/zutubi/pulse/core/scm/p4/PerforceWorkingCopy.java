@@ -79,7 +79,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         return core.getLatestRevisionForFiles(null, "//" + getClientName(core) + "/...");
     }
 
-    public Revision guessHaveRevision(WorkingCopyContext context) throws ScmException
+    public Revision guessLocalRevision(WorkingCopyContext context) throws ScmException
     {
         PerforceCore core = createCore(context);
         String client = getClientName(core);
@@ -95,11 +95,14 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         //      it will not be reported.
         //   3) It is possible that the client is not sunc to a single
         //      revision, different files may be sunc to different revisions.
-        // To overcome this, we can do a dry-run sync to the given changelist
-        // and see if it would do anything.  While it reports that something
-        // would change, we increment the revision and keep trying - for a
-        // while.  We can't try forever due to 3) - so after a few attempts we
-        // guess that we have hit this case and bail.
+        // Note that my own testing suggests 1) is not actually a problem
+        // (unless I am missing what they mean), but 2) and 3) do happen.  To
+        // overcome this, we can do a dry-run sync to the given changelist and
+        // see if it would do anything.  If  it reports that something would
+        // change, we get all submitted changes for the project after our
+        // original guess and try a few of them.  We can't try forever due to
+        // 3) - so after a few attempts we guess that we have hit this case and
+        // bail.
         PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_CHANGES), COMMAND_CHANGES, FLAG_MAXIMUM, "1", "@" + client);
         Matcher matcher = PATTERN_CHANGES.matcher(result.stdout);
         if (!matcher.find())
@@ -110,35 +113,42 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         long revision = Long.parseLong(matcher.group(1));
         if (isSyncNonTrivial(core, revision))
         {
-            // Looks like we hit a tricky case.  Get the next few changelists
-            // submitted for out project, and try them.
-            List<Long> tried = new LinkedList<Long>();
-            tried.add(revision);
-
-            result = core.runP4(null, getP4Command(COMMAND_CHANGES), COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + client + "/...@" + (revision + 1) + ",#head");
-            matcher = PATTERN_CHANGES.matcher(result.stdout);
-            int retries = 0;
-            boolean found = false;
-            while (!found && retries++ < GUESS_REVISION_RETRIES && matcher.find())
-            {
-                revision = Long.parseLong(matcher.group(1));
-                if (isSyncNonTrivial(core, revision))
-                {
-                    tried.add(revision);                    
-                }
-                else
-                {
-                    found = true;
-                }
-            }
-
-            if (!found)
-            {
-                throw new ScmException("Unable to guess have revision: tried " + tried + ": is your client at a single changelist?");
-            }
+            revision = searchForLocalRevisionInProjectChanges(core, client, revision);
         }
 
         return new Revision(revision);
+    }
+
+    private long searchForLocalRevisionInProjectChanges(PerforceCore core, String client, long revision) throws ScmException
+    {
+        // Looks like we hit a tricky case.  Get the next few changelists
+        // submitted for out project, and try them.
+        List<Long> tried = new LinkedList<Long>();
+        tried.add(revision);
+
+        PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_CHANGES), COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, "//" + client + "/...@" + (revision + 1) + ",#head");
+        Matcher matcher = PATTERN_CHANGES.matcher(result.stdout);
+        int retries = 0;
+        boolean found = false;
+        while (!found && retries++ < GUESS_REVISION_RETRIES && matcher.find())
+        {
+            revision = Long.parseLong(matcher.group(1));
+            if (isSyncNonTrivial(core, revision))
+            {
+                tried.add(revision);
+            }
+            else
+            {
+                found = true;
+            }
+        }
+
+        if (!found)
+        {
+            throw new ScmException("Unable to guess have revision: tried " + tried + ": is your client at a single changelist?");
+        }
+
+        return revision;
     }
 
     private String getClientName(PerforceCore core) throws ScmException

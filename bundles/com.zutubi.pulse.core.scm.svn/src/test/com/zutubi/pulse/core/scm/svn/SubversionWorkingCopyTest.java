@@ -565,34 +565,34 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertEquals("8", wc.getLatestRemoteRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionUpToDate() throws ScmException
+    public void testGuessLocalRevisionUpToDate() throws ScmException
     {
-        assertEquals("7", wc.guessHaveRevision(context).getRevisionString());
+        assertEquals("7", wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionRestrictedToView() throws ScmException, IOException, SVNException
+    public void testGuessLocalRevisionRestrictedToView() throws ScmException, IOException, SVNException
     {
         assertEquals(8L, branchEdit("file1"));
         assertEquals(8L, updateClient.doUpdate(base, SVNRevision.HEAD, SVNDepth.INFINITY, false, false));
-        assertEquals("7", wc.guessHaveRevision(context).getRevisionString());
+        assertEquals("7", wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionOutOfDate() throws ScmException, IOException, SVNException
+    public void testGuessLocalRevisionOutOfDate() throws ScmException, IOException, SVNException
     {
         assertEquals(4L, updateClient.doUpdate(base, SVNRevision.create(4), SVNDepth.INFINITY, false, false));
-        assertEquals("2", wc.guessHaveRevision(context).getRevisionString());
+        assertEquals("2", wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionLatestCommitFromWC() throws ScmException, IOException, SVNException
+    public void testGuessLocalRevisionLatestCommitFromWC() throws ScmException, IOException, SVNException
     {
         assertEquals(8L, doEdit("file1", base, true));
-        assertEquals("8", wc.guessHaveRevision(context).getRevisionString());
+        assertEquals("8", wc.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionMixedRevisions() throws ScmException, IOException, SVNException
+    public void testGuessLocalRevisionMixedRevisions() throws ScmException, IOException, SVNException
     {
         assertEquals(1L, updateClient.doUpdate(new File(base, "dir1"), SVNRevision.create(1), SVNDepth.INFINITY, false, false));
-        assertEquals("7", wc.guessHaveRevision(context).getRevisionString());
+        assertEquals("7", wc.guessLocalRevision(context).getRevisionString());
     }
 
     private File edit(String path) throws IOException, SVNException

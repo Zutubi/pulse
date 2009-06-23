@@ -44,7 +44,7 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
         return CvsClient.convertRevision(new CvsRevision(null, getBranch(context), null, new Date()));
     }
 
-    public Revision guessHaveRevision(WorkingCopyContext context) throws ScmException
+    public Revision guessLocalRevision(WorkingCopyContext context) throws ScmException
     {
         throw new ScmException("Operation not supported");
     }
@@ -63,7 +63,7 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
     private String getBranch(WorkingCopyContext context)
     {
         String branch = context.getConfig().getProperty(CvsConstants.BRANCH);
-        if ("".equals(branch))
+        if (branch.trim().length() == 0)
         {
             // slightly paranoid action. Ensure that we use a null if no branch is specified.
             branch = null;

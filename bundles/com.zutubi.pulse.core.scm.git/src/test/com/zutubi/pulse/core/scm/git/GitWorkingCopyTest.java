@@ -78,34 +78,34 @@ public class GitWorkingCopyTest extends PulseTestCase
         assertEquals(REVISION_EXPERIMENTAL, workingCopy.getLatestRemoteRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevision() throws ScmException
+    public void testGuessLocalRevision() throws ScmException
     {
-        assertEquals(REVISION_HEAD, workingCopy.guessHaveRevision(context).getRevisionString());
+        assertEquals(REVISION_HEAD, workingCopy.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionAfterLocalCommit() throws ScmException, IOException
+    public void testGuessLocalRevisionAfterLocalCommit() throws ScmException, IOException
     {
         editFile(baseDir, "file1");
-        assertEquals(REVISION_HEAD, workingCopy.guessHaveRevision(context).getRevisionString());
+        assertEquals(REVISION_HEAD, workingCopy.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionAfterOtherPush() throws ScmException, IOException
+    public void testGuessLocalRevisionAfterOtherPush() throws ScmException, IOException
     {
         otherPush();
-        assertEquals(REVISION_HEAD, workingCopy.guessHaveRevision(context).getRevisionString());
+        assertEquals(REVISION_HEAD, workingCopy.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionAfterOtherPushThenPull() throws ScmException, IOException
+    public void testGuessLocalRevisionAfterOtherPushThenPull() throws ScmException, IOException
     {
         String latest = otherPush();
         runGit(baseDir, COMMAND_PULL);
-        assertEquals(latest, workingCopy.guessHaveRevision(context).getRevisionString());
+        assertEquals(latest, workingCopy.guessLocalRevision(context).getRevisionString());
     }
 
-    public void testGuessHaveRevisionOnBranch() throws ScmException, IOException
+    public void testGuessLocalRevisionOnBranch() throws ScmException, IOException
     {
         switchToBranch(BRANCH_EXPERIMENTAL);
-        assertEquals(REVISION_EXPERIMENTAL, workingCopy.guessHaveRevision(context).getRevisionString());
+        assertEquals(REVISION_EXPERIMENTAL, workingCopy.guessLocalRevision(context).getRevisionString());
     }
 
     private void switchToBranch(String branch) throws IOException
@@ -125,7 +125,7 @@ public class GitWorkingCopyTest extends PulseTestCase
 
         editFile(otherDir, "file1");
         runGit(otherDir, COMMAND_PUSH);
-        NativeGit nativeGit = new NativeGit(-1);
+        NativeGit nativeGit = new NativeGit();
         nativeGit.setWorkingDirectory(otherDir);
         return nativeGit.log(1).get(0).getId();
     }
