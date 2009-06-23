@@ -441,7 +441,6 @@ public class CvsCore
             long time = System.currentTimeMillis();
             try
             {
-                CvsDebugFormatter.contextHolder.set("" + (++COMMAND_COUNT));
                 LOG.info("Executing command: 'cvs -d " + root + " " + command.getCVSCommand() + "'.");
                 if (!client.executeCommand(command, globalOptions))
                 {
@@ -453,7 +452,6 @@ public class CvsCore
             finally
             {
                 LOG.finer("Elapsed time: " + ((System.currentTimeMillis() - time) / Constants.SECOND) + " second(s)");
-                CvsDebugFormatter.contextHolder.set(null);
             }
         }
         catch (AuthenticationException ae)
