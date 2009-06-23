@@ -4,7 +4,9 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
- * <class comment/>
+ * Formatter for cvs debug output.  It applies the current threads id to the start
+ * of each debug comment so that simultaneous debugging output from multiple threads
+ * can be differentiated.
  */
 public class CvsDebugFormatter extends Formatter
 {
