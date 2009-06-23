@@ -73,9 +73,7 @@ public class ArtifactRepositoryTestUtils
      */
     public static String getIvyFile(String projectName, int buildNumber) throws IOException
     {
-        String path = ivyPath(projectName, buildNumber);
-        File ivyFile = new File(getArtifactRepository(), path);
-        return IOUtils.fileToString(ivyFile);
+        return getIvyFile(projectName, String.valueOf(buildNumber));
     }
 
     public static String getIvyFile(String projectName, String version) throws IOException
