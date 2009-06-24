@@ -265,9 +265,16 @@ public class IvyClient
             throw new IllegalArgumentException("Failed to located ivy descriptor for '" + mrid + "'");
         }
 
-        XmlModuleDescriptorParser parser = XmlModuleDescriptorParser.getInstance();
         Resource resource = resolvedResource.getResource();
         URL ivyFileUrl = resourceToURL(resource);
+        return getArtifactPaths(ivyFileUrl);
+    }
+
+    public List<String> getArtifactPaths(URL ivyFileUrl) throws ParseException, IOException
+    {
+        final RepositoryResolver resolver = (RepositoryResolver) ivy.getSettings().getDefaultResolver();
+        XmlModuleDescriptorParser parser = XmlModuleDescriptorParser.getInstance();
+
         ModuleDescriptor repositoryBasedDescriptor = parser.parseDescriptor(ivy.getSettings(), ivyFileUrl, false);
 
         List<ArtifactOrigin> artifactOrigins = CollectionUtils.map(repositoryBasedDescriptor.getAllArtifacts(), new Mapping<Artifact, ArtifactOrigin>()
@@ -308,9 +315,9 @@ public class IvyClient
         }
     }
 
-    public String getIvyPath(ModuleRevisionId mrid) throws IOException, ParseException
+    public String getIvyPath(ModuleRevisionId mrid, String revision) throws IOException, ParseException
     {
-        return IvyPatternHelper.substitute(ivyPattern, mrid);
+        return IvyPatternHelper.substitute(ivyPattern, mrid.getOrganisation(), mrid.getName(), revision, "ivy", "xml", "xml");
     }
 
     public boolean isResolved(ModuleRevisionId mrid)

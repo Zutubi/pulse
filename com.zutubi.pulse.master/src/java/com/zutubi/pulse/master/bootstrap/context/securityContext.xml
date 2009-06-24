@@ -95,6 +95,7 @@ The beans defined within the security subsystem need not be accessed by other co
     <bean name="repositoryAuthorityProvider" class="com.zutubi.pulse.master.security.RepositoryAuthorityProvider">
         <property name="accessManager" ref="accessManager"/>
         <property name="eventManager" ref="eventManager"/>
+        <property name="masterConfigurationManager" ref="configurationManager"/>
     </bean>
 
     <!-- This filter is responsible for clearing the security context when each request is complete. -->

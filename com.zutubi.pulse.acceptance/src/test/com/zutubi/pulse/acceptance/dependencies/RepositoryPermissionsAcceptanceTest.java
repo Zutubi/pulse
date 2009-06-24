@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.Constants;
 import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
 import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.getArtifactRepository;
+import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
 import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
@@ -35,8 +36,14 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
         projectName = randomName();
 
         xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertSimpleProject(projectName);
+        String projectPath = xmlRpcHelper.insertSimpleProject(projectName);
+        String projectHandle = xmlRpcHelper.getConfigHandle(projectPath);
         xmlRpcHelper.logout();
+
+        // since we are not running builds as such, we need to initialise the repository by manually adding
+        // the project handle to the appropriate path.  This is normally handled during a build.
+        RepositoryAttributes attributes = new RepositoryAttributes(ArtifactRepositoryTestUtils.getArtifactRepository());
+        attributes.addAttribute(projectName, RepositoryAttributes.PROJECT_HANDLE, projectHandle);
 
         resetDefaultAccess();
 

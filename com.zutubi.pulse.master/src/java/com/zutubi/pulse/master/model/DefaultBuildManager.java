@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.model;
 
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
+import com.zutubi.pulse.core.dependency.RepositoryAttributes;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -12,16 +15,16 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.cleanup.FileDeletionService;
 import com.zutubi.pulse.master.database.DatabaseConsole;
-import com.zutubi.pulse.master.dependency.ivy.IvyModuleRevisionId;
 import com.zutubi.pulse.master.model.persistence.ArtifactDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.logging.Logger;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -572,7 +575,7 @@ public class DefaultBuildManager implements BuildManager
         }
     }
 
-    private List<File> getRepositoryFilesFor(BuildResult build) throws Exception
+    private List<File> getRepositoryFilesFor(final BuildResult build) throws Exception
     {
         List<File> repositoryFiles = new LinkedList<File>();
 
@@ -586,14 +589,28 @@ public class DefaultBuildManager implements BuildManager
             String host = new URL(masterLocation).getHost();
 
             // the reponse from the ivy client will be relative to the repository root.
-            File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
+            final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
 
             IvyClient ivy = ivyManager.createIvyClient(masterLocation + WebManager.REPOSITORY_PATH);
             ivy.addCredentials(host, "pulse", securityToken);
 
-            ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(build);
+            // this mrid will only reference the latest path, so:
+            // a) find all of the paths for our project.
+            RepositoryAttributes attributes = new RepositoryAttributes(repositoryRoot);
+            List<String> paths = attributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(build.getProject().getConfig().getHandle())));
 
-            List<String> artifacts = ivy.getArtifactPaths(mrid);
+            // file the ivy file.
+            String path = CollectionUtils.find(paths, new Predicate<String>()
+            {
+                public boolean satisfied(String path)
+                {
+                    return new File(repositoryRoot, path + "/ivy-" + build.getVersion() + ".xml").isFile();
+                }
+            });
+            File ivyFile = new File(repositoryRoot, path + "/ivy-" + build.getVersion() + ".xml");
+            URL ivyUrl = ivyFile.toURI().toURL();
+            
+            List<String> artifacts = ivy.getArtifactPaths(ivyUrl);
             if (artifacts != null)
             {
                 for (String relativePath : artifacts)
@@ -603,9 +620,8 @@ public class DefaultBuildManager implements BuildManager
                     repositoryFiles.addAll(findRelatedFiles(file));
                 }
             }
-            File file = new File(repositoryRoot, ivy.getIvyPath(mrid));
-            repositoryFiles.add(file);
-            repositoryFiles.addAll(findRelatedFiles(file));
+            repositoryFiles.add(ivyFile);
+            repositoryFiles.addAll(findRelatedFiles(ivyFile));
         }
         finally
         {

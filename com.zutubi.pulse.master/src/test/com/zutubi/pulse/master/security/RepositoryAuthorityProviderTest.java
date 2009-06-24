@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.security;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.RepositoryConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
@@ -8,18 +9,22 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import static com.zutubi.tove.security.AccessManager.ACTION_WRITE;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.CollectionUtils.asSet;
 import static org.mockito.Mockito.*;
 import static org.mortbay.http.HttpRequest.__GET;
 import static org.mortbay.http.HttpRequest.__PUT;
 
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 public class RepositoryAuthorityProviderTest extends PulseTestCase
 {
     private RepositoryAuthorityProvider provider;
     private ConfigurationProvider configurationProvider;
     private ProjectConfigurationAuthorityProvider delegateProvider;
+    private RepositoryAttributes repositoryAttributes;
 
     private int handle = 1;
     private RepositoryConfiguration repositoryConfiguration;
@@ -34,29 +39,32 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
         configurationProvider = mock(ConfigurationProvider.class);
         repositoryConfiguration = new RepositoryConfiguration();
         stub(configurationProvider.get(RepositoryConfiguration.class)).toReturn(repositoryConfiguration);
+        
+        repositoryAttributes =  mock(RepositoryAttributes.class);
 
         provider = new RepositoryAuthorityProvider();
         provider.setConfigurationProvider(configurationProvider);
         provider.setProjectConfigurationAuthorityProvider(delegateProvider);
+        provider.setRepositoryAttributes(repositoryAttributes);
     }
 
     public void testPathWithoutOrg()
     {
         ProjectConfiguration project = newProject(null, "project");
-        provider.getAllowedAuthorities(null, newInvocation(__PUT, "project/ixy.xml"));
+        provider.getAllowedAuthorities(null, newInvocation(__PUT, "project/ivy.xml"));
         verify(delegateProvider, times(1)).getAllowedAuthorities(ACTION_WRITE, project);
     }
 
     public void testPathWithMismatchingOrg()
     {
         newProject("orgA", "project");
-        provider.getAllowedAuthorities(null, newInvocation(__PUT, "orgB/project/ixy.xml"));
+        provider.getAllowedAuthorities(null, newInvocation(__PUT, "orgB/project/ivy.xml"));
         verify(delegateProvider, times(0)).getAllowedAuthorities(eq(ACTION_WRITE), (ProjectConfiguration) anyObject());
     }
 
     public void testPathWithNoMatches()
     {
-        provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ixy.xml"));
+        provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ivy.xml"));
         verify(delegateProvider, times(0)).getAllowedAuthorities(eq(ACTION_WRITE), (ProjectConfiguration) anyObject());
     }
 
@@ -65,7 +73,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
         ProjectConfiguration project = newProject("org", "project");
         stub(delegateProvider.getAllowedAuthorities(ACTION_WRITE, project)).toReturn(asSet("write"));
 
-        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ixy.xml"));
+        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());
         assertTrue(allowedAuthorities.contains("write"));
 
@@ -77,7 +85,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
         ProjectConfiguration project = newProject("org", "project");
         stub(delegateProvider.getAllowedAuthorities(ACTION_VIEW, project)).toReturn(asSet("read"));
 
-        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__GET, "org/project/ixy.xml"));
+        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__GET, "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());
         assertTrue(allowedAuthorities.contains("read"));
 
@@ -88,7 +96,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
     {
         addDefaultWriteGroup("writers");
 
-        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ixy.xml"));
+        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());
         assertTrue(allowedAuthorities.contains("group:writers"));
     }
@@ -97,7 +105,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
     {
         addDefaultReadGroup("readers");
 
-        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__GET, "org/project/ixy.xml"));
+        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__GET, "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());
         assertTrue(allowedAuthorities.contains("group:readers"));
     }
@@ -129,6 +137,12 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
         ProjectConfiguration project = new ProjectConfiguration(org, name);
         project.setHandle(handle++);
         stub(configurationProvider.get(PROJECTS_SCOPE + "/" + name, ProjectConfiguration.class)).toReturn(project);
+        stub(configurationProvider.get(project.getHandle(), ProjectConfiguration.class)).toReturn(project);
+        String repositoryPath = PathUtils.getPath(org == null ? "" : org, name);
+        Map<String, String> attributes = new HashMap<String, String>();
+        attributes.put(RepositoryAttributes.PROJECT_HANDLE, String.valueOf(project.getHandle()));
+        stub(repositoryAttributes.getMergedAttributes(repositoryPath + "/ivy.xml")).toReturn(attributes);
+
         return project;
     }
 

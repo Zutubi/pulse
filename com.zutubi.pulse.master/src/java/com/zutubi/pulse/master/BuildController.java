@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.engine.PulseFileSource;
@@ -42,7 +43,9 @@ import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -980,6 +983,17 @@ public class BuildController implements EventListener
 
             String buildNumber = Long.toString(buildResult.getNumber());
             ivy.publishIvy(descriptor, buildNumber);
+
+            // add projecthandle attribute to the repository.
+            long projectHandle = buildContext.getLong(PROPERTY_PROJECT_HANDLE, 0);
+            if (projectHandle != 0)
+            {
+                MasterUserPaths paths = configurationManager.getUserPaths();
+                RepositoryAttributes attributes = new RepositoryAttributes(paths.getRepositoryRoot());
+
+                String path = ivy.getIvyPath(descriptor.getModuleRevisionId(), buildNumber);
+                attributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
+            }
 
             // could possibly use the build result version here for 'magic' maven support..
             String version = buildContext.getString(PROPERTY_BUILD_VERSION);

@@ -244,6 +244,23 @@ public class CollectionUtils
         return new Pair<T,U>(first, second);
     }
 
+    /**
+     * Convert the properties instance into a map.
+     *
+     * @param properties    instance to be converted.
+     * @return  the new map instance with the same values as contained
+     * within the original properties instance.
+     */
+    public static Map<String, String> asMap(Properties properties)
+    {
+        Map<String, String> map = new HashMap<String, String>();
+        for (String propertyName : properties.stringPropertyNames())
+        {
+            map.put(propertyName, properties.getProperty(propertyName));
+        }
+        return map;
+    }
+
     public static <T, U> Map<T, U> asMap(Pair<? extends T, ? extends U>... pairs)
     {
         return asMap(Arrays.asList(pairs));

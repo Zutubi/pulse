@@ -28,7 +28,7 @@ public class DefaultIvyClientFactory
     /**
      * The ivy pattern used by the internal pulse repository.
      */
-    private static final String PATTERN_IVY = "([organisation]/)[module]/([stage]/)ivy-[revision].xml";
+    private static final String PATTERN_IVY = "([organisation]/)[module]/ivy-[revision].xml";
 
     public static final String VARIABLE_REPOSITORY_BASE = "repository.base";
 

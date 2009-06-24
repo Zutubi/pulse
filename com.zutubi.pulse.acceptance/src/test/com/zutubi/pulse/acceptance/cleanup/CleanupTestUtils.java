@@ -4,13 +4,16 @@ import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.Options.RETAIN_WORKING_COPY;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -79,6 +82,12 @@ public class CleanupTestUtils
         File data = AcceptanceTestUtils.getDataDirectory();
 
         return new File(data, "projects/" + projectId + "/" + String.format("%08d", buildNumber));
+    }
+
+    public boolean hasIvyFile(String projectName, int buildNumber) throws IOException
+    {
+        File root = ArtifactRepositoryTestUtils.getArtifactRepository();
+        return new File(root, PathUtils.getPath(projectName, "ivy-" + buildNumber + ".xml")).isFile();
     }
 
     public boolean hasBuildDirectory(String projectName, int buildNumber) throws Exception

@@ -7,9 +7,11 @@ import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
+import com.zutubi.util.RandomUtils;
 import static com.zutubi.util.Constants.SECOND;
 
 import java.util.Vector;
+import java.util.Hashtable;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.
@@ -163,6 +165,70 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         {
             assertTrue(e.getMessage().contains("Unknown build '1' for project '"+projectName+"'"));
         }
+    }
+
+    public void testCleanupRepositoryArtifacts() throws Exception
+    {
+        final String projectName = random;
+        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
+
+        utils.addCleanupRule(projectName, "repository_artifacts", CleanupWhat.REPOSITORY_ARTIFACTS);
+        utils.deleteCleanupRule(projectName, "default");
+
+        xmlRpcHelper.runBuild(projectName);
+        waitForCleanupToRunAsynchronously();
+
+        assertTrue(utils.hasIvyFile(projectName, 1));
+
+        xmlRpcHelper.runBuild(projectName);
+        waitForCleanupToRunAsynchronously(new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasIvyFile(projectName, 1);
+            }
+        });
+
+        assertTrue(utils.hasIvyFile(projectName, 2));
+        assertFalse(utils.hasIvyFile(projectName, 1));
+    }
+
+    public void testCleanupRepositoryArtifactsAfterProjectRename() throws Exception
+    {
+        final String projectName = random;
+        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
+
+        utils.addCleanupRule(projectName, "repository_artifacts", CleanupWhat.REPOSITORY_ARTIFACTS);
+        utils.deleteCleanupRule(projectName, "default");
+
+        xmlRpcHelper.runBuild(projectName);
+        waitForCleanupToRunAsynchronously();
+
+        assertTrue(utils.hasIvyFile(projectName, 1));
+
+        // rename the project.
+        String newProjectName = renameProject(projectName);
+
+        xmlRpcHelper.runBuild(newProjectName);
+        waitForCleanupToRunAsynchronously(new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasIvyFile(projectName, 1);
+            }
+        });
+
+        assertTrue(utils.hasIvyFile(newProjectName, 2));
+        assertFalse(utils.hasIvyFile(projectName, 1));
+    }
+
+    private String renameProject(String projectName) throws Exception
+    {
+        String newProjectName = getName() + "-" + RandomUtils.randomString(10);
+        Hashtable<String, Object> projectConfig = xmlRpcHelper.getConfig("projects/" + projectName);
+        projectConfig.put("name", newProjectName);
+        xmlRpcHelper.saveConfig("projects/" + projectName, projectConfig, false);
+        return newProjectName;
     }
 
     private void waitForCleanupToRunAsynchronously(Condition... conditions)

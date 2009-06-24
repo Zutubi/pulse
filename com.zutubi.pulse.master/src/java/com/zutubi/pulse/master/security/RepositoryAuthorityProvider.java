@@ -1,27 +1,28 @@
 package com.zutubi.pulse.master.security;
 
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import static com.zutubi.pulse.master.bootstrap.WebManager.REPOSITORY_PATH;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.tove.config.admin.RepositoryConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import static com.zutubi.tove.security.AccessManager.ACTION_WRITE;
 import com.zutubi.tove.security.AuthorityProvider;
 import com.zutubi.tove.security.DefaultAccessManager;
-import static com.zutubi.tove.type.record.PathUtils.getPathElements;
-import com.zutubi.util.TextUtils;
-import com.zutubi.events.EventManager;
 import org.mortbay.http.HttpRequest;
 
 import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 /**
  * The repository authority provider determines the authorities that
@@ -46,6 +47,7 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
             HttpRequest.__GET, HttpRequest.__HEAD
     );
 
+    private RepositoryAttributes repositoryAttributes;
     private ConfigurationProvider configurationProvider;
     private ProjectConfigurationAuthorityProvider projectAuthorityProvider;
 
@@ -109,16 +111,12 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
     {
         ProjectConfiguration project = null;
 
-        String[] pathElements = getPathElements(path);
-        if (pathElements.length > 1)
+        Map<String, String> attributes = repositoryAttributes.getMergedAttributes(path);
+        if (attributes.containsKey(RepositoryAttributes.PROJECT_HANDLE))
         {
-            project = getProject(pathElements[1], pathElements[0]);
+            long handle = Long.valueOf(attributes.get(RepositoryAttributes.PROJECT_HANDLE));
+            project = configurationProvider.get(handle, ProjectConfiguration.class);
         }
-        if (project == null && pathElements.length > 0)
-        {
-            project = getProject(pathElements[0], null);
-        }
-
         return project;
     }
 
@@ -150,44 +148,6 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
             }
         }
         return authorities;
-    }
-
-    /**
-     * Get the project identified by the specified name and organisation.  Note that even though
-     * a project is uniquely defined by a name, we have no guarentee that the name being used is
-     * one that has been validated by Pulse.  Therefore we force a match on the organisation field
-     * as well.
-     *
-     * @param name name of the project
-     * @param org  organisation of the project
-     * @return a project configuration for the project with matching name and org, null otherwise.
-     */
-    private ProjectConfiguration getProject(String name, String org)
-    {
-        if (configurationProvider != null)
-        {
-            ProjectConfiguration project = configurationProvider.get(PROJECTS_SCOPE + "/" + name, ProjectConfiguration.class);
-            if (project == null)
-            {
-                return null;
-            }
-
-            if (org != null)
-            {
-                if (org.equals(project.getOrganisation()))
-                {
-                    return project;
-                }
-            }
-            else
-            {
-                if (!TextUtils.stringSet(project.getOrganisation()))
-                {
-                    return project;
-                }
-            }
-        }
-        return null;
     }
 
     /**
@@ -226,6 +186,21 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
     public void setProjectConfigurationAuthorityProvider(ProjectConfigurationAuthorityProvider projectAuthorityProvider)
     {
         this.projectAuthorityProvider = projectAuthorityProvider;
+    }
+
+    public void setRepositoryAttributes(RepositoryAttributes repositoryAttributes)
+    {
+        this.repositoryAttributes = repositoryAttributes;
+    }
+
+    public void setMasterUserPaths(MasterUserPaths paths)
+    {
+        setRepositoryAttributes(new RepositoryAttributes(paths.getRepositoryRoot()));
+    }
+
+    public void setMasterConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        setMasterUserPaths(configurationManager.getUserPaths());
     }
 
     public void setEventManager(EventManager eventManager)

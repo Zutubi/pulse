@@ -2253,6 +2253,12 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
+    public <T extends Configuration> T getInstance(long handle, Class<T> clazz)
+    {
+        String path = recordManager.getPathForHandle(handle);
+        return getInstance(path, clazz);
+    }
+
     /**
      * Load the object at the specified path, or null if no object exists.
      *

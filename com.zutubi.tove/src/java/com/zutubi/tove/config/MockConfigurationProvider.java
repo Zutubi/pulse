@@ -42,6 +42,11 @@ public class MockConfigurationProvider implements ConfigurationProvider
         throw new RuntimeException("Method not yet implemented.");
     }
 
+    public <T extends Configuration> T get(long handle, Class<T> clazz)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
     public <T extends Configuration> Collection<T> getAll(Class<T> clazz)
     {
         List<Configuration> found = instancesByClass.get(clazz);

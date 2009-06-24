@@ -80,6 +80,11 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         }
     }
 
+    public <T extends Configuration> T get(long handle, Class<T> clazz)
+    {
+        return configurationTemplateManager.getInstance(handle, clazz);
+    }
+
     public <T extends Configuration> T get(String path, Class<T> clazz)
     {
         return configurationTemplateManager.getInstance(path, clazz);

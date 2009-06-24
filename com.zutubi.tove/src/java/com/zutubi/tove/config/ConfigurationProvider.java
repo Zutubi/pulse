@@ -12,6 +12,17 @@ import java.util.Set;
 public interface ConfigurationProvider
 {
     /**
+     * Retrieve the instance identified by the specified handle.  The instance must be of the
+     * type specified by the second argument.
+     *
+     * @param handle    the handle of the configuration instance.
+     * @param clazz     is the expected type of the configuration instance.
+     *
+     * @return the configuration instance
+     */
+    <T extends Configuration> T get(long handle, Class<T> clazz);
+
+    /**
      * Retrieve the instance located at the specified path.  The instance must be of the type
      * specified by the second argument.
      * 
