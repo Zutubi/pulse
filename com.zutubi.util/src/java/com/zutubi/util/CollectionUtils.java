@@ -254,9 +254,9 @@ public class CollectionUtils
     public static Map<String, String> asMap(Properties properties)
     {
         Map<String, String> map = new HashMap<String, String>();
-        for (String propertyName : properties.stringPropertyNames())
+        for (Object propertyName : properties.keySet())
         {
-            map.put(propertyName, properties.getProperty(propertyName));
+            map.put((String) propertyName, properties.getProperty((String) propertyName));
         }
         return map;
     }
