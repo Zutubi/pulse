@@ -33,7 +33,7 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
         assertEquals(0, descriptor.getAllArtifacts().length);
         assertEquals(0, descriptor.getDependencies().length);
 
-        assertEquals(IvyModuleRevisionId.newInstance(project, (String)null), descriptor.getModuleRevisionId());
+        assertEquals(MasterIvyModuleRevisionId.newInstance(project, (String)null), descriptor.getModuleRevisionId());
     }
 
     private ProjectConfiguration newProject(String org, String name)
@@ -53,9 +53,7 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
 
     public PublicationConfiguration addArtifact(BuildStageConfiguration stage, String name, String ext)
     {
-        PublicationConfiguration publication = new PublicationConfiguration();
-        publication.setName(name);
-        publication.setExt(ext);
+        PublicationConfiguration publication = new PublicationConfiguration(name, ext);
         publication.setHandle(nexthandle++);
         stage.getPublications().add(publication);
         return publication;
@@ -99,7 +97,7 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
         ModuleDescriptor descriptor = factory.createDescriptor(project);
         assertEquals(1, descriptor.getDependencies().length);
         DependencyDescriptor dependencyDescriptor = descriptor.getDependencies()[0];
-        assertEquals(IvyModuleRevisionId.newInstance(dependency), dependencyDescriptor.getDependencyRevisionId());
+        assertEquals(MasterIvyModuleRevisionId.newInstance(dependency), dependencyDescriptor.getDependencyRevisionId());
     }
 
     public void testStatus()

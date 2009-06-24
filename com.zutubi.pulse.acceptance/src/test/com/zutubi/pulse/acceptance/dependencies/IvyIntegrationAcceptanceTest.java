@@ -6,7 +6,7 @@ import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
-import com.zutubi.pulse.master.dependency.ivy.IvyModuleRevisionId;
+import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -301,7 +301,7 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
         String revision = "1";
         runBuild(project, revision);
 
-        ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(project, revision);
+        ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(project, revision);
 
         List<String> artifactPaths = core.getArtifactPaths(mrid);
         assertEquals(1, artifactPaths.size());
@@ -318,7 +318,7 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
         runBuild(project, "2");
         runBuild(project, "3");
 
-        ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(project, "latest.integration");
+        ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(project, "latest.integration");
 
         List<String> artifactPaths = core.getArtifactPaths(mrid);
         assertEquals(1, artifactPaths.size());
@@ -424,8 +424,8 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
             }
 
             Map<String, String> extraAttributes = new HashMap<String, String>();
-            extraAttributes.put(IvyModuleRevisionId.EXTRA_ATTRIBUTE_STAGE, IvyUtils.ivyEncodeStageName(stage.getName()));  // e:stage is used for generating publication path so needs appropriate modification.
-            ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(project.getOrganisation(), project.getName(), null, extraAttributes);
+            extraAttributes.put(MasterIvyModuleRevisionId.EXTRA_ATTRIBUTE_STAGE, IvyUtils.ivyEncodeStageName(stage.getName()));  // e:stage is used for generating publication path so needs appropriate modification.
+            ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(project.getOrganisation(), project.getName(), null, extraAttributes);
 
             // publish the artifacts from each stage.
             for (PublicationConfiguration artifact : stage.getPublications())
@@ -545,8 +545,8 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
         public boolean isFile(String org, String name, String revision, String stageName, String artifactName, String artifactExt)
         {
             Map<String, String> extraAttributes = new HashMap<String, String>();
-            extraAttributes.put(IvyModuleRevisionId.EXTRA_ATTRIBUTE_STAGE, IvyUtils.ivyEncodeStageName(stageName));
-            ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(org, name, revision, extraAttributes);
+            extraAttributes.put(MasterIvyModuleRevisionId.EXTRA_ATTRIBUTE_STAGE, IvyUtils.ivyEncodeStageName(stageName));
+            ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(org, name, revision, extraAttributes);
 
             String path = IvyPatternHelper.substitute(artifactPattern, mrid, artifactName, artifactExt, artifactExt);
             return new File(baseDir, path).isFile();
@@ -554,14 +554,14 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
 
         public File getIvyFile(ProjectConfiguration project, String revision)
         {
-            ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(project, revision);
+            ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(project, revision);
             String path = IvyPatternHelper.substitute(ivyPattern, mrid);
             return new File(baseDir, path);
         }
 
         public boolean isIvyFile(String org, String name, String revision)
         {
-            ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(org, name, null, revision);
+            ModuleRevisionId mrid = MasterIvyModuleRevisionId.newInstance(org, name, null, revision);
             String path = IvyPatternHelper.substitute(ivyPattern, mrid);
             return new File(baseDir, path).isFile();
         }

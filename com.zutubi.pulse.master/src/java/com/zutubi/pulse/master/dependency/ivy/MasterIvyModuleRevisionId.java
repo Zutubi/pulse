@@ -16,7 +16,7 @@ import java.util.HashMap;
  * An extension of the core IvyModuleRevisionId that adds an extra set of factory methods
  * for data types available to the master code only.
  */
-public class IvyModuleRevisionId extends com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId 
+public class MasterIvyModuleRevisionId extends com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId 
 {
     public static final String EXTRA_ATTRIBUTE_STAGE = NAMESPACE_EXTRA_ATTRIBUTES + ":stage";
 

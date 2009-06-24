@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.dependency.ivy;
 import org.apache.ivy.core.module.descriptor.*;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import com.zutubi.pulse.master.tove.config.project.*;
-import static com.zutubi.pulse.master.dependency.ivy.IvyModuleRevisionId.*;
+import static com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.util.CollectionUtils;
