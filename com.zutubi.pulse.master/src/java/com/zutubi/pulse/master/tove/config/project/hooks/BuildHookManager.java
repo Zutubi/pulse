@@ -75,7 +75,7 @@ public class BuildHookManager
     {
         if (hook.canManuallyTriggerFor(result))
         {
-            HibernateBuildResultDao.intialise(result);
+            HibernateBuildResultDao.initialise(result);
             executor.execute(new Runnable()
             {
                 public void run()

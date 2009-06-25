@@ -312,7 +312,7 @@ public class PersonalBuildClient
 
     private MenuOption<String> makeRevisionOption(String value, boolean defaultOption)
     {
-        return new MenuOption<String>(value, I18N.format("revision.option." + value), defaultOption);
+        return new MenuOption<String>(value, I18N.format("revision.option." + value.substring(1)), defaultOption);
     }
 
     private PersonalBuildRevision guessLocalRevision(WorkingCopy wc, WorkingCopyContext context) throws PersonalBuildException

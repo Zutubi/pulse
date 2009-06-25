@@ -340,7 +340,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             for (BuildResult result : results)
             {
-                intialise(result);
+                initialise(result);
             }
         }
 
@@ -493,7 +493,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public BuildResult findLatestSuccessfulByProject(Project project)
     {
-        return (BuildResult) findFirstByNamedQuery("findLatestSuccessfulByProject", "project", project, false);
+        BuildResult result = (BuildResult) findFirstByNamedQuery("findLatestSuccessfulByProject", "project", project, false);
+        initialise(result);
+        return result;
     }
 
     public BuildResult findLatestSuccessful()
@@ -501,7 +503,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (BuildResult) findFirstByNamedQuery("findLatestSuccessful", false);
     }
 
-    public static void intialise(final BuildResult result)
+    public static void initialise(final BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());
         for (RecipeResultNode node : result)

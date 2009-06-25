@@ -298,8 +298,6 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 command = [self.getScript(), 'shutdown']
                 if self._port is not None:
                     command += ['-p', str(self._port)]
-                if self._dataDir is not None:
-                    command += ['-d', self._dataDir]
                 if self._configFile is not None:
                     command += ['-f', self._configFile]
                 if self._context is not None:

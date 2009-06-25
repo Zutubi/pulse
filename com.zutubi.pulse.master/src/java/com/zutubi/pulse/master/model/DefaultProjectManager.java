@@ -851,7 +851,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         try
         {
             PulseFileSource pulseFile = getPulseFile(projectConfig, revision, archive);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig));
+            BuildRevision buildRevision = revision == null ? new BuildRevision(): new BuildRevision(revision, pulseFile, false);
+            eventManager.publish(new PersonalBuildRequestEvent(this, number, buildRevision, user, archive, projectConfig));
         }
         catch (Exception e)
         {
