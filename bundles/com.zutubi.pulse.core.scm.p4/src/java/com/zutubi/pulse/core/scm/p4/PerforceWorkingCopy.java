@@ -187,7 +187,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
             ConfigSupport configSupport = new ConfigSupport(context.getConfig());
             if(configSupport.getBooleanProperty(PROPERTY_CONFIRM_RESOLVE, true))
             {
-                PersonalBuildUI.Response response = ui.ynaPrompt("Some files must be resolved.  Auto-resolve now?", PersonalBuildUI.Response.YES);
+                YesNoResponse response = ui.yesNoPrompt("Some files must be resolved.  Auto-resolve now?", true, false, YesNoResponse.YES);
                 if(response.isPersistent())
                 {
                     configSupport.setBooleanProperty(PROPERTY_CONFIRM_RESOLVE, !response.isAffirmative());

@@ -66,10 +66,10 @@ public class PostProcessCommand implements Command
                 .hasArg()
                 .create('e'));
 
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new GnuParser();
         try
         {
-            CommandLine commandLine = parser.parse(options, argv, true);
+            CommandLine commandLine = parser.parse(options, argv, false);
             String[] args = commandLine.getArgs();
             if(args.length < 2)
             {

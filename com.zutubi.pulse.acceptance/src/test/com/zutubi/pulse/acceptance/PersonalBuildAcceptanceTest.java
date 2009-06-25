@@ -3,8 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
 import com.zutubi.pulse.dev.personal.PersonalBuildClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
@@ -31,7 +31,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -252,14 +251,14 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     private long runPersonalBuild(String expectedStatus)
     {
         // Request the build and wait for it to complete
-        TestPersonalBuildUI ui = requestPersonalBuild();
+        AcceptancePersonalBuildUI ui = requestPersonalBuild();
 
-        List<String> warnings = ui.getWarnings();
+        List<String> warnings = ui.getWarningMessages();
         assertTrue("Got warnings: " + StringUtils.join("\n", warnings), warnings.isEmpty());
-        List<String> errors = ui.getErrors();
+        List<String> errors = ui.getErrorMessages();
         assertTrue("Got errors: " + StringUtils.join("\n", errors), errors.isEmpty());
 
-        List<String> statuses = ui.getStatuses();
+        List<String> statuses = ui.getStatusMessages();
         assertTrue(statuses.size() > 0);
         assertTrue("Patch not accepted given status:\n" + StringUtils.join("\n", statuses), ui.isPatchAccepted());
 
@@ -302,10 +301,10 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         }
     }
 
-    private TestPersonalBuildUI requestPersonalBuild()
+    private AcceptancePersonalBuildUI requestPersonalBuild()
     {
-        PersonalBuildConfig config = new PersonalBuildConfig(workingCopyDir, null);
-        TestPersonalBuildUI ui = new TestPersonalBuildUI();
+        PersonalBuildConfig config = new PersonalBuildConfig(workingCopyDir);
+        AcceptancePersonalBuildUI ui = new AcceptancePersonalBuildUI();
         PersonalBuildClient client = new PersonalBuildClient(config, ui);
 
         PersonalBuildCommand command = new PersonalBuildCommand();
@@ -330,7 +329,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         browser.click(IDs.buildChangesTab());
         PersonalBuildChangesPage changesPage = browser.createPage(PersonalBuildChangesPage.class, buildNumber);
         changesPage.waitFor();
-        assertTrue(Long.parseLong(changesPage.getCheckedOutRevision()) >= 2);
+        assertEquals(1L, Long.parseLong(changesPage.getCheckedOutRevision()));
         assertEquals("build.xml", changesPage.getChangedFile(0));
 
         browser.click(IDs.buildTestsTab());
@@ -354,33 +353,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTrue(wcPage.isWorkingCopyNotPresent());
     }
 
-    private static class TestPersonalBuildUI implements PersonalBuildUI
+    private static class AcceptancePersonalBuildUI extends TestPersonalBuildUI
     {
-        private List<String> debugs = new LinkedList<String>();
-        private List<String> statuses = new LinkedList<String>();
-        private List<String> warnings = new LinkedList<String>();
-        private List<String> errors = new LinkedList<String>();
         private long buildNumber = -1;
-
-        public List<String> getDebugs()
-        {
-            return debugs;
-        }
-
-        public List<String> getStatuses()
-        {
-            return statuses;
-        }
-
-        public List<String> getWarnings()
-        {
-            return warnings;
-        }
-
-        public List<String> getErrors()
-        {
-            return errors;
-        }
 
         public boolean isPatchAccepted()
         {
@@ -392,13 +367,10 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             return buildNumber;
         }
 
-        public void debug(String message)
-        {
-            debugs.add(message);
-        }
-
         public void status(String message)
         {
+            super.status(message);
+
             if (message.startsWith("Patch accepted"))
             {
                 String[] pieces = message.split(" ");
@@ -406,31 +378,6 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
                 number = number.substring(0, number.length() - 1);
                 buildNumber = Long.parseLong(number);
             }
-
-            statuses.add(message);
-        }
-
-        public void warning(String message)
-        {
-            warnings.add(message);
-        }
-
-        public void error(String message)
-        {
-            errors.add(message);
-        }
-
-        public void error(String message, Throwable throwable)
-        {
-            errors.add(message);
-        }
-
-        public void enterContext()
-        {
-        }
-
-        public void exitContext()
-        {
         }
 
         public String inputPrompt(String question)
@@ -438,24 +385,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             return "";
         }
 
-        public String inputPrompt(String prompt, String defaultResponse)
-        {
-            return defaultResponse;
-        }
-
         public String passwordPrompt(String question)
         {
             return "";
-        }
-
-        public Response ynPrompt(String question, Response defaultResponse)
-        {
-            return defaultResponse;
-        }
-
-        public Response ynaPrompt(String question, Response defaultResponse)
-        {
-            return defaultResponse;
         }
     }
 }

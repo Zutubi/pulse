@@ -32,8 +32,8 @@ public class ShutdownCommand extends AdminCommand
         Options options = getSharedOptions();
         options.addOption(new Option("F", "force", false, "force shutdown"));
 
-        CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(options, argv, true);
+        CommandLineParser parser = new GnuParser();
+        CommandLine commandLine = parser.parse(options, argv, false);
 
         setForce(commandLine.hasOption('F'));
         processSharedOptions(commandLine);

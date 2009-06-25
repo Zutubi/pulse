@@ -6,6 +6,17 @@ import com.zutubi.util.config.*;
 import java.io.File;
 
 /**
+ * Configuration for the personal build command.  Extends the regular
+ * {@link com.zutubi.util.config.Config} interface with support for loading
+ * .pulse2.properties files and convenience methods for accessing the core
+ * personal build properties.
+ * <p/>
+ * The .properties files are loaded from the personal build base directory,
+ * then its parent directory and so on.  A .properties file in the user's
+ * home directory is also added to the end of this chain if it exists.
+ * <p/>
+ * Configuration provided from an external user interface may be passed in to
+ * the constrtcutor to take precedence over the .properties files.
  */
 public class PersonalBuildConfig implements Config
 {
@@ -19,22 +30,28 @@ public class PersonalBuildConfig implements Config
     public static final String PROPERTY_PROJECT = "project";
 
     public static final String PROPERTY_CHECK_REPOSITORY = "check.repository";
-    public static final String PROPERTY_CONFIRM_UPDATE = "confirm.update";
     public static final String PROPERTY_CONFIRMED_VERSION = "confirmed.version";
 
+    public static final String PROPERTY_REVISION = "revision";
+    public static final String PROPERTY_UPDATE = "update";
+    public static final String PROPERTY_PATCH_FILE = "patch.file";
+    public static final String PROPERTY_SEND_REQUEST = "send.request";
+
     private File base;
+    private String[] files;
     private ConfigSupport config;
     private ConfigSupport localConfig;
     private ConfigSupport userConfig;
 
-    public PersonalBuildConfig(File base)
+    public PersonalBuildConfig(File base, String... files)
     {
-        this(base, null);    
+        this(base, null, files);
     }
 
-    public PersonalBuildConfig(File base, Config ui)
+    public PersonalBuildConfig(File base, Config ui, String... files)
     {
         this.base = base;
+        this.files = files;
         CompositeConfig composite = new CompositeConfig();
 
         // First, properties defined by the UI that is invoking us (e.g.
@@ -76,12 +93,22 @@ public class PersonalBuildConfig implements Config
         config = new ConfigSupport(composite);
     }
 
+    public File getBase()
+    {
+        return base;
+    }
+
+    public String[] getFiles()
+    {
+        return files;
+    }
+
     private Config getDefaults()
     {
         PropertiesConfig defaults = new PropertiesConfig();
 
         String userName = System.getProperty("user.name");
-        if(userName != null)
+        if (userName != null)
         {
             defaults.setProperty(PROPERTY_PULSE_USER, userName);
         }
@@ -124,11 +151,6 @@ public class PersonalBuildConfig implements Config
         return config.getProperty(PROPERTY_PROJECT);
     }
 
-    public File getBase()
-    {
-        return base;
-    }
-
     public boolean getCheckRepository()
     {
         return config.getBooleanProperty(PROPERTY_CHECK_REPOSITORY, true);
@@ -139,16 +161,6 @@ public class PersonalBuildConfig implements Config
         return setBooleanProperty(PROPERTY_CHECK_REPOSITORY, check);
     }
 
-    public boolean getConfirmUpdate()
-    {
-        return config.getBooleanProperty(PROPERTY_CONFIRM_UPDATE, true);
-    }
-
-    public boolean setConfirmUpdate(boolean confirm)
-    {
-        return setBooleanProperty(PROPERTY_CONFIRM_UPDATE, confirm);
-    }
-
     public int getConfirmedVersion()
     {
         return config.getInteger(PROPERTY_CONFIRMED_VERSION, 0);
@@ -157,6 +169,46 @@ public class PersonalBuildConfig implements Config
     public boolean setConfirmedVersion(int version)
     {
         return setIntegerProperty(PROPERTY_CONFIRMED_VERSION, version);
+    }
+
+    public Boolean getUpdate()
+    {
+        return config.getBooleanProperty(PROPERTY_UPDATE, null);
+    }
+
+    public boolean setUpdate(boolean update)
+    {
+        return setBooleanProperty(PROPERTY_UPDATE, update);
+    }
+
+    public String getRevision()
+    {
+        return getProperty(PROPERTY_REVISION);
+    }
+
+    public void setRevision(String revision)
+    {
+        setProperty(PROPERTY_REVISION, revision);
+    }
+
+    public String getPatchFile()
+    {
+        return getProperty(PROPERTY_PATCH_FILE);
+    }
+
+    public void setPatchFile(String patchFile)
+    {
+        setProperty(PROPERTY_PATCH_FILE, patchFile);
+    }
+
+    public boolean getSendRequest()
+    {
+        return config.getBooleanProperty(PROPERTY_SEND_REQUEST, true);
+    }
+
+    public boolean setSendRequest(boolean sendRequest)
+    {
+        return setBooleanProperty(PROPERTY_SEND_REQUEST, sendRequest);
     }
 
     private boolean setBooleanProperty(String property, boolean value)
@@ -202,7 +254,6 @@ public class PersonalBuildConfig implements Config
         }
     }
 
-
     public void removeProperty(String key)
     {
         config.removeProperty(key);
@@ -226,7 +277,7 @@ public class PersonalBuildConfig implements Config
     public File getUserConfigFile()
     {
         String userHome = System.getProperty("user.home");
-        if(userHome != null)
+        if (userHome != null)
         {
             return FileSystemUtils.composeFile(userHome, PROPERTIES_FILENAME);
         }

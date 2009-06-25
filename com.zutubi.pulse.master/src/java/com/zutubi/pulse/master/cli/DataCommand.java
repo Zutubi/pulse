@@ -195,7 +195,7 @@ public abstract class DataCommand implements Command
     {
         Options options = getSharedOptions();
         
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new GnuParser();
         CommandLine commandLine = parser.parse(options, argv, false);
 
         processSharedOptions(commandLine);

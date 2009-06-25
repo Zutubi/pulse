@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.scm.api;
 
+import java.util.List;
+
 /**
  * An interface for interaction with a user that is running personal build/
  * working copy operations.  Can be used to query for user input such as
@@ -8,137 +10,6 @@ package com.zutubi.pulse.core.scm.api;
  */
 public interface PersonalBuildUI
 {
-    /**
-     * Used to represent a response from the user.
-     */
-    public enum Response
-    {
-        /**
-         * An affirmative response.
-         */
-        YES
-        {
-            public boolean isAffirmative()
-            {
-                return true;
-            }
-
-            public boolean isPersistent()
-            {
-                return false;
-            }
-        },
-        /**
-         * A negative response.
-         */
-        NO
-        {
-            public boolean isAffirmative()
-            {
-                return false;
-            }
-
-            public boolean isPersistent()
-            {
-                return false;
-            }
-        },
-        /**
-         * A <strong>persistent</strong> positive response.  Only returned from
-         * PersonalBuildUI#ynaPrompt.  Implementations that support the always
-         * response are responsible for saving the preference to the user's
-         * configuration.
-         *
-         * @see WorkingCopyContext#getConfig
-         */
-        ALWAYS
-        {
-            public boolean isAffirmative()
-            {
-                return true;
-            }
-
-            public boolean isPersistent()
-            {
-                return true;
-            }
-        };
-
-        /**
-         * @return true if the response is affirmative, false if it is negative
-         */
-        public abstract boolean isAffirmative();
-
-        /**
-         * @return true if the preference should be persisted to the user's
-         * configuration
-         */
-        public abstract boolean isPersistent();
-
-        /**
-         * Converts raw user input to a response, checking it falls withing the
-         * set of valid responses.
-         *
-         * @param input            raw input from the user
-         * @param defaultResponse  the default response, returned if input is
-         *                         the empty string
-         * @param allowedResponses the set of allowed responses
-         * @return the user's response, or null if it did not conform to the
-         *         allowed set
-         */
-        public static Response fromInput(String input, Response defaultResponse, Response... allowedResponses)
-        {
-            input = input.toUpperCase();
-            int length = input.length();
-
-            if(length == 0)
-            {
-                return defaultResponse;
-            }
-            else if(length == 1)
-            {
-                char inputChar = input.charAt(0);
-
-                for(Response r: values())
-                {
-                    if(in(r, allowedResponses) && r.toString().charAt(0) == inputChar)
-                    {
-                        return r;
-                    }
-                }
-            }
-            else
-            {
-                try
-                {
-                    Response r = valueOf(input);
-                    if(in(r, allowedResponses))
-                    {
-                        return r;
-                    }
-                }
-                catch(IllegalArgumentException e)
-                {
-                    // Fall through
-                }
-            }
-
-            return null;
-        }
-
-        private static boolean in(Response r, Response... a)
-        {
-            for(Response c: a)
-            {
-                if(c == r)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
 
     /**
      * Reports a line of debugging-level feedback to the user.  The user will
@@ -242,29 +113,32 @@ public interface PersonalBuildUI
 
     /**
      * Prompts the user for a yes or no response, with a default option
-     * provided.
+     * provided.  The prompt may optionally show always and/or never options,
+     * which are just like yes and no respectively except that they should
+     * persist.  Persistance of the response is the responsibility of the
+     * caller.
      *
      * @param question        the question to ask the user, the UI itself will
      *                        provide details of the default response
+     * @param showAlways      if true, an always option is added
+     * @param showNever       if true, a never option is added
      * @param defaultResponse the response to return if the user accepts the
      *                        default
-     * @return the user's response, one of {@link Response#YES} or
-     *         {@link Response#NO}
-     */
-    Response ynPrompt(String question, Response defaultResponse);
+     * @return the user's response     */
+    YesNoResponse yesNoPrompt(String question, boolean showAlways, boolean showNever, YesNoResponse defaultResponse);
 
     /**
-     * Prompts the user for a yes, no or always response, with a default option
-     * provided.  If the always response is given, the caller is responsible
-     * for saving the preference to the user's configuration.
-     *
-     * @param question        the question to ask the user, the UI itself will
-     *                        provide details of the default response
-     * @param defaultResponse the response to return if the user accepts the
-     *                        default
-     * @return the user's response
-     *
-     * @see WorkingCopyContext#getConfig()
+     * Prompts the user to make a choice from a menu consisting of the given
+     * options.  The choice returned may optionally indicate that the user
+     * would like the choice to persist.  In this case persistence of the
+     * choice is the responsibility of the caller.
+     * 
+     * @param question question to introduce the choices with: should not end
+     *                 with any punctuation
+     * @param options  a list of available options
+     * @param <T> the type of value carried by the options
+     * @return the user's choice, the value of which will be taken from one of
+     *         the given options
      */
-    Response ynaPrompt(String question, Response defaultResponse);
+    <T> MenuChoice<T> menuPrompt(String question, List<MenuOption<T>> options);
 }

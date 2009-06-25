@@ -2,8 +2,8 @@ package com.zutubi.pulse.servercore.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
@@ -50,8 +50,8 @@ public class StopServiceCommand extends AdminCommand
 
     public int doExecute(String[] argv) throws XmlRpcException, IOException, ParseException
     {
-        CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(getSharedOptions(), argv, true);
+        CommandLineParser parser = new GnuParser();
+        CommandLine commandLine = parser.parse(getSharedOptions(), argv, false);
         super.processSharedOptions(commandLine);
         xmlRpcClient.execute("RemoteApi.stopService", new Vector<Object>(Arrays.asList(adminToken)));
         return 0;

@@ -7,8 +7,8 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
@@ -70,8 +70,8 @@ public class SetPasswordCommand extends AdminCommand
 
     public int doExecute(String[] argv) throws XmlRpcException, IOException, ParseException
     {
-        CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(getSharedOptions(), argv, true);
+        CommandLineParser parser = new GnuParser();
+        CommandLine commandLine = parser.parse(getSharedOptions(), argv, false);
 
         String[] args = commandLine.getArgs();
         if(args.length < 2)

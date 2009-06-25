@@ -4,6 +4,7 @@ import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
+import com.zutubi.pulse.core.scm.api.YesNoResponse;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.config.PropertiesConfig;
@@ -30,8 +31,8 @@ public class ConfigCommand implements Command
         options.addOption(OptionBuilder.withLongOpt("project")
                 .create('p'));
 
-        CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(options, bootContext.getCommandArgv());
+        CommandLineParser parser = new GnuParser();
+        CommandLine commandLine = parser.parse(options, bootContext.getCommandArgv(), false);
         if(commandLine.hasOption('p'))
         {
             projectOnly = true;
@@ -60,7 +61,7 @@ public class ConfigCommand implements Command
 
     private String getPulseURL(PersonalBuildUI ui)
     {
-        PersonalBuildUI.Response response;
+        YesNoResponse response;
         String pulseURL;
 
         while (true)
@@ -88,7 +89,7 @@ public class ConfigCommand implements Command
             catch (PulseXmlRpcException e)
             {
                 ui.error("Unable to contact pulse server: " + e, e);
-                response = ui.ynPrompt("Continue with this URL anyway?", PersonalBuildUI.Response.NO);
+                response = ui.yesNoPrompt("Continue with this URL anyway?", false, false, YesNoResponse.NO);
                 if (response.isAffirmative())
                 {
                     break;

@@ -2,9 +2,9 @@ package com.zutubi.pulse.servercore.cli;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.servercore.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.cli.*;
@@ -139,8 +139,8 @@ public class StartCommand implements Command
         options.addOption(OptionBuilder.withLongOpt("migrate")
                 .create('m'));
 
-        CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(options, argv, true);
+        CommandLineParser parser = new GnuParser();
+        CommandLine commandLine = parser.parse(options, argv, false);
 
         if (commandLine.hasOption('p'))
         {

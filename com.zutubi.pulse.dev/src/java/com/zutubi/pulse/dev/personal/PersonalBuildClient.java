@@ -1,5 +1,6 @@
 package com.zutubi.pulse.dev.personal;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.ScmLocation;
@@ -24,6 +25,8 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The client does the work of actually talking to the Pulse server, sending
@@ -31,6 +34,14 @@ import java.net.MalformedURLException;
  */
 public class PersonalBuildClient
 {
+    private static final Messages I18N = Messages.getInstance(PersonalBuildClient.class);
+
+    static final String REVISION_OPTION_LOCAL    = "@local";
+    static final String REVISION_OPTION_LATEST   = "@latest";
+    static final String REVISION_OPTION_FLOATING = "@floating";
+    static final String REVISION_OPTION_GOOD     = "@good";
+    static final String REVISION_OPTION_CUSTOM   = "@custom";
+
     private PersonalBuildConfig config;
     private PersonalBuildUI ui;
     private String password;
@@ -39,6 +50,16 @@ public class PersonalBuildClient
     {
         this.config = config;
         this.ui = ui;
+    }
+
+    public PersonalBuildConfig getConfig()
+    {
+        return config;
+    }
+
+    public PersonalBuildUI getUI()
+    {
+        return ui;
     }
 
     public Pair<WorkingCopy, WorkingCopyContext> checkConfiguration() throws PersonalBuildException
@@ -127,12 +148,13 @@ public class PersonalBuildClient
                         question = String.format("Server version (%s) does not match tools version (%s).  Continue anyway?", serverVersion, ourVersion);
                     }
 
-                    PersonalBuildUI.Response response = ui.ynaPrompt(question, PersonalBuildUI.Response.NO);
-                    if (response == PersonalBuildUI.Response.ALWAYS)
+                    YesNoResponse response = ui.yesNoPrompt(question, true, false, YesNoResponse.NO);
+                    if (response.isPersistent())
                     {
                         config.setConfirmedVersion(serverBuild);
                     }
-                    else if (!response.isAffirmative())
+
+                    if (!response.isAffirmative())
                     {
                         throw new UserAbortException();
                     }
@@ -151,7 +173,7 @@ public class PersonalBuildClient
     {
         if (config.getPulseUrl() == null)
         {
-            PersonalBuildUI.Response response = ui.ynPrompt("No pulse server configured.  Configure one now?", PersonalBuildUI.Response.YES);
+            YesNoResponse response = ui.yesNoPrompt("No pulse server configured.  Configure one now?", false, false, YesNoResponse.YES);
             if (response.isAffirmative())
             {
                 new ConfigCommand().setupPulseConfig(ui, config);
@@ -164,7 +186,7 @@ public class PersonalBuildClient
 
         if (config.getProject() == null)
         {
-            PersonalBuildUI.Response response = ui.ynPrompt("No pulse project configured.  Configure one now?", PersonalBuildUI.Response.YES);
+            YesNoResponse response = ui.yesNoPrompt("No pulse project configured.  Configure one now?", false, false, YesNoResponse.YES);
             if (response.isAffirmative())
             {
                 new ConfigCommand().setupLocalConfig(ui, config);
@@ -198,7 +220,7 @@ public class PersonalBuildClient
                 ui.debug("Checking working copy matches project SCM configuration");
                 if (!wc.matchesLocation(context, scmLocation.getLocation()))
                 {
-                    PersonalBuildUI.Response response = ui.ynaPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", PersonalBuildUI.Response.NO);
+                    YesNoResponse response = ui.yesNoPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", true, false, YesNoResponse.NO);
                     if (response.isPersistent())
                     {
                         config.setCheckRepository(!response.isAffirmative());
@@ -227,32 +249,157 @@ public class PersonalBuildClient
         }
     }
 
-    public Revision preparePatch(WorkingCopy wc, WorkingCopyContext context, File patchFile, String... spec) throws PersonalBuildException
+    public PersonalBuildRevision chooseRevision(WorkingCopy wc, WorkingCopyContext context) throws PersonalBuildException
     {
-        Revision rev;
+        String chosenRevision = config.getRevision();
+        boolean fromConfig = true;
+        if (!TextUtils.stringSet(chosenRevision))
+        {
+            fromConfig = false;
+            
+            List<MenuOption<String>> options = new LinkedList<MenuOption<String>>();
+            options.add(makeRevisionOption(REVISION_OPTION_LOCAL, false));
+            options.add(makeRevisionOption(REVISION_OPTION_LATEST, true));
+            options.add(makeRevisionOption(REVISION_OPTION_FLOATING, false));
+            options.add(makeRevisionOption(REVISION_OPTION_GOOD, false));
+            options.add(makeRevisionOption(REVISION_OPTION_CUSTOM, false));
+
+            MenuChoice<String> choice = ui.menuPrompt(I18N.format("choose.revision.prompt"), options);
+            chosenRevision = choice.getValue();
+            if (choice.isPersistent())
+            {
+                config.setRevision(chosenRevision);
+            }
+        }
+
+        if (chosenRevision.equals(REVISION_OPTION_LOCAL))
+        {
+            return guessLocalRevision(wc, context);
+        }
+        else if (chosenRevision.equals(REVISION_OPTION_LATEST))
+        {
+            return getLatestRemoteRevision(wc, context);
+        }
+        else if (chosenRevision.equals(REVISION_OPTION_FLOATING))
+        {
+            return new PersonalBuildRevision(WorkingCopy.REVISION_FLOATING, false);
+        }
+        else if (chosenRevision.equals(REVISION_OPTION_GOOD))
+        {
+            return new PersonalBuildRevision(WorkingCopy.REVISION_LAST_KNOWN_GOOD, false);
+        }
+        else if (chosenRevision.equals(REVISION_OPTION_CUSTOM))
+        {
+            String custom = ui.inputPrompt(I18N.format("custom.revision.prompt")).trim();
+            if (custom.length() > 0)
+            {
+                return new PersonalBuildRevision(new Revision(custom), true);
+            }
+            else
+            {
+                return new PersonalBuildRevision(WorkingCopy.REVISION_FLOATING, false);
+            }
+        }
+        else if (fromConfig)
+        {
+            return new PersonalBuildRevision(new Revision(chosenRevision), true);
+        }
+        else
+        {
+            throw new PersonalBuildException("Unknown revision choice '" + chosenRevision + "'");
+        }
+    }
+
+    private MenuOption<String> makeRevisionOption(String value, boolean defaultOption)
+    {
+        return new MenuOption<String>(value, I18N.format("revision.option." + value), defaultOption);
+    }
+
+    private PersonalBuildRevision guessLocalRevision(WorkingCopy wc, WorkingCopyContext context) throws PersonalBuildException
+    {
+        Revision revision;
+        ui.status("Guessing revision of local working copy...");
+        ui.enterContext();
         try
         {
-            ui.status("Updating working copy...");
-            ui.enterContext();
-            try
-            {
-                rev = wc.update(context, Revision.HEAD);
-            }
-            finally
-            {
-                ui.exitContext();
-            }
-            ui.status("Update complete.");
+            revision = wc.guessLocalRevision(context);
         }
         catch (ScmException e)
         {
-            throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
+            throw new PersonalBuildException("Unable to guess local revision: " + e.getMessage(), e);
+        }
+        finally
+        {
+            ui.exitContext();
         }
 
+        ui.status("Guessed revision '" + revision.getRevisionString() + "'.");
+        return new PersonalBuildRevision(revision, true);
+    }
+
+    private PersonalBuildRevision getLatestRemoteRevision(WorkingCopy wc, WorkingCopyContext context) throws PersonalBuildException
+    {
+        Revision revision;
+        ui.status("Getting latest remote revision...");
+        try
+        {
+            revision = wc.getLatestRemoteRevision(context);
+        }
+        catch (ScmException e)
+        {
+            throw new PersonalBuildException("Unable to guess local revision: " + e.getMessage(), e);
+        }
+        finally
+        {
+            ui.exitContext();
+        }
+
+        ui.status("Latest remote revision is '" + revision + "'");
+        return new PersonalBuildRevision(revision, true);
+    }
+
+    public void updateIfDesired(WorkingCopy wc, WorkingCopyContext context, Revision revision) throws PersonalBuildException
+    {
+        Boolean update = config.getUpdate();
+        if (update == null)
+        {
+            YesNoResponse response = ui.yesNoPrompt(I18N.format("update.prompt"), true, true, YesNoResponse.YES);
+            if (response.isPersistent())
+            {
+                config.setUpdate(response.isAffirmative());
+            }
+
+            update = response.isAffirmative();
+        }
+
+        if (update)
+        {
+            try
+            {
+                ui.status("Updating working copy...");
+                ui.enterContext();
+                try
+                {
+                    wc.update(context, revision);
+                    ui.status("Update complete.");
+                }
+                finally
+                {
+                    ui.exitContext();
+                }
+            }
+            catch (ScmException e)
+            {
+                throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
+            }
+        }
+    }
+
+    public boolean preparePatch(WorkingCopy wc, WorkingCopyContext context, File patchFile, String... spec) throws PersonalBuildException
+    {
         try
         {
             boolean created;
-
             ui.status("Creating patch archive...");
             ui.enterContext();
 
@@ -268,13 +415,13 @@ public class PersonalBuildClient
             if (created)
             {
                 ui.status("Patch created.");
-                return rev;
             }
             else
             {
                 ui.status("No patch created.");
-                return null;
             }
+
+            return created;
         }
         catch (ScmException e)
         {

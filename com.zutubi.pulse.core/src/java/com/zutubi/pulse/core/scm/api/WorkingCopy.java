@@ -14,6 +14,17 @@ import java.io.File;
 public interface WorkingCopy
 {
     /**
+     * A placeholder revision value that indicates to the Pulse server that it
+     * should leave the revision floating for a personal build.
+     */
+    public static final Revision REVISION_FLOATING = new Revision("__floating__");
+    /**
+     * A placeholder revision value that indicates to the Pulse server that it
+     * should use the latest known good revision for a personl build.
+     */
+    public static final Revision REVISION_LAST_KNOWN_GOOD = new Revision("__last_known_good__");
+
+    /**
      * Used to test if the working copy matches the SCM location of a Pulse
      * project.  When the user requests a personal build of a project, some
      * sanity checks should be made to ensure that their working copy is from

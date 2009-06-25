@@ -61,8 +61,8 @@ public class LocalBuild
 
         try
         {
-            CommandLineParser parser = new PosixParser();
-            CommandLine commandLine = parser.parse(options, argv, true);
+            CommandLineParser parser = new GnuParser();
+            CommandLine commandLine = parser.parse(options, argv, false);
 
             if (commandLine.hasOption('p'))
             {

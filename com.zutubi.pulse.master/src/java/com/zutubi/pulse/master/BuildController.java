@@ -146,7 +146,7 @@ public class BuildController implements EventListener
         TreeNode<RecipeController> root = tree.getRoot();
         buildResult = request.createResult(projectManager, userManager);
         buildManager.save(buildResult);
-        previousSuccessful = getPreviousSuccessfulBuild();
+        previousSuccessful = buildManager.getLatestSuccessfulBuildResult(project);
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         buildDir = paths.getBuildDir(buildResult);
@@ -203,17 +203,6 @@ public class BuildController implements EventListener
     {
         String token = buildContext.getSecurityHash();
         repositoryAuthenticationProvider.deactivate(token);
-    }
-
-    private BuildResult getPreviousSuccessfulBuild()
-    {
-        BuildResult previousSuccessful = null;
-        List<BuildResult> previousSuccess = buildManager.queryBuilds(project, new ResultState[]{ResultState.SUCCESS}, -1, -1, 0, 1, true, true);
-        if (previousSuccess.size() > 0)
-        {
-            previousSuccessful = previousSuccess.get(0);
-        }
-        return previousSuccessful;
     }
 
     private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode)

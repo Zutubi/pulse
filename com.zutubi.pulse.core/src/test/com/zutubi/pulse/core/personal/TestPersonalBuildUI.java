@@ -1,6 +1,11 @@
 package com.zutubi.pulse.core.personal;
 
+import com.zutubi.pulse.core.scm.api.MenuChoice;
+import com.zutubi.pulse.core.scm.api.MenuOption;
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
+import com.zutubi.pulse.core.scm.api.YesNoResponse;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -85,13 +90,28 @@ public class TestPersonalBuildUI implements PersonalBuildUI
         return "test password";
     }
 
-    public Response ynPrompt(String question, Response defaultResponse)
+    public YesNoResponse yesNoPrompt(String question, boolean showAlways, boolean showNever, YesNoResponse defaultResponse)
     {
         return defaultResponse;
     }
 
-    public Response ynaPrompt(String question, Response defaultResponse)
+    public <T> MenuChoice<T> menuPrompt(String question, List<MenuOption<T>> choices)
     {
-        return defaultResponse;
+        MenuOption<T> defaultOption = CollectionUtils.find(choices, new Predicate<MenuOption<T>>()
+        {
+            public boolean satisfied(MenuOption<T> option)
+            {
+                return option.isDefaultOption();
+            }
+        });
+
+        if (defaultOption != null)
+        {
+            return new MenuChoice<T>(defaultOption.getValue(), false);
+        }
+        else
+        {
+            throw new RuntimeException("No default option");
+        }
     }
 }

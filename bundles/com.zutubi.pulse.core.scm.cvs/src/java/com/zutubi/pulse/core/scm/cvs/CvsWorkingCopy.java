@@ -63,7 +63,7 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
     private String getBranch(WorkingCopyContext context)
     {
         String branch = context.getConfig().getProperty(CvsConstants.BRANCH);
-        if (branch.trim().length() == 0)
+        if (branch != null && branch.trim().length() == 0)
         {
             // slightly paranoid action. Ensure that we use a null if no branch is specified.
             branch = null;

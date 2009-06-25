@@ -5,8 +5,11 @@ import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -28,6 +31,7 @@ public class PersonalBuildAction extends ActionSupport
     private long number;
     private String errorMessage;
     private MasterConfigurationManager configurationManager;
+    private BuildManager buildManager;
 
     public void setProject(String project)
     {
@@ -127,7 +131,7 @@ public class PersonalBuildAction extends ActionSupport
             uploadedPatch.delete();
             
             archive = new PatchArchive(patchFile);
-            projectManager.triggerBuild(number, p, user, new Revision(revision), archive);
+            projectManager.triggerBuild(number, p, user, convertRevision(p), archive);
         }
         catch (Exception e)
         {
@@ -139,8 +143,38 @@ public class PersonalBuildAction extends ActionSupport
         return SUCCESS;
     }
 
+    private Revision convertRevision(Project project)
+    {
+        if (revision == null || revision.equals(WorkingCopy.REVISION_FLOATING.getRevisionString()))
+        {
+            return null;
+        }
+        else if (revision.equals(WorkingCopy.REVISION_LAST_KNOWN_GOOD.getRevisionString()))
+        {
+            BuildResult lastKnownGood = buildManager.getLatestSuccessfulBuildResult(project);
+            if (lastKnownGood == null)
+            {
+                // Let it float.
+                return null;
+            }
+            else
+            {
+                return new Revision(lastKnownGood.getRevision().getRevisionString());
+            }
+        }
+        else
+        {
+            return new Revision(revision);
+        }
+    }
+
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }
