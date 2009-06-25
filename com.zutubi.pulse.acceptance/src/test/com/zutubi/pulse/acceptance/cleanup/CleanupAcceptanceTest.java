@@ -222,6 +222,39 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         assertFalse(utils.hasIvyFile(projectName, 1));
     }
 
+    public void testCleanupLogs() throws Exception
+    {
+        final String projectName = random;
+        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
+
+        utils.setRetainWorkingCopy(projectName, true);
+        utils.addCleanupRule(projectName, "logs", CleanupWhat.LOGS);
+        utils.deleteCleanupRule(projectName, "default");
+
+        xmlRpcHelper.runBuild(projectName);
+        waitForCleanupToRunAsynchronously();
+
+        assertTrue(utils.hasBuildLog(projectName, 1));
+        assertTrue(isBuildLogsPresentViaUI(projectName, 1));
+
+        xmlRpcHelper.runBuild(projectName);
+        waitForCleanupToRunAsynchronously(new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasBuildLog(projectName, 1);
+            }
+        });
+
+        assertTrue(isBuildPresentViaUI(projectName, 2));
+        assertTrue(isBuildLogsPresentViaUI(projectName, 2));
+        assertTrue(utils.hasBuildLog(projectName, 2));
+
+        assertTrue(isBuildPresentViaUI(projectName, 1));
+        assertFalse(isBuildLogsPresentViaUI(projectName, 1));
+        assertFalse(utils.hasBuildLog(projectName, 1));
+    }
+
     private String renameProject(String projectName) throws Exception
     {
         String newProjectName = getName() + "-" + RandomUtils.randomString(10);

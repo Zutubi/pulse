@@ -538,6 +538,11 @@ public class DefaultBuildManager implements BuildManager
 
                 cleanupWorkDirectories(build);
             }
+
+            if (options.isCleanupLogs())
+            {
+                cleanupBuildLogs(build);
+            }
         }
 
         if (options.isCleanRepositoryArtifacts())
@@ -663,12 +668,12 @@ public class DefaultBuildManager implements BuildManager
      * @param nodes     list of nodes to be traversed.
      * @param cleanup   the cleanup process to be applied to each recipe result.
      */
-    private void runCleanupForNodes(List<RecipeResultNode> nodes, RecipeCleanup cleanup)
+    private void runCleanupForRecipies(List<RecipeResultNode> nodes, RecipeCleanup cleanup)
     {
         for (RecipeResultNode node : nodes)
         {
             cleanup.cleanup(node.getResult());
-            runCleanupForNodes(node.getChildren(), cleanup);
+            runCleanupForRecipies(node.getChildren(), cleanup);
         }
     }
 
@@ -681,7 +686,7 @@ public class DefaultBuildManager implements BuildManager
     private void cleanupWorkDirectories(final BuildResult build)
     {
         final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        runCleanupForNodes(build.getRoot().getChildren(), new RecipeCleanup()
+        runCleanupForRecipies(build.getRoot().getChildren(), new RecipeCleanup()
         {
             public void cleanup(RecipeResult recipe)
             {
@@ -698,7 +703,7 @@ public class DefaultBuildManager implements BuildManager
     private void cleanupBuildArtifacts(final BuildResult build)
     {
         final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        runCleanupForNodes(build.getRoot().getChildren(), new RecipeCleanup()
+        runCleanupForRecipies(build.getRoot().getChildren(), new RecipeCleanup()
         {
             public void cleanup(RecipeResult recipe)
             {
@@ -708,17 +713,38 @@ public class DefaultBuildManager implements BuildManager
         });
     }
 
-    private void cleanupBuildDirectory(final BuildResult build)
+    private void cleanupBuildDirectory(BuildResult build)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         scheduleCleanup(paths.getBuildDir(build));
     }
 
-    private void scheduleCleanup(File dir)
+    /**
+     * Cleanup the build.log and recipe.log files associated with this build.
+     *
+     * @param build     the build for which the logs are being removed.
+     */
+    private void cleanupBuildLogs(final BuildResult build)
     {
-        if (dir != null && dir.exists())
+        final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        File buildDir = paths.getBuildDir(build);
+        scheduleCleanup(new File(buildDir, BuildResult.BUILD_LOG));
+
+        runCleanupForRecipies(build.getRoot().getChildren(), new RecipeCleanup()
         {
-            fileDeletionService.delete(dir);
+            public void cleanup(RecipeResult recipe)
+            {
+                File recipeDir = paths.getRecipeDir(build, recipe.getId());
+                scheduleCleanup(new File(recipeDir, RecipeResult.RECIPE_LOG));
+            }
+        });
+    }
+
+    private void scheduleCleanup(File file)
+    {
+        if (file != null && file.exists())
+        {
+            fileDeletionService.delete(file);
         }
     }
 

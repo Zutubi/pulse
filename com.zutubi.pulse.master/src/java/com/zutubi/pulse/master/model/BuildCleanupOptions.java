@@ -71,6 +71,16 @@ public class BuildCleanupOptions
         return isCleanup(CleanupWhat.REPOSITORY_ARTIFACTS);
     }
 
+    /**
+     * Indicates whether or not the log files associated with a build should be cleaned up.
+     *
+     * @return true if the logs should be cleaned up, false otherwise.
+     */
+    public boolean isCleanupLogs()
+    {
+        return isCleanup(CleanupWhat.LOGS);
+    }
+
     public boolean isCleanup(CleanupWhat what)
     {
         return this.cleanupAll || whats.contains(what);

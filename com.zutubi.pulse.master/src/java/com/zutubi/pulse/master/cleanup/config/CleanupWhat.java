@@ -19,5 +19,10 @@ public enum CleanupWhat
     /**
      * Cleanup the artifacts published to the repository.
      */
-    REPOSITORY_ARTIFACTS
+    REPOSITORY_ARTIFACTS,
+
+    /**
+     * Cleanup the build logs.
+     */
+    LOGS
 }

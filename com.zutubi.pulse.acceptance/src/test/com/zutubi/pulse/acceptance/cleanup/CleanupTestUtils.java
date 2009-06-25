@@ -8,6 +8,7 @@ import com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.tove.type.record.PathUtils;
@@ -93,6 +94,12 @@ public class CleanupTestUtils
     public boolean hasBuildDirectory(String projectName, int buildNumber) throws Exception
     {
         return getBuildDirectory(projectName, buildNumber).isDirectory();
+    }
+
+    public boolean hasBuildLog(String projectName, int buildNumber) throws Exception
+    {
+        File buildDir = getBuildDirectory(projectName, buildNumber);
+        return new File(buildDir, BuildResult.BUILD_LOG).isFile();
     }
 
     public boolean hasBuildWorkingCopy(String projectName, int buildNumber) throws Exception
