@@ -318,7 +318,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
             return false;
         }
         page.clickBuildLogLink();
-        return browser.isTextPresent("tail of build log");
+        return !browser.isTextPresent("log file does not exist");
     }
 
     public boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)
