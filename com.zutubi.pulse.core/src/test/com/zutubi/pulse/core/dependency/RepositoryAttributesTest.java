@@ -78,6 +78,8 @@ public class RepositoryAttributesTest extends PulseTestCase
 
         List<String> paths = attributes.getPaths(attributeEquals("name", "value2"));
         assertEquals(3, paths.size());
-        assertEquals(paths, asList("path1/child", "path2", "path2/child"));
+        assertTrue(paths.contains("path1/child"));
+        assertTrue(paths.contains("path2/child"));
+        assertTrue(paths.contains("path2"));
     }
 }
