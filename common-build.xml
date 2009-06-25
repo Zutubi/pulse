@@ -130,7 +130,8 @@
 
         <patternset id="release.excludes">
             <exclude name="**/LicenseEncoder*"/>
-        </patternset>        
+            <exclude name="**/LicenseCommandLineInterface*"/>
+        </patternset>
     </target>
 
     <target name="show" depends="init"/>

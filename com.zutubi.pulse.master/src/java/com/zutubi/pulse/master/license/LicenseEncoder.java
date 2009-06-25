@@ -13,7 +13,7 @@ import java.util.Date;
 
 public class LicenseEncoder implements LicenseKeyFactory
 {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
     /**
      * Base 64 encoded Private key
