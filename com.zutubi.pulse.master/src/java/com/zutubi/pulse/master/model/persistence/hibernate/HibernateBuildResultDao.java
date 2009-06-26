@@ -494,7 +494,10 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     public BuildResult findLatestSuccessfulByProject(Project project)
     {
         BuildResult result = (BuildResult) findFirstByNamedQuery("findLatestSuccessfulByProject", "project", project, false);
-        initialise(result);
+        if (result != null)
+        {
+            initialise(result);
+        }
         return result;
     }
 
