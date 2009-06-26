@@ -329,7 +329,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         browser.click(IDs.buildChangesTab());
         PersonalBuildChangesPage changesPage = browser.createPage(PersonalBuildChangesPage.class, buildNumber);
         changesPage.waitFor();
-        assertEquals(1L, Long.parseLong(changesPage.getCheckedOutRevision()));
+        assertEquals(17L, Long.parseLong(changesPage.getCheckedOutRevision()));
         assertEquals("build.xml", changesPage.getChangedFile(0));
 
         browser.click(IDs.buildTestsTab());
