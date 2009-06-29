@@ -16,6 +16,7 @@ public class NotifyConditionFactory
     // Primitive conditions
     public static final String CHANGED = "changed";
     public static final String CHANGED_BY_ME = "changed.by.me";
+    public static final String CHANGED_BY_ME_SINCE_SUCCESS = "changed.by.me.since.success";
     public static final String ERROR = "error";
     public static final String FAILURE = "failure";
     public static final String FALSE = "false";
@@ -39,6 +40,7 @@ public class NotifyConditionFactory
         // initialise the default notification types.
         typeMap.put(CHANGED, ChangedNotifyCondition.class);
         typeMap.put(CHANGED_BY_ME, ChangedByMeNotifyCondition.class);
+        typeMap.put(CHANGED_BY_ME_SINCE_SUCCESS, ChangedByMeSinceSuccessNotifyCondition.class);
         typeMap.put(ERROR, ErrorNotifyCondition.class);
         typeMap.put(FAILURE, FailureNotifyCondition.class);
         typeMap.put(FALSE, FalseNotifyCondition.class);

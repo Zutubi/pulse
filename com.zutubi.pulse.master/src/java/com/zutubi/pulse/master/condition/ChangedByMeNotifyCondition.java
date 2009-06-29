@@ -4,12 +4,12 @@ import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.util.CollectionUtils;
 
 import java.util.List;
 
 /**
- * 
- *
+ * A condition that is true if the build contains changes by the user.
  */
 public class ChangedByMeNotifyCondition implements NotifyCondition
 {
@@ -36,38 +36,11 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
             public void run()
             {
                 List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result);
-                for (PersistentChangelist changelist : changelists)
-                {
-                    if (byMe(changelist, user) && changelist.getChanges() != null && changelist.getChanges().size() > 0)
-                    {
-                        response[0] = true;
-                        return;
-                    }
-                }
-                response[0] = false;
+                response[0] = CollectionUtils.contains(changelists, new ByMePredicate(user));
             }
         });
 
         return response[0];
-    }
-
-    private boolean byMe(PersistentChangelist changelist, UserConfiguration user)
-    {
-        String author = changelist.getAuthor();
-        if(author.equals(user.getLogin()))
-        {
-            return true;
-        }
-
-        for(String alias: user.getPreferences().getAliases())
-        {
-            if(author.equals(alias))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void setBuildManager(BuildManager buildManager)

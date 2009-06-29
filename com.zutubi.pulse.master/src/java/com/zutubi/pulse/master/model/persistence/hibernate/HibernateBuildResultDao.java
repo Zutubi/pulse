@@ -92,6 +92,23 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public BuildResult findPreviousBuildResultWithRevision(final BuildResult result, final ResultState[] states)
+    {
+        return (BuildResult)getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = getBuildResultCriteria(session, result.getProject(), states, false);
+                criteria.add(Expression.lt("number", result.getNumber()));
+                criteria.add(Expression.eq("userRevision", false));
+                criteria.add(Expression.isNotNull("revisionString"));
+                criteria.setMaxResults(1);
+                criteria.addOrder(Order.desc("number"));
+                return criteria.uniqueResult();
+            }
+        });
+    }
+
     public List<BuildResult> findLatestCompleted(final Project project, final int first, final int max)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()

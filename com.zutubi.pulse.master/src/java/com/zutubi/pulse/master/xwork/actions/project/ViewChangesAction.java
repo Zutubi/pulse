@@ -55,35 +55,6 @@ public class ViewChangesAction extends BuildActionBase
         return changelists;
     }
 
-    private BuildResult getPrevious(ResultState[] states)
-    {
-        BuildResult result = getRequiredBuildResult();
-        if(result.getNumber() == 1)
-        {
-            return null;
-        }
-
-        int offset = 0;
-        while(true)
-        {
-            List<BuildResult> previousResults = buildManager.queryBuilds(result.getProject(), states, -1, result.getNumber() - 1, offset, 1, true, false);
-            if(previousResults.size() > 0)
-            {
-                BuildResult buildResult = previousResults.get(0);
-                if(!buildResult.isUserRevision() && buildResult.getRevision() != null)
-                {
-                    return buildResult;
-                }
-            }
-            else
-            {
-                return null;
-            }
-
-            offset++;
-        }
-    }
-
     public String execute()
     {
         BuildResult result = getRequiredBuildResult();
@@ -92,7 +63,7 @@ public class ViewChangesAction extends BuildActionBase
             return "personal";
         }
 
-        previous = getPrevious(ResultState.getCompletedStates());
+        previous = buildManager.getPreviousBuildResultWithRevision(result, ResultState.getCompletedStates());
         if(sinceBuild == 0)
         {
             sinceResult = previous;
@@ -131,8 +102,8 @@ public class ViewChangesAction extends BuildActionBase
         changelists.addAll(buildManager.getChangesForBuild(result));
         Collections.sort(changelists, new ChangelistComparator());
         
-        previousSuccessful = getPrevious(new ResultState[] { ResultState.SUCCESS });
-        previousUnsuccessful = getPrevious(ResultState.getBrokenStates());
+        previousSuccessful = buildManager.getPreviousBuildResultWithRevision(result, new ResultState[] { ResultState.SUCCESS });
+        previousUnsuccessful = buildManager.getPreviousBuildResultWithRevision(result, ResultState.getBrokenStates());
 
         return SUCCESS;
     }

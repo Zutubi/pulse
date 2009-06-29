@@ -23,11 +23,12 @@ public interface NotifyConditionTreeParserTokenTypes {
 	int LITERAL_error = 19;
 	int LITERAL_changed = 20;
 	// "changed.by.me" = 21
-	// "state.change" = 22
-	// "unsuccessful.count.builds" = 23
-	// "unsuccessful.count.days" = 24
-	int LEFT_PAREN = 25;
-	int RIGHT_PAREN = 26;
-	int WORD = 27;
-	int WHITESPACE = 28;
+	// "changed.by.me.since.success" = 22
+	// "state.change" = 23
+	// "unsuccessful.count.builds" = 24
+	// "unsuccessful.count.days" = 25
+	int LEFT_PAREN = 26;
+	int RIGHT_PAREN = 27;
+	int WORD = 28;
+	int WHITESPACE = 29;
 }
