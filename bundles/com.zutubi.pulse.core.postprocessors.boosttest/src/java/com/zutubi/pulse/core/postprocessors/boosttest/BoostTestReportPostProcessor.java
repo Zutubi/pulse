@@ -2,13 +2,12 @@ package com.zutubi.pulse.core.postprocessors.boosttest;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
 import com.zutubi.pulse.core.util.XMLUtils;
-import com.zutubi.util.StringUtils;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Post-processor for extracting test reports from Boost.Test XML test logs. To
@@ -25,10 +24,31 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
     private static final String ELEMENT_ERROR = "Error";
     private static final String ELEMENT_FATAL_ERROR = "FatalError";
     private static final String ELEMENT_EXCEPTION = "Exception";
+    private static final String ELEMENT_MESSAGE = "Message";
+    private static final String ELEMENT_INFO = "Info";
 
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_FILE = "file";
     private static final String ATTRIBUTE_LINE = "line";
+
+    private static final Map<String, TestStatus> ELEMENT_TO_STATUS = new HashMap<String, TestStatus>();
+    private static final Map<String, String> ELEMENT_TO_MESSAGE = new HashMap<String, String>();
+
+    static
+    {
+        ELEMENT_TO_STATUS.put(ELEMENT_ERROR, TestStatus.FAILURE);
+        ELEMENT_TO_STATUS.put(ELEMENT_FATAL_ERROR, TestStatus.FAILURE);
+        ELEMENT_TO_STATUS.put(ELEMENT_EXCEPTION, TestStatus.ERROR);
+
+        ELEMENT_TO_MESSAGE.put(ELEMENT_ERROR, "error");
+        ELEMENT_TO_MESSAGE.put(ELEMENT_FATAL_ERROR, "fatal error");
+        ELEMENT_TO_MESSAGE.put(ELEMENT_EXCEPTION, "uncaught exception");
+        ELEMENT_TO_MESSAGE.put(ELEMENT_MESSAGE, "message");
+        ELEMENT_TO_MESSAGE.put(ELEMENT_INFO, "info");
+    }
+
+    private boolean processMessages = false;
+    private boolean processInfo = false;
 
     public BoostTestReportPostProcessor()
     {
@@ -57,8 +77,25 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
             TestSuiteResult suiteResult = new TestSuiteResult(name);
             processSuites(element, suiteResult);
             processCases(element, suiteResult);
+            suiteResult.setDuration(getTotalDuration(suiteResult));
             parentSuite.addSuite(suiteResult);
         }
+    }
+
+    private long getTotalDuration(TestSuiteResult suiteResult)
+    {
+        long totalDuration = 0;
+        for (TestSuiteResult childSuite: suiteResult.getSuites())
+        {
+            totalDuration += childSuite.getDuration();
+        }
+
+        for (TestCaseResult childCase: suiteResult.getCases())
+        {
+            totalDuration += childCase.getDuration();
+        }
+
+        return totalDuration;
     }
 
     private void processCases(Element containingElement, TestSuiteResult parentSuite)
@@ -76,79 +113,65 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
         if (name != null)
         {
             long duration = getDuration(element);
-            TestStatus status;
-            String message = null;
+            StringBuilder builder = new StringBuilder();
+            TestStatus status = processMessages(element, builder);
+            parentSuite.addCase(new TestCaseResult(name, duration, status, builder.length() > 0 ? builder.toString() : null));
+        }
 
-            String exception = getException(element);
-            if (exception == null)
+    }
+
+    private TestStatus processMessages(Element element, StringBuilder builder)
+    {
+        TestStatus status = TestStatus.PASS;
+        Elements children = element.getChildElements();
+        for (int i = 0; i < children.size(); i++)
+        {
+            Element child = children.get(i);
+            String name = child.getLocalName();
+
+            TestStatus brokenStatus = ELEMENT_TO_STATUS.get(name);
+            if (brokenStatus == null)
             {
-                List<String> errors = getErrors(element);
-                if (errors.isEmpty())
+                if (processMessages && name.equals(ELEMENT_MESSAGE) || processInfo && name.equals(ELEMENT_INFO))
                 {
-                    status = TestStatus.PASS;
-                }
-                else
-                {
-                    status = TestStatus.FAILURE;
-                    message = StringUtils.join("\n", errors);
+                    appendMessage(child, builder);
                 }
             }
             else
             {
-                status = TestStatus.ERROR;
-                message = "uncaught exception: " + exception;
-            }
+                if (brokenStatus.compareTo(status) > 0)
+                {
+                    status = brokenStatus;
+                }
 
-            parentSuite.addCase(new TestCaseResult(name, duration, status, message));
-        }
-
-    }
-
-    private String getException(Element element)
-    {
-        Element exceptionElement = element.getFirstChildElement(ELEMENT_EXCEPTION);
-        if (exceptionElement != null)
-        {
-            return XMLUtils.getText(exceptionElement);
-        }
-        
-        return null;
-    }
-
-    private List<String> getErrors(Element element)
-    {
-        List<String> errors = new LinkedList<String>();
-        Elements childElements = element.getChildElements();
-        for (int i = 0; i < childElements.size(); i++)
-        {
-            Element child = childElements.get(i);
-            String name = child.getLocalName();
-            if (name.equals(ELEMENT_ERROR) || name.equals(ELEMENT_FATAL_ERROR))
-            {
-                errors.add(getError(child));
+                appendMessage(child, builder);
             }
         }
 
-        return errors;
+        return status;
     }
 
-    private String getError(Element element)
+    private void appendMessage(Element element, StringBuilder builder)
     {
-        String error = element.getLocalName().replace('_', ' ').toLowerCase();
+        String message = ELEMENT_TO_MESSAGE.get(element.getLocalName());
         String file = element.getAttributeValue(ATTRIBUTE_FILE);
         if (file != null)
         {
-            error += ": " + file;
+            message += ": " + file;
 
             String line = element.getAttributeValue(ATTRIBUTE_LINE);
             if (line != null)
             {
-                error += ":" + line;
+                message += ":" + line;
             }
         }
         
-        error += ": " + XMLUtils.getText(element, "");
-        return error;
+        message += ": " + XMLUtils.getText(element, "");
+        if (builder.length() > 0)
+        {
+            builder.append("\n");
+        }
+        builder.append(message);
     }
 
     private long getDuration(Element element)
@@ -157,7 +180,7 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
                                                     Long.toString(TestResult.DURATION_UNKNOWN));
         try
         {
-            return (long) (Double.parseDouble(durationText) * 1000);
+            return (long) (Double.parseDouble(durationText) / 1000);
         }
         catch (NumberFormatException e)
         {
@@ -165,5 +188,15 @@ public class BoostTestReportPostProcessor extends XMLTestReportPostProcessorSupp
         }
 
         return TestResult.DURATION_UNKNOWN;
+    }
+
+    public void setProcessMessages(boolean processMessages)
+    {
+        this.processMessages = processMessages;
+    }
+
+    public void setProcessInfo(boolean processInfo)
+    {
+        this.processInfo = processInfo;
     }
 }

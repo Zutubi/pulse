@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestLog>
+    <TestSuite name="Outer">
+        <TestSuite name="Nested1">
+            <TestCase name="nested1Case1">
+                <TestingTime>203000</TestingTime>
+            </TestCase>
+            <TestCase name="nested1Case2">
+                <TestingTime>1000</TestingTime>
+            </TestCase>
+        </TestSuite>
+        <TestSuite name="Nested2">
+            <TestCase name="nested2Case1">
+                <TestingTime>2000</TestingTime>
+            </TestCase>
+        </TestSuite>
+        <TestCase name="directCase1">
+            <TestingTime>3000</TestingTime>
+        </TestCase>
+        <TestCase name="directCase2">
+            <TestingTime>50000</TestingTime>
+        </TestCase>
+    </TestSuite>
+</TestLog>

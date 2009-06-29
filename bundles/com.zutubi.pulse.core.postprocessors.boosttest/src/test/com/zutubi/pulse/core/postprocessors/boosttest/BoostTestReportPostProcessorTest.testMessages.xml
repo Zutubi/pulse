@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestLog>
+    <TestSuite name="suite">
+        <TestCase name="pass">
+            <Info file="suites.cpp" line="27">check e == m * c * c passed</Info>
+            <TestingTime>0</TestingTime>
+        </TestCase>
+        <TestCase name="message">
+            <Message file="suites.cpp" line="32">This is a message</Message>
+            <TestingTime>0</TestingTime>
+        </TestCase>
+        <TestCase name="passpassfail">
+            <Info file="suites.cpp" line="37">check 1 == 1 passed</Info>
+            <Info file="suites.cpp" line="39">check 2 == 2 passed</Info>
+            <Error file="suites.cpp" line="40">check 1 == 2 failed</Error>
+            <TestingTime>0</TestingTime>
+        </TestCase>
+    </TestSuite>
+</TestLog>
