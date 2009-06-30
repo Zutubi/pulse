@@ -38,6 +38,7 @@ public class PerforceConstants
     public static final String COMMAND_SET = "set";
     public static final String COMMAND_SUBMIT = "submit";
     public static final String COMMAND_SYNC = "sync";
+    public static final String COMMAND_USER = "user";
     public static final String FLAG_AFFECTED_CHANGELIST = "-e";
     public static final String FLAG_AUTO_MERGE = "-am";
     public static final String FLAG_CHANGELIST = "-c";
@@ -95,6 +96,8 @@ public class PerforceConstants
     // Output of p4 changes -s submitted -m 1:
     //   Change <number> on <date> by <user>@<client>
     public static final Pattern PATTERN_CHANGES = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.*)'$", Pattern.MULTILINE);
+    // User emails are part of a user spec.
+    public static final Pattern PATTERN_EMAIL = Pattern.compile("Email:\\s*([^\\s]+@[^\\s]+)", Pattern.MULTILINE);
 
     public static final String[] EXECUTABLE_TYPES = {
             "xtext",

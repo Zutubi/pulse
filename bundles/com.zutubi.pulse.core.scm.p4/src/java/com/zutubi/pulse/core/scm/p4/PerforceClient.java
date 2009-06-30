@@ -334,7 +334,7 @@ public class PerforceClient extends CachingScmClient
 
     public Set<ScmCapability> getCapabilities(ScmContext context)
     {
-        return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
+        return EnumSet.allOf(ScmCapability.class);
     }
 
     public String getUid()
@@ -637,6 +637,28 @@ public class PerforceClient extends CachingScmClient
         catch (NumberFormatException e)
         {
             throw new ScmException("Invalid revision '" + revision.getRevisionString() + "': " + e.getMessage());
+        }
+    }
+
+    public String getEmailAddress(ScmContext context, String user) throws ScmException
+    {
+        try
+        {
+            PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_USER), COMMAND_USER, FLAG_OUTPUT, user);
+            Matcher matcher = PATTERN_EMAIL.matcher(p4Result.stdout);
+            if (matcher.find())
+            {
+                return matcher.group(1);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (ScmException e)
+        {
+            // User may not exist.
+            return null;
         }
     }
 

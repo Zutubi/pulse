@@ -7,9 +7,9 @@ import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.util.*;
+import static com.zutubi.util.FileSystemUtils.createFile;
 import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.IOUtils;
-import static com.zutubi.util.FileSystemUtils.createFile;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -105,7 +105,7 @@ public class CvsClient implements ScmClient
 
     public Set<ScmCapability> getCapabilities(ScmContext context)
     {
-        Set<ScmCapability> capabilities = EnumSet.allOf(ScmCapability.class);
+        Set<ScmCapability> capabilities = EnumSet.complementOf(EnumSet.of(ScmCapability.EMAIL));
         try
         {
             String version = (context != null) ? getContextVersion(context) : core.version();
@@ -352,6 +352,11 @@ public class CvsClient implements ScmClient
             // just in case.
             return null;
         }
+    }
+
+    public String getEmailAddress(ScmContext context, String user) throws ScmException
+    {
+        throw new ScmException("Operation not supported");
     }
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException

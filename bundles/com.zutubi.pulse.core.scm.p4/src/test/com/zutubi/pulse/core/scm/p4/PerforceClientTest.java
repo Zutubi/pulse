@@ -537,6 +537,12 @@ public class PerforceClientTest extends PerforceTestBase
         assertTrue(client.getRevisions(null, new Revision(7), null).size() > 0);
     }
 
+    public void testGetEmail() throws ScmException
+    {
+        getServer(TEST_WORKSPACE);
+        assertEquals("jsankey@bob", client.getEmailAddress(null, "jsankey"));
+    }
+
     private PerforceCore getClient()
     {
         PerforceCore core = new PerforceCore();

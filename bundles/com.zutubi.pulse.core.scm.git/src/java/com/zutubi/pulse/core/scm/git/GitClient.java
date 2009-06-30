@@ -567,6 +567,11 @@ public class GitClient implements ScmClient
         return null;
     }
 
+    public String getEmailAddress(ScmContext context, String user) throws ScmException
+    {
+        throw new ScmException("Operation not supported");
+    }
+
     public void setRepository(String repository)
     {
         this.repository = repository;

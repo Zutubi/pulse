@@ -53,5 +53,11 @@ public enum ScmCapability
      * a local scm directory.  This is used by the personal build process to determine which files have
      * been changed and therefore need to be added to the patch sent to the pulse server for building
      */
-    PATCH
+    PATCH,
+
+    /**
+     * Indicates that the SCM can map from SCM use names in changes to email addresses.  A few SCMs
+     * have user accounts which contain this information, which may be reused by Pulse on occasion.
+     */
+    EMAIL
 }

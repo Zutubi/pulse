@@ -18,7 +18,7 @@ public class SeleniumUtils
 {
     public static final int DEFAULT_TIMEOUT = 30000;
 
-    private static File captureFailure(Selenium selenium)
+    public static File captureFailure(Selenium selenium)
     {
         int i = 1;
         File failureFile;

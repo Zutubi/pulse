@@ -60,6 +60,8 @@
                 <ref local="gitTrackSelectedBranch"/>
                 <ref local="autoClearResponsibility"/>
                 <ref local="globalReports"/>
+                <ref local="emailCommittersSinceSuccess"/>
+                <ref local="emailCommittersMappings"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -225,5 +227,13 @@
 
     <bean id="globalReports" class="com.zutubi.pulse.master.upgrade.tasks.GlobalReportsUpgradeTask">
         <property name="buildNumber" value="200031001"/>
+    </bean>
+
+    <bean id="emailCommittersSinceSuccess" class="com.zutubi.pulse.master.upgrade.tasks.EmailCommittersSinceSuccessUpgradeTask">
+        <property name="buildNumber" value="200032001"/>
+    </bean>
+
+    <bean id="emailCommittersMappings" class="com.zutubi.pulse.master.upgrade.tasks.EmailCommittersMappingsUpgradeTask">
+        <property name="buildNumber" value="200032002"/>
     </bean>
 </beans>
