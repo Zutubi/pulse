@@ -14,7 +14,6 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.Condition;
 import com.zutubi.util.ExceptionWrappingRunnable;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
@@ -153,13 +152,8 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void waitForStatus(final String message)
     {
-        SeleniumUtils.refreshUntil(selenium, STATUS_TIMEOUT, new Condition()
-        {
-            public boolean satisfied()
-            {
-                return selenium.isElementPresent(IDs.STATUS_MESSAGE) && selenium.getText(IDs.STATUS_MESSAGE).contains(message);
-            }
-        }, "status to appear containing text '" + message + "'");
+        SeleniumUtils.waitForElementId(selenium, IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
+        SeleniumUtils.assertText(selenium, IDs.STATUS_MESSAGE, message);
     }
 
     protected String addProject(String name, boolean useAPI)
