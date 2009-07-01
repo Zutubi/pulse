@@ -9,11 +9,13 @@ import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.Condition;
 import com.zutubi.util.ExceptionWrappingRunnable;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
@@ -153,7 +155,13 @@ public class SeleniumTestBase extends PulseTestCase
     protected void waitForStatus(final String message)
     {
         SeleniumUtils.waitForElementId(selenium, IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
-        SeleniumUtils.assertText(selenium, IDs.STATUS_MESSAGE, message);
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return selenium.getText(IDs.STATUS_MESSAGE).equals(message);
+            }
+        }, STATUS_TIMEOUT, "status to contain '" + message + "'");
     }
 
     protected String addProject(String name, boolean useAPI)

@@ -82,6 +82,25 @@ public class NativeGit
         run(handler, getGitCommand(), COMMAND_PULL);
     }
 
+    public void fetch(ScmFeedbackHandler handler) throws GitException
+    {
+        run(handler, getGitCommand(), COMMAND_FETCH);
+    }
+
+    public String revisionParse(String revision) throws GitException
+    {
+        OutputCapturingHandler capturingHandler = new OutputCapturingHandler();
+        runWithHandler(capturingHandler, null, getGitCommand(), COMMAND_REVISION_PARSE, revision);
+        return capturingHandler.getSingleOutputLine();
+    }
+
+    public String mergeBase(String commit1, String commit2) throws GitException
+    {
+        OutputCapturingHandler capturingHandler = new OutputCapturingHandler();
+        runWithHandler(capturingHandler, null, getGitCommand(), COMMAND_MERGE_BASE, commit1, commit2);
+        return capturingHandler.getSingleOutputLine();
+    }
+
     public InputStream show(String file) throws GitException
     {
         return show(REVISION_HEAD, file);
@@ -430,6 +449,63 @@ public class NativeGit
                     throw new GitOperationCancelledException(e);
                 }
             }
+        }
+    }
+
+    /**
+     * A simple output handler that just captures stdout and stderr line by line.
+     */
+    static class OutputCapturingHandler implements OutputHandler
+    {
+        private List<String> outputLines = new LinkedList<String>();
+        private List<String> errorLines = new LinkedList<String>();
+
+        public String getSingleOutputLine() throws GitException
+        {
+            if (outputLines.size() != 1)
+            {
+                throw new GitException("Expecting single line of output got: " + outputLines);
+            }
+
+            String line = outputLines.get(0).trim();
+            if (line.length() == 0)
+            {
+                throw new GitException("Expected non-trivial output");
+            }
+
+            return line;
+        }
+
+        public List<String> getOutputLines()
+        {
+            return outputLines;
+        }
+
+        public List<String> getErrorLines()
+        {
+            return errorLines;
+        }
+
+        public void handleCommandLine(String line)
+        {
+        }
+
+        public void handleStdout(String line)
+        {
+            outputLines.add(line);
+        }
+
+        public void handleStderr(String line)
+        {
+            errorLines.add(line);
+        }
+
+        public void handleExitCode(int code) throws GitException
+        {
+        }
+
+        public void checkCancelled() throws GitOperationCancelledException
+        {
         }
     }
 

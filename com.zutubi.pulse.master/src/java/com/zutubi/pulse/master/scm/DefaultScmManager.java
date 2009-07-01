@@ -312,6 +312,11 @@ public class DefaultScmManager implements ScmManager, Stoppable
         {
             eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Error polling SCM: " + e.getMessage()));
             LOG.debug(e);
+
+            if (e.isReinitialiseRequired())
+            {
+                projectManager.makeStateTransition(projectConfig.getProjectId(), Project.Transition.INITIALISE);
+            }
         }
         finally
         {
