@@ -15,4 +15,14 @@ public interface ScmManager extends ScmContextFactory, ScmClientFactory<ScmConfi
      * ready, implements the pollable interface, and has monitoring enabled.
      */
     void pollActiveScms();
+
+    /**
+     * Clears any cached information for the project with the given id.  This
+     * should be called whenever the SCM details for a project change
+     * significantly.  Note that a context lock for the given project must be
+     * held when calling this method.
+     *
+     * @param projectId the project to clear the cache for
+     */
+    void clearCache(long projectId);
 }

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.project;
 
 import com.zutubi.events.EventManager;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.project.events.*;
@@ -11,11 +12,10 @@ import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.i18n.Messages;
 
 import java.io.File;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A background service to run project initialisation, as this may take some
@@ -206,6 +206,7 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                     scmContext.lock();
                     try
                     {
+                        scmManager.clearCache(projectConfiguration.getProjectId());
                         scmClient.destroy(scmContext, new ScmFeedbackAdapter());
                     }
                     finally
