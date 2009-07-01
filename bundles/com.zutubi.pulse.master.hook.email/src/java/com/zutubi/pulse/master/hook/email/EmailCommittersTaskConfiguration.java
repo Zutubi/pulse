@@ -4,9 +4,11 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.config.api.CommitterMappingConfiguration;
 import com.zutubi.pulse.master.ResultNotifier;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -58,7 +60,6 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
     private boolean sinceLastSuccess = false;
     private boolean ignorePulseUsers = false;
     private boolean useScmEmails = false;
-    private List<CommitterMappingConfiguration> committerMappings = new LinkedList<CommitterMappingConfiguration>();
 
     private BuildResultRenderer buildResultRenderer;
     private ConfigurationProvider configurationProvider;
@@ -114,16 +115,6 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
     public void setIgnorePulseUsers(boolean ignorePulseUsers)
     {
         this.ignorePulseUsers = ignorePulseUsers;
-    }
-
-    public List<CommitterMappingConfiguration> getCommitterMappings()
-    {
-        return committerMappings;
-    }
-
-    public void setCommitterMappings(List<CommitterMappingConfiguration> committerMappings)
-    {
-        this.committerMappings = committerMappings;
     }
 
     public void execute(ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode) throws Exception
@@ -191,7 +182,8 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
 
     private String getEmail(final String scmLogin)
     {
-        CommitterMappingConfiguration mapping = CollectionUtils.find(committerMappings, new Predicate<CommitterMappingConfiguration>()
+        ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
+        CommitterMappingConfiguration mapping = CollectionUtils.find(projectConfig.getScm().getCommitterMappings(), new Predicate<CommitterMappingConfiguration>()
         {
             public boolean satisfied(CommitterMappingConfiguration committerMappingConfiguration)
             {
@@ -206,12 +198,18 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
             {
                 try
                 {
-                    ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
                     email = ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<String>()
                     {
                         public String process(ScmClient client, ScmContext context) throws ScmException
                         {
-                            return client.getEmailAddress(context, scmLogin);
+                            if (client.getCapabilities(context).contains(ScmCapability.EMAIL))
+                            {
+                                return client.getEmailAddress(context, scmLogin);
+                            }
+                            else
+                            {
+                                return null;
+                            }
                         }
                     });
                 }

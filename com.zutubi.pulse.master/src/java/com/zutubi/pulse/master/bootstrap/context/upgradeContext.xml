@@ -61,7 +61,7 @@
                 <ref local="autoClearResponsibility"/>
                 <ref local="globalReports"/>
                 <ref local="emailCommittersSinceSuccess"/>
-                <ref local="emailCommittersMappings"/>
+                <ref local="scmCommitterMappings"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -233,7 +233,7 @@
         <property name="buildNumber" value="200032001"/>
     </bean>
 
-    <bean id="emailCommittersMappings" class="com.zutubi.pulse.master.upgrade.tasks.EmailCommittersMappingsUpgradeTask">
+    <bean id="scmCommitterMappings" class="com.zutubi.pulse.master.upgrade.tasks.ScmCommitterMappingsUpgradeTask">
         <property name="buildNumber" value="200032002"/>
     </bean>
 </beans>

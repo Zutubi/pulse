@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.hook.email;
+package com.zutubi.pulse.core.scm.config.api;
 
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;

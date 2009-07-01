@@ -12,15 +12,12 @@ import java.util.Map;
 /**
  * Adds the new committer mappings collection to email committers hook tasks.
  */
-public class EmailCommittersMappingsUpgradeTask extends AbstractUpgradeTask
+public class ScmCommitterMappingsUpgradeTask extends AbstractUpgradeTask
 {
     private static final String SCOPE_PROJECTS = "projects";
-    private static final String PROPERTY_HOOKS = "buildHooks";
-    private static final String PROPERTY_TASK = "task";
+    private static final String PROPERTY_SCM = "scm";
 
     private static final String PROPERTY_MAPPINGS = "committerMappings";
-
-    private static final String TYPE_EMAIL_COMMITTERS = "zutubi.emailCommittersTaskConfig";
 
     private RecordManager recordManager;
 
@@ -31,13 +28,10 @@ public class EmailCommittersMappingsUpgradeTask extends AbstractUpgradeTask
 
     public void execute() throws TaskException
     {
-        Map<String,Record> taskRecords = recordManager.selectAll(getPath(SCOPE_PROJECTS, WILDCARD_ANY_ELEMENT, PROPERTY_HOOKS, WILDCARD_ANY_ELEMENT, PROPERTY_TASK));
-        for (Map.Entry<String, Record> pathRecord: taskRecords.entrySet())
+        Map<String,Record> scmRecords = recordManager.selectAll(getPath(SCOPE_PROJECTS, WILDCARD_ANY_ELEMENT, PROPERTY_SCM));
+        for (Map.Entry<String, Record> pathRecord: scmRecords.entrySet())
         {
-            if (pathRecord.getValue().getSymbolicName().equals(TYPE_EMAIL_COMMITTERS))
-            {
-                recordManager.insert(getPath(pathRecord.getKey(), PROPERTY_MAPPINGS), new MutableRecordImpl());
-            }
+            recordManager.insert(getPath(pathRecord.getKey(), PROPERTY_MAPPINGS), new MutableRecordImpl());
         }
     }
 

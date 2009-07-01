@@ -5,6 +5,9 @@ import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Base for SCM configuration types.  All SCM plugins must support at least
  * this configuration.
@@ -14,6 +17,7 @@ public abstract class ScmConfiguration extends AbstractConfiguration
 {
     @Required
     private CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
+    private List<CommitterMappingConfiguration> committerMappings = new LinkedList<CommitterMappingConfiguration>();
 
     public CheckoutScheme getCheckoutScheme()
     {
@@ -23,6 +27,16 @@ public abstract class ScmConfiguration extends AbstractConfiguration
     public void setCheckoutScheme(CheckoutScheme checkoutScheme)
     {
         this.checkoutScheme = checkoutScheme;
+    }
+
+    public List<CommitterMappingConfiguration> getCommitterMappings()
+    {
+        return committerMappings;
+    }
+
+    public void setCommitterMappings(List<CommitterMappingConfiguration> committerMappings)
+    {
+        this.committerMappings = committerMappings;
     }
 
     /**
