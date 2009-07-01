@@ -81,7 +81,7 @@
     </div>
 
     <h3 class="heading">#wwtext("name=stage.tail.box") #if($logExists) &nbsp;<a href="$urls.stageLogs($buildResult, $recipeResultNode)raw/true/"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a> #end </h3>
-    <div class="box">
+    <div id="stage-log-${project.name}-${buildResult.number}-${recipeResultNode.stageName}" class="box">
         <div id="panel">
             #parse("ajax/tail-log-panel.vm")
         </div>

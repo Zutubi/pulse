@@ -42,18 +42,36 @@ public class BuildDetailedViewPage extends SeleniumPage
      */
     public boolean isBuildLogLinkPresent()
     {
-        return browser.isLinkPresent(getLogLinkId());
+        return browser.isLinkPresent(getBuildLogLinkId());
     }
 
-    public void clickBuildLogLink()
+    public BuildLogPage clickBuildLogLink()
     {
-        browser.click("id=" + getLogLinkId());
+        browser.click("id=" + getBuildLogLinkId());
         browser.waitForPageToLoad();
+        return browser.createPage(BuildLogPage.class, projectName, buildId);
     }
 
-    private String getLogLinkId()
+    private String getBuildLogLinkId()
     {
         return "log-" + projectName + "-" + buildId;
+    }
+
+    public boolean isStageLogLinkPresent(String stageName)
+    {
+        return browser.isLinkPresent(getStageLogLinkId(stageName));
+    }
+
+    public StageLogPage clickStageLogLink(String stageName)
+    {
+        browser.click("id=" + getStageLogLinkId(stageName));
+        browser.waitForPageToLoad();
+        return browser.createPage(StageLogPage.class, projectName, buildId, stageName);
+    }
+
+    private String getStageLogLinkId(String stageName)
+    {
+        return "log-" + projectName + "-" + buildId + "-" + stageName;
     }
 
     public String getCustomFieldsId(String stageName)

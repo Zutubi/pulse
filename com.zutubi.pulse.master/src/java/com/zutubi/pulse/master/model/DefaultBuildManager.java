@@ -668,12 +668,12 @@ public class DefaultBuildManager implements BuildManager
      * @param nodes     list of nodes to be traversed.
      * @param cleanup   the cleanup process to be applied to each recipe result.
      */
-    private void runCleanupForRecipies(List<RecipeResultNode> nodes, RecipeCleanup cleanup)
+    private void runCleanupForRecipes(List<RecipeResultNode> nodes, RecipeCleanup cleanup)
     {
         for (RecipeResultNode node : nodes)
         {
             cleanup.cleanup(node.getResult());
-            runCleanupForRecipies(node.getChildren(), cleanup);
+            runCleanupForRecipes(node.getChildren(), cleanup);
         }
     }
 
@@ -686,7 +686,7 @@ public class DefaultBuildManager implements BuildManager
     private void cleanupWorkDirectories(final BuildResult build)
     {
         final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        runCleanupForRecipies(build.getRoot().getChildren(), new RecipeCleanup()
+        runCleanupForRecipes(build.getRoot().getChildren(), new RecipeCleanup()
         {
             public void cleanup(RecipeResult recipe)
             {
@@ -703,7 +703,7 @@ public class DefaultBuildManager implements BuildManager
     private void cleanupBuildArtifacts(final BuildResult build)
     {
         final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        runCleanupForRecipies(build.getRoot().getChildren(), new RecipeCleanup()
+        runCleanupForRecipes(build.getRoot().getChildren(), new RecipeCleanup()
         {
             public void cleanup(RecipeResult recipe)
             {
@@ -730,7 +730,7 @@ public class DefaultBuildManager implements BuildManager
         File buildDir = paths.getBuildDir(build);
         scheduleCleanup(new File(buildDir, BuildResult.BUILD_LOG));
 
-        runCleanupForRecipies(build.getRoot().getChildren(), new RecipeCleanup()
+        runCleanupForRecipes(build.getRoot().getChildren(), new RecipeCleanup()
         {
             public void cleanup(RecipeResult recipe)
             {

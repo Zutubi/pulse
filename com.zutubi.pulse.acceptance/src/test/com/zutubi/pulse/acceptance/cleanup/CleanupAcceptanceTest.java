@@ -32,6 +32,9 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
 
         utils = new CleanupTestUtils(xmlRpcHelper);
+
+        xmlRpcHelper.insertSimpleProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false);
+        utils.deleteCleanupRule(random, "default");
     }
 
     @Override
@@ -47,11 +50,9 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     public void testCleanupWorkingDirectories() throws Exception
     {
         final String projectName = random;
-        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         utils.setRetainWorkingCopy(projectName, true);
         utils.addCleanupRule(projectName, "working_directory", CleanupWhat.WORKING_COPY_SNAPSHOT);
-        utils.deleteCleanupRule(projectName, "default");
 
         xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
@@ -83,11 +84,9 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     public void testCleanupBuildArtifacts() throws Exception
     {
         final String projectName = random;
-        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         utils.setRetainWorkingCopy(projectName, true);
         utils.addCleanupRule(projectName, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
-        utils.deleteCleanupRule(projectName, "default");
 
         xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
@@ -118,7 +117,8 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         assertFalse(utils.hasBuildFeaturesDirectory(projectName, 1));
 
         assertTrue(isBuildPulseFilePresentViaUI(projectName, 1));
-        assertTrue(isBuildLogsPresentViaUI(projectName, 1));
+        assertBuildLogsPresentViaUI(projectName, 1);
+        assertStageLogsPresentViaUI(projectName, 1, "default");
         assertFalse(isBuildArtifactsPresentViaUI(projectName, 1));
 
         // the remote api returns artifacts based on what is in the database.
@@ -129,11 +129,8 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     public void testCleanupAll() throws Exception
     {
         final String projectName = random;
-        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
-        utils.setRetainWorkingCopy(projectName, true);
         utils.addCleanupRule(projectName, "everything");
-        utils.deleteCleanupRule(projectName, "default");
 
         xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
@@ -170,10 +167,8 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     public void testCleanupRepositoryArtifacts() throws Exception
     {
         final String projectName = random;
-        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         utils.addCleanupRule(projectName, "repository_artifacts", CleanupWhat.REPOSITORY_ARTIFACTS);
-        utils.deleteCleanupRule(projectName, "default");
 
         xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
@@ -196,10 +191,8 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     public void testCleanupRepositoryArtifactsAfterProjectRename() throws Exception
     {
         final String projectName = random;
-        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         utils.addCleanupRule(projectName, "repository_artifacts", CleanupWhat.REPOSITORY_ARTIFACTS);
-        utils.deleteCleanupRule(projectName, "default");
 
         xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
@@ -225,17 +218,15 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     public void testCleanupLogs() throws Exception
     {
         final String projectName = random;
-        xmlRpcHelper.insertSimpleProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
-        utils.setRetainWorkingCopy(projectName, true);
         utils.addCleanupRule(projectName, "logs", CleanupWhat.LOGS);
-        utils.deleteCleanupRule(projectName, "default");
 
         xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuildLog(projectName, 1));
-        assertTrue(isBuildLogsPresentViaUI(projectName, 1));
+        assertBuildLogsPresentViaUI(projectName, 1);
+        assertStageLogsPresentViaUI(projectName, 1, "default");
 
         xmlRpcHelper.runBuild(projectName);
         waitForCleanupToRunAsynchronously(new InvertedCondition()
@@ -247,11 +238,13 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         });
 
         assertTrue(isBuildPresentViaUI(projectName, 2));
-        assertTrue(isBuildLogsPresentViaUI(projectName, 2));
+        assertBuildLogsPresentViaUI(projectName, 2);
+        assertStageLogsPresentViaUI(projectName, 2, "default");
         assertTrue(utils.hasBuildLog(projectName, 2));
 
         assertTrue(isBuildPresentViaUI(projectName, 1));
-        assertFalse(isBuildLogsPresentViaUI(projectName, 1));
+        assertBuildLogsNotPresentViaUI(projectName, 1);
+        assertStageLogsNotPresentViaUI(projectName, 1, "default");
         assertFalse(utils.hasBuildLog(projectName, 1));
     }
 
@@ -306,19 +299,56 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         return canOpenPage(page);
     }
 
-    public boolean isBuildLogsPresentViaUI(String projectName, long buildNumber)
+    public void assertBuildLogsPresentViaUI(String projectName, long buildNumber)
+    {
+        BuildLogPage buildLog = openBuildLogsUI(projectName, buildNumber);
+        assertTrue(buildLog.isLogAvailable());
+    }
+
+    public void assertStageLogsPresentViaUI(String projectName, long buildNumber, String stageName)
+    {
+        StageLogPage stageLog = openStageLogsUI(projectName, buildNumber, stageName);
+        assertTrue(stageLog.isLogAvailable());
+    }
+
+    public void assertBuildLogsNotPresentViaUI(String projectName, long buildNumber)
+    {
+        BuildLogPage buildLog = openBuildLogsUI(projectName, buildNumber);
+        assertTrue(buildLog.isLogNotAvailable());
+    }
+
+    public void assertStageLogsNotPresentViaUI(String projectName, long buildNumber, String stageName)
+    {
+        StageLogPage stageLog = openStageLogsUI(projectName, buildNumber, stageName);
+        assertTrue(stageLog.isLogNotAvailable());
+    }
+
+    private BuildLogPage openBuildLogsUI(String projectName, long buildNumber)
     {
         BuildDetailedViewPage page = browser.createPage(BuildDetailedViewPage.class, projectName, buildNumber);
         if (!canOpenPage(page))
         {
-            return false;
+            fail("Failed to open detailed build page.");
         }
         if (!page.isBuildLogLinkPresent())
         {
-            return false;
+            fail("Failed to locate build log link.");
         }
-        page.clickBuildLogLink();
-        return !browser.isTextPresent("log file does not exist");
+        return page.clickBuildLogLink();
+    }
+
+    private StageLogPage openStageLogsUI(String projectName, long buildNumber, String stageName)
+    {
+        BuildDetailedViewPage page = browser.createPage(BuildDetailedViewPage.class, projectName, buildNumber);
+        if (!canOpenPage(page))
+        {
+            fail("Failed to open detailed build page.");
+        }
+        if (!page.isStageLogLinkPresent(stageName))
+        {
+            fail("Failed to locate stage log link.");
+        }
+        return page.clickStageLogLink(stageName);
     }
 
     public boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)

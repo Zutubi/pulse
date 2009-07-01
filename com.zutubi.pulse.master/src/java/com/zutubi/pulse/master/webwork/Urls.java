@@ -285,6 +285,11 @@ public class Urls
         return buildLogs(build) + getStageComponent(node);
     }
 
+    public String stageLogs(Object project, String number, Object stage)
+    {
+        return buildLog(project, number) + getStageComponent(stage);
+    }
+
     public String buildChanges(BuildResult build)
     {
         return build(build) + "changes/";
@@ -407,9 +412,17 @@ public class Urls
         return build(project, number) + "wc/";
     }
 
-    private String getStageComponent(RecipeResultNode node)
+    private String getStageComponent(Object stage)
     {
-        return uriComponentEncode(node.getStageName()) + "/";
+        if (stage instanceof RecipeResultNode)
+        {
+            return uriComponentEncode(((RecipeResultNode)stage).getStageName()) + "/";
+        }
+        else if (stage instanceof String)
+        {
+            return uriComponentEncode((String)stage) + "/";
+        }
+        return null;
     }
 
     public String server()
