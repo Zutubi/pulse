@@ -152,7 +152,9 @@ public class SeleniumUtils
         {
             public boolean satisfied()
             {
-                return text.equals(selenium.getText(StringUtils.toValidHtmlName(id)));
+                String safeId = StringUtils.toValidHtmlName(id);
+                waitForElementId(selenium, safeId);
+                return text.equals(selenium.getText(safeId));
             }
         }, "text '" + text + "' in element '" + id + "'");
     }
