@@ -14,7 +14,6 @@ public class ScmContextImpl implements ScmContext
 {
     private String projectName;
     private long projectHandle;
-    private long projectId;
     private File persistentWorkingDir;
     private ReentrantLock lock = new ReentrantLock();
 

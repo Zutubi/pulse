@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.scm;
 
 import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
-import com.zutubi.events.Event;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
@@ -52,7 +52,13 @@ public class DefaultScmManagerTest extends PulseTestCase
         scmClientFactory = mock(ScmClientFactory.class);
 
         ScmContextFactory scmContextFactory = mock(ScmContextFactory.class);
-        stub(scmContextFactory.createContext((ProjectConfiguration) anyObject())).toReturn(new ScmContextImpl());
+        stub(scmContextFactory.createContext((ProjectConfiguration) anyObject())).toAnswer(new Answer<Object>()
+        {
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                return new ScmContextImpl();
+            }
+        });
 
         ShutdownManager shutdownManager = mock(ShutdownManager.class);
         Scheduler scheduler = mock(Scheduler.class);
