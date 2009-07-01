@@ -261,6 +261,7 @@ public class BuildController implements EventListener
         ModuleDescriptorFactory f = new ModuleDescriptorFactory();
         DefaultModuleDescriptor descriptor = f.createDescriptor(project);
         descriptor.setStatus(buildResult.getStatus());
+        descriptor.addExtraInfo("buildNumber", String.valueOf(buildResult.getNumber()));
         return descriptor;
     }
 
@@ -971,7 +972,6 @@ public class BuildController implements EventListener
             ivy.resolve(descriptor);
 
             String buildNumber = Long.toString(buildResult.getNumber());
-            ivy.publishIvy(descriptor, buildNumber);
 
             // add projecthandle attribute to the repository.
             long projectHandle = buildContext.getLong(PROPERTY_PROJECT_HANDLE, 0);
@@ -984,12 +984,8 @@ public class BuildController implements EventListener
                 attributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
             }
 
-            // could possibly use the build result version here for 'magic' maven support..
             String version = buildContext.getString(PROPERTY_BUILD_VERSION);
-            if (!buildNumber.equals(version))
-            {
-                ivy.publishIvy(descriptor, version);
-            }
+            ivy.publishIvy(descriptor, version);
         }
         catch (Exception e)
         {
