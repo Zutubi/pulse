@@ -1,19 +1,20 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
+import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.getAttribute;
 import com.zutubi.pulse.core.dependency.ivy.DefaultIvyClientFactory;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
+import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.PublicationConfiguration;
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
@@ -406,7 +407,12 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
         // Resovle and deliver this projects full ivy.xml, then use it to retrieve the dependencies.
         ModuleDescriptor descriptor = createModuleDescriptor(project, null);
         ResolveReport resolveReport = core.resolve(descriptor);
-        assertFalse(resolveReport.hasError());
+        if (resolveReport.hasError())
+        {
+            @SuppressWarnings({"unchecked"})
+            List<String> problemMessages = resolveReport.getAllProblemMessages();
+            fail("Resolve failed:\n" + StringUtils.join("\n", problemMessages));
+        }
 
         // publish artifacts as they are generated.
         for (BuildStageConfiguration stage : project.getStages().values())
