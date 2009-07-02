@@ -551,7 +551,7 @@ public class DefaultBuildManager implements BuildManager
             }
         }
 
-        if (options.isCleanRepositoryArtifacts())
+        if (options.isCleanRepositoryArtifacts() && !build.isPersonal())
         {
             try
             {
