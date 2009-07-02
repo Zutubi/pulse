@@ -54,6 +54,7 @@ public class DefaultBuildManager implements BuildManager
 
     private IvyManager ivyManager;
     private MasterLocationProvider masterLocationProvider;
+    private RepositoryAttributes repositoryAttributes;
 
     public void init()
     {
@@ -601,8 +602,7 @@ public class DefaultBuildManager implements BuildManager
 
             // this mrid will only reference the latest path, so:
             // a) find all of the paths for our project.
-            RepositoryAttributes attributes = new RepositoryAttributes(repositoryRoot);
-            List<String> paths = attributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(build.getProject().getConfig().getHandle())));
+            List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(build.getProject().getConfig().getHandle())));
 
             // file the ivy file.
             String path = CollectionUtils.find(paths, new Predicate<String>()
@@ -645,6 +645,11 @@ public class DefaultBuildManager implements BuildManager
                 return name.startsWith(file.getName());
             }
         }));
+    }
+
+    public void setRepositoryAttributes(RepositoryAttributes repositoryAttributes)
+    {
+        this.repositoryAttributes = repositoryAttributes;
     }
 
     /**

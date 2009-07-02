@@ -1,14 +1,13 @@
 package com.zutubi.pulse.core.dependency;
 
-import com.zutubi.pulse.core.test.api.PulseTestCase;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
-import java.util.Map;
+import java.io.IOException;
 import java.util.List;
-import java.util.Arrays;
-import static java.util.Arrays.asList;
+import java.util.Map;
 
 public class RepositoryAttributesTest extends PulseTestCase
 {
@@ -21,7 +20,14 @@ public class RepositoryAttributesTest extends PulseTestCase
         super.setUp();
 
         tmp = FileSystemUtils.createTempDir();
-        attributes = new RepositoryAttributes(tmp);
+        attributes = newAttributes();
+    }
+
+    private RepositoryAttributes newAttributes() throws IOException
+    {
+        RepositoryAttributes attributes = new RepositoryAttributes(tmp);
+        attributes.init();
+        return attributes;
     }
 
     @Override
@@ -81,5 +87,27 @@ public class RepositoryAttributesTest extends PulseTestCase
         assertTrue(paths.contains("path1/child"));
         assertTrue(paths.contains("path2/child"));
         assertTrue(paths.contains("path2"));
+    }
+
+    public void testPersistentAdd() throws IOException
+    {
+        attributes.addAttribute("path1", "name", "value1");
+
+        assertTrue(new File(tmp, "path1/" + RepositoryAttributes.ATTRIBUTE_FILE_NAME).isFile());
+
+        attributes = newAttributes();
+        assertEquals("value1", attributes.getAttribute("path1", "name"));
+    }
+
+    public void testPersistentRemove() throws IOException
+    {
+        attributes.addAttribute("path1", "name1", "value1");
+        attributes.addAttribute("path1", "name2", "value2");
+
+        attributes = newAttributes();
+        assertTrue(attributes.removeAttribute("path1", "name1"));
+
+        attributes = newAttributes();
+        assertEquals(null, attributes.getAttribute("path1", "name1"));
     }
 }

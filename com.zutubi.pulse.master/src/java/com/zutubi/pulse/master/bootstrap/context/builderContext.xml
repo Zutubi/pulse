@@ -230,4 +230,13 @@
     <bean id="dependencyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init"/>
     <alias name="dependencyManager" alias="ivyManager"/>
 
+    <bean id="repositoryAttributes" class="com.zutubi.pulse.core.dependency.RepositoryAttributes" init-method="init">
+        <constructor-arg index="0">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName" value="configurationManager"/>
+                <property name="propertyPath" value="userPaths.repositoryRoot"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
 </beans>

@@ -106,6 +106,7 @@ public class BuildController implements EventListener
     private RecipeDispatchService recipeDispatchService;
 
     private IvyManager ivyManager;
+    private RepositoryAttributes repositoryAttributes;
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -978,10 +979,9 @@ public class BuildController implements EventListener
             if (projectHandle != 0)
             {
                 MasterUserPaths paths = configurationManager.getUserPaths();
-                RepositoryAttributes attributes = new RepositoryAttributes(paths.getRepositoryRoot());
 
                 String path = ivy.getIvyPath(descriptor.getModuleRevisionId(), buildNumber);
-                attributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
+                repositoryAttributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
             }
 
             String version = buildContext.getString(PROPERTY_BUILD_VERSION);
@@ -1119,6 +1119,11 @@ public class BuildController implements EventListener
     public void setIvyManager(IvyManager ivyManager)
     {
         this.ivyManager = ivyManager;
+    }
+
+    public void setRepositoryAttributes(RepositoryAttributes repositoryAttributes)
+    {
+        this.repositoryAttributes = repositoryAttributes;
     }
 
     private static interface BootstrapperCreator

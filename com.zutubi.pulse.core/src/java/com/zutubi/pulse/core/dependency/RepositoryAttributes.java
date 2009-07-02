@@ -3,11 +3,11 @@ package com.zutubi.pulse.core.dependency;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.CollectionUtils.asMap;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.io.DirectoryFileFilter;
 import com.zutubi.util.Predicate;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.FileFilter;
 import java.util.*;
 
 /**
@@ -16,9 +16,11 @@ import java.util.*;
  */
 public class RepositoryAttributes
 {
-    private static final String ATTRIBUTE_FILE_NAME = ".attribute";
+    protected static final String ATTRIBUTE_FILE_NAME = ".attribute";
 
     public static final String PROJECT_HANDLE = "projecthandle";
+
+    private final Map<String, Map<String, String>> cache = new HashMap<String, Map<String, String>>();
 
     /**
      * The base directory of the artifact repository.
@@ -28,6 +30,26 @@ public class RepositoryAttributes
     public RepositoryAttributes(File base)
     {
         this.base = base;
+    }
+
+    public void init() throws IOException
+    {
+        initCache("", base);
+    }
+
+    private void initCache(String path, File dir) throws IOException
+    {
+        // load attributes at this path.
+        readAttributes(path);
+
+        File[] childDirectories = dir.listFiles(DirectoryFileFilter.INSTANCE);
+        if (childDirectories != null)
+        {
+            for (File childDirectory : childDirectories)
+            {
+                initCache(PathUtils.getPath(path, childDirectory.getName()), childDirectory);
+            }
+        }
     }
 
     /**
@@ -64,19 +86,9 @@ public class RepositoryAttributes
     {
         try
         {
-            File attributeFile = getAttributeFile(path);
-            if (!attributeFile.getParentFile().exists() && !attributeFile.getParentFile().mkdirs())
-            {
-                throw new RepositoryAttributesException("Failed to create directory: " + attributeFile.getParentFile().getAbsolutePath());
-            }
-            if (!attributeFile.isFile() && !attributeFile.createNewFile())
-            {
-                throw new RepositoryAttributesException("Failed to create file: " + attributeFile.getAbsolutePath());
-            }
-
-            Map<String,String> attributes = readAttributeFile(attributeFile);
+            Map<String,String> attributes = readAttributes(path);
             attributes.put(attributeName, attributeValue);
-            writeAttributeFile(attributeFile, attributes);
+            writeAttributes(path, attributes);
         }
         catch (IOException e)
         {
@@ -95,12 +107,12 @@ public class RepositoryAttributes
     {
         try
         {
-            File attributeFile = getAttributeFile(path);
-            Map<String, String> attributes = readAttributeFile(attributeFile);
+            Map<String, String> attributes = readAttributes(path);
             if (attributes.containsKey(attributeName))
             {
                 attributes.remove(attributeName);
-                writeAttributeFile(attributeFile, attributes);
+
+                writeAttributes(path, attributes);
                 return true;
             }
             return false;
@@ -121,8 +133,7 @@ public class RepositoryAttributes
     {
         try
         {
-            File attributeFile = getAttributeFile(path);
-            Map<String, String> attributes = readAttributeFile(attributeFile);
+            Map<String, String> attributes = readAttributes(path);
             return attributes.get(attributeName);
         }
         catch (IOException e)
@@ -152,28 +163,18 @@ public class RepositoryAttributes
         }
     }
 
-    private void applyPredicate(String path, Predicate<Map<String, String>> predicate, List<String> result) throws IOException
+    private synchronized void applyPredicate(String path, Predicate<Map<String, String>> predicate, List<String> result) throws IOException
     {
-        File attributeFile = getAttributeFile(path);
-        Map<String, String> attributes = readAttributeFile(attributeFile);
-        if (predicate.satisfied(attributes))
+        for (String key : cache.keySet())
         {
-            result.add(path);
-        }
-        
-        File f = new File(base, path);
-
-        File[] directories = f.listFiles(new FileFilter()
-        {
-            public boolean accept(File file)
+            if (PathUtils.prefixPatternMatchesPath(path, key))
             {
-                return file.isDirectory();
+                Map<String, String> attributes = cache.get(key);
+                if (predicate.satisfied(attributes))
+                {
+                    result.add(key);
+                }
             }
-        });
-        for (File dir : directories)
-        {
-            String childPath = PathUtils.getPath(path, dir.getName());
-            applyPredicate(childPath, predicate, result);
         }
     }
 
@@ -185,9 +186,48 @@ public class RepositoryAttributes
         }
 
         Map<String, String> attributes = internalGetMergedAttributes(PathUtils.getParentPath(path));
-        File attributeFile = getAttributeFile(path);
-        attributes.putAll(readAttributeFile(attributeFile));
+
+        attributes.putAll(readAttributes(path));
+
         return attributes;
+    }
+
+    private synchronized Map<String, String> readAttributes(String path) throws IOException
+    {
+        if (!cache.containsKey(path))
+        {
+            File f = getAttributeFile(path);
+            if (f.isFile())
+            {
+                cache.put(path, asMap(IOUtils.read(f)));
+            }
+            else
+            {
+                cache.put(path, new HashMap<String, String>());
+            }
+        }
+        return cache.get(path);
+    }
+
+    private synchronized void writeAttributes(String path, Map<String, String> attributes) throws IOException
+    {
+        // update cache.
+        cache.put(path, attributes);
+
+        // update persistent file.
+        File attributeFile = getAttributeFile(path);
+        if (!attributeFile.getParentFile().exists() && !attributeFile.getParentFile().mkdirs())
+        {
+            throw new RepositoryAttributesException("Failed to create directory: " + attributeFile.getParentFile().getAbsolutePath());
+        }
+        if (!attributeFile.isFile() && !attributeFile.createNewFile())
+        {
+            throw new RepositoryAttributesException("Failed to create file: " + attributeFile.getAbsolutePath());
+        }
+
+        Properties props = new Properties();
+        props.putAll(attributes);
+        IOUtils.write(props, attributeFile);
     }
 
     private File getAttributeFile(String path)
@@ -202,21 +242,5 @@ public class RepositoryAttributes
         }
 
         return new File(base, path + ATTRIBUTE_FILE_NAME);
-    }
-
-    private synchronized Map<String, String> readAttributeFile(File f) throws IOException
-    {
-        if (f.isFile())
-        {
-            return asMap(IOUtils.read(f));
-        }
-        return new HashMap<String, String>();
-    }
-
-    private synchronized void writeAttributeFile(File f, Map<String, String> attributes) throws IOException
-    {
-        Properties props = new Properties();
-        props.putAll(attributes);
-        IOUtils.write(props, f);
     }
 }

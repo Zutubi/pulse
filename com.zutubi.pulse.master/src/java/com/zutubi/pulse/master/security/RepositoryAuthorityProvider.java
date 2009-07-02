@@ -1,15 +1,13 @@
 package com.zutubi.pulse.master.security;
 
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import static com.zutubi.pulse.master.bootstrap.WebManager.REPOSITORY_PATH;
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.tove.config.admin.RepositoryConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
@@ -21,8 +19,8 @@ import org.mortbay.http.HttpRequest;
 import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The repository authority provider determines the authorities that
@@ -193,16 +191,6 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
         this.repositoryAttributes = repositoryAttributes;
     }
 
-    public void setMasterUserPaths(MasterUserPaths paths)
-    {
-        setRepositoryAttributes(new RepositoryAttributes(paths.getRepositoryRoot()));
-    }
-
-    public void setMasterConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        setMasterUserPaths(configurationManager.getUserPaths());
-    }
-
     public void setEventManager(EventManager eventManager)
     {
         // The two providers are not available when the security system is initialised and so
@@ -213,6 +201,7 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
             {
                 setConfigurationProvider((ConfigurationProvider) SpringComponentContext.getBean("configurationProvider"));
                 setProjectConfigurationAuthorityProvider((ProjectConfigurationAuthorityProvider) SpringComponentContext.getBean("projectConfigurationAuthorityProvider"));
+                setRepositoryAttributes((RepositoryAttributes) SpringComponentContext.getBean("repositoryAttributes"));
             }
         });
     }
