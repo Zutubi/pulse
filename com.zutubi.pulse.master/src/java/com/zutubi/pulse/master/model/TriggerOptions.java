@@ -57,6 +57,11 @@ public class TriggerOptions
      */
     private boolean resolveVersion = true;
 
+    /**
+     * Indicates whether or not this is a dependent build.
+     */
+    private boolean dependent = false;
+
     public TriggerOptions(TriggerOptions other)
     {
         this.properties.addAll(other.properties);
@@ -156,5 +161,15 @@ public class TriggerOptions
     public void setResolveVersion(boolean resolveVersion)
     {
         this.resolveVersion = resolveVersion;
+    }
+
+    public boolean isDependent()
+    {
+        return dependent;
+    }
+
+    public void setDependent(boolean dependent)
+    {
+        this.dependent = dependent;
     }
 }

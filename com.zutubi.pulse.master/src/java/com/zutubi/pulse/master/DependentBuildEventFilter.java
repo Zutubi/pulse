@@ -65,6 +65,7 @@ public class DependentBuildEventFilter implements EventTriggerFilter
         if (propagateVersion)
         {
             context.put(BuildProjectTask.PARAM_VERSION, result.getVersion());
+            context.put(BuildProjectTask.PARAM_VERSION_PROPAGATED, true);
         }
 
         context.put(BuildProjectTask.PARAM_DEPENDENT, true);

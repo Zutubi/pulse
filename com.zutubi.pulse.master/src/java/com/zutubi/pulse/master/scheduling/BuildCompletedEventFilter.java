@@ -47,6 +47,7 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
             if (getBooleanParam(dataMap, PARAM_PROPAGATE_VERSION, false))
             {
                 context.put(BuildProjectTask.PARAM_VERSION, bce.getBuildResult().getVersion());
+                context.put(BuildProjectTask.PARAM_VERSION_PROPAGATED, true);
             }
             context.put(BuildProjectTask.PARAM_DEPENDENT, true);
         }

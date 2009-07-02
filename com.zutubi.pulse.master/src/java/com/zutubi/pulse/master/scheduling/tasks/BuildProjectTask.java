@@ -43,7 +43,11 @@ public class BuildProjectTask implements Task
      * The version to be used for the build.
      */
     public static final String PARAM_VERSION = "version";
-
+    /**
+     * Indicates if the associated version has been propagated from
+     * a previous build.
+     */
+    public static final String PARAM_VERSION_PROPAGATED = "version.propagated";
     /**
      * Indicates if this build project task is triggered as a result of
      * a dependency relationship by the completion of a dependent projects build.
@@ -66,6 +70,9 @@ public class BuildProjectTask implements Task
 
         Boolean dependentValue = (Boolean) context.get(PARAM_DEPENDENT);
         boolean dependent = dependentValue != null && dependentValue;
+
+        Boolean versionPropagatedValue = (Boolean) context.get(PARAM_VERSION_PROPAGATED);
+        boolean versionPropagated = versionPropagatedValue != null && versionPropagatedValue;
 
         String version = (String) context.get(PARAM_VERSION);
 
@@ -91,8 +98,9 @@ public class BuildProjectTask implements Task
             options.setForce(false);
             options.setProperties(properties);
             options.setStatus(status);
-            options.setResolveVersion(!dependent);
+            options.setResolveVersion(!versionPropagated);
             options.setVersion(version);
+            options.setDependent(dependent);
             projectManager.triggerBuild(project, options, revision);
         }
         else

@@ -63,10 +63,6 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(isBuildSuccessful(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, buildVersion);
-
-        // regardless of the build version being used, we should always have
-        // an ivy file for the build number.
-        assertTrue(isInArtifactRepository(ivyPath(projectName, buildNumber)));
     }
 
     public void testSpecifyVariableBuildVersion() throws Exception
@@ -77,10 +73,6 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(isBuildSuccessful(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, projectName + "-" + buildNumber);
-
-        // regardless of the build version being used, we should always have
-        // an ivy file for the build number.
-        assertTrue(isInArtifactRepository(ivyPath(projectName, buildNumber)));
     }
 
     public void testSpecifyVersionViaManualPrompt() throws Exception
