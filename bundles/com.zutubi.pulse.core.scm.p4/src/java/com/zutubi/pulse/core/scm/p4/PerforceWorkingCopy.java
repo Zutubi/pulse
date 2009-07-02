@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.diff.Patch;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.util.TextUtils;
@@ -20,6 +21,8 @@ import java.util.regex.Matcher;
  */
 public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
 {
+    private static final Messages I18N = Messages.getInstance(PerforceWorkingCopy.class);
+
     // Note that the preferred way to set these standard Perforce properties is
     // to just use regular p4 configuration (e.g. environment, P4CONFIG, etc).
     // They are supported by this implementation for completeness and testing.
@@ -61,7 +64,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
                     if(!value.equals(pieces[1]))
                     {
-                        context.getUI().warning("P4PORT setting '" + value + "' does not match Pulse project's P4PORT '" + pieces[1] + "'");
+                        context.getUI().warning(I18N.format("warning.p4.port", new Object[]{value, pieces[1]}));
                         return false;
                     }
                 }
@@ -187,7 +190,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
             ConfigSupport configSupport = new ConfigSupport(context.getConfig());
             if(configSupport.getBooleanProperty(PROPERTY_CONFIRM_RESOLVE, true))
             {
-                YesNoResponse response = ui.yesNoPrompt("Some files must be resolved.  Auto-resolve now?", true, false, YesNoResponse.YES);
+                YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.auto.resolve"), true, false, YesNoResponse.YES);
                 if(response.isPersistent())
                 {
                     configSupport.setBooleanProperty(PROPERTY_CONFIRM_RESOLVE, !response.isAffirmative());
@@ -199,7 +202,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
                 }
             }
 
-            ui.status("Running auto-resolve...");
+            ui.status(I18N.format("status.resolving"));
             ui.enterContext();
             try
             {
@@ -209,7 +212,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
             {
                 ui.exitContext();
             }
-            ui.status("Resolve complete.");
+            ui.status(I18N.format("status.resolved"));
         }
 
         return revision;

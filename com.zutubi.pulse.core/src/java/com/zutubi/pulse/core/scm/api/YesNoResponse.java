@@ -8,33 +8,11 @@ public enum YesNoResponse
     /**
      * An affirmative response.
      */
-    YES('Y', true, false, "Yes")
-    {
-        public boolean isAffirmative()
-        {
-            return true;
-        }
-
-        public boolean isPersistent()
-        {
-            return false;
-        }
-    },
+    YES('Y', true, false, "Yes"),
     /**
      * A negative response.
      */
-    NO('N', false, false, "No")
-    {
-        public boolean isAffirmative()
-        {
-            return false;
-        }
-
-        public boolean isPersistent()
-        {
-            return false;
-        }
-    },
+    NO('N', false, false, "No"),
     /**
      * A <strong>persistent</strong> positive response.  Implementations
      * that support the always response are responsible for saving the
@@ -42,18 +20,7 @@ public enum YesNoResponse
      *
      * @see com.zutubi.pulse.core.scm.api.WorkingCopyContext#getConfig
      */
-    ALWAYS('A', true, true, "Always")
-    {
-        public boolean isAffirmative()
-        {
-            return true;
-        }
-
-        public boolean isPersistent()
-        {
-            return true;
-        }
-    },
+    ALWAYS('A', true, true, "Always"),
     /**
      * A <strong>persistent</strong> negative response.  Implementations
      * that support the always response are responsible for saving the
@@ -61,18 +28,7 @@ public enum YesNoResponse
      *
      * @see com.zutubi.pulse.core.scm.api.WorkingCopyContext#getConfig
      */
-    NEVER('E', false, true, "nEver")
-    {
-        public boolean isAffirmative()
-        {
-            return false;
-        }
-
-        public boolean isPersistent()
-        {
-            return true;
-        }
-    };
+    NEVER('E', false, true, "nEver");
 
     private char keyChar;
     private boolean affirmative;

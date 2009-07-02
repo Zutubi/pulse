@@ -141,11 +141,11 @@ public class PersonalBuildClient
 
                     if (serverVersion.equals(ourVersion))
                     {
-                        question = String.format("Server build (%d) does not match tools build (%d).  Continue anyway?", serverBuild, ourBuild);
+                        question = I18N.format("prompt.build.mismatch", serverBuild, ourBuild);
                     }
                     else
                     {
-                        question = String.format("Server version (%s) does not match tools version (%s).  Continue anyway?", serverVersion, ourVersion);
+                        question = I18N.format("prompt.version.mismatch", new Object[]{serverVersion, ourVersion});
                     }
 
                     YesNoResponse response = ui.yesNoPrompt(question, true, false, YesNoResponse.NO);
@@ -173,7 +173,7 @@ public class PersonalBuildClient
     {
         if (config.getPulseUrl() == null)
         {
-            YesNoResponse response = ui.yesNoPrompt("No pulse server configured.  Configure one now?", false, false, YesNoResponse.YES);
+            YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.pulse.server"), false, false, YesNoResponse.YES);
             if (response.isAffirmative())
             {
                 new ConfigCommand().setupPulseConfig(ui, config);
@@ -186,7 +186,7 @@ public class PersonalBuildClient
 
         if (config.getProject() == null)
         {
-            YesNoResponse response = ui.yesNoPrompt("No pulse project configured.  Configure one now?", false, false, YesNoResponse.YES);
+            YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.pulse.project"), false, false, YesNoResponse.YES);
             if (response.isAffirmative())
             {
                 new ConfigCommand().setupLocalConfig(ui, config);
@@ -220,7 +220,7 @@ public class PersonalBuildClient
                 ui.debug("Checking working copy matches project SCM configuration");
                 if (!wc.matchesLocation(context, scmLocation.getLocation()))
                 {
-                    YesNoResponse response = ui.yesNoPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", true, false, YesNoResponse.NO);
+                    YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.wc.mismatch", new Object[]{ config.getProject() }), true, false, YesNoResponse.NO);
                     if (response.isPersistent())
                     {
                         config.setCheckRepository(!response.isAffirmative());
@@ -264,7 +264,7 @@ public class PersonalBuildClient
             options.add(makeRevisionOption(REVISION_OPTION_GOOD, false));
             options.add(makeRevisionOption(REVISION_OPTION_CUSTOM, false));
 
-            MenuChoice<String> choice = ui.menuPrompt(I18N.format("choose.revision.prompt"), options);
+            MenuChoice<String> choice = ui.menuPrompt(I18N.format("prompt.choose.revision"), options);
             chosenRevision = choice.getValue();
             if (choice.isPersistent())
             {
@@ -290,7 +290,7 @@ public class PersonalBuildClient
         }
         else if (chosenRevision.equals(REVISION_OPTION_CUSTOM))
         {
-            String custom = ui.inputPrompt(I18N.format("custom.revision.prompt")).trim();
+            String custom = ui.inputPrompt(I18N.format("prompt.custom.revision")).trim();
             if (custom.length() > 0)
             {
                 return new PersonalBuildRevision(new Revision(custom), true);
@@ -318,7 +318,7 @@ public class PersonalBuildClient
     private PersonalBuildRevision guessLocalRevision(WorkingCopy wc, WorkingCopyContext context) throws PersonalBuildException
     {
         Revision revision;
-        ui.status("Guessing revision of local working copy...");
+        ui.status(I18N.format("status.guessing.revision"));
         ui.enterContext();
         try
         {
@@ -333,14 +333,14 @@ public class PersonalBuildClient
             ui.exitContext();
         }
 
-        ui.status("Guessed revision '" + revision.getRevisionString() + "'.");
+        ui.status(I18N.format("status.guessed.revision", new Object[]{revision.getRevisionString()}));
         return new PersonalBuildRevision(revision, true);
     }
 
     private PersonalBuildRevision getLatestRemoteRevision(WorkingCopy wc, WorkingCopyContext context) throws PersonalBuildException
     {
         Revision revision;
-        ui.status("Getting latest remote revision...");
+        ui.status(I18N.format("status.getting.latest.revision"));
         try
         {
             revision = wc.getLatestRemoteRevision(context);
@@ -354,7 +354,7 @@ public class PersonalBuildClient
             ui.exitContext();
         }
 
-        ui.status("Latest remote revision is '" + revision + "'");
+        ui.status(I18N.format("status.got.latest.revision", new Object[]{revision.getRevisionString()}));
         return new PersonalBuildRevision(revision, true);
     }
 
@@ -363,7 +363,7 @@ public class PersonalBuildClient
         Boolean update = config.getUpdate();
         if (update == null)
         {
-            YesNoResponse response = ui.yesNoPrompt(I18N.format("update.prompt"), true, true, YesNoResponse.YES);
+            YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.update"), true, true, YesNoResponse.YES);
             if (response.isPersistent())
             {
                 config.setUpdate(response.isAffirmative());
@@ -376,12 +376,12 @@ public class PersonalBuildClient
         {
             try
             {
-                ui.status("Updating working copy...");
+                ui.status(I18N.format("status.updating"));
                 ui.enterContext();
                 try
                 {
                     wc.update(context, revision);
-                    ui.status("Update complete.");
+                    ui.status(I18N.format("status.updated"));
                 }
                 finally
                 {
@@ -400,7 +400,7 @@ public class PersonalBuildClient
         try
         {
             boolean created;
-            ui.status("Creating patch archive...");
+            ui.status(I18N.format("status.preparing.patch"));
             ui.enterContext();
 
             try
@@ -414,11 +414,11 @@ public class PersonalBuildClient
 
             if (created)
             {
-                ui.status("Patch created.");
+                ui.status(I18N.format("status.prepared.patch"));
             }
             else
             {
-                ui.status("No patch created.");
+                ui.status(I18N.format("status.no.patch"));
             }
 
             return created;

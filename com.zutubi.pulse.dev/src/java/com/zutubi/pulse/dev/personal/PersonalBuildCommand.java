@@ -1,5 +1,6 @@
 package com.zutubi.pulse.dev.personal;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
@@ -22,6 +23,8 @@ import java.util.Map;
 @SuppressWarnings({ "AccessStaticViaInstance" })
 public class PersonalBuildCommand implements Command
 {
+    private static final Messages I18N = Messages.getInstance(PersonalBuildCommand.class);
+
     public int execute(PersonalBuildClient client)
     {
         try
@@ -95,19 +98,12 @@ public class PersonalBuildCommand implements Command
 
     public String getHelp()
     {
-        return "request a personal build";
+        return I18N.format("command.help");
     }
 
     public String getDetailedHelp()
     {
-        return "Sends a personal build request to a pulse server.  This involves choosing\n" +
-               "the revision to build against, optionally updating to this revision,\n" +
-               "analysing any outstanding changes, forming a patch file and sending the patch\n" +
-               "to the pulse server to execute a build.\n\n" +
-               "Configuration is defined via properties files or command line arguments.  The\n" +
-               "configuration specifies connection details for the pulse server, along with\n" +
-               "information about the project you wish to execute.  The SCM configuration of\n" +
-               "the project must match the working copy.";
+        return I18N.format("command.detailed.help");
     }
 
     public List<String> getUsages()
@@ -123,20 +119,20 @@ public class PersonalBuildCommand implements Command
     public Map<String, String> getOptions()
     {
         Map<String, String> options = new LinkedHashMap<String, String>();
-        options.put("-r [--project] project", "set project to build");
-        options.put("-s [--server] url", "set pulse server url");
-        options.put("-u [--user] name", "set pulse user name");
-        options.put("-p [--password] password", "set pulse password");
-        options.put("-b [--base-dir] dir", "set base directory of working copy");
-        options.put("-f [--file] filename", "set patch file name");
-        options.put("-d [--define] name=value", "set named property to given value");
-        options.put("-q [--quiet]", "suppress unnecessary output");
-        options.put("-v [--verbose]", "show verbose output");
-        options.put("-e [--revision] rev", "build against the specified revision");
-        options.put("--no-send-request", "create patch but do not request build");
-        options.put("--send-request", "request a personal build (the default)");
-        options.put("--no-update", "do not update the working copy");
-        options.put("--update", "update the working copy to the build revision");
+        options.put("-r [--project] project", I18N.format("flag.project"));
+        options.put("-s [--server] url", I18N.format("flag.server"));
+        options.put("-u [--user] name", I18N.format("flag.user"));
+        options.put("-p [--password] password", I18N.format("flag.password"));
+        options.put("-b [--base-dir] dir", I18N.format("flag.base.dir"));
+        options.put("-f [--file] filename", I18N.format("flag.file"));
+        options.put("-d [--define] name=value", I18N.format("flag.define"));
+        options.put("-q [--quiet]", I18N.format("flag.quiet"));
+        options.put("-v [--verbose]", I18N.format("flag.verbose"));
+        options.put("-e [--revision] rev", I18N.format("flag.revision"));
+        options.put("--no-send-request", I18N.format("flag.no.request"));
+        options.put("--send-request", I18N.format("flag.request"));
+        options.put("--no-update", I18N.format("flag.no.update"));
+        options.put("--update", I18N.format("flag.update"));
         return options;
     }
 

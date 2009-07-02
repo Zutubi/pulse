@@ -1,5 +1,6 @@
 package com.zutubi.pulse.dev.personal;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
@@ -18,9 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A command which allows interactive setup of required configuration for the
+ * dev tools.
  */
 public class ConfigCommand implements Command
 {
+    private static final Messages I18N = Messages.getInstance(ConfigCommand.class);
+
     private boolean projectOnly = false;
 
     @SuppressWarnings({"AccessStaticViaInstance"})
@@ -54,7 +59,7 @@ public class ConfigCommand implements Command
         String pulseURL = getPulseURL(ui);
         String pulseUser = getPulseUser(ui);
 
-        ui.status("Storing Pulse server details in '" + config.getUserConfigFile().getAbsolutePath() + "'.");
+        ui.status(I18N.format("status.storing.server", new Object[]{config.getUserConfigFile().getAbsolutePath()}));
         config.setProperty(PersonalBuildConfig.PROPERTY_PULSE_URL, pulseURL);
         config.setProperty(PersonalBuildConfig.PROPERTY_PULSE_USER, pulseUser);
     }
@@ -66,7 +71,7 @@ public class ConfigCommand implements Command
 
         while (true)
         {
-            pulseURL = ui.inputPrompt("Pulse URL [e.g. http://pulse:8080]");
+            pulseURL = ui.inputPrompt(I18N.format("prompt.pulse.url"));
 
             PulseXmlRpcClient rpc;
             try
@@ -89,7 +94,7 @@ public class ConfigCommand implements Command
             catch (PulseXmlRpcException e)
             {
                 ui.error("Unable to contact pulse server: " + e, e);
-                response = ui.yesNoPrompt("Continue with this URL anyway?", false, false, YesNoResponse.NO);
+                response = ui.yesNoPrompt(I18N.format("prompt.url.continue"), false, false, YesNoResponse.NO);
                 if (response.isAffirmative())
                 {
                     break;
@@ -105,20 +110,21 @@ public class ConfigCommand implements Command
         String systemUser = System.getProperty("user.name");
         String pulseUser;
 
+        String prompt = I18N.format("prompt.pulse.user");
         if (systemUser == null)
         {
-            pulseUser = ui.inputPrompt("Pulse user");
+            pulseUser = ui.inputPrompt(prompt);
         }
         else
         {
-            pulseUser = ui.inputPrompt("Pulse user", systemUser);
+            pulseUser = ui.inputPrompt(prompt, systemUser);
         }
         return pulseUser;
     }
 
     public void setupLocalConfig(PersonalBuildUI ui, PersonalBuildConfig config) throws PersonalBuildException
     {
-        String pulseProject = ui.inputPrompt("Pulse project");
+        String pulseProject = ui.inputPrompt(I18N.format("prompt.pulse.project"));
 
         ui.status("Storing project details in '" + config.getLocalConfigFile().getAbsolutePath() + "'.");
         config.setProperty(PersonalBuildConfig.PROPERTY_PROJECT, pulseProject, true);
@@ -126,18 +132,12 @@ public class ConfigCommand implements Command
 
     public String getHelp()
     {
-        return "configure pulse server and project";
+        return I18N.format("command.help");
     }
 
     public String getDetailedHelp()
     {
-        return "Configures the Pulse server and project details used for personal builds.\n" +
-                "You will be prompted to enter the required details, and they will be stored\n" +
-                "in $HOME/.pulse2.properties (server details) and ./.pulse2.properties (project\n" +
-                "details).  You should run this command from the base directory of a working\n" +
-                "copy for your project.  You can set up additional working copies for other\n" +
-                "projects using the -p flag, which indicates that you do not wish to\n" +
-                "reconfigure the Pulse server details.";
+        return I18N.format("command.detailed.help");
     }
 
     public List<String> getUsages()
@@ -153,7 +153,7 @@ public class ConfigCommand implements Command
     public Map<String, String> getOptions()
     {
         Map<String, String> options = new LinkedHashMap<String, String>();
-        options.put("-p [--project]", "only configure project settings");
+        options.put("-p [--project]", I18N.format("flag.project"));
         return options;
     }
 

@@ -20,7 +20,7 @@ public interface WorkingCopy
     public static final Revision REVISION_FLOATING = new Revision("__floating__");
     /**
      * A placeholder revision value that indicates to the Pulse server that it
-     * should use the latest known good revision for a personl build.
+     * should use the latest known good revision for a personal build.
      */
     public static final Revision REVISION_LAST_KNOWN_GOOD = new Revision("__last_known_good__");
 
