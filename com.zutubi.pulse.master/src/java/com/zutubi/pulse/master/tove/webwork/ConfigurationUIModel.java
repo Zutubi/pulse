@@ -350,7 +350,7 @@ public class ConfigurationUIModel
 
     private String composeIconPath(String type, String name)
     {
-        return FileSystemUtils.composeFilename("images", "config", type, name + ".gif");
+        return StringUtils.join("/", "images", "config", type, name + ".gif");
     }
 
     public List<ActionLink> getActions()
