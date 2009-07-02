@@ -3370,9 +3370,9 @@ public class RemoteApi
         return true;
     }
 
-    private Project internalGetProject(String projectName, boolean allownIvalid)
+    private Project internalGetProject(String projectName, boolean allownInvalid)
     {
-        Project project = projectManager.getProject(projectName, allownIvalid);
+        Project project = projectManager.getProject(projectName, allownInvalid);
         if (project == null)
         {
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
@@ -3389,7 +3389,7 @@ public class RemoteApi
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
         }
 
-        List<Project> projects = projectManager.getDescendentProjects(projectName, false, true);
+        List<Project> projects = projectManager.getDescendentProjects(projectName, false, allowInvalid);
         return projects.toArray(new Project[projects.size()]);
     }
 
