@@ -7,6 +7,8 @@ import com.zutubi.pulse.core.api.PulseException;
  */
 public class ScmException extends PulseException
 {
+    private boolean reinitialiseRequired = false;
+
     /**
      * Create a new SCM exception.
      */
@@ -44,5 +46,27 @@ public class ScmException extends PulseException
     public ScmException(String message, Throwable cause)
     {
         super(message, cause);
+    }
+
+    /**
+     * Indicates if this error means that the project requires
+     * reinitialisation.
+     *
+     * @return true if the project should be reinitialised to overcome this
+     *         error
+     */
+    public boolean isReinitialiseRequired()
+    {
+        return reinitialiseRequired;
+    }
+
+    /**
+     * Used to flag this error as one requiring project reinitialisation.  When
+     * errors with this flag set are seen by some internal Pulse managers,
+     * those managers will request the initialisation.
+     */
+    public void setReinitialiseRequired()
+    {
+        this.reinitialiseRequired = true;
     }
 }

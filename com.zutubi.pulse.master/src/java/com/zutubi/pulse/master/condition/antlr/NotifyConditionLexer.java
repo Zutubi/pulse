@@ -25,10 +25,10 @@ public NotifyConditionLexer(LexerSharedInputState state) {
 	setCaseSensitive(true);
 	literals = new Hashtable();
 	literals.put(new ANTLRHashString("changed.by.me", this), new Integer(21));
-	literals.put(new ANTLRHashString("state.change", this), new Integer(22));
+	literals.put(new ANTLRHashString("state.change", this), new Integer(23));
 	literals.put(new ANTLRHashString("true", this), new Integer(15));
 	literals.put(new ANTLRHashString("changed", this), new Integer(20));
-	literals.put(new ANTLRHashString("unsuccessful.count.days", this), new Integer(24));
+	literals.put(new ANTLRHashString("unsuccessful.count.days", this), new Integer(25));
 	literals.put(new ANTLRHashString("false", this), new Integer(16));
 	literals.put(new ANTLRHashString("success", this), new Integer(17));
 	literals.put(new ANTLRHashString("not", this), new Integer(6));
@@ -36,8 +36,9 @@ public NotifyConditionLexer(LexerSharedInputState state) {
 	literals.put(new ANTLRHashString("and", this), new Integer(4));
 	literals.put(new ANTLRHashString("previous", this), new Integer(13));
 	literals.put(new ANTLRHashString("failure", this), new Integer(18));
+	literals.put(new ANTLRHashString("changed.by.me.since.success", this), new Integer(22));
 	literals.put(new ANTLRHashString("error", this), new Integer(19));
-	literals.put(new ANTLRHashString("unsuccessful.count.builds", this), new Integer(23));
+	literals.put(new ANTLRHashString("unsuccessful.count.builds", this), new Integer(24));
 }
 
 public Token nextToken() throws TokenStreamException {

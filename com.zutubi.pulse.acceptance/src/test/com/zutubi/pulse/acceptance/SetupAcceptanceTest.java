@@ -86,8 +86,8 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         String defaultDataDir = "data";
 
         form.nextFormElements("");
+        form.waitFor();
         assertTextPresent("pulse data directory requires a value");
-        assertTrue(form.isFormPresent());
 
         form.nextFormElements(defaultDataDir);
     }
@@ -105,7 +105,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         assertPulseTabsNotVisible();
 
         SetupDatabaseTypeForm form = browser.createForm(SetupDatabaseTypeForm.class);
-        assertTrue(form.isFormPresent());
+        form.waitFor();
         assertFalse("Detail fields should be disabled for embedded database", form.isEditable("host"));
         form.nextFormElements("EMBEDDED", null, null, null, null, null, null);
     }
@@ -116,7 +116,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
         PulseLicenseForm licenseForm = browser.createForm(PulseLicenseForm.class);
 
-        assertTrue(licenseForm.isFormPresent());
+        licenseForm.waitFor();
 
         // check that license is required.
         licenseForm.nextFormElements("");
@@ -148,7 +148,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         CreateAdminForm createAdminForm = browser.createForm(CreateAdminForm.class);
 
         // create admin.
-        assertTrue(createAdminForm.isFormPresent());
+        createAdminForm.waitFor();
         createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin", "admin");
     }
 
@@ -157,7 +157,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         assertPulseTabsNotVisible();
 
         ServerSettingsForm settingsForm = browser.createForm(ServerSettingsForm.class);
-        assertTrue(settingsForm.isFormPresent());
+        settingsForm.waitFor();
         settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
     }
 

@@ -5,13 +5,13 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.NullaryFunction;
 
 import java.util.List;
 
 /**
- * 
- *
+ * A condition that is true if the build contains changes by the user.
  */
 public class ChangedByMeNotifyCondition implements NotifyCondition
 {
@@ -38,35 +38,9 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
             public Boolean process()
             {
                 List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result);
-                for (PersistentChangelist changelist : changelists)
-                {
-                    if (byMe(changelist, user) && changelist.getChanges() != null && changelist.getChanges().size() > 0)
-                    {
-                        return true;
-                    }
-                }
-                return false;
+                return CollectionUtils.contains(changelists, new ByMePredicate(user));
             }
         });
-    }
-
-    private boolean byMe(PersistentChangelist changelist, UserConfiguration user)
-    {
-        String author = changelist.getAuthor();
-        if(author.equals(user.getLogin()))
-        {
-            return true;
-        }
-
-        for(String alias: user.getPreferences().getAliases())
-        {
-            if(author.equals(alias))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void setBuildManager(BuildManager buildManager)

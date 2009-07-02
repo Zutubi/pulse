@@ -139,6 +139,11 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not yet implemented");
     }
 
+    public String getEmailAddress(ScmContext context, String user) throws ScmException
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
     public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
     {
         throw new RuntimeException("Not implemented");

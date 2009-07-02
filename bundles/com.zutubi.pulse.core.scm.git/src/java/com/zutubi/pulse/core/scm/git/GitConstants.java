@@ -34,6 +34,10 @@ public class GitConstants
     public static final String COMMAND_CONFIG = "config";
     public static final String COMMAND_REVISION_PARSE = "rev-parse";
     public static final String COMMAND_COMMIT = "commit";
+    public static final String COMMAND_REBASE = "rebase";
+    public static final String COMMAND_RESET = "reset";
+    public static final String COMMAND_FETCH = "fetch";
+    public static final String COMMAND_MERGE_BASE = "merge-base";
 
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_FORCE = "-f";
@@ -49,12 +53,16 @@ public class GitConstants
     public static final String FLAG_SET_HEAD = "-m";
     public static final String FLAG_MESSAGE = "-m";
     public static final String FLAG_ALL = "-a";
+    public static final String FLAG_ONTO = "--onto";
+    public static final String FLAG_HARD = "--hard";
+    public static final String FLAG_ADD = "-a";
 
     public static final String ARG_ADD = "add";
 
     public static final String REMOTE_ORIGIN = "origin";
 
     public static final String REVISION_HEAD = "HEAD";
+    public static final String REVISION_FETCH_HEAD = "HEAD";
 
     /**
      * File has conflicts after a merge

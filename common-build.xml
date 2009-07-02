@@ -231,7 +231,7 @@
         <echo message="    Component: testing ${ivy.module}              "/>
         <echo message="----------------------------------------------"/>
 
-        <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
+        <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed" outputtoformatters="false">
             <sysproperty key="pulse.root" value="${project.root.dir}"/>
             <classpath>
                 <pathelement location="${classes.dir}"/>

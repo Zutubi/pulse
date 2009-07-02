@@ -315,7 +315,8 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
                 parentPath = path;
             }
 
-            template = configurationTemplateManager.isTemplatedPath(path);
+            String templateOwner = configurationTemplateManager.getTemplateOwnerPath(path);
+            template = templateOwner != null && !configurationTemplateManager.getTemplateNode(templateOwner).isConcrete();
         }
 
         Class wizardClass = ConventionSupport.getWizard(type);

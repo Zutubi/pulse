@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.ParseException;
+import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -29,6 +31,8 @@ public class GitClientTest extends PulseTestCase
     private static final String REVISION_HEAD = "HEAD";
     private static final String REVISION_INITIAL = "96e8d45dd7627d9e3cab980e90948e3ae1c99c62";
     private static final String REVISION_MASTER_LATEST = "a495e21cd263d9dca25379dfbff733461f0d9873";
+    private static final String REVISION_MASTER_PREVIOUS = "2d1ce48a43c5c675c618f915af43e76ed7dac253";
+    private static final String REVISION_MASTER_TWO_PREVIOUS = "e34da05e88de03a4aa5b10b338382f09bbe65d4b";
     private static final String REVISION_DEV_MERGE_NO_CONFLICTS = "9751b1dbd8cdbbeedce404bad38d1df1053078f6";
     private static final String REVISION_DEV_MERGE_CONFLICTS = "2b54f24e1facb7d97643d38e0f89cd5db88b186a";
     private static final String REVISION_MULTILINE_COMMENT = "01aaf6555b7524871204c8df64273597c0bc1f1b";
@@ -168,6 +172,68 @@ public class GitClientTest extends PulseTestCase
         assertEquals(REVISION_SIMPLE_LATEST, rev.getRevisionString());
     }
 
+    public void testGetRevisions() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        assertEquals(asList(new Revision(REVISION_MASTER_PREVIOUS), new Revision(REVISION_MASTER_LATEST)), client.getRevisions(scmContext, new Revision(REVISION_MASTER_TWO_PREVIOUS), null));
+    }
+
+    public void testGetRevisionsAfterUpstreamCommit() throws ScmException, IOException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        assertEquals(REVISION_MASTER_LATEST, client.getLatestRevision(scmContext).getRevisionString());
+
+        // Making a commit after we init ensures a working fetch/merge for this
+        // expected fast-forward case.
+        makeUpstreamCommit();
+
+        assertEquals(1, client.getRevisions(scmContext, new Revision(REVISION_MASTER_LATEST), null).size());
+    }
+
+    public void testGetRevisionsAfterRewritingHistory() throws ScmException, IOException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        assertEquals(REVISION_MASTER_LATEST, client.getLatestRevision(scmContext).getRevisionString());
+
+        rewriteUpstreamHistory();
+
+        try
+        {
+            client.getRevisions(scmContext, new Revision(REVISION_MASTER_LATEST), null);
+            fail("Shouldn't be able to get revisions when pull would require merge.");
+        }
+        catch (ScmException e)
+        {
+            assertEquals("Merge after fetch is not fast-forward, likely due to history changes upstream.  Project reinitialisation required.", e.getMessage());
+        }
+    }
+
+    private void makeUpstreamCommit() throws IOException, GitException
+    {
+        NativeGit git = getNativeGitOnMaster();
+
+        File b = new File(repositoryBase, "b.txt");
+        FileSystemUtils.createFile(b, getName());
+        git.run(git.getGitCommand(), COMMAND_COMMIT, FLAG_ADD, FLAG_MESSAGE, "Will need merging");
+    }
+
+    private void rewriteUpstreamHistory() throws GitException, IOException
+    {
+        // Reset to delete the latest master commit
+        NativeGit git = getNativeGitOnMaster();
+        git.run(git.getGitCommand(), COMMAND_RESET, FLAG_HARD, "HEAD~1");
+        makeUpstreamCommit();
+    }
+
+    private NativeGit getNativeGitOnMaster() throws GitException
+    {
+        // Add a new commit which requires merging
+        NativeGit git = new NativeGit(0);
+        git.setWorkingDirectory(repositoryBase);
+        git.checkout(null, "master");
+        return git;
+    }
+
     public void testRetrieve() throws ScmException, IOException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
@@ -203,7 +269,7 @@ public class GitClientTest extends PulseTestCase
         client.checkout(context, null, handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertTrue(handler.getStatusMessages().contains("Branch local set up to track remote branch refs/remotes/origin/master."));
-        assertThat(handler.getStatusMessages(), not(hasItem(GitClient.INCOMPLETE_CHECKOUT_WARNING)));
+        assertThat(handler.getStatusMessages(), not(hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT))));
 
         handler.reset();
 
@@ -286,7 +352,7 @@ public class GitClientTest extends PulseTestCase
     public void testUpdateNoCheckout() throws ScmException
     {
         client.update(context, null, handler);
-        assertThat(handler.getStatusMessages(), hasItem(GitClient.INCOMPLETE_CHECKOUT_WARNING));
+        assertThat(handler.getStatusMessages(), hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT)));
         assertHeadCheckedOut();
     }
 
@@ -299,8 +365,20 @@ public class GitClientTest extends PulseTestCase
         assertTrue(completeFile.delete());
 
         client.update(context, null, handler);
-        assertThat(handler.getStatusMessages(), hasItem(GitClient.INCOMPLETE_CHECKOUT_WARNING));
+        assertThat(handler.getStatusMessages(), hasItem(GitClient.I18N.format(GitClient.KEY_INCOMPLETE_CHECKOUT)));
         assertHeadCheckedOut();
+    }
+
+    public void testUpdateAfterRewritingHistory() throws ScmException, IOException
+    {
+        client.checkout(context, null, handler);
+        handler.reset();
+
+        rewriteUpstreamHistory();
+
+        client.update(context, null, handler);
+        assertThat(handler.getStatusMessages(), hasItem(GitClient.I18N.format(GitClient.KEY_MERGE_ON_UPDATE)));
+        assertFiles(workingDir, "a.txt", "b.txt", "c.txt");
     }
 
     public void testChanges() throws ScmException
@@ -513,3 +591,88 @@ public class GitClientTest extends PulseTestCase
         }
     }
 }
+
+//  $ git log --name-status
+//    commit 6e16107f3d99519a0cf341d3f455283d8244536e
+//    Author: Jason Sankey <jason@zutubi.com>
+//    Date:   Fri Mar 27 14:04:04 2009 +0000
+//
+//        A regular commit to finish up.
+//
+//    M	b.txt
+//
+//    commit 01aaf6555b7524871204c8df64273597c0bc1f1b
+//    Author: Jason Sankey <jason@zutubi.com>
+//    Date:   Fri Mar 27 13:37:33 2009 +0000
+//
+//        This is a
+//        multi-line
+//        commit comment
+//
+//    M	a.txt
+//
+//    commit 2b54f24e1facb7d97643d38e0f89cd5db88b186a
+//    Merge: 9751b1d... a495e21...
+//    Author: Jason Sankey <jason@zutubi.com>
+//    Date:   Fri Mar 27 13:13:50 2009 +0000
+//
+//        Fixed merge conflict.
+//
+//    commit a495e21cd263d9dca25379dfbff733461f0d9873
+//    Author: Jason Sankey <jason@zutubi.com>
+//    Date:   Fri Mar 27 13:12:32 2009 +0000
+//
+//        Edit, add and remove on master.
+//
+//    M	a.txt
+//    D	c.txt
+//    A	d.txt
+//
+//    commit 9751b1dbd8cdbbeedce404bad38d1df1053078f6
+//    Merge: 21aa65b... 2d1ce48...
+//    Author: Jason Sankey <jason@zutubi.com>
+//    Date:   Fri Mar 27 13:10:25 2009 +0000
+//
+//        Merge branch 'master' into devbranch
+//
+//    commit 2d1ce48a43c5c675c618f915af43e76ed7dac253
+//    Author: Jason Sankey <jason@zutubi.com>
+//    Date:   Fri Mar 27 13:10:04 2009 +0000
+//
+//        Simple edit to b.txt on master.
+//
+//    M	b.txt
+//
+//    commit 21aa65b9a35bffaefead12680334288d6d69e596
+//    Author: Jason Sankey <jason@zutubi.com>
+//    Date:   Fri Mar 27 13:09:23 2009 +0000
+//
+//        Simple edit to a.txt on devbranch.
+//
+//    M	a.txt
+//
+//    commit e34da05e88de03a4aa5b10b338382f09bbe65d4b
+//    Author: Daniel Ostermeier <daniel@zutubi.com>
+//    Date:   Sun Sep 28 15:06:49 2008 +1000
+//
+//        removed content from a.txt
+//
+//    M	a.txt
+//
+//    commit b69a48a6b0f567d0be110c1fbca2c48fc3e1b112
+//    Author: Daniel Ostermeier <daniel@zutubi.com>
+//    Date:   Sun Sep 28 15:06:32 2008 +1000
+//
+//        added content to a.txt
+//
+//    M	a.txt
+//
+//    commit 96e8d45dd7627d9e3cab980e90948e3ae1c99c62
+//    Author: Daniel Ostermeier <daniel@zutubi.com>
+//    Date:   Sun Sep 28 13:26:10 2008 +1000
+//
+//        initial commit
+//
+//    A	a.txt
+//    A	b.txt
+//    A	c.txt

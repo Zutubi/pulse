@@ -456,7 +456,12 @@ public class SeleniumBrowser
 
     public void waitForElement(String id, long timeout)
     {
-        waitForCondition("selenium.browserbot.findElementOrNull('id=" + StringUtils.toValidHtmlName(id) + "') != null", timeout);
+        waitForCondition(getElementExistenceCondition(id), timeout);
+    }
+
+    public String getElementExistenceCondition(String id)
+    {
+        return "selenium.browserbot.findElementOrNull('id=" + StringUtils.toValidHtmlName(id) + "') != null";
     }
 
     public void waitForLocator(String locator)

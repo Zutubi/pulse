@@ -168,6 +168,10 @@ public class ChangelistIsolatorTest extends PulseTestCase
         {
             public void pollActiveScms() { }
 
+            public void clearCache(long projectId)
+            {
+            }
+
             public ScmContext createContext(ProjectConfiguration projectConfiguration) throws ScmException
             {
                 return new ScmContextImpl();

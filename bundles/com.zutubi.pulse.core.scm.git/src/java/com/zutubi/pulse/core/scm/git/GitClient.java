@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
@@ -23,7 +24,10 @@ public class GitClient implements ScmClient
 {
     private static final Revision HEAD = new Revision("HEAD");
 
-    static final String INCOMPLETE_CHECKOUT_WARNING = "Warning: Missing or incomplete checkout detected, performing a clean checkout.";
+    static final Messages I18N = Messages.getInstance(GitClient.class);
+
+    static final String KEY_INCOMPLETE_CHECKOUT = "incomplete.checkout.warning";
+    static final String KEY_MERGE_ON_UPDATE = "merge.on.update.warning";
     /**
      * Marker file used to indicate a checkout completed.  Used to detect
      * incomplete checkouts (e.g. those that were cancelled part way through)
@@ -264,7 +268,7 @@ public class GitClient implements ScmClient
         File checkoutMarker = new File(workingDir, CHECKOUT_COMPLETE_FILENAME);
         if (!isGitRepository(workingDir) || !checkoutMarker.isFile())
         {
-            handler.status(INCOMPLETE_CHECKOUT_WARNING);
+            handler.status(I18N.format(KEY_INCOMPLETE_CHECKOUT));
             return checkout(context, revision, handler);
         }
 
@@ -275,13 +279,25 @@ public class GitClient implements ScmClient
         git.checkout(handler, LOCAL_BRANCH_NAME);
 
         // - get the current revision on head.
-        // - pull
+        // - fetch
+        // - check merge is fast-forward
+        // - merge
         // - get the new revision on head
         // - run a diff to provide feedback.
 
-        String fromRevision = git.log(1).get(0).getId();
-        git.pull(handler);
-        String toRevision = git.log(1).get(0).getId();
+        String fromRevision = git.revisionParse(REVISION_HEAD);
+        git.fetch(handler);
+        String remote = REMOTE_ORIGIN + "/" + branch;
+        String mergeBaseSha = git.mergeBase(REVISION_HEAD, remote);
+        if (!fromRevision.equals(mergeBaseSha))
+        {
+            handler.status(I18N.format(KEY_MERGE_ON_UPDATE));
+            return checkout(context, revision, handler);
+        }
+
+        git.merge(handler, remote);
+
+        String toRevision = git.revisionParse(REVISION_HEAD);
         if (fromRevision.compareTo(toRevision) != 0)
         {
             git.diff(handler, new Revision(fromRevision), new Revision(toRevision));
@@ -314,7 +330,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(workingDir);
+            preparePersistentDirectory(workingDir, null);
 
             NativeGit git = new NativeGit(inactivityTimeout);
             git.setWorkingDirectory(workingDir);
@@ -351,7 +367,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(workingDir);
+            preparePersistentDirectory(workingDir, null);
 
             NativeGit git = new NativeGit(inactivityTimeout);
             git.setWorkingDirectory(workingDir);
@@ -366,19 +382,27 @@ public class GitClient implements ScmClient
         }
     }
 
-    private void preparePersistentDirectory(File workingDir) throws ScmException
+    private void preparePersistentDirectory(File workingDir, ScmFeedbackHandler handler) throws ScmException
     {
+        if (handler == null)
+        {
+            handler = new ScmFeedbackAdapter();
+        }
+
         NativeGit git = new NativeGit(inactivityTimeout);
         if (!isGitRepository(workingDir))
         {
+            String path;
             try
             {
-                throw new ScmException("Git repository not found: " + workingDir.getCanonicalPath());
+                path = workingDir.getCanonicalPath();
             }
             catch (IOException e)
             {
-                throw new ScmException("Git repository not found: " + workingDir.getAbsolutePath());
+                path = workingDir.getAbsolutePath();
             }
+
+            throw new ScmException("Git repository not found: " + path);
         }
         else
         {
@@ -394,16 +418,25 @@ public class GitClient implements ScmClient
                 }
             }
 
-            ScmFeedbackHandler handler = new ScmFeedbackAdapter();
-
+            String remote = REMOTE_ORIGIN + "/" + branch;
             if (localBranchExists)
             {
                 git.checkout(handler, LOCAL_BRANCH_NAME);
-                git.pull(handler);
+                git.fetch(handler);
+                String headSha = git.revisionParse(REVISION_HEAD);
+                String mergeBaseSha = git.mergeBase(REVISION_HEAD, remote);
+                if (!headSha.equals(mergeBaseSha))
+                {
+                    GitException exception = new GitException("Merge after fetch is not fast-forward, likely due to history changes upstream.  Project reinitialisation required.");
+                    exception.setReinitialiseRequired();
+                    throw exception;
+                }
+
+                git.merge(handler, remote);
             }
             else
             {
-                git.checkout(handler, "origin/" + branch, LOCAL_BRANCH_NAME);
+                git.checkout(handler, remote, LOCAL_BRANCH_NAME);
             }
         }
     }
@@ -420,7 +453,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(workingDir);
+            preparePersistentDirectory(workingDir, null);
 
             if (to == null)
             {
@@ -457,7 +490,7 @@ public class GitClient implements ScmClient
 
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(workingDir);
+            preparePersistentDirectory(workingDir, null);
 
             NativeGit git = new NativeGit(inactivityTimeout);
             git.setWorkingDirectory(workingDir);
@@ -510,7 +543,7 @@ public class GitClient implements ScmClient
         {
             File workingDir = context.getPersistentWorkingDir();
 
-            preparePersistentDirectory(workingDir);
+            preparePersistentDirectory(workingDir, null);
 
             ScmFile parent = new ScmFile(path);
             File base = new File(workingDir, path);
@@ -566,6 +599,11 @@ public class GitClient implements ScmClient
         // The previous revision is in fact revision^.  However, we should
         // return the actual SHA this is resolved as.
         return null;
+    }
+
+    public String getEmailAddress(ScmContext context, String user) throws ScmException
+    {
+        throw new ScmException("Operation not supported");
     }
 
     public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException

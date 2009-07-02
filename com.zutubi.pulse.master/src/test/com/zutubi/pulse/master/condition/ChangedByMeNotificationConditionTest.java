@@ -12,8 +12,6 @@ import com.zutubi.pulse.master.util.TransactionContext;
 
 import java.util.Arrays;
 
-/**
- */
 public class ChangedByMeNotificationConditionTest extends PulseTestCase
 {
     private MockBuildManager buildManager = new MockBuildManager();
@@ -70,5 +68,4 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
     {
         return new PersistentChangelist(new Revision("1"), 0, author, "comment", Arrays.asList(new PersistentFileChange("file", "1", FileChange.Action.EDIT, false)));
     }
-
 }

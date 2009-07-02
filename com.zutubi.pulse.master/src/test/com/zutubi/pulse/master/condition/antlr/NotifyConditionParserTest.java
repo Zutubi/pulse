@@ -61,6 +61,12 @@ public class NotifyConditionParserTest extends PulseTestCase
         assertTrue(condition instanceof ChangedByMeNotifyCondition);
     }
 
+    public void testParseChangedByMeSinceSuccess()
+    {
+        NotifyCondition condition = parseExpression("changed.by.me.since.success");
+        assertTrue(condition instanceof ChangedByMeSinceSuccessNotifyCondition);
+    }
+
     public void testParseStateChange()
     {
         NotifyCondition condition = parseExpression("state.change");

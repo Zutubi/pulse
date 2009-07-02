@@ -457,6 +457,11 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findPreviousBuildResult(result);
     }
 
+    public BuildResult getPreviousBuildResultWithRevision(BuildResult result, ResultState[] states)
+    {
+        return buildResultDao.findPreviousBuildResultWithRevision(result, states);
+    }
+
     public CommandResult getCommandResultByArtifact(long artifactId)
     {
         return buildResultDao.findCommandResultByArtifact(artifactId);

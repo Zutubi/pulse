@@ -38,7 +38,7 @@ public class GitWorkingCopy implements WorkingCopy
         NativeGit.OutputCapturingHandler capturingHandler = new NativeGit.OutputCapturingHandler();
         git.lsRemote(capturingHandler, remote, "refs/heads/" + remoteBranch);
 
-        String output = getSingleOutputLine(capturingHandler);
+        String output = capturingHandler.getSingleOutputLine();
         String[] pieces = output.split("\\s+");
         return new Revision(pieces[0]);
     }
@@ -55,7 +55,7 @@ public class GitWorkingCopy implements WorkingCopy
         String remote = getRemoteForBranch(git, branch);
         String remoteBranch = getRemoteTrackingBranch(git, branch);
 
-        return new Revision(git.revParse(remote + "/" + remoteBranch));
+        return new Revision(git.revisionParse(remote + "/" + remoteBranch));
     }
 
     private String getLocalBranch(NativeGit git) throws ScmException
@@ -96,23 +96,6 @@ public class GitWorkingCopy implements WorkingCopy
             String[] pieces = StringUtils.split(branch, '/');
             return pieces[pieces.length - 1];
         }
-    }
-
-    private String getSingleOutputLine(NativeGit.OutputCapturingHandler capturingHandler) throws ScmException
-    {
-        List<String> output = capturingHandler.getOutputLines();
-        if (output.size() != 1)
-        {
-            throw new ScmException("Expecting single line of output got: " + output);
-        }
-
-        String line = output.get(0).trim();
-        if (line.length() == 0)
-        {
-            throw new ScmException("Expected non-trivial output");
-        }
-
-        return line;
     }
 
     public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... scope) throws ScmException

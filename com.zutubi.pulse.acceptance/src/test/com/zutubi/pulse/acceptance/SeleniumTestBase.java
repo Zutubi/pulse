@@ -125,9 +125,7 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void waitForStatus(String message)
     {
-        browser.refreshUntilElement(IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
-
-        // now we wait for the element to contain a message.
+        browser.waitForElement(IDs.STATUS_MESSAGE, STATUS_TIMEOUT);
         AcceptanceTestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()

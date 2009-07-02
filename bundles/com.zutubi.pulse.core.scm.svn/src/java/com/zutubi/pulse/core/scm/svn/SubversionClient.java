@@ -259,7 +259,7 @@ public class SubversionClient implements ScmClient
 
     public Set<ScmCapability> getCapabilities(ScmContext context)
     {
-        return EnumSet.allOf(ScmCapability.class);
+        return EnumSet.complementOf(EnumSet.of(ScmCapability.EMAIL));
     }
 
     public Map<String, String> getServerInfo() throws ScmException
@@ -787,6 +787,11 @@ public class SubversionClient implements ScmClient
         {
             throw new ScmException("Invalid revision '" + revision.getRevisionString() + "': " + e.getMessage());
         }
+    }
+
+    public String getEmailAddress(ScmContext context, String user) throws ScmException
+    {
+        throw new ScmException("Operation not supported");
     }
 
     public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException

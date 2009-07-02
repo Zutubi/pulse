@@ -106,7 +106,7 @@ public class CvsClient implements ScmClient
 
     public Set<ScmCapability> getCapabilities(ScmContext context)
     {
-        Set<ScmCapability> capabilities = EnumSet.allOf(ScmCapability.class);
+        Set<ScmCapability> capabilities = EnumSet.complementOf(EnumSet.of(ScmCapability.EMAIL));
         try
         {
             String version = (context != null) ? getContextVersion(context) : core.version();
@@ -353,6 +353,11 @@ public class CvsClient implements ScmClient
             // just in case.
             return null;
         }
+    }
+
+    public String getEmailAddress(ScmContext context, String user) throws ScmException
+    {
+        throw new ScmException("Operation not supported");
     }
 
     public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException

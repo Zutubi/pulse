@@ -148,6 +148,18 @@ public interface BuildManager
     @SecureResult
     BuildResult getPreviousBuildResult(BuildResult result);
 
+    /**
+     * Retrieve the latest build result from before the given result that has a
+     * non-user build revision and a state in the given set.
+     *
+     * @param result the result to search before
+     * @param states the set of acceptable states for the previous build (may
+     *               be null to indicate not to restrict by state)
+     * @return a build result or null if no results meet the criteria
+     */
+    @SecureResult
+    BuildResult getPreviousBuildResultWithRevision(BuildResult result, ResultState[] states);
+
     @SecureParameter(action = AccessManager.ACTION_VIEW)
     Revision getPreviousRevision(Project project);
 

@@ -28,6 +28,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private Project projectA;
     private Project projectB;
+    private static final TriggerBuildReason TEST_REASON = new TriggerBuildReason("scm trigger");
 
     public void setUp() throws Exception
     {
@@ -98,7 +99,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project project = new Project();
         projectDao.save(project);
 
-        BuildResult buildResult = new BuildResult(new TriggerBuildReason("scm trigger"), project, 11, false);
+        BuildResult buildResult = new BuildResult(TEST_REASON, project, 11, false);
         buildResult.commence();
         buildResult.setRevision(revision);
         RecipeResultNode recipeNode = new RecipeResultNode("stage name", 123, recipeResult);
@@ -244,7 +245,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, 1, false);
+        BuildResult result = new BuildResult(TEST_REASON, p1, 1, false);
         buildResultDao.save(result);
 
         commitAndRefreshTransaction();
@@ -258,7 +259,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, 1, false);
+        BuildResult result = new BuildResult(TEST_REASON, p1, 1, false);
         result.commence(0);
         buildResultDao.save(result);
 
@@ -322,11 +323,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult resultA = new BuildResult(new TriggerBuildReason("scm trigger"), p1, 1, false);
+        BuildResult resultA = new BuildResult(TEST_REASON, p1, 1, false);
         buildResultDao.save(resultA);
-        BuildResult resultB = new BuildResult(new TriggerBuildReason("scm trigger"), p1, 2, false);
+        BuildResult resultB = new BuildResult(TEST_REASON, p1, 2, false);
         buildResultDao.save(resultB);
-        BuildResult resultC = new BuildResult(new TriggerBuildReason("scm trigger"), p1, 3, false);
+        BuildResult resultC = new BuildResult(TEST_REASON, p1, 3, false);
         buildResultDao.save(resultC);
 
         commitAndRefreshTransaction();
@@ -334,6 +335,135 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertNull(buildResultDao.findPreviousBuildResult(resultA));
         assertEquals(resultA, buildResultDao.findPreviousBuildResult(resultB));
         assertEquals(resultB, buildResultDao.findPreviousBuildResult(resultC));
+    }
+
+    public void testGetPreviousBuildResultWithRevision()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+        Project p2 = new Project();
+        projectDao.save(p2);
+
+        BuildResult r1 = createCompletedBuild(p1, 1);
+        BuildResult r2 = createCompletedBuild(p1, 2);
+        BuildResult r3 = createCompletedBuild(p1, 3);
+        BuildResult other = createCompletedBuild(p2, 1);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(other);
+
+        commitAndRefreshTransaction();
+
+        assertNull(buildResultDao.findPreviousBuildResultWithRevision(r1, null));
+        assertEquals(r1, buildResultDao.findPreviousBuildResultWithRevision(r2, null));
+        assertEquals(r2, buildResultDao.findPreviousBuildResultWithRevision(r3, null));
+    }
+
+    public void testGetPreviousBuildResultWithRevisionFilterStates()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult r1 = createCompletedBuild(p1, 1);
+        BuildResult r2 = createFailedBuild(p1, 2);
+        BuildResult r3 = createCompletedBuild(p1, 3);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+
+        commitAndRefreshTransaction();
+
+        assertNull(buildResultDao.findPreviousBuildResultWithRevision(r1, new ResultState[]{ResultState.SUCCESS}));
+        assertEquals(r1, buildResultDao.findPreviousBuildResultWithRevision(r2, new ResultState[]{ResultState.SUCCESS}));
+        assertEquals(r1, buildResultDao.findPreviousBuildResultWithRevision(r3, new ResultState[]{ResultState.SUCCESS}));
+    }
+
+    public void testGetPreviousBuildResultWithRevisionSkipsUserRevision()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult r1 = createUserRevisionBuild(p1, 1);
+        BuildResult r2 = createCompletedBuild(p1, 2);
+        BuildResult r3 = createUserRevisionBuild(p1, 3);
+        BuildResult r4 = createCompletedBuild(p1, 4);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        assertNull(buildResultDao.findPreviousBuildResultWithRevision(r2, null));
+        assertEquals(r2, buildResultDao.findPreviousBuildResultWithRevision(r3, null));
+        assertEquals(r2, buildResultDao.findPreviousBuildResultWithRevision(r4, null));
+    }
+
+    private BuildResult createUserRevisionBuild(Project project, long number)
+    {
+        BuildResult result = new BuildResult(TEST_REASON, project, number, true);
+        result.commence(time++);
+        result.complete(time++);
+        result.setRevision(new Revision(number));
+        return result;
+    }
+
+    public void testGetPreviousBuildResultWithRevisionSkipsNullRevision()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult r1 = createNullRevisionBuild(p1, 1);
+        BuildResult r2 = createCompletedBuild(p1, 2);
+        BuildResult r3 = createNullRevisionBuild(p1, 3);
+        BuildResult r4 = createCompletedBuild(p1, 4);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        assertNull(buildResultDao.findPreviousBuildResultWithRevision(r2, null));
+        assertEquals(r2, buildResultDao.findPreviousBuildResultWithRevision(r3, null));
+        assertEquals(r2, buildResultDao.findPreviousBuildResultWithRevision(r4, null));
+    }
+
+    private BuildResult createNullRevisionBuild(Project project, long number)
+    {
+        BuildResult result = new BuildResult(TEST_REASON, project, number, true);
+        result.commence(time++);
+        result.complete(time++);
+        return result;
+    }
+
+    public void testGetPreviousBuildResultWithRevisionSkipsPersonal()
+    {
+        User u1 = new User();
+        userDao.save(u1);
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult r1 = createPersonalBuild(u1, p1, 1);
+        BuildResult r2 = createCompletedBuild(p1, 2);
+        BuildResult r3 = createPersonalBuild(u1, p1, 3);
+        BuildResult r4 = createCompletedBuild(p1, 4);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        assertNull(buildResultDao.findPreviousBuildResultWithRevision(r2, null));
+        assertEquals(r2, buildResultDao.findPreviousBuildResultWithRevision(r3, null));
+        assertEquals(r2, buildResultDao.findPreviousBuildResultWithRevision(r4, null));
     }
 
     public void testGetLatestCompletedSimple()
@@ -367,7 +497,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao.save(p1);
 
         BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, 2, false);
+        BuildResult r2 = new BuildResult(TEST_REASON, p1, 2, false);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -385,7 +515,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao.save(p1);
 
         BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, 2, false);
+        BuildResult r2 = new BuildResult(TEST_REASON, p1, 2, false);
         r2.commence();
 
         buildResultDao.save(r1);
@@ -875,7 +1005,8 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private BuildResult createCompletedBuild(Project project, long number)
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, number, false);
+        BuildResult result = new BuildResult(TEST_REASON, project, number, false);
+        result.setRevision(new Revision(number));
         result.commence(time++);
         result.complete(time++);
         return result;
@@ -883,7 +1014,8 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private BuildResult createFailedBuild(Project project, long number)
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, number, false);
+        BuildResult result = new BuildResult(TEST_REASON, project, number, false);
+        result.setRevision(new Revision(number));
         result.commence(time++);
         result.failure();
         result.complete(time++);
@@ -893,6 +1025,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private BuildResult createPersonalBuild(User user, Project project, long number)
     {
         BuildResult result = createIncompletePersonalBuild(user, project, number);
+        result.setRevision(new Revision(number));
         result.complete(time++);
         return result;
     }
@@ -900,6 +1033,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private BuildResult createIncompletePersonalBuild(User user, Project project, long number)
     {
         BuildResult result = new BuildResult(new PersonalBuildReason(user.getLogin()), user, project, number);
+        result.setRevision(new Revision(number));
         result.commence(time++);
         return result;
     }

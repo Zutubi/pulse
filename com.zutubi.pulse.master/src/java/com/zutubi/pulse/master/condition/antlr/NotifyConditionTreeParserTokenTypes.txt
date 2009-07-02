@@ -18,10 +18,11 @@ LITERAL_failure="failure"=18
 LITERAL_error="error"=19
 LITERAL_changed="changed"=20
 "changed.by.me"=21
-"state.change"=22
-"unsuccessful.count.builds"=23
-"unsuccessful.count.days"=24
-LEFT_PAREN("an opening parenthesis '('")=25
-RIGHT_PAREN("a closing parenthesis ')'")=26
-WORD("a word")=27
-WHITESPACE=28
+"changed.by.me.since.success"=22
+"state.change"=23
+"unsuccessful.count.builds"=24
+"unsuccessful.count.days"=25
+LEFT_PAREN("an opening parenthesis '('")=26
+RIGHT_PAREN("a closing parenthesis ')'")=27
+WORD("a word")=28
+WHITESPACE=29

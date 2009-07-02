@@ -55,6 +55,8 @@
                 <ref local="gitTrackSelectedBranch"/>
                 <ref local="autoClearResponsibility"/>
                 <ref local="globalReports"/>
+                <ref local="emailCommittersSinceSuccess"/>
+                <ref local="scmCommitterMappings"/>
                 <ref local="resourceRequirementOptional"/>
                 <ref local="triggerProperties"/>
                 <ref local="globalPostProcessors"/>
@@ -235,6 +237,14 @@
 
     <bean id="globalReports" class="com.zutubi.pulse.master.upgrade.tasks.GlobalReportsUpgradeTask">
         <property name="buildNumber" value="200031001"/>
+    </bean>
+
+    <bean id="emailCommittersSinceSuccess" class="com.zutubi.pulse.master.upgrade.tasks.EmailCommittersSinceSuccessUpgradeTask">
+        <property name="buildNumber" value="200032001"/>
+    </bean>
+
+    <bean id="scmCommitterMappings" class="com.zutubi.pulse.master.upgrade.tasks.ScmCommitterMappingsUpgradeTask">
+        <property name="buildNumber" value="200032002"/>
     </bean>
     
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">

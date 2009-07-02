@@ -96,6 +96,25 @@ public class NativeGit
         run(handler, getGitCommand(), COMMAND_PULL);
     }
 
+    public void fetch(ScmFeedbackHandler handler) throws GitException
+    {
+        run(handler, getGitCommand(), COMMAND_FETCH);
+    }
+
+    public String revisionParse(String revision) throws GitException
+    {
+        OutputCapturingHandler capturingHandler = new OutputCapturingHandler();
+        runWithHandler(capturingHandler, null, true, getGitCommand(), COMMAND_REVISION_PARSE, revision);
+        return capturingHandler.getSingleOutputLine();
+    }
+
+    public String mergeBase(String commit1, String commit2) throws GitException
+    {
+        OutputCapturingHandler capturingHandler = new OutputCapturingHandler();
+        runWithHandler(capturingHandler, null, true, getGitCommand(), COMMAND_MERGE_BASE, commit1, commit2);
+        return capturingHandler.getSingleOutputLine();
+    }
+
     public InputStream show(String file) throws GitException
     {
         return show(REVISION_HEAD, file);
@@ -283,19 +302,6 @@ public class NativeGit
         }
 
         return value;
-    }
-
-    public String revParse(String revision) throws GitException
-    {
-        OutputCapturingHandler handler = new OutputCapturingHandler();
-        runWithHandler(handler, null, true, getGitCommand(), COMMAND_REVISION_PARSE, revision);
-        List<String> lines = handler.getOutputLines();
-        if (lines.size() != 1)
-        {
-            throw new GitException("Expecting rev-parse to produce a single output line, got: " + lines);
-        }
-
-        return lines.get(0).trim();
     }
 
     protected int run(String... commands) throws GitException
@@ -509,6 +515,22 @@ public class NativeGit
     {
         private List<String> outputLines = new LinkedList<String>();
         private List<String> errorLines = new LinkedList<String>();
+
+        public String getSingleOutputLine() throws GitException
+        {
+            if (outputLines.size() != 1)
+            {
+                throw new GitException("Expecting single line of output got: " + outputLines);
+            }
+
+            String line = outputLines.get(0).trim();
+            if (line.length() == 0)
+            {
+                throw new GitException("Expected non-trivial output");
+            }
+
+            return line;
+        }
 
         public List<String> getOutputLines()
         {

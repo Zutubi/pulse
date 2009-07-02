@@ -22,9 +22,9 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedList;
 import java.util.concurrent.*;
 
 public class DefaultScmManager implements ScmManager, Stoppable
@@ -220,24 +220,35 @@ public class DefaultScmManager implements ScmManager, Stoppable
             eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Polling SCM for changes..."));
             projectManager.updateLastPollTime(projectId, now);
 
-            // when was the last time that we checked? if never, get the latest revision.
             ScmContext context = createContext(projectConfig);
             client = createClient(projectConfig.getScm());
 
-            Revision previous = latestRevisions.get(projectId);
-
-            // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
-            if (previous == null)
+            // When was the last time that we checked?  If never, get the
+            // latest revision.  We do this under the lock to protect from
+            // races with project destruction clearing the latestRevisions
+            // cache.
+            context.lock();
+            Revision previous;
+            try
             {
-                Revision revision = client.getLatestRevision(context);
-                if (revision == null)
+                previous = latestRevisions.get(projectId);
+                if (previous == null)
                 {
-                    eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Scm failed to return latest revision."));
+                    Revision revision = client.getLatestRevision(context);
+                    // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
+                    if (revision == null)
+                    {
+                        eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Scm failed to return latest revision."));
+                        return;
+                    }
+                    latestRevisions.put(projectId, revision);
+                    eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Retrieved initial revision: " + revision.getRevisionString() + " (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
                     return;
                 }
-                latestRevisions.put(projectId, revision);
-                eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Retrieved initial revision: " + revision.getRevisionString() + " (took " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - now) + ")."));
-                return;
+            }
+            finally
+            {
+                context.unlock();
             }
 
             if (pollable.isQuietPeriodEnabled())
@@ -301,6 +312,11 @@ public class DefaultScmManager implements ScmManager, Stoppable
         {
             eventManager.publish(new ProjectStatusEvent(this, projectConfig, "Error polling SCM: " + e.getMessage()));
             LOG.debug(e);
+
+            if (e.isReinitialiseRequired())
+            {
+                projectManager.makeStateTransition(projectConfig.getProjectId(), Project.Transition.INITIALISE);
+            }
         }
         finally
         {
@@ -347,6 +363,11 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
         }
         return true;
+    }
+
+    public void clearCache(long projectId)
+    {
+        latestRevisions.remove(projectId);
     }
 
     public ScmContext createContext(ProjectConfiguration projectConfiguration) throws ScmException

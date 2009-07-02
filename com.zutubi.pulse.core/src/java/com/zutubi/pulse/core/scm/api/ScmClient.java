@@ -326,6 +326,24 @@ public interface ScmClient extends Closeable
     Revision getPreviousRevision(ScmContext context, Revision revision, boolean isFile) throws ScmException;
 
     /**
+     * Maps from an SCM user to an email address for that user.  For SCMs that
+     * have explicit user accounts with this information, providing it to Pulse
+     * can be used, for example, when contacting committers.  If the user does
+     * not exist or has no configured email, the implementation should return
+     * null rather than throwing an exception.
+     * <p/>
+     * Required for {@link ScmCapability#EMAIL}.
+     *
+     * @param context defines the scm context in which the operation is being
+     *                run
+     * @param user    name of the user to look up the email address for
+     * @return the email address for the given user, or null if this user does
+     *         not have an email address configured in the SCM
+     * @throws ScmException on any error
+     */
+    String getEmailAddress(ScmContext context, String user) throws ScmException;
+
+    /**
      * Applies the changes in the given patch file to a working copy based at
      * the given directory.  This patch file would have been created by calling
      * {@link WorkingCopy#writePatchFile(WorkingCopyContext, java.io.File, String[])}.

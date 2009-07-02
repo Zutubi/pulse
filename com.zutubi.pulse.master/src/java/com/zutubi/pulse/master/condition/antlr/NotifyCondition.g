@@ -1,10 +1,10 @@
 header {
-    package com.zutubi.pulse.condition.antlr;
+    package com.zutubi.pulse.master.condition.antlr;
 }
 
 {
-    import com.zutubi.pulse.spring.ComponentContext;
-    import com.zutubi.pulse.condition.*;
+    import com.zutubi.pulse.core.spring.SpringComponentContext;
+    import com.zutubi.pulse.master.condition.*;
 }
 
 class NotifyConditionTreeParser extends TreeParser;
@@ -75,6 +75,7 @@ boolsymbol
     | "error"
     | "changed"
     | "changed.by.me"
+    | "changed.by.me.since.success"
     | "state.change"
     ;
 
@@ -129,6 +130,7 @@ boolsymbol
     | "error"
     | "changed"
     | "changed.by.me"
+    | "changed.by.me.since.success"
     | "state.change"
     ;
 
