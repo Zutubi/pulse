@@ -3370,9 +3370,9 @@ public class RemoteApi
         return true;
     }
 
-    private Project internalGetProject(String projectName, boolean allownInvalid)
+    private Project internalGetProject(String projectName, boolean allowInvalid)
     {
-        Project project = projectManager.getProject(projectName, allownInvalid);
+        Project project = projectManager.getProject(projectName, allowInvalid);
         if (project == null)
         {
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
