@@ -568,10 +568,10 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         RecipeAssignmentRequest queuedRequest = createAssignmentRequest(0, 1001, projectConfig);
         queue.enqueue(queuedRequest);
 
+        queue.setSleepInterval(1);
         createAvailableAgent(0);
         awaitBuild();
 
-        queue.setSleepInterval(1);
         queue.setUnsatisfiableTimeout(1);
 
         // Negative revision will be rejected by mock
