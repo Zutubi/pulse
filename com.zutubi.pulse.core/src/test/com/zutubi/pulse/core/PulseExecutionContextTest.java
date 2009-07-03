@@ -122,7 +122,7 @@ public class PulseExecutionContextTest extends PulseTestCase
         PulseExecutionContext context = makeNonTrivialContext();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         context.setOutputStream(outputStream);
-        context.setVersion("ver");
+        context.setSecurityHash("hash");
         context.setWorkingDir(new File("foo"));
 
         PulseExecutionContext copy = new PulseExecutionContext(context);
@@ -131,7 +131,7 @@ public class PulseExecutionContextTest extends PulseTestCase
         assertEquals("p", copy.getString("parent"));
         assertEquals("c", copy.getString("child"));
         assertSame(outputStream, context.getOutputStream());
-        assertEquals("ver", copy.getVersion());
+        assertEquals("hash", copy.getSecurityHash());
         assertEquals(new File("foo"), copy.getWorkingDir());
     }
 

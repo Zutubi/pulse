@@ -13,11 +13,8 @@ import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
-import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.engine.api.*;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.events.*;
@@ -28,6 +25,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Pair;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
@@ -48,6 +46,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class RecipeProcessor
 {
     private static final Logger LOG = Logger.getLogger(RecipeProcessor.class);
+
+    public static final String BUILD_FIELDS_FILE = "build." + ResultCustomFields.CUSTOM_FIELDS_FILE;
 
     private static final String LABEL_EXECUTE = "execute";
 
@@ -72,7 +72,7 @@ public class RecipeProcessor
         recipeResult.commence();
 
         PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
-        Map<String, String> customFields = new HashMap<String, String>();
+        Map<Pair<FieldScope, String>, String> customFields = new HashMap<Pair<FieldScope, String>, String>();
 
         runningRecipe = recipeResult.getId();
         eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeResult.getStartTime()));
@@ -101,13 +101,7 @@ public class RecipeProcessor
             compressResults(paths, context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, false), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_WORKING_DIR, false));
 
             recipeResult.complete();
-            RecipeCompletedEvent completedEvent = new RecipeCompletedEvent(this, recipeResult);
-            if (context.getVersion() != null)
-            {
-                completedEvent.setBuildVersion(context.getVersion());
-            }
-
-            eventManager.publish(completedEvent);
+            eventManager.publish(new RecipeCompletedEvent(this, recipeResult));
 
             context.pop();
 
@@ -145,7 +139,6 @@ public class RecipeProcessor
                 return;
             }
         }
-
 
         // Now we can load the recipe from the pulse file
         ProjectRecipesConfiguration recipesConfiguration = loadPulseFile(request, context);
@@ -233,18 +226,43 @@ public class RecipeProcessor
         eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Test results stored."));
     }
 
-    private void storeCustomFields(RecipePaths paths, Map<String, String> customFields)
+    private void storeCustomFields(RecipePaths paths, Map<Pair<FieldScope, String>, String> customFields)
     {
         if (customFields.size() > 0)
         {
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing custom fields..."));
-            RecipeCustomFields recipeCustomFields = new RecipeCustomFields(paths.getOutputDir());
-            recipeCustomFields.store(customFields);
+
+            Map<String, String> buildFields = new HashMap<String, String>();
+            Map<String, String> recipeFields = new HashMap<String, String>();
+            for (Map.Entry<Pair<FieldScope, String>, String> entry: customFields.entrySet())
+            {
+                if (entry.getKey().first == FieldScope.BUILD)
+                {
+                    buildFields.put(entry.getKey().second, entry.getValue());
+                }
+                else
+                {
+                    recipeFields.put(entry.getKey().second, entry.getValue());
+                }
+            }
+
+            if (buildFields.size() > 0)
+            {
+                ResultCustomFields resultCustomFields = new ResultCustomFields(paths.getOutputDir(), BUILD_FIELDS_FILE);
+                resultCustomFields.store(buildFields);
+            }
+
+            if (recipeFields.size() > 0)
+            {
+                ResultCustomFields resultCustomFields = new ResultCustomFields(paths.getOutputDir());
+                resultCustomFields.store(recipeFields);
+            }
+
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Custom fields stored."));
         }
     }
 
-    private void pushRecipeContext(PulseExecutionContext context, RecipeRequest request, PersistentTestSuiteResult testResults, Map<String, String> customFields, long recipeStartTime)
+    private void pushRecipeContext(PulseExecutionContext context, RecipeRequest request, PersistentTestSuiteResult testResults, Map<Pair<FieldScope, String>, String> customFields, long recipeStartTime)
     {
         context.push();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
@@ -317,11 +335,6 @@ public class RecipeProcessor
         finally
         {
             context.pop();
-            String version = config.getVersion();
-            if (TextUtils.stringSet(version))
-            {
-                context.setVersion(version);
-            }
         }
     }
 

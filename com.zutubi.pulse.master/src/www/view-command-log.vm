@@ -62,6 +62,20 @@
                 <div id="node_$result.root.id" style="display: none">
                     <div class="panecontent">
                         #showBuild($result false true)
+
+    #set($customFields = $action.getCustomFields($result))
+    #if($customFields.size() > 0)
+                        <table class="content" id='#id("custom.fields")'>
+                            #headingRow("build.custom.fields" 2)
+                            <tr>
+                                #contentHeading("custom.field.name" 1)
+                                #contentHeading("custom.field.value" 1)
+                            </tr>
+        #foreach($customField in $customFields.entrySet())
+                            #propertyRow($customField)
+        #end
+                        </table>
+    #end
                     </div>
                 </div>
 
@@ -80,7 +94,7 @@
         #set($customFields = $action.getCustomFields($recipeResult))
         #if($customFields.size() > 0)
                         <table class="content" id='#id("custom.fields.${node.stageName}")'>
-                            #headingRow("build.stage.custom.fields" 2)
+                            #headingRow("build.custom.fields" 2)
                             <tr>
                                 #contentHeading("custom.field.name" 1)
                                 #contentHeading("custom.field.value" 1)

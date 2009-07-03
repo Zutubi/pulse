@@ -13,10 +13,9 @@ import java.util.Map;
  * Configures a sequence of commands to run as a single unit or recipe.
  */
 @SymbolicName("zutubi.recipeConfig")
-@Form(fieldOrder = {"name", "version"})
+@Form(fieldOrder = {"name"})
 public class RecipeConfiguration extends AbstractNamedConfiguration
 {
-    private String version;
     @Ordered
     private Map<String, CommandConfiguration> commands = new LinkedHashMap<String, CommandConfiguration>();
 
@@ -27,16 +26,6 @@ public class RecipeConfiguration extends AbstractNamedConfiguration
     public RecipeConfiguration(String name)
     {
         super(name);
-    }
-
-    public String getVersion()
-    {
-        return version;
-    }
-
-    public void setVersion(String version)
-    {
-        this.version = version;
     }
 
     public Map<String, CommandConfiguration> getCommands()

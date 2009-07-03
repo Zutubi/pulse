@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
-import com.zutubi.pulse.core.model.RecipeCustomFields;
-import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.Result;
+import com.zutubi.pulse.core.model.ResultCustomFields;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -75,9 +75,9 @@ public class ViewBuildAction extends CommandActionBase
         return summaryColumns;
     }
 
-    public Map<String, String> getCustomFields(RecipeResult recipe)
+    public Map<String, String> getCustomFields(Result result)
     {
-        RecipeCustomFields customFields = new RecipeCustomFields(recipe.getAbsoluteOutputDir(configurationManager.getDataDirectory()));
+        ResultCustomFields customFields = new ResultCustomFields(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()));
         return customFields.load();
     }
 

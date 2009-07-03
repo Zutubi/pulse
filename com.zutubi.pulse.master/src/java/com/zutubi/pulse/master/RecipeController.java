@@ -13,6 +13,7 @@ import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResultCustomFields;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
@@ -34,8 +35,10 @@ import com.zutubi.pulse.servercore.CopyBootstrapper;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -335,6 +338,7 @@ public class RecipeController
         {
             logger.collecting(recipeResult, collectWorkingCopy);
             collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
+            copyBuildFields();
         }
         catch (BuildException e)
         {
@@ -347,6 +351,28 @@ public class RecipeController
         finally
         {
             logger.collectionComplete();
+        }
+    }
+
+    private void copyBuildFields()
+    {
+        File recipeOutputDir = recipeResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
+        File buildFieldsFile = new File(recipeOutputDir, RecipeProcessor.BUILD_FIELDS_FILE);
+        if (buildFieldsFile.exists())
+        {
+            ResultCustomFields fromRecipeLoader = new ResultCustomFields(recipeOutputDir, RecipeProcessor.BUILD_FIELDS_FILE);
+            Map<String,String> fromRecipeFields = fromRecipeLoader.load();
+
+            File buildOutputDir = buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
+            ResultCustomFields toBuildLoader = new ResultCustomFields(buildOutputDir);
+            Map<String, String> toBuildFields = toBuildLoader.load();
+            toBuildFields.putAll(fromRecipeFields);
+            toBuildLoader.store(toBuildFields);
+
+            if (!buildFieldsFile.delete())
+            {
+                LOG.warning("Could not delete build fields file '" + buildFieldsFile.getAbsolutePath() + "'");
+            }
         }
     }
 

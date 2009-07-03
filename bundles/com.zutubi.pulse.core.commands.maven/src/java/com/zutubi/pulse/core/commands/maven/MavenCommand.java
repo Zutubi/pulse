@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.util.TextUtils;
 
@@ -44,7 +45,7 @@ public class MavenCommand extends NamedArgumentCommand
             String version = MavenUtils.extractVersion(new File(getWorkingDir(pec.getWorkingDir()), projectFile), "currentVersion");
             if (version != null)
             {
-                pec.setVersion(version);
+                commandContext.addCustomField(FieldScope.BUILD, "maven.version", version);
             }
         }
         catch (PulseException e)

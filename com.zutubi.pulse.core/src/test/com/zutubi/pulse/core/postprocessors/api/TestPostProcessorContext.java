@@ -2,7 +2,10 @@ package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Pair;
 
 import java.util.*;
 
@@ -20,7 +23,7 @@ public class TestPostProcessorContext implements PostProcessorContext
     private TestSuiteResult testSuiteResult = new TestSuiteResult(null);
     private List<Feature> features = new LinkedList<Feature>();
     private List<Feature> commandFeatures = new LinkedList<Feature>();
-    private Map<String, String> customFields = new HashMap<String, String>();
+    private Map<Pair<FieldScope, String>, String> customFields = new HashMap<Pair<FieldScope, String>, String>();
 
     /**
      * Creates a context that contains the given execution context and has the
@@ -121,17 +124,17 @@ public class TestPostProcessorContext implements PostProcessorContext
 
     /**
      * Returns all custom fields collected so far.  These are fields added by
-     * {@link #addCustomField(String, String)}.
+     * {@link #addCustomField(FieldScope, String, String)}.
      *
      * @return all custom fields added to the recipe result so far
      */
-    public Map<String, String> getCustomFields()
+    public Map<Pair<FieldScope, String>, String> getCustomFields()
     {
         return customFields;
     }
 
-    public void addCustomField(String name, String value)
+    public void addCustomField(FieldScope scope, String name, String value)
     {
-        customFields.put(name, value);
+        customFields.put(asPair(scope, name), value);
     }
 }

@@ -12,30 +12,39 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 /**
- * Manages custom fields related to a recipe result.
+ * Manages custom fields related to a result.
  */
-public class RecipeCustomFields
+public class ResultCustomFields
 {
     public static final String CUSTOM_FIELDS_FILE = "fields.properties";
+    
+    public static final String FIELD_VERSION = "version";
 
-    private static final Logger LOG = Logger.getLogger(RecipeCustomFields.class);
+    private static final Logger LOG = Logger.getLogger(ResultCustomFields.class);
 
-    private File recipeOutputDir;
+    private File outputDir;
+    private String filename;
     /** Caches loaded fields. */
     private Map<String, String> customFields;
 
-    public RecipeCustomFields(File recipeOutputDir)
+    public ResultCustomFields(File outputDir)
     {
-        this.recipeOutputDir = recipeOutputDir;
+        this(outputDir, CUSTOM_FIELDS_FILE);
+    }
+
+    public ResultCustomFields(File outputDir, String filename)
+    {
+        this.outputDir = outputDir;
+        this.filename = filename;
     }
 
     /**
-     * Loads and returns all custom fields for a recipe from disk.  If no
+     * Loads and returns all custom fields for a result from disk.  If no
      * custom fields file is found, or an error occurs, an empty map is
      * returned.
      *
      * @return a mapping of field name to field value for all custom fields for
-     *         a recipe
+     *         a result
      */
     public Map<String, String> load()
     {
@@ -43,7 +52,7 @@ public class RecipeCustomFields
         {
             // Use a tree map to sort properties.
             customFields = new TreeMap<String, String>();
-            File customFile = new File(recipeOutputDir, CUSTOM_FIELDS_FILE);
+            File customFile = new File(outputDir, filename);
             if (customFile.exists())
             {
                 FileInputStream inputStream = null;
@@ -73,7 +82,7 @@ public class RecipeCustomFields
     }
 
     /**
-     * Stores the given custom fields to disk as part of a recipe result.
+     * Stores the given custom fields to disk as part of a result.
      *
      * @param customFields a mapping of field name to field value for all custom
      *                     fields
@@ -85,7 +94,7 @@ public class RecipeCustomFields
 
         Properties properties = new Properties();
         properties.putAll(customFields);
-        File customFile = new File(recipeOutputDir, CUSTOM_FIELDS_FILE);
+        File customFile = new File(outputDir, filename);
         FileOutputStream outputStream = null;
         try
         {

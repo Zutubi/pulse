@@ -1,19 +1,19 @@
 package com.zutubi.pulse.master.tove.config.project.reports;
 
-import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.Result;
 
 /**
- * An interface to abstract the details of loading custom fields for recipe results.
+ * An interface to abstract the details of loading custom fields for results.
  */
 public interface CustomFieldSource
 {
     /**
-     * Retrieves the value of a given custom field for the given recipe result,
-     * if it exists.
+     * Retrieves the value of a given custom field for the given result, if it
+     * exists.
      *
-     * @param recipeResult the recipe to get the field value for
-     * @param name         the name of the field to retrieve
+     * @param result the result to get the field value for
+     * @param name   the name of the field to retrieve
      * @return the field value, or null if it has no value
      */
-    String getFieldValue(RecipeResult recipeResult, String name);
+    String getFieldValue(Result result, String name);
 }

@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.engine.api.ResultState;
 
 /**
@@ -91,12 +92,14 @@ public interface PostProcessorContext
     void addFeatureToCommand(Feature feature);
 
     /**
-     * Adds a custom field to the recipe result.  Custom fields can be used to
-     * attach extra data to a recipe result.  If the field with the same name
+     * Adds a custom field to a result.  Custom fields can be used to attach
+     * extra data to a build or recipe result.  If the field with the same name
      * has already been added, it is updated to this value.
      *
+     * @param scope specifies where the fields should be added: i.e. as a
+     *              property of the whole build or just the current recipe
      * @param name  name of the field to add, must not be empty
      * @param value value of the field
      */
-    void addCustomField(String name, String value);
+    void addCustomField(FieldScope scope, String name, String value);
 }

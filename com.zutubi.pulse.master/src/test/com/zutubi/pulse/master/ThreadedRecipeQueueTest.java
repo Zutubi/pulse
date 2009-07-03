@@ -49,8 +49,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-/**
- */
 public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutubi.events.EventListener
 {
     private static final String PULSE_FILE = "<xml version=\"1.0\"><project default-recipe=\"default\"><recipe name=\"default\"/></project>";
@@ -118,16 +116,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         }
         
         eventManager.unregister(this);
-        slave1000 = null;
-        agentManager = null;
-        eventManager = null;
-        buildSemaphore = null;
-        errorSemaphore = null;
-        dispatchedSemaphore = null;
-        queue = null;
-        recipeErrors = null;
         recipeDispatchService.stop(true);
-        recipeDispatchService = null;
         super.tearDown();
     }
 
@@ -579,10 +568,11 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         RecipeAssignmentRequest queuedRequest = createAssignmentRequest(0, 1001, projectConfig);
         queue.enqueue(queuedRequest);
 
-        queue.setSleepInterval(1);
-        queue.setUnsatisfiableTimeout(1);
         createAvailableAgent(0);
         awaitBuild();
+
+        queue.setSleepInterval(1);
+        queue.setUnsatisfiableTimeout(1);
 
         // Negative revision will be rejected by mock
         BuildRevision queuedRevision = queuedRequest.getRevision();

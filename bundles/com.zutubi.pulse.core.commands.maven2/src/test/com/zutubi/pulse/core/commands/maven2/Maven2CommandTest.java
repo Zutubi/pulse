@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core.commands.maven2;
 
-import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
+import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 
@@ -26,9 +27,8 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
 
         Maven2CommandConfiguration command = new Maven2CommandConfiguration();
         command.setGoals("compile");
-        PulseExecutionContext context = (PulseExecutionContext) createExecutionContext();
-        runCommand(new Maven2Command(command), context);
-        assertEquals("1.0-SNAPSHOT", context.getVersion());
+        TestCommandContext context = runCommand(new Maven2Command(command), createExecutionContext());
+        assertEquals("1.0-SNAPSHOT", context.getCustomFields().get(asPair(FieldScope.BUILD, "maven.version")));
     }
 
     public void testNoTarget() throws Exception

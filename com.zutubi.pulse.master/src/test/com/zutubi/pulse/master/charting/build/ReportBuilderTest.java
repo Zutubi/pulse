@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.charting.build;
 
 import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.charting.model.DataPoint;
 import com.zutubi.pulse.master.charting.model.ReportData;
@@ -43,7 +44,7 @@ public class ReportBuilderTest extends PulseTestCase
 
         fieldSource = new CustomFieldSource()
         {
-            public String getFieldValue(RecipeResult recipeResult, String name)
+            public String getFieldValue(Result result, String name)
             {
                 return "3";
             }

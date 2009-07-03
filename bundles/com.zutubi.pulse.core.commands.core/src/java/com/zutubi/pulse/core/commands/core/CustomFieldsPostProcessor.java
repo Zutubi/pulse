@@ -31,9 +31,11 @@ public class CustomFieldsPostProcessor extends PostProcessorSupport
             inputStream = new FileInputStream(artifactFile);
             Properties properties = new Properties();
             properties.load(inputStream);
+
+            CustomFieldsPostProcessorConfiguration config = (CustomFieldsPostProcessorConfiguration) getConfig();
             for (Map.Entry<Object, Object> entry: properties.entrySet())
             {
-                ppContext.addCustomField(entry.getKey().toString(), entry.getValue().toString());
+                ppContext.addCustomField(config.getScope(), entry.getKey().toString(), entry.getValue().toString());
             }
         }
         catch (IOException e)

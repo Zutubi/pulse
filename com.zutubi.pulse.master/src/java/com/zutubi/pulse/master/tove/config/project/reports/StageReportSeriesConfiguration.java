@@ -15,8 +15,6 @@ public class StageReportSeriesConfiguration extends ReportSeriesConfiguration
 {
     @ControllingSelect(dependentFields = {"field", "fieldType"}, enableSet = {"CUSTOM_FIELD"})
     private StageMetric metric;
-    private String field;
-    private MetricType fieldType;
     @ControllingCheckbox(dependentFields = {"aggregationFunction"})
     private boolean combineStages;
     private AggregationFunction aggregationFunction;
@@ -61,26 +59,6 @@ public class StageReportSeriesConfiguration extends ReportSeriesConfiguration
     public void setMetric(StageMetric metric)
     {
         this.metric = metric;
-    }
-
-    public String getField()
-    {
-        return field;
-    }
-
-    public void setField(String field)
-    {
-        this.field = field;
-    }
-
-    public MetricType getFieldType()
-    {
-        return fieldType;
-    }
-
-    public void setFieldType(MetricType fieldType)
-    {
-        this.fieldType = fieldType;
     }
 
     public boolean isCombineStages()

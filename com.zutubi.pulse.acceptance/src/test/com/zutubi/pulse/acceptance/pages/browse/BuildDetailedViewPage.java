@@ -76,7 +76,13 @@ public class BuildDetailedViewPage extends SeleniumPage
 
     public String getCustomFieldsId(String stageName)
     {
-        return "custom.fields." + stageName;
+        String id = "custom.fields";
+        if (stageName != null)
+        {
+            id += "." + stageName;
+        }
+
+        return id;
     }
 
     public String getCustomFieldValue(String stageName, int index)

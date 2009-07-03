@@ -10,9 +10,9 @@ import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
-import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
@@ -205,16 +205,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "greeting");
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
-    }
-
-    public void testVersion() throws Exception
-    {
-        PulseExecutionContext context = runBasicRecipe("version");
-        assertRecipeCommenced(1, "version");
-        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap");
-        assertRecipeCompleted(1, ResultState.SUCCESS);
-        assertNoMoreEvents();
-        assertEquals("test version", context.getVersion());
     }
 
     public void testExceptionDuringBootstrap() throws Exception

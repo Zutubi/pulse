@@ -3,6 +3,8 @@ package com.zutubi.pulse.core.commands.api;
 import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 
 import java.io.File;
@@ -24,6 +26,7 @@ public class TestCommandContext implements CommandContext
     private Map<String, String> properties = new HashMap<String, String>();
     private Map<String, String> links = new HashMap<String, String>();
     private Map<String, Output> outputs = new HashMap<String, Output>();
+    private Map<Pair<FieldScope, String>, String> customFields = new HashMap<Pair<FieldScope, String>, String>();
 
     /**
      * Create a new context that will return the given execution context from
@@ -106,6 +109,18 @@ public class TestCommandContext implements CommandContext
         return outputs;
     }
 
+    /**
+     * Returns all custom fields added via {@link #addCustomField(com.zutubi.pulse.core.engine.api.FieldScope, String, String)}.
+     * The map keys are (scope, name) pairs and the map values are the property
+     * values.
+     *
+     * @return all added custom fields
+     */
+    public Map<Pair<FieldScope, String>, String> getCustomFields()
+    {
+        return customFields;
+    }
+
     public void failure(String message)
     {
         addFeature(new Feature(Feature.Level.ERROR, message));
@@ -154,6 +169,11 @@ public class TestCommandContext implements CommandContext
         }
 
         output.setIndex(index);
+    }
+
+    public void addCustomField(FieldScope scope, String name, String value)
+    {
+        customFields.put(asPair(scope, name), value);
     }
 
     public void registerProcessors(String name, List<PostProcessorConfiguration> postProcessors)

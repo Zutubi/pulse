@@ -4,8 +4,6 @@
         <noop name="greeting"/>
     </recipe>
 
-    <recipe name="version" version="test version"/>
-
     <recipe name="failure">
         <failure name="born to fail"/>
     </recipe>

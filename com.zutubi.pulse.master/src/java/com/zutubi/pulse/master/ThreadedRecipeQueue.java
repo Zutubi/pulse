@@ -17,13 +17,13 @@ import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentResourcesDiscoveredEvent;
 import com.zutubi.pulse.master.events.build.BuildRevisionUpdatedEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
@@ -60,7 +60,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private boolean stopRequested = false;
     private boolean isRunning = false;
     /**
-     * * Maximum number of seconds between checks of the queue.  Usually
+     * Maximum number of seconds between checks of the queue.  Usually
      * checks occur due to the condition being flagged, but we need to
      * wake up periodically to enforce timeouts.
      */

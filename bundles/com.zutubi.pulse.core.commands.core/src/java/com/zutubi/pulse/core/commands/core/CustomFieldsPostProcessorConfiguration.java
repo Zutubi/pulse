@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.commands.core;
 
+import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfigurationSupport;
 import com.zutubi.tove.annotations.SymbolicName;
 
@@ -9,6 +10,8 @@ import com.zutubi.tove.annotations.SymbolicName;
 @SymbolicName("zutubi.customFieldPostProcessorConfig")
 public class CustomFieldsPostProcessorConfiguration extends PostProcessorConfigurationSupport
 {
+    private FieldScope scope = FieldScope.RECIPE;
+
     public CustomFieldsPostProcessorConfiguration()
     {
         super(CustomFieldsPostProcessor.class);
@@ -18,6 +21,16 @@ public class CustomFieldsPostProcessorConfiguration extends PostProcessorConfigu
     {
         super(CustomFieldsPostProcessor.class);
         setName(name);
+    }
+
+    public FieldScope getScope()
+    {
+        return scope;
+    }
+
+    public void setScope(FieldScope scope)
+    {
+        this.scope = scope;
     }
 }
 

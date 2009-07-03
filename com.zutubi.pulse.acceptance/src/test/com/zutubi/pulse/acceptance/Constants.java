@@ -92,6 +92,7 @@ public class Constants
          */
         public static class Command
         {
+            public static final String NAME = "name";
             public static final String CAPTURES = "outputs";
 
             /**
@@ -130,6 +131,21 @@ public class Constants
         {
             public static final String ARGUMENTS = "args";
             public static final String TARGETS = "targets";
+        }
+
+        /**
+         * Property names in the custom fields command class.
+         */
+        public static class CustomFieldsCommand extends Command
+        {
+            public static final String FIELDS = "fields";
+
+            public static class Field
+            {
+                public static final String NAME = "name";
+                public static final String VALUE = "value";
+                public static final String SCOPE = "scope";
+            }
         }
 
         /**

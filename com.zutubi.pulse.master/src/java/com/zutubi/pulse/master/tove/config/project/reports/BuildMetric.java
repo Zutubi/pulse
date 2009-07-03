@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.reports;
 
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.util.BinaryFunction;
 import com.zutubi.util.Constants;
-import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.logging.Logger;
 
 /**
  * Metrics that apply to a whole build result.
@@ -16,11 +17,11 @@ public enum BuildMetric
      */
     ELAPSED_TIME
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return (double)buildResult.getStamps().getElapsed() / Constants.SECOND;
                 }
@@ -32,11 +33,11 @@ public enum BuildMetric
      */
     TEST_TOTAL_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getTestSummary().getTotal();
                 }
@@ -48,11 +49,11 @@ public enum BuildMetric
      */
     TEST_PASS_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getTestSummary().getPassed();
                 }
@@ -64,11 +65,11 @@ public enum BuildMetric
      */
     TEST_FAIL_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getTestSummary().getFailures();
                 }
@@ -80,11 +81,11 @@ public enum BuildMetric
      */
     TEST_ERROR_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getTestSummary().getErrors();
                 }
@@ -96,11 +97,11 @@ public enum BuildMetric
      */
     TEST_SKIPPED_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getTestSummary().getSkipped();
                 }
@@ -112,11 +113,11 @@ public enum BuildMetric
      */
     TEST_BROKEN_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getTestSummary().getBroken();
                 }
@@ -128,11 +129,11 @@ public enum BuildMetric
      */
     TEST_SUCCESS_PERCENTAGE
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getTestSummary().getSuccessPercent();
                 }
@@ -144,11 +145,11 @@ public enum BuildMetric
      */
     TEST_BROKEN_PERCENTAGE
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return 100 - buildResult.getTestSummary().getSuccessPercent();
                 }
@@ -160,11 +161,11 @@ public enum BuildMetric
      */
     ERROR_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getErrorFeatureCount();
                 }
@@ -176,11 +177,11 @@ public enum BuildMetric
      */
     WARNING_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getWarningFeatureCount();
                 }
@@ -192,11 +193,11 @@ public enum BuildMetric
      */
     BROKEN_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getState().isBroken() ? 1 : 0;
                 }
@@ -208,18 +209,50 @@ public enum BuildMetric
      */
     SUCCESS_COUNT
     {
-        public UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
-            return new UnaryFunction<BuildResult, Number>()
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult)
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
                     return buildResult.getState().isBroken() ? 0 : 1;
                 }
             };
         }
+    },
+    /**
+     * The value of a custom field whose name is specified in the {@link BuildReportSeriesConfiguration}.
+     */
+    CUSTOM_FIELD
+    {
+        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(final BuildReportSeriesConfiguration config)
+        {
+            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
+            {
+                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
+                {
+                    String fieldName = config.getField();
+                    String fieldValue = recipeFields.getFieldValue(buildResult, fieldName);
+                    if (fieldValue != null)
+                    {
+                        try
+                        {
+                            return config.getFieldType().parse(fieldValue);
+                        }
+                        catch (NumberFormatException e)
+                        {
+                            LOG.warning("Unable to parse value of field '" + fieldName + "' (" + fieldValue + ") as a number for reporting");
+                        }
+                    }
+
+                    return null;
+                }
+            };
+        }
     };
 
+    private static final Logger LOG = Logger.getLogger(BuildMetric.class);
+    
     /**
      * Returns a function that can extract a value for this metric from a build
      * result.  The returned function may return null if passed a result that
@@ -228,5 +261,5 @@ public enum BuildMetric
      * @param config the series configuration this metric is being used for
      * @return a function that can extract the metric value from build results
      */
-    public abstract UnaryFunction<BuildResult, Number> getExtractionFunction(BuildReportSeriesConfiguration config);
+    public abstract BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config);
 }

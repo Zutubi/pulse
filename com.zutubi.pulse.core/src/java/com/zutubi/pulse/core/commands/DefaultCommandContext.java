@@ -2,6 +2,8 @@ package com.zutubi.pulse.core.commands;
 
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.*;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_CUSTOM_FIELDS;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
@@ -9,7 +11,10 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.Pair;
+import com.zutubi.util.TextUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
@@ -110,6 +115,18 @@ public class DefaultCommandContext implements CommandContext
         }
 
         spec.artifact.setIndex(index);
+    }
+
+    public void addCustomField(FieldScope scope, String name, String value)
+    {
+        if (!TextUtils.stringSet(name))
+        {
+            throw new IllegalArgumentException("Name must be specified");
+        }
+
+        @SuppressWarnings({"unchecked"})
+        Map<Pair<FieldScope, String>, String> fields = executionContext.getValue(NAMESPACE_INTERNAL, PROPERTY_CUSTOM_FIELDS, Map.class);
+        fields.put(asPair(scope, name), value);
     }
 
     public void registerProcessors(String name, List<PostProcessorConfiguration> postProcessors)

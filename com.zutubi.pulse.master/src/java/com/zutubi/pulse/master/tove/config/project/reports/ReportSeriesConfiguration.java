@@ -13,6 +13,8 @@ import com.zutubi.validation.annotations.Constraint;
 @Table(columns = {"name"})
 public abstract class ReportSeriesConfiguration extends AbstractNamedConfiguration
 {
+    private String field;
+    private MetricType fieldType;
     private boolean successfulOnly;
     @ControllingCheckbox(dependentFields = {"customColour"})
     private boolean useCustomColour;
@@ -35,6 +37,26 @@ public abstract class ReportSeriesConfiguration extends AbstractNamedConfigurati
         this.successfulOnly = successfulOnly;
         this.useCustomColour = true;
         this.customColour = customColour;
+    }
+
+    public String getField()
+    {
+        return field;
+    }
+
+    public void setField(String field)
+    {
+        this.field = field;
+    }
+
+    public MetricType getFieldType()
+    {
+        return fieldType;
+    }
+
+    public void setFieldType(MetricType fieldType)
+    {
+        this.fieldType = fieldType;
     }
 
     public boolean isSuccessfulOnly()

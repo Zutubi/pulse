@@ -8,10 +8,6 @@ import com.zutubi.pulse.core.model.RecipeResult;
 public class RecipeCompletedEvent extends RecipeEvent
 {
     private RecipeResult result;
-    /**
-     * If non-null, the build version as extracted when running this recipe.
-     */
-    private String buildVersion;
 
     private RecipeCompletedEvent()
     {
@@ -30,16 +26,6 @@ public class RecipeCompletedEvent extends RecipeEvent
         return result;
     }
 
-    public String getBuildVersion()
-    {
-        return buildVersion;
-    }
-
-    public void setBuildVersion(String buildVersion)
-    {
-        this.buildVersion = buildVersion;
-    }
-
     public boolean equals(Object o)
     {
         if (this == o)
@@ -56,11 +42,6 @@ public class RecipeCompletedEvent extends RecipeEvent
         }
 
         RecipeCompletedEvent event = (RecipeCompletedEvent) o;
-        if (buildVersion != null ? !buildVersion.equals(event.buildVersion) : event.buildVersion != null)
-        {
-            return false;
-        }
-
         return result.equals(event.result);
     }
 
@@ -68,7 +49,6 @@ public class RecipeCompletedEvent extends RecipeEvent
     {
         int result1 = super.hashCode();
         result1 = 31 * result1 + result.hashCode();
-        result1 = 31 * result1 + (buildVersion != null ? buildVersion.hashCode() : 0);
         return result1;
     }
 

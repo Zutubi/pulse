@@ -33,10 +33,6 @@ public class PulseExecutionContext implements ExecutionContext
      */
     private OutputStream outputStream = null;
 
-    // from the build - used by maven to specify the maven version number of the build.  We should
-    // pass this value around as a user(?) property rather than directly implemented as a field.
-    private String version = null;
-
     /**
      * A security token that can be used to authenticate processes that run during the build that
      * need access to the artifact repository.
@@ -53,7 +49,6 @@ public class PulseExecutionContext implements ExecutionContext
         this.scopeStack = new MultiScopeStack(other.scopeStack);
         this.workingDir = other.workingDir;
         this.outputStream = other.outputStream;
-        this.version = other.version;
         this.securityHash = other.securityHash;
     }
 
@@ -281,16 +276,6 @@ public class PulseExecutionContext implements ExecutionContext
     public void setOutputStream(OutputStream outputStream)
     {
         this.outputStream = outputStream;
-    }
-
-    public String getVersion()
-    {
-        return version;
-    }
-
-    public void setVersion(String version)
-    {
-        this.version = version;
     }
 
     public String getSecurityHash()

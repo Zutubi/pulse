@@ -9,6 +9,9 @@ import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
 import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
+import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
+import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
+import com.zutubi.pulse.core.engine.api.FieldScope;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -100,6 +103,36 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         browser.waitForElement(detailedViewPage.getCustomFieldsId(STAGE_DEFAULT));
         assertEquals(Double.toString(value1), detailedViewPage.getCustomFieldValue(STAGE_DEFAULT, 1));
         assertEquals(Double.toString(value2), detailedViewPage.getCustomFieldValue(STAGE_DEFAULT, 2));
+    }
+
+    public void testBuildScopedCustomFields() throws Exception
+    {
+        final String FIELD_NAME = "test field";
+        final String FIELD_VALUE = "3";
+
+        String projectPath = addProject(random, true);
+        String commandsPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS);
+
+        Hashtable<String, Object> field = xmlRpcHelper.createEmptyConfig(CustomFieldConfiguration.class);
+        field.put(Constants.Project.CustomFieldsCommand.Field.NAME, FIELD_NAME);
+        field.put(Constants.Project.CustomFieldsCommand.Field.VALUE, FIELD_VALUE);
+        field.put(Constants.Project.CustomFieldsCommand.Field.SCOPE, FieldScope.BUILD.toString());
+
+        Hashtable<String, Object> fields = new Hashtable<String, Object>();
+        fields.put(FIELD_NAME, field);
+
+        Hashtable<String, Object> command = xmlRpcHelper.createEmptyConfig(CustomFieldsCommandConfiguration.class);
+        command.put(Constants.Project.Command.NAME, "fields");
+        command.put(Constants.Project.CustomFieldsCommand.FIELDS, fields);
+
+        xmlRpcHelper.insertConfig(commandsPath, command);
+        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        loginAsAdmin();
+
+        BuildDetailedViewPage detailedViewPage = browser.openAndWaitFor(BuildDetailedViewPage.class, random, buildId);
+        browser.waitForElement(detailedViewPage.getCustomFieldsId(null));
+        assertEquals(FIELD_VALUE, detailedViewPage.getCustomFieldValue(null, 1));
     }
 
     public void testReportsSanity() throws Exception

@@ -6,6 +6,7 @@
         <command name="named-argument" class="com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration"/>
         <command name="print" class="com.zutubi.pulse.core.commands.core.PrintCommandConfiguration"/>
         <command name="sleep" class="com.zutubi.pulse.core.commands.core.SleepCommandConfiguration"/>
+        <command name="custom-fields" class="com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="regex-test.pp" display-name="regular expression test processor"

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.charting.build;
 
-import com.zutubi.pulse.core.model.RecipeCustomFields;
-import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.Result;
+import com.zutubi.pulse.core.model.ResultCustomFields;
 import com.zutubi.pulse.master.tove.config.project.reports.CustomFieldSource;
 
 import java.io.File;
@@ -16,20 +16,20 @@ import java.util.Map;
 public class DefaultCustomFieldSource implements CustomFieldSource
 {
     private File dataRoot;
-    private Map<RecipeResult, RecipeCustomFields> resultToFields = new HashMap<RecipeResult, RecipeCustomFields>();
+    private Map<Result, ResultCustomFields> resultToFields = new HashMap<Result, ResultCustomFields>();
 
     public DefaultCustomFieldSource(File dataRoot)
     {
         this.dataRoot = dataRoot;
     }
 
-    public String getFieldValue(RecipeResult recipeResult, String name)
+    public String getFieldValue(Result result, String name)
     {
-        RecipeCustomFields customFields = resultToFields.get(recipeResult);
+        ResultCustomFields customFields = resultToFields.get(result);
         if (customFields == null)
         {
-            customFields = new RecipeCustomFields(recipeResult.getAbsoluteOutputDir(dataRoot));
-            resultToFields.put(recipeResult, customFields);
+            customFields = new ResultCustomFields(result.getAbsoluteOutputDir(dataRoot));
+            resultToFields.put(result, customFields);
         }
 
         return customFields.load().get(name);

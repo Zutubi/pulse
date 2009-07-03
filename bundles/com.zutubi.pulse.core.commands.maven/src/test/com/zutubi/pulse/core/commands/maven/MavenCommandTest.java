@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core.commands.maven;
 
-import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
+import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.SystemUtils;
 
 import java.io.File;
@@ -29,9 +30,8 @@ public class MavenCommandTest extends ExecutableCommandTestCase
     {
         copyMavenFile("basic", "project.xml");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
-        PulseExecutionContext context = (PulseExecutionContext) createExecutionContext();
-        runCommand(new MavenCommand(command), context);
-        assertEquals("1.0-SNAPSHOT", context.getVersion());
+        TestCommandContext context = runCommand(new MavenCommand(command), createExecutionContext());
+        assertEquals("1.0-SNAPSHOT", context.getCustomFields().get(asPair(FieldScope.BUILD, "maven.version")));
     }
 
     public void testRunSpecificTarget() throws Exception

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.reports;
 
+import com.zutubi.tove.annotations.ControllingSelect;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 
@@ -7,9 +8,10 @@ import com.zutubi.tove.annotations.SymbolicName;
  * A report series that takes data from builds.
  */
 @SymbolicName("zutubi.buildReportSeriesConfig")
-@Form(fieldOrder = {"name", "metric", "successfulOnly", "useCustomColour", "customColour"})
+@Form(fieldOrder = {"name", "metric", "field", "fieldType", "successfulOnly", "useCustomColour", "customColour"})
 public class BuildReportSeriesConfiguration extends ReportSeriesConfiguration
 {
+    @ControllingSelect(dependentFields = {"field", "fieldType"}, enableSet = {"CUSTOM_FIELD"})
     private BuildMetric metric;
 
     public BuildReportSeriesConfiguration()

@@ -68,11 +68,11 @@ public class ReportBuilder
     private void addBuildSeries(ReportData reportData, BuildReportSeriesConfiguration seriesConfig, List<BuildResult> dataSet)
     {
         SeriesData seriesData = new SeriesData(seriesConfig.getName());
-        UnaryFunction<BuildResult, Number> extractFn = seriesConfig.getMetric().getExtractionFunction(seriesConfig);
+        BinaryFunction<BuildResult, CustomFieldSource, Number> extractFn = seriesConfig.getMetric().getExtractionFunction(seriesConfig);
 
         for (BuildResult build: dataSet)
         {
-            Number value = extractFn.process(build);
+            Number value = extractFn.process(build, customFieldSource);
             if (value != null)
             {
                 seriesData.addPoint(new DataPoint(build.getNumber(), value));
