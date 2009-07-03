@@ -126,7 +126,7 @@ public class CollapsedCollectionAcceptanceTest extends SeleniumTestBase
 
         ConfigurationForm recipeForm = browser.createForm(ConfigurationForm.class, RecipeConfiguration.class, true);
         recipeForm.waitFor();
-        recipeForm.applyFormElements(NEW_NAME, null);
+        recipeForm.applyFormElements(NEW_NAME);
         
         waitForRecipePage(random, NEW_NAME);
     }
