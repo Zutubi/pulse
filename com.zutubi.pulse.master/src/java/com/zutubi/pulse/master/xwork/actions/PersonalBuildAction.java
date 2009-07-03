@@ -19,8 +19,12 @@ import org.acegisecurity.AccessDeniedException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
+ * Action for requesting a personal build.  The personal build client posts to
+ * this action, with both simple parameters and a file upload (the patch).
  */
 public class PersonalBuildAction extends ActionSupport
 {
@@ -28,8 +32,9 @@ public class PersonalBuildAction extends ActionSupport
 
     private String project;
     private String revision;
-    private long number;
-    private String errorMessage;
+    private long number = 0;
+    private List<String> responseErrors = new LinkedList<String>();
+    private List<String> responseWarnings = new LinkedList<String>();
     private MasterConfigurationManager configurationManager;
     private BuildManager buildManager;
 
@@ -48,9 +53,14 @@ public class PersonalBuildAction extends ActionSupport
         return number;
     }
 
-    public String getErrorMessage()
+    public List<String> getResponseErrors()
     {
-        return errorMessage;
+        return responseErrors;
+    }
+
+    public List<String> getResponseWarnings()
+    {
+        return responseWarnings;
     }
 
     public String execute()
@@ -67,7 +77,7 @@ public class PersonalBuildAction extends ActionSupport
 
         if(user == null)
         {
-            errorMessage = "Unable to determine user";
+            responseErrors.add("Unable to determine user");
             return ERROR;
         }
 
@@ -78,7 +88,7 @@ public class PersonalBuildAction extends ActionSupport
 
         if (!(request instanceof MultiPartRequestWrapper))
         {
-            errorMessage = "Invalid request: expecting multipart POST";
+            responseErrors.add("Invalid request: expecting multipart POST");
             return ERROR;
         }
 
@@ -86,27 +96,27 @@ public class PersonalBuildAction extends ActionSupport
         File[] files = mpr.getFiles("patch.zip");
         if(files == null || files.length == 0 || files[0] == null)
         {
-            errorMessage = "POST does not contain required file parameter 'patch.zip'";
+            responseErrors.add("POST does not contain required file parameter 'patch.zip'");
             return ERROR;
         }
 
         File uploadedPatch = files[0];
         if(!uploadedPatch.exists())
         {
-            errorMessage = "Uploaded patch file '" + uploadedPatch.getAbsolutePath() + "' does not exist";
+            responseErrors.add("Uploaded patch file '" + uploadedPatch.getAbsolutePath() + "' does not exist");
             return ERROR;
         }
 
         if(!uploadedPatch.isFile())
         {
-            errorMessage = "Uploaded patch file '" + uploadedPatch.getAbsolutePath() + "' is not a regular file";
+            responseErrors.add("Uploaded patch file '" + uploadedPatch.getAbsolutePath() + "' is not a regular file");
             return ERROR;
         }
 
         Project p = projectManager.getProject(project, false);
         if(p == null)
         {
-            errorMessage = "Unknown project '" + project + "'";
+            responseErrors.add("Unknown project '" + project + "'");
             return ERROR;
         }
 
@@ -115,20 +125,28 @@ public class PersonalBuildAction extends ActionSupport
         File patchDir = paths.getUserPatchDir(user.getId());
         if(!patchDir.isDirectory())
         {
-            patchDir.mkdirs();
+            if (!patchDir.mkdirs())
+            {
+                responseErrors.add("Unable to create patch directory '" + patchDir.getAbsolutePath() + "'.");
+                return ERROR;
+            }
         }
 
         File patchFile = paths.getUserPatchFile(user.getId(), number);
         if(patchFile.exists())
         {
-            errorMessage = "Patch file '" + patchFile.getAbsolutePath() + "' already exists.  Retry the build.";
+            responseErrors.add("Patch file '" + patchFile.getAbsolutePath() + "' already exists.  Retry the build.");
+            return ERROR;
         }
 
         PatchArchive archive;
         try
         {
             IOUtils.copyFile(uploadedPatch, patchFile);
-            uploadedPatch.delete();
+            if (!uploadedPatch.delete())
+            {
+                responseWarnings.add("Unable to clean up uploaded patch.");
+            }
             
             archive = new PatchArchive(patchFile);
             projectManager.triggerBuild(number, p, user, convertRevision(p), archive);
@@ -136,7 +154,7 @@ public class PersonalBuildAction extends ActionSupport
         catch (Exception e)
         {
             LOG.severe(e);
-            errorMessage = e.getClass().getName() + ": " + e.getMessage();
+            responseErrors.add(e.getClass().getName() + ": " + e.getMessage());
             return ERROR;
         }
 
@@ -155,6 +173,8 @@ public class PersonalBuildAction extends ActionSupport
             if (lastKnownGood == null)
             {
                 // Let it float.
+                responseWarnings.add("No successful build to establish last known good revision.");
+                responseWarnings.add("Using floating revision.");
                 return null;
             }
             else

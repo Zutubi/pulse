@@ -11,7 +11,7 @@ import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.Pair;
 import com.zutubi.util.TextUtils;
-import com.zutubi.util.io.IOUtils;
+import nu.xom.ParsingException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -462,24 +462,32 @@ public class PersonalBuildClient
             if (status == HttpStatus.SC_OK)
             {
                 // That's good ... now check the response
-                String response = IOUtils.inputStreamToString(post.getResponseBodyAsStream());
-                if (response.startsWith("OK:"))
+                try
                 {
-                    String numberStr = response.substring(3);
-                    try
+                    PersonalBuildResponse response = PersonalBuildResponse.parse(post.getResponseBodyAsStream());
+                    for (String warning: response.getWarnings())
                     {
-                        long number = Long.parseLong(numberStr);
-                        ui.status("Patch accepted: personal build " + numberStr + ".");
-                        return number;
+                        ui.warning(warning);
                     }
-                    catch (NumberFormatException e)
+
+                    for (String error: response.getErrors())
                     {
-                        throw new PersonalBuildException("Pulse server returned invalid build number '" + numberStr + "'");
+                        ui.error(error);
+                    }
+
+                    if (response.isSuccess())
+                    {
+                        ui.status("Patch accepted: personal build " + response.getNumber() + ".");
+                        return response.getNumber();
+                    }
+                    else
+                    {
+                        throw new PersonalBuildException("Patch rejected.");
                     }
                 }
-                else
+                catch (ParsingException e)
                 {
-                    throw new PersonalBuildException("Pulse server responded with: " + response);
+                    throw new PersonalBuildException("Unable to parse response from server: " + e.getMessage(), e);
                 }
             }
             else

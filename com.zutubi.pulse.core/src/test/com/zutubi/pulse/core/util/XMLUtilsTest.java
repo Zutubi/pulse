@@ -2,8 +2,6 @@ package com.zutubi.pulse.core.util;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
-/**
- */
 public class XMLUtilsTest extends PulseTestCase
 {
     public void testRemoveIllegalCharactersEmpty()
@@ -45,5 +43,20 @@ public class XMLUtilsTest extends PulseTestCase
     public void testRemoveIllegalCharactersMixed()
     {
         assertEquals("abcdefghi", XMLUtils.removeIllegalCharacters("\u0000ab\u0011c\u0012\u0002def\u0000g\u0001\u0001\u0001hi"));
+    }
+
+    public void testEscapeEmpty()
+    {
+        assertEquals("", XMLUtils.escape(""));
+    }
+
+    public void testEscapeWhitespace()
+    {
+        assertEquals(" \n \t", XMLUtils.escape(" \n \t"));
+    }
+
+    public void testEscapeSpecials()
+    {
+        assertEquals("&lt;this&gt; is bad &amp; so is &lt;that&gt;", XMLUtils.escape("<this> is bad & so is <that>"));
     }
 }

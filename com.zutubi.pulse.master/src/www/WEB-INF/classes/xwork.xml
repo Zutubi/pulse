@@ -313,8 +313,8 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="personalBuild" class="com.zutubi.pulse.master.xwork.actions.PersonalBuildAction">
-            <result name="error" type="velocity">error.vm</result>
-            <result name="success" type="velocity">success.vm</result>
+            <result name="error" type="velocity">response.vm</result>
+            <result name="success" type="velocity">response.vm</result>
         </action>
     </package>
 

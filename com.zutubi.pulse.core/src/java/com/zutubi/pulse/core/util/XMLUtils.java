@@ -223,4 +223,19 @@ public class XMLUtils
 
         return child;
     }
+
+    /**
+     * Escapes XML special characters in the given string, converting it to a
+     * form suitable for direct inclusion in an XML document.  For example,
+     * &lt; will be replaced with &amp;lt;.
+     *
+     * @param s the string to escape
+     * @return the string with all XML special characters escaped
+     * @throws IllegalCharacterDataException if the input string contains
+     *         characters that cannot be represented in XML
+     */
+    public static String escape(String s)
+    {
+        return new Text(s).toXML();
+    }
 }
