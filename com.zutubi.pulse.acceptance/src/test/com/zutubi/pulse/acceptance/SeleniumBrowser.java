@@ -29,9 +29,9 @@ import java.util.Arrays;
  */
 public class SeleniumBrowser
 {
-    public static final long PAGELOAD_TIMEOUT = 30000;
-    public static final long WAITFOR_TIMEOUT = 30000;
-    public static final long REFRESH_TIMEOUT = 30000;
+    public static final long PAGELOAD_TIMEOUT = 60000;
+    public static final long WAITFOR_TIMEOUT = 60000;
+    public static final long REFRESH_TIMEOUT = 60000;
 
     private static final int SELENIUM_PORT = 4446;
     
