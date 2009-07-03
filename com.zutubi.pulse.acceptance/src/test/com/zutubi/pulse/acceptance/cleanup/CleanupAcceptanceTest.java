@@ -167,15 +167,11 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     public void testCleanupRepositoryArtifacts() throws Exception
     {
         final String projectName = random;
-
-        utils.addCleanupRule(projectName, "repository_artifacts", CleanupWhat.REPOSITORY_ARTIFACTS);
-
-        xmlRpcHelper.runBuild(projectName);
-        waitForCleanupToRunAsynchronously();
-
-        assertTrue(utils.hasIvyFile(projectName, 1));
+        prepareProjectWithRepositoryCleanup(projectName);
 
         xmlRpcHelper.runBuild(projectName);
+        assertTrue(utils.hasIvyFile(projectName, 2));
+
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
             public boolean notSatisfied() throws Exception
@@ -184,25 +180,18 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        assertTrue(utils.hasIvyFile(projectName, 2));
         assertFalse(utils.hasIvyFile(projectName, 1));
     }
 
     public void testCleanupRepositoryArtifactsAfterProjectRename() throws Exception
     {
         final String projectName = random;
-
-        utils.addCleanupRule(projectName, "repository_artifacts", CleanupWhat.REPOSITORY_ARTIFACTS);
-
-        xmlRpcHelper.runBuild(projectName);
-        waitForCleanupToRunAsynchronously();
-
-        assertTrue(utils.hasIvyFile(projectName, 1));
+        prepareProjectWithRepositoryCleanup(projectName);
 
         // rename the project.
         String newProjectName = renameProject(projectName);
-
         xmlRpcHelper.runBuild(newProjectName);
+
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
             public boolean notSatisfied() throws Exception
@@ -213,6 +202,16 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
         assertTrue(utils.hasIvyFile(newProjectName, 2));
         assertFalse(utils.hasIvyFile(projectName, 1));
+    }
+
+    private void prepareProjectWithRepositoryCleanup(String projectName) throws Exception
+    {
+        utils.addCleanupRule(projectName, "repository_artifacts", CleanupWhat.REPOSITORY_ARTIFACTS);
+
+        xmlRpcHelper.runBuild(projectName);
+        waitForCleanupToRunAsynchronously();
+
+        assertTrue(utils.hasIvyFile(projectName, 1));
     }
 
     public void testCleanupLogs() throws Exception
