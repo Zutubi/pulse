@@ -15,6 +15,7 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.cleanup.FileDeletionService;
 import com.zutubi.pulse.master.database.DatabaseConsole;
+import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
 import com.zutubi.pulse.master.model.persistence.ArtifactDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
@@ -605,33 +606,40 @@ public class DefaultBuildManager implements BuildManager
             IvyClient ivy = ivyManager.createIvyClient(masterLocation + WebManager.REPOSITORY_PATH);
             ivy.addCredentials(host, "pulse", securityToken);
 
-            // this mrid will only reference the latest path, so:
-            // a) find all of the paths for our project.
-            List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(build.getProject().getConfig().getHandle())));
+            String candidateIvyPath = ivy.getIvyPath(MasterIvyModuleRevisionId.newInstance(build), build.getVersion());
+            File candidateIvyFile = new File(repositoryRoot, candidateIvyPath);
+            if (!candidateIvyFile.isFile())
+            {
+                List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(build.getProject().getConfig().getHandle())));
 
-            // file the ivy file.
-            String path = CollectionUtils.find(paths, new Predicate<String>()
-            {
-                public boolean satisfied(String path)
+                // file the ivy file.
+                candidateIvyPath = CollectionUtils.find(paths, new Predicate<String>()
                 {
-                    return new File(repositoryRoot, path + "/ivy-" + build.getVersion() + ".xml").isFile();
-                }
-            });
-            File ivyFile = new File(repositoryRoot, path + "/ivy-" + build.getVersion() + ".xml");
-            URL ivyUrl = ivyFile.toURI().toURL();
-            
-            List<String> artifacts = ivy.getArtifactPaths(ivyUrl);
-            if (artifacts != null)
-            {
-                for (String relativePath : artifacts)
-                {
-                    File file = new File(repositoryRoot, relativePath);
-                    repositoryFiles.add(file);
-                    repositoryFiles.addAll(findRelatedFiles(file));
-                }
+                    public boolean satisfied(String path)
+                    {
+                        return new File(repositoryRoot, path + "/ivy-" + build.getVersion() + ".xml").isFile();
+                    }
+                });
+                candidateIvyFile = new File(repositoryRoot, candidateIvyPath + "/ivy-" + build.getVersion() + ".xml");
             }
-            repositoryFiles.add(ivyFile);
-            repositoryFiles.addAll(findRelatedFiles(ivyFile));
+
+            if (candidateIvyFile.isFile())
+            {
+                URL ivyUrl = candidateIvyFile.toURI().toURL();
+
+                List<String> artifacts = ivy.getArtifactPaths(ivyUrl);
+                if (artifacts != null)
+                {
+                    for (String relativePath : artifacts)
+                    {
+                        File file = new File(repositoryRoot, relativePath);
+                        repositoryFiles.add(file);
+                        repositoryFiles.addAll(findRelatedFiles(file));
+                    }
+                }
+                repositoryFiles.add(candidateIvyFile);
+                repositoryFiles.addAll(findRelatedFiles(candidateIvyFile));
+            }
         }
         finally
         {
