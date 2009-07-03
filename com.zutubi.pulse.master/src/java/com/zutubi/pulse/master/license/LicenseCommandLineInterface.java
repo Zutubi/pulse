@@ -2,10 +2,10 @@ package com.zutubi.pulse.master.license;
 
 import org.apache.commons.cli.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
-
-import static com.zutubi.pulse.master.license.LicenseEncoder.*;
+import java.util.TimeZone;
 
 /**
  * A command line interface that provides the website with access to the
@@ -55,8 +55,16 @@ public class LicenseCommandLineInterface
         int execute();
     }
 
+    private SimpleDateFormat getDateFormat()
+    {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return format;
+    }
+
     private class Encode implements Command
     {
+
         private License license;
 
         @SuppressWarnings({"AccessStaticViaInstance" })
@@ -88,7 +96,7 @@ public class LicenseCommandLineInterface
             Date expiry = null;
             if (!expiryString.equals("Never"))
             {
-                expiry = DATE_FORMAT.parse(expiryString);
+                expiry = getDateFormat().parse(expiryString);
             }
 
             String supportedString = commandLine.getOptionValue('s');
@@ -110,10 +118,12 @@ public class LicenseCommandLineInterface
             System.out.println(encodedLicense);
             return 0;
         }
+
     }
 
     private class Decode implements Command
     {
+
         private String key;
 
         @SuppressWarnings({"AccessStaticViaInstance" })
@@ -135,13 +145,14 @@ public class LicenseCommandLineInterface
             License license = decoder.decode(key);
             System.out.println("type:" + license.getType().toString());
             System.out.println("holder:" + license.getHolder());
-            System.out.println("expiry:" + ((license.getExpiryDate() != null) ? DATE_FORMAT.format(license.getExpiryDate()): "Never"));
+            System.out.println("expiry:" + ((license.getExpiryDate() != null) ? getDateFormat().format(license.getExpiryDate()): "Never"));
             System.out.println("supports:" + license.getSupportedAgents() + ":" +
                     license.getSupportedProjects() + ":" +
                     license.getSupportedUsers() + ":" +
                     license.getSupportedContactPoints());
             return 0;
         }
+
     }
 
 }

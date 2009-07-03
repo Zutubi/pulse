@@ -291,6 +291,13 @@ public class ReflectionUtils
         return Modifier.isFinal(member.getModifiers());
     }
 
+    public static Object getFieldValue(Object target, String fieldName) throws NoSuchFieldException, IllegalAccessException
+    {
+        Field f = target.getClass().getDeclaredField(fieldName);
+        f.setAccessible(true);
+        return f.get(target);
+    }
+
     /**
      * Sets the given instance's given field to the given value via reflection,
      * working around any accessibility constraint (e.g. fields declared

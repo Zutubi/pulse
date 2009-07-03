@@ -93,7 +93,7 @@
             <arg value="encode"/>
             <arg value="-t"/><arg value="EVALUATION"/> <!-- license type -->
             <arg value="-h"/><arg value="S O MeBody"/> <!-- license holder -->
-            <arg value="-e"/><arg value="2001-10-10 10:10:10 gmt"/> <!-- license expiry -->
+            <arg value="-e"/><arg value="2001-10-11 01:10:10"/> <!-- license expiry -->
             <arg value="-s"/><arg value="1:1:1:1"/> <!-- support -->
         </java>
     </target>
@@ -101,7 +101,7 @@
     <target name="check.decode">
         <java jar="build/encoder.jar" fork="true">
             <arg value="decode"/>
-            <arg value="-k"/><arg value="AAAANkVWQUxVQVRJT04KUyBPIE1lQm9keQoyMDAxLTEwLTEwIDIwOjEwOjEwIEVTVAoxCjEKMQoxCkl7nxBA99MM08HLqI6PoS97a0cWtL25pI+xi1dbt31zRkjcn5QkSItugCHNf3Upqgq9CDa/vDh4tYB8nzFVJEnsnVHfAs7ExLgYKo19HGHpFBljsUDeTChUk0e2R+mHgByxd+rAtMzN3UV8GjU5yNODCI+5CEkHlN5T+QWCrLIa"/>
+            <arg value="-k"/><arg value="AAAANkVWQUxVQVRJT04KUyBPIE1lQm9keQoyMDAxLTEwLTExIDAyOjEwOjEwIEJTVAoxCjEKMQoxCkcjqWmI3CvX7L4slr/CCYOMEf4IucBMaIytyQePB7nz4+aQabCsAvnwLrKmtwxnNK6g5XadC1GJdlcIuSFDgifcBLCwyZMwKXMDCFc976c1nmtm6vIKVnDppslp0Fsv/ZK2ieiPl7fjJa4Z6rQN//cLKVtaggMVABJuG1hI/1WK"/>
         </java>
     </target>
 

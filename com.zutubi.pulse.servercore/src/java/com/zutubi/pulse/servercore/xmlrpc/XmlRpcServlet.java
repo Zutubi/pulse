@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servercore.xmlrpc;
 
-import com.zutubi.util.ObjectUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.ReflectionUtils;
 import org.apache.xmlrpc.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.XmlRpcServer;
 import org.apache.xmlrpc.XmlRpcWorker;
@@ -31,7 +31,7 @@ public class XmlRpcServlet extends HttpServlet
                 try
                 {
                     // extract the handler mapping - stupid i know, but there are limited options.
-                    XmlRpcHandlerMapping handlerMapping = (XmlRpcHandlerMapping) ObjectUtils.getField("handlerMapping", worker);
+                    XmlRpcHandlerMapping handlerMapping = (XmlRpcHandlerMapping) ReflectionUtils.getFieldValue(worker, "handlerMapping");
                     return new PulseXmlRpcWorker(handlerMapping);
                 }
                 catch (Exception e)
