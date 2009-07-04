@@ -46,6 +46,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
         // We should be denied access and redirected to the login page.
         LoginPage loginPage = browser.createPage(LoginPage.class);
+        loginPage.waitFor();
         assertTitle(loginPage);
     }
 
@@ -62,7 +63,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         form.saveFormElements("login_" + random, "name_" + random, "password", "password");
 
         WelcomePage welcomePage = browser.createPage(WelcomePage.class);
-        assertTrue(welcomePage.isPresent());
+        welcomePage.waitFor();
         assertTitle(welcomePage);
         assertTextPresent("name_" + random);
         assertElementPresent(ID_DASHBOARD_TAB);
@@ -74,7 +75,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     public void testAnonymousSignupDisabled() throws Exception
     {
         ensureSetting(KEY_ANONYMOUS_SIGNUP, false);
-        LoginPage loginPage = browser.open(LoginPage.class);
+        LoginPage loginPage = browser.openAndWaitFor(LoginPage.class);
         assertFalse(loginPage.isSignupPresent());
         browser.open(SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
@@ -88,7 +89,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
         browser.open(SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
-        assertTrue(form.isFormPresent());
+        form.waitFor();
         form.saveFormElements(random, random, "p1", "p2");
         assertTrue(form.isFormPresent());
         assertTextPresent("passwords do not match");
@@ -99,7 +100,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
         browser.open(SIGNUP_INPUT_ACTION);
         SignupForm form = browser.createForm(SignupForm.class);
-        assertTrue(form.isFormPresent());
+        form.waitFor();
         form.saveFormElements("admin", "name", "p", "p");
         assertTrue(form.isFormPresent());
         assertTextPresent("login 'admin' is already in use");
@@ -109,8 +110,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
     {
         ensureSetting(KEY_ANONYMOUS_ACCESS, true);
 
-        BrowsePage browsePage = browser.open(BrowsePage.class);
-        assertTrue(browsePage.isPresent());
+        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
         assertTitle(browsePage);
         assertElementPresent(ID_LOGIN);
 
