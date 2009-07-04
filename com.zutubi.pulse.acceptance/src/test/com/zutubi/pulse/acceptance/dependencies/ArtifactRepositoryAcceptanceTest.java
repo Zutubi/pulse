@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.ProjectManager;
 
 import java.util.Hashtable;
@@ -38,7 +39,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = createAndRunIvyAntProject("publish");
 
         // ensure that the build passed.
-        assertTrue(isBuildSuccessful(random, buildNumber));
+        assertEquals(ResultState.SUCCESS, getBuildStatus(random, buildNumber));
 
         assertTrue(isInArtifactRepository("zutubi/com.zutubi.sample/jars"));
     }
@@ -53,7 +54,7 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = createAndRunIvyAntProject("retrieve");
 
         // ensure that the build passed.
-        assertTrue(isBuildSuccessful(random, buildNumber));
+        assertEquals(ResultState.SUCCESS, getBuildStatus(random, buildNumber));
     }
 
     private int createAndRunIvyAntProject(String target) throws Exception

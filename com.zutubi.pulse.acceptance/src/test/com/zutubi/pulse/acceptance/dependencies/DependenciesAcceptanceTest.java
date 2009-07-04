@@ -6,6 +6,7 @@ import static com.zutubi.pulse.acceptance.Constants.Project.Dependencies.*;
 import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
@@ -154,7 +155,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         build.addFileToCreate("incorrect/path/artifact.jar");
 
         int buildNumber = triggerBuild(project, build);
-        assertTrue(isBuildErrored(project.getName(), buildNumber));
+        assertEquals(ResultState.ERROR, getBuildStatus(project.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(project, buildNumber);
@@ -456,7 +457,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         buildB.addExpectedFile("lib/artifact.jar");
 
         int buildNumber = triggerBuild(projectB, buildB);
-        assertTrue(isBuildFailure(projectB.getName(), buildNumber));
+        assertEquals(ResultState.FAILURE, getBuildStatus(projectB.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(projectB, buildNumber);
@@ -541,29 +542,26 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private int triggerSuccessfulBuild(Project project, AntBuildConfiguration build) throws Exception
     {
         int buildNumber = triggerBuild(project, build);
-        assertTrue(isBuildSuccessful(project.getName(), buildNumber));
+        assertEquals(ResultState.SUCCESS, getBuildStatus(project.getName(), buildNumber));
         return buildNumber;
     }
 
     private int triggerSuccessfulBuild(Project project, AntBuildConfiguration build, String status) throws Exception
     {
         int buildNumber = triggerBuild(project, build, status);
-        assertTrue(isBuildSuccessful(project.getName(), buildNumber));
+        assertEquals(ResultState.SUCCESS, getBuildStatus(project.getName(), buildNumber));
         return buildNumber;
     }
 
     private int triggerBuild(Project project, AntBuildConfiguration build, String status) throws Exception
     {
         triggerBuildCommon(project, build);
-
         return xmlRpcHelper.runBuild(project.getName(), asPair("status", (Object)status));
     }
 
     private int triggerBuild(Project project, AntBuildConfiguration build) throws Exception
     {
-        // for each stage, set the necessary build properties.
         triggerBuildCommon(project, build);
-
         return xmlRpcHelper.runBuild(project.getName());
     }
 

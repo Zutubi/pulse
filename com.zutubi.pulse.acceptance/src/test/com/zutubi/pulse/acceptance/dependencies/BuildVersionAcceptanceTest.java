@@ -7,6 +7,7 @@ import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUti
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Predicate;
@@ -50,7 +51,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         // trigger a successful build.
         int buildNumber = xmlRpcHelper.runBuild(projectName);
-        assertTrue(isBuildSuccessful(projectName, buildNumber));
+        assertEquals(ResultState.SUCCESS, getBuildStatus(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, Integer.toString(buildNumber));
     }
@@ -60,7 +61,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String buildVersion = "FIXED";
 
         int buildNumber = xmlRpcHelper.runBuild(projectName, asPair("version", (Object)buildVersion));
-        assertTrue(isBuildSuccessful(projectName, buildNumber));
+        assertEquals(ResultState.SUCCESS, getBuildStatus(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, buildVersion);
     }
@@ -70,7 +71,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String buildVersion = "${project}-${build.number}";
 
         int buildNumber = xmlRpcHelper.runBuild(projectName, asPair("version", (Object)buildVersion));
-        assertTrue(isBuildSuccessful(projectName, buildNumber));
+        assertEquals(ResultState.SUCCESS, getBuildStatus(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, projectName + "-" + buildNumber);
     }

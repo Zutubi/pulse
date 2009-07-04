@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.RandomUtils;
 import org.apache.commons.httpclient.HttpClient;
@@ -104,25 +105,10 @@ public class BaseXmlRpcAcceptanceTest extends PulseTestCase
         }
     }
 
-    protected boolean isBuildSuccessful(String projectName, int buildNumber) throws Exception
-    {
-        return "success".compareTo(getBuildStatus(projectName, buildNumber)) == 0;
-    }
-
-    protected boolean isBuildFailure(String projectName, int buildNumber) throws Exception
-    {
-        return "failure".compareTo(getBuildStatus(projectName, buildNumber)) == 0;
-    }
-
-    protected boolean isBuildErrored(String projectName, int buildNumber) throws Exception
-    {
-        return "error".compareTo(getBuildStatus(projectName, buildNumber)) == 0;
-    }
-
-    protected String getBuildStatus(String projectName, int buildNumber) throws Exception
+    protected ResultState getBuildStatus(String projectName, int buildNumber) throws Exception
     {
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, buildNumber);
-        return (String) build.get("status");
+        return ResultState.fromPrettyString((String) build.get("status"));
     }
 
     protected String downloadAsAdmin(String url) throws IOException
