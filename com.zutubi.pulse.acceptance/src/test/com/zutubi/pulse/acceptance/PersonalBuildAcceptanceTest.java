@@ -3,8 +3,12 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.WorkingCopy;
+import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
 import com.zutubi.pulse.dev.personal.PersonalBuildClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
@@ -15,7 +19,9 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNDepth;
@@ -74,7 +80,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
-        long buildNumber = runPersonalBuild("failure");
+        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
         verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
 
         PersonalEnvironmentArtifactPage envPage = browser.openAndWaitFor(PersonalEnvironmentArtifactPage.class, PROJECT_NAME, buildNumber, "default", "build");
@@ -96,12 +102,12 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         {
             checkout(Constants.TRIVIAL_ANT_REPOSITORY);
             makeChangeToBuildFile();
-            createConfigFile(PROJECT_NAME, "localhost", PROXY_PORT);
+            createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_PROXY_HOST, "localhost"), asPair(PersonalBuildConfig.PROPERTY_PROXY_PORT, PROXY_PORT));
 
             loginAsAdmin();
             ensureProject(PROJECT_NAME);
             editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
-            long buildNumber = runPersonalBuild("failure");
+            long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
             verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
         }
         finally
@@ -134,7 +140,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         ensureAgent(AGENT_NAME);
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
-        long buildNumber = runPersonalBuild("failure");
+        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
         verifyPersonalBuildTabs(buildNumber, AGENT_NAME);
     }
 
@@ -159,7 +165,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
-        long buildNumber = runPersonalBuild("failure");
+        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
 
         // Finally check that only the enabled hooks ran.
         String text = getLogText(urls.dashboardMyBuildLog(Long.toString(buildNumber)));
@@ -189,7 +195,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
-        long buildNumber = runPersonalBuild("failure");
+        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
 
         PersonalBuildSummaryPage page = browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTrue(page.isHookPresent(HOOK_NAME));
@@ -198,6 +204,42 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         browser.waitForVisible("status-message");
         assertTextPresent("triggered hook '" + HOOK_NAME + "'");
     }
+
+    public void testPersonalBuildFloatingRevision() throws Exception
+    {
+        checkout(Constants.TRIVIAL_ANT_REPOSITORY);
+        makeChangeToBuildFile();
+        createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_REVISION, WorkingCopy.REVISION_FLOATING));
+
+        loginAsAdmin();
+        ensureProject(PROJECT_NAME);
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
+        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
+
+        // Check that we actually built against the latest.
+        SubversionClient client = new SubversionClient(Constants.TRIVIAL_ANT_REPOSITORY);
+        Revision revision = client.getLatestRevision(null);
+
+        PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
+        assertEquals(revision.getRevisionString(), changesPage.getCheckedOutRevision());
+    }
+
+    public void testPersonalBuildConflicts() throws Exception
+    {
+        checkout(Constants.TRIVIAL_ANT_REPOSITORY);
+        makeChangeToBuildFile();
+        // Set revision to something before the last edit to the build file.
+        createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_REVISION, "1"), asPair(PersonalBuildConfig.PROPERTY_UPDATE, false));
+
+        loginAsAdmin();
+        ensureProject(PROJECT_NAME);
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
+        long buildNumber = runPersonalBuild(ResultState.ERROR.getPrettyString());
+
+        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTextPresent("Patch does not apply cleanly");
+    }
+
 
     private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception
     {
@@ -270,12 +312,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         return buildNumber;
     }
 
-    private void createConfigFile(String projectName) throws IOException
-    {
-        createConfigFile(projectName, null, 0);
-    }
-
-    private void createConfigFile(String projectName, String proxyHost, int proxyPort) throws IOException
+    private void createConfigFile(String projectName, Pair<String, ?>... extraProperties) throws IOException
     {
         File configFile = new File(workingCopyDir, PersonalBuildConfig.PROPERTIES_FILENAME);
         Properties config = new Properties();
@@ -283,10 +320,10 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         config.put(PersonalBuildConfig.PROPERTY_PULSE_USER, "admin");
         config.put(PersonalBuildConfig.PROPERTY_PULSE_PASSWORD, "admin");
         config.put(PersonalBuildConfig.PROPERTY_PROJECT, projectName);
-        if (proxyHost != null)
+
+        for (Pair<String, ?> extra: extraProperties)
         {
-            config.put(PersonalBuildConfig.PROPERTY_PROXY_HOST, proxyHost);
-            config.put(PersonalBuildConfig.PROPERTY_PROXY_PORT, Integer.toString(proxyPort));
+            config.put(extra.first, extra.second.toString());
         }
 
         FileOutputStream os = null;
