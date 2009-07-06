@@ -23,7 +23,11 @@ public class RecipeResult extends Result
     private String recipeName;
     private List<CommandResult> results = new LinkedList<CommandResult>();
     private TestResultSummary testSummary = new TestResultSummary();
+
+    // This field is not persisted with the recipe result in the database, and needs to
+    // be loaded separately via the loadFailedTestResults method.
     private PersistentTestSuiteResult failedTestResults;
+    private int failedTestLoadLimit = 0;
 
     public RecipeResult()
     {
@@ -270,6 +274,8 @@ public class RecipeResult extends Result
                 LOG.severe("Unable to load test results: " + e.getMessage(), e);
             }
         }
+
+        failedTestLoadLimit = limit;
     }
 
     /**
@@ -281,14 +287,16 @@ public class RecipeResult extends Result
      */
     public int getExcessFailureCount()
     {
-        int loadedCount = 0;
+        return testSummary.getBroken() - failedTestLoadLimit;
+    }
 
-        if(failedTestResults != null)
+    public int getLoadedTestFailures()
+    {
+        if (failedTestResults != null)
         {
-            loadedCount = failedTestResults.getSummary().getBroken();
+            return failedTestResults.getSummary().getBroken();
         }
-
-        return testSummary.getBroken() - loadedCount;
+        return 0;
     }
 
     public TestResultSummary getTestSummary()

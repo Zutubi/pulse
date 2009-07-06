@@ -31,4 +31,14 @@ public class StageTestsPage extends AbstractTestsPage
         clickSuiteLink(suite);
         return browser.waitFor(TestSuitePage.class, projectName, buildId, stageName, suite);
     }
+
+    public boolean isLoadFailureMessageShown()
+    {
+        return browser.isElementIdPresent("test.load.failure");
+    }
+
+    public boolean isBreadcrumbsVisible()
+    {
+        return browser.isElementIdPresent("allcrumb") && browser.isElementIdPresent("stagecrumb");
+    }
 }

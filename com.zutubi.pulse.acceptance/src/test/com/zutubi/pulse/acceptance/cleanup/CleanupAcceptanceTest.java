@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.cleanup;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
+import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
@@ -33,7 +34,9 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
         utils = new CleanupTestUtils(xmlRpcHelper);
 
-        xmlRpcHelper.insertSimpleProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false);
+        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        antConfig.put(Constants.Project.AntCommand.TARGETS, "build");
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), antConfig);
         utils.deleteCleanupRule(random, "default");
     }
 
@@ -162,6 +165,51 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         {
             assertTrue(e.getMessage().contains("Unknown build '1' for project '"+projectName+"'"));
         }
+    }
+
+    public void testTestCleanup() throws Exception
+    {
+        final String projectName = random;
+
+        utils.setAntTarget(projectName, "test");
+        utils.insertTestCapture("projects/" + projectName, "junit xml report processor");
+        utils.addCleanupRule(projectName, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
+
+        xmlRpcHelper.runBuild(projectName);
+        waitForCleanupToRunAsynchronously();
+
+        xmlRpcHelper.runBuild(projectName);
+        waitForCleanupToRunAsynchronously(new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasBuildOutputDirectory(projectName, 1);
+            }
+        }, new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasBuildFeaturesDirectory(projectName, 1);
+            }
+        });
+
+        // build 2 shows tests
+        BuildTestsPage buildTests = browser.openAndWaitFor(BuildTestsPage.class, projectName, 2L);
+        assertTrue(buildTests.hasFailedTests());
+        assertFalse(buildTests.isFailureUnavailableMessageShown());
+
+        // build 1 does not show tests.
+        buildTests = browser.openAndWaitFor(BuildTestsPage.class, projectName, 1L);
+        assertTrue(buildTests.hasFailedTests());
+        assertTrue(buildTests.isFailureUnavailableMessageShown());
+
+        StageTestsPage stageTests = browser.openAndWaitFor(StageTestsPage.class, projectName, 2L, "default");
+        assertFalse(stageTests.isLoadFailureMessageShown());
+        assertTrue(stageTests.isBreadcrumbsVisible());
+
+        stageTests = browser.openAndWaitFor(StageTestsPage.class, projectName, 1L, "default");
+        assertTrue(stageTests.isLoadFailureMessageShown());
+        assertTrue(stageTests.isBreadcrumbsVisible());
     }
 
     public void testCleanupRepositoryArtifacts() throws Exception

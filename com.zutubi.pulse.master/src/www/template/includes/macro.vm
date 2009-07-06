@@ -346,7 +346,7 @@
 ##
 #macro(noteRow $key $span)
     <tr>
-        <th class="note" colspan="$span">#wwtext("name=$key")</th>
+        <th id="$key" class="note" colspan="$span">#wwtext("name=$key")</th>
     </tr>
 #end
 
@@ -1291,7 +1291,7 @@
 
 #macro(buildTestFailures $buildResult)
     #if($buildResult.completed() && $buildResult.hasBrokenTests())
-    <h2 class="section">#wwtext("name=failed.tests")</h2>
+    <h2 id="failed.tests" class="section">#wwtext("name=failed.tests")</h2>
         #foreach($recipeNode in $buildResult.root.children)
             #if($recipeNode.hasBrokenTests())
     <table class="fill-content">
@@ -1300,17 +1300,22 @@
                 #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stageName) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
             </th>
         </tr>
-        #set($excess = $recipeNode.result.excessFailureCount)
-        #if($excess > 0)
-            #noteRow($action.getText("test.excess.failures", [$excess]) 5)
+        #set($broken = $recipeNode.result.loadedTestFailures)
+        #if($broken == 0)
+            #noteRow("test.broken.unavailable" 5)
+        #else
+            #set($excess = $recipeNode.result.excessFailureCount)
+            #if($excess > 0)
+                #noteRow($action.getText("test.excess.failures", [$excess]) 5)
+            #end
+            <tr>
+                #contentHeading("test.name" 1)
+                #contentHeading("test.status" 2)
+                #contentHeading("test.details" 1)
+                #contentHeading("test.duration" 1)
+            </tr>
+            #showRecipeTestFailures($buildResult $recipeNode)
         #end
-        <tr>
-            #contentHeading("test.name" 1)
-            #contentHeading("test.status" 2)
-            #contentHeading("test.details" 1)
-            #contentHeading("test.duration" 1)
-        </tr>
-        #showRecipeTestFailures($buildResult $recipeNode)
     </table>
             #end
         #end

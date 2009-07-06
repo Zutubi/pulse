@@ -59,35 +59,6 @@ public class PersistentTestSuiteResult extends PersistentTestResult
         }
     }
 
-    private PersistentTestCaseResult convertCase(TestCaseResult caseResult, NameConflictResolution resolution)
-    {
-        String name = caseResult.getName();
-        if (resolution != NameConflictResolution.OFF && hasCase(name))
-        {
-            int addition = 2;
-            while (hasCase(makeCaseName(name, addition, resolution)))
-            {
-                addition++;
-            }
-
-            name = makeCaseName(name, addition, resolution);
-        }
-
-        return new PersistentTestCaseResult(name, caseResult.getDuration(), caseResult.getStatus(), caseResult.getMessage());
-    }
-
-    private String makeCaseName(String name, int addition, NameConflictResolution resolution)
-    {
-        if (resolution == NameConflictResolution.APPEND)
-        {
-            return name + addition;
-        }
-        else
-        {
-            return Integer.toString(addition) + name;
-        }
-    }
-
     public PersistentTestSuiteResult(String name, long duration, int total, int errors, int failures, int skipped)
     {
         super(name, duration);
@@ -315,5 +286,34 @@ public class PersistentTestSuiteResult extends PersistentTestResult
         }
 
         return null;
+    }
+
+    private PersistentTestCaseResult convertCase(TestCaseResult caseResult, NameConflictResolution resolution)
+    {
+        String name = caseResult.getName();
+        if (resolution != NameConflictResolution.OFF && hasCase(name))
+        {
+            int addition = 2;
+            while (hasCase(makeCaseName(name, addition, resolution)))
+            {
+                addition++;
+            }
+
+            name = makeCaseName(name, addition, resolution);
+        }
+
+        return new PersistentTestCaseResult(name, caseResult.getDuration(), caseResult.getStatus(), caseResult.getMessage());
+    }
+
+    private String makeCaseName(String name, int addition, NameConflictResolution resolution)
+    {
+        if (resolution == NameConflictResolution.APPEND)
+        {
+            return name + addition;
+        }
+        else
+        {
+            return Integer.toString(addition) + name;
+        }
     }
 }

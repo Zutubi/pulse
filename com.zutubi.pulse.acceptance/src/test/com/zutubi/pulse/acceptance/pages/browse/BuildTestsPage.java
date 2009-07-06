@@ -32,6 +32,16 @@ public class BuildTestsPage extends AbstractTestsPage
         return !browser.isElementIdPresent(ID_BUILD_INCOMPLETE);
     }
 
+    public boolean isFailureUnavailableMessageShown()
+    {
+        return  browser.isElementIdPresent("test.broken.unavailable");
+    }
+
+    public boolean hasFailedTests()
+    {
+        return browser.isElementIdPresent("failed.tests");
+    }
+
     public boolean hasTests()
     {
         return isBuildComplete() && !browser.isElementIdPresent(ID_NO_TESTS) && browser.isElementIdPresent(ID_TEST_SUMMARY);

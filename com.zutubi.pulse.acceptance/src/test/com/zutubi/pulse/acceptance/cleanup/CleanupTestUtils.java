@@ -3,12 +3,23 @@ package com.zutubi.pulse.acceptance.cleanup;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.Options.RETAIN_WORKING_COPY;
+import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryOutput.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Output.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.CAPTURES;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.tove.type.record.PathUtils;
@@ -18,6 +29,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+import java.util.Arrays;
 
 /**
  * A set of utility methods used by the cleanup acceptance tests.
@@ -136,5 +148,22 @@ public class CleanupTestUtils
                 return new File(file, directoryName).isDirectory();
             }
         });
+    }
+
+    public void insertTestCapture(String projectPath, String processorName) throws Exception
+    {
+        Hashtable<String, Object> dirOutputConfig = xmlRpcHelper.createDefaultConfig(DirectoryOutputConfiguration.class);
+        dirOutputConfig.put(NAME, "xml reports");
+        dirOutputConfig.put(BASE, "build/reports/xml");
+        dirOutputConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, CAPTURES), dirOutputConfig);
+    }
+
+    public void setAntTarget(String projectName, String target) throws Exception
+    {
+        String path = "projects/" + projectName + "/type/recipes/default/commands/build";
+        Hashtable<String, Object> antConfig = xmlRpcHelper.getConfig(path);
+        antConfig.put(Constants.Project.AntCommand.TARGETS, target);
+        xmlRpcHelper.saveConfig(path, antConfig, false);
     }
 }

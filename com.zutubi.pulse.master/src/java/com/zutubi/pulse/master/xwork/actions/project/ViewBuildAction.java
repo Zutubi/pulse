@@ -81,7 +81,7 @@ public class ViewBuildAction extends CommandActionBase
         return customFields.load();
     }
 
-    public static int getFailureLimit()
+    public int getFailureLimit()
     {
         int limit = DEFAULT_FAILURE_LIMIT;
         String property = System.getProperty(FAILURE_LIMIT_PROPERTY);

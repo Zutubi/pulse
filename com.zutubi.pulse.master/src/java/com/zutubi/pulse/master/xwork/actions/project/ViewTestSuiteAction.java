@@ -13,8 +13,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
- *
+ * The action that allows for the viewing of a test suite.  The input for this
+ * action is the path that defines the suite of interest.
+ * <ul>
+ * <li>path: the path of the suite in question</li>
+ * </ul>
  */
 public class ViewTestSuiteAction extends StageActionBase
 {
@@ -25,19 +28,43 @@ public class ViewTestSuiteAction extends StageActionBase
     private List<String> paths;
     private MasterConfigurationManager configurationManager;
 
-    public String getPath()
-    {
-        return path;
-    }
-
+    /**
+     * The path of the suite to be viewed by this action.
+     *
+     * @param path  of the suite
+     */
     public void setPath(String path)
     {
         this.path = path;
     }
 
+    /**
+     * Get the path of the suite that is being viewed by this action.
+     *
+     * @return the suites path
+     */
+    public String getPath()
+    {
+        return path;
+    }
+
+    /**
+     * Get the suite being viewed by this action
+     * 
+     * @return  the suite or null if the suite does not exist.
+     */
     public PersistentTestSuiteResult getSuite()
     {
         return suite;
+    }
+
+    /**
+     * Returns true if a suite exists at the specified path.
+     * @return  true if a suite exists, false otherwise.
+     */
+    public boolean getSuiteExists()
+    {
+        return suite != null;
     }
 
     public List<String> getPaths()
@@ -45,6 +72,13 @@ public class ViewTestSuiteAction extends StageActionBase
         return paths;
     }
 
+    /**
+     * Get the path to a test that is a child of this test suite.
+     *
+     * @param childName     name of the child entity.
+     *
+     * @return the path to the child
+     */
     public String getChildUriPath(String childName)
     {
         String uriChildName = StringUtils.uriComponentEncode(childName);
@@ -81,11 +115,8 @@ public class ViewTestSuiteAction extends StageActionBase
         }
 
         File testDir = new File(node.getResult().getAbsoluteOutputDir(configurationManager.getDataDirectory()), RecipeResult.TEST_DIR);
-        if(path != null && path.startsWith("/"))
-        {
-            path = path.substring(1);
-        }
 
+        path = stripPrefix(path, "/");
         if(TextUtils.stringSet(path))
         {
             String[] elements = path.split("/");
@@ -98,22 +129,35 @@ public class ViewTestSuiteAction extends StageActionBase
                     return urlEncode(s);
                 }
             }, new String[elements.length]);
+
             testDir = new File(testDir, FileSystemUtils.composeFilename(encodedElements));
         }
 
-        TestSuitePersister persister = new TestSuitePersister();
-        try
+        if (testDir.isDirectory())
         {
-            suite = persister.read(null, testDir, false, false, -1);
-        }
-        catch (Exception e)
-        {
-            LOG.warning(e);
-            addActionError("Unable to read test suite from directory '" + testDir.getAbsolutePath() + "': " + e.getMessage());
-            return ERROR;
+            TestSuitePersister persister = new TestSuitePersister();
+            try
+            {
+                suite = persister.read(null, testDir, false, false, -1);
+            }
+            catch (Exception e)
+            {
+                LOG.warning(e);
+                addActionError("Unable to read test suite from directory '" + testDir.getAbsolutePath() + "': " + e.getMessage());
+                return ERROR;
+            }
         }
 
         return SUCCESS;
+    }
+
+    private String stripPrefix(String str, String prefix)
+    {
+        if(str != null && str.startsWith(prefix))
+        {
+            return str.substring(prefix.length());
+        }
+        return str;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
