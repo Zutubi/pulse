@@ -80,7 +80,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
-        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
+        long buildNumber = runPersonalBuild(ResultState.FAILURE);
         verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
 
         PersonalEnvironmentArtifactPage envPage = browser.openAndWaitFor(PersonalEnvironmentArtifactPage.class, PROJECT_NAME, buildNumber, "default", "build");
@@ -107,7 +107,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             loginAsAdmin();
             ensureProject(PROJECT_NAME);
             editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
-            long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
+            long buildNumber = runPersonalBuild(ResultState.FAILURE);
             verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
         }
         finally
@@ -125,7 +125,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
-        long buildNumber = runPersonalBuild("error");
+        long buildNumber = runPersonalBuild(ResultState.ERROR);
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTextPresent("Unknown child element 'notrecognised'");
     }
@@ -140,7 +140,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         ensureAgent(AGENT_NAME);
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
-        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
+        long buildNumber = runPersonalBuild(ResultState.FAILURE);
         verifyPersonalBuildTabs(buildNumber, AGENT_NAME);
     }
 
@@ -165,7 +165,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
-        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
+        long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
         // Finally check that only the enabled hooks ran.
         String text = getLogText(urls.dashboardMyBuildLog(Long.toString(buildNumber)));
@@ -195,7 +195,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
-        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
+        long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
         PersonalBuildSummaryPage page = browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTrue(page.isHookPresent(HOOK_NAME));
@@ -214,7 +214,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
-        long buildNumber = runPersonalBuild(ResultState.FAILURE.getPrettyString());
+        long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
         // Check that we actually built against the latest.
         SubversionClient client = new SubversionClient(Constants.TRIVIAL_ANT_REPOSITORY);
@@ -234,7 +234,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
-        long buildNumber = runPersonalBuild(ResultState.ERROR.getPrettyString());
+        long buildNumber = runPersonalBuild(ResultState.ERROR);
 
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTextPresent("Patch does not apply cleanly");
@@ -290,7 +290,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.saveConfig(stagePath, stage, false);
     }
 
-    private long runPersonalBuild(String expectedStatus)
+    private long runPersonalBuild(ResultState expectedStatus)
     {
         // Request the build and wait for it to complete
         AcceptancePersonalBuildUI ui = requestPersonalBuild();
@@ -308,7 +308,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         browser.openAndWaitFor(MyBuildsPage.class);
         browser.refreshUntilElement(MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
-        browser.refreshUntilText(MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus, BUILD_TIMEOUT);
+        browser.refreshUntilText(MyBuildsPage.getBuildStatusId(buildNumber), expectedStatus.getPrettyString(), BUILD_TIMEOUT);
         return buildNumber;
     }
 

@@ -27,7 +27,6 @@ public class RecipeResult extends Result
     // This field is not persisted with the recipe result in the database, and needs to
     // be loaded separately via the loadFailedTestResults method.
     private PersistentTestSuiteResult failedTestResults;
-    private int failedTestLoadLimit = 0;
 
     public RecipeResult()
     {
@@ -274,8 +273,6 @@ public class RecipeResult extends Result
                 LOG.severe("Unable to load test results: " + e.getMessage(), e);
             }
         }
-
-        failedTestLoadLimit = limit;
     }
 
     /**
@@ -287,7 +284,7 @@ public class RecipeResult extends Result
      */
     public int getExcessFailureCount()
     {
-        return testSummary.getBroken() - failedTestLoadLimit;
+        return testSummary.getBroken() - getLoadedTestFailures();
     }
 
     public int getLoadedTestFailures()
