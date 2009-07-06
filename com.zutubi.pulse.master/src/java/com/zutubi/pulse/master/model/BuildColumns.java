@@ -2,8 +2,6 @@ package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 /**
  */
@@ -97,24 +95,5 @@ public class BuildColumns
     public static String[] getAllColumns()
     {
         return new String[] { KEY_ACTIONS, KEY_ELAPSED, KEY_ID, KEY_OWNER, KEY_PROJECT, KEY_REASON, KEY_REVISION, KEY_STATUS, KEY_TESTS, KEY_VERSION, KEY_WHEN, KEY_WARNINGS };
-    }
-
-    public void removeAll(final String... keys)
-    {
-        columns = CollectionUtils.filterToArray(columns,  new Predicate<String>()
-        {
-            public boolean satisfied(String s)
-            {
-                for(String key: keys)
-                {
-                    if(s.equals(key))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        });
     }
 }
