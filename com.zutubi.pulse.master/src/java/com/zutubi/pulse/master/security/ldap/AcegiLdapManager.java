@@ -2,11 +2,9 @@ package com.zutubi.pulse.master.security.ldap;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.master.license.LicenseHolder;
-import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -16,6 +14,8 @@ import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
+import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.BadCredentialsException;
@@ -30,6 +30,10 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
+import javax.naming.directory.DirContext;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.StartTlsRequest;
+import javax.naming.ldap.StartTlsResponse;
 import java.util.*;
 
 /**
@@ -39,6 +43,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     private static final Logger LOG = Logger.getLogger(AcegiLdapManager.class);
 
     private static final String EMAIL_CONTACT_NAME = "LDAP email";
+    private static final String PROPERTY_START_TLS = "pulse.ldap.use.starttls";
 
     private boolean initialised = false;
     private ConfigurationProvider configurationProvider;
@@ -191,7 +196,13 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         statusMessage = null;
         try
         {
-            contextFactory.newInitialDirContext();
+            DirContext dirContext = contextFactory.newInitialDirContext();
+            if (Boolean.getBoolean(PROPERTY_START_TLS))
+            {
+                LdapContext ldapContext = (LdapContext) dirContext;
+                StartTlsResponse tlsResponse = (StartTlsResponse) ldapContext.extendedOperation(new StartTlsRequest());
+                tlsResponse.negotiate();
+            }
         }
         catch (Exception e)
         {
