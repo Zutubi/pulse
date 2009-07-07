@@ -28,7 +28,7 @@ public class DependencyConfiguration extends AbstractConfiguration
     /**
      * The project being depended upon.
      */
-    @Required @Reference
+    @Required @Reference @Select(optionProvider = "DependencyProjectOptionProvider")
     private ProjectConfiguration project;
 
     /**

@@ -58,4 +58,10 @@ public class ProjectConfigPage extends CompositePage
         return browser.waitFor(CleanupRulesPage.class, listPage.getPath());
     }
 
+    public ProjectDependenciesPage clickDependenciesAndWait()
+    {
+        CompositePage compositePage = clickComposite("dependencies", "project dependencies");
+        compositePage.expandTreeNode(compositePage.getPath());
+        return browser.waitFor(ProjectDependenciesPage.class, compositePage.getPath());
+    }
 }
