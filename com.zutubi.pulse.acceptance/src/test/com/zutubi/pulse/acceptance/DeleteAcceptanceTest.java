@@ -13,8 +13,6 @@ import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTrigge
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -31,14 +29,12 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     private static final String ACTION_RESTORE       = "restore";
 
-    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
-    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

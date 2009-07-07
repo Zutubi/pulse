@@ -44,6 +44,9 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
 
         Map<String, String> variables = new HashMap<String, String>();
         variables.put("repository.base", tmp.toURI().toString());
+        variables.put("ivy.cache.dir", tmp.toURI().toString() + "cache");
+        variables.put("ivy.cache.resolution", new File(tmp, "cache/resolution").getCanonicalPath());
+        variables.put("ivy.cache.repository", new File(tmp, "cache/repository").getCanonicalPath());
 
         String artifactPattern = repository.getArtifactPattern();
         String ivyPattern = repository.getIvyPattern();

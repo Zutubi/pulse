@@ -9,11 +9,12 @@ import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.util.Message;
 
 import java.io.IOException;
+import java.io.File;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.net.URI;
 
 /**
  * The ivy implementation of the dependency manager interface.
@@ -27,9 +28,9 @@ public class IvyManager implements DependencyManager
     public static String STATUS_MILESTONE     = "milestone";
     public static String STATUS_RELEASE       = "release";
 
-    private DefaultIvyClientFactory ivyClientFactory = new DefaultIvyClientFactory();
-
     private IvySettings defaultSettings;
+
+    private File cacheBase;
 
     public void init() throws IOException, ParseException
     {
@@ -39,7 +40,7 @@ public class IvyManager implements DependencyManager
         defaultSettings = loadDefaultSettings();
     }
 
-    private IvySettings loadDefaultSettings() throws ParseException, IOException
+    protected IvySettings loadDefaultSettings() throws ParseException, IOException
     {
         IvySettings settings = new IvySettings();
         settings.load(getClass().getResource("ivysettings.xml"));
@@ -84,6 +85,11 @@ public class IvyManager implements DependencyManager
         return StatusManager.getCurrent().getDefaultStatus();
     }
 
+    public void setDataDir(File dataDir)
+    {
+        this.cacheBase = new File(dataDir, "cache");
+    }
+
     /**
      * @param repositoryBase    defines the base path to the internal pulse repository.  The
      * format of this field must be a valid uri.
@@ -98,6 +104,16 @@ public class IvyManager implements DependencyManager
 
         Map<String, String> variables = new HashMap<String, String>();
         variables.put(DefaultIvyClientFactory.VARIABLE_REPOSITORY_BASE, repositoryBase);
+        
+        if (cacheBase != null)
+        {
+            variables.put("ivy.cache.dir", cacheBase.toURI().toString());
+            variables.put("ivy.cache.resolution", cacheBase.getCanonicalPath());
+            variables.put("ivy.cache.repository", cacheBase.getCanonicalPath());
+        }
+        
+        DefaultIvyClientFactory ivyClientFactory = new DefaultIvyClientFactory();
+        ivyClientFactory.setIvyManager(this);
         return ivyClientFactory.createClient(variables);
     }
 

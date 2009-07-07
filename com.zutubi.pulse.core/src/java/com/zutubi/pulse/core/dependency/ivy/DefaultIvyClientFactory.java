@@ -38,6 +38,8 @@ public class DefaultIvyClientFactory
 
     private String ivyPattern;
 
+    private IvyManager ivyManager;
+
     public DefaultIvyClientFactory()
     {
         this(PATTERN_ARTIFACT, PATTERN_IVY);
@@ -51,9 +53,7 @@ public class DefaultIvyClientFactory
 
     public IvyClient createClient(Map<String, String> variables) throws Exception
     {
-        IvySettings settings = new IvySettings();
-        settings.load(DefaultIvyClientFactory.class.getResource("ivysettings.xml"));
-
+        IvySettings settings = ivyManager.loadDefaultSettings();
         for (String variableName : variables.keySet())
         {
             settings.setVariable(variableName, variables.get(variableName));
@@ -88,5 +88,10 @@ public class DefaultIvyClientFactory
     private boolean isFile(URI uri)
     {
         return uri.getScheme().equals("file");
+    }
+
+    public void setIvyManager(IvyManager ivyManager)
+    {
+        this.ivyManager = ivyManager;
     }
 }
