@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.dependency.ivy.DefaultIvyClientFactory;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
@@ -52,6 +53,7 @@ public class IvyIntegrationAcceptanceTest extends PulseTestCase
         String ivyPattern = repository.getIvyPattern();
 
         DefaultIvyClientFactory icf = new DefaultIvyClientFactory(artifactPattern, ivyPattern);
+        icf.setIvyManager(new IvyManager());
         core = icf.createClient(variables);
     }
 
