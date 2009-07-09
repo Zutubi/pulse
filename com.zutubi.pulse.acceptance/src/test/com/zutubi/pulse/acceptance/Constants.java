@@ -1,5 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * General bucket for constants used in acceptance tests.
  */
@@ -46,6 +49,17 @@ public class Constants
      * Subversion URL for a versioned pulse file project.
      */
     public static final String VERSIONED_REPOSITORY = SUBVERSION_ACCEPT_REPO + "testversioned";
+
+    /**
+     * @return the url of the test git repository
+     */
+    public static String getGitUrl() throws IOException
+    {
+        // the git repository is located on the local file system in the work.dir/git-repo directory
+        File workingDir = AcceptanceTestUtils.getWorkingDirectory();
+        File repositoryBase = new File(workingDir, "git-repo");
+        return "file://" + repositoryBase.getCanonicalPath();
+    }
 
     /**
      * The constants for the property names in the ProjectConfiguration class.

@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import com.zutubi.pulse.core.test.api.Matchers;
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
@@ -46,6 +47,8 @@ public class GitClientTest extends PulseTestCase
     private static final String TEST_AUTHOR = "Jason Sankey";
     private static final String CONTENT_A_TXT = "another a edit";
 
+    private static final String EXTENSION_TXT = "txt";
+
     private File tmp;
     private String repository;
     private GitClient client;
@@ -59,7 +62,7 @@ public class GitClientTest extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir();
+        tmp = FileSystemUtils.createTempDir(getName(), ".tmp");
 
         URL url = getClass().getResource("GitClientTest.zip");
         PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
@@ -560,6 +563,75 @@ public class GitClientTest extends PulseTestCase
         String info = IOUtils.inputStreamToString(nativeGit.show(null, TAG_NAME));
         assertThat(info, containsString(REVISION_MASTER_LATEST));
         assertThat(info, containsString("Edit, add and remove on master"));
+    }
+
+    public void testApplyPatch() throws ScmException, IOException
+    {
+        client.checkout(context, null, handler);
+        handler.reset();
+        client.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, EOLStyle.BINARY, handler);
+        assertEquals("edited by " + getName() + "\n", IOUtils.fileToString(new File(workingDir, "a.txt")));
+        assertCleanPatch();
+    }
+
+    public void testApplyRenamePatch() throws ScmException, IOException
+    {
+        client.checkout(context, null, handler);
+        handler.reset();
+        client.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, EOLStyle.BINARY, handler);
+        assertEquals(CONTENT_A_TXT + "\n", IOUtils.fileToString(new File(workingDir, "ren.txt")));
+        assertCleanPatch();
+    }
+
+    public void testApplyBinaryPatch() throws ScmException, IOException
+    {
+        client.checkout(context, null, handler);
+        handler.reset();
+        client.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, EOLStyle.BINARY, handler);
+        assertTrue(new File(workingDir, "binfile").exists());
+        assertCleanPatch();
+    }
+
+    private void assertCleanPatch()
+    {
+        assertThat(handler.getStatusMessages(), hasItem(Matchers.matchesRegex(".*Applied patch .* cleanly.*")));
+    }
+
+    public void testApplyPatchUnclean() throws ScmException, IOException
+    {
+        client.checkout(context, new Revision(REVISION_MASTER_PREVIOUS), handler);
+        handler.reset();
+        try
+        {
+            client.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, EOLStyle.BINARY, handler);
+            fail("Patch should not apply");
+        }
+        catch (ScmException e)
+        {
+            assertThat(e.getMessage(), containsString("error: patch failed"));
+        }
+    }
+
+    public void testReadFileStatuses() throws ScmException, IOException
+    {
+        File f = copyInputToDirectory(EXTENSION_TXT, tmp);
+        List<FileStatus> statusList = client.readFileStatuses(scmContext, f);
+        assertEquals(9, statusList.size());
+        assertStatus(statusList.get(0), ".gitignore", FileStatus.State.DELETED);
+        assertStatus(statusList.get(1), "binfile", FileStatus.State.MODIFIED);
+        assertStatus(statusList.get(2), "src/clojure/contrib/bin.clj", FileStatus.State.ADDED);
+        assertStatus(statusList.get(3), "src/clojure/contrib/classy.clj", FileStatus.State.RENAMED);
+        assertStatus(statusList.get(4), "src/clojure/contrib/miglayout.clj", FileStatus.State.MODIFIED);
+        assertStatus(statusList.get(5), "src/clojure/contrib/monads.clj", FileStatus.State.DELETED);
+        assertStatus(statusList.get(6), "src/clojure/contrib/new.clj", FileStatus.State.ADDED);
+        assertStatus(statusList.get(7), "src/clojure/contrib/xul.clj", FileStatus.State.ADDED);
+        assertStatus(statusList.get(8), "src/clojure/contrib/zip_filter.clj", FileStatus.State.MODIFIED);
+    }
+
+    private void assertStatus(FileStatus fileStatus, String path, FileStatus.State state)
+    {
+        assertEquals(path, fileStatus.getPath());
+        assertEquals(state, fileStatus.getState());
     }
 
     private void assertHeadCheckedOut()

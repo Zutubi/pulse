@@ -3,12 +3,18 @@ package com.zutubi.pulse.dev.personal;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
+import java.util.EnumSet;
+import java.util.List;
 
 public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
 {
@@ -19,6 +25,8 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
     private WorkingCopy workingCopy;
     private WorkingCopyContext context;
     private PersonalBuildClient client;
+    
+    private List<MenuOption<String>> revisionOptions;
 
     @Override
     protected void setUp() throws Exception
@@ -27,6 +35,7 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         config = new PersonalBuildConfig(baseDir);
         ui = mock(PersonalBuildUI.class);
         workingCopy = mock(WorkingCopy.class);
+        stub(workingCopy.getCapabilities()).toReturn(EnumSet.allOf(WorkingCopyCapability.class));
         context = new WorkingCopyContextImpl(baseDir, config, ui);
         client = new PersonalBuildClient(config, ui);
     }
@@ -116,6 +125,22 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertTrue(buildRevision.isUpdateSupported());
     }
 
+    public void testCapabilitiesRespectedByRevisionPrompt() throws PersonalBuildException
+    {
+        stub(workingCopy.getCapabilities()).toReturn(EnumSet.complementOf(EnumSet.of(WorkingCopyCapability.LOCAL_REVISION, WorkingCopyCapability.REMOTE_REVISION)));
+        setRevisionChoice(PersonalBuildClient.REVISION_OPTION_FLOATING, false);
+
+        PersonalBuildRevision revision = client.chooseRevision(workingCopy, context);
+        assertEquals(WorkingCopy.REVISION_FLOATING, revision.getRevision());
+
+        assertEquals(3, revisionOptions.size());
+        assertFalse(CollectionUtils.contains(revisionOptions, new OptionValuePredicate(PersonalBuildClient.REVISION_OPTION_LOCAL)));
+        assertFalse(CollectionUtils.contains(revisionOptions, new OptionValuePredicate(PersonalBuildClient.REVISION_OPTION_LATEST)));
+
+        MenuOption<String> floatingOption = CollectionUtils.find(revisionOptions, new OptionValuePredicate(PersonalBuildClient.REVISION_OPTION_FLOATING));
+        assertTrue(floatingOption.isDefaultOption());
+    }
+    
     public void testUpdateIfDesiredPromptYes() throws PersonalBuildException, ScmException
     {
         Revision revision = new Revision(TEST_REVISION);
@@ -133,7 +158,8 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
 
         client.updateIfDesired(workingCopy, context, new Revision(TEST_REVISION));
 
-        verifyZeroInteractions(workingCopy);
+        verify(workingCopy).getCapabilities();
+        verifyNoMoreInteractions(workingCopy);
         assertNull(config.getUpdate());
     }
 
@@ -145,7 +171,8 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         client.updateIfDesired(workingCopy, context, revision);
 
         verifyZeroInteractions(ui);
-        verifyZeroInteractions(workingCopy);
+        verify(workingCopy).getCapabilities();
+        verifyNoMoreInteractions(workingCopy);
     }
 
     public void testUpdateIfDesiredPersistence() throws PersonalBuildException, ScmException
@@ -158,13 +185,48 @@ public class PersonalBuildClientTest extends AbstractPersonalBuildTestCase
         assertFalse(config.getUpdate());
     }
 
-    private void setRevisionChoice(String option, boolean persistent)
+    public void testUpdateRespectsCapabilities() throws PersonalBuildException, ScmException
     {
-        stub(ui.<String>menuPrompt(anyString(), anyList())).toReturn(new MenuChoice<String>(option, persistent));
+        stub(workingCopy.getCapabilities()).toReturn(EnumSet.complementOf(EnumSet.of(WorkingCopyCapability.UPDATE)));
+        Revision revision = new Revision(TEST_REVISION);
+
+        client.updateIfDesired(workingCopy, context, revision);
+
+        verifyZeroInteractions(ui);
+        verify(workingCopy).getCapabilities();
+        verifyNoMoreInteractions(workingCopy);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private void setRevisionChoice(final String option, final boolean persistent)
+    {
+        stub(ui.<String>menuPrompt(anyString(), anyList())).toAnswer(new Answer<Object>()
+        {
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                revisionOptions = (List<MenuOption<String>>) invocationOnMock.getArguments()[1];
+                return new MenuChoice<String>(option, persistent);
+            }
+        });
     }
 
     private void setUpdateChoice(YesNoResponse choice)
     {
         stub(ui.yesNoPrompt(anyString(), eq(true), eq(true), eq(YesNoResponse.YES))).toReturn(choice);
+    }
+
+    private static class OptionValuePredicate implements Predicate<MenuOption<String>>
+    {
+        private String value;
+
+        private OptionValuePredicate(String value)
+        {
+            this.value = value;
+        }
+
+        public boolean satisfied(MenuOption<String> option)
+        {
+            return option.getValue().equals(value);
+        }
     }
 }

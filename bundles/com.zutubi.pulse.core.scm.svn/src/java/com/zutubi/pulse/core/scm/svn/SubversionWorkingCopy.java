@@ -14,8 +14,10 @@ import org.tmatesoft.svn.core.wc.*;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  */
@@ -96,6 +98,11 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
         }
 
         return password;
+    }
+
+    public Set<WorkingCopyCapability> getCapabilities()
+    {
+        return EnumSet.allOf(WorkingCopyCapability.class);
     }
 
     public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException

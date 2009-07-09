@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The client does the work of actually talking to the Pulse server, sending
@@ -256,11 +257,18 @@ public class PersonalBuildClient
         if (!TextUtils.stringSet(chosenRevision))
         {
             fromConfig = false;
-            
+            Set<WorkingCopyCapability> capabilities = wc.getCapabilities();
+
             List<MenuOption<String>> options = new LinkedList<MenuOption<String>>();
-            options.add(makeRevisionOption(REVISION_OPTION_LOCAL, false));
-            options.add(makeRevisionOption(REVISION_OPTION_LATEST, true));
-            options.add(makeRevisionOption(REVISION_OPTION_FLOATING, false));
+            if (capabilities.contains(WorkingCopyCapability.LOCAL_REVISION))
+            {
+                options.add(makeRevisionOption(REVISION_OPTION_LOCAL, false));
+            }
+            if (capabilities.contains(WorkingCopyCapability.REMOTE_REVISION))
+            {
+                options.add(makeRevisionOption(REVISION_OPTION_LATEST, true));
+            }
+            options.add(makeRevisionOption(REVISION_OPTION_FLOATING, !capabilities.contains(WorkingCopyCapability.REMOTE_REVISION)));
             options.add(makeRevisionOption(REVISION_OPTION_GOOD, false));
             options.add(makeRevisionOption(REVISION_OPTION_CUSTOM, false));
 
@@ -360,37 +368,40 @@ public class PersonalBuildClient
 
     public void updateIfDesired(WorkingCopy wc, WorkingCopyContext context, Revision revision) throws PersonalBuildException
     {
-        Boolean update = config.getUpdate();
-        if (update == null)
+        if (wc.getCapabilities().contains(WorkingCopyCapability.UPDATE))
         {
-            YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.update"), true, true, YesNoResponse.YES);
-            if (response.isPersistent())
+            Boolean update = config.getUpdate();
+            if (update == null)
             {
-                config.setUpdate(response.isAffirmative());
+                YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.update"), true, true, YesNoResponse.YES);
+                if (response.isPersistent())
+                {
+                    config.setUpdate(response.isAffirmative());
+                }
+
+                update = response.isAffirmative();
             }
 
-            update = response.isAffirmative();
-        }
-
-        if (update)
-        {
-            try
+            if (update)
             {
-                ui.status(I18N.format("status.updating"));
-                ui.enterContext();
                 try
                 {
-                    wc.update(context, revision);
-                    ui.status(I18N.format("status.updated"));
+                    ui.status(I18N.format("status.updating"));
+                    ui.enterContext();
+                    try
+                    {
+                        wc.update(context, revision);
+                        ui.status(I18N.format("status.updated"));
+                    }
+                    finally
+                    {
+                        ui.exitContext();
+                    }
                 }
-                finally
+                catch (ScmException e)
                 {
-                    ui.exitContext();
+                    throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
                 }
-            }
-            catch (ScmException e)
-            {
-                throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
             }
         }
     }

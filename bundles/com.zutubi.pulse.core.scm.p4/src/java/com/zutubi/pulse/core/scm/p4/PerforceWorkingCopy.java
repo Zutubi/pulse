@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.diff.Patch;
+import com.zutubi.diff.unified.UnifiedPatch;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
@@ -11,8 +11,10 @@ import com.zutubi.util.config.ConfigSupport;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 
 /**
@@ -35,6 +37,11 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
     public static final String PROPERTY_PRE_2004_2 = "p4.pre.2004.2";
 
     private static final int GUESS_REVISION_RETRIES = 5;
+
+    public Set<WorkingCopyCapability> getCapabilities()
+    {
+        return EnumSet.allOf(WorkingCopyCapability.class);
+    }
 
     public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException
     {
@@ -294,8 +301,8 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         final PrintWriter writer = new PrintWriter(output);
 
         // p4 outputs only hunks, no header, so we output a header ourselves
-        writer.println(Patch.HEADER_OLD_FILE + " " + path);
-        writer.println(Patch.HEADER_NEW_FILE + " " + path);
+        writer.println(UnifiedPatch.HEADER_OLD_FILE + " " + path);
+        writer.println(UnifiedPatch.HEADER_NEW_FILE + " " + path);
         
         core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
         {

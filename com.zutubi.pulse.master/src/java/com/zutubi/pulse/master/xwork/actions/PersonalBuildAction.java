@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.xwork.actions;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.master.MasterBuildPaths;
@@ -139,7 +138,6 @@ public class PersonalBuildAction extends ActionSupport
             return ERROR;
         }
 
-        PatchArchive archive;
         try
         {
             IOUtils.copyFile(uploadedPatch, patchFile);
@@ -148,8 +146,7 @@ public class PersonalBuildAction extends ActionSupport
                 responseWarnings.add("Unable to clean up uploaded patch.");
             }
             
-            archive = new PatchArchive(patchFile);
-            projectManager.triggerBuild(number, p, user, convertRevision(p), archive);
+            projectManager.triggerBuild(number, p, user, convertRevision(p), patchFile);
         }
         catch (Exception e)
         {

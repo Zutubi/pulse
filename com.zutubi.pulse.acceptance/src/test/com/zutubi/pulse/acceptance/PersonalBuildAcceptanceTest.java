@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
+import com.zutubi.pulse.core.scm.git.GitWorkingCopy;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
 import com.zutubi.pulse.dev.personal.PersonalBuildClient;
@@ -23,6 +24,7 @@ import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -36,7 +38,9 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import static java.util.Arrays.asList;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -55,6 +59,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         super.setUp();
 
         WorkingCopyFactory.registerType("svn", SubversionWorkingCopy.class);
+        WorkingCopyFactory.registerType("git", GitWorkingCopy.class);
         workingCopyDir = FileSystemUtils.createTempDir("PersonalBuildAcceptanceTest", "");
 
         DAVRepositoryFactory.setup();
@@ -240,6 +245,52 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTextPresent("Patch does not apply cleanly");
     }
 
+    public void testGitPersonalBuild() throws Exception
+    {
+        String gitUrl = Constants.getGitUrl();
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(gitUrl), xmlRpcHelper.getAntConfig());
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
+
+        FileSystemUtils.rmdir(workingCopyDir);
+        runGit(null, "clone", gitUrl, workingCopyDir.getAbsolutePath());
+        createConfigFile(random);
+
+        File buildFile = new File(workingCopyDir, "build.xml");
+        FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
+                "<project default=\"build\">\n" +
+                "  <target name=\"build\">\n" +
+                "    <fail message=\"Force build failure\"/>\n" +
+                "  </target>\n" +
+                "</project>");
+        runGit(workingCopyDir, "commit", "-a", "-m", "Make it fail");
+        
+        xmlRpcHelper.waitForProjectToInitialise(random);
+
+        loginAsAdmin();
+        long buildNumber = runPersonalBuild(ResultState.FAILURE);
+        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTextPresent("Force build failure");
+        
+        PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
+        assertEquals("0f267c3c48939fd51dacbbddcf15f530f82f1523", changesPage.getCheckedOutRevision());
+        assertEquals("build.xml", changesPage.getChangedFile(0));
+    }
+
+    private void runGit(File working, String... args) throws IOException
+    {
+        List<String> command = new LinkedList<String>();
+        command.add("git");
+        command.addAll(asList(args));
+
+        ProcessBuilder pd = new ProcessBuilder(command);
+        pd.redirectErrorStream(true);
+        if (working != null)
+        {
+            pd.directory(working);
+        }
+
+        SystemUtils.runCommandWithInput(null, pd);
+    }
 
     private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception
     {

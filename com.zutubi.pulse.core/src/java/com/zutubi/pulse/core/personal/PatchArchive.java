@@ -5,6 +5,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.diff.DiffException;
 import com.zutubi.diff.Patch;
 import com.zutubi.diff.PatchFile;
+import com.zutubi.diff.PatchFileParser;
+import com.zutubi.diff.unified.UnifiedPatchParser;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
@@ -285,7 +287,8 @@ public class PatchArchive
     {
         try
         {
-            PatchFile patchFile = PatchFile.read(new StringReader(diff));
+            PatchFileParser parser = new PatchFileParser(new UnifiedPatchParser());
+            PatchFile patchFile = parser.parse(new StringReader(diff));
             List<Patch> patches = patchFile.getPatches();
             if (patches.size() != 1)
             {

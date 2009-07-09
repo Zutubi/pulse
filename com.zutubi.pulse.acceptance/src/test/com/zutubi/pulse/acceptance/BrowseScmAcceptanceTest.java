@@ -5,7 +5,6 @@ import com.zutubi.pulse.acceptance.forms.admin.AntCommandForm;
 import com.zutubi.pulse.acceptance.windows.BrowseScmWindow;
 import com.zutubi.pulse.master.model.ProjectManager;
 
-import java.io.File;
 import java.util.Hashtable;
 
 /**
@@ -179,16 +178,8 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     private AntCommandForm insertTestGitProjectAndNavigateToCommandConfig() throws Exception
     {
-        // the git repository is located on the local file system in the work.dir/git-repo directory
-        File workingDir = AcceptanceTestUtils.getWorkingDirectory();
-        File repositoryBase = new File(workingDir, "git-repo");
-
-        Hashtable<String, Object> gitConfig = xmlRpcHelper.createEmptyConfig("zutubi.gitConfig");
-        gitConfig.put("repository", "file://" + repositoryBase.getCanonicalPath());
-        gitConfig.put("checkoutScheme", "CLEAN_CHECKOUT");
-        gitConfig.put("monitor", false);
         xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, gitConfig, xmlRpcHelper.getAntConfig());
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(Constants.getGitUrl()), xmlRpcHelper.getAntConfig());
         xmlRpcHelper.logout();
         return navigateToCommandConfig();
     }

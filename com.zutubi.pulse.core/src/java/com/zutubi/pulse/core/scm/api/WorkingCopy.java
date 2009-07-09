@@ -1,10 +1,16 @@
 package com.zutubi.pulse.core.scm.api;
 
 import java.io.File;
+import java.util.Set;
 
 /**
  * An interface for interaction with a checked-out working copy of a project.
  * This interface must be implemented to support personal builds for an SCM.
+ * <p/>
+ * Note that not all methods need to be implemented, for early implementations
+ * or for those where not all operations make sense.  The supported methods are
+ * communicated via the {@link #getCapabilities()} method.  All other methods
+ * have documentation indicating which capabilities they are required for.
  * <p/>
  * Implementations of this interface should also consider using the
  * {@link com.zutubi.pulse.core.scm.api.PersonalBuildUI} instance provided by
@@ -24,6 +30,8 @@ public interface WorkingCopy
      */
     public static final Revision REVISION_LAST_KNOWN_GOOD = new Revision("__last_known_good__");
 
+    Set<WorkingCopyCapability> getCapabilities();
+
     /**
      * Used to test if the working copy matches the SCM location of a Pulse
      * project.  When the user requests a personal build of a project, some
@@ -31,9 +39,10 @@ public interface WorkingCopy
      * the same project.  This check is made prior to querying the status of
      * the working copy.
      * <p/>
-     * A valid implementation of this method can always return true.  Generally
-     * speaking, however, the more verification can be done the better, to
-     * provide the user with timely and accurate feedback.
+     * Required for all implementations, however a valid implementation of this
+     * method can always return true.  Generally speaking, the more
+     * verification that can be done the better, to provide the user with
+     * timely and accurate feedback.
      *
      * @param context the context in which the operation is run, in particular
      *                contains the base directory
@@ -50,6 +59,8 @@ public interface WorkingCopy
      * Returns the latest revision committed to the remote repository that
      * affects this working copy (i.e. later revisions affecting only files
      * outside the scope of this working copy are not reported).
+     * <p/>
+     * Required for {@link WorkingCopyCapability#REMOTE_REVISION}.
      *
      * @param context the context in which the operation is run, in particular
      *                contains the base directory
@@ -66,6 +77,8 @@ public interface WorkingCopy
      * reasonable guess can be made, the implementation may just throw an
      * {@link ScmException}.  The implementation may also issue warnings via
      * the UI in the context if it is uncertain of the returned guess.
+     * <p/>
+     * Required for {@link WorkingCopyCapability#LOCAL_REVISION}.
      *
      * @param context the context in which the operation is run, in particular
      *                contains the base directory
@@ -84,6 +97,8 @@ public interface WorkingCopy
      * feedback for an operation in progress.  The UI may also be used to query
      * for user input if necessary.  Implementations are encouraged to report
      * feedback in the format used by the SCM tools themselves.
+     * <p/>
+     * Required for {@link WorkingCopyCapability#UPDATE}.
      *
      * @param context  the context in which the operation is run, in particular
      *                 contains the base directory
@@ -127,7 +142,9 @@ public interface WorkingCopy
      * If there are no changes to the local working copy, the implementation
      * should report this using the UI available in the context and return
      * false.
-     *
+     * <p/>
+     * Required for all implementations.
+     * 
      * @param context   the context in which the operation is run, in particular
      *                  contains the base directory
      * @param patchFile the file to write the patch to

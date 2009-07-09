@@ -1,8 +1,10 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.diff.Hunk;
-import com.zutubi.diff.Patch;
 import com.zutubi.diff.PatchFile;
+import com.zutubi.diff.PatchFileParser;
+import com.zutubi.diff.unified.UnifiedHunk;
+import com.zutubi.diff.unified.UnifiedPatch;
+import com.zutubi.diff.unified.UnifiedPatchParser;
 import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
@@ -533,19 +535,20 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         wc.diff(context, "file1", baos);
 
+        PatchFileParser parser = new PatchFileParser(new UnifiedPatchParser());
         StringReader reader = new StringReader(new String(baos.toByteArray()));
-        PatchFile pf = PatchFile.read(reader);
+        PatchFile pf = parser.parse(reader);
         assertEquals(1, pf.getPatches().size());
 
-        Patch patch = pf.getPatches().get(0);
+        UnifiedPatch patch = (UnifiedPatch) pf.getPatches().get(0);
         assertEquals(1, patch.getHunks().size());
 
-        Hunk hunk = patch.getHunks().get(0);
+        UnifiedHunk hunk = patch.getHunks().get(0);
         assertEquals(1, hunk.getLines().size());
         
-        Hunk.Line line = hunk.getLines().get(0);
+        UnifiedHunk.Line line = hunk.getLines().get(0);
         assertEquals("a line", line.getContent());
-        assertEquals(Hunk.LineType.ADDED, line.getType());
+        assertEquals(UnifiedHunk.LineType.ADDED, line.getType());
     }
 
     public void testGetLatestRemoteRevision() throws ScmException

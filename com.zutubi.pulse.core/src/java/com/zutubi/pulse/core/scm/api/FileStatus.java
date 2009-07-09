@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.api;
 
+import com.zutubi.diff.PatchType;
 import com.zutubi.util.FileSystemUtils;
 
 import java.util.Collections;
@@ -451,6 +452,32 @@ public class FileStatus
          *         the local path in a remote working copy
          */
         public abstract PayloadType preferredPayloadType();
+
+        /**
+         * Converts from a patch type to a state.
+         *
+         * @param type the patch type to convert
+         * @return the corresponding state
+         */
+        public static State valueOf(PatchType type)
+        {
+            switch (type)
+            {
+                case ADD:
+                case COPY:
+                    return ADDED;
+                case DELETE:
+                    return DELETED;
+                case EDIT:
+                    return MODIFIED;
+                case METADATA:
+                    return METADATA_MODIFIED;
+                case RENAME:
+                    return RENAMED;
+            }
+
+            throw new IllegalArgumentException("Unrecognised patch type '" + type + "'");
+        }
     }
 
     private String path;

@@ -402,6 +402,15 @@ public class XmlRpcHelper
         return scm;
     }
 
+    public Hashtable<String, Object> getGitConfig(String url)
+    {
+        Hashtable<String, Object> gitConfig = createEmptyConfig("zutubi.gitConfig");
+        gitConfig.put("repository", url);
+        gitConfig.put("checkoutScheme", "CLEAN_CHECKOUT");
+        gitConfig.put("monitor", false);
+        return gitConfig;
+    }
+
     public Hashtable<String, Object> getAntConfig()
     {
         Hashtable<String, Object> type = createEmptyConfig(AntCommandConfiguration.class);

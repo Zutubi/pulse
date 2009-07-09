@@ -1,0 +1,4 @@
+diff --git a/a.txt b/ren.txt
+similarity index 100%
+rename from a.txt
+rename to ren.txt

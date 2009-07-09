@@ -215,21 +215,6 @@ public class NativeGit
         return handler.getBranches();
     }
 
-    /**
-     * The purpose of this diff implementation is purely for generating a set of status messages
-     * that identify the difference added by the specified revision
-     *
-     * @param handler the handler that will be recieving the status messages
-     * @param revision the revision of interest.  If null, HEAD is used.
-     *
-     * @throws GitException is thrown if there is an error
-     */
-    public void diff(ScmFeedbackHandler handler, Revision revision) throws GitException
-    {
-        String rev = (revision != null) ? revision.getRevisionString() : "HEAD";
-        diff(handler, new Revision(rev + "~1"), new Revision(rev));
-    }
-
     public void diff(ScmFeedbackHandler handler, Revision revA, Revision revB) throws GitException
     {
         String[] command = {getGitCommand(), COMMAND_DIFF, FLAG_NAME_STATUS, revA.getRevisionString(), revB.getRevisionString()};
@@ -261,6 +246,11 @@ public class NativeGit
     public void push(String repository, String refspec) throws GitException
     {
         run(getGitCommand(), COMMAND_PUSH, repository, refspec);
+    }
+
+    public void apply(ScmFeedbackHandler handler, File patch) throws GitException
+    {
+        run(handler, getGitCommand(), COMMAND_APPLY, FLAG_VERBOSE, patch.getAbsolutePath());
     }
 
     public List<String> getConfig(String name) throws GitException
@@ -689,6 +679,40 @@ public class NativeGit
 
                 throw new GitException(e);
             }
+        }
+    }
+
+    /**
+     * An output handler that just captures stdout to a writer.
+     */
+    static class OutputWritingHandler implements OutputHandler
+    {
+        private PrintWriter writer;
+
+        OutputWritingHandler(PrintWriter writer)
+        {
+            this.writer = writer;
+        }
+
+        public void handleCommandLine(String line)
+        {
+        }
+
+        public void handleStdout(String line)
+        {
+            writer.println(line);
+        }
+
+        public void handleStderr(String line)
+        {
+        }
+
+        public void handleExitCode(int code) throws GitException
+        {
+        }
+
+        public void checkCancelled() throws GitOperationCancelledException
+        {
         }
     }
 

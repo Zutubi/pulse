@@ -1,0 +1,7 @@
+diff --git a/a.txt b/a.txt
+index 5642986..1229a76 100644
+--- a/a.txt
++++ b/a.txt
+@@ -1 +1 @@
+-another a edit
++edited by testApplyPatchUnclean

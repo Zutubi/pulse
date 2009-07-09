@@ -58,6 +58,7 @@ import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -840,7 +841,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    public void triggerBuild(long number, Project project, User user, Revision revision, PatchArchive archive) throws PulseException
+    public void triggerBuild(long number, Project project, User user, Revision revision, File patchFile) throws PulseException
     {
         ProjectConfiguration projectConfig = getProjectConfig(project.getId(), false);
         if(projectConfig == null)
@@ -850,9 +851,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
         try
         {
-            PulseFileSource pulseFile = getPulseFile(projectConfig, revision, archive);
+            PulseFileSource pulseFile = getPulseFile(projectConfig, revision, patchFile);
             BuildRevision buildRevision = revision == null ? new BuildRevision(): new BuildRevision(revision, pulseFile, false);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, buildRevision, user, archive, projectConfig));
+            eventManager.publish(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, projectConfig));
         }
         catch (Exception e)
         {
@@ -896,10 +897,20 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
+    private PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, File patchFile) throws Exception
     {
         TypeConfiguration type = projectConfig.getType();
-        return type.getPulseFile(projectConfig, revision, patch);
+        PatchArchive archive = null;
+        try
+        {
+            archive = new PatchArchive(patchFile);
+        }
+        catch (PulseException e)
+        {
+            // TODO support patching pulse file for other patch formats.
+        }
+
+        return type.getPulseFile(projectConfig, revision, archive);
     }
 
     private void ensureTransitionPermission(Project project, Project.Transition transition)

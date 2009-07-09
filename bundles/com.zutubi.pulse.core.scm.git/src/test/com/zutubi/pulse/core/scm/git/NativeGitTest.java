@@ -171,19 +171,6 @@ public class NativeGitTest extends PulseTestCase
         assertTrue(IOUtils.fileToString(new File(cloneBase, "README.txt")).contains("ON BRANCH"));
     }
 
-    public void testDiffFeedback() throws GitException
-    {
-        git.setWorkingDirectory(tmp);
-        git.clone(null, repository, "base");
-
-        git.setWorkingDirectory(new File(tmp, "base"));
-        RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
-        git.diff(handler, null);
-        List<String> messages = handler.getStatusMessages();
-        assertEquals(2, messages.size());
-        assertEquals("M\tsmiley.txt", messages.get(1));
-    }
-
     public void testLogParse() throws IOException, GitException
     {
         logParseHelper();

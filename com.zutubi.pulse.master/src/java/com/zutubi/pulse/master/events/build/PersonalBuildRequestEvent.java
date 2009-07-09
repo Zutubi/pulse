@@ -3,9 +3,10 @@ package com.zutubi.pulse.master.events.build;
 import com.zutubi.pulse.core.BuildRevision;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.model.NamedEntity;
-import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+
+import java.io.File;
 
 /**
  * A request for a personal build.
@@ -14,9 +15,9 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
 {
     private long number;
     private User user;
-    private PatchArchive patch;
+    private File patch;
 
-    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, ProjectConfiguration projectConfig)
+    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, File patch, ProjectConfiguration projectConfig)
     {
         super(source, revision, projectConfig, new TriggerOptions(new PersonalBuildReason(user.getLogin()), null));
         this.number = number;
@@ -44,7 +45,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
         return result;
     }
 
-    public PatchArchive getPatch()
+    public File getPatch()
     {
         return patch;
     }

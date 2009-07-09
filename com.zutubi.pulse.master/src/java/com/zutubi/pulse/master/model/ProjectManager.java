@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.security.SecureParameter;
 import com.zutubi.pulse.master.security.SecureResult;
@@ -9,6 +8,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
@@ -147,7 +147,7 @@ public interface ProjectManager extends EntityManager<Project>
 
     // Personal builds are shielded by their own permission, not the trigger
     // authority.
-    void triggerBuild(long number, Project project, User user, Revision revision, PatchArchive archive) throws PulseException;
+    void triggerBuild(long number, Project project, User user, Revision revision, File patchFile) throws PulseException;
 
     @SecureParameter(action = AccessManager.ACTION_VIEW)
     long getNextBuildNumber(Project project);

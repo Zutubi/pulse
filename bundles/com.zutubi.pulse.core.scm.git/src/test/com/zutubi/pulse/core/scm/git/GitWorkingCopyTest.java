@@ -1,16 +1,20 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.zutubi.diff.*;
 import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import com.zutubi.pulse.core.scm.git.diff.GitPatchParser;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -108,6 +112,66 @@ public class GitWorkingCopyTest extends PulseTestCase
         assertEquals(REVISION_EXPERIMENTAL, workingCopy.guessLocalRevision(context).getRevisionString());
     }
 
+    public void testWritePatchFile() throws ScmException, IOException, PatchParseException
+    {
+        editFile(baseDir, "file2");
+        assertPatchFile("file2", "file2", PatchType.EDIT);
+    }
+
+    public void testWritePatchFileStaged() throws ScmException, IOException, PatchParseException
+    {
+        stageFile(baseDir, "file2");
+        assertPatchFile("file2", "file2", PatchType.EDIT, ":");
+    }
+
+    public void testWritePatchFileScoped() throws ScmException, IOException, PatchParseException
+    {
+        stageFile(baseDir, "file1");
+        stageFile(baseDir, "file2");
+        assertPatchFile("file2", "file2", PatchType.EDIT, ":", "file2");
+    }
+
+    public void testWritePatchSingleCommit() throws ScmException, IOException, PatchParseException
+    {
+        assertPatchFile("file1", "file1", PatchType.EDIT, ":74d50a8");
+    }
+
+    public void testWritePatchCommitRange() throws ScmException, IOException, PatchParseException
+    {
+        assertPatchFile("file1", "file1", PatchType.EDIT, ":70017..0cd9762");
+    }
+    
+    private void assertPatchFile(String oldFile, String newFile, PatchType type, String... scope) throws PatchParseException, FileNotFoundException, ScmException
+    {
+        File file = new File(tempDir, "patch");
+        assertTrue(workingCopy.writePatchFile(context, file, scope));
+
+
+        PatchFileParser parser = new PatchFileParser(new GitPatchParser());
+        PatchFile patchFile = parser.parse(new FileReader(file));
+        List<Patch> patches = patchFile.getPatches();
+        assertEquals(1, patches.size());
+        Patch patch = patches.get(0);
+        assertEquals(oldFile, patch.getOldFile());
+        assertEquals(newFile, patch.getNewFile());
+        assertEquals(type, patch.getType());
+    }
+
+    public void testWritePatchFileNoChanges() throws ScmException, IOException, PatchParseException
+    {
+        File file = new File(tempDir, "patch");
+        assertFalse(workingCopy.writePatchFile(context, file));
+        assertFalse(file.exists());
+    }
+
+    public void testWritePatchScopeHasNoChanges() throws ScmException, IOException, PatchParseException
+    {
+        editFile(baseDir, "file1");
+        File file = new File(tempDir, "patch");
+        assertFalse(workingCopy.writePatchFile(context, file, "file2"));
+        assertFalse(file.exists());
+    }
+
     private void switchToBranch(String branch) throws IOException
     {
         runGit(baseDir, COMMAND_CHECKOUT, FLAG_BRANCH, branch);
@@ -130,12 +194,18 @@ public class GitWorkingCopyTest extends PulseTestCase
         return nativeGit.log(1).get(0).getId();
     }
 
-
     private void editFile(File dir, String path) throws IOException
     {
         File f = new File(dir, path);
         FileSystemUtils.createFile(f, "edited in " + getName());
         runGit(dir, COMMAND_COMMIT, FLAG_ALL, FLAG_MESSAGE, "made an edit");
+    }
+
+    private void stageFile(File dir, String path) throws IOException
+    {
+        File f = new File(dir, path);
+        FileSystemUtils.createFile(f, "edited in " + getName());
+        runGit(dir, COMMAND_ADD, path);
     }
 
     private String runGit(File workingDir, String... command) throws IOException

@@ -38,6 +38,8 @@ public class GitConstants
     public static final String COMMAND_RESET = "reset";
     public static final String COMMAND_FETCH = "fetch";
     public static final String COMMAND_MERGE_BASE = "merge-base";
+    public static final String COMMAND_APPLY = "apply";
+    public static final String COMMAND_ADD = "add";
 
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_FORCE = "-f";
@@ -56,7 +58,13 @@ public class GitConstants
     public static final String FLAG_ONTO = "--onto";
     public static final String FLAG_HARD = "--hard";
     public static final String FLAG_ADD = "-a";
+    public static final String FLAG_BINARY = "--binary";
+    public static final String FLAG_FIND_COPIES = "-C";
+    public static final String FLAG_CACHED = "--cached";
+    public static final String FLAG_VERBOSE = "--verbose";
 
+    public static final String FLAG_SEPARATOR = "--";
+    
     public static final String ARG_ADD = "add";
 
     public static final String REMOTE_ORIGIN = "origin";
