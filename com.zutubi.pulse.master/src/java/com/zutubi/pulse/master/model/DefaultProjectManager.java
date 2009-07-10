@@ -552,9 +552,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private long[] sortForLock(long... projectIds)
     {
-        projectIds = Arrays.copyOf(projectIds, projectIds.length);
-        Arrays.sort(projectIds);
-        return projectIds;
+        long[] idsCopy = new long[projectIds.length];
+        System.arraycopy(projectIds, 0, idsCopy, 0, projectIds.length);
+        Arrays.sort(idsCopy);
+        return idsCopy;
     }
 
     private void initialiseProjects()
