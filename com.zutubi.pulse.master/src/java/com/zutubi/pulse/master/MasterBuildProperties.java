@@ -73,6 +73,18 @@ public class MasterBuildProperties extends BuildProperties
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_COUNT, Integer.toString(project.getBuildCount()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_SUCCESS_COUNT, Integer.toString(project.getSuccessCount()));
 
+        String owner;
+        if (buildResult.isPersonal())
+        {
+            owner = ((User) buildResult.getOwner()).getLogin();
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_USER, owner);
+        }
+        else
+        {
+            owner = buildResult.getProject().getName();
+        }
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OWNER, owner);
+
         CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(!buildResult.isPersonal() && checkoutScheme != CheckoutScheme.CLEAN_CHECKOUT));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!buildResult.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE));

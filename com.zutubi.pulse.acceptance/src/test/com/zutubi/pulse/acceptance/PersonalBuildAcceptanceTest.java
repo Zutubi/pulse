@@ -89,6 +89,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(true)));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, "admin"));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_USER, "admin"));
         // Make sure this view is not decorated (CIB-1711).
         assertTextNotPresent("logout");
     }

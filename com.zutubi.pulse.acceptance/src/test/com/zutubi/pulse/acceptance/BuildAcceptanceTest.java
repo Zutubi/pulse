@@ -96,6 +96,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         envPage.goTo();
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(false)));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, random));
+        assertFalse(envPage.isPropertyPresent(BuildProperties.PROPERTY_USER));
     }
 
     public void testChangesBetweenBuilds() throws Exception
