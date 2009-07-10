@@ -1877,12 +1877,17 @@ public class RemoteApi
     }
 
     /**
-     * Returns the ID that will be used for the next build of the given project.  Ids form an
-     * increasing sequence starting at one.
+     * Returns the ID that will be used for the next build of the given project.  In the simple
+     * case, IDs form an increasing sequence starting at one.  If the project has a build ID
+     * sequence leader set in its build options, however, the next ID will depend on the leader.
+     * This method takes the leader into account, but because other projects may share the same
+     * leader it is not guaranteed that the next build of the given project will be allocated the
+     * returned ID.
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project to retrieve the next build number of
-     * @return the ID that will be assigned to the next build of the given project
+     * @return the ID that would be assigned to the next build of the given project if it commenced
+     *         now
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires view permission for the given project
      * @see #setNextBuildNumber(String, String, String) 
@@ -1893,7 +1898,7 @@ public class RemoteApi
         try
         {
             Project project = internalGetProject(projectName, true);
-            return (int) project.getNextBuildNumber();
+            return (int) projectManager.getNextBuildNumber(project, false);
         }
         finally
         {
@@ -1925,7 +1930,7 @@ public class RemoteApi
         {
             long n = Long.parseLong(number);
             Project project = internalGetProject(projectName, true);
-            projectManager.lockProjectState(project.getId());
+            projectManager.lockProjectStates(project.getId());
             try
             {
                 long next = project.getNextBuildNumber();
@@ -1939,7 +1944,7 @@ public class RemoteApi
             }
             finally
             {
-                projectManager.unlockProjectState(project.getId());
+                projectManager.unlockProjectStates(project.getId());
             }
         }
         finally

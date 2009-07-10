@@ -561,6 +561,41 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         testsPage.waitFor();
     }
 
+    public void testIdLeader() throws Exception
+    {
+        String template = random + "-template";
+        String leader = random + "-leader";
+        String follower1 = random + "-follower1";
+        String follower2 = random + "-follower2";
+
+        String templatePath = xmlRpcHelper.insertSimpleProject(template, true);
+        String leaderPath = xmlRpcHelper.insertSimpleProject(leader, template, false);
+        xmlRpcHelper.insertSimpleProject(follower1, template, false);
+        xmlRpcHelper.insertSimpleProject(follower2, template, false);
+
+        // Build follower1 before setting leader, to test the id not being less
+        // than an existing build.
+        assertEquals(1, xmlRpcHelper.runBuild(follower1, BUILD_TIMEOUT));
+
+        // Set the leader in the template.
+        String optionsPath = PathUtils.getPath(templatePath, Constants.Project.OPTIONS);
+        Hashtable<String, Object> templateOptions = xmlRpcHelper.getConfig(optionsPath);
+        templateOptions.put(Constants.Project.Options.ID_LEADER, leaderPath);
+        xmlRpcHelper.saveConfig(optionsPath, templateOptions, false);
+
+        // Make sure projects are sharing sequence.
+        assertEquals(2, xmlRpcHelper.runBuild(follower1, BUILD_TIMEOUT));
+        assertEquals(3, xmlRpcHelper.runBuild(follower2, BUILD_TIMEOUT));
+        assertEquals(4, xmlRpcHelper.runBuild(follower1, BUILD_TIMEOUT));
+
+        // Clear the leader
+        templateOptions.put(Constants.Project.Options.ID_LEADER, "");
+        xmlRpcHelper.saveConfig(optionsPath, templateOptions, false);
+
+        // Make sure follower2 is back on its own sequence.
+        assertEquals(4, xmlRpcHelper.runBuild(follower2, BUILD_TIMEOUT));
+    }
+
     private void enableBuildPrompting(String projectName) throws Exception
     {
         Hashtable<String, Object> config = xmlRpcHelper.getConfig(getOptionsPath(projectName));

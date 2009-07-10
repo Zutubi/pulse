@@ -532,14 +532,29 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return getProjectStateLock(projectId).isHeldByCurrentThread();
     }
 
-    public void lockProjectState(long projectId)
+    public void lockProjectStates(long... projectIds)
     {
-        getProjectStateLock(projectId).lock();
+        projectIds = sortForLock(projectIds);
+        for (long id: projectIds)
+        {
+            getProjectStateLock(id).lock();
+        }
     }
 
-    public void unlockProjectState(long projectId)
+    public void unlockProjectStates(long... projectIds)
     {
-        getProjectStateLock(projectId).unlock();
+        projectIds = sortForLock(projectIds);
+        for (int i = projectIds.length - 1; i >= 0; i--)
+        {
+            getProjectStateLock(projectIds[i]).unlock();
+        }
+    }
+
+    private long[] sortForLock(long... projectIds)
+    {
+        projectIds = Arrays.copyOf(projectIds, projectIds.length);
+        Arrays.sort(projectIds);
+        return projectIds;
     }
 
     private void initialiseProjects()
@@ -589,7 +604,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             return;
         }
 
-        lockProjectState(id);
+        lockProjectStates(id);
         try
         {
             Project.State state = project.getState();
@@ -604,7 +619,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
         finally
         {
-            unlockProjectState(id);
+            unlockProjectStates(id);
         }
     }
 
@@ -860,20 +875,35 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    public long getNextBuildNumber(Project project)
+    public long getNextBuildNumber(Project project, boolean allocate)
     {
-        lockProjectState(project.getId());
+        Project idLeader = project;
+        ProjectConfiguration idLeaderConfig = project.getConfig().getOptions().getIdLeader();
+        if (idLeaderConfig != null)
+        {
+            idLeader = getProject(idLeaderConfig.getProjectId(), true);
+        }
+
+        lockProjectStates(project.getId(), idLeader.getId());
         try
         {
             project = getProject(project.getId(), true);
-            long number = project.getNextBuildNumber();
-            project.setNextBuildNumber(number + 1);
-            save(project);
-            return number;
+            idLeader = getProject(idLeader.getId(), true);
+
+            BuildResult latest = buildManager.getLatestBuildResult(project);
+            long minimum = latest == null ? 1 : latest.getNumber() + 1;
+
+            long next = Math.max(minimum, idLeader.getNextBuildNumber());
+            if (allocate)
+            {
+                idLeader.setNextBuildNumber(next + 1);
+                save(idLeader);
+            }
+            return next;
         }
         finally
         {
-            unlockProjectState(project.getId());
+            unlockProjectStates(project.getId(), idLeader.getId());
         }
     }
 
@@ -909,7 +939,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public boolean makeStateTransition(long projectId, Project.Transition transition)
     {
-        lockProjectState(projectId);
+        lockProjectStates(projectId);
         try
         {
             Project project = getProject(projectId, true);
@@ -953,7 +983,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
         finally
         {
-            unlockProjectState(projectId);
+            unlockProjectStates(projectId);
         }
     }
 
@@ -1077,7 +1107,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public void updateLastPollTime(long projectId, long timestamp)
     {
-        lockProjectState(projectId);
+        lockProjectStates(projectId);
         try
         {
             Project project = getState(projectId);
@@ -1089,7 +1119,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
         finally
         {
-            unlockProjectState(projectId);
+            unlockProjectStates(projectId);
         }
     }
 
@@ -1123,7 +1153,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         if (!buildResult.isPersonal())
         {
             long projectId = buildResult.getProject().getId();
-            lockProjectState(projectId);
+            lockProjectStates(projectId);
             try
             {
                 Project project = getProject(projectId, true);
@@ -1144,7 +1174,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
             finally
             {
-                unlockProjectState(projectId);
+                unlockProjectStates(projectId);
             }
         }
     }

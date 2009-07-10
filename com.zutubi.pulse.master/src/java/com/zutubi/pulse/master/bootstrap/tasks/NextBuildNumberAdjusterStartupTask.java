@@ -28,13 +28,13 @@ public class NextBuildNumberAdjusterStartupTask implements StartupTask
 
         for (Project project : projects)
         {
-            long nextNumber = project.getNextBuildNumber();
+            long nextNumber = projectManager.getNextBuildNumber(project, false);
             File candidateDir = getCandidateDir(paths, project, nextNumber);
             while(candidateDir.exists())
             {
                 LOG.warning("Build directory '" + candidateDir.getAbsolutePath() + "' already exists.  Skipping build number '" + nextNumber + "' for project '" + project.getId() + "'");
-                // Increments and saves the new number.
-                projectManager.getNextBuildNumber(project);
+                // Allocates the new number.
+                projectManager.getNextBuildNumber(project, true);
                 candidateDir = getCandidateDir(paths, project, ++nextNumber);
             }
         }

@@ -33,7 +33,7 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
     public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
     {
         Project project = projectManager.getProject(getProjectConfig().getProjectId(), false);
-        return new BuildResult(getReason(), project, projectManager.getNextBuildNumber(project), getRevision().isUser());
+        return new BuildResult(getReason(), project, projectManager.getNextBuildNumber(project, true), getRevision().isUser());
     }
 
     public String toString()

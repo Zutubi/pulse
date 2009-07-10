@@ -225,7 +225,7 @@ public class FatController implements EventListener, Stoppable
         }
 
         long projectId = event.getProjectConfig().getProjectId();
-        projectManager.lockProjectState(projectId);
+        projectManager.lockProjectStates(projectId);
         try
         {
             Project project = projectManager.getProject(projectId, false);
@@ -254,7 +254,7 @@ public class FatController implements EventListener, Stoppable
         }
         finally
         {
-            projectManager.unlockProjectState(projectId);
+            projectManager.unlockProjectStates(projectId);
         }
     }
 
@@ -271,7 +271,7 @@ public class FatController implements EventListener, Stoppable
 
         if (!buildResult.isPersonal())
         {
-            projectManager.lockProjectState(projectId);
+            projectManager.lockProjectStates(projectId);
         }
 
         boolean newlyIdle = false;
@@ -302,7 +302,7 @@ public class FatController implements EventListener, Stoppable
 
             if (!buildResult.isPersonal())
             {
-                projectManager.unlockProjectState(projectId);
+                projectManager.unlockProjectStates(projectId);
             }
         }
     }

@@ -25,7 +25,7 @@ class ProjectStateCleanupTask extends DatabaseStateCleanupTaskSupport
     {
         long projectId = instance.getProjectId();
 
-        projectManager.lockProjectState(projectId);
+        projectManager.lockProjectStates(projectId);
         try
         {
             Project project = projectManager.getProject(projectId, true);
@@ -51,7 +51,7 @@ class ProjectStateCleanupTask extends DatabaseStateCleanupTaskSupport
         }
         finally
         {
-            projectManager.unlockProjectState(projectId);
+            projectManager.unlockProjectStates(projectId);
         }
     }
 }

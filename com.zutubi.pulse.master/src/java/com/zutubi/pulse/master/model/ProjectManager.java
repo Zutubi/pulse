@@ -71,27 +71,29 @@ public interface ProjectManager extends EntityManager<Project>
     void abortUnfinishedBuilds(Project project, String message);
 
     /**
-     * Acquires a lock on the state for the given project.  The lock must be
+     * Acquires a lock on the states for the given projects.  The lock must be
      * held when performing compound logic involving the project state.  The
-     * lock is exclusive and reentrant.
+     * lock is exclusive and reentrant.  When locking multiple states, pass
+     * them all to this method at once to ensure a consistent locking order.
      *
-     * @param projectId identifier of the project to lock the state for
+     * @param projectIds identifiers of the projects to lock the state for
      *
-     * @see #unlockProjectState(long)
+     * @see #unlockProjectStates(long...)
      * @see #isProjectStateLocked(long)
      */
-    void lockProjectState(long projectId);
+    void lockProjectStates(long... projectIds);
 
     /**
-     * Releases a lock on the state for the given project.  The caller must
-     * currently hold the lock.
+     * Releases a lock on the states for the given projects.  The caller must
+     * currently hold the locks.  When unlocking multiple states, pass them all
+     * to this method at once to ensure a consistent unlocking order.
      *
-     * @param projectId identifier of the project to unlock the state for
+     * @param projectIds identifiers of the projects to unlock the state for
      *
-     * @see #lockProjectState(long)
+     * @see #lockProjectStates(long...)
      * @see #isProjectStateLocked(long)
      */
-    void unlockProjectState(long projectId);
+    void unlockProjectStates(long... projectIds);
 
     /**
      * Indicates if the calling thread holds the state lock for the given
@@ -111,7 +113,7 @@ public interface ProjectManager extends EntityManager<Project>
      * so.  In cases where the caller needs to inspect the state first or
      * perform other operations atomically with the transition, however, the
      * caller should increase the scope of the locking as required using
-     * {@link #lockProjectState(long)}.  State locks are reentrant to allow
+     * {@link #lockProjectStates(long)}.  State locks are reentrant to allow
      * this pattern.
      * <p/>
      * If the project transitions into a state which requires further action,
@@ -159,7 +161,7 @@ public interface ProjectManager extends EntityManager<Project>
     void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;
 
     @SecureParameter(action = AccessManager.ACTION_VIEW)
-    long getNextBuildNumber(Project project);
+    long getNextBuildNumber(Project project, boolean allocate);
 
     // These are secured as they use mapConfigsToProjects underneath
     Collection<ProjectGroup> getAllProjectGroups();

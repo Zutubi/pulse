@@ -105,6 +105,7 @@ public class Constants
         public class Options
         {
             public static final String AUTO_CLEAR_RESPONSIBILITY = "autoClearResponsibility";
+            public static final String ID_LEADER = "idLeader";
         }
     }
 
