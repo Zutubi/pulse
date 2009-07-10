@@ -35,18 +35,26 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
         TypeProperty property = ((CompositeType) parentType).getProperty(baseName);
         if(property.getType() instanceof ReferenceType)
         {
-            if(property.getAnnotation(Required.class) != null)
+            if (configurationTemplateManager.existsInTemplateParent(referencingPath))
             {
-                return configurationTemplateManager.getCleanupTasks(parentPath);
+                // Inherited single references cleaned in parent.
+                return null;
             }
             else
             {
-                return new NullifyReferenceCleanupTask(referencingPath, recordManager);
+                if(property.getAnnotation(Required.class) != null)
+                {
+                    return configurationTemplateManager.getCleanupTasks(parentPath);
+                }
+                else
+                {
+                    return new NullifyReferenceCleanupTask(referencingPath, recordManager);
+                }
             }
         }
         else
         {
-            return new RemoveReferenceCleanupTask(referencingPath, recordManager);
+            return new RemoveReferenceCleanupTask(referencingPath, deletedPath, recordManager);
         }
     }
 
