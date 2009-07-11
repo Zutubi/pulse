@@ -4,42 +4,51 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 /**
  * A record cleanup task that removes a reference from a collection.
  */
 public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
 {
-    public RemoveReferenceCleanupTask(String referencingPath)
+    private String deletedHandle;
+
+    public RemoveReferenceCleanupTask(String referencingPath, long deletedHandle)
     {
         super(referencingPath);
+        this.deletedHandle = Long.toString(deletedHandle);
     }
 
     public void run(RecordManager recordManager)
     {
+        // Note our referencing path is of the form:
+        //   <referencing collection>/<index>.
+        // Due to templating, the index isn't much use.  Instead, we seek and
+        // destroy the deleted handle, which may not exist at this level (it
+        // may be an inherited reference).
         String collectionPath = PathUtils.getParentPath(getAffectedPath());
-        String itemName = PathUtils.getBaseName(getAffectedPath());
-        int itemIndex = Integer.parseInt(itemName);
         String parentPath = PathUtils.getParentPath(collectionPath);
         String baseName = PathUtils.getBaseName(collectionPath);
 
         Record parentRecord = recordManager.select(parentPath);
         if (parentRecord != null)
         {
-            MutableRecord newValues = parentRecord.copy(false);
-            String[] references = (String[]) newValues.get(baseName);
-            String[] newReferences = new String[references.length - 1];
-
-            for(int srcIndex = 0, destIndex = 0; srcIndex < references.length; srcIndex++)
+            String[] references = (String[]) parentRecord.get(baseName);
+            if (references != null && CollectionUtils.contains(references, deletedHandle))
             {
-                if(srcIndex != itemIndex)
+                MutableRecord newValues = parentRecord.copy(false);
+                String[] newReferences = CollectionUtils.filterToArray(references, new Predicate<String>()
                 {
-                    newReferences[destIndex++] = references[srcIndex];
-                }
-            }
+                    public boolean satisfied(String handle)
+                    {
+                        return !handle.equals(deletedHandle);
+                    }
+                });
 
-            newValues.put(baseName, newReferences);
-            recordManager.update(parentPath, newValues);
+                newValues.put(baseName, newReferences);
+                recordManager.update(parentPath, newValues);
+            }
         }
     }
 }
