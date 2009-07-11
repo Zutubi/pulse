@@ -109,6 +109,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, "default", "build");
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(false)));
+        assertTrue(envPage.isPropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, random));
+        assertFalse(envPage.isPropertyPresent(BuildProperties.PROPERTY_USER));
     }
 
     public void testChangesBetweenBuilds() throws Exception

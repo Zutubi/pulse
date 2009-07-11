@@ -27,6 +27,6 @@ public class EnvironmentArtifactPage extends CommandArtifactPage
 
     private String getPropertyPrefix(String property)
     {
-        return property.toUpperCase().replace('.', '_') + "=";
+        return "PULSE_" + property.toUpperCase().replace('.', '_') + "=";
     }
 }

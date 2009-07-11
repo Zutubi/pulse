@@ -8,7 +8,13 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import org.tmatesoft.svn.core.SVNCommitInfo;
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.wc.SVNClientManager;
+import org.tmatesoft.svn.core.wc.SVNCopyClient;
+import org.tmatesoft.svn.core.wc.SVNCopySource;
+import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,15 +24,19 @@ import java.util.List;
 
 public class SubversionClientTest extends PulseTestCase
 {
+    private static final String REPO = "svn://localhost/test/";
     private static final String USER = "jsankey";
     private static final String PASSWORD = "password";
+
+    private static final String TRUNK_PATH = REPO + "trunk";
+    private static final String BRANCH_PATH = REPO + "branches/new-branch";
+    private static final String TAG_PATH = REPO + "tags/test-tag";
 
     private SubversionClient client;
     private File tmpDir;
     private File gotDir;
     private File expectedDir;
     private Process serverProcess;
-    private static final String TAG_PATH = "svn://localhost/test/tags/test-tag";
     private PulseExecutionContext context;
 
 //    $ svn log -v svn://localhost/test
@@ -108,7 +118,7 @@ public class SubversionClientTest extends PulseTestCase
 
         TestUtils.waitForServer(3690);
 
-        client = new SubversionClient("svn://localhost/test/trunk", USER, PASSWORD);
+        client = new SubversionClient(TRUNK_PATH, USER, PASSWORD);
     }
 
     protected void tearDown() throws Exception
@@ -130,6 +140,16 @@ public class SubversionClientTest extends PulseTestCase
     public void testGetLatestRevisionRestrictedToFiles() throws ScmException
     {
         assertEquals("4", client.getLatestRevision(null).getRevisionString());
+    }
+
+    public void testGetLatestRevisionNewBranch() throws ScmException, SVNException
+    {
+        SVNCopyClient client = SVNClientManager.newInstance().getCopyClient();
+        SVNCopySource[] copySource = {new SVNCopySource(SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNURL.parseURIDecoded(TRUNK_PATH))};
+        SVNCommitInfo info = client.doCopy(copySource, SVNURL.parseURIDecoded(BRANCH_PATH), false, true, true, "Create a branch", null);
+
+        SubversionClient branchClient = new SubversionClient(BRANCH_PATH);
+        assertEquals(Long.toString(info.getNewRevision()), branchClient.getLatestRevision(null).getRevisionString());
     }
 
     public void testGetLatestRevisionBadRepository()
