@@ -30,7 +30,7 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
     public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
     {
         Project project = projectManager.getProject(getProjectConfig().getProjectId(), false);
-        BuildResult result = new BuildResult(options.getReason(), project, projectManager.getNextBuildNumber(project), getRevision().isUser());
+        BuildResult result = new BuildResult(options.getReason(), project, projectManager.getNextBuildNumber(project, true), getRevision().isUser());
 
         String status = getProjectConfig().getDependencies().getStatus();
         if (getOptions().hasStatus())

@@ -57,6 +57,7 @@
                 <ref local="globalReports"/>
                 <ref local="emailCommittersSinceSuccess"/>
                 <ref local="scmCommitterMappings"/>
+                <ref local="addIdLeader"/>
                 <ref local="resourceRequirementOptional"/>
                 <ref local="triggerProperties"/>
                 <ref local="globalPostProcessors"/>
@@ -246,7 +247,11 @@
     <bean id="scmCommitterMappings" class="com.zutubi.pulse.master.upgrade.tasks.ScmCommitterMappingsUpgradeTask">
         <property name="buildNumber" value="200032002"/>
     </bean>
-    
+
+    <bean id="addIdLeader" class="com.zutubi.pulse.master.upgrade.tasks.AddIdLeaderUpgradeTask">
+        <property name="buildNumber" value="200033001"/>
+    </bean>
+
     <bean id="resourceRequirementOptional" class="com.zutubi.pulse.master.upgrade.tasks.ResourceRequirementOptionalUpgradeTask">
         <property name="buildNumber" value="200999001"/>
     </bean>

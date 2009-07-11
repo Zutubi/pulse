@@ -139,12 +139,19 @@ public class ReferenceType extends SimpleType implements Type
         {
             typeCheck(data, String.class);
             String path = (String) data;
-            long handle = configurationReferenceManager.getReferenceHandleForPath(path);
-            if(handle == 0)
+            long handle;
+            if (path.length() == 0)
             {
-                throw new TypeException("Reference to unknown path '" + path + "'");
+                handle = 0;
             }
-
+            else
+            {
+                handle = configurationReferenceManager.getReferenceHandleForPath(path);
+                if(handle == 0)
+                {
+                    throw new TypeException("Reference to unknown path '" + path + "'");
+                }
+            }
             return Long.toString(handle);
         }
     }
