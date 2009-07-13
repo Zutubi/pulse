@@ -15,6 +15,7 @@ import java.util.Map;
 public class BrowseViewColumnsOptionProvider extends MapOptionProvider
 {
     private static final Map<String, String> COLUMNS = asOrderedMap(asPair(BuildColumns.KEY_VERSION, "build version"),
+                                                                    asPair(BuildColumns.KEY_COMPLETED, "completed time"),
                                                                     asPair(BuildColumns.KEY_ERRORS, "error count"),
                                                                     asPair(BuildColumns.KEY_REASON, "reason"),
                                                                     asPair(BuildColumns.KEY_REVISION, "revision"),

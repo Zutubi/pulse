@@ -610,20 +610,33 @@
 ##
 ## Shared by date cell macros
 ##
-#macro(dateCellContent $entity $date $time)
-    <a href="#" class="unadorned" title="$date" onclick="toggleDisplay('${entity.id}_time'); toggleDisplay('${entity.id}_date'); return false;">
+#macro(dateCellContent $entity $type $date $time)
+    <a href="#" class="unadorned" title="$date" onclick="toggleDisplay('${entity.id}_${type}_time'); toggleDisplay('${entity.id}_${type}_date'); return false;">
         <img alt="toggle format" src="$base/images/calendar.gif"/>
     </a>
-    <span id="${entity.id}_time">$time</span>
-    <span id="${entity.id}_date" style="display: none">$date</span>
+    <span id="${entity.id}_${type}_time">$time</span>
+    <span id="${entity.id}_${type}_date" style="display: none">$date</span>
 #end
 
 ##
-## Outputs a timestamp cell with class based on $cssClass
+## Outputs a start timestamp cell with class based on $cssClass
 ##
 #macro(dateClassCell $result)
     <td class="$cssClass">
-        #dateCellContent($result $result.stamps.getPrettyStartDate($locale) $result.stamps.prettyStartTime)
+        #dateCellContent($result "start" $result.stamps.getPrettyStartDate($locale) $result.stamps.prettyStartTime)
+    </td>
+#end
+
+##
+## Outputs an end timestamp cell with class based on $cssClass
+##
+#macro(endDateClassCell $result)
+    <td class="$cssClass">
+    #if($result.completed())
+        #dateCellContent($result "end" $result.stamps.getPrettyEndDate($locale) $result.stamps.prettyEndTime)
+    #else
+        n/a
+    #end
     </td>
 #end
 
@@ -633,7 +646,7 @@
 ##
 #macro(dateCell $entity)
     <td class="content">
-        #dateCellContent($entity $entity.getPrettyDate($locale) $entity.prettyTime)
+        #dateCellContent($entity "" $entity.getPrettyDate($locale) $entity.prettyTime)
     </td>
 #end
 
@@ -1822,6 +1835,8 @@
         #end
     #elseif($key == "when")
         #dateClassCell($buildResult)
+    #elseif($key == "completed")
+        #endDateClassCell($buildResult)
     #elseif($key == "elapsed")
         #elapsedCell($buildResult)
     #elseif($key == "actions")
@@ -1851,106 +1866,6 @@
         #if($percentComplete > 0)<img class="centre" title="$buildResult.stamps.prettyElapsed (${percentComplete}%) elapsed" src="$base/images/box-elapsed.gif" height="10" width="$percentComplete"/>#end#if($percentRemaining > 0)<img class="centre" title="$buildResult.stamps.prettyEstimatedTimeRemaining (${percentRemaining}%) remaining" src="$base/images/box-remaining.gif" height="10" width="$percentRemaining"/>#end
     #else
         $buildResult.stamps.prettyElapsed
-    #end
-#end
-
-##
-## Outputs the value of a build column, labelled where necessary, for
-## presentation in a horizontal layout with no defined table columns/headers.
-##
-#macro(buildColumnValue $buildResult $key)
-    #set($project = $buildResult.project)
-    #if($key == "id")
-        <a href="$urls.build($buildResult)">build $buildResult.number</a>
-    #elseif($key == "project")
-        <a href="$urls.projectHome($project)">project: #html($project.name)</a>
-    #elseif($key == "status")
-        #if($buildResult.succeeded() && $buildResult.warningFeatureCount > 0)
-            #set($statusClass = "warning")
-        #else
-            #set($statusClass ="$buildResult.state.string")
-        #end
-        <span id='#id("${buildResult.ownerName}.build.${buildResult.number}.status")' class="$statusClass">
-            #statusImage($buildResult true)
-            #if($buildResult.inProgress())
-                #elapsedValue($buildResult)
-            #else
-                $buildResult.state.prettyString
-            #end
-        </span>
-    #elseif($key == "reason")
-        why: $buildResult.reason.summary
-    #elseif($key == "tests")
-        #set($summary = $buildResult.testSummary)
-        tests:
-        #if($summary.total == 0)
-            #wwtext("name=tests.none")
-        #else
-            <a href="$urls.buildTests($buildResult)">
-            #if($summary.hasBroken())
-                $action.getText("tests.some.broken", ["$summary.broken", "$summary.total"])
-            #else
-                $action.getText("tests.all.passed", ["$summary.total"])
-            #end
-            #if($summary.hasSkipped())
-                $action.getText("tests.some.skipped", ["$summary.skipped"])
-            #end
-            </a>
-        #end
-    #elseif($key == "owner")
-        #if($rr.personal)
-            <img alt="personal" src="$base/images/user.gif"/>
-            #html($buildResult.owner.config.login)
-        #else
-            <a href="$urls.projectHome($buildResult.owner)">
-                #html($buildResult.owner.name)
-            </a>
-        #end
-    #elseif($key == "rev")
-            rev:
-        #if($buildResult.personal)
-            personal
-        #elseif($buildResult.revision)
-            $action.updateChangeUrl($project, $buildResult.revision)
-            #set($changeUrl = $action.getChangeUrl())
-            #if($buildResult.revision.abbreviated)
-                <span title="$!webwork.htmlEncode($buildResult.revision.revisionString)">
-            #end
-            #if($changeUrl)<a href="$changeUrl">#end#html($buildResult.revision.abbreviatedRevisionString)#if($changeUrl)</a>#end
-            #if($buildResult.revision.abbreviated)
-                </span>
-            #end
-        #else
-            none
-        #end
-    #elseif($key == "version")
-        version:
-        #if($buildResult.version)
-            #html($buildResult.version)
-        #else
-            none
-        #end
-    #elseif($key == "when")
-        when:
-        #dateCellContent($buildResult $buildResult.stamps.getPrettyStartDate($locale) $buildResult.stamps.prettyStartTime)
-    #elseif($key == "elapsed")
-        #if($buildResult.completed())
-            time: $buildResult.stamps.prettyElapsed
-        #else
-            remaining: $buildResult.stamps.prettyEstimatedTimeRemaining
-        #end
-    #elseif($key == "actions")
-        <a href="$urls.build($buildResult)" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
-        <a href="$urls.buildDetails($buildResult)" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
-        <a href="$urls.buildChanges($buildResult)" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
-        <a href="$urls.buildArtifacts($buildResult)" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
-        #if($action.hasPermission("view source", $project))
-        <a href="$urls.buildWorkingCopy($buildResult)" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
-        #end
-    #elseif($key == "warnings")
-        warnings: $buildResult.warningFeatureCount
-    #elseif($key == "errors")
-        errors: $buildResult.errorFeatureCount
     #end
 #end
 
@@ -2002,10 +1917,11 @@
                             #buildColumnCheckbox("tests" $idSuffix $popupName)
                             #buildColumnCheckbox("when" $idSuffix $popupName)
                             #buildColumnCheckbox("elapsed" $idSuffix $popupName)
+                            #buildColumnCheckbox("completed" $idSuffix $popupName)
                             #buildColumnCheckbox("owner" $idSuffix $popupName)
-                            #buildColumnCheckbox("version" $idSuffix $popupName)
                         </tr>
                         <tr>
+                            #buildColumnCheckbox("version" $idSuffix $popupName)
                             #buildColumnCheckbox("warnings" $idSuffix $popupName)
                             #buildColumnCheckbox("errors" $idSuffix $popupName)
                             #buildColumnCheckbox("actions" $idSuffix $popupName)

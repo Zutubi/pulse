@@ -10,6 +10,7 @@ var keyToText = {
         'tests': 'tests',
         'version': 'version',
         'when': 'when',
+        'completed': 'completed',
         'warnings': 'warnings',
         'errors': 'errors'
 };

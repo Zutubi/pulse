@@ -19,6 +19,7 @@ public class BuildColumns
     public static final String KEY_VERSION = "version";
     public static final String KEY_WHEN = "when";
     public static final String KEY_ELAPSED = "elapsed";
+    public static final String KEY_COMPLETED = "completed";
     public static final String KEY_ACTIONS = "actions";
     public static final String KEY_WARNINGS = "warnings";
     public static final String KEY_ERRORS = "errors";
@@ -96,7 +97,7 @@ public class BuildColumns
 
     public static String[] getAllColumns()
     {
-        return new String[] { KEY_ACTIONS, KEY_ELAPSED, KEY_ID, KEY_OWNER, KEY_PROJECT, KEY_REASON, KEY_REVISION, KEY_STATUS, KEY_TESTS, KEY_VERSION, KEY_WHEN, KEY_WARNINGS };
+        return new String[] { KEY_ACTIONS, KEY_COMPLETED, KEY_ELAPSED, KEY_ID, KEY_OWNER, KEY_PROJECT, KEY_REASON, KEY_REVISION, KEY_STATUS, KEY_TESTS, KEY_VERSION, KEY_WHEN, KEY_WARNINGS };
     }
 
     public void removeAll(final String... keys)
