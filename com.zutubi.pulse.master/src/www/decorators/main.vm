@@ -149,19 +149,19 @@
                         statusAreaEl = Ext.get('status-area');
                         statusMessageEl = Ext.get('status-message');
 
-                        ## By default, focus on the centermost panel so that
-                        ## the user can scroll using the keyboard only.
-                        var centerScrollable = Ext.get('nested-center').child('.x-panel-body');
-                        if (centerScrollable)
+                        ## By default, focus on a dummy link in the center
+                        ## panel so that the user can scroll using the keyboard
+                        ## only (focusing on a div fails in Safari).
+                        var focusLink = Ext.get('focus-link');
+                        if (focusLink)
                         {
-                            centerScrollable.focus();
+                            focusLink.focus();
                         }
                     }
                 }
             }();
 
             Ext.onReady(PageLayout.init, PageLayout, true);
-            Ext.onReady(function(){});
 
             function hideStatus(animate)
             {
@@ -283,6 +283,7 @@
       <div id="content" class="x-layout-inactive-content"></div>
 
       <div id="center">
+          <a id="focus-link" href="#" style="position: absolute; top: -10px; left: -10px"></a>          
           $body
       </div>
         
