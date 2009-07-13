@@ -69,6 +69,13 @@ function encodeURIPath(path)
     return encodedPath;
 }
 
+// Converts the given string to a valid HTML name by replacing any invalid
+// characters with '.'.
+function toHtmlName(s)
+{
+    return s.replace(/[^\w-:.]/g, '.');
+}
+
 // Function to toggle the enable state of a control based on the state of a
 // checkbox.
 function setEnableState(id, checkboxId, inverse)

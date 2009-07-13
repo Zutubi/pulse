@@ -27,4 +27,9 @@ public class BrowsePage extends ProjectsSummaryPage
         super.waitFor();
         SeleniumUtils.waitForVariable(selenium, "view.initialised", SeleniumUtils.DEFAULT_TIMEOUT);
     }
+
+    public boolean isInvalidProjectPresent(String project)
+    {
+        return selenium.isElementPresent("invalid-" + project);
+    }
 }

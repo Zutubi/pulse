@@ -14,10 +14,47 @@
             var refreshInterval = 0;
         #end
 
+        var invalidEl;
+        var projectsTable;
         var view;
+
+        function update(data)
+        {
+            var invalidProjects = data.invalidProjects;
+            if (invalidProjects.length == 0)
+            {
+                invalidEl.hide();
+            }
+            else
+            {
+                var invalidListEl = Ext.get('invalid-projects-list');
+                invalidListEl.update('');
+
+                for (var i = 0; i < invalidProjects.length; i++)
+                {
+                    var project = invalidProjects[i];
+                    invalidListEl.createChild({
+                        tag: 'li',
+                        id: 'invalid-' + toHtmlName(project),
+                        children: {
+                            tag: 'a',
+                            href: window.baseUrl + '/admin/projects/' + encodeURIComponent(project) + '/',
+                            html: Ext.util.Format.htmlEncode(project)
+                        }
+                    });
+                }
+
+                invalidEl.show();
+            }
+
+            projectsTable.update(data.projectGroups);
+        }
+
         Ext.onReady(function() {
-            var projectsTable = new ZUTUBI.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $rssEnabled, false);
-            view = new ZUTUBI.ActiveView(window.baseUrl + '/ajax/browseData.action', refreshInterval, projectsTable.update, projectsTable, Ext.get('projects'), 'Unable to load projects.');
+            invalidEl = Ext.get('invalid-projects');
+            invalidEl.setVisibilityMode(Ext.Element.DISPLAY);
+            projectsTable = new ZUTUBI.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $rssEnabled, false);
+            view = new ZUTUBI.ActiveView(window.baseUrl + '/ajax/browseData.action', refreshInterval, update, window, Ext.get('projects'), 'Unable to load projects.');
             view.init();
         });
     </script>
@@ -30,6 +67,13 @@
         <span id="projects.toolbar" style="float: right">
         </span>
         <h2>:: all projects ::</h2>
+    </div>
+
+    <div id="invalid-projects" style="display: none;" class="invalid-configs">
+        #wwtext("name=invalid.projects")
+    
+        <ul id="invalid-projects-list">
+        </ul>
     </div>
     
     <div id="projects">
