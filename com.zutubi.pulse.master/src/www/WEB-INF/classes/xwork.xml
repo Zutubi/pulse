@@ -423,7 +423,7 @@
         </action>
 
         <action name="browseData" class="com.zutubi.pulse.master.xwork.actions.project.BrowseDataAction">
-            <result name="success" type="flexjson">models</result>
+            <result name="success" type="flexjson">model</result>
         </action>
 
         <action name="dashboardData" class="com.zutubi.pulse.master.xwork.actions.user.DashboardDataAction">

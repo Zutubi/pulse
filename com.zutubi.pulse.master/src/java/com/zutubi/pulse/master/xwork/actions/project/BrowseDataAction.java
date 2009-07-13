@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.NamedEntityComparator;
 import com.zutubi.pulse.master.model.LabelProjectTuple;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectGroup;
@@ -9,6 +8,7 @@ import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.Sort;
 import com.zutubi.util.TruePredicate;
 import com.zutubi.util.bean.ObjectFactory;
 
@@ -22,20 +22,14 @@ import java.util.Set;
  */
 public class BrowseDataAction extends ProjectActionSupport
 {
-    private List<ProjectsModel> models = new LinkedList<ProjectsModel>();
-    private List<Project> invalidProjects = new LinkedList<Project>();
+    private BrowseModel model = new BrowseModel();
 
     private ObjectFactory objectFactory;
     private ConfigurationManager configurationManager;
 
-    public List<ProjectsModel> getModels()
+    public BrowseModel getModel()
     {
-        return models;
-    }
-
-    public List<Project> getInvalidProjects()
-    {
-        return invalidProjects;
+        return model;
     }
 
     public String execute() throws Exception
@@ -47,25 +41,27 @@ public class BrowseDataAction extends ProjectActionSupport
         List<Project> projects = projectManager.getProjects(true);
 
         // Filter invalid projects into a separate list.
+        List<String> invalidProjects = new LinkedList<String>();
         for (Project project: projects)
         {
             if (!projectManager.isProjectValid(project))
             {
-                invalidProjects.add(project);
+                invalidProjects.add(project.getName());
             }
         }
 
-        Collections.sort(invalidProjects, new NamedEntityComparator());
+        Collections.sort(invalidProjects, new Sort.StringComparator());
+        model.setInvalidProjects(invalidProjects);
 
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
-        models = helper.createProjectsModels(user, browseConfig, collapsed, urls, new TruePredicate<Project>(), new Predicate<ProjectGroup>()
+        model.setProjectGroups(helper.createProjectsModels(user, browseConfig, collapsed, urls, new TruePredicate<Project>(), new Predicate<ProjectGroup>()
         {
             public boolean satisfied(ProjectGroup projectGroup)
             {
                 return browseConfig.isGroupsShown();
             }
-        }, true);
+        }, true));
         
         return SUCCESS;
     }

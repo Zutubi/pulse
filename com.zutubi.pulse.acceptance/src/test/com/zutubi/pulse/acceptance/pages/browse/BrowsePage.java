@@ -26,4 +26,9 @@ public class BrowsePage extends ProjectsSummaryPage
         super.waitFor();
         browser.waitForVariable("view.initialised");
     }
+
+    public boolean isInvalidProjectPresent(String project)
+    {
+        return browser.isElementPresent("invalid-" + project);
+    }
 }

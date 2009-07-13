@@ -1156,7 +1156,7 @@ public class StringUtils
      * name characters with periods ('.').  An 'a' character may also be
      * prepended if the string does not start with an ASCII letter.  Note
      * that this conversion is lossy: two input strings may result in the
-     * same output string (e.g. "a:b" and "a/b" both give "a:b").
+     * same output string (e.g. "a!b" and "a/b" both give "a.b").
      *
      * @param s input string to convert
      * @return a valid HTML name string that resembles s as closely as

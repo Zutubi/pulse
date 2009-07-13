@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
 
@@ -95,5 +96,23 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.triggerBuild(project);
         xmlRpcHelper.waitForBuildInProgress(project, 1, BUILD_TIMEOUT);
+    }
+
+    public void testInvalidProject() throws Exception
+    {
+        String template = random + "-template";
+        String concrete = random + "-concrete";
+
+        String templatePath = xmlRpcHelper.insertProject(template, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+        xmlRpcHelper.insertProject(concrete, template, false, null, null);
+
+        String svnPath = PathUtils.getPath(templatePath, Constants.Project.SCM);
+        Hashtable<String, Object> svn = xmlRpcHelper.getConfig(svnPath);
+        svn.put("url", "");
+        xmlRpcHelper.saveConfig(svnPath, svn, false);
+        
+        loginAsAdmin();
+        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        assertTrue(browsePage.isInvalidProjectPresent(concrete));
     }
 }
