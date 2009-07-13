@@ -623,7 +623,11 @@
 ##
 #macro(dateClassCell $result)
     <td class="$cssClass">
+    #if($result.commenced())
         #dateCellContent($result "start" $result.stamps.getPrettyStartDate($locale) $result.stamps.prettyStartTime)
+    #else
+        n/a
+    #end
     </td>
 #end
 
