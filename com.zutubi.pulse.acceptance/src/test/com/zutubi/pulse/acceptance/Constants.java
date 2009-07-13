@@ -208,7 +208,7 @@ public class Constants
 
         public static class Artifact
         {
-
+            public static final String NAME = "name";
         }
 
         /**

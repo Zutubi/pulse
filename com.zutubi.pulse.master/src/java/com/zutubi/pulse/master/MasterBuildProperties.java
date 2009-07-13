@@ -84,7 +84,7 @@ public class MasterBuildProperties extends BuildProperties
         if (buildResult.isPersonal())
         {
             owner = ((User) buildResult.getOwner()).getLogin();
-            context.addString(NAMESPACE_INTERNAL, PROPERTY_USER, owner);
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSONAL_USER, owner);
         }
         else
         {

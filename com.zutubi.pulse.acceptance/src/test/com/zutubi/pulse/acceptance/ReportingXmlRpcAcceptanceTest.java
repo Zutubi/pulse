@@ -1,5 +1,15 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Artifact.NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.CAPTURES;
+import static com.zutubi.pulse.acceptance.Constants.Project.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -14,6 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -134,7 +145,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String dashboardPath = PathUtils.getPath(userPath, "preferences", "dashboard");
         Hashtable<String, Object> dashboardSettings = xmlRpcHelper.getConfig(dashboardPath);
         dashboardSettings.put("showAllProjects", false);
-        dashboardSettings.put("shownProjects", new Vector<String>(Arrays.asList(projectPath)));
+        dashboardSettings.put("shownProjects", new Vector<String>(asList(projectPath)));
         xmlRpcHelper.saveConfig(dashboardPath, dashboardSettings, true);
 
         Vector<String> myProjects = xmlRpcHelper.getMyProjectNames();
@@ -407,6 +418,80 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // No builds have warnings, but this sanity check found a login bug.
         Vector<Hashtable<String, Object>> builds = xmlRpcHelper.getLatestBuildsWithWarnings(PROJECT_HIERARCHY_TEMPLATE, 10);
         assertEquals(0, builds.size());
+    }
+
+    public void testGetArtifactFileListing() throws Exception
+    {
+        String project = randomName();
+        Hashtable<String, Object> svnConfig = xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY);
+        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        antConfig.put(TARGETS, "test");
+
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, antConfig);
+
+        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(DirectoryOutputConfiguration.class);
+        artifactConfig.put(NAME, "reports");
+        artifactConfig.put(BASE, "build/reports");
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, CAPTURES), artifactConfig);
+
+        int buildId = xmlRpcHelper.runBuild(project);
+
+        Vector<String> files = xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "");
+        Collections.sort(files, new Sort.StringComparator());
+        assertEquals(asList(
+                "html/allclasses-frame.html",
+                "html/all-tests.html",
+                "html/alltests-errors.html",
+                "html/alltests-fails.html",
+                "html/com/zutubi/testant/0_UnitTest.html",
+                "html/com/zutubi/testant/0_UnitTest-fails.html",
+                "html/com/zutubi/testant/package-frame.html",
+                "html/com/zutubi/testant/package-summary.html",
+                "html/index.html",
+                "html/overview-frame.html",
+                "html/overview-summary.html",
+                "html/stylesheet.css",
+                "TEST-com.zutubi.testant.UnitTest.xml",
+                "xml/TESTS-TestSuites.xml"
+        ), files);
+
+        files = xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "html/com/zutubi/testant");
+        Collections.sort(files, new Sort.StringComparator());
+        assertEquals(asList("0_UnitTest.html", "0_UnitTest-fails.html", "package-frame.html", "package-summary.html"), files);
+
+        assertEquals(Arrays.<String>asList(), xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "xm"));
+        assertEquals(asList("TESTS-TestSuites.xml"), xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "xml"));
+        assertEquals(asList("TESTS-TestSuites.xml"), xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "xml/"));
+
+        try
+        {
+            xmlRpcHelper.getArtifactFileListing(project, buildId, "nosuchstage", "build", "reports", "");
+            fail("Shouldn't work for invalid stage name");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("build '1' does not have a stage named 'nosuchstage'"));
+        }
+
+        try
+        {
+            xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "nosuchcommand", "reports", "");
+            fail("Shouldn't work for invalid command name");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("build '1' stage 'default' does not have a command named 'nosuchcommand'"));
+        }
+
+        try
+        {
+            xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "nosuchartifact", "");
+            fail("Shouldn't work for invalid artifact name");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("build '1' stage 'default' command 'build' does not have an artifact named 'nosuchartifact'"));
+        }
     }
 
     private void ensureProjectHierarchy() throws Exception

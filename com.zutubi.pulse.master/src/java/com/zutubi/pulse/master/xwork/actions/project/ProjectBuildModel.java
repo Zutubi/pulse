@@ -205,16 +205,11 @@ public class ProjectBuildModel
         }
         else if (column.equals(BuildColumns.KEY_WHEN))
         {
-            content = merge("<a href='#' class='unadorned' title='${date}' onclick=\\\"toggleDisplay('${timeId}'); toggleDisplay('${dateId}'); return false;\\\">" +
-                                "<img alt='toggle format' src='${base}images/calendar.gif'/>" +
-                            "</a> " +
-                            "<span id='${timeId}'>${time}</span>" +
-                            "<span id='${dateId}' style='display: none'>${date}</span>",
-                    asPair("base", urls.base()),
-                    asPair("timeId", "time." + buildResult.getId()),
-                    asPair("dateId", "date." + buildResult.getId()),
-                    asPair("date", buildResult.getStamps().getPrettyStartDate(ActionContext.getContext().getLocale())),
-                    asPair("time", buildResult.getStamps().getPrettyStartTime()));
+            content = renderTime(buildResult, buildResult.getStamps().getStartTime(), "start", urls);
+        }
+        else if (column.equals(BuildColumns.KEY_COMPLETED))
+        {
+            content = renderTime(buildResult, buildResult.getStamps().getEndTime(), "end", urls);
         }
         else if (column.equals(BuildColumns.KEY_TESTS))
         {
@@ -252,6 +247,28 @@ public class ProjectBuildModel
         }
 
         return label + ": " + content;
+    }
+
+    private String renderTime(BuildResult buildResult, long time, String type, Urls urls)
+    {
+        if (time == TimeStamps.UNINITIALISED_TIME)
+        {
+            return "n/a";
+        }
+        else
+        {
+            String idSuffix = type + "." + buildResult.getId();
+            return merge("<a href='#' class='unadorned' title='${date}' onclick=\\\"toggleDisplay('${timeId}'); toggleDisplay('${dateId}'); return false;\\\">" +
+                                "<img alt='toggle format' src='${base}images/calendar.gif'/>" +
+                            "</a> " +
+                            "<span id='${timeId}'>${time}</span>" +
+                            "<span id='${dateId}' style='display: none'>${date}</span>",
+                    asPair("base", urls.base()),
+                    asPair("timeId", "time." + idSuffix),
+                    asPair("dateId", "date." + idSuffix),
+                    asPair("date", TimeStamps.getPrettyDate(time, ActionContext.getContext().getLocale())),
+                    asPair("time", TimeStamps.getPrettyTime(time)));
+        }
     }
 
     private String renderRevisionString(Revision revision)

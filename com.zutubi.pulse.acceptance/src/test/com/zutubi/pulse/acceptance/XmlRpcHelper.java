@@ -813,6 +813,11 @@ public class XmlRpcHelper
         }, timeout, "build " + number + " of project " + projectName + " to complete");
     }
 
+    public Vector<String> getArtifactFileListing(String projectName, int buildId, String stageName, String commandName, String artifactName, String path) throws Exception
+    {
+        return call("getArtifactFileListing", projectName, buildId, stageName, commandName, artifactName, path);
+    }
+
     public Hashtable<String, String> getResponsibilityInfo(String projectName) throws Exception
     {
         return call("getResponsibilityInfo", projectName);
