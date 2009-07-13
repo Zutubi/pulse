@@ -121,6 +121,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_PERSONAL_BUILD          = "personal.build";
     /**
+     * For personal builds, the login of the user running the build.
+     */
+    public static final String PROPERTY_PERSONAL_USER           = "personal.user";
+    /**
      * The name of the project being built.
      */
     public static final String PROPERTY_PROJECT                 = "project";
@@ -138,10 +142,6 @@ public class BuildProperties
      * (only available post-build).
      */
     public static final String PROPERTY_TEST_SUMMARY            = "test.summary";
-    /**
-     * For personal builds, the login of the user running the build.
-     */
-    public static final String PROPERTY_USER                    = "user";
 
     //-----------------------------------------------------------------------
     // Stage/Recipe level properties
