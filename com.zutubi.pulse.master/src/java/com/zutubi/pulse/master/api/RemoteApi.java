@@ -2375,7 +2375,7 @@ public class RemoteApi
      * @param id          ID of the build to retrieve the artifacts for
      * @return {@xtype array<[RemoteApi.Artifact]>} all artifacts captured in the given build
      * @throws IllegalArgumentException if the given project name or build is invalid
-     * @access requires view permission for th given project
+     * @access requires view permission for the given project
      */
     public Vector<Hashtable<String, Object>> getArtifactsInBuild(String token, final String projectName, final int id)
     {
@@ -2410,6 +2410,87 @@ public class RemoteApi
                             }
                         }
                     });
+                }
+            });
+
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Returns an array of all artifact file paths for files nested under the
+     * given path in the given artifact.  The returned paths are relative to
+     * the given path.  Note that all files nested anywhere under the path,
+     * even under child directories, are returned.  Directories themselves are
+     * not returned as separate entries (although they can be inferred from the
+     * file paths).  All paths use forward slashes (/) as separators.  The path
+     * may be empty to list all files captured in the artifact.  If the path
+     * matches no files in the artifact, an empty array will be returned.
+     *
+     * @param token        authentication token, see {@link #login(String, String)}
+     * @param projectName  name of the project that owns the build result
+     * @param id           ID of the build result
+     * @param stageName    name of the stage that captured the artifact
+     * @param commandName  name of the command that captured the artifact
+     * @param artifactName name of the artifact to list files under
+     * @param path         path of a directory within the artifact to restrict
+     *                     the result to, may be empty to list all files in the
+     *                     artifact
+     * @return an array of files captured in the given artifact that fall under
+     *         the given path
+     * @throws IllegalArgumentException if the given project name, build ID,
+     *         stage name, command name or artifact name is invalid
+     * @access requires view permission for the given project
+     */
+    public Vector<String> getArtifactFileListing(String token, final String projectName, final int id, final String stageName, final String commandName, final String artifactName, final String path)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            final Project project = internalGetProject(projectName, true);
+            final Vector<String> result = new Vector<String>();
+            
+            buildManager.executeInTransaction(new Runnable()
+            {
+                public void run()
+                {
+                    BuildResult build = internalGetBuild(project, id);
+                    RecipeResultNode recipeNode = build.findResultNode(stageName);
+                    if (recipeNode == null)
+                    {
+                        throw new IllegalArgumentException("Project '" + projectName + "' build '" + id + "' does not have a stage named '" + stageName + "'");
+                    }
+
+                    CommandResult commandResult = recipeNode.getResult().getCommandResult(commandName);
+                    if (commandResult == null)
+                    {
+                        throw new IllegalArgumentException("Project '" + projectName + "' build '" + id + "' stage '" + stageName + "' does not have a command named '" + commandName + "'");
+                    }
+
+                    StoredArtifact artifact = commandResult.getArtifact(artifactName);
+                    if (artifact == null)
+                    {
+                        throw new IllegalArgumentException("Project '" + projectName + "' build '" + id + "' stage '" + stageName + "' command '" + commandName + "' does not have an artifact named '" + artifactName + "'");
+                    }
+
+                    String pathPrefix = StringUtils.join("/", true, true, artifactName, path);
+                    if (!pathPrefix.endsWith("/"))
+                    {
+                        pathPrefix += "/";
+                    }
+
+                    for (StoredFileArtifact fileArtifact: artifact.getChildren())
+                    {
+                        String filePath = fileArtifact.getPath();
+                        if (filePath.startsWith(pathPrefix))
+                        {
+                            result.add(filePath.substring(pathPrefix.length()));
+                        }
+                    }
                 }
             });
 
