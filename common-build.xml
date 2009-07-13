@@ -25,7 +25,7 @@
 
         <!-- Load the user's properties, then the module's properties to allow them to
              override the default root level properties. -->
-        <property file="${project.root.dir}/local.properties"/>
+        <property file="${user.home}/ant.properties"/>
         <property file="build.properties"/>
         <property file="${project.root.dir}/build.properties"/>
 
