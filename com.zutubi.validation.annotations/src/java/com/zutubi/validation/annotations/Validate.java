@@ -14,16 +14,20 @@ import java.lang.annotation.Target;
  * validation of the house. That is, the house will not be considered valid
  * unless the door is also valid.  Without the validate annotation, the
  * door would be ignored.
- * <code>
+ * </p>
+ * 
+ * <pre>
+ * {@code
  * public class House
  * {
- *     @Validate
+ *     &#064;Validate
  *     public Door getDoor()
  *     {
  *
  *     }
  * }
- * </code>
+ * }
+ * </pre>
  */
 @Constraint("com.zutubi.validation.validators.DelegateValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

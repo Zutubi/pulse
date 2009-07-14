@@ -52,6 +52,7 @@
         <property name="build.tmp.dir" value="${build.dir}/tmp"/>
 
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
+        <property name="distconf" value="release"/>
 
         <!-- resources / properties definition-->
         <patternset id="resources">
@@ -305,7 +306,7 @@
 
     <target name="common-dist">
         <dirname property="current.dir" file="ivy.xml"/>
-        <ivy:publish resolver="private" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
+        <ivy:publish resolver="private" artifactspattern="${current.dir}/build/[artifact].[ext]" conf="${distconf}"/>
     </target>
 
     <macrodef name="package-src">

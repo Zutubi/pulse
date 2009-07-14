@@ -77,4 +77,7 @@
         </copy>
     </target>
 
+    <target name="module-pre-dist">
+        <property name="distconf" value="bundle"/>
+    </target>
 </project>
