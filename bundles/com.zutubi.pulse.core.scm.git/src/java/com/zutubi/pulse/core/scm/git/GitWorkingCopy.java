@@ -138,7 +138,7 @@ public class GitWorkingCopy implements WorkingCopy
         if (scope.length > 0 && scope[0].startsWith(":"))
         {
             String range = scope[0].substring(1);
-            if (range.isEmpty())
+            if (range.length() == 0)
             {
                 args.add(FLAG_CACHED);
             }
