@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -391,7 +390,6 @@ public class RegexPostProcessorTest extends PulseTestCase
             result[i] = joined.toString();
         }
 
-        System.out.println("result = " + Arrays.asList(result));
         return result;
     }
 
