@@ -139,14 +139,20 @@ public abstract class Result extends Entity
         stamps.setEndTime(endTime);
     }
 
-    public void success()
-    {
-        state = ResultState.SUCCESS;
-    }
-
     public void failure()
     {
-        state = ResultState.FAILURE;
+        if (state != ResultState.ERROR && state != ResultState.TERMINATING)
+        {
+            state = ResultState.FAILURE;
+        }
+    }
+
+    public void error()
+    {
+        if (state != ResultState.TERMINATING)
+        {
+            state = ResultState.ERROR;
+        }
     }
 
     public void addFeature(Feature.Level level, String message)
@@ -170,7 +176,7 @@ public abstract class Result extends Entity
 
     public void error(String message)
     {
-        state = ResultState.ERROR;
+        error();
         addFeature(Feature.Level.ERROR, message);
     }
 

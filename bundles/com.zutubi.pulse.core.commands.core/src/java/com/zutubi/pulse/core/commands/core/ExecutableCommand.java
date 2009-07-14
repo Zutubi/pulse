@@ -196,7 +196,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
             switch(state)
             {
                 case SUCCESS:
-                    cmdResult.success();
+                    cmdResult.complete();
                     break;
                 case FAILURE:
                     cmdResult.failure("Command '" + commandLine + "' exited with code '" + result + "'");

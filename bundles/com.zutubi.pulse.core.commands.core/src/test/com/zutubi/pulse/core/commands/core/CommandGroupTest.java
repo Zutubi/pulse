@@ -16,11 +16,8 @@ import com.zutubi.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 
-/**
- */
 public class CommandGroupTest extends CommandTestBase
 {
-
     public void testSimpleNestedCommand() throws Exception
     {
         CommandGroup group = createEchoCommand();

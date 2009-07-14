@@ -195,7 +195,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         CommandResult result = new CommandResult("command name");
         result.commence();
-        result.success();
+        result.complete();
         StoredFileArtifact artifact = new StoredFileArtifact("to file");
         PersistentPlainFeature feature = new PersistentPlainFeature(Feature.Level.ERROR, "getSummary here", 7);
 

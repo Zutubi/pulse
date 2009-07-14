@@ -61,6 +61,7 @@ public abstract class CommandTestBase extends PulseTestCase
         context.setWorkingDir(baseDir);
 
         CommandResult result = new CommandResult(command.getName());
+        result.commence();
         File commandOutput = new File(outputDir, Recipe.getCommandDirName(0, result));
         if (!commandOutput.mkdirs())
         {
@@ -77,6 +78,7 @@ public abstract class CommandTestBase extends PulseTestCase
         }
         finally
         {
+            result.complete();
             context.popTo(LABEL_EXECUTE);
         }
         return result;

@@ -306,11 +306,11 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     public void complete()
     {
-        // Check the recipe results, if there are any failures/errors
-        // then take on the worst result.
-        state = root.getWorstState(state);
-
         super.complete();
+
+        // Check the recipe results, if there are any failures/errors
+        // then take on the worst result from ourself or any recipe.
+        state = ResultState.getWorseState(state, root.getWorstState(state));
     }
 
     public Iterator<RecipeResultNode> iterator()
