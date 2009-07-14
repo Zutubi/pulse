@@ -103,7 +103,7 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
         String template = random + "-template";
         String concrete = random + "-concrete";
 
-        String templatePath = xmlRpcHelper.insertProject(template, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+        String templatePath = xmlRpcHelper.insertSingleCommandProject(template, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
         xmlRpcHelper.insertProject(concrete, template, false, null, null);
 
         String svnPath = PathUtils.getPath(templatePath, Constants.Project.SCM);
