@@ -137,8 +137,6 @@ public class ConfigurationUIModel
 
         targetType = type.getTargetType();
 
-        nestedProperties = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
-
         if (targetType instanceof CompositeType)
         {
             CompositeType ctype = (CompositeType) targetType;
@@ -162,17 +160,6 @@ public class ConfigurationUIModel
         {
             record = configurationTemplateManager.getRecord(path);
             instance = configurationProvider.get(path, Configuration.class);
-
-            if (instance != null)
-            {
-                for (String nested: nestedProperties)
-                {
-                    for(String error: instance.getFieldErrors(nested))
-                    {
-                        nestedPropertyErrors.add(new Pair<String, String>(nested, error));
-                    }
-                }
-            }
         }
 
         if (!(type instanceof CollectionType))
@@ -192,9 +179,23 @@ public class ConfigurationUIModel
                         return PathUtils.getPathElements(s)[1];
                     }
                 });
+
+                if (configuredDescendents.size() == 0 && !((CompositeType) type).isExtendable())
+                {
+                    nestedProperties = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
+                }
             }
             else
             {
+                nestedProperties = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
+                for (String nested: nestedProperties)
+                {
+                    for(String error: instance.getFieldErrors(nested))
+                    {
+                        nestedPropertyErrors.add(new Pair<String, String>(nested, error));
+                    }
+                }
+
                 links = linkManager.getLinks(instance);
             }
         }
