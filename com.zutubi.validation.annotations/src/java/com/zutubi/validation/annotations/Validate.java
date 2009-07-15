@@ -16,18 +16,14 @@ import java.lang.annotation.Target;
  * door would be ignored.
  * </p>
  * 
- * <pre>
- * {@code
- * public class House
+ * <pre><code> public class House
  * {
  *     &#064;Validate
  *     public Door getDoor()
  *     {
  *
  *     }
- * }
- * }
- * </pre>
+ * }</code></pre>
  */
 @Constraint("com.zutubi.validation.validators.DelegateValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})
