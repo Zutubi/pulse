@@ -52,7 +52,7 @@
         <property name="build.tmp.dir" value="${build.dir}/tmp"/>
 
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
-        <property name="distconf" value="release"/>
+        <property name="distconf" value="build"/>
 
         <!-- resources / properties definition-->
         <patternset id="resources">

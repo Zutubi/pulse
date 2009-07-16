@@ -32,7 +32,6 @@
                 <exclude name="*.jar"/>
             </fileset>
             <fileset dir="resources" excludes="resources/META-INF/MANIFEST.MF"/>
-            <path refid="src.export.selection"/>
         </jar>
 
         <package-src name="${ivy.module}-src.jar" pathref="src.export.selection"/>
