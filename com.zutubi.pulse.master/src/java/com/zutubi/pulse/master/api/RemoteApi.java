@@ -2427,7 +2427,7 @@ public class RemoteApi
                                     String command = commandResult.getCommandName();
                                     for (StoredArtifact artifact : commandResult.getArtifacts())
                                     {
-                                        result.add(convertArtifact(artifact, projectName, build, stage, command));
+                                        result.add(convertArtifact(artifact, project, build, stage, command));
                                     }
                                 }
                             }
@@ -2526,7 +2526,7 @@ public class RemoteApi
         }
     }
 
-    private Hashtable<String, Object> convertArtifact(StoredArtifact artifact, String project, BuildResult build, String stage, String command)
+    private Hashtable<String, Object> convertArtifact(StoredArtifact artifact, Project project, BuildResult build, String stage, String command)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
         result.put("id", Long.toString(artifact.getId()));

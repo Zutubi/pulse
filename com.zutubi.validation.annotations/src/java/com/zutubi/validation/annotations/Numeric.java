@@ -11,14 +11,13 @@ import java.lang.annotation.Target;
  * <p>
  * This annotation can be applied to integral and string fields.
  * <p>
- * For example
- * <code>
- *     @Numeric(min = 0, max = 100)
- *     public String getNumber()
- *     {
- *         return "093";
- *     }
- * </code>
+ * For example:
+ *
+ * <pre><code>&#064;Numeric(min = 0, max = 100)
+ * public String getNumber()
+ * {
+ *     return "093";
+ * }</code></pre>
  */
 @Constraint("com.zutubi.validation.validators.NumericValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})

@@ -47,6 +47,11 @@
                 <include pattern="pulse-*${pulse.version}.*"/>
             </dir-artifact>
         </command>
+        <ant name="dist" targets="dist.all"/>
+        <command name="javadoc">
+            <ant targets="javadoc"/>
+            <dir-artifact name="javadoc" base="build/docs/javadoc"/>
+        </command>
     </recipe>
 
     <recipe name="dbtest">

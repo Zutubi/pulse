@@ -59,7 +59,7 @@ public class ConfigurationUIModel
     private String displayName;
 
     private List<String> simpleProperties;
-    private List<String> nestedProperties;
+    private List<String> nestedProperties = Collections.emptyList();
     private String collapsedCollection;
     private List<Pair<String, String>> nestedPropertyErrors = new LinkedList<Pair<String, String>>();
 
@@ -138,16 +138,6 @@ public class ConfigurationUIModel
 
         targetType = type.getTargetType();
 
-        collapsedCollection = ToveUtils.getCollapsedCollection(path, type, configurationSecurityManager);
-        if (collapsedCollection == null)
-        {
-            nestedProperties = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
-        }
-        else
-        {
-            nestedProperties = Collections.emptyList();
-        }
-
         if (targetType instanceof CompositeType)
         {
             CompositeType ctype = (CompositeType) targetType;
@@ -171,17 +161,6 @@ public class ConfigurationUIModel
         {
             record = configurationTemplateManager.getRecord(path);
             instance = configurationProvider.get(path, Configuration.class);
-
-            if (instance != null)
-            {
-                for (String nested: nestedProperties)
-                {
-                    for(String error: instance.getFieldErrors(nested))
-                    {
-                        nestedPropertyErrors.add(new Pair<String, String>(nested, error));
-                    }
-                }
-            }
         }
 
         if (!(type instanceof CollectionType))
@@ -201,14 +180,38 @@ public class ConfigurationUIModel
                         return PathUtils.getPathElements(s)[1];
                     }
                 });
+
+                if (configuredDescendents.size() == 0 && !((CompositeType) type).isExtendable())
+                {
+                    resolveNested();
+                }
             }
             else
             {
+                resolveNested();
+                
+                for (String nested: nestedProperties)
+                {
+                    for(String error: instance.getFieldErrors(nested))
+                    {
+                        nestedPropertyErrors.add(new Pair<String, String>(nested, error));
+                    }
+                }
+
                 links = linkManager.getLinks(instance);
             }
         }
 
         displayName = ToveUtils.getDisplayName(path, configurationTemplateManager);
+    }
+
+    private void resolveNested()
+    {
+        collapsedCollection = ToveUtils.getCollapsedCollection(path, type, configurationSecurityManager);
+        if (collapsedCollection == null)
+        {
+            nestedProperties = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
+        }
     }
 
     private void determineActions(ComplexType parentType)

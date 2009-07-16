@@ -80,9 +80,10 @@
         </junitreport>
     </target>
 
-    <target name="dist.all" depends="buildlist"
+    <target name="dist.all" depends="init"
             description="Publishes built artifacts to the Subversion repository, assuming they are already built.">
-        <subant inheritall="false" target="dist" buildpathref="build.path"/>
+        <set-package-deps module="master"/>
+        <subant inheritall="false" target="dist" buildpathref="build.path.master"/>
     </target>
 
     <target name="clean.dev" description="Cleans up data created during development.">
@@ -541,6 +542,67 @@
         </javadoc>
     </target>
 
+    <target name="javadoc" depends="init">
+        <property name="docdir" value="build/docs/javadoc"/>
+        <delete dir="${docdir}"/>
+        <javadoc destdir="${docdir}">
+            <link href="http://java.sun.com/j2se/1.5/docs/api/"/>
+            <link href="http://java.sun.com/products/javamail/javadocs/"/>
+            <link href="http://www.cafeconleche.org/XOM/apidocs/"/>
+            <link href="http://www.jmock.org/javadoc/2.0.0/"/>
+
+            <!-- Just the top level i18n package to show Messages -->
+            <fileset dir="com.zutubi.i18n/src/java">
+                <include name="com/zutubi/i18n/*.java"/>
+            </fileset>
+
+            <!-- Top level plus the validators -->
+            <fileset dir="com.zutubi.validation/src/java">
+                <include name="com/zutubi/pulse/validation/*.java"/>
+                <include name="com/zutubi/pulse/validation/validators/*.java"/>
+            </fileset>
+            <fileset dir="com.zutubi.validation.annotations/src/java"/>
+
+            <!-- Tove has separate API packages -->
+            <fileset dir="com.zutubi.tove/src/java">
+                <include name="**/api/*.java"/>
+            </fileset>
+            <fileset dir="com.zutubi.tove.annotations/src/java"/>
+
+            <!-- Pick a handful of utils that are most useful and quite stable -->
+            <fileset dir="com.zutubi.util/src/java">
+                <include name="com/zutubi/util/Pair.java"/>
+                <include name="com/zutubi/util/StringUtils.java"/>
+                <include name="com/zutubi/util/io/*.java"/>
+            </fileset>
+
+            <!-- Pulse has API packages, but don't show some internal tests -->
+            <fileset dir="com.zutubi.pulse.core/src/java">
+                <include name="**/api/*.java"/>
+            </fileset>
+            <fileset dir="com.zutubi.pulse.core/src/test">
+                <include name="**/api/*.java"/>
+                <exclude name="**/scm/api/*.java"/>
+            </fileset>
+
+            <!-- Pulse master APIs, but exclude remote api -->
+            <fileset dir="com.zutubi.pulse.master/src/java">
+                <include name="**/api/*.java"/>
+                <exclude name="**/master/api/*.java"/>
+            </fileset>
+            <fileset dir="com.zutubi.pulse.master/src/test">
+                <include name="com/zutubi/**/api/*.java"/>
+                <exclude name="**/master/api/*.java"/>
+            </fileset>
+
+            <classpath>
+                <fileset dir="com.zutubi.pulse.master/build/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javadoc>
+    </target>
+
     <target name="idea" description="Runs build.idea.modules with -Dskip.tests=true">
         <antcall target="build.idea.modules">
             <param name="skip.tests" value="true"/>
@@ -644,10 +706,9 @@
         </copyright>
 
         <native-zip dir="${project.root.dir}/build" file="${package.name}.zip" path="${package.name}"/>
-
     </target>
 
-    <macrodef name="build-package-deps">
+    <macrodef name="set-package-deps">
         <attribute name="module"/>
         <sequential>
             <ivy:buildlist reference="build.path.@{module}" root="com.zutubi.pulse.@{module}-package" ivyfilepath="ivy.xml" excluderoot="true" onMissingDescriptor="skip">
@@ -657,7 +718,13 @@
                     <include name="package/*/build.xml"/>
                 </fileset>
             </ivy:buildlist>
+        </sequential>
+    </macrodef>
 
+    <macrodef name="build-package-deps">
+        <attribute name="module"/>
+        <sequential>
+            <set-package-deps module="@{module}"/>
             <subant inheritAll="false" target="build.module" buildpathref="build.path.@{module}">
                 <property name="skip.dependencies" value="true"/>
             </subant>

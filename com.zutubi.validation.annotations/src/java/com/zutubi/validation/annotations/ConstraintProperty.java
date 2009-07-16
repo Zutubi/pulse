@@ -1,9 +1,9 @@
 package com.zutubi.validation.annotations;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
 
 /**
  * The ConstraintProperty annotation can be used in conjunction with the
@@ -12,13 +12,12 @@ import java.lang.annotation.ElementType;
  * <p>
  * In the following example, the Max annotation is marked with the Constraint annotation
  * and has its value mapped to the validator's max property.
- * {code}
- * @Constraint("com.zutubi.validation.validators.NumericValidator")
- * public @interface Max
+ *
+ * <pre><code> &#064;Constraint("com.zutubi.validation.validators.NumericValidator")
+ * public &#064;interface Max
  * {
- *    @ConstraintProperty("max") int value();
- * }
- * {code}
+ *    &#064;ConstraintProperty("max") int value();
+ * }</code></pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
