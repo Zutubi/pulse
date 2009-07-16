@@ -2477,20 +2477,7 @@ public class RemoteApi
                         throw new IllegalArgumentException("Project '" + projectName + "' build '" + id + "' stage '" + stageName + "' command '" + commandName + "' does not have an artifact named '" + artifactName + "'");
                     }
 
-                    String pathPrefix = StringUtils.join("/", true, true, artifactName, path);
-                    if (!pathPrefix.endsWith("/"))
-                    {
-                        pathPrefix += "/";
-                    }
-
-                    for (StoredFileArtifact fileArtifact: artifact.getChildren())
-                    {
-                        String filePath = fileArtifact.getPath();
-                        if (filePath.startsWith(pathPrefix))
-                        {
-                            result.add(filePath.substring(pathPrefix.length()));
-                        }
-                    }
+                    result.addAll(artifact.getFileListing(path));
                 }
             });
 

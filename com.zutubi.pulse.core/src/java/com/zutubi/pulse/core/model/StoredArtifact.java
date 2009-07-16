@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.postprocessors.api.Feature;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -185,6 +186,41 @@ public class StoredArtifact extends Entity
     public void setUrl(String url)
     {
         this.url = url;
+    }
+
+    /**
+     * Returns an array of all paths for files nested under the given path in
+     * this artifact.  The returned paths are relative to the given path.  Note
+     * that all files nested anywhere under the path, even under child
+     * directories, are returned.  Directories themselves are not returned as
+     * separate entries (although they can be inferred from the file paths).
+     * The path may be empty to list all files.  If the path matches no files,
+     * an empty array will be returned.
+     *
+     * @param path path of a directory to restrict the result to, may be empty
+     *             to list all files
+     * @return an list of paths for files in this artifact that fall under the
+     *         given path
+     */
+    public List<String> getFileListing(String path)
+    {
+        String pathPrefix = StringUtils.join("/", true, true, name, path);
+        if (!pathPrefix.endsWith("/"))
+        {
+            pathPrefix += "/";
+        }
+
+        List<String> result = new LinkedList<String>();
+        for (StoredFileArtifact fileArtifact: children)
+        {
+            String filePath = fileArtifact.getPath();
+            if (filePath.startsWith(pathPrefix))
+            {
+                result.add(filePath.substring(pathPrefix.length()));
+            }
+        }
+
+        return result;
     }
 
     public StoredFileArtifact findFile(String filePath)
