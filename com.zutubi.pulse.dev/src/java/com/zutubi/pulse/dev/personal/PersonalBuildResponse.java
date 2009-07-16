@@ -1,6 +1,6 @@
 package com.zutubi.pulse.dev.personal;
 
-import com.zutubi.pulse.core.util.XMLUtils;
+import com.zutubi.pulse.core.util.api.XMLUtils;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -31,7 +31,7 @@ public class PersonalBuildResponse
         Element root = document.getRootElement();
 
         PersonalBuildResponse response = new PersonalBuildResponse();
-        String numberString = XMLUtils.getRequiredAttribute(root, ATTRIBUTE_NUMBER);
+        String numberString = XMLUtils.getRequiredAttributeValue(root, ATTRIBUTE_NUMBER);
         try
         {
             response.number = Long.parseLong(numberString);

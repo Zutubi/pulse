@@ -12,6 +12,7 @@ import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.Pair;
 import com.zutubi.util.TextUtils;
 import nu.xom.ParsingException;
+import nu.xom.XMLException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -499,6 +500,10 @@ public class PersonalBuildClient
                 catch (ParsingException e)
                 {
                     throw new PersonalBuildException("Unable to parse response from server: " + e.getMessage(), e);
+                }
+                catch (XMLException e)
+                {
+                    throw new PersonalBuildException("Invalid response from server: " + e.getMessage(), e);
                 }
             }
             else

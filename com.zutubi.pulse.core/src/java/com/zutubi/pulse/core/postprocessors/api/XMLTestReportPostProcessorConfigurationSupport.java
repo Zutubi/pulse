@@ -8,7 +8,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  * to walk.  <a href="http://www.xom.nu/">XOM</a> is used for parsing as it
  * has a convenient document API.
  *
- * @see com.zutubi.pulse.core.util.XMLUtils
+ * @see com.zutubi.pulse.core.util.api.XMLUtils
  */
 @SymbolicName("zutubi.xmlTestReportPostProcessorConfigSupport")
 public abstract class XMLTestReportPostProcessorConfigurationSupport extends TestReportPostProcessorConfigurationSupport

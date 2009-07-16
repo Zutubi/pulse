@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.boosttest;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
-import com.zutubi.pulse.core.util.XMLUtils;
+import com.zutubi.pulse.core.util.api.XMLUtils;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;

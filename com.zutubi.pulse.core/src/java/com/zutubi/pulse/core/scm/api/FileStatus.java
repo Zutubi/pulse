@@ -53,8 +53,8 @@ public class FileStatus
 
     /**
      * Indicates the state that a path is in.  For example, if local edits have
-     * been made, the state will be #MODIFIED.  If no changes have been made,
-     * the state will be #UNCHANGED.
+     * been made, the state will be {@link #MODIFIED}.  If no changes have been
+     * made, the state will be {@link #UNCHANGED}.
      * <p/>
      * Generally, implementations should provide states that are as specific as
      * possible, and matching the native terminology of the SCM as closely as

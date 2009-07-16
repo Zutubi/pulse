@@ -19,7 +19,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Supporting static methods for creating and applying patch files using the
  * standard Pulse patch file format.  Helps implement the personal build-related
- * methods on the (@link ScmClient} and {@link WorkingCopy} interfaces in the
+ * methods on the {@link ScmClient} and {@link WorkingCopy} interfaces in the
  * case where the standard patch file is used.
  *
  * @see ScmClient

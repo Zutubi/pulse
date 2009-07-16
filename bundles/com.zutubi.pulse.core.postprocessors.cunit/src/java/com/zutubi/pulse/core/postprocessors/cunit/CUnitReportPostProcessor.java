@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.cunit;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
-import com.zutubi.pulse.core.util.XMLUtils;
+import com.zutubi.pulse.core.util.api.XMLUtils;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
 import nu.xom.Builder;

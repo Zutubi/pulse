@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.engine.api.Referenceable;
 import com.zutubi.pulse.core.engine.api.Scope;
-import com.zutubi.pulse.core.util.XMLUtils;
+import com.zutubi.pulse.core.util.api.XMLUtils;
 import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.core.validation.PulseValidationContext;
 import com.zutubi.pulse.core.validation.PulseValidationManager;

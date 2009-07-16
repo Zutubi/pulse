@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.postprocessors.api.TestResult;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
-import com.zutubi.pulse.core.util.XMLUtils;
+import com.zutubi.pulse.core.util.api.XMLUtils;
 import com.zutubi.util.FileSystemUtils;
 import nu.xom.*;
 import org.apache.commons.codec.binary.Base64;

@@ -16,7 +16,7 @@ import java.io.IOException;
  * to walk.  <a href="http://www.xom.nu/">XOM</a> is used for parsing as it
  * has a convenient document API.
  *
- * @see com.zutubi.pulse.core.util.XMLUtils
+ * @see com.zutubi.pulse.core.util.api.XMLUtils
  */
 public abstract class XMLTestReportPostProcessorSupport extends TestReportPostProcessorSupport
 {
