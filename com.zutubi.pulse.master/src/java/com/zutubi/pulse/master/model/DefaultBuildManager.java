@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
@@ -26,6 +27,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.ivy.util.url.CredentialsStore;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -589,7 +591,7 @@ public class DefaultBuildManager implements BuildManager
 
     private List<File> getRepositoryFilesFor(final BuildResult build) throws Exception
     {
-        List<File> repositoryFiles = new LinkedList<File>();
+        final List<File> repositoryFiles = new LinkedList<File>();
 
         String securityToken = RandomUtils.randomToken(15);
         try
@@ -603,8 +605,11 @@ public class DefaultBuildManager implements BuildManager
             // the reponse from the ivy client will be relative to the repository root.
             final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
 
-            IvyClient ivy = ivyManager.createIvyClient(masterLocation + WebManager.REPOSITORY_PATH);
-            ivy.addCredentials(host, "pulse", securityToken);
+            final IvyClient ivy = ivyManager.createIvyClient(masterLocation + WebManager.REPOSITORY_PATH);
+
+            String user = AuthenticatedAction.USER;
+            String realm = AuthenticatedAction.REALM;
+            CredentialsStore.INSTANCE.addCredentials(realm, host, user, securityToken);
 
             String candidateIvyPath = ivy.getIvyPath(MasterIvyModuleRevisionId.newInstance(build), build.getVersion());
             File candidateIvyFile = new File(repositoryRoot, candidateIvyPath);

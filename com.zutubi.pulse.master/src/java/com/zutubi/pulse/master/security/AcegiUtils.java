@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.security;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
 import com.zutubi.tove.security.Actor;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
@@ -26,8 +27,8 @@ public class AcegiUtils
         systemUser = new AcegiUser(user, null);
 
         UserConfiguration repositoryUserConfig = new UserConfiguration();
-        repositoryUserConfig.setName("pulse");
-        repositoryUserConfig.setLogin("pulse");
+        repositoryUserConfig.setName(AuthenticatedAction.USER);
+        repositoryUserConfig.setLogin(AuthenticatedAction.USER);
         repositoryUserConfig.addDirectAuthority(ServerPermission.ADMINISTER.toString());
         repositoryUser = new AcegiUser(repositoryUserConfig, null);
     }

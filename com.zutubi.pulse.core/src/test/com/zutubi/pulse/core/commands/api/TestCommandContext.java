@@ -148,6 +148,11 @@ public class TestCommandContext implements CommandContext
         links.put(name, url);
     }
 
+    public void setPublishOutput(String name, boolean b, String pattern)
+    {
+        outputs.get(name).setPublish(b);
+    }
+
     public File registerOutput(String name, String type)
     {
         File toDir = new File(executionContext.getFile(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_OUTPUT_DIR), name);
@@ -206,6 +211,7 @@ public class TestCommandContext implements CommandContext
         private String name;
         private String index;
         private List<PostProcessorConfiguration> appliedProcessors = new LinkedList<PostProcessorConfiguration>();
+        private boolean publish;
 
         /**
          * Creates an output of the given name.
@@ -271,6 +277,16 @@ public class TestCommandContext implements CommandContext
         public void applyProcessors(List<PostProcessorConfiguration> processors)
         {
             appliedProcessors.addAll(processors);
+        }
+
+        public boolean isPublish()
+        {
+            return publish;
+        }
+
+        public void setPublish(boolean b)
+        {
+            publish = b;
         }
     }
 }

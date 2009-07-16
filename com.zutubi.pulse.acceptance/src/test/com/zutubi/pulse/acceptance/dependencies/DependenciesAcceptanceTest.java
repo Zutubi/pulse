@@ -3,15 +3,14 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
 import static com.zutubi.pulse.acceptance.Constants.Project.Dependencies.*;
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.*;
+import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.*;
-import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.pulse.master.tove.config.project.PublicationConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
@@ -24,6 +23,8 @@ import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
@@ -31,10 +32,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private static final String PROPERTY_EXPECTED_LIST = "expected.list";
     private static final String PROPERTY_NOT_EXPECTED_LIST = "not.expected.list";
 
-    /**
-     * Timeout waiting for an artifact to appear in the repository.
-     */
-    private static final int AVAILABILITY_TIMEOUT = 5000;
+    private Repository repository;
 
     protected void setUp() throws Exception
     {
@@ -42,7 +40,8 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         loginAsAdmin();
 
-        clearArtifactRepository();
+        repository = new Repository();
+        repository.clear();
     }
 
     public void testPublish_NoArtifacts() throws Exception
@@ -62,7 +61,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublish_SingleArtifact() throws Exception
     {
         Project project = new Project(randomName());
-        project.getDefaultStage().addArtifacts("artifact.jar");
+        Artifact artifact = project.getDefaultRecipe().addArtifact("artifact.jar");
         createProject(project);
 
         AntBuildConfiguration build = new AntBuildConfiguration();
@@ -72,13 +71,13 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
-        assertJarInRepository(project, project.getDefaultStage().getName(), "artifact", buildNumber);
+        assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifact);
     }
 
     public void testPublish_MultipleArtifacts() throws Exception
     {
         Project project = new Project(randomName());
-        project.getDefaultStage().addArtifacts("artifact.jar", "another-artifact.jar");
+        List<Artifact> artifacts = project.addArtifacts("artifact.jar", "another-artifact.jar");
         createProject(project);
 
         AntBuildConfiguration build = new AntBuildConfiguration();
@@ -89,15 +88,15 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
-        assertJarInRepository(project, project.getDefaultStage().getName(), "artifact", buildNumber);
-        assertJarInRepository(project, project.getDefaultStage().getName(), "another-artifact", buildNumber);
+        assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifacts.get(0));
+        assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifacts.get(1));
     }
 
     public void testPublish_MultipleStages() throws Exception
     {
         Project project = new Project(randomName());
-        project.addArtifact("default", "artifact.jar");
-        project.addArtifact("stage", "artifact.jar");
+        Artifact artifact = project.addArtifact("artifact.jar");
+        project.addStage("stage");
         createProject(project);
 
         AntBuildConfiguration build = new AntBuildConfiguration();
@@ -106,49 +105,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         int buildNumber = triggerSuccessfulBuild(project, build);
 
         assertIvyInRepository(project, buildNumber);
-        assertJarInRepository(project, "default", "artifact", buildNumber);
-        assertJarInRepository(project, "stage", "artifact", buildNumber);
-    }
-
-    public void testPublish_CustomPublicationPattern() throws Exception
-    {
-        Project project = new Project(randomName());
-        project.setPublicationPattern("my/build/[artifact].[ext]");
-        project.getDefaultStage().addArtifacts("artifact.jar");
-        createProject(project);
-
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("my/build/artifact.jar");
-
-        int buildNumber = triggerSuccessfulBuild(project, build);
-
-        // ensure that we have the expected artifact in the repository.
-        assertIvyInRepository(project, buildNumber);
-        assertJarInRepository(project, project.getDefaultStage().getName(), "artifact", buildNumber);
-    }
-
-    public void testPublish_CustomPublicationPatternViaProperty() throws Exception
-    {
-        Project project = new Project(randomName());
-        project.setPublicationPattern("${publicationPattern}");
-        project.getDefaultStage().addArtifacts("artifact.jar");
-        project.getDefaultStage().addProperty("publicationPattern", "custom/build/[artifact].[ext]");
-        createProject(project);
-
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("custom/build/artifact.jar");
-
-        int buildNumber = triggerSuccessfulBuild(project, build);
-
-        // ensure that we have the expected artifact in the repository.
-        assertIvyInRepository(project, buildNumber);
-        assertJarInRepository(project, project.getDefaultStage().getName(), "artifact", buildNumber);
+        assertArtifactInRepository(project, project.getStage("default"), buildNumber, artifact);
+        assertArtifactInRepository(project, project.getStage("stage"), buildNumber, artifact);
     }
 
     public void testPublishFails_MissingArtifacts() throws Exception
     {
         Project project = new Project(randomName());
-        project.getDefaultStage().addArtifacts("artifact.jar");
+        Artifact artifact = project.addArtifact("artifact.jar");
         createProject(project);
 
         AntBuildConfiguration build = new AntBuildConfiguration();
@@ -159,49 +123,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(project, buildNumber);
-        assertJarNotInRepository(project, project.getDefaultStage().getName(), "artifact", buildNumber);
-    }
-
-    public void testPublish_ConfigurationAtProjectLevel() throws Exception
-    {
-        Project project = new Project(randomName());
-        project.addArtifacts("artifact.jar");
-        createProject(project);
-
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact.jar");
-
-        int buildNumber = triggerSuccessfulBuild(project, build);
-
-        // ensure that we have the expected artifact in the repository.
-        assertIvyInRepository(project, buildNumber);
-        assertJarInRepository(project, project.getDefaultStage().getName(), "artifact", buildNumber);
-    }
-
-    public void testPublish_ConfigurationAtProjectLevelAdditive() throws Exception
-    {
-        Project project = new Project(randomName());
-        project.addArtifacts("artifact.jar");
-        project.getDefaultStage().addArtifacts("another-artifact.jar");
-        createProject(project);
-
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact.jar");
-        build.addFileToCreate("build/another-artifact.jar");
-
-        int buildNumber = triggerSuccessfulBuild(project, build);
-
-        // ensure that we have the expected artifact in the repository.
-        assertIvyInRepository(project, buildNumber);
-        assertJarInRepository(project, project.getDefaultStage().getName(), "artifact", buildNumber);
-        assertJarInRepository(project, project.getDefaultStage().getName(), "another-artifact", buildNumber);
+        assertArtifactNotInRepository(project, project.getDefaultStage(), buildNumber, artifact);
     }
 
     public void testPublish_StatusConfiguration() throws Exception
     {
         Project project = new Project(randomName());
         project.setStatus(STATUS_RELEASE);
-        project.getDefaultStage().addArtifacts("artifact.jar");
+        project.addArtifacts("artifact.jar");
         createProject(project);
 
         AntBuildConfiguration build = new AntBuildConfiguration();
@@ -217,7 +146,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testPublish_DefaultStatus() throws Exception
     {
         Project project = new Project(randomName());
-        project.getDefaultStage().addArtifacts("artifact.jar");
+        project.addArtifacts("artifact.jar");
         createProject(project);
 
         AntBuildConfiguration build = new AntBuildConfiguration();
@@ -234,7 +163,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             Project project = new Project(randomName());
             project.setStatus("invalid");
-            project.getDefaultStage().addArtifacts("artifact.jar");
+            project.addArtifacts("artifact.jar");
             createProject(project);
         }
         catch (Exception e)
@@ -246,7 +175,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRemoteTriggerWithCustomStatus() throws Exception
     {
         Project project = new Project(randomName());
-        project.getDefaultStage().addArtifacts("artifact.jar");
+        project.addArtifacts("artifact.jar");
         createProject(project);
 
         AntBuildConfiguration build = new AntBuildConfiguration();
@@ -262,7 +191,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_SingleArtifact() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.getDefaultStage().addArtifacts("artifact.jar");
+        projectA.addArtifacts("artifact.jar");
         createProject(projectA);
 
         AntBuildConfiguration buildA = new AntBuildConfiguration();
@@ -284,7 +213,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_MultipleArtifacts() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.getDefaultStage().addArtifacts("artifact.jar", "another-artifact.jar");
+        projectA.addArtifacts("artifact.jar", "another-artifact.jar");
         createProject(projectA);
 
         AntBuildConfiguration buildA = new AntBuildConfiguration();
@@ -305,30 +234,32 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRetrieve_SpecificStage() throws Exception
     {
-        Project projectA = new Project(randomName());
-        projectA.addArtifact("default", "default-artifact.jar");
-        projectA.addArtifact("stage", "stage-artifact.jar");
-        createProject(projectA);
+        // need different recipies that produce different artifacts.
+        Project project = new Project(randomName());
+        Artifact recipeAArtifact = project.addRecipe("recipeA").addArtifact("artifactA.jar");
+        Artifact recipeBArtifact = project.addRecipe("recipeB").addArtifact("artifactB.jar");
+        Stage stageA = project.addStage("A");
+        stageA.setRecipe(project.getRecipe("recipeA"));
+        Stage stageB = project.addStage("B");
+        stageB.setRecipe(project.getRecipe("recipeB"));
+        createProject(project);
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFileToCreate("build/default-artifact.jar");
-        buildA.addFileToCreate("build/stage-artifact.jar");
-        triggerSuccessfulBuild(projectA, buildA);
+        AntBuildConfiguration build = new AntBuildConfiguration();
+        build.addFilesToCreate("build/artifactA.jar", "build/artifactB.jar");
+        int buildNumber = triggerSuccessfulBuild(project, build);
 
-        Project projectB = new Project(randomName());
-        projectB.addDependency(new Dependency(projectA, true, "stage"));
-        createProject(projectB);
+        assertIvyInRepository(project, buildNumber);
+        assertArtifactInRepository(project, stageA, buildNumber, recipeAArtifact);
+        assertArtifactNotInRepository(project, stageB, buildNumber, recipeAArtifact);
 
-        AntBuildConfiguration buildB = new AntBuildConfiguration();
-        buildB.addNotExpectedFile("lib/default-artifact.jar");
-        buildB.addExpectedFiles("lib/stage-artifact.jar");
-        triggerSuccessfulBuild(projectB, buildB);
+        assertArtifactInRepository(project, stageB, buildNumber, recipeBArtifact);
+        assertArtifactNotInRepository(project, stageA, buildNumber, recipeBArtifact);
     }
 
     public void testRetrieve_SpeicificRevision() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.addArtifact("default", "default-artifact.jar");
+        projectA.addArtifacts("default-artifact.jar");
         createProject(projectA);
 
         AntBuildConfiguration buildA = new AntBuildConfiguration();
@@ -351,7 +282,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_MultipleProjects() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.getDefaultStage().addArtifacts("projectA-artifact.jar");
+        projectA.addArtifacts("projectA-artifact.jar");
         createProject(projectA);
 
         AntBuildConfiguration buildA = new AntBuildConfiguration();
@@ -359,7 +290,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         triggerSuccessfulBuild(projectA, buildA);
 
         Project projectB = new Project(randomName());
-        projectB.getDefaultStage().addArtifacts("projectB-artifact.jar");
+        projectB.addArtifacts("projectB-artifact.jar");
         createProject(projectB);
 
         AntBuildConfiguration buildB = new AntBuildConfiguration();
@@ -381,7 +312,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_TransitiveDependencies() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.getDefaultStage().addArtifacts("projectA-artifact.jar");
+        projectA.addArtifacts("projectA-artifact.jar");
         createProject(projectA);
 
         AntBuildConfiguration buildA = new AntBuildConfiguration();
@@ -389,7 +320,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         triggerSuccessfulBuild(projectA, buildA);
 
         Project projectB = new Project(randomName());
-        projectB.getDefaultStage().addArtifacts("projectB-artifact.jar");
+        projectB.addArtifacts("projectB-artifact.jar");
         projectB.addDependency(new Dependency(projectA, true));
         createProject(projectB);
 
@@ -412,7 +343,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieve_TransitiveDependenciesDisabled() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.getDefaultStage().addArtifacts("projectA-artifact.jar");
+        projectA.addArtifacts("projectA-artifact.jar");
         createProject(projectA);
 
         AntBuildConfiguration buildA = new AntBuildConfiguration();
@@ -420,7 +351,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         triggerSuccessfulBuild(projectA, buildA);
 
         Project projectB = new Project(randomName());
-        projectB.getDefaultStage().addArtifacts("projectB-artifact.jar");
+        projectB.addArtifacts("projectB-artifact.jar");
         projectB.addDependency(projectA);
         createProject(projectB);
 
@@ -444,7 +375,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRetrieveFails_MissingDependencies() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.getDefaultStage().addArtifacts("artifact.jar");
+        projectA.addArtifacts("artifact.jar");
         createProject(projectA);
 
         // do not build project a simulating dependency not available.
@@ -466,7 +397,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testDependentBuild_TriggeredOnSuccess() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.getDefaultStage().addArtifacts("artifact.jar");
+        projectA.addArtifacts("artifact.jar");
         createProject(projectA);
 
         Project projectB = new Project(randomName());
@@ -483,7 +414,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testDependentBuild_PropagateStatus() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.getDefaultStage().addArtifacts("artifact.jar");
+        projectA.addArtifacts("artifact.jar");
         projectA.setStatus(STATUS_RELEASE);
         createProject(projectA);
 
@@ -506,7 +437,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testDependentBuild_PropagateVersion() throws Exception
     {
         Project projectA = new Project(randomName());
-        projectA.getDefaultStage().addArtifacts("artifact.jar");
+        projectA.addArtifacts("artifact.jar");
         projectA.setVersion("FIXED");
         createProject(projectA);
 
@@ -521,14 +452,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
-        assertInRepository(ivyPath(projectB.getName(), "FIXED"));
+        assertIvyInRepository(projectB, "FIXED");
         assertIvyRevision("FIXED", projectB, "FIXED");
     }
 
     public void testRepositoryFormat_OrgSpecified() throws Exception
     {
         Project project = new Project(randomName(), "org");
-        project.getDefaultStage().addArtifacts("artifact.jar");
+        project.addArtifacts("artifact.jar");
         createProject(project);
 
         AntBuildConfiguration build = new AntBuildConfiguration();
@@ -536,7 +467,25 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         int buildNumber = triggerSuccessfulBuild(project, build);
 
-        assertInRepository(project.getOrg() + "/" + project.getName() + "/ivy-" + buildNumber + ".xml");
+        assertIvyInRepository(project, buildNumber);
+    }
+
+    public void testArtifactPattern() throws Exception
+    {
+        Project project = new Project(randomName());
+        Artifact artifact = project.addArtifact("artifact-12345.jar");
+        artifact.setArtifactPattern("(.+)-[0-9]+\\.(.+)");
+        createProject(project);
+
+        AntBuildConfiguration build = new AntBuildConfiguration();
+        build.addFileToCreate("build/artifact-12345.jar");
+
+        int buildNumber = triggerSuccessfulBuild(project, build);
+
+        // update the artifact details because the -1 should be filtered out by the artifact pattern.
+        artifact.name = "artifact";
+        artifact.extension = "jar";
+        assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifact);
     }
 
     private int triggerSuccessfulBuild(Project project, AntBuildConfiguration build) throws Exception
@@ -570,6 +519,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // for each stage, set the necessary build properties.
         for (Stage stage : project.stages)
         {
+            stage.getRecipe();
             xmlRpcHelper.insertOrUpdateStageProperty(project.getName(), stage.getName(), PROPERTY_CREATE_LIST, build.getCreateList());
             xmlRpcHelper.insertOrUpdateStageProperty(project.getName(), stage.getName(), PROPERTY_EXPECTED_LIST, build.getExpectedList());
             xmlRpcHelper.insertOrUpdateStageProperty(project.getName(), stage.getName(), PROPERTY_NOT_EXPECTED_LIST, build.getNotExpectedList());
@@ -582,6 +532,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String args = "-Dcreate.list=\"${"+PROPERTY_CREATE_LIST+"}\" -Dpresent.list=\"${"+PROPERTY_EXPECTED_LIST+"}\" -Dnot.present.list=\"${"+PROPERTY_NOT_EXPECTED_LIST+"}\"";
 
         Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        antConfig.put("name", "build");
         antConfig.put("targets", target);
         antConfig.put("args", args);
 
@@ -590,20 +541,20 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         setProjectOrganisation(project);
         configureDependencies(project);
 
-        for (String artifact : project.artifacts)
+        for (Recipe recipe : project.getRecipes())
         {
-            addPublication(project, artifact);
+            ensureRecipeExists(project, recipe, antConfig);
+            for (Artifact artifact : recipe.getArtifacts())
+            {
+                String command = "build";
+                addArtifact(project, recipe.getName(), command, artifact.getName(), artifact.getExtension(), artifact.getArtifactPattern());
+            }
         }
 
         for (Stage stage : project.stages)
         {
             // create stage.
             ensureStageExists(project, stage);
-
-            for (String artifact : stage.artifacts)
-            {
-                addPublication(project, stage.getName(), artifact);
-            }
 
             // set blank default properties.
             xmlRpcHelper.insertOrUpdateStageProperty(project.getName(), stage.getName(), PROPERTY_CREATE_LIST, "");
@@ -641,6 +592,22 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
     }
 
+    private void ensureRecipeExists(Project project, Recipe recipe, Hashtable<String, Object> commandConfig) throws Exception
+    {
+        String recipePath = "projects/" + project.getName() + "/type/recipes/" + recipe.getName();
+        if (!xmlRpcHelper.configPathExists(recipePath))
+        {
+            Hashtable<String, Object> recipeConfig = xmlRpcHelper.createDefaultConfig(RecipeConfiguration.class);
+            recipeConfig.put(Constants.Project.MultiRecipeType.NAME, recipe.getName());
+
+            Hashtable<String, Object> commands = new Hashtable<String, Object>();
+            commands.put((String)commandConfig.get("name"), commandConfig);
+            recipeConfig.put("commands", commands);
+
+            xmlRpcHelper.insertConfig("projects/" + project.getName() + "/type/recipes", recipeConfig);
+        }
+    }
+
     public void ensureStageExists(Project project, Stage stage) throws Exception
     {
         // configure the default stage.
@@ -649,7 +616,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             Hashtable<String, Object> stageConfig = xmlRpcHelper.createDefaultConfig(BuildStageConfiguration.class);
             stageConfig.put(Constants.Project.Stage.NAME, stage.getName());
-
+            stageConfig.put(Constants.Project.Stage.RECIPE, stage.getRecipe().getName());
             xmlRpcHelper.insertConfig("projects/" + project.getName() + "/stages", stageConfig);
         }
     }
@@ -659,7 +626,6 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // configure the default stage.
         String dependenciesPath = "projects/" + project.getName() + "/dependencies";
         Hashtable<String, Object> dependencies = xmlRpcHelper.getConfig(dependenciesPath);
-        dependencies.put(PUBLICATION_PATTERN, project.publicationPattern);
         dependencies.put(RETRIEVAL_PATTERN, project.retrievalPattern);
         if (TextUtils.stringSet(project.status))
         {
@@ -672,38 +638,20 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.saveConfig(dependenciesPath, dependencies, false);
     }
 
-    private void addPublication(Project project, String stageName, String artifact) throws Exception
+    private void addArtifact(Project project, String recipe, String command, String artifactName, String artifactExtension, String pattern) throws Exception
     {
-        String stagePath = "projects/" + project.getName() + "/stages/" + stageName;
-        addPublicationToPath(stagePath, artifact);
-    }
+        String artifactsPath = "projects/" + project.getName() + "/type/recipes/" + recipe + "/commands/" + command + "/outputs";
 
-    private void addPublication(Project project, String artifact) throws Exception
-    {
-        String dependenciesPath = "projects/" + project.getName() + "/dependencies";
-        addPublicationToPath(dependenciesPath, artifact);
-    }
-
-    private void addPublicationToPath(String path, String artifact) throws Exception
-    {
-        Hashtable<String, Object> publicationContainer = xmlRpcHelper.getConfig(path);
-        if (!publicationContainer.containsKey("publications"))
+        Hashtable<String, Object> artifactData = xmlRpcHelper.createDefaultConfig(FileOutputConfiguration.class);
+        artifactData.put("name", artifactName);
+        artifactData.put("file", "build/" + artifactName + "." + artifactExtension);
+        artifactData.put("publish", true);
+        if (pattern != null)
         {
-            publicationContainer.put("publications", new Vector<Hashtable<String, Object>>());
+            artifactData.put("artifactPattern", pattern);
         }
-        @SuppressWarnings("unchecked")
-        Vector<Hashtable<String, Object>> publications = (Vector<Hashtable<String, Object>>) publicationContainer.get("publications");
-        publications.add(createPublication(artifact));
 
-        xmlRpcHelper.saveConfig(path, publicationContainer, true);
-    }
-
-    private Hashtable<String, Object> createPublication(String artifact)
-    {
-        Hashtable<String, Object> jar = xmlRpcHelper.createEmptyConfig(PublicationConfiguration.class);
-        jar.put("name", artifact.substring(0, artifact.lastIndexOf(".")));
-        jar.put("ext", artifact.substring(artifact.lastIndexOf(".") + 1));
-        return jar;
+        xmlRpcHelper.insertConfig(artifactsPath, artifactData);
     }
 
     private void addDependency(Project project, Dependency projectDependency) throws Exception
@@ -743,45 +691,45 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private void assertIvyStatus(String expectedStatus, Project project, int buildNumber) throws IOException
     {
-        assertThat(getIvyFile(project.getName(), buildNumber), containsString("status=\""+ expectedStatus +"\""));
+        assertEquals(expectedStatus, repository.getIvyFile(project.getOrg(), project.getName(), buildNumber).getStatus());
     }
 
     private void assertIvyRevision(String expectedRevision, Project project, String version) throws IOException
     {
-        assertThat(getIvyFile(project.getName(), version), containsString("revision=\""+ expectedRevision +"\""));
+        assertEquals(expectedRevision, repository.getIvyFile(project.getOrg(), project.getName(), version).getRevision());
     }
 
-    private void assertIvyInRepository(Project project, int buildNumber) throws IOException
+    private void assertIvyInRepository(Project project, Object revision) throws IOException
     {
-        assertInRepository(ivyPath(project.getName(), buildNumber));
+        assertInRepository(repository.getIvyFile(project.getOrg(), project.getName(), revision).getPath());
     }
 
-    private void assertIvyNotInRepository(Project project, int buildNumber) throws IOException
+    private void assertIvyNotInRepository(Project project, Object revision) throws IOException
     {
-        assertNotInRepository(ivyPath(project.getName(), buildNumber));
+        assertNotInRepository(repository.getIvyFile(project.getOrg(), project.getName(), revision).getPath());
     }
 
-    private void assertJarInRepository(Project project, String stageName, String artifactName, int buildNumber) throws IOException
+    private void assertArtifactInRepository(Project project, Stage stage, Object revision, Artifact artifact) throws IOException
     {
-        assertInRepository(project.getName() + "/" + IvyUtils.ivyEncodeStageName(stageName) + "/jars/" + artifactName + "-" + buildNumber + ".jar");
+        assertInRepository(repository.getArtifactFile(project.getOrg(), project.getName(), stage.getName(), revision, artifact.getName(), artifact.getExtension()).getPath());
     }
 
-    private void assertJarNotInRepository(Project project, String stageName, String artifactName, int buildNumber) throws IOException
+    private void assertArtifactNotInRepository(Project project, Stage stage, Object revision, Artifact artifact) throws IOException
     {
-        assertNotInRepository(project.getName() + "/" + IvyUtils.ivyEncodeStageName(stageName) + "/jars/" + artifactName + "-" + buildNumber + ".jar");
+        assertNotInRepository(repository.getArtifactFile(project.getOrg(), project.getName(), stage.getName(), revision, artifact.getName(), artifact.getExtension()).getPath());
     }
 
     private void assertInRepository(String baseArtifactName) throws IOException
     {
         // all artifacts are being published with .md5 and .sha1 hashes.
-        assertTrue(waitUntilInRepository(baseArtifactName, AVAILABILITY_TIMEOUT));
-        assertTrue(waitUntilInRepository(baseArtifactName + ".md5", AVAILABILITY_TIMEOUT));
-        assertTrue(waitUntilInRepository(baseArtifactName + ".sha1", AVAILABILITY_TIMEOUT));
+        assertTrue(repository.waitUntilInRepository(baseArtifactName));
+        assertTrue(repository.waitUntilInRepository(baseArtifactName + ".md5"));
+        assertTrue(repository.waitUntilInRepository(baseArtifactName + ".sha1"));
     }
 
     public void assertNotInRepository(String baseArtifactName) throws IOException
     {
-        assertFalse(waitUntilInRepository(baseArtifactName, AVAILABILITY_TIMEOUT));
+        assertFalse(repository.waitUntilInRepository(baseArtifactName));
     }
 
     /**
@@ -796,27 +744,40 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private String status;
         private String version;
         private List<Dependency> dependencies = new LinkedList<Dependency>();
-        private List<String> artifacts = new LinkedList<String>();
+
         private List<Stage> stages = new LinkedList<Stage>();
-        private Stage defaultStage = new Stage("default");
+        private List<Recipe> recipes = new LinkedList<Recipe>();
 
         private boolean propagateStatus = false;
         private boolean propagateVersion = false;
-
-        private String publicationPattern = "build/[artifact].[ext]";
 
         private String retrievalPattern = "lib/[artifact].[ext]";
 
         private Project(String name)
         {
             this.setName(name);
-            this.stages.add(getDefaultStage());
+            addStage("default");
+            addRecipe("default");
         }
 
         private Project(String name, String org)
         {
             this(name);
             this.setOrg(org);
+        }
+
+        public Recipe addRecipe(String recipeName)
+        {
+            Recipe recipe = new Recipe(this, recipeName);
+            this.recipes.add(recipe);
+            return recipe;
+        }
+
+        public Stage addStage(String stageName)
+        {
+            Stage stage = new Stage(this, stageName);
+            this.stages.add(stage);
+            return stage;
         }
 
         private void addDependency(Project dependency)
@@ -831,45 +792,22 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         private Stage getDefaultStage()
         {
-            return defaultStage;
+            return getStage("default");
         }
 
-        private void addArtifacts(String... artifacts)
+        private Artifact addArtifact(String artifact)
         {
-            this.artifacts.addAll(Arrays.asList(artifacts));
+            return getRecipe("default").addArtifact(artifact);
         }
 
-        private void addArtifact(String stageName, String artifactName)
+        private List<Artifact> addArtifacts(String... artifacts)
         {
-            getStage(stageName).addArtifacts(artifactName);
-        }
-
-        private Stage getStage(final String name)
-        {
-            Stage stage = CollectionUtils.find(stages, new Predicate<Stage>()
-            {
-                public boolean satisfied(Stage stage)
-                {
-                    return stage.getName().equals(name);
-                }
-            });
-
-            if (stage == null)
-            {
-                stage = new Stage(name);
-                stages.add(stage);
-            }
-            return stage;
+            return getRecipe("default").addArtifacts(artifacts);
         }
 
         private void setRetrievalPattern(String retrievalPattern)
         {
             this.retrievalPattern = retrievalPattern;
-        }
-
-        private void setPublicationPattern(String publicationPattern)
-        {
-            this.publicationPattern = publicationPattern;
         }
 
         private String getName()
@@ -890,6 +828,11 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private void setOrg(String org)
         {
             this.org = org;
+        }
+
+        public String getStatus()
+        {
+            return status;
         }
 
         public void setStatus(String status)
@@ -920,6 +863,37 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         public void setPropagateVersion(boolean b)
         {
             this.propagateVersion = b;
+        }
+
+        public Stage getStage(final String stageName)
+        {
+            return CollectionUtils.find(stages, new Predicate<Stage>()
+            {
+                public boolean satisfied(Stage stage)
+                {
+                    return stage.getName().equals(stageName);
+                }
+            });
+        }
+        public Recipe getRecipe(final String recipeName)
+        {
+            return CollectionUtils.find(recipes, new Predicate<Recipe>()
+            {
+                public boolean satisfied(Recipe recipe)
+                {
+                    return recipe.getName().equals(recipeName);
+                }
+            });
+        }
+
+        public List<Recipe> getRecipes()
+        {
+            return recipes;
+        }
+
+        public Recipe getDefaultRecipe()
+        {
+            return getRecipe("default");
         }
     }
 
@@ -959,25 +933,21 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private class Stage
     {
+        private Project project;
         private String name;
-
-        private List<String> artifacts = new LinkedList<String>();
+        private Recipe recipe;
 
         private Map<String, String> properties = new HashMap<String, String>();
 
-        private Stage(String name)
+        private Stage(Project project, String name)
         {
             this.setName(name);
+            this.setProject(project);
         }
 
         private void addProperty(String name, String value)
         {
             properties.put(name, value);
-        }
-
-        private void addArtifacts(String... names)
-        {
-            artifacts.addAll(Arrays.asList(names));
         }
 
         private String getName()
@@ -988,6 +958,116 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         private void setName(String name)
         {
             this.name = name;
+        }
+
+        public Project getProject()
+        {
+            return project;
+        }
+
+        public void setProject(Project project)
+        {
+            this.project = project;
+        }
+
+        public Recipe getRecipe()
+        {
+            if (recipe != null)
+            {
+                return recipe;
+            }
+            return project.getDefaultRecipe();
+        }
+
+        public void setRecipe(Recipe recipe)
+        {
+            this.recipe = recipe;
+        }
+    }
+
+    private class Recipe
+    {
+        private Project project;
+        private String name;
+        private List<Artifact> artifacts = new LinkedList<Artifact>();
+
+        private Recipe(Project project, String name)
+        {
+            this.project = project;
+            this.name = name;
+        }
+
+        public Artifact addArtifact(String artifactName)
+        {
+            Artifact artifact = new Artifact(artifactName, this);
+            this.artifacts.add(artifact);
+            return artifact;
+        }
+
+        public List<Artifact> addArtifacts(String... artifactNames)
+        {
+            List<Artifact> artifacts = new LinkedList<Artifact>();
+            for (String artifactName : artifactNames)
+            {
+                artifacts.add(addArtifact(artifactName));
+            }
+            return artifacts;
+        }
+
+        public List<Artifact> getArtifacts()
+        {
+            return artifacts;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+    }
+
+    private class Artifact
+    {
+        private final Pattern pattern = Pattern.compile("(.+)\\.(.+)");
+
+        private String name;
+        private String extension;
+        private Recipe recipe;
+        private String artifactPattern;
+
+        private Artifact(String filename, Recipe recipe)
+        {
+            this.recipe = recipe;
+            Matcher m = pattern.matcher(filename);
+            if (m.matches())
+            {
+                name = m.group(1);
+                extension = m.group(2);
+            }
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public String getExtension()
+        {
+            return extension;
+        }
+
+        public Recipe getRecipe()
+        {
+            return recipe;
+        }
+
+        public String getArtifactPattern()
+        {
+            return artifactPattern;
+        }
+
+        public void setArtifactPattern(String artifactPattern)
+        {
+            this.artifactPattern = artifactPattern;
         }
     }
 

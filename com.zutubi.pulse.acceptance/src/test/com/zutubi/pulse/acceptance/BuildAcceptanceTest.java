@@ -10,7 +10,7 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.getIvyFile;
+import com.zutubi.pulse.acceptance.dependencies.Repository;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -41,8 +41,6 @@ import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.Constants.SECOND;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -77,6 +75,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     private static final String LOCATOR_ENV_ARTIFACT = "link=env.txt";
     private static final String LOCATOR_OUTPUT_ARTIFACT = "link=output.txt";
 
+    private Repository repository;
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -90,6 +90,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
                 xmlRpcHelper.deleteConfig(PathUtils.getPath(AGENTS_SCOPE, agent));
             }
         }
+
+        repository = new Repository();
     }
 
     protected void tearDown() throws Exception
@@ -515,7 +517,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // next page is the project homepage.
         waitForBuildOnProjectHomePage(random, MASTER_AGENT_NAME);
 
-        assertThat(getIvyFile(random, 1), containsString("status=\"" + STATUS_RELEASE + "\""));
+        assertEquals(STATUS_RELEASE, repository.getIvyFile(random, 1).getStatus());
     }
 
     public void testTriggerProperties() throws Exception

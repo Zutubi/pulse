@@ -82,12 +82,12 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
 
     public void preIvyPublish()
     {
-        logMarker("Running ivy publish...");
+        logMarker("Publishing to internal repository...");
     }
 
     public void postIvyPublish()
     {
-        logMarker("Ivy publish complete.");
+        logMarker("Publish to internal repository complete.");
     }
 
     /**

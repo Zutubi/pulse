@@ -34,8 +34,6 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     @Transient
     private ObjectFactory objectFactory;
 
-    private List<PublicationConfiguration> publications = new LinkedList<PublicationConfiguration>();
-
     public BuildStageConfiguration()
     {
     }
@@ -88,16 +86,6 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     public void setRequirements(List<ResourceRequirementConfiguration> requirements)
     {
         this.requirements = requirements;
-    }
-
-    public List<PublicationConfiguration> getPublications()
-    {
-        return publications;
-    }
-
-    public void setPublications(List<PublicationConfiguration> publications)
-    {
-        this.publications = publications;
     }
 
     @Transient

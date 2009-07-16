@@ -225,10 +225,6 @@ public class BuildProperties
      */
     public static final String PROPERTY_STAGE                   = "stage";
     /**
-     * The pattern that defines where to find the publications produced by a build. 
-     */
-    public static final String PROPERTY_PUBLICATION_PATTERN     = "publication.pattern";
-    /**
      * The pattern that defines where retrieved dependencies are to be delivered.
      */
     public static final String PROPERTY_RETRIEVAL_PATTERN       = "retrieval.pattern";

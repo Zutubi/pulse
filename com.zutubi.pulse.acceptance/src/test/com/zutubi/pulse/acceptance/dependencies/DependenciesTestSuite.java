@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.clearArtifactRepository;
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -20,7 +19,6 @@ public class DependenciesTestSuite
         TestSuite dependencySuite = new TestSuite();
         dependencySuite.addTestSuite(DependenciesAcceptanceTest.class);
         dependencySuite.addTestSuite(DependenciesConfigurationAcceptanceTest.class);
-        dependencySuite.addTestSuite(IvyIntegrationAcceptanceTest.class);
         dependencySuite.addTestSuite(BuildVersionAcceptanceTest.class);
         dependencySuite.addTestSuite(RepositoryPermissionsAcceptanceTest.class);
 
@@ -30,6 +28,8 @@ public class DependenciesTestSuite
 
     private static class CleanArtifactRepository extends TestSetup
     {
+        private Repository repository;
+
         private CleanArtifactRepository(Test test)
         {
             super(test);
@@ -37,7 +37,8 @@ public class DependenciesTestSuite
 
         protected void tearDown() throws Exception
         {
-            clearArtifactRepository();
+            repository = new Repository();
+            repository.clear();
 
             super.tearDown();
         }

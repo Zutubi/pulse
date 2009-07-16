@@ -12,8 +12,6 @@ import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
-import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
-import com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
@@ -32,12 +30,8 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.Ivy;
-import org.apache.ivy.core.module.descriptor.Configuration;
-import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
-import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
-import org.apache.ivy.core.module.descriptor.MDArtifact;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.settings.IvySettings;
+import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
 import org.apache.ivy.util.MessageLoggerEngine;
 import static org.mockito.Mockito.*;
@@ -115,18 +109,11 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
         recipeProcessor.setFileLoaderFactory(fileLoaderFactory);
 
-        // setup the default dependency resolver.  All we need is a name.
-        MessageLoggerEngine loggerEngine = mock(MessageLoggerEngine.class);
-        DependencyResolver resolver = mock(DependencyResolver.class);
-        stub(resolver.getName()).toReturn("pulse");
-        IvySettings settings = mock(IvySettings.class);
-        stub(settings.getDefaultResolver()).toReturn(resolver);
-        Ivy ivy = mock(Ivy.class);
-        stub(ivy.getSettings()).toReturn(settings);
         IvyManager ivyManager = mock(IvyManager.class);
-        stub(ivyManager.createIvyClient(anyString())).toReturn(new IvyClient(ivy, null, null));
+        IvyClient ivyClient = mock(IvyClient.class);
+        stub(ivyClient.hasDependencies((ModuleDescriptor) anyObject())).toReturn(false);
+        stub(ivyManager.createIvyClient(anyString())).toReturn(ivyClient);
         recipeProcessor.setIvyManager(ivyManager);
-        stub(ivy.getLoggerEngine()).toReturn(loggerEngine);
     }
 
     protected void tearDown() throws Exception
@@ -135,67 +122,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         removeDirectory(outputDir);
 
         super.tearDown();
-    }
-
-    public void testPublish() throws IOException
-    {
-        PulseExecutionContext context = makeContext(1, "default");
-
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(IvyModuleRevisionId.newInstance("org", "module", null), STATUS_INTEGRATION, null);
-
-        addArtifact(descriptor, "build", "artifact", "jar");
-        addArtifact(descriptor, "build", "artifact", "txt");
-
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_PUBLICATION_PATTERN, "");
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE, "build");
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, descriptor);
-        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
-
-        assertRecipeCommenced(1, "default");
-        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "greeting", "publish");
-        assertRecipeCompleted(1, ResultState.SUCCESS);
-        assertNoMoreEvents();
-    }
-
-    public void testRetrieve() throws IOException
-    {
-        PulseExecutionContext context = makeContext(1, "default");
-
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(IvyModuleRevisionId.newInstance("org", "module", null), STATUS_INTEGRATION, null);
-
-        addDependency(descriptor, "org", "projectA", "1.0");
-        addDependency(descriptor, "org", "projectB", "1.0");
-
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, "");
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE, "build");
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, descriptor);
-        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
-
-        assertRecipeCommenced(1, "default");
-        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "retrieve", "greeting");
-        assertRecipeCompleted(1, ResultState.SUCCESS);
-        assertNoMoreEvents();
-    }
-
-    private void addDependency(DefaultModuleDescriptor descriptor, String org, String module, String revision)
-    {
-        ModuleRevisionId dependencyMrid = IvyModuleRevisionId.newInstance(org, module, revision);
-        DefaultDependencyDescriptor depDesc = new DefaultDependencyDescriptor(dependencyMrid, true, false);
-        depDesc.addDependencyConfiguration("build", "*");
-        descriptor.addDependency(depDesc);
-    }
-
-    private void addArtifact(DefaultModuleDescriptor descriptor, String configName, String artifactName, String artifactType)
-    {
-        Configuration config = descriptor.getConfiguration(configName);
-        if (config == null)
-        {
-            descriptor.addConfiguration(new Configuration(configName));
-        }
-
-        MDArtifact ivyArtifact = new MDArtifact(descriptor, artifactName, artifactType, artifactType, null, null);
-        ivyArtifact.addConfiguration(configName);
-        descriptor.addArtifact(configName, ivyArtifact);
     }
 
     public void testBasicRecipe() throws Exception

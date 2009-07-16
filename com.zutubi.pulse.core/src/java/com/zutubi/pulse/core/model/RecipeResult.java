@@ -197,6 +197,16 @@ public class RecipeResult extends Result
         return false;
     }
 
+    public List<StoredArtifact> getArtifacts()
+    {
+        List<StoredArtifact> artifacts = new LinkedList<StoredArtifact>();
+        for (CommandResult result : results)
+        {
+            artifacts.addAll(result.getArtifacts());
+        }
+        return artifacts;
+    }
+
     public StoredArtifact getArtifact(String name)
     {
         for (CommandResult result : results)

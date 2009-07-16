@@ -40,13 +40,18 @@ public class DefaultCommandContext implements CommandContext
         this.postProcessorFactory = postProcessorFactory;
     }
 
+    /**
+     * It is important that @{link #processOutputs} is called before this method
+     * to ensure that artifact files have been both picked up and processed before
+     * recording them on the result. 
+     */
     public void addArtifactsToResult()
     {
         for (OutputSpec spec: registeredOutputs.values())
         {
-            if (spec.artifact.getChildren().size() > 0)
+            if (spec.getArtifact().getChildren().size() > 0)
             {
-                result.addArtifact(spec.artifact);
+                result.addArtifact(spec.getArtifact());
             }
         }
     }
@@ -114,7 +119,18 @@ public class DefaultCommandContext implements CommandContext
             throw new BuildException("Attempt to set index file for unknown output '" + name + "'");
         }
 
-        spec.artifact.setIndex(index);
+        spec.getArtifact().setIndex(index);
+    }
+
+    public void setPublishOutput(String name, boolean b, String pattern)
+    {
+        OutputSpec spec = registeredOutputs.get(name);
+        if (spec == null)
+        {
+            throw new BuildException("Attempt to set publish for unknown output '" + name + "'");
+        }
+        spec.getArtifact().setPublish(b);
+        spec.getArtifact().setArtifactPattern(pattern);
     }
 
     public void addCustomField(FieldScope scope, String name, String value)
@@ -131,18 +147,19 @@ public class DefaultCommandContext implements CommandContext
 
     public void registerProcessors(String name, List<PostProcessorConfiguration> postProcessors)
     {
-        final OutputSpec spec = registeredOutputs.get(name);
-        if (spec != null)
+        OutputSpec spec = registeredOutputs.get(name);
+        if (spec == null)
         {
-            spec.processors.addAll(postProcessors);
+            throw new BuildException("Attempt to register processors for unknown output '" + name + "'");
         }
+        spec.addAll(postProcessors);
     }
 
     public void processOutputs()
     {
         for (OutputSpec spec: registeredOutputs.values())
         {
-            final List<PostProcessor> processors = CollectionUtils.map(spec.processors, new Mapping<PostProcessorConfiguration, PostProcessor>()
+            final List<PostProcessor> processors = CollectionUtils.map(spec.getProcessors(), new Mapping<PostProcessorConfiguration, PostProcessor>()
             {
                 public PostProcessor map(PostProcessorConfiguration postProcessorConfiguration)
                 {
@@ -151,19 +168,19 @@ public class DefaultCommandContext implements CommandContext
             });
 
             DirectoryScanner scanner = new DirectoryScanner();
-            scanner.setBasedir(spec.toDir);
+            scanner.setBasedir(spec.getToDir());
             scanner.setExcludes(null);
             scanner.scan();
 
-            String prefix = spec.artifact.getName() + "/";
+            String prefix = spec.getArtifact().getName() + "/";
             for (String path : scanner.getIncludedFiles())
             {
-                StoredFileArtifact fileArtifact = new StoredFileArtifact(prefix + path, spec.type);
-                spec.artifact.add(fileArtifact);
+                StoredFileArtifact fileArtifact = new StoredFileArtifact(prefix + path, spec.getType());
+                spec.getArtifact().add(fileArtifact);
                 PostProcessorContext ppContext = new DefaultPostProcessorContext(fileArtifact, result, executionContext);
                 for (PostProcessor pp: processors)
                 {
-                    pp.process(new File(spec.toDir, path), ppContext);
+                    pp.process(new File(spec.getToDir(), path), ppContext);
                 }
             }            
         }
@@ -181,6 +198,31 @@ public class DefaultCommandContext implements CommandContext
             this.artifact = artifact;
             this.type = type;
             this.toDir = toDir;
+        }
+
+        public void addAll(List<PostProcessorConfiguration> postProcessors)
+        {
+            this.getProcessors().addAll(postProcessors);
+        }
+
+        public StoredArtifact getArtifact()
+        {
+            return artifact;
+        }
+
+        public String getType()
+        {
+            return type;
+        }
+
+        public File getToDir()
+        {
+            return toDir;
+        }
+
+        public List<PostProcessorConfiguration> getProcessors()
+        {
+            return processors;
         }
     }
 }

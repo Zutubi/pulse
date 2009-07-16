@@ -13,6 +13,8 @@ import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId;
+import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -23,8 +25,7 @@ import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
-import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
@@ -43,7 +44,6 @@ import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
-import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
@@ -51,6 +51,8 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
+import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.util.url.CredentialsStore;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -61,6 +63,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The BuildController is responsible for executing and coordinating a single
@@ -159,11 +163,11 @@ public class BuildController implements EventListener
         MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig));
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, projectConfig.getScm());
-        for (ResourceProperty requestProperty: asResourceProperties(request.getProperties()))
+        for (ResourceProperty requestProperty : asResourceProperties(request.getProperties()))
         {
             buildContext.add(requestProperty);
         }
-        
+
         String version = projectConfig.getDependencies().getVersion();
         TriggerOptions options = request.getOptions();
         if (options.hasVersion())
@@ -225,9 +229,7 @@ public class BuildController implements EventListener
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
 
-            String publicationPattern = projectConfig.getDependencies().getPublicationPattern();
             String retrievalPattern = projectConfig.getDependencies().getRetrievalPattern();
-            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_PUBLICATION_PATTERN, publicationPattern);
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, retrievalPattern);
 
             RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
@@ -262,7 +264,6 @@ public class BuildController implements EventListener
         ModuleDescriptorFactory f = new ModuleDescriptorFactory();
         DefaultModuleDescriptor descriptor = f.createDescriptor(project);
         descriptor.setStatus(buildResult.getStatus());
-        descriptor.addExtraInfo("buildNumber", String.valueOf(buildResult.getNumber()));
         return descriptor;
     }
 
@@ -428,7 +429,7 @@ public class BuildController implements EventListener
      * Updates an active build's revision to the new revision.  This is
      * allowed up until the point where the revision is fixed (which is at the
      * same time as the build commences).
-     *
+     * <p/>
      * The build revision for this build <strong>must</strong> be locked before
      * making this call.
      *
@@ -765,7 +766,7 @@ public class BuildController implements EventListener
                 try
                 {
                     Set<ScmCapability> capabilities = getCapabilities(project, projectConfig, scmManager);
-                    if(capabilities.contains(ScmCapability.CHANGESETS))
+                    if (capabilities.contains(ScmCapability.CHANGESETS))
                     {
                         ScmContext context = scmManager.createContext(projectConfig);
                         client = scmManager.createClient(scm);
@@ -952,28 +953,36 @@ public class BuildController implements EventListener
             String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
             String repositoryUrl = masterUrl + WebManager.REPOSITORY_PATH;
 
-            IvyClient ivy = ivyManager.createIvyClient(repositoryUrl);
-            ivy.addCredentials(new URL(masterUrl).getHost(), "pulse", buildContext.getSecurityHash());
-
+            final IvyClient ivy = ivyManager.createIvyClient(repositoryUrl);
             ivy.setMessageLogger(buildLogger.getMessageLogger());
-            
-            ModuleDescriptor descriptor = buildContext.getValue(PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
-            ivy.resolve(descriptor);
 
-            String buildNumber = Long.toString(buildResult.getNumber());
+            String host = new URL(masterUrl).getHost();
+            String password = buildContext.getSecurityHash();
+
+            String user = AuthenticatedAction.USER;
+            String realm = AuthenticatedAction.REALM;
+            CredentialsStore.INSTANCE.addCredentials(realm, host, user, password);
+
+            String version = buildContext.getString(PROPERTY_BUILD_VERSION);
+            final ModuleRevisionId mrid = IvyModuleRevisionId.newInstance(projectConfig.getOrganisation(), projectConfig.getName(), version);
 
             // add projecthandle attribute to the repository.
             long projectHandle = buildContext.getLong(PROPERTY_PROJECT_HANDLE, 0);
             if (projectHandle != 0)
             {
-                MasterUserPaths paths = configurationManager.getUserPaths();
-
-                String path = ivy.getIvyPath(descriptor.getModuleRevisionId(), buildNumber);
+                String path = ivy.getIvyPath(mrid, version);
                 repositoryAttributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
             }
 
-            String version = buildContext.getString(PROPERTY_BUILD_VERSION);
-            ivy.publishIvy(descriptor, version);
+            publishMarkedArtifacts(buildResult, mrid, ivy);
+
+            ModuleDescriptorFactory f = new ModuleDescriptorFactory();
+            DefaultModuleDescriptor descriptor = f.createDescriptor(projectConfig, buildResult, version);
+            descriptor.setStatus(buildResult.getStatus());
+            descriptor.addExtraInfo("buildNumber", String.valueOf(buildResult.getNumber()));
+
+            ivy.resolve(descriptor);
+            ivy.publish(descriptor, version);
         }
         catch (Exception e)
         {
@@ -985,10 +994,91 @@ public class BuildController implements EventListener
         }
     }
 
+    // identify and publish the artifacts that are marked for publishing to the internal repository.
+    private void publishMarkedArtifacts(final BuildResult buildResult, final ModuleRevisionId mrid, final IvyClient ivy)
+    {
+        PublishMarkedArtifacts function = new PublishMarkedArtifacts(ivy, mrid);
+        buildResult.getRoot().forEachNode(function);
+
+        if (!function.isSuccessful())
+        {
+            throw new BuildException("Error occured during publish.  See build warnings for details.");
+        }
+    }
+
+    private class PublishMarkedArtifacts implements UnaryProcedure<RecipeResultNode>
+    {
+        private boolean successful = true;
+        private IvyClient ivy;
+        private ModuleRevisionId mrid;
+
+        private PublishMarkedArtifacts(IvyClient ivy, ModuleRevisionId mrid)
+        {
+            this.ivy = ivy;
+            this.mrid = mrid;
+        }
+
+        public boolean isSuccessful()
+        {
+            return successful;
+        }
+
+        public void process(RecipeResultNode node)
+        {
+            RecipeResult result = node.getResult();
+            if (result == null)
+            {
+                // ignore the root since it provides us with no useful information.
+                return;
+            }
+
+            String stage = node.getStageName();
+
+            for (CommandResult commandResult : result.getCommandResults())
+            {
+                for (StoredArtifact artifact : commandResult.getArtifacts())
+                {
+                    if (artifact.isPublish())
+                    {
+                        Pattern p = Pattern.compile(artifact.getArtifactPattern());
+
+                        for (StoredFileArtifact file : artifact.getChildren())
+                        {
+                            File outputDir = commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
+                            File artifactFile = new File(outputDir, file.getPath());
+
+                            try
+                            {
+                                Matcher m = p.matcher(artifactFile.getName());
+                                if (m.matches())
+                                {
+                                    String artifactName = m.group(1);
+                                    String artifactExt = m.group(2);
+                                    ivy.publish(mrid, stage, artifactName, artifactExt, artifactFile);
+                                }
+                                else
+                                {
+                                    // fallback to default <name>.<ext> or ignore altogether?
+                                    result.warning("Artifact pattern " + artifact.getArtifactPattern() + " does not match artifact file " + artifactFile.getName() + ". Skipping.");
+                                    successful = false;
+                                }
+                            }
+                            catch (IOException e)
+                            {
+                                result.warning("Failed to publish artifact file: " + artifactFile + ". Cause: " + e.getMessage());
+                                successful = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void abortUnfinishedRecipes()
     {
         buildResult.abortUnfinishedRecipes();
-        for (TreeNode<RecipeController> controllerNode: executingControllers)
+        for (TreeNode<RecipeController> controllerNode : executingControllers)
         {
             eventManager.publish(new RecipeAbortedEvent(this, controllerNode.getData().getResult().getId()));
         }
@@ -1015,7 +1105,7 @@ public class BuildController implements EventListener
         {
             buildHookManager.handleEvent(evt, buildLogger);
         }
-        
+
         eventManager.publish(evt);
     }
 

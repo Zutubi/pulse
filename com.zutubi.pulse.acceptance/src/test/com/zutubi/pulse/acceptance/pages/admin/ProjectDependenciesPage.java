@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.forms.admin.DependencyForm;
 import com.zutubi.pulse.master.webwork.Urls;
 
 /**
@@ -13,9 +14,9 @@ public class ProjectDependenciesPage extends CompositePage
         super(browser, urls, path);
     }
 
-    public DependenciesPage clickDependenciesAndWait()
+    public DependencyForm clickAdd()
     {
-        ListPage listPage = clickCollection("dependencies", "dependencies");
-        return browser.waitFor(DependenciesPage.class, listPage.getPath());
+        browser.click(ListPage.ADD_LINK);
+        return browser.createForm(DependencyForm.class);
     }
 }

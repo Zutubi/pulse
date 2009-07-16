@@ -2,8 +2,6 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.isInArtifactRepository;
-import static com.zutubi.pulse.acceptance.dependencies.ArtifactRepositoryTestUtils.ivyPath;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
@@ -26,6 +24,7 @@ import java.util.Vector;
 public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private String projectName;
+    private Repository repository;
 
     @Override
     protected void setUp() throws Exception
@@ -37,6 +36,8 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // create a project.
         projectName = getName() + "-" + RandomUtils.randomString(10);
         xmlRpcHelper.insertSimpleProject(projectName);
+
+        repository = new Repository();
     }
 
     @Override
@@ -129,7 +130,7 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         // verify a build version by:
         // a) the ivy file name
-        assertTrue(isInArtifactRepository(ivyPath(projectName, expectedVersion)));
+        assertTrue(repository.getIvyFile(projectName, expectedVersion).exists());
 
         // b) the xml rpc interface - build details
         Hashtable<String, Object> buildDetails = xmlRpcHelper.getBuild(projectName, buildNumber);

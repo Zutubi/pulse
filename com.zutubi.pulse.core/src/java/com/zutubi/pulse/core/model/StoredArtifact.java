@@ -9,11 +9,20 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * The stored artifact represents the details of actual artifacts captured
+ * during a build.
+ *
+ * These details are stored in the database and can be used to resolve a
+ * reference to the actual artifact on disk. 
  */
 public class StoredArtifact extends Entity
 {
     private static final String[] INDEX_NAMES = {"index.html", "index.htm", "default.html", "default.htm"};
 
+    /**
+     * The name of the artifact, used as a human readable handle for this
+     * artifact.
+     */
     private String name;
 
     /**
@@ -33,6 +42,19 @@ public class StoredArtifact extends Entity
      * artifact is a link to an external location.
      */
     private String url;
+
+    //---(non persistent dependency fields)---
+
+    /**
+     * The publish field indicates whether or not this artifact is published
+     * to the internal pulse artifact repository.  Only published artifacts
+     * are available for use by other projects via the dependency system.
+     */
+    private boolean publish;
+
+    // pattern used to extract the artifacts name and extension from the artifacts
+    // file name.  group 1 = name, group 2 = extension.
+    private String pattern = "(.+)\\.(.+)";
 
     public StoredArtifact()
     {
@@ -239,5 +261,39 @@ public class StoredArtifact extends Entity
     public boolean isLink()
     {
         return url != null;
+    }
+
+    /**
+     * Indicates whether or not this artifact needs to be published to the
+     * artifact repository.  Note that this field is not persisted, and so
+     * should only be used in the content of the build where this stored
+     * artifact was created.
+     *
+     * @return true if this artifact should be published, false otherwise.
+     */
+    public boolean isPublish()
+    {
+        return publish;
+    }
+
+    public void setPublish(boolean b)
+    {
+        this.publish = b;
+    }
+
+    /**
+     * Defines the regular expression that can be used to extract the artifact
+     * name and type from the artifacts filename.
+     *
+     * @return a regular expression.
+     */
+    public String getArtifactPattern()
+    {
+        return pattern;
+    }
+
+    public void setArtifactPattern(String pattern)
+    {
+        this.pattern = pattern;
     }
 }

@@ -4,7 +4,6 @@ import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import com.zutubi.pulse.acceptance.forms.admin.DependencyForm;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
-import com.zutubi.pulse.acceptance.pages.admin.DependenciesPage;
 
 /**
  * A set of acceptance tests focused on the dependency systems UI.
@@ -42,11 +41,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, projectName, false);
 
         ProjectDependenciesPage projectDependenciesPage = projectPage.clickDependenciesAndWait();
-        DependenciesPage dependenciesPage = projectDependenciesPage.clickDependenciesAndWait();
-
-        dependenciesPage.clickAdd();
-
-        DependencyForm form = browser.createForm(DependencyForm.class);
+        DependencyForm form = projectDependenciesPage.clickAdd();
         form.waitFor();
         
         assertFalse(form.isProjectInOptions(projectHandle));

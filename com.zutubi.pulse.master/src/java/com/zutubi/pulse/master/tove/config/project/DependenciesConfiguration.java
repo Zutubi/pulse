@@ -23,10 +23,6 @@ public class DependenciesConfiguration extends AbstractConfiguration
 
     @Required
     @Constraint("com.zutubi.pulse.core.dependency.ivy.IvyPatternValidator")
-    private String publicationPattern = "build/[artifact].[ext]";
-    
-    @Required
-    @Constraint("com.zutubi.pulse.core.dependency.ivy.IvyPatternValidator")
     private String retrievalPattern = "lib/[artifact].[ext]";
 
     @Required
@@ -36,8 +32,6 @@ public class DependenciesConfiguration extends AbstractConfiguration
 
     @Required
     private String version = "${build.number}";
-
-    private List<PublicationConfiguration> publications = new LinkedList<PublicationConfiguration>();
 
     public List<DependencyConfiguration> getDependencies()
     {
@@ -49,16 +43,6 @@ public class DependenciesConfiguration extends AbstractConfiguration
         this.dependencies = dependencies;
     }
 
-    public String getPublicationPattern()
-    {
-        return publicationPattern;
-    }
-
-    public void setPublicationPattern(String publicationPattern)
-    {
-        this.publicationPattern = publicationPattern;
-    }
-
     public String getRetrievalPattern()
     {
         return retrievalPattern;
@@ -67,16 +51,6 @@ public class DependenciesConfiguration extends AbstractConfiguration
     public void setRetrievalPattern(String retrievalPattern)
     {
         this.retrievalPattern = retrievalPattern;
-    }
-
-    public List<PublicationConfiguration> getPublications()
-    {
-        return publications;
-    }
-
-    public void setPublications(List<PublicationConfiguration> publications)
-    {
-        this.publications = publications;
     }
 
     public String getStatus()

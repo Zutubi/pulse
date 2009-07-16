@@ -84,7 +84,7 @@ public class Constants
             public static final String DEFAULT_RECIPE  = "default";
 
             public static final String RECIPES = "recipes";
-
+            public static final String NAME = "name";
             public static class Recipe
             {
                 public static final String DEFAULT_COMMAND = "build";

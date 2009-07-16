@@ -30,6 +30,7 @@ public abstract class FileSystemOutputSupport extends OutputSupport
         FileSystemOutputConfigurationSupport config = (FileSystemOutputConfigurationSupport) getConfig();
         File file = context.registerOutput(config.getName(), config.getType());
         captureFiles(file, context);
+        context.setPublishOutput(config.getName(), config.isPublish(), config.getArtifactPattern());
         context.registerProcessors(config.getName(), config.getPostProcessors());
     }
 

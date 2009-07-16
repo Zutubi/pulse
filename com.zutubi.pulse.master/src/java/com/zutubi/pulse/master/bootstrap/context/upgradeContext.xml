@@ -73,6 +73,7 @@
                 <ref local="addDependenciesVersionField"/>
                 <ref local="addRepositoryConfiguration"/>
                 <ref local="addDependentTriggerPropagateFields"/>
+                <ref local="refactorDependencyPublicationUpgradeTask"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -311,4 +312,9 @@
     <bean id="addDependentTriggerPropagateFields" class="com.zutubi.pulse.master.upgrade.tasks.AddDependentTriggerPropagateFieldsUpgradeTask">
         <property name="buildNumber" value="201003008"/>
     </bean>
+
+    <bean id="refactorDependencyPublicationUpgradeTask" class="com.zutubi.pulse.master.upgrade.tasks.RefactorDependencyPublicationUpgradeTask">
+        <property name="buildNumber" value="201003009"/>
+    </bean>
+    
 </beans>

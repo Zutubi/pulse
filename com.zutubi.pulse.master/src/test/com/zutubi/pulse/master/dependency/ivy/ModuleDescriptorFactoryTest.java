@@ -1,12 +1,10 @@
 package com.zutubi.pulse.master.dependency.ivy;
 
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
-import com.zutubi.pulse.core.dependency.ivy.IvyUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.PublicationConfiguration;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 
@@ -49,40 +47,6 @@ public class ModuleDescriptorFactoryTest extends PulseTestCase
         stage.setHandle(nexthandle++);
         project.getStages().put(stage.getName(), stage);
         return stage;
-    }
-
-    public PublicationConfiguration addArtifact(BuildStageConfiguration stage, String name, String ext)
-    {
-        PublicationConfiguration publication = new PublicationConfiguration(name, ext);
-        publication.setHandle(nexthandle++);
-        stage.getPublications().add(publication);
-        return publication;
-    }
-
-    public void testBuildStage()
-    {
-        ProjectConfiguration project = newProject("", "project");
-        BuildStageConfiguration stage = addStage(project, "stage");
-
-        ModuleDescriptor descriptor = factory.createDescriptor(project);
-        assertEquals(1, descriptor.getConfigurationsNames().length);
-
-        // stages only change the descriptor if they have publications.
-        addArtifact(stage, "artifact", "ext");
-
-        descriptor = factory.createDescriptor(project);
-        assertEquals(2, descriptor.getConfigurationsNames().length);
-        assertEquals(1, descriptor.getArtifacts("stage").length);
-    }
-
-    public void testBuildStageNameEncoding()
-    {
-        ProjectConfiguration project = newProject("", "project");
-        BuildStageConfiguration stage = addStage(project, "#$%*");
-        addArtifact(stage, "artifact", "jar");
-
-        ModuleDescriptor descriptor = factory.createDescriptor(project);
-        assertNotNull(descriptor.getConfiguration(IvyUtils.ivyEncodeStageName(stage.getName())));
     }
 
     public void testDependencies()

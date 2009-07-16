@@ -8,13 +8,15 @@ import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
+
 /**
  * An authentication provider implementation that uses a token (a shared token
  * between the pulse master and agents) to provide an authentication.
  */
 public class RepositoryAuthenticationProvider implements AuthenticationProvider
 {
-    private static final String USERNAME = "pulse";
+    private static final String USERNAME = AuthenticatedAction.USER;
 
     private Set<Object> activeTokens = new HashSet<Object>();
 
