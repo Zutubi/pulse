@@ -87,7 +87,6 @@ public class FormDirective extends ToveDirective
      */
     public void setNamespace(String namespace)
     {
-        //TODO: Is there a way to extract this automatically?  It is used via PathUtils.getConfigPath
         this.namespace = namespace;
     }
 

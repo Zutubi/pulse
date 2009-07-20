@@ -5,7 +5,7 @@
     #i18n("key=introduction")
 </p>
 <p>
-    #table("path=$config.path" "ajax=true")
+    #table("path=$config.path")
 </p>
 
 <script type="text/javascript">

@@ -70,7 +70,7 @@
                 #renderform()
     #end
     #if ($config.collapsedCollection)
-        #table("path=$config.path/$config.collapsedCollection" "ajax=true")
+        #table("path=$config.path/$config.collapsedCollection")
     #end
         </td>
         

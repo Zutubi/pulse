@@ -36,18 +36,11 @@ public class TableDirective extends ToveDirective
 
     private Configuration configuration;
 
-    private boolean ajax = false;
-
     private String path;
 
     public TableDirective()
     {
         SpringComponentContext.autowire(this);
-    }
-
-    public void setAjax(boolean ajax)
-    {
-        this.ajax = ajax;
     }
 
     public void setPath(String path)
@@ -89,15 +82,9 @@ public class TableDirective extends ToveDirective
             context.put("path", path);
             context.put("embedded", ToveUtils.isEmbeddedCollection(collectionType));
 
-            String templateName = "table.ftl";
-            if (ajax)
-            {
-                templateName = "atable.ftl";
-            }
-
             try
             {
-                Template template = configuration.getTemplate("tove/xhtml/" + templateName);
+                Template template = configuration.getTemplate("tove/xhtml/table.ftl");
                 template.process(context, writer);
             }
             catch (TemplateException e)
