@@ -41,7 +41,7 @@
             });
 
             form.on('afterlayout', function() {
-                this.getForm().el.dom.action = '${urls.projectReports($u_projectName)}#uce($group)/';
+                this.getForm().el.dom.action = '#jss("${urls.projectReports($u_projectName)}#uce($group)/")';
             }, form, {single: true});
             form.render('params-form');
         });

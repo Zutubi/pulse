@@ -40,6 +40,7 @@ public class SeleniumTestBase extends PulseTestCase
      * agent on port 8890).
      */
     protected static final String AGENT_NAME = "localhost";
+    protected static final String SPECIAL_CHARACTERS = " #%&<>'\"()!@";
 
     protected Selenium selenium;
     protected Urls urls;
@@ -61,7 +62,7 @@ public class SeleniumTestBase extends PulseTestCase
         xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", Integer.parseInt(port), "/xmlrpc"));
         baseUrl = "http://localhost:" + port + "/";
         urls = Urls.getBaselessInstance();
-        random = getName() + "-" + RandomUtils.randomString(10);
+        random = getRandomName();
 
         String browser = SeleniumUtils.getSeleniumBrowserProperty();
         
@@ -75,6 +76,11 @@ public class SeleniumTestBase extends PulseTestCase
         selenium = null;
         xmlRpcHelper = null;
         super.tearDown();
+    }
+
+    protected String getRandomName()
+    {
+        return getName() + "-" + RandomUtils.randomString(10);
     }
 
     protected void newSession()

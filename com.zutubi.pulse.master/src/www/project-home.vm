@@ -9,7 +9,7 @@
     <script type="text/javascript">
     //<![CDATA[
         #set($ajaxUrl = "$base/ajax/projectHomePanel.action?projectName=$u_projectName")
-        #updater($ajaxUrl "project-home-#uce($project.name)" $principle)
+        #updater($ajaxUrl "project-home-$project.name" $principle)
 
         var summaryPopup;
         var recentPopup;
@@ -25,7 +25,7 @@
 
     #parse("/template/includes/actionerrors.vm")
     
-    <div id="project-home-#uce($project.name)">
+    <div id='#id("project-home-$project.name")'>
         #parse("ajax/project-home-panel.vm")
     </div>
 

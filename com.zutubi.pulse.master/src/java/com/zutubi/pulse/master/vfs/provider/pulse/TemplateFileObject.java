@@ -14,6 +14,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -38,7 +39,7 @@ public class TemplateFileObject extends AbstractPulseFileObject implements Compa
         TemplateHierarchy hierarchy = scopeFile.getTemplateHierarchy();
         if(hierarchy != null)
         {
-            node = hierarchy.getNodeByTemplatePath(scopeFile.getName().getRelativeName(getName()));
+            node = hierarchy.getNodeByTemplatePath(UriParser.decode(scopeFile.getName().getRelativeName(getName())));
         }
     }
 
@@ -86,7 +87,7 @@ public class TemplateFileObject extends AbstractPulseFileObject implements Compa
             String[] children = new String[childNodes.size()];
             childNodes.toArray(children);
             Arrays.sort(children, new Sort.StringComparator());
-            return children;
+            return UriParser.encode(children);
         }
 
         return new String[0];

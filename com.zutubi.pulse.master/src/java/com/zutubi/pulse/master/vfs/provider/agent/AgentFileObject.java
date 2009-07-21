@@ -43,7 +43,7 @@ public class AgentFileObject extends AbstractFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        String path = getName().getPath();
+        String path = getName().getPathDecoded();
         if (fs.isWindows() && path.equals(FileName.ROOT_PATH))
         {
             return fs.getRoots();
@@ -64,7 +64,7 @@ public class AgentFileObject extends AbstractFileObject
 
     protected FileInfo getFileInfo() throws FileSystemException
     {
-        String path = getName().getPath();
+        String path = getName().getPathDecoded();
         try
         {
             if (fs.isWindows() && fs.isRoot(path))

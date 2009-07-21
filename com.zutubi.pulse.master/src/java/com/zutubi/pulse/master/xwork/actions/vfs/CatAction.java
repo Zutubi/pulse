@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.vfs;
 import com.zutubi.util.TextUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.io.InputStream;
 
@@ -65,7 +66,7 @@ public class CatAction extends VFSActionSupport
             return ERROR;
         }
 
-        filename = fo.getName().getBaseName();
+        filename = UriParser.decode(fo.getName().getBaseName());
         contentType = fo.getContent().getContentInfo().getContentType();
         inputStream = fo.getContent().getInputStream();
 

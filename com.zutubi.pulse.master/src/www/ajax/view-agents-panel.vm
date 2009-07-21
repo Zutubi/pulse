@@ -28,7 +28,7 @@
 #foreach($model in $models)
     <tr>
         #set($h_agentName = $!webwork.htmlEncode($model.name))
-        #dynamicLinkCell($h_agentName "$urls.agentStatus($model.agent)")
+        #dynamicLinkCell($model.name "$urls.agentStatus($model.agent)")
         #staticCell($model.location)
         #staticCell($model.status)
         <td class="content">
@@ -42,7 +42,7 @@
         #end
     #end
         </td>
-        #editCellSpan("$base/admin/${model.agent.config.configurationPath}/" "edit_$h_agentName" 1)
+        #editCellSpan("$base/admin/#uce(${model.agent.config.configurationPath})/" "edit_$h_agentName" 1)
     </tr>
 #end
 </table>

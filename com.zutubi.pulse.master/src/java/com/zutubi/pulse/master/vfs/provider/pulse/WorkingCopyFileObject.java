@@ -8,6 +8,7 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,7 +63,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
     
     protected String[] doListChildren() throws Exception
     {
-        return base.list();
+        return UriParser.encode(base.list());
     }
 
     protected long doGetContentSize() throws Exception
@@ -108,7 +109,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
     protected String getWorkingCopyPath() throws FileSystemException
     {
         AbstractPulseFileObject fo = getAncestor(WorkingCopyStageFileObject.class);
-        return fo.getName().getRelativeName(getName());
+        return UriParser.decode(fo.getName().getRelativeName(getName()));
     }
 
     protected boolean doIsReadable() throws Exception

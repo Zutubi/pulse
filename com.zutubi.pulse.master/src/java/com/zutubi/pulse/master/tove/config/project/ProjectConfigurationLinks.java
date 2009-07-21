@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.links.ConfigurationLink;
+import com.zutubi.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,7 +18,7 @@ public class ProjectConfigurationLinks
         if (projectConfiguration.isConcrete())
         {
             Urls urls = Urls.getBaselessInstance();
-            String name = projectConfiguration.getName();
+            String name = StringUtils.uriComponentEncode(projectConfiguration.getName());
             return Arrays.asList(
                     new ConfigurationLink("home", urls.projectHome(name)),
                     new ConfigurationLink("reports", urls.projectReports(name)),

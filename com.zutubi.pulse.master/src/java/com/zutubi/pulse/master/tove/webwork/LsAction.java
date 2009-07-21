@@ -13,6 +13,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -57,11 +58,11 @@ public class LsAction extends ActionSupport
         String fullPath = "pulse:///";
         if(TextUtils.stringSet(basePath))
         {
-            fullPath += "/" + PathUtils.normalisePath(basePath);
+            fullPath += "/" + UriParser.encode(PathUtils.normalisePath(basePath));
         }
         if(TextUtils.stringSet(path))
         {
-            fullPath += "/" + PathUtils.normalisePath(path);
+            fullPath += "/" + UriParser.encode(PathUtils.normalisePath(path));
         }
 
         final FileObject fileObject = fileSystemManager.resolveFile(fullPath);
@@ -80,18 +81,26 @@ public class LsAction extends ActionSupport
             return ERROR;
         }
 
-        FileObject[] children = fileObject.getChildren();
-        if (children != null)
+        try
         {
-            sortChildren(fileObject, children);
-            listing = new ExtFile[children.length];
-            CollectionUtils.mapToArray(children, new Mapping<FileObject, ExtFile>()
+            FileObject[] children = fileObject.getChildren();
+            if (children != null)
             {
-                public ExtFile map(FileObject child)
+                sortChildren(fileObject, children);
+                listing = new ExtFile[children.length];
+                CollectionUtils.mapToArray(children, new Mapping<FileObject, ExtFile>()
                 {
-                    return new ExtFile(new FileObjectWrapper(child, fileObject));
-                }
-            }, listing);
+                    public ExtFile map(FileObject child)
+                    {
+                        return new ExtFile(new FileObjectWrapper(child, fileObject));
+                    }
+                }, listing);
+            }
+        }
+        catch (FileSystemException e)
+        {
+// FIXME
+            e.printStackTrace();
         }
 
         return SUCCESS;

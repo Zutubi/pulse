@@ -51,7 +51,7 @@
                             anchor: '95%',
                             listeners: {
                                 click: function() {
-                                    document.location = '$urls.projectHistory($u_projectName)';
+                                    document.location = '#jss($urls.projectHistory($u_projectName))';
                                 }
                             }
                         }]
@@ -60,7 +60,7 @@
             });
 
             form.on('afterlayout', function() {
-                this.getForm().el.dom.action = '${urls.projectHistory($u_projectName)}';
+                this.getForm().el.dom.action = '#jss(${urls.projectHistory($u_projectName)})';
             }, form, {single: true});
             form.render("filter-form");
         }

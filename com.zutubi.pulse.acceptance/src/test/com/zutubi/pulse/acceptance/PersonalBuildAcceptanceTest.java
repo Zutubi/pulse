@@ -16,6 +16,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import org.testng.annotations.AfterMethod;
@@ -238,9 +239,10 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     {
         // Edit the build.xml file so we have an outstanding change
         File buildFile = new File(workingCopyDir, "build.xml");
+        String target = RandomUtils.randomString(10);
         FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
-                "<project default=\"" + random + "\">\n" +
-                "    <target name=\"" + random + "\">\n" +
+                "<project default=\"" + target + "\">\n" +
+                "    <target name=\"" + target + "\">\n" +
                 "        <nosuchcommand/>\n" +
                 "    </target>\n" +
                 "</project>");

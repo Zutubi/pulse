@@ -1,23 +1,24 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.scm;
 
-import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
-import com.zutubi.pulse.master.vfs.provider.pulse.PulseFileName;
-import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
-import com.zutubi.pulse.master.scm.ScmClientUtils;
-import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.core.scm.api.ScmFile;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFile;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
+import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
+import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
+import com.zutubi.pulse.master.vfs.provider.pulse.PulseFileName;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.List;
 
@@ -67,7 +68,7 @@ public abstract class AbstractScmFileObject extends AbstractPulseFileObject
 
         ScmRootFileObject scmRoot = getAncestor(ScmRootFileObject.class);
 
-        ScmFile fi = new ScmFile(scmRoot.getName().getRelativeName(name), name.getType() == FileType.FOLDER);
+        ScmFile fi = new ScmFile(UriParser.decode(scmRoot.getName().getRelativeName(name)), name.getType() == FileType.FOLDER);
 
         return objectFactory.buildBean(ScmFileObject.class,
                 new Class[]{ScmFile.class, FileName.class, AbstractFileSystem.class},
@@ -78,13 +79,13 @@ public abstract class AbstractScmFileObject extends AbstractPulseFileObject
     protected String[] doListChildren() throws Exception
     {
         List<ScmFile> children = getScmChildren();
-        return CollectionUtils.mapToArray(children, new Mapping<ScmFile, String>()
+        return UriParser.encode(CollectionUtils.mapToArray(children, new Mapping<ScmFile, String>()
         {
             public String map(ScmFile scmFile)
             {
                 return scmFile.getName() + ((scmFile.isDirectory()) ? DIRECTORY_SUFFIX : FILE_SUFFIX);
             }
-        }, new String[children.size()]);
+        }, new String[children.size()]));
     }
 
     private List<ScmFile> getScmChildren() throws FileSystemException

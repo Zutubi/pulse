@@ -5,6 +5,7 @@ import com.zutubi.util.Sort;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -41,12 +42,11 @@ public class TemplateScopesFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        // do not support listing.
         Set<String> scopes = configurationTemplateManager.getTemplateScopes();
         String[] children = new String[scopes.size()];
         scopes.toArray(children);
         Arrays.sort(children, new Sort.StringComparator());
-        return children;
+        return UriParser.encode(children);
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

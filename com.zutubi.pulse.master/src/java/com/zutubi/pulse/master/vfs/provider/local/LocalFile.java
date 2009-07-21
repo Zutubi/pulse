@@ -69,7 +69,7 @@ public class LocalFile extends AbstractFileObject implements FileObject
     // MODIFIED
     protected String[] doListChildren() throws Exception
     {
-        String path = getName().getPath();
+        String path = getName().getPathDecoded();
         if (fs.isWindows() && path.equals(FileName.ROOT_PATH))
         {
             return fs.getRoots();
@@ -77,9 +77,9 @@ public class LocalFile extends AbstractFileObject implements FileObject
         return UriParser.encode(file.list());
     }
     
-    protected File getFileInfo()
+    protected File getFileInfo() throws FileSystemException
     {
-        String path = getName().getPath();
+        String path = getName().getPathDecoded();
         if (isRoot())
         {
             // need to munge it a little, must add the trailing slash if we want
@@ -89,9 +89,9 @@ public class LocalFile extends AbstractFileObject implements FileObject
         return new File(path);
     }
 
-    protected boolean isRoot()
+    protected boolean isRoot() throws FileSystemException
     {
-        String path = getName().getPath();
+        String path = getName().getPathDecoded();
         return (fs.isWindows() && fs.isRoot(path));
     }
 
@@ -149,7 +149,7 @@ public class LocalFile extends AbstractFileObject implements FileObject
      * Determines if this file is hidden.
      */
     // MODIFIED
-    protected boolean doIsHidden()
+    protected boolean doIsHidden() throws FileSystemException
     {
         if (isRoot())
         {

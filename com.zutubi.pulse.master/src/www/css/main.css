@@ -633,8 +633,16 @@ td.health-warnings {
     background-color: #ffffe0;
 }
 
+td.build-status {
+    padding-right: 10px;
+}
+
 .build-details {
     text-align: right;
+}
+
+.build-column {
+    border-left: dotted 1px #bbb;
 }
 
 ul.actions {

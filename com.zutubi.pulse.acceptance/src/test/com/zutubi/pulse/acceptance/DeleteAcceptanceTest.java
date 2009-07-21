@@ -196,9 +196,19 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     public void testDeleteAgent() throws Exception
     {
-        String path = xmlRpcHelper.insertSimpleAgent(random);
+        deleteAgentHelper(random);
+    }
+
+    public void testDeleteAgentWithSpecialCharacters() throws Exception
+    {
+        deleteAgentHelper(random + " ~!#%^&*()_+<>?.,\":';][}{'|=-`");
+    }
+
+    private void deleteAgentHelper(String name) throws Exception
+    {
+        String path = xmlRpcHelper.insertSimpleAgent(name, random);
         loginAsAdmin();
-        AgentHierarchyPage hierarchyPage = new AgentHierarchyPage(selenium, urls, random, false);
+        AgentHierarchyPage hierarchyPage = new AgentHierarchyPage(selenium, urls, name, false);
         hierarchyPage.goTo();
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();

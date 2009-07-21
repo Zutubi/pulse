@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.servercore.filesystem.FileSystemException;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -7,11 +8,11 @@ import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.Comparator;
 import java.util.List;
@@ -52,7 +53,8 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        String childPath = PathUtils.getPath(path, fileName.getBaseName());
+        String decodedBaseName = UriParser.decode(fileName.getBaseName());
+        String childPath = PathUtils.getPath(path, decodedBaseName);
         Type childType = configurationTemplateManager.getType(childPath);
         if(!(childType instanceof ComplexType))
         {
@@ -75,7 +77,7 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
         }
         else
         {
-            childValue = (Record) value.get(fileName.getBaseName());
+            childValue = (Record) value.get(decodedBaseName);
         }
 
         return objectFactory.buildBean(ConfigFileObject.class,
@@ -121,7 +123,7 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
     protected String[] doListChildren() throws Exception
     {
         List<String> listing = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
-        return listing.toArray(new String[listing.size()]);
+        return UriParser.encode(listing.toArray(new String[listing.size()]));
     }
 
     public Comparator<FileObject> getComparator()

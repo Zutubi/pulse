@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 
@@ -11,13 +13,22 @@ import com.zutubi.tove.config.ConfigurationProvider;
  */
 public class BrowseAction extends ActionSupport
 {
+    private int columnCount;
     private ConfigurationProvider configurationProvider;
+
+    public int getColumnCount()
+    {
+        return columnCount;
+    }
 
     @Override
     public String execute() throws Exception
     {
-        if (configurationProvider.get(GlobalConfiguration.class).isAnonymousAccessEnabled() || getLoggedInUser() != null)
+        User user = getLoggedInUser();
+        if (configurationProvider.get(GlobalConfiguration.class).isAnonymousAccessEnabled() || user != null)
         {
+            BrowseViewConfiguration browseConfig = user == null ? new BrowseViewConfiguration() : user.getPreferences().getBrowseView();
+            columnCount = browseConfig.getColumns().size();
             return SUCCESS;
         }
         else

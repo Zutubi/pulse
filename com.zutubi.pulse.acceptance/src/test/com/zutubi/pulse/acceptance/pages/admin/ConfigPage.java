@@ -4,7 +4,6 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import junit.framework.Assert;
 
 /**
  * Base for config pages that appear when the "configuration" tab is selected

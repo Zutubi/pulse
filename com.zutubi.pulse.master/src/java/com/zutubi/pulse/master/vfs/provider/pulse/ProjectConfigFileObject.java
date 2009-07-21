@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.tove.config.ConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
@@ -8,8 +9,10 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +61,14 @@ public class ProjectConfigFileObject extends AbstractPulseFileObject implements 
 
     public ProjectConfiguration getProjectConfig()
     {
-        return configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, getName().getBaseName()), ProjectConfiguration.class);
+        try
+        {
+            return configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, UriParser.decode(getName().getBaseName())), ProjectConfiguration.class);
+        }
+        catch (FileSystemException e)
+        {
+            throw new PulseRuntimeException(e);
+        }
     }
 
     public boolean isLocal()

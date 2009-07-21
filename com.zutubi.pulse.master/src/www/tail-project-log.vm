@@ -56,7 +56,7 @@
             });
 
             form.on('afterlayout', function() {
-                this.getForm().el.dom.action = '${urls.projectLog($project)}';
+                this.getForm().el.dom.action = '#jss(${urls.projectLog($project)})';
 
                 new Ext.KeyNav(this.getForm().getEl(), {
                     'enter': function(e) {

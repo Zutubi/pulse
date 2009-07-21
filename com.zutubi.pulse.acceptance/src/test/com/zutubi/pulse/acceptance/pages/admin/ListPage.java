@@ -6,7 +6,8 @@ import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.StringUtils;
+import static com.zutubi.util.StringUtils.toValidHtmlName;
+import static com.zutubi.util.StringUtils.urlEncodePath;
 
 /**
  * A page in the admin UI that displays a list of composites.  The list is
@@ -41,17 +42,17 @@ public class ListPage extends ConfigPage
 
     public String getUrl()
     {
-        return urls.admin() + path + "/";
+        return urls.admin() + urlEncodePath(path) + "/";
     }
 
     public boolean isItemPresent(String baseName)
     {
-        return selenium.isElementPresent(StringUtils.toValidHtmlName(getItemId(baseName)));
+        return selenium.isElementPresent(getItemId(baseName));
     }
 
     public boolean isAnnotationPresent(String baseName, String annotation)
     {
-        return selenium.isElementPresent(StringUtils.toValidHtmlName(annotation + ":" + baseName));
+        return selenium.isElementPresent(toValidHtmlName(annotation + ":" + baseName));
     }
 
     public boolean isActionLinkPresent(String baseName, String action)
@@ -66,12 +67,12 @@ public class ListPage extends ConfigPage
 
     private String getItemId(String baseName)
     {
-        return "item:" + baseName;
+        return toValidHtmlName("item:" + baseName);
     }
 
     public String getActionId(String action, String baseName)
     {
-        return action + ":" + baseName;
+        return toValidHtmlName(action + ":" + baseName);
     }
 
     public void clickAdd()

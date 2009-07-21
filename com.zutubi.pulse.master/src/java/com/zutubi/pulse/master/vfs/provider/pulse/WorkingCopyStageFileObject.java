@@ -9,6 +9,7 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.io.File;
 
@@ -67,7 +68,7 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
         File copyBase = getWorkingCopyBase();
         if (copyBase.isDirectory())
         {
-            return copyBase.list();
+            return UriParser.encode(copyBase.list());
         }
         
         return new String[]{NO_WORKING_COPY_AVAILABLE};
@@ -75,7 +76,7 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
 
     protected File getWorkingCopyBase() throws FileSystemException
     {
-        BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        BuildResultProvider provider = getAncestor(BuildResultProvider.class);
         if (provider == null)
         {
             return null;
