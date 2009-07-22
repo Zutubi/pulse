@@ -12,8 +12,6 @@ import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -156,7 +154,7 @@ public class NativeGit
         command.add(COMMAND_LOG);
         command.add(FLAG_NAME_STATUS);
         command.add(FLAG_SHOW_MERGE_FILES);
-        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%cn%n%cd%n%s%n%b" + LOG_SENTINAL);
+        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%cn%n%ct%n%s%n%b" + LOG_SENTINAL);
         command.add(FLAG_REVERSE);
         if (changes != -1)
         {
@@ -524,11 +522,6 @@ public class NativeGit
      */
     static class LogOutputHandler extends OutputHandlerAdapter
     {
-        /**
-         * The date format used to read the 'date' field on git log output.
-         */
-        private final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
-
         private List<GitLogEntry> entries;
 
         private List<String> lines;
@@ -584,11 +577,11 @@ public class NativeGit
                         logEntry.setDateString(str);
                         try
                         {
-                            logEntry.setDate(LOG_DATE_FORMAT.parse(str));
+                            logEntry.setDate(new Date(Long.parseLong(str)));
                         }
-                        catch (ParseException e)
+                        catch (NumberFormatException e)
                         {
-                            LOG.severe("Failed to parse the date: '" + str + "'");
+                            LOG.severe("Failed to parse the timestamp: '" + str + "'");
                         }
 
                         String comment = "";
