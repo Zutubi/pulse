@@ -577,7 +577,7 @@ public class NativeGit
                         logEntry.setDateString(str);
                         try
                         {
-                            logEntry.setDate(new Date(Long.parseLong(str)));
+                            logEntry.setDate(new Date(Long.parseLong(str) * Constants.SECOND));
                         }
                         catch (NumberFormatException e)
                         {
