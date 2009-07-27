@@ -81,26 +81,18 @@ public class LsAction extends ActionSupport
             return ERROR;
         }
 
-        try
+        FileObject[] children = fileObject.getChildren();
+        if (children != null)
         {
-            FileObject[] children = fileObject.getChildren();
-            if (children != null)
+            sortChildren(fileObject, children);
+            listing = new ExtFile[children.length];
+            CollectionUtils.mapToArray(children, new Mapping<FileObject, ExtFile>()
             {
-                sortChildren(fileObject, children);
-                listing = new ExtFile[children.length];
-                CollectionUtils.mapToArray(children, new Mapping<FileObject, ExtFile>()
+                public ExtFile map(FileObject child)
                 {
-                    public ExtFile map(FileObject child)
-                    {
-                        return new ExtFile(new FileObjectWrapper(child, fileObject));
-                    }
-                }, listing);
-            }
-        }
-        catch (FileSystemException e)
-        {
-// FIXME
-            e.printStackTrace();
+                    return new ExtFile(new FileObjectWrapper(child, fileObject));
+                }
+            }, listing);
         }
 
         return SUCCESS;
