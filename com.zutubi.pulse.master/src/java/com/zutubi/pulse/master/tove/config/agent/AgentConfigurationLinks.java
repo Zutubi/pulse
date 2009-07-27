@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.tove.config.agent;
 
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.links.ConfigurationLink;
+import com.zutubi.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,7 +18,7 @@ public class AgentConfigurationLinks
         if (agentConfiguration.isConcrete())
         {
             Urls urls = Urls.getBaselessInstance();
-            String name = agentConfiguration.getName();
+            String name = StringUtils.uriComponentEncode(agentConfiguration.getName());
             return Arrays.asList(
                     new ConfigurationLink("status", urls.agentStatus(name)),
                     new ConfigurationLink("messages", urls.agentMessages(name)),

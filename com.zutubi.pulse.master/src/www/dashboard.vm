@@ -52,7 +52,7 @@
         }
 
         Ext.onReady(function() {
-            projectsTable = new ZUTUBI.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $rssEnabled, true);
+            projectsTable = new ZUTUBI.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $dashboardConfig.columns.size(), $rssEnabled, true);
 #if($dashboardConfig.showMyChanges)
             myChangesTable = new ZUTUBI.ChangesTable(Ext.get('my.changes'), 'my', '#wwtext("name=my.latest.changes")', false);
 #end

@@ -67,6 +67,30 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertEquals("1", changes.get(2).getRevision().getRevisionString());
     }
 
+    public void testLatestForProjectSameTimestamp()
+    {
+        // If the timestamps are identical, the latest saved revision should
+        // come first (i.e. ordered by descending id).
+        final int TIMESTAMP = 101000010;
+        changelistDao.save(createChangelist(1, 1, TIMESTAMP, "login1"));
+        changelistDao.save(createChangelist(1, 2, TIMESTAMP, "login1"));
+        changelistDao.save(createChangelist(1, 3, TIMESTAMP, "login1"));
+        changelistDao.save(createChangelist(1, 4, TIMESTAMP, "login1"));
+        changelistDao.save(createChangelist(1, 5, TIMESTAMP, "login1"));
+
+        commitAndRefreshTransaction();
+        Project p = new Project();
+        p.setId(1);
+
+        List<PersistentChangelist> changes = changelistDao.findLatestByProject(p, 10);
+        assertEquals(5, changes.size());
+        assertEquals("5", changes.get(0).getRevision().getRevisionString());
+        assertEquals("4", changes.get(1).getRevision().getRevisionString());
+        assertEquals("3", changes.get(2).getRevision().getRevisionString());
+        assertEquals("2", changes.get(3).getRevision().getRevisionString());
+        assertEquals("1", changes.get(4).getRevision().getRevisionString());
+    }
+
     public void testLatestForProjects()
     {
         changelistDao.save(createChangelist(1, 1, "login1"));
@@ -249,7 +273,12 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
     private PersistentChangelist createChangelist(long project, long number, String login)
     {
-        PersistentChangelist changelist = new PersistentChangelist(createRevision(number), number, login, null, Collections.<PersistentFileChange>emptyList());
+        return createChangelist(project, number, number, login);
+    }
+
+    private PersistentChangelist createChangelist(long project, long number, long timestamp, String login)
+    {
+        PersistentChangelist changelist = new PersistentChangelist(createRevision(number), timestamp, login, null, Collections.<PersistentFileChange>emptyList());
 
         if(project != 0)
         {

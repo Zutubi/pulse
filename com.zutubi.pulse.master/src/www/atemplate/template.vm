@@ -3,7 +3,7 @@
 <p></p>
 
 #macro(actionHeader $id $action $img $onclick)
-    <th><img alt="$action" src="$base/images/${img}.gif"/> <a href="#" onclick="$onclick; return false" id="$id">$action</a></th>
+    <th><img alt="$action" src="$base/images/${img}.gif"/> <a href="#" onclick="#html($onclick); return false" id="$id">$action</a></th>
     <td style="width: 25px"><a href="#" class="unadorned" onclick="showFieldHelp('$id'); return false"><img alt="show help" src="$base/images/help.gif"/></a></td>
 #end
 

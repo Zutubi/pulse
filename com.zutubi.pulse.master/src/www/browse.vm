@@ -53,7 +53,7 @@
         Ext.onReady(function() {
             invalidEl = Ext.get('invalid-projects');
             invalidEl.setVisibilityMode(Ext.Element.DISPLAY);
-            projectsTable = new ZUTUBI.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $rssEnabled, false);
+            projectsTable = new ZUTUBI.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $columnCount, $rssEnabled, false);
             view = new ZUTUBI.ActiveView(window.baseUrl + '/ajax/browseData.action', refreshInterval, update, window, Ext.get('projects'), 'Unable to load projects.');
             view.init();
         });

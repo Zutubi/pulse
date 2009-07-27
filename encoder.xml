@@ -49,21 +49,21 @@
     <!-- execute the common portion of the build. -->
     <target name="build" depends="prepare">
 
-        <javac srcdir="${util.src.dir}" destdir="${classes.dir}" debug="true">
+        <javac srcdir="${util.src.dir}" destdir="${classes.dir}" target="5" debug="true">
             <include name="**/IOUtils.java"/>
             <include name="**/ObjectUtils.java"/>
             <include name="**/StringUtils.java"/>
             <include name="**/TextUtils.java"/>
             <include name="**/Constants.java"/>
         </javac>
-        <javac srcdir="${core.src.dir}" destdir="${classes.dir}" debug="true">
+        <javac srcdir="${core.src.dir}" destdir="${classes.dir}" target="5" debug="true">
             <classpath refid="lib.path"/>
             <include name="**/Version.java"/>
             <include name="**/PulseRuntimeException.java"/>
             <include name="**/PulseException.java"/>
         </javac>
 
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="true">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" target="5" debug="true">
             <classpath refid="lib.path"/>
             <classpath location="${classes.dir}"/>
             <include name="**/LicenseEncoder.java"/>

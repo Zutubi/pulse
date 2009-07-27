@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeView
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.StringUtils.uriComponentEncode;
 import com.zutubi.util.io.IOUtils;
 
 import static java.util.Arrays.asList;
@@ -25,7 +26,7 @@ import java.util.Hashtable;
  */
 public class ConfigUIAcceptanceTest extends SeleniumTestBase
 {
-    private static final String CHECK_PROJECT = "config-check-project";
+    private static final String CHECK_PROJECT = "config-check-project" + SPECIAL_CHARACTERS;
 
     private static final String ACTION_DOWN = "down";
     private static final String ACTION_UP   = "up";
@@ -35,6 +36,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
+        random = getRandomName() + SPECIAL_CHARACTERS;
         xmlRpcHelper.loginAsAdmin();
     }
 
@@ -50,7 +52,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // single select should have an empty option added.
         loginAsAdmin();
         addProject(random, true, GLOBAL_PROJECT_NAME, false);
-        browser.open(urls.adminProject(random) + "scm/");
+        browser.open(urls.adminProject(uriComponentEncode(random)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         String[] options = form.getComboBoxOptions("checkoutScheme");
@@ -127,7 +129,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
-        browser.open(urls.adminProject(CHECK_PROJECT) + "scm/");
+        browser.open(urls.adminProject(uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "svn://localhost:3088/");
@@ -141,7 +143,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
-        browser.open(urls.adminProject(CHECK_PROJECT) + "scm/");
+        browser.open(urls.adminProject(uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "svn://localhost:9999/foo");
@@ -155,7 +157,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     {
         loginAsAdmin();
         ensureProject(CHECK_PROJECT);
-        browser.open(urls.adminProject(CHECK_PROJECT) + "scm/");
+        browser.open(urls.adminProject(uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = browser.createForm(SubversionForm.class);
         form.waitFor();
         form.setFieldValue("url", "");
@@ -898,7 +900,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     private void checkListedRecipes(String... expectedRecipes)
     {
         loginAsAdmin();
-        browser.open(urls.adminProject(random) + Constants.Project.STAGES + "/" + ProjectConfigurationWizard.DEFAULT_STAGE + "/");
+        browser.open(urls.adminProject(uriComponentEncode(random)) + Constants.Project.STAGES + "/" + ProjectConfigurationWizard.DEFAULT_STAGE + "/");
 
         BuildStageForm stageForm = browser.createForm(BuildStageForm.class, false);
         stageForm.waitFor();

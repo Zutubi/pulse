@@ -131,7 +131,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     private PluginsPage installPlugin(String id) throws IOException
     {
-        File testPlugin = makeTestPlugin(id, getRandomName());
+        File testPlugin = makeTestPlugin(id, getRandomProcessorName());
 
         loginAsAdmin();
         PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
@@ -142,7 +142,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         return pluginsPage;
     }
 
-    private String getRandomName()
+    private String getRandomProcessorName()
     {
         return "Test Post-Processor " + random;
     }

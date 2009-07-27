@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.vfs;
 
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.AddressableFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
@@ -8,6 +9,7 @@ import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.io.File;
 import java.util.Collections;
@@ -32,16 +34,30 @@ public class FileObjectWrapper
 
     public String getName()
     {
-        if (fo instanceof AbstractPulseFileObject)
+        try
         {
-            return ((AbstractPulseFileObject)fo).getDisplayName();
+            if (fo instanceof AbstractPulseFileObject)
+            {
+                return ((AbstractPulseFileObject)fo).getDisplayName();
+            }
+            return UriParser.decode(fo.getName().getBaseName());
         }
-        return fo.getName().getBaseName();
+        catch (FileSystemException e)
+        {
+            throw new PulseRuntimeException(e);
+        }
     }
 
     public String getBaseName()
     {
-        return fo.getName().getBaseName();
+        try
+        {
+            return UriParser.decode(fo.getName().getBaseName());
+        }
+        catch (FileSystemException e)
+        {
+            throw new PulseRuntimeException(e);
+        }
     }
 
     public String getUrl()
@@ -94,7 +110,15 @@ public class FileObjectWrapper
 
     public String getId()
     {
-        return fo.getName().getBaseName();
+        String baseName = fo.getName().getBaseName();
+        try
+        {
+            return UriParser.decode(baseName);
+        }
+        catch (FileSystemException e)
+        {
+            throw new PulseRuntimeException(e);
+        }
     }
 
     public String getRelativeParentPath()

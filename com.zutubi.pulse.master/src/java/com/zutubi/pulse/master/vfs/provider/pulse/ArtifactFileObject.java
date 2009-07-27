@@ -6,6 +6,7 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         File base = getArtifactBase();
         if(base.isDirectory())
         {
-            return base.list();
+            return UriParser.encode(base.list());
         }
         return new String[0];
     }

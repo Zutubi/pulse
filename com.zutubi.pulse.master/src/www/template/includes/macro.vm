@@ -1640,10 +1640,10 @@
         Ext.onReady(function() {
             var task = {
                 run: function(){
-                    var updater = new Ext.Updater('$panelId');
+                    var updater = new Ext.Updater('#jss("#id($panelId)")');
                     updater.showLoadIndicator = false;
                     updater.update({
-                        url: '$url',
+                        url: '#jss($url)',
                         scripts: true
                     });
                 },

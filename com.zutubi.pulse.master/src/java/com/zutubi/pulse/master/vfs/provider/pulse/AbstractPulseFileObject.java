@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.bean.ObjectFactory;
@@ -8,6 +9,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.io.File;
 import java.io.InputStream;
@@ -65,7 +67,14 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      */
     public String getDisplayName()
     {
-        return getName().getBaseName();
+        try
+        {
+            return UriParser.decode(getName().getBaseName());
+        }
+        catch (FileSystemException e)
+        {
+            throw new PulseRuntimeException(e);
+        }
     }
 
     /**

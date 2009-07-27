@@ -2,7 +2,8 @@ package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.StringUtils;
+import static com.zutubi.util.StringUtils.toValidHtmlName;
+import static com.zutubi.util.StringUtils.urlEncodePath;
 
 /**
  * A page in the admin UI that displays a single composite.  This page
@@ -28,7 +29,7 @@ public class CompositePage extends ConfigPage
 
     public String getUrl()
     {
-        return urls.admin() + path + "/";
+        return urls.admin() + urlEncodePath(path) + "/";
     }
 
     public boolean isConfigureLinkPresent()
@@ -38,7 +39,7 @@ public class CompositePage extends ConfigPage
 
     public boolean isConfiguredDescendentPresent(String descendent)
     {
-        return browser.isElementIdPresent(StringUtils.toValidHtmlName("cd-" + descendent));
+        return browser.isElementIdPresent(toValidHtmlName("cd-" + descendent));
     }
 
     public void clickConfigure()

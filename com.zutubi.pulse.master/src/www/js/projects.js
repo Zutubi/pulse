@@ -24,17 +24,16 @@ ZUTUBI.BUILD_CELLS = '<td class="build-id fit-width">' +
                              '<img src="{base}/images/default/s.gif" class="popdown floating-widget" id="{buildId}_bactions_button" alt="build menu"/>' +
                          '</span>' +
                      '</td>' +
-                     '<td class="fit-width">' +
+                     '<td class="build-status fit-width">' +
                          ':: <span id="{buildId}.status"><img alt="status" src="{base}/images/{statusIcon}"/> {status}</span>' +
                      '</td>' +
-                     '<td class="build-details">' +
-                         '<tpl for="columns">{.} <tpl if="xindex &lt; xcount"><span class="understated">//</span> </tpl></tpl>' +
-                     '</td>';
+                     '<tpl for="columns"><td class="build-column">{.} <tpl if="xindex &lt; xcount"></tpl></td></tpl>';
 
-ZUTUBI.NO_BUILD_CELLS = '<td colspan="4" class="understated">this project has never been built</td>';
+ZUTUBI.NO_BUILD_CELLS = '<td colspan="{noBuildSpan}" class="understated">this project has never been built</td>';
 
-ZUTUBI.ConcreteProject = function(data, showHideLinks) {
+ZUTUBI.ConcreteProject = function(data, columnCount, showHideLinks) {
     this.data = data;
+    this.columnCount = columnCount;
     this.showHideLinks = showHideLinks;
     this.hidden = false;
     this.rows = [];
@@ -67,7 +66,8 @@ ZUTUBI.ConcreteProject.prototype = {
             base: window.baseUrl,
             indent: this.data.depth * 12,
             homeLink: window.baseUrl + '/' + this.getProjectTabLink('home'),
-            name: this.data.name
+            name: this.data.name,
+            noBuildSpan: this.columnCount + 3
         };
 
         // This is slightly more complex than adding the project row and then
@@ -264,11 +264,12 @@ ZUTUBI.ConcreteProject.prototype = {
     }
 };
 
-ZUTUBI.ProjectContainer = function(model, showHideLinks) {
+ZUTUBI.ProjectContainer = function(model, columnCount, showHideLinks) {
     this.model = model;
     this.children = [];
     this.hidden = false;
     this.childrenRendered = false;
+    this.columnCount = columnCount;
     this.showHideLinks = showHideLinks;
 };
 
@@ -286,11 +287,11 @@ ZUTUBI.ProjectContainer.prototype = {
                 var child;
                 if (childData.concrete)
                 {
-                    child = new ZUTUBI.ConcreteProject(childData, this.showHideLinks);
+                    child = new ZUTUBI.ConcreteProject(childData, this.columnCount, this.showHideLinks);
                 }
                 else
                 {
-                    child = new ZUTUBI.TemplateProject(childData, this.showHideLinks);
+                    child = new ZUTUBI.TemplateProject(childData, this.columnCount, this.showHideLinks);
                 }
 
                 previousRowEl = child.render(previousRowEl);
@@ -415,8 +416,8 @@ ZUTUBI.ProjectContainer.prototype = {
     }
 };
 
-ZUTUBI.TemplateProject = function(data, showHideLinks) {
-    ZUTUBI.TemplateProject.superclass.constructor.call(this, data, showHideLinks);
+ZUTUBI.TemplateProject = function(data, columnCount, showHideLinks) {
+    ZUTUBI.TemplateProject.superclass.constructor.call(this, data, columnCount, showHideLinks);
     this.data = data;
 };
 
@@ -430,7 +431,7 @@ Ext.extend(ZUTUBI.TemplateProject, ZUTUBI.ProjectContainer, {
             '</td>' +
             '<td class="project-template-actions">&nbsp;</td>' +
             '<td class="fit-width" colspan="3" id="{id}.building">{building}</td>' +
-            '<td class="build-details">' +
+            '<td class="build-details" colspan="{columnCount}">' +
                 'summary :: ' +
                 '<img alt="health: ok" src="{base}/images/health/ok.gif"> ok: {okCount} ' +
                 '<img alt="health: warnings" src="{base}/images/health/warnings.gif"> warnings: {warningCount} ' +
@@ -457,7 +458,8 @@ Ext.extend(ZUTUBI.TemplateProject, ZUTUBI.ProjectContainer, {
             building: this.data.building,
             okCount: this.data.okCount,
             warningCount: this.data.warningCount,
-            brokenCount: this.data.brokenCount
+            brokenCount: this.data.brokenCount,
+            columnCount: this.columnCount
         }, true);
 
         if (canExpand)
@@ -477,8 +479,8 @@ Ext.extend(ZUTUBI.TemplateProject, ZUTUBI.ProjectContainer, {
     }
 });
 
-ZUTUBI.ProjectGroup = function(data, rssEnabled, showHideLinks, last) {
-    ZUTUBI.ProjectGroup.superclass.constructor.call(this, data.root, showHideLinks);
+ZUTUBI.ProjectGroup = function(data, columnCount, rssEnabled, showHideLinks, last) {
+    ZUTUBI.ProjectGroup.superclass.constructor.call(this, data.root, columnCount, showHideLinks);
     this.data = data;
     this.rssEnabled = rssEnabled;
     this.last = last;
@@ -488,7 +490,7 @@ Ext.extend(ZUTUBI.ProjectGroup, ZUTUBI.ProjectContainer, {
     template: new Ext.XTemplate('<tr class="project-row project-expandable {collapsed}" id="{id}">' +
             '<td class="group-header health-{health}">&nbsp;</td>' +
             '<td class="group-header fit-width" colspan="5"><img src="{base}/images/default/s.gif" alt="-" class="group-name"/> {name:htmlEncode}</td>' +
-            '<td class="group-header build-details">' +
+            '<td class="group-header build-details" colspan="{columnCount}">' +
                 '<img alt="health: ok" src="{base}/images/health/ok.gif"> ok: {okCount} ' +
                 '<img alt="health: warnings" src="{base}/images/health/warnings.gif"> warnings: {warningCount} ' +
                 '<img alt="health: broken" src="{base}/images/health/broken.gif"> broken: {brokenCount}&nbsp;' +
@@ -507,6 +509,7 @@ Ext.extend(ZUTUBI.ProjectGroup, ZUTUBI.ProjectContainer, {
             brokenCount: this.data.root.brokenCount,
             encodedName: encodeURIComponent(this.data.groupName),
             collapsed: this.model.collapsed ? 'project-collapsed' : '',
+            columnCount: this.columnCount,
             rssEnabled: this.rssEnabled,
             showHideLinks: this.showHideLinks,
             labelled: this.data.labelled
@@ -544,9 +547,10 @@ Ext.extend(ZUTUBI.ProjectGroup, ZUTUBI.ProjectContainer, {
     }
 });
 
-ZUTUBI.ProjectsTable = function(containerEl, toolbarEl, rssEnabled, isDashboard) {
+ZUTUBI.ProjectsTable = function(containerEl, toolbarEl, columnCount, rssEnabled, isDashboard) {
     this.toolbarEl = toolbarEl;
     this.containerEl = containerEl;
+    this.columnCount = columnCount;
     this.rssEnabled = rssEnabled;
     this.isDashboard = isDashboard;
     this.groups = {};
@@ -670,7 +674,7 @@ ZUTUBI.ProjectsTable.prototype = {
                 var groupName = this.getGroupName(groupData);
                 this.applyPreviousState(groupData, previousGroups[groupName]);
 
-                var group = new ZUTUBI.ProjectGroup(groupData, this.rssEnabled, this.isDashboard, i == groupsData.length - 1);
+                var group = new ZUTUBI.ProjectGroup(groupData, this.columnCount, this.rssEnabled, this.isDashboard, i == groupsData.length - 1);
                 group.render(tableEl);
                 this.groups[groupName] = group;
             }

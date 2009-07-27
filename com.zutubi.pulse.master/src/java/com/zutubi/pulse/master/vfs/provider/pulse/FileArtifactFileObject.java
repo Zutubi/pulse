@@ -10,6 +10,7 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,7 +78,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
 
     protected String[] doListChildren() throws Exception
     {
-        return base.list();
+        return UriParser.encode(base.list());
     }
 
     protected long doGetContentSize() throws Exception

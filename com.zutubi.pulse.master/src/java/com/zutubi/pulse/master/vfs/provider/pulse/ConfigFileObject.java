@@ -12,6 +12,7 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -57,14 +58,24 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
     public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
         String collapsedCollection = ToveUtils.getCollapsedCollection(path, type, configurationSecurityManager);
+        String decodedBaseName;
+        try
+        {
+            decodedBaseName = UriParser.decode(fileName.getBaseName());
+        }
+        catch (org.apache.commons.vfs.FileSystemException e)
+        {
+            throw new FileSystemException(e);
+        }
+        
         String childPath;
         if (collapsedCollection == null)
         {
-            childPath = PathUtils.getPath(path, fileName.getBaseName());
+            childPath = PathUtils.getPath(path, decodedBaseName);
         }
         else
         {
-            childPath = PathUtils.getPath(path, collapsedCollection, fileName.getBaseName());
+            childPath = PathUtils.getPath(path, collapsedCollection, decodedBaseName);
         }
 
         Type childType = configurationTemplateManager.getType(childPath);
@@ -92,14 +103,14 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
         {
             if (collapsedCollection == null)
             {
-                childValue = (Record) value.get(fileName.getBaseName());
+                childValue = (Record) value.get(decodedBaseName);
             }
             else
             {
                 Record collection = (Record) value.get(collapsedCollection);
                 if (collection != null)
                 {
-                    childValue = (Record) collection.get(fileName.getBaseName());
+                    childValue = (Record) collection.get(decodedBaseName);
                 }
             }
         }
@@ -147,7 +158,7 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
     protected String[] doListChildren() throws Exception
     {
         List<String> listing = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
-        return listing.toArray(new String[listing.size()]);
+        return UriParser.encode(listing.toArray(new String[listing.size()]));
     }
 
     public Comparator<FileObject> getComparator()

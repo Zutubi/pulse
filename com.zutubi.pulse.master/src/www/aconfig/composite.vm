@@ -98,14 +98,13 @@
             <div class="config-container">
             <ul class="config-actions">
         #foreach($action in $config.actions)
-                    <li>
-                        <a href="#" id='#id("action.${action.action}")' class="unadorned"
             #if($action.action == "delete")
-                            onclick="deletePath('#jss(${path})'); return false;"
+                #set($onclick = "deletePath('#jss(${path})'); return false;")
             #else
-                            onclick="actionPath('#jss(${path})', '${action.action}', false); return false;"
+                #set($onclick = "actionPath('#jss(${path})', '${action.action}', false); return false;")
             #end
-                        >
+                    <li>
+                        <a href="#" id='#id("action.${action.action}")' class="unadorned" onclick="#html($onclick)">
                             <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
                         </a>
                     </li>
@@ -121,7 +120,8 @@
             <div class="config-container">
             <ul class="config-links">
         #foreach($prop in $config.nestedProperties)
-                    <li #if($config.isPropertyInvalid($prop)) class="invalid-property" #end><a href="#" onclick="selectPath('#jss(${path})/${prop}'); return false;">#displayname("path=${path}/${prop}")</a></li>
+            #set($onclick = "selectPath('#jss(${path})/${prop}'); return false;")
+                <li #if($config.isPropertyInvalid($prop)) class="invalid-property" #end><a href="#" onclick="#html($onclick)">#displayname("path=${path}/${prop}")</a></li>
         #end
             </ul>
             </div>
@@ -134,9 +134,10 @@
     #if($config.extensions.size() > 0)
         #if($config.writable)
             #if($config.configuredDescendents.size() == 0)
+                #set($onclick = "addToPath('#jss(${path})'); return false;")
     <table class="template-actions" cellspacing="5px">
         <tr>
-            <th><a href="#" class="unadorned" onclick="addToPath('#jss(${path})'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" id="configure" onclick="addToPath('${path}'); return false">configure</a></th>
+            <th><a href="#" class="unadorned" onclick="#html($onclick)"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" id="configure" onclick="#html($onclick)">configure</a></th>
             <td>configure a #i18n("key=label") using the wizard</td>
         </tr>
     </table>

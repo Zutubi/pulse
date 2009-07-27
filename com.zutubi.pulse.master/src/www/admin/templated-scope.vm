@@ -99,11 +99,6 @@
             configPanel.doLayout();
         }
 
-        var clonePath = function(path)
-        {
-            runAjaxRequest('$base/aconfig/' + path + '?clone=input');
-        }
-
         // ------------------------------------------------------------------
         // Template tree
         // ------------------------------------------------------------------

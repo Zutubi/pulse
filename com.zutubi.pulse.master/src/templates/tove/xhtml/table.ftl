@@ -3,7 +3,7 @@
     <#assign annotationId = "${id}:${baseName}"/>
     <img id="${annotationId?id}" src="${base}/images/${id}.gif" alt="${id}"/>
     <script type="text/javascript>
-        Ext.get("${annotationId?id?js_string}").dom.qtip = "${qtip}";
+        Ext.get("${annotationId?id?js_string}").dom.qtip = "${qtip?js_string}";
     </script>
 </#macro>
 
@@ -21,13 +21,13 @@
 <#if table.parameters.orderInheritedFrom?exists>
             <img id="order-inherited" src="${base}/images/inherited.gif" alt="order inherited"/>
             <script type="text/javascript>
-                Ext.get("order-inherited").dom.qtip = "order inherited from ${table.parameters.orderInheritedFrom}";
+                Ext.get("order-inherited").dom.qtip = "order inherited from ${table.parameters.orderInheritedFrom?js_string}";
             </script>
 </#if>
 <#if table.parameters.orderOverriddenOwner?exists>
             <img id="order-overridden" src="${base}/images/overridden.gif" alt="order overridden"/>
             <script type="text/javascript>
-                Ext.get("order-overridden").dom.qtip = "overrides order defined by ${table.parameters.orderOverriddenOwner}";
+                Ext.get("order-overridden").dom.qtip = "overrides order defined by ${table.parameters.orderOverriddenOwner?js_string}";
             </script>
 </#if>
        </th>
@@ -56,11 +56,11 @@
         <#else>
             <#if !table.isLastVisible(row)>
                 <#assign actionId = "down:${row.baseName}"/>
-            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string}', 'down', true); return false;"><img src="${base}/images/resultset_down.gif" alt="move down"/></a>
+            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string?html}', 'down', true); return false;"><img src="${base}/images/resultset_down.gif" alt="move down"/></a>
             </#if>
             <#if !table.isFirstVisible(row)>
                 <#assign actionId = "up:${row.baseName}"/>
-            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string}', 'up', true); return false;"><img src="${base}/images/resultset_up.gif" alt="move up"/></a>
+            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string?html}', 'up', true); return false;"><img src="${base}/images/resultset_up.gif" alt="move up"/></a>
             </#if>
         </#if>
         </td>
@@ -100,11 +100,11 @@
                 <#else>
                     <#assign clickAction = "select"/>
                 </#if>
-                onclick="${clickAction}Path('${row.path}'); return false">
+                onclick="${clickAction}Path('${row.path?js_string?html}'); return false">
             <#elseif actionLink.action == "delete">
-                onclick="deletePath('${row.path?js_string}'); return false;">
+                onclick="deletePath('${row.path?js_string?html}'); return false;">
             <#else>
-                onclick="actionPath('${row.path?js_string}', '${actionLink.action}', true); return false;">
+                onclick="actionPath('${row.path?js_string?html}', '${actionLink.action}', true); return false;">
             </#if>
             <#if actionLink.icon?exists>
                 <img alt="${actionLink.label?html}" src="${base}/images/config/actions/${actionLink.icon}.gif"/>
@@ -122,7 +122,7 @@
 <#if table.addAllowed>
     <tr>
         <td colspan="${table.width}">
-            <a id="map:add" class="unadorned" href="#" onclick="addToPath('${path}'); return false;">
+            <a id="map:add" class="unadorned" href="#" onclick="addToPath('${path?js_string?html}'); return false;">
                 <img alt="add" src="${base}/images/config/actions/add.gif"/>
                 ${"add.label"?i18n}
             </a>

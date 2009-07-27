@@ -8,6 +8,7 @@ import com.zutubi.util.Mapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.List;
 
@@ -47,13 +48,13 @@ public class PluginsFileObject extends AbstractPulseFileObject
     protected String[] doListChildren() throws Exception
     {
         List<Plugin> allPlugins = pluginManager.getPlugins();
-        return CollectionUtils.mapToArray(allPlugins, new Mapping<Plugin, String>()
+        return UriParser.encode(CollectionUtils.mapToArray(allPlugins, new Mapping<Plugin, String>()
         {
             public String map(Plugin plugin)
             {
                 return plugin.getId();
             }
-        }, new String[allPlugins.size()]);
+        }, new String[allPlugins.size()]));
     }
 
     public void setPluginManager(PluginManager pluginManager)

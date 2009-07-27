@@ -58,7 +58,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Query createQuery(Session session)
             {
-                Query queryObject = session.createQuery("from PersistentChangelist model where model.author in (:logins) order by model.time desc");
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.author in (:logins) order by model.time desc, model.id desc");
                 queryObject.setParameterList("logins", allLogins);
                 return queryObject;
             }
@@ -71,7 +71,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Query createQuery(Session session)
             {
-                Query queryObject = session.createQuery("from PersistentChangelist model where model.projectId = :projectId order by model.time desc");
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.projectId = :projectId order by model.time desc, model.id desc");
                 queryObject.setParameter("projectId", project.getId());
                 return queryObject;
             }
@@ -90,7 +90,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Query createQuery(Session session)
             {
-                Query queryObject = session.createQuery("from PersistentChangelist model where model.projectId in (:projectIds) order by model.time desc");
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.projectId in (:projectIds) order by model.time desc, model.id desc");
                 queryObject.setParameterList("projectIds", projectIds);
                 return queryObject;
             }
@@ -132,7 +132,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from PersistentChangelist model where model.resultId = :resultId order by model.time desc");
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.resultId = :resultId order by model.time desc, model.id desc");
                 queryObject.setParameter("resultId", id);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
