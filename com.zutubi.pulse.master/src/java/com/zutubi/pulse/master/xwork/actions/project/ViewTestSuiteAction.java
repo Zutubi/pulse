@@ -116,7 +116,7 @@ public class ViewTestSuiteAction extends StageActionBase
 
         File testDir = new File(node.getResult().getAbsoluteOutputDir(configurationManager.getDataDirectory()), RecipeResult.TEST_DIR);
 
-        path = stripPrefix(path, "/");
+        path = StringUtils.stripPrefix(path, "/");
         if(TextUtils.stringSet(path))
         {
             String[] elements = path.split("/");
@@ -149,15 +149,6 @@ public class ViewTestSuiteAction extends StageActionBase
         }
 
         return SUCCESS;
-    }
-
-    private String stripPrefix(String str, String prefix)
-    {
-        if(str != null && str.startsWith(prefix))
-        {
-            return str.substring(prefix.length());
-        }
-        return str;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
