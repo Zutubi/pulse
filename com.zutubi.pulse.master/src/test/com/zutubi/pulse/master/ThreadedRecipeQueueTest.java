@@ -7,11 +7,8 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.engine.PulseFileSource;
-import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -51,8 +48,6 @@ import java.util.concurrent.TimeUnit;
 
 public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutubi.events.EventListener
 {
-    private static final String PULSE_FILE = "<xml version=\"1.0\"><project default-recipe=\"default\"><recipe name=\"default\"/></project>";
-
     private ThreadedRecipeQueue queue;
     private Semaphore buildSemaphore;
     private Semaphore errorSemaphore;
@@ -474,7 +469,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         queuedRevision.lock();
         try
         {
-            queuedRevision.update(createRevision(revision), getPulseFileForRevision(revision));
+            queuedRevision.update(createRevision(revision));
         }
         finally
         {
@@ -487,25 +482,11 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         return createProjectConfig(0);
     }
 
-    private ProjectConfiguration createProjectConfig(int projectId)
+    private ProjectConfiguration createProjectConfig(final int projectId)
     {
         ProjectConfiguration projectConfig = new ProjectConfiguration();
         projectConfig.setProjectId(projectId);
-        CustomTypeConfiguration type = new CustomTypeConfiguration()
-        {
-            @Override
-            public PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
-            {
-                long number = Long.valueOf(revision.getRevisionString());
-                if (number == 0)
-                {
-                    throw new BuildException("test");
-                }
-                return getPulseFileForRevision(number);
-            }
-        };
-
-        projectConfig.setType(type);
+        projectConfig.setType(new CustomTypeConfiguration());
         return projectConfig;
     }
 
@@ -595,11 +576,6 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
     private void awaitDispatched() throws InterruptedException
     {
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-    }
-
-    private PulseFileSource getPulseFileForRevision(long revision)
-    {
-        return new PulseFileSource(PULSE_FILE + "<!--" + revision + "-->");
     }
 
     private void assertRecipeError(long id, String message)
@@ -694,7 +670,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         revision.lock();
         try
         {
-            revision.update(new Revision("1"), getPulseFileForRevision(1));
+            revision.update(new Revision("1"));
         }
         finally
         {

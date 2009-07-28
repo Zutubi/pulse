@@ -1,6 +1,12 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.model.TriggerOptions;
+import com.zutubi.pulse.master.scm.ScmFileResolver;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
@@ -13,7 +19,10 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Action links for the project config page.
@@ -37,6 +46,7 @@ public class ProjectConfigurationActions
     private ProjectManager projectManager;
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ScmManager scmManager;
 
     public boolean actionsEnabled(ProjectConfiguration instance, boolean deeplyValid)
     {
@@ -158,7 +168,8 @@ public class ProjectConfigurationActions
         CustomTypeConfiguration result = new CustomTypeConfiguration();
         try
         {
-            result.setPulseFileString(projectConfiguration.getType().getPulseFile(projectConfiguration, null, null).getFileContent());
+            ScmFileResolver resolver = new ScmFileResolver(projectConfiguration, Revision.HEAD, scmManager);
+            result.setPulseFileString(projectConfiguration.getType().getPulseFile().getFileContent(resolver));
         }
         catch (Exception e)
         {
@@ -222,5 +233,10 @@ public class ProjectConfigurationActions
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setScmManager(ScmManager scmManager)
+    {
+        this.scmManager = scmManager;
     }
 }

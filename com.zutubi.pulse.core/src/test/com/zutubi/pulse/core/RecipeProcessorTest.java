@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import com.zutubi.pulse.core.engine.FixedPulseFileSource;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
@@ -29,11 +30,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.IOUtils;
-import org.apache.ivy.Ivy;
-import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.plugins.resolver.DependencyResolver;
-import org.apache.ivy.util.MessageLoggerEngine;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -411,7 +408,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     private PulseFileSource getPulseFile(String name) throws IOException
     {
-        return new PulseFileSource(IOUtils.inputStreamToString(getInput(name, "xml")));
+        return new FixedPulseFileSource(IOUtils.inputStreamToString(getInput(name, "xml")));
     }
 
     public void handleEvent(Event evt)

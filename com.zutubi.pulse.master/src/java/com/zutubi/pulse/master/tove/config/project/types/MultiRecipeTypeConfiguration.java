@@ -1,13 +1,11 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
+import com.zutubi.pulse.core.engine.FixedPulseFileSource;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.ToveFileStorer;
-import com.zutubi.pulse.core.personal.PatchArchive;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.Element;
@@ -32,7 +30,7 @@ public class MultiRecipeTypeConfiguration extends TypeConfiguration
     @Transient
     private PulseFileLoaderFactory fileLoaderFactory;
 
-    public PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
+    public PulseFileSource getPulseFile() throws Exception
     {
         ProjectRecipesConfiguration prc = new ProjectRecipesConfiguration();
         prc.setDefaultRecipe(defaultRecipe);
@@ -43,7 +41,7 @@ public class MultiRecipeTypeConfiguration extends TypeConfiguration
         try
         {
             fileStorer.store(baos, prc, new Element("project"));
-            return new PulseFileSource(new String(baos.toByteArray()));
+            return new FixedPulseFileSource(new String(baos.toByteArray()));
         }
         finally
         {

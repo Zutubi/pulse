@@ -33,6 +33,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.CopyBootstrapper;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -188,7 +189,6 @@ public class RecipeController
         // Update the request and its context before it is sent to the agent.
         RecipeRequest recipeRequest = assignmentRequest.getRequest();
         BuildRevision buildRevision = assignmentRequest.getRevision();
-        recipeRequest.setPulseFileSource(buildRevision.getPulseFile());
 
         final ExecutionContext agentContext = recipeRequest.getContext();
         addRevisionProperties(agentContext, buildRevision);
@@ -338,7 +338,7 @@ public class RecipeController
         {
             logger.collecting(recipeResult, collectWorkingCopy);
             collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
-            copyBuildFields();
+            copyBuildScopedData();
         }
         catch (BuildException e)
         {
@@ -354,16 +354,48 @@ public class RecipeController
         }
     }
 
-    private void copyBuildFields()
+    private void copyBuildScopedData()
     {
-        File recipeOutputDir = recipeResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
+        File dataDir = configurationManager.getDataDirectory();
+        File buildOutputDir = buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
+        File recipeOutputDir = recipeResult.getAbsoluteOutputDir(dataDir);
+
+        copyPulseFile(buildOutputDir, recipeOutputDir);
+        copyBuildFields(buildOutputDir, recipeOutputDir);
+    }
+
+    private void copyPulseFile(File buildOutputDir, File recipeOutputDir)
+    {
+        File source = new File(recipeOutputDir, RecipeProcessor.PULSE_FILE);
+        File dest = new File(buildOutputDir, RecipeProcessor.PULSE_FILE);
+
+        // Only copy the first pulse file we see come back (they are all
+        // identical).
+        if (dest.exists())
+        {
+            FileSystemUtils.robustDelete(source);
+        }
+        else
+        {
+            try
+            {
+                FileSystemUtils.robustRename(source, dest);
+            }
+            catch (IOException e)
+            {
+                LOG.warning("Unable to rename pulse file from '" + source.getAbsolutePath() + "' to '" + dest.getAbsolutePath() + "'");
+            }
+        }
+    }
+
+    private void copyBuildFields(File buildOutputDir, File recipeOutputDir)
+    {
         File buildFieldsFile = new File(recipeOutputDir, RecipeProcessor.BUILD_FIELDS_FILE);
         if (buildFieldsFile.exists())
         {
             ResultCustomFields fromRecipeLoader = new ResultCustomFields(recipeOutputDir, RecipeProcessor.BUILD_FIELDS_FILE);
             Map<String,String> fromRecipeFields = fromRecipeLoader.load();
 
-            File buildOutputDir = buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
             ResultCustomFields toBuildLoader = new ResultCustomFields(buildOutputDir);
             Map<String, String> toBuildFields = toBuildLoader.load();
             toBuildFields.putAll(fromRecipeFields);

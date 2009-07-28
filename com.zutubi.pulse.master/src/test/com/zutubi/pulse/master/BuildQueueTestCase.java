@@ -4,7 +4,6 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.BuildRevision;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
-import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
@@ -17,6 +16,7 @@ import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
+import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.FileSystemUtils;
@@ -125,6 +125,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         ProjectConfiguration projectConfiguration = new ProjectConfiguration();
         projectConfiguration.setName(projectName);
         projectConfiguration.setScm(new MockScmConfiguration());
+        projectConfiguration.setType(new CustomTypeConfiguration());
         projectConfiguration.setProjectId(project.getId());
         project.setConfig(projectConfiguration);
         return project;
@@ -132,7 +133,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
 
     protected AbstractBuildRequestEvent createRequest(final Project owner, final long buildId, String source, boolean replaceable, Revision revision)
     {
-        BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, new PulseFileSource("pulse file"), false);
+        BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, false);
         TriggerOptions options = new TriggerOptions(null, source);
         options.setStatus(STATUS_INTEGRATION);
         options.setReplaceable(replaceable);

@@ -14,7 +14,6 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
@@ -258,20 +257,6 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             catch (ScmException e)
             {
                 addFieldError("revision", "Unable to verify revision: " + e.getMessage());
-                LOG.severe(e);
-                renderForm();
-                return INPUT;
-            }
-
-            // CIB-1162: Make sure we can get a pulse file at this revision
-            try
-            {
-                TypeConfiguration projectType = project.getConfig().getType();
-                projectType.getPulseFile(project.getConfig(), r, null);
-            }
-            catch (Exception e)
-            {
-                addFieldError("revision", "Unable to get pulse file for revision: " + e.getMessage());
                 LOG.severe(e);
                 renderForm();
                 return INPUT;

@@ -1,9 +1,11 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.util.api.XMLUtils;
+import com.zutubi.pulse.master.scm.ScmFileResolver;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import org.hsqldb.lib.StringInputStream;
 
 import java.io.InputStream;
@@ -15,6 +17,7 @@ public class DownloadProjectBuildFileAction extends ProjectActionBase
 {
     private InputStream inputStream;
     private long contentLength;
+    private ScmManager scmManager;
 
     public InputStream getInputStream()
     {
@@ -36,8 +39,8 @@ public class DownloadProjectBuildFileAction extends ProjectActionBase
         ProjectConfiguration projectConfig = getRequiredProject().getConfig();
         try
         {
-            TypeConfiguration typeConfiguration = projectConfig.getType();
-            String pulseFile = XMLUtils.prettyPrint(typeConfiguration.getPulseFile(projectConfig, null, null).getFileContent());
+            ScmFileResolver resolver = new ScmFileResolver(projectConfig, Revision.HEAD, scmManager);
+            String pulseFile = XMLUtils.prettyPrint(projectConfig.getType().getPulseFile().getFileContent(resolver));
             inputStream = new StringInputStream(pulseFile);
             contentLength = pulseFile.length();
         }
@@ -48,5 +51,10 @@ public class DownloadProjectBuildFileAction extends ProjectActionBase
         }
 
         return SUCCESS;
+    }
+
+    public void setScmManager(ScmManager scmManager)
+    {
+        this.scmManager = scmManager;
     }
 }

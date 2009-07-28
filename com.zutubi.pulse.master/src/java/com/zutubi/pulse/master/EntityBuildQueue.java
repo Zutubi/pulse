@@ -179,7 +179,7 @@ public class EntityBuildQueue
                 try
                 {
                     BuildRevision buildRevision = event.getRevision();
-                    if (activeBuild.getController().updateRevisionIfNotFixed(buildRevision.getRevision(), buildRevision.getPulseFile()))
+                    if (activeBuild.getController().updateRevisionIfNotFixed(buildRevision.getRevision()))
                     {
                         return true;
                     }

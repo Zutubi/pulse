@@ -7,9 +7,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.model.TestCaseIndex;
-import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -40,7 +38,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
-import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
@@ -867,8 +864,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
         try
         {
-            PulseFileSource pulseFile = getPulseFile(projectConfig, revision, patchFile);
-            BuildRevision buildRevision = revision == null ? new BuildRevision(): new BuildRevision(revision, pulseFile, false);
+            BuildRevision buildRevision = revision == null ? new BuildRevision(): new BuildRevision(revision, false);
             eventManager.publish(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, projectConfig));
         }
         catch (Exception e)
@@ -918,30 +914,12 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         try
         {
-            PulseFileSource pulseFile = getPulseFile(project.getConfig(), revision, null);
-
-            eventManager.publish(new BuildRequestEvent(this, project, new BuildRevision(revision, pulseFile, options.getReason().isUser()), options));
+            eventManager.publish(new BuildRequestEvent(this, project, new BuildRevision(revision, options.getReason().isUser()), options));
         }
         catch (Exception e)
         {
             LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
         }
-    }
-
-    private PulseFileSource getPulseFile(ProjectConfiguration projectConfig, Revision revision, File patchFile) throws Exception
-    {
-        TypeConfiguration type = projectConfig.getType();
-        PatchArchive archive = null;
-        try
-        {
-            archive = new PatchArchive(patchFile);
-        }
-        catch (PulseException e)
-        {
-            // TODO support patching pulse file for other patch formats.
-        }
-
-        return type.getPulseFile(projectConfig, revision, archive);
     }
 
     private void ensureTransitionPermission(Project project, Project.Transition transition)

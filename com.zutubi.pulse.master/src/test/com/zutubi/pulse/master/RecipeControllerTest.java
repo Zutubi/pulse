@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.engine.PulseFileSource;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -26,6 +25,7 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.AnyCapableAgentRequirements;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
@@ -72,9 +72,10 @@ public class RecipeControllerTest extends PulseTestCase
         RecipeRequest recipeRequest = new RecipeRequest(makeContext("project", rootResult.getId(), rootResult.getRecipeName()));
         Project project = new Project();
         ProjectConfiguration projectConfig = new ProjectConfiguration();
+        projectConfig.setType(new CustomTypeConfiguration());
         project.setConfig(projectConfig);
         BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), project, 1, false);
-        assignmentRequest = new RecipeAssignmentRequest(project, new AnyCapableAgentRequirements(), null, new BuildRevision(new Revision("0"), new PulseFileSource("dummy"), false), recipeRequest, null);
+        assignmentRequest = new RecipeAssignmentRequest(project, new AnyCapableAgentRequirements(), null, new BuildRevision(new Revision("0"), false), recipeRequest, null);
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
         {
             public File getDataDirectory()

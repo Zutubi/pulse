@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
 
@@ -37,7 +38,7 @@ public class DownloadBuildFileAction extends BuildActionBase
         BuildResult result = getRequiredBuildResult();
         try
         {
-            File file = new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE);
+            File file = new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), RecipeProcessor.PULSE_FILE);
             contentLength = file.length();
             inputStream = new FileInputStream(file);
         }

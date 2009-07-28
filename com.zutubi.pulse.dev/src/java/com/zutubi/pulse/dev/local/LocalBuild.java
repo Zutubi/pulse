@@ -3,7 +3,7 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.engine.ExternalPulseFileSource;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
@@ -12,7 +12,10 @@ import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Entry point for executing local builds within a development tree.
@@ -171,7 +174,7 @@ public class LocalBuild
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repository);
             context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipe);
             Bootstrapper bootstrapper = new LocalBootstrapper();
-            RecipeRequest request = new RecipeRequest(bootstrapper, loadPulseFile(baseDir, pulseFileName), context);
+            RecipeRequest request = new RecipeRequest(bootstrapper, new ExternalPulseFileSource(pulseFileName), context);
             recipeProcessor.build(request);
         }
         catch (FileNotFoundException e)
@@ -184,29 +187,6 @@ public class LocalBuild
         }
 
         printEpilogue(logFile);
-    }
-
-    private PulseFileSource loadPulseFile(File baseDir, String pulseFileName) throws PulseException
-    {
-        File pulseFile = new File(baseDir, pulseFileName);
-        FileInputStream pulseFileInputStream = null;
-        String content;
-
-        try
-        {
-            pulseFileInputStream = new FileInputStream(pulseFile);
-            content = IOUtils.inputStreamToString(pulseFileInputStream);
-        }
-        catch (IOException e)
-        {
-            throw new PulseException("Unable to load pulse file '" + pulseFile.getPath() + "': " + e.getMessage());
-        }
-        finally
-        {
-            IOUtils.close(pulseFileInputStream);
-        }
-
-        return new PulseFileSource(pulseFileName, content);
     }
 
     private void printPrologue(String pulseFile, String resourcesFile, String outputDir)

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
+import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.io.IOUtils;
@@ -32,10 +33,10 @@ public class ViewBuildFileAction extends BuildActionBase
 
         try
         {
-            is = new FileInputStream(new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE));
+            is = new FileInputStream(new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), RecipeProcessor.PULSE_FILE));
             os = new ByteArrayOutputStream();
             XmlXhtmlRenderer renderer = new XmlXhtmlRenderer();
-            renderer.highlight(BuildResult.PULSE_FILE, is, os, null, true);
+            renderer.highlight(RecipeProcessor.PULSE_FILE, is, os, null, true);
             highlightedFile = os.toString();
         }
         catch (IOException e)

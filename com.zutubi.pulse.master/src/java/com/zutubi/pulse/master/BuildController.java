@@ -11,10 +11,10 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
+import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId;
-import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -40,7 +40,6 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
-import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
@@ -212,6 +211,8 @@ public class BuildController implements EventListener
 
     private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode)
     {
+        PulseFileSource pulseFileSource = getPulseFileSource();
+
         for (BuildStageConfiguration stageConfig : projectConfig.getStages().values())
         {
             RecipeResult recipeResult = new RecipeResult(stageConfig.getRecipe());
@@ -233,6 +234,7 @@ public class BuildController implements EventListener
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, retrievalPattern);
 
             RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
+            recipeRequest.setPulseFileSource(pulseFileSource);
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);
             recipeRequest.addAllResourceRequirements(resourceRequirements);
             recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
@@ -256,6 +258,18 @@ public class BuildController implements EventListener
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             pendingRecipes++;
+        }
+    }
+
+    private PulseFileSource getPulseFileSource()
+    {
+        try
+        {
+            return projectConfig.getType().getPulseFile();
+        }
+        catch (Exception e)
+        {
+            throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
         }
     }
 
@@ -415,7 +429,7 @@ public class BuildController implements EventListener
             if (!buildRevision.isInitialised())
             {
                 buildLogger.status("Initialising build revision...");
-                updateRevision(buildRevision, null, null);
+                updateRevision(buildRevision, null);
                 buildLogger.status("Revision initialised to '" + buildRevision.getRevision().getRevisionString() + "'");
             }
         }
@@ -435,13 +449,10 @@ public class BuildController implements EventListener
      *
      * @param revision  the new revision, which may be null to indicate that
      *                  the latest revision should be used
-     * @param pulseFile the pulse file for the revision, ignored if revision is
-     *                  null (the pulse file will be obtained for the obtained
-     *                  latest revision)
      * @return true iff the revision was updated
      * @throws BuildException if the revision cannot be set due to an error
      */
-    public boolean updateRevisionIfNotFixed(Revision revision, PulseFileSource pulseFile)
+    public boolean updateRevisionIfNotFixed(Revision revision)
     {
         boolean updated = false;
 
@@ -451,7 +462,7 @@ public class BuildController implements EventListener
         {
             if (!buildRevision.isFixed())
             {
-                updateRevision(buildRevision, revision, pulseFile);
+                updateRevision(buildRevision, revision);
                 updated = true;
             }
         }
@@ -469,12 +480,11 @@ public class BuildController implements EventListener
         return updated;
     }
 
-    private void updateRevision(BuildRevision buildRevision, Revision revision, PulseFileSource pulseFile)
+    private void updateRevision(BuildRevision buildRevision, Revision revision)
     {
         if (revision == null)
         {
             revision = getLatestRevision();
-            pulseFile = getPulseFileForRevision(revision);
         }
 
         if (revision.equals(buildRevision.getRevision()))
@@ -482,7 +492,7 @@ public class BuildController implements EventListener
             return;
         }
 
-        buildRevision.update(revision, pulseFile);
+        buildRevision.update(revision);
     }
 
     private Revision getLatestRevision()
@@ -503,22 +513,6 @@ public class BuildController implements EventListener
         {
             throw new BuildException("Unable to retrieve latest revision: " + e.getMessage(), e);
         }
-    }
-
-    private PulseFileSource getPulseFileForRevision(Revision revision)
-    {
-        TypeConfiguration type = projectConfig.getType();
-        PulseFileSource pulseFile;
-        try
-        {
-            pulseFile = type.getPulseFile(projectConfig, revision, null);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
-        }
-        return pulseFile;
     }
 
     private Bootstrapper createPersonalBuildBootstrapper(final Bootstrapper initialBootstrapper)
@@ -728,15 +722,6 @@ public class BuildController implements EventListener
     private void handleFirstAssignment()
     {
         BuildRevision buildRevision = request.getRevision();
-
-        try
-        {
-            FileSystemUtils.createFile(new File(buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE), buildRevision.getPulseFile().getFileContent());
-        }
-        catch (IOException e)
-        {
-            LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
-        }
 
         MasterBuildProperties.addRevisionProperties(buildContext, buildRevision);
         getChanges(buildRevision);

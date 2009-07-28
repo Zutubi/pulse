@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
-import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.marshal.RelativeFileResolver;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.scm.ScmFileResolver;
@@ -54,10 +53,10 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
                     ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(stages, ProjectConfiguration.class);
                     if (projectConfig != null)
                     {
-                        PulseFileSource pulseFileSource = projectConfig.getType().getPulseFile(projectConfig, null, null);
+                        PulseFileSource pulseFileSource = projectConfig.getType().getPulseFile();
                         PulseFileLoader pulseFileLoader = fileLoaderFactory.createLoader();
-                        FileResolver fileResolver = new RelativeFileResolver(pulseFileSource.getPath(), new ScmFileResolver(projectConfig, Revision.HEAD, scmManager));
-                        return pulseFileLoader.loadAvailableRecipes(pulseFileSource.getFileContent(), fileResolver);
+                        ScmFileResolver resolver = new ScmFileResolver(projectConfig, Revision.HEAD, scmManager);
+                        return pulseFileLoader.loadAvailableRecipes(pulseFileSource.getFileContent(resolver), new RelativeFileResolver(pulseFileSource.getPath(), resolver));
                     }
 
                     return Collections.emptyList();

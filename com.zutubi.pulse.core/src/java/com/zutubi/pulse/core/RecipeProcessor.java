@@ -47,6 +47,7 @@ public class RecipeProcessor
     private static final Logger LOG = Logger.getLogger(RecipeProcessor.class);
 
     public static final String BUILD_FIELDS_FILE = "build." + ResultCustomFields.CUSTOM_FIELDS_FILE;
+    public static final String PULSE_FILE = "pulse.xml";
 
     private static final String LABEL_EXECUTE = "execute";
 
@@ -158,7 +159,6 @@ public class RecipeProcessor
         }
 
         executeRecipe(recipeConfiguration, status, context, outputDir);
-
     }
 
     private void compressResults(RecipePaths paths, boolean compressArtifacts, boolean compressWorkingCopy)
@@ -285,24 +285,34 @@ public class RecipeProcessor
         context.setLabel(SCOPE_RECIPE);
         PulseScope globalScope = new PulseScope(context.getScope());
 
-        // CIB-286: special case empty file for better reporting
-        PulseFileSource pulseFileSource = request.getPulseFileSource();
-        if (!TextUtils.stringSet(pulseFileSource.getFileContent()))
-        {
-            throw new BuildException("Unable to parse pulse file: File is empty");
-        }
+        LocalFileResolver localResolver = new LocalFileResolver(context.getWorkingDir());
 
-        // load the pulse file from the source.
         try
         {
+            // CIB-286: special case empty file for better reporting
+            PulseFileSource pulseFileSource = request.getPulseFileSource();
+            String pulseFileContent = pulseFileSource.getFileContent(localResolver);
+            storePulseFile(pulseFileContent, context);
+            if (!TextUtils.stringSet(pulseFileContent))
+            {
+                throw new BuildException("Unable to parse pulse file: File is empty");
+            }
+
+            // load the pulse file from the source.
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-            FileResolver fileResolver = new RelativeFileResolver(pulseFileSource.getPath(), new LocalFileResolver(context.getWorkingDir()));
-            return fileLoader.loadRecipe(pulseFileSource.getFileContent(), request.getRecipeName(), globalScope, fileResolver);
+            FileResolver relativeResolver = new RelativeFileResolver(pulseFileSource.getPath(), localResolver);
+            return fileLoader.loadRecipe(pulseFileContent, request.getRecipeName(), globalScope, relativeResolver);
         }
         catch (Exception e)
         {
             throw new BuildException("Unable to parse pulse file: " + e.getMessage(), e);
         }
+    }
+
+    private void storePulseFile(String pulseFileContent, PulseExecutionContext context) throws IOException
+    {
+        RecipePaths paths = context.getValue(PROPERTY_RECIPE_PATHS, RecipePaths.class);
+        FileSystemUtils.createFile(new File(paths.getOutputDir(), PULSE_FILE), pulseFileContent);
     }
 
     public void executeRecipe(RecipeConfiguration config, RecipeStatus status, PulseExecutionContext context, File outputDir)

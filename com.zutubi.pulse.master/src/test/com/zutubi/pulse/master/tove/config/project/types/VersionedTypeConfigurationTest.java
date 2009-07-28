@@ -1,14 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.pulse.core.personal.PatchArchive;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import org.hibernate.lob.ReaderInputStream;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.io.StringReader;
 
@@ -18,6 +14,7 @@ public class VersionedTypeConfigurationTest extends PulseTestCase
     private static final String VERSIONED_PULSE_FILE_CONTENT = "versioned content";
 
     private VersionedTypeConfiguration configuration;
+    private FileResolver mockResolver;
 
     @Override
     protected void setUp() throws Exception
@@ -26,34 +23,13 @@ public class VersionedTypeConfigurationTest extends PulseTestCase
         configuration = new VersionedTypeConfiguration();
         configuration.setPulseFileName(VERSIONED_PULSE_FILE_PATH);
 
+        mockResolver = mock(FileResolver.class);
         ReaderInputStream inputStream = new ReaderInputStream(new StringReader(VERSIONED_PULSE_FILE_CONTENT));
-        ScmClient mockClient = mock(ScmClient.class);
-        stub(mockClient.retrieve((ScmContext) anyObject(), eq(VERSIONED_PULSE_FILE_PATH), (Revision) anyObject())).toReturn(inputStream);
-
-        ScmManager mockScmManager = mock(ScmManager.class);
-        stub(mockScmManager.createClient(null)).toReturn(mockClient);
-        configuration.setScmManager(mockScmManager);
+        stub(mockResolver.resolve(VERSIONED_PULSE_FILE_PATH)).toReturn(inputStream);
     }
 
-    public void testNoPatch() throws Exception
+    public void testSimple() throws Exception
     {
-        assertEquals(VERSIONED_PULSE_FILE_CONTENT, configuration.getPulseFile(new ProjectConfiguration(), null, null).getFileContent());
-    }
-
-    public void testPatchNoChangeToPath() throws Exception
-    {
-        PatchArchive mockPatch = mock(PatchArchive.class);
-        stub(mockPatch.containsPath(VERSIONED_PULSE_FILE_PATH)).toReturn(false);
-        assertEquals(VERSIONED_PULSE_FILE_CONTENT, configuration.getPulseFile(new ProjectConfiguration(), null, mockPatch).getFileContent());
-    }
-
-    public void testPatchWithChangeToPath() throws Exception
-    {
-        final String NEW_CONTENT = "new content";
-
-        PatchArchive mockPatch = mock(PatchArchive.class);
-        stub(mockPatch.containsPath(VERSIONED_PULSE_FILE_PATH)).toReturn(true);
-        stub(mockPatch.retrieveFile(VERSIONED_PULSE_FILE_PATH)).toReturn(NEW_CONTENT);
-        assertEquals(NEW_CONTENT, configuration.getPulseFile(new ProjectConfiguration(), null, mockPatch).getFileContent());
+        assertEquals(VERSIONED_PULSE_FILE_CONTENT, configuration.getPulseFile().getFileContent(mockResolver));
     }
 }

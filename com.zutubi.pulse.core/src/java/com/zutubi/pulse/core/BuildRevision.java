@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.engine.PulseFileSource;
 import com.zutubi.pulse.core.scm.api.Revision;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -17,10 +16,6 @@ public class BuildRevision
      * determined.
      */
     private Revision revision;
-    /**
-     * The pulse file corresponding to the revision.
-     */
-    private PulseFileSource pulseFile;
     /**
      * True if the revision has been determined and should *not* change from
      * now on.
@@ -53,25 +48,18 @@ public class BuildRevision
      * Create a new revision that will stay fixed at the given revision.
      *
      * @param revision  the revision to build, which will not change.
-     * @param pulseFile the pulse file corresponding to the revision
      * @param user      if true, this is a user-specified revision (as
      *                  opposed to a fixed revision decided on by Pulse
      *                  itself, as happens e.g. when isolating changes).
      */
-    public BuildRevision(Revision revision, PulseFileSource pulseFile, boolean user)
+    public BuildRevision(Revision revision, boolean user)
     {
         if (revision == null)
         {
             throw new NullPointerException("Revision may not be null");
         }
 
-        if (pulseFile == null)
-        {
-            throw new NullPointerException("Pulse file may not be null");
-        }
-
         this.revision = revision;
-        this.pulseFile = pulseFile;
         this.user = user;
     }
 
@@ -82,15 +70,6 @@ public class BuildRevision
     public Revision getRevision()
     {
         return revision;
-    }
-
-    /**
-     * @return the pulse file for the project at our current revision, may be
-     *         null if this revision has not been initialised
-     */
-    public PulseFileSource getPulseFile()
-    {
-        return pulseFile;
     }
 
     /**
@@ -177,14 +156,12 @@ public class BuildRevision
     }
 
     /**
-     * Update to a new revision, with the corresponding pulse file.  The
-     * revision <strong>must not</strong> be fixed, and it <strong>must</strong>
-     * be locked when making this call.
+     * Update to a new revision.  The revision <strong>must not</strong> be
+     * fixed, and it <strong>must</strong> be locked when making this call.
      *
      * @param revision  the new revision to build
-     * @param pulseFile the pulse file corresponding to the revision
      */
-    public void update(Revision revision, PulseFileSource pulseFile)
+    public void update(Revision revision)
     {
         checkLocked();
 
@@ -194,7 +171,6 @@ public class BuildRevision
         }
 
         this.revision = revision;
-        this.pulseFile = pulseFile;
     }
 
     /**
