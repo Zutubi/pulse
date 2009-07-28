@@ -6,6 +6,9 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectDependenciesPage;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import static com.zutubi.util.CollectionUtils.asPair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -49,8 +52,8 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         ProjectDependenciesPage projectDependenciesPage = projectPage.clickDependenciesAndWait();
         DependencyForm form = projectDependenciesPage.clickAdd();
         form.waitFor();
-        
-        assertFalse(form.isProjectInOptions(projectHandle));
+
+        assertThat(form.getProjectOptions(), hasItem(projectHandle));
     }
 
     public void testDependencyStageOptionsBelongToSelectedProject() throws Exception
@@ -86,18 +89,18 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         form.setProject(projectAHandle);
         optionValues = form.getStagesOptionValues();
         assertEquals(5, optionValues.size());
-        assertTrue(optionValues.containsAll(getStageHandles(projectA, "1", "2", "3", "4", "default")));
+        assertThat(optionValues, hasItems(getStageHandles(projectA, "1", "2", "3", "4", "default")));
 
         form.setProject(projectBHandle);
         optionValues = form.getStagesOptionValues();
         assertEquals(3, optionValues.size());
-        List<String> projectBStageHandles = getStageHandles(projectB, "a", "b", "default");
-        assertTrue(optionValues.containsAll(projectBStageHandles));
+        String[] projectBStageHandles = getStageHandles(projectB, "a", "b", "default");
+        assertThat(optionValues, hasItems(projectBStageHandles));
 
         form.finishNamedFormElements(
                 asPair("project", projectBHandle), 
                 asPair("allStages", "false"),
-                asPair("stages", projectBStageHandles.get(1))
+                asPair("stages", projectBStageHandles[1])
         );
 
         // verify that the dependency appears as expected, with stage 'b' selected.
@@ -115,14 +118,14 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         return xmlRpcHelper.getConfigHandle("projects/" + name);
     }
 
-    private List<String> getStageHandles(String projectName, String... stageNames) throws Exception
+    private String[] getStageHandles(String projectName, String... stageNames) throws Exception
     {
         List<String> handles = new LinkedList<String>();
         for (String stageName : stageNames)
         {
             handles.add(xmlRpcHelper.getConfigHandle("projects/" + projectName + "/stages/" + stageName));
         }
-        return handles;
+        return handles.toArray(new String[handles.size()]);
     }
 
     private void addStages(String projectName, String... stageNames) throws Exception

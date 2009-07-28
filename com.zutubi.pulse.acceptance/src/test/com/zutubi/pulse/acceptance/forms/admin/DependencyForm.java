@@ -18,10 +18,9 @@ public class DependencyForm extends ConfigurationForm
         super(browser, DependencyConfiguration.class);
     }
 
-    public boolean isProjectInOptions(String projectHandle)
+    public List<String> getProjectOptions()
     {
-        List<String> options = Arrays.asList(getComboBoxOptions("project"));
-        return options.contains(projectHandle);
+        return Arrays.asList(getComboBoxOptions("project"));
     }
 
     public void setProject(String projectHandle)
