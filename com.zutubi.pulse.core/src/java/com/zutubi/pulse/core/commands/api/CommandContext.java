@@ -142,12 +142,10 @@ public interface CommandContext
      * pattern argument.
      *
      * @param name      name of the output
-     * @param publish   boolean indicating whether or not the output should be
-     *                  published. 
      * @param pattern   the regex pattern used to extract the name and type of
      *                  the artifact to be published from the file name.  The regex
      *                  requires two groups.  The first identifies the artifact name,
      *                  the second the artifact type.
      */
-    void setPublishOutput(String name, boolean publish, String pattern);
+    void markOutputForPublish(String name, String pattern);
 }

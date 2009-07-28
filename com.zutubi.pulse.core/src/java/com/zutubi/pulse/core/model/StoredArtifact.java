@@ -53,8 +53,10 @@ public class StoredArtifact extends Entity
      */
     private boolean publish;
 
-    // pattern used to extract the artifacts name and extension from the artifacts
-    // file name.  group 1 = name, group 2 = extension.
+    /**
+     * Pattern used to extract the artifacts name and extension from the artifacts file name.
+     * group 1 = name, group 2 = extension.
+     */
     private String pattern = "(.+)\\.(.+)";
 
     public StoredArtifact()

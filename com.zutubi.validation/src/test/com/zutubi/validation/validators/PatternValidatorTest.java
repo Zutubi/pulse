@@ -35,4 +35,14 @@ public class PatternValidatorTest extends FieldValidatorTestCase
         validator.validate(new FieldProvider("["));
         assertTrue(validationAware.hasErrors());
     }
+
+    public void testGroupCheck() throws ValidationException
+    {
+        ((PatternValidator)validator).setGroupCount(2);
+        validator.validate(new FieldProvider("(.+)\\.(.+)"));
+        assertFalse(validationAware.hasErrors());
+
+        validator.validate(new FieldProvider(".+\\.(.+)"));
+        assertTrue(validationAware.hasErrors());
+    }
 }

@@ -16,7 +16,7 @@ import java.util.List;
  * @see DirectoryOutput
  */
 @SymbolicName("zutubi.directoryOutputConfig")
-@Form(fieldOrder = {"name", "base", "inclusions", "exclusions", "postProcessors", "index", "type", "failIfNotPresent", "ignoreStale", "followSymlinks"})
+@Form(fieldOrder = {"name", "base", "inclusions", "exclusions", "postProcessors", "index", "type", "failIfNotPresent", "ignoreStale", "followSymlinks", "publish", "artifactPattern"})
 public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationSupport
 {
     private String base;

@@ -42,11 +42,15 @@ import java.util.*;
  */
 public class IvyClient
 {
+    public static final String NAMESPACE_EXTRA_ATTRIBUTES = "e";
+
     private static final Logger LOG = Logger.getLogger(IvyClient.class);
 
     private static final String[] ALL_CONFS = new String[]{"*"};
 
     public static final String CONFIGURATION_BUILD = "build";
+
+    private static final String DUMMY_NAME = "whatever";
 
     private Ivy ivy;
     private String ivyPattern;
@@ -218,13 +222,13 @@ public class IvyClient
     {
         DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, "integration", null);
         descriptor.addConfiguration(new Configuration(IvyClient.CONFIGURATION_BUILD));
-        descriptor.addExtraAttributeNamespace("e", "http://ant.apache.org/ivy/extra");
+        descriptor.addExtraAttributeNamespace(NAMESPACE_EXTRA_ATTRIBUTES, "http://ant.apache.org/ivy/extra");
 
-        String confName = "whatever";
+        String confName = DUMMY_NAME;
         descriptor.addConfiguration(new Configuration(confName));
 
         Map<String, String> extraAttributes = new HashMap<String, String>();
-        extraAttributes.put("e:stage", IvyUtils.ivyEncodeStageName(stage));
+        extraAttributes.put(NAMESPACE_EXTRA_ATTRIBUTES + ":stage", IvyUtils.ivyEncodeStageName(stage));
         MDArtifact ivyArtifact = new MDArtifact(descriptor, artifactName, artifactExtension, artifactExtension, null, extraAttributes);
         ivyArtifact.addConfiguration(confName);
         descriptor.addArtifact(confName, ivyArtifact);
@@ -246,7 +250,10 @@ public class IvyClient
             options.setHaltOnMissing(true);
 
             Collection missing = ivy.getPublishEngine().publish(descriptor, Arrays.asList(pattern), dependencyResolver, options);
-            // we expect missing to be empty, else throw an exception.
+            if (missing.size() > 0)
+            {
+                throw new IOException("Failed to publish " + artifact.getCanonicalPath());
+            }
         }
         finally
         {

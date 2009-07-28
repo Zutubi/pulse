@@ -148,9 +148,9 @@ public class TestCommandContext implements CommandContext
         links.put(name, url);
     }
 
-    public void setPublishOutput(String name, boolean b, String pattern)
+    public void markOutputForPublish(String name, String pattern)
     {
-        outputs.get(name).setPublish(b);
+        outputs.get(name).setPublish(true);
     }
 
     public File registerOutput(String name, String type)

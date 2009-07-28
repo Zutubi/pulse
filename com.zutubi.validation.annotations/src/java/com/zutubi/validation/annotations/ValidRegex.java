@@ -18,7 +18,11 @@ public @interface ValidRegex
 
     static final boolean DEFAULT_shortCircuit = true;
 
+    static final int DEFAULT_groupCount = 0;
+
     String defaultKeySuffix() default DEFAULT_defaultKeySuffix;
 
     boolean shortCircuit() default DEFAULT_shortCircuit;
+
+    int groupCount() default DEFAULT_groupCount;
 }

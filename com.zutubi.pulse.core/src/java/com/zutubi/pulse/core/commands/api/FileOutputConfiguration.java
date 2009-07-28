@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Required;
  * @see FileOutput
  */
 @SymbolicName("zutubi.fileOutputConfig")
-@Form(fieldOrder = {"name", "file", "postProcessors", "type", "failIfNotPresent", "ignoreStale"})
+@Form(fieldOrder = {"name", "file", "postProcessors", "type", "failIfNotPresent", "ignoreStale", "publish", "artifactPattern"})
 public class FileOutputConfiguration extends FileSystemOutputConfigurationSupport
 {
     @Required

@@ -42,7 +42,8 @@ public abstract class FileSystemOutputConfigurationSupport extends OutputConfigu
      * artifact name, and the files extension for the artifacts
      * extension.
      */
-    @ValidRegex
+    @ValidRegex(groupCount = 2)
+    @Wizard.Ignore
     private String artifactPattern = "(.+)\\.(.+)";
 
     protected FileSystemOutputConfigurationSupport()

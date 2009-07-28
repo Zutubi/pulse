@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  */
 public class ModuleDescriptorFactory
 {
-    public static final String NAMESPACE_EXTRA_ATTRIBUTES = "e";
+    public static final String NAMESPACE_EXTRA_ATTRIBUTES = IvyClient.NAMESPACE_EXTRA_ATTRIBUTES;
 
     /**
      * Create a descriptor based on the specified configuration.

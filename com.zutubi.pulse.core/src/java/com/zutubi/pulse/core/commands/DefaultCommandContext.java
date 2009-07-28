@@ -122,14 +122,14 @@ public class DefaultCommandContext implements CommandContext
         spec.getArtifact().setIndex(index);
     }
 
-    public void setPublishOutput(String name, boolean b, String pattern)
+    public void markOutputForPublish(String name, String pattern)
     {
         OutputSpec spec = registeredOutputs.get(name);
         if (spec == null)
         {
             throw new BuildException("Attempt to set publish for unknown output '" + name + "'");
         }
-        spec.getArtifact().setPublish(b);
+        spec.getArtifact().setPublish(true);
         spec.getArtifact().setArtifactPattern(pattern);
     }
 

@@ -1052,13 +1052,33 @@ public class BuildController implements EventListener
                                 Matcher m = p.matcher(artifactFile.getName());
                                 if (m.matches())
                                 {
-                                    String artifactName = m.group(1);
-                                    String artifactExt = m.group(2);
-                                    ivy.publish(mrid, stage, artifactName, artifactExt, artifactFile);
+                                    if (m.groupCount() < 2)
+                                    {
+                                        result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to match the 2 expected groups in file " + artifactFile.getName() + ". Skipping.");
+                                        successful = false;
+                                    }
+                                    else
+                                    {
+                                        String artifactName = m.group(1);
+                                        if (artifactName == null || artifactName.trim().length() == 0)
+                                        {
+                                            result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to capture an artifact name from file " + artifactFile.getName() + ". Skipping.");
+                                            successful = false;
+                                        }
+                                        String artifactExt = m.group(2);
+                                        if (artifactExt == null || artifactExt.trim().length() == 0)
+                                        {
+                                            result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to capture an artifact name from file " + artifactFile.getName() + ". Skipping.");
+                                            successful = false;
+                                        }
+                                        if (successful)
+                                        {
+                                            ivy.publish(mrid, stage, artifactName, artifactExt, artifactFile);
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    // fallback to default <name>.<ext> or ignore altogether?
                                     result.warning("Artifact pattern " + artifact.getArtifactPattern() + " does not match artifact file " + artifactFile.getName() + ". Skipping.");
                                     successful = false;
                                 }
