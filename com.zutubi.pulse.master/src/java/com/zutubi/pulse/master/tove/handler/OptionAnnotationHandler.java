@@ -12,7 +12,10 @@ import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.bean.BeanUtils;
+import com.zutubi.util.bean.BeanException;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -22,6 +25,8 @@ import java.util.List;
  */
 public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 {
+    private static final Logger LOG = Logger.getLogger(OptionAnnotationHandler.class);
+
     /**
      * Object factory provides access to object instantiation services.
      */
@@ -59,10 +64,31 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 
     public static void process(ConfigurationProvider configurationProvider, OptionProvider optionProvider, String parentPath, String baseName, OptionFieldDescriptor field)
     {
-        Configuration instance = null;
+        Object instance = null;
         if(baseName != null && configurationProvider != null)
         {
             instance = configurationProvider.get(PathUtils.getPath(parentPath, baseName), Configuration.class);
+        }
+
+        // In the case of the @Reference annotation, the presence of the 'dependentOn' field is used to
+        // replace the default 'instance' for use by the OptionProvider.  Note that the configured OptionProvider
+        // will need to expect that it will not be receiving the default instance.
+        if (field.hasParameter("dependentOn"))
+        {
+            String dependentField = (String) field.getParameter("dependentOn");
+            if (instance != null)
+            {
+                try
+                {
+                    instance = BeanUtils.getProperty(dependentField, instance);
+                }
+                catch (BeanException e)
+                {
+                    // This is caused by an annotation configuration problem.  Would be good to catch
+                    // this earlier.
+                    LOG.warning("Failed to retrieve dependent property.", e);
+                }
+            }
         }
 
         TypeProperty fieldTypeProperty = field.getProperty();

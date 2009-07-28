@@ -382,6 +382,11 @@ public abstract class SeleniumForm
         return fieldTypes;
     }
 
+    public void triggerEvent(String fieldName, String eventType)
+    {
+        browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(fieldName) + "'); field.fireEvent('"+ eventType +"', field);");
+    }
+
     public abstract String getFormName();
     public abstract String[] getFieldNames();
 }

@@ -1526,6 +1526,49 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         }
     },
 
+    /**
+     * Clear / reset the values of the item picker to an empty list.
+     */
+    clear: function()
+    {
+        if(!this.ValueRecord)
+        {
+            // Superclass onRender calls before we are ready.
+            return;
+        }
+
+        this.store.removeAll();
+        for(i = 0; i < this.hiddenFields.length; i++)
+        {
+            this.hiddenFields[i].remove();
+        }
+        this.hiddenFields = [];
+    },
+
+    /**
+     * Use the response data to define the options.   
+     * @param response  data to be used as options
+     * @param append    if true, the data will be appended to the existing options.
+     * If false, the existing options will be replaced.
+     */
+    loadOptions: function(response, append)
+    {
+        this.optionStore.loadData(response, append);  
+    },
+
+    /**
+     * Get a list of the current option keys.
+     */
+    getOptionValues: function()
+    {
+        var optionValues = [];
+        this.optionStore.each(function(record)
+        {
+            optionValues.push(record.data.value);
+        });
+        return optionValues;
+    },
+
     getTextForValue: function(value)
     {
         if(this.input)

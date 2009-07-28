@@ -533,6 +533,10 @@
             <result name="error" type="velocity">/ajax/generic-error-panel.vm</result>
         </action>
 
+        <action name="options" class="com.zutubi.pulse.master.tove.webwork.OptionsAction">
+            <result name="success" type="flexjson">options</result>
+        </action>
+
         <action name="help" class="com.zutubi.pulse.master.tove.webwork.help.TypeHelpAction">
             <result name="success" type="velocity">help.vm</result>
         </action>

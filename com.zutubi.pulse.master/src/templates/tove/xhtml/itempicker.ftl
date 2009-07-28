@@ -57,6 +57,30 @@
     var picker = new ZUTUBI.ItemPicker(fc);
     ${form.name}.add(picker);
     picker.on('change', updateButtons);
+
+<#if parameters.dependentOn?exists>
+    ${form.name}.items.each(function(field) {
+        if (field.id === 'zfid.' + '${parameters.dependentOn}') {
+            field.on('select', function(){
+                picker.clear();
+                //Question: do we do any masking here to indicate that we are loading data?
+                Ext.Ajax.request({
+                    url: window.baseUrl + '/aconfig/${path}?options',
+                    method: 'POST',
+                    params: {field:'${parameters.name}', dependency:field.getValue()},
+                    success: function(result, request){
+                        optionString = Ext.util.JSON.decode(result.responseText);
+                        picker.loadOptions(optionString, false);
+                    },
+                    failure: function(result, request){
+                        // What to do here
+                    }
+                });
+            });
+        }
+    });
+</#if>
+
 }());
 
 <#include "/tove/xhtml/controlfooter.ftl" />

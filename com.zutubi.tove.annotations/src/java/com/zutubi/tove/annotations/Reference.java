@@ -16,6 +16,17 @@ import java.lang.annotation.Target;
 @Handler(className = DefaultAnnotationHandlers.REFERENCE)
 public @interface Reference
 {
+    static final String DEFAULT_dependentOn = "";
+
     String optionProvider() default "com.zutubi.pulse.master.tove.config.DefaultReferenceOptionProvider";
     String cleanupTaskProvider() default "com.zutubi.tove.config.cleanup.DefaultReferenceCleanupTaskProvider";
+
+    /**
+     * A reference field that is dependent on another field uses that
+     * other field as the context instance for the option provider to
+     * calculate the options.
+     *
+     * @return the field that this field depends on.
+     */
+    String dependentOn() default DEFAULT_dependentOn;
 }

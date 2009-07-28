@@ -24,6 +24,7 @@ import org.apache.velocity.runtime.parser.node.Node;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  *
@@ -134,7 +135,9 @@ public class FormDirective extends ToveDirective
                 form.setAction(action);
             }
 
-            ToveUtils.renderForm(form, clazz, writer, configuration);
+            Map<String, Object> context = new HashMap<String, Object>();
+            context.put("path", path);
+            ToveUtils.renderForm(context, form, clazz, writer, configuration);
 
             return true;
         }

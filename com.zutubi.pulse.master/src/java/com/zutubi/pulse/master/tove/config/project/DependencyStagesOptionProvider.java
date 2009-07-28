@@ -7,6 +7,7 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeProperty;
 
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * An option provider that gives a list of stage names.
@@ -17,8 +18,21 @@ public class DependencyStagesOptionProvider extends DefaultReferenceOptionProvid
 
     public Map<String, String> getMap(Object instance, String path, TypeProperty property)
     {
-        Configuration c = configurationProvider.get(path, Configuration.class);
-        ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(c, ProjectConfiguration.class);
+        if (instance == null)
+        {
+            return Collections.emptyMap();
+        }
+
+        ProjectConfiguration projectConfig;
+        if (instance instanceof ProjectConfiguration)
+        {
+            projectConfig = (ProjectConfiguration) instance;
+        }
+        else
+        {
+            Configuration c = configurationProvider.get(path, Configuration.class);
+            projectConfig = configurationProvider.getAncestorOfType(c, ProjectConfiguration.class);
+        }
 
         return super.getMap(instance, projectConfig.getConfigurationPath(), property);
     }

@@ -28,7 +28,7 @@ public class DependencyConfiguration extends AbstractConfiguration
     /**
      * The project being depended upon.
      */
-    @Required @Reference @Select(optionProvider = "DependencyProjectOptionProvider")
+    @Required @Reference(optionProvider = "DependencyProjectOptionProvider")
     private ProjectConfiguration project;
 
     /**
@@ -45,7 +45,7 @@ public class DependencyConfiguration extends AbstractConfiguration
     @ControllingCheckbox(invert = true, dependentFields = {"stages"})
     private boolean allStages = true;
 
-    @Reference @Select(optionProvider = "DependencyStagesOptionProvider") 
+    @Reference(dependentOn = "project", optionProvider = "DependencyStagesOptionProvider")
     private List<BuildStageConfiguration> stages = new LinkedList<BuildStageConfiguration>();
 
     public String getOrg()
