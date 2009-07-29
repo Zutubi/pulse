@@ -30,6 +30,8 @@ public class WebManager
 
     private JettyServerManager jettyServerManager;
 
+    private boolean mainDeployed = false;
+
     /**
      * Load the setup process' xwork configuration.
      */
@@ -47,11 +49,17 @@ public class WebManager
     {
         ensureJettyStarted();
 
+        mainDeployed = true;
         loadXworkConfiguration("xwork.xml");
 
         // enable security only when the standard xwork file is loaded.
         SecurityManager securityManager = SpringComponentContext.getBean("securityManager");
         securityManager.secure();
+    }
+
+    public boolean isMainDeployed()
+    {
+        return mainDeployed;
     }
 
     private void loadXworkConfiguration(String name)

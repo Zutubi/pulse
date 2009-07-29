@@ -241,10 +241,6 @@
             </result>
         </action>
 
-        <action name="index!default" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
-            <result name="success" type="velocity">/index.vm</result>
-        </action>
-
         <action name="currentBuild" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/project-home.vm</result>

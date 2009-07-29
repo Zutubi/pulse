@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.webwork.dispatcher.mapper.agents.AgentsActionReso
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.browse.BrowseActionResolver;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.dashboard.MyBuildsActionResolver;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.server.ServerActionResolver;
+import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
@@ -48,6 +49,19 @@ public class PulseActionMapper implements ActionMapper
         configNamespaces.add("/atemplate");
     }
 
+    // Setup paths are only available during the setup.
+    private static final Set<String> setupNamespaces = new HashSet<String>();
+    {
+        setupNamespaces.add("migrate");
+        setupNamespaces.add("restore");
+        setupNamespaces.add("startup");
+        setupNamespaces.add("setup");
+        setupNamespaces.add("setupconfig");
+        setupNamespaces.add("upgrade");
+    }
+
+    private WebManager webManager = null;
+
     public ActionMapping getMapping(HttpServletRequest request)
     {
         String namespace = request.getServletPath();
@@ -55,6 +69,12 @@ public class PulseActionMapper implements ActionMapper
         if(path != null)
         {
             path = PathUtils.normalisePath(path);
+        }
+
+        // Is this a request for one of the setup paths?
+        if (isSetupRequest(request) && webManager.isMainDeployed())
+        {
+            return new ActionMapping("default", "", null, null);
         }
 
         ActionMapping mapping = null;
@@ -95,6 +115,12 @@ public class PulseActionMapper implements ActionMapper
         }
 
         return mapping;
+    }
+
+    private boolean isSetupRequest(HttpServletRequest request)
+    {
+        String[] pathElements = PathUtils.getPathElements(request.getServletPath());
+        return pathElements.length > 0 && setupNamespaces.contains(pathElements[0]);
     }
 
     private ActionMapping getConfigMapping(String namespace, String path, String query)
@@ -317,6 +343,11 @@ public class PulseActionMapper implements ActionMapper
     public String getUriFromActionMapping(ActionMapping mapping)
     {
         return delegate.getUriFromActionMapping(mapping);
+    }
+
+    public void setWebManager(WebManager webManager)
+    {
+        this.webManager = webManager;
     }
 
     public static void main(String argv[])
