@@ -7,6 +7,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectDependenciesPage;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 
@@ -54,7 +55,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         DependencyForm form = projectDependenciesPage.clickAdd();
         form.waitFor();
 
-        assertThat(form.getProjectOptions(), hasItem(projectHandle));
+        assertThat(form.getProjectOptions(), not(hasItem(projectHandle)));
     }
 
     public void testDependencyStageOptionsBelongToSelectedProject() throws Exception

@@ -1336,7 +1336,7 @@ public class StringUtils
      */
     public static String stripPrefix(String s, String prefix)
     {
-        if (s.startsWith(prefix))
+        if (s != null && s.startsWith(prefix))
         {
             return s.substring(prefix.length());
         }
