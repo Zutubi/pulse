@@ -224,14 +224,13 @@ public class IvyClient
         descriptor.addConfiguration(new Configuration(IvyClient.CONFIGURATION_BUILD));
         descriptor.addExtraAttributeNamespace(NAMESPACE_EXTRA_ATTRIBUTES, "http://ant.apache.org/ivy/extra");
 
-        String confName = DUMMY_NAME;
-        descriptor.addConfiguration(new Configuration(confName));
+        descriptor.addConfiguration(new Configuration(DUMMY_NAME));
 
         Map<String, String> extraAttributes = new HashMap<String, String>();
         extraAttributes.put(NAMESPACE_EXTRA_ATTRIBUTES + ":stage", IvyUtils.ivyEncodeStageName(stage));
         MDArtifact ivyArtifact = new MDArtifact(descriptor, artifactName, artifactExtension, artifactExtension, null, extraAttributes);
-        ivyArtifact.addConfiguration(confName);
-        descriptor.addArtifact(confName, ivyArtifact);
+        ivyArtifact.addConfiguration(DUMMY_NAME);
+        descriptor.addArtifact(DUMMY_NAME, ivyArtifact);
 
         String pattern = artifact.getAbsolutePath();
 

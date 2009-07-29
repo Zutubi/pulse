@@ -447,8 +447,8 @@ public class BuildController implements EventListener
      * The build revision for this build <strong>must</strong> be locked before
      * making this call.
      *
-     * @param revision  the new revision, which may be null to indicate that
-     *                  the latest revision should be used
+     * @param revision the new revision, which may be null to indicate that
+     *                 the latest revision should be used
      * @return true iff the revision was updated
      * @throws BuildException if the revision cannot be set due to an error
      */
@@ -1032,50 +1032,57 @@ public class BuildController implements EventListener
                             File outputDir = commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
                             File artifactFile = new File(outputDir, file.getPath());
 
-                            try
+                            successful = publishArtifact(result, stage, artifact, p, artifactFile);
+                            if (!successful)
                             {
-                                Matcher m = p.matcher(artifactFile.getName());
-                                if (m.matches())
-                                {
-                                    if (m.groupCount() < 2)
-                                    {
-                                        result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to match the 2 expected groups in file " + artifactFile.getName() + ". Skipping.");
-                                        successful = false;
-                                    }
-                                    else
-                                    {
-                                        String artifactName = m.group(1);
-                                        if (artifactName == null || artifactName.trim().length() == 0)
-                                        {
-                                            result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to capture an artifact name from file " + artifactFile.getName() + ". Skipping.");
-                                            successful = false;
-                                        }
-                                        String artifactExt = m.group(2);
-                                        if (artifactExt == null || artifactExt.trim().length() == 0)
-                                        {
-                                            result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to capture an artifact name from file " + artifactFile.getName() + ". Skipping.");
-                                            successful = false;
-                                        }
-                                        if (successful)
-                                        {
-                                            ivy.publish(mrid, stage, artifactName, artifactExt, artifactFile);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    result.warning("Artifact pattern " + artifact.getArtifactPattern() + " does not match artifact file " + artifactFile.getName() + ". Skipping.");
-                                    successful = false;
-                                }
-                            }
-                            catch (IOException e)
-                            {
-                                result.warning("Failed to publish artifact file: " + artifactFile + ". Cause: " + e.getMessage());
-                                successful = false;
+                                return;
                             }
                         }
                     }
                 }
+            }
+        }
+
+        private boolean publishArtifact(RecipeResult result, String stage, StoredArtifact artifact, Pattern p, File artifactFile)
+        {
+            try
+            {
+                Matcher m = p.matcher(artifactFile.getName());
+                if (m.matches())
+                {
+                    if (m.groupCount() < 2)
+                    {
+                        result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to match the 2 expected groups in file " + artifactFile.getName() + ". Skipping.");
+                        return false;
+                    }
+                    else
+                    {
+                        String artifactName = m.group(1);
+                        if (artifactName == null || artifactName.trim().length() == 0)
+                        {
+                            result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to capture an artifact name from file " + artifactFile.getName() + ". Skipping.");
+                            return false;
+                        }
+                        String artifactExt = m.group(2);
+                        if (artifactExt == null || artifactExt.trim().length() == 0)
+                        {
+                            result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to capture an artifact name from file " + artifactFile.getName() + ". Skipping.");
+                            return false;
+                        }
+                        ivy.publish(mrid, stage, artifactName, artifactExt, artifactFile);
+                        return true;
+                    }
+                }
+                else
+                {
+                    result.warning("Artifact pattern " + artifact.getArtifactPattern() + " does not match artifact file " + artifactFile.getName() + ". Skipping.");
+                    return false;
+                }
+            }
+            catch (IOException e)
+            {
+                result.warning("Failed to publish artifact file: " + artifactFile + ". Cause: " + e.getMessage());
+                return  false;
             }
         }
     }
