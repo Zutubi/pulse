@@ -11,4 +11,6 @@
         <ivy:resolve conf="build"/>
         <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
     </target>
+
+    <target name="dist"/>
 </project>

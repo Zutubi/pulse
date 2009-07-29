@@ -23,6 +23,10 @@
         <foreachbundle target="build.module"/>        
     </target>
 
+    <target name="dist" depends="init">
+        <foreachbundle target="dist"/>        
+    </target>
+
     <!--
     copy and extract the 3rd party packages for each bundle into the plugin/prepackages/<pluginId>
     directory so that the plugins will successfully deploy when pulse is run via IDEA.
