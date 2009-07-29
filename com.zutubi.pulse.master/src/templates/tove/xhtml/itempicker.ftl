@@ -59,26 +59,38 @@
     picker.on('change', updateButtons);
 
 <#if parameters.dependentOn?exists>
-    ${form.name}.items.each(function(field) {
+
+    var dependentField = ${form.name}.items.find(function(field) {
         if (field.id === 'zfid.' + '${parameters.dependentOn}') {
-            field.on('select', function(){
-                picker.clear();
-                //Question: do we do any masking here to indicate that we are loading data?
-                Ext.Ajax.request({
-                    url: window.baseUrl + '/aconfig/${path}?options',
-                    method: 'POST',
-                    params: {field:'${parameters.name}', dependency:field.getValue()},
-                    success: function(result, request){
-                        optionString = Ext.util.JSON.decode(result.responseText);
-                        picker.loadOptions(optionString, false);
-                    },
-                    failure: function(result, request){
-                        // What to do here
-                    }
-                });
-            });
+            return true;
         }
+        return false;
     });
+
+    if (dependentField) {
+        dependentField.on('select', function(){
+            var pane = Ext.get('nested-layout');
+            pane.mask('Please wait...');
+            window.actionInProgress = true;
+            picker.clear();
+            Ext.Ajax.request({
+                url: window.baseUrl + '/aconfig/${path}?options',
+                method: 'POST',
+                params: {field:'${parameters.name}', dependency:dependentField.getValue()},
+                success: function(result, request){
+                    optionString = Ext.util.JSON.decode(result.responseText);
+                    picker.loadOptions(optionString, false);
+                    pane.unmask();
+                    window.actionInProgress = false;
+                },
+                failure: function(result, request){
+                    showStatus('failed to update dependency stages options', 'failure');
+                    pane.unmask();
+                    window.actionInProgress = false;
+                }
+            });
+        });
+    }
 </#if>
 
 }());

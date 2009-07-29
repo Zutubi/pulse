@@ -28,9 +28,6 @@ import java.util.Map;
 //      configuraiton.  Generalising the implementation may be an option in the future. 
 public class OptionsAction extends ActionSupport
 {
-    // HMMzzz, the existing ToveActionSupport does not seem to be very relevant to the
-    // the processing we require here.
-
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ObjectFactory objectFactory;

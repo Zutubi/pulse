@@ -27,32 +27,16 @@ public class DependencyForm extends ConfigurationForm
     {
         setFieldValue("project", projectHandle);
 
+        // Ensure that actionInProgress is true before we wait for it to be false.  The ordering
+        // may seem a little odd here, but it will ensure that we wait until the options have been
+        // reloaded.
+        browser.evalExpression("selenium.browserbot.getCurrentWindow().actionInProgress = true;");
+
         // Simulate the select event on the project field to that the subsequent
         // processes (update of the option field) is triggered.
         triggerEvent("project", "select");
 
-        // The 'select' event triggers an ajax refresh of the stage fields options.  Wait for
-        // this refresh to complete before continueing.
-//        waitForAjaxCallToComplete();
-        // it seems that this ajax wait is only for the loading, and does not include the success/failure
-        // function calls.
-        try
-        {
-            // what is the best way to fix this?...
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException e)
-        {
-            // noop.
-        }
-    }
-
-    /**
-     * Wait for any pending Ext.Ajax calls to complete.
-     */
-    public void waitForAjaxCallToComplete()
-    {
-        browser.waitForCondition("selenium.browserbot.getCurrentWindow().Ext.Ajax.isLoading();");
+        browser.waitForCondition("selenium.browserbot.getCurrentWindow().actionInProgress === false;");
     }
 
     public Object getStagesValues()

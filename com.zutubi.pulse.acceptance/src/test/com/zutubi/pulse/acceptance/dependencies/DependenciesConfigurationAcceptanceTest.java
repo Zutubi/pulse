@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.hasItems;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * A set of acceptance tests focused on the dependency systems UI.
@@ -58,8 +59,6 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     public void testDependencyStageOptionsBelongToSelectedProject() throws Exception
     {
-        // two projects. Project A will have 5 stages, Project B will have 3 stages, Project C will
-        // depend on A or B.
         String projectA = random + "A";
         String projectB = random + "B";
         String projectC = random + "C";
@@ -68,11 +67,8 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         addProject(projectB, true);
         addProject(projectC, true);
 
-        addStages(projectA, "1", "2", "3", "4");
-        addStages(projectB, "a", "b");
-
-        String projectAHandle = getProjectHandle(projectA);
-        String projectBHandle = getProjectHandle(projectB);
+        addStages(projectA, "a1", "a2", "a3", "a4");
+        addStages(projectB, "b1", "b2");
 
         loginAsAdmin();
 
@@ -86,31 +82,51 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         List<String> optionValues = form.getStagesOptionValues();
         assertEquals(0, optionValues.size());
 
-        form.setProject(projectAHandle);
-        optionValues = form.getStagesOptionValues();
-        assertEquals(5, optionValues.size());
-        assertThat(optionValues, hasItems(getStageHandles(projectA, "1", "2", "3", "4", "default")));
-
-        form.setProject(projectBHandle);
-        optionValues = form.getStagesOptionValues();
-        assertEquals(3, optionValues.size());
-        String[] projectBStageHandles = getStageHandles(projectB, "a", "b", "default");
-        assertThat(optionValues, hasItems(projectBStageHandles));
+        assertExpectedStageOptions(form, projectA, "a1", "a2", "a3", "a4", "default");
+        assertExpectedStageOptions(form, projectB, "b1", "b2", "default");
 
         form.finishNamedFormElements(
-                asPair("project", projectBHandle), 
+                asPair("project", getProjectHandle(projectB)),
                 asPair("allStages", "false"),
-                asPair("stages", projectBStageHandles[1])
+                asPair("stages", getStageHandles(projectB, "b1")[0])
         );
+        projectDependenciesPage.waitFor();
 
-        // verify that the dependency appears as expected, with stage 'b' selected.
+        assertDependenciesTableRow(projectDependenciesPage, 1, projectB, "latest.integration", "b1", "true");
 
-        // Hmmzz, finding the path to the newly created dependency instance is problematic.  In particular,
-        // it is projects/projectName/dependencies/dependencies/xyz, where xyz is that dependency instances
-        // name.  However, that name is not available on the instance itself, nor from the dependencies list
-        // in the DependenciesConfiguration instance.
-        // TODO: check form (not just wizard as above).
-        //projectDependenciesPage.clickView(projectBHandle);
+        Vector<String> listing = xmlRpcHelper.getConfigListing("projects/" + projectC + "/dependencies/dependencies");
+        String dependencyName = listing.get(0);
+
+        form = projectDependenciesPage.clickView(dependencyName);
+        form.waitFor();
+        
+        assertExpectedStageOptions(form, projectA, "a1", "a2", "a3", "a4", "default");
+        form.saveNamedFormElements(
+                asPair("project", getProjectHandle(projectA)),
+                asPair("allStages", "false"),
+                asPair("stages", getStageHandles(projectA, "a1")[0])
+        );
+        projectDependenciesPage.waitFor();
+
+        assertDependenciesTableRow(projectDependenciesPage, 1, projectA, "latest.integration", "a1", "true");
+    }
+
+    private void assertDependenciesTableRow(ProjectDependenciesPage page, int rowIndex, String project, String revision, String stages, String transitive)
+    {
+        String[] row = page.getDependencyRow(rowIndex);
+        assertEquals(project, row[0]);
+        assertEquals(revision, row[1]);
+        assertEquals(stages, row[2]);
+        assertEquals(transitive, row[3]);
+    }
+
+    private void assertExpectedStageOptions(DependencyForm form, String projectName, String... expectedStages) throws Exception
+    {
+        String projectHandle = getProjectHandle(projectName);
+        form.setProject(projectHandle);
+        List<String> optionValues = form.getStagesOptionValues();
+        assertEquals(expectedStages.length, optionValues.size());
+        assertThat(optionValues, hasItems(getStageHandles(projectName, expectedStages)));
     }
 
     private String getProjectHandle(String name) throws Exception
