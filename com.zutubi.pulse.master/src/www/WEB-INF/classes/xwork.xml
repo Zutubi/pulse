@@ -336,21 +336,6 @@
         </action>
     </package>
 
-    <package name="setup" namespace="/setup" extends="webwork-default-package">
-        <!--
-        a simple redirect to ensure that if the setup requests actions (e.g.
-        due to a refresh at the time the contexts are switched over) from
-        this xwork config, it handles it gracefully.
-         -->
-        <action name="setup" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
-            <result name="success" type="redirect">/</result>
-        </action>
-
-        <action name="execute" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
-            <result name="success" type="redirect">/</result>
-        </action>
-    </package>
-
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 

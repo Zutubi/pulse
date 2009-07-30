@@ -54,9 +54,7 @@ public class PulseActionMapper implements ActionMapper
     {
         setupNamespaces.add("migrate");
         setupNamespaces.add("restore");
-        setupNamespaces.add("startup");
         setupNamespaces.add("setup");
-        setupNamespaces.add("setupconfig");
         setupNamespaces.add("upgrade");
     }
 
@@ -74,7 +72,7 @@ public class PulseActionMapper implements ActionMapper
         // Is this a request for one of the setup paths?
         if (isSetupRequest(request) && webManager.isMainDeployed())
         {
-            return new ActionMapping("default", "", null, null);
+            return new ActionMapping("starting", "/startup", null, new HashMap());
         }
 
         ActionMapping mapping = null;
