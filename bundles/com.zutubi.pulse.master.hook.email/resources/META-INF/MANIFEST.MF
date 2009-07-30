@@ -2,4 +2,4 @@ Bundle-Name: Email Committers Build Hook Task
 Bundle-SymbolicName: com.zutubi.pulse.master.hook.email; singleton:=true
 Bundle-Description: A build hook task that can be used to email users that committed changes (even if they do not have Pulse accounts).
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.0.0
+Bundle-Version: 2.1.0

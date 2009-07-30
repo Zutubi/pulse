@@ -41,7 +41,10 @@ public interface PatchFormat
      * If there are no changes to the local working copy, the implementation should report this
      * using the UI available in the context and return false.
      * <p/>
-     * Required for all implementations.
+     * Implementations need not support this method if the patch file can be obtained via other
+     * means.  Instead, an {@link UnsupportedOperationException} can be thrown. In that case no SCM
+     * plugin should register this patch format as its default - the format will only be used when a
+     * patch file created separately by the user is submitted to Pulse.
      *
      * @param workingCopy implementation used to interact with the working copy
      * @param context     the context in which the operation is run, in particular contains the base
@@ -97,4 +100,14 @@ public interface PatchFormat
      * @throws ScmException on any error
      */
     List<FileStatus> readFileStatuses(File patchFile) throws ScmException;
+
+    /**
+     * Tests if a file appears to be a patch in this format.  This is not an exact test, so a valid
+     * implementation can always return false.  However, a better guess may lead to more convenience
+     * for the user (as it may relieve them from specifying patch formats explicitly).
+     *
+     * @param patchFile the file to test
+     * @return true if this file appears to be a patch in this format.
+     */
+    boolean isPatchFile(File patchFile);
 }

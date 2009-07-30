@@ -1,0 +1,6 @@
+This is a simple text file.
+It has a few lines.
+
+They are mostly boring though.
+Apart from this one which has the dubious honour of being edited!
+That's enough excitement for one day.

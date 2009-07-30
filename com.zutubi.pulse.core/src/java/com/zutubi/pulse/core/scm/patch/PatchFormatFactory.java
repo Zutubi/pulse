@@ -3,6 +3,9 @@ package com.zutubi.pulse.core.scm.patch;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.util.Pair;
 
+import java.io.File;
+import java.util.List;
+
 /**
  * An interface for factories that can create {@link com.zutubi.pulse.core.scm.patch.api.PatchFormat}
  * instances based on types.
@@ -16,6 +19,13 @@ public interface PatchFormatFactory
      * @return true if the type is recognised, false otherwise
      */
     boolean isValidFormatType(String formatType);
+
+    /**
+     * Returns a list of all known format types.
+     *
+     * @return all known format types
+     */
+    List<String> getFormatTypes();
 
     /**
      * Creates a patch format to use with SCMs of the given type.  This is
@@ -39,4 +49,15 @@ public interface PatchFormatFactory
      *         the type is unrecognised
      */
     PatchFormat createByFormatType(String formatType);
+
+    /**
+     * Attempts to guess the type of a patch file.  The guess is deferred to
+     * the various formats.  If only one format claims it, that guess is
+     * returned.  If none or multiple claim it, null is returned.
+     *
+     * @param patchFile file to guess the format type for
+     * @return a guess of the format type for the patch, or null if no
+     *         unambiguous guess can be made
+     */
+    String guessFormatType(File patchFile);
 }

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.dev.personal;
 
+import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
@@ -24,6 +25,16 @@ public class PersonalBuildContext
 
     public WorkingCopy getWorkingCopy()
     {
+        return workingCopy;
+    }
+
+    public WorkingCopy getRequiredWorkingCopy() throws PersonalBuildException
+    {
+        if (workingCopy == null)
+        {
+            throw new PersonalBuildException("Personal builds are not supported for this SCM.");
+        }
+
         return workingCopy;
     }
 

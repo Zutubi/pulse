@@ -35,6 +35,7 @@ public class PersonalBuildConfig implements Config
     public static final String PROPERTY_REVISION = "revision";
     public static final String PROPERTY_UPDATE = "update";
     public static final String PROPERTY_PATCH_FILE = "patch.file";
+    public static final String PROPERTY_PATCH_TYPE = "patch.format";
     public static final String PROPERTY_SEND_REQUEST = "send.request";
 
     private File base;
@@ -199,6 +200,16 @@ public class PersonalBuildConfig implements Config
     public void setPatchFile(String patchFile)
     {
         setProperty(PROPERTY_PATCH_FILE, patchFile);
+    }
+
+    public String getPatchType()
+    {
+        return getProperty(PROPERTY_PATCH_TYPE);
+    }
+
+    public void setPatchType(String patchType)
+    {
+        setProperty(PROPERTY_PATCH_TYPE, patchType);
     }
 
     public boolean getSendRequest()

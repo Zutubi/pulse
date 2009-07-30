@@ -60,6 +60,7 @@ public class PersonalBuildClientFactory
         addPropertyOption(switchConfig, options, 'r', "project", PersonalBuildConfig.PROPERTY_PROJECT);
         addPropertyOption(switchConfig, options, 'e', "revision", PersonalBuildConfig.PROPERTY_REVISION);
         addPropertyOption(switchConfig, options, 'f', "file", PersonalBuildConfig.PROPERTY_PATCH_FILE);
+        addPropertyOption(switchConfig, options, 't', "patch-type", PersonalBuildConfig.PROPERTY_PATCH_TYPE);
 
         addBooleanOption(switchConfig, options, "send-request", PersonalBuildConfig.PROPERTY_SEND_REQUEST);
         addBooleanOption(switchConfig, options, "update", PersonalBuildConfig.PROPERTY_UPDATE);

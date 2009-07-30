@@ -31,16 +31,17 @@ public class PersonalBuildCommand implements Command
         {
             PersonalBuildContext context = client.checkConfiguration(patchFormatFactory);
             PersonalBuildRevision revision = client.chooseRevision(context);
-            if (revision.isUpdateSupported())
-            {
-                client.updateIfDesired(context, revision.getRevision());
-            }
 
             File patchFile;
             PersonalBuildConfig config = client.getConfig();
             String patchFilename = config.getPatchFile();
-            if(patchFilename == null)
+            if (patchFilename == null)
             {
+                if (revision.isUpdateSupported())
+                {
+                    client.updateIfDesired(context, revision.getRevision());
+                }
+
                 try
                 {
                     patchFile = File.createTempFile("pulse.patch.", ".zip");
@@ -51,13 +52,18 @@ public class PersonalBuildCommand implements Command
                     client.getUI().error("Unable to create temporary patch file: " + e.getMessage(), e);
                     return 1;
                 }
+
+                if (!client.preparePatch(context, patchFile, config.getFiles()))
+                {
+                    return 1;
+                }
             }
             else
             {
                 patchFile = new File(patchFilename);
             }
 
-            if (client.preparePatch(context, patchFile, config.getFiles()) && config.getSendRequest())
+            if (config.getSendRequest())
             {
                 client.sendRequest(context, revision.getRevision(), patchFile);
             }
@@ -123,6 +129,7 @@ public class PersonalBuildCommand implements Command
         options.put("-p [--password] password", I18N.format("flag.password"));
         options.put("-b [--base-dir] dir", I18N.format("flag.base.dir"));
         options.put("-f [--file] filename", I18N.format("flag.file"));
+        options.put("-t [--patch-type] type", I18N.format("flag.patch.type"));
         options.put("-d [--define] name=value", I18N.format("flag.define"));
         options.put("-q [--quiet]", I18N.format("flag.quiet"));
         options.put("-v [--verbose]", I18N.format("flag.verbose"));

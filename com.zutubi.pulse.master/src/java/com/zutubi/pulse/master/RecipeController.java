@@ -367,23 +367,26 @@ public class RecipeController
     private void copyPulseFile(File buildOutputDir, File recipeOutputDir)
     {
         File source = new File(recipeOutputDir, RecipeProcessor.PULSE_FILE);
-        File dest = new File(buildOutputDir, RecipeProcessor.PULSE_FILE);
+        if (source.exists())
+        {
+            File dest = new File(buildOutputDir, RecipeProcessor.PULSE_FILE);
 
-        // Only copy the first pulse file we see come back (they are all
-        // identical).
-        if (dest.exists())
-        {
-            FileSystemUtils.robustDelete(source);
-        }
-        else
-        {
-            try
+            // Only copy the first pulse file we see come back (they are all
+            // identical).
+            if (dest.exists())
             {
-                FileSystemUtils.robustRename(source, dest);
+                FileSystemUtils.robustDelete(source);
             }
-            catch (IOException e)
+            else
             {
-                LOG.warning("Unable to rename pulse file from '" + source.getAbsolutePath() + "' to '" + dest.getAbsolutePath() + "'");
+                try
+                {
+                    FileSystemUtils.robustRename(source, dest);
+                }
+                catch (IOException e)
+                {
+                    LOG.warning("Unable to rename pulse file from '" + source.getAbsolutePath() + "' to '" + dest.getAbsolutePath() + "'");
+                }
             }
         }
     }

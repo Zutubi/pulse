@@ -1,0 +1,11 @@
+--- build.xml	(revision 16)
++++ build.xml	(working copy)
+@@ -1,7 +1,7 @@
+ <?xml version="1.0"?>
+ <project default="default">
+     <target name="default">
+-        <sleep seconds="1"/>
++        <fail message="unified diffs will sink you"/>
+     </target>
+     <target name="slow">
+         <sleep seconds="100"/>

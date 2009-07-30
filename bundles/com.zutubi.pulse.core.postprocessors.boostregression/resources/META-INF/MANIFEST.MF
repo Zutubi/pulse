@@ -2,5 +2,5 @@ Bundle-Name: Boost Regression Post-Processor
 Bundle-SymbolicName: com.zutubi.pulse.core.postprocessors.boostregression; singleton:=true
 Bundle-Description: A post-processor that reads test results from Boost regression reports.
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.0.0
-Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.0.0,3.0.0)"
+Bundle-Version: 2.1.0
+Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.1.0,2.2.0)"

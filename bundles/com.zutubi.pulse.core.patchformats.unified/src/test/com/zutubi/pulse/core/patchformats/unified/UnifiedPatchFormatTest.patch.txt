@@ -1,0 +1,9 @@
+--- original.txt	2009-07-30 15:39:06.000000000 +0100
++++ original.txt	2009-07-30 15:39:35.000000000 +0100
+@@ -2,5 +2,5 @@
+ It has a few lines.
+ 
+ They are mostly boring though.
+-Apart from this one!
++Apart from this one which has the dubious honour of being edited!
+ That's enough excitement for one day.

@@ -5,7 +5,7 @@
         <config class="com.zutubi.pulse.core.scm.git.config.GitConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.patchformats">
-        <scm name="git" class="com.zutubi.pulse.core.scm.git.GitPatchFormat"/>
+        <patch-format name="git" class="com.zutubi.pulse.core.scm.git.GitPatchFormat"/>
     </extension>
     <extension point="com.zutubi.pulse.core.scms">
         <scm name="git"

@@ -194,4 +194,18 @@ public class StandardPatchFormat implements PatchFormat
             throw new ScmException(e);
         }
     }
+
+    public boolean isPatchFile(File patchFile)
+    {
+        try
+        {
+            // See if it is a zip with a meta file.
+            new PatchArchive(patchFile);
+            return true;
+        }
+        catch (PulseException e)
+        {
+            return false;
+        }
+    }
 }

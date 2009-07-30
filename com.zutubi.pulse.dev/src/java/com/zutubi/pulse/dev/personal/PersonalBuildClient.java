@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.Pair;
+import com.zutubi.util.Sort;
 import com.zutubi.util.TextUtils;
 import nu.xom.ParsingException;
 import nu.xom.XMLException;
@@ -28,6 +29,7 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -209,45 +211,29 @@ public class PersonalBuildClient
             ui.debug("Checking configuration and obtaining project SCM details...");
             ScmLocation scmLocation = rpc.preparePersonalBuild(token, config.getProject());
             ui.debug("Configuration accepted.");
+
             String scmType = scmLocation.getType();
             ui.debug("SCM type: " + scmType);
 
             WorkingCopyContext context = new WorkingCopyContextImpl(config.getBase(), config, ui);
             WorkingCopy wc = WorkingCopyFactory.create(scmType);
-            if (wc == null)
+            if (config.getPatchFile() == null)
             {
-                throw new PersonalBuildException("Personal builds are not supported for this SCM (" + scmType + ")");
-            }
+                checkRepositoryIfRequired(wc, context, scmLocation);
 
-            Pair<String, PatchFormat> typeAndFormat = patchFormatFactory.createByScmType(scmType);
-            if (typeAndFormat == null)
-            {
-                throw new PersonalBuildException("Patching is not supported for this SCM (" + scmType + ")");
-            }
-
-            if (config.getCheckRepository())
-            {
-                ui.debug("Checking working copy matches project SCM configuration");
-                if (!wc.matchesLocation(context, scmLocation.getLocation()))
+                Pair<String, PatchFormat> typeAndFormat = patchFormatFactory.createByScmType(scmType);
+                if (typeAndFormat == null)
                 {
-                    YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.wc.mismatch", new Object[]{ config.getProject() }), true, false, YesNoResponse.NO);
-                    if (response.isPersistent())
-                    {
-                        config.setCheckRepository(!response.isAffirmative());
-                    }
+                    throw new PersonalBuildException("No patch format registered for this SCM (" + scmType + ")");
+                }
 
-                    if (!response.isAffirmative())
-                    {
-                        throw new UserAbortException();
-                    }
-                }
-                else
-                {
-                    ui.debug("Configuration matches.");
-                }
+                return new PersonalBuildContext(wc, context, typeAndFormat.first, typeAndFormat.second);
             }
-
-            return new PersonalBuildContext(wc, context, typeAndFormat.first, typeAndFormat.second);
+            else
+            {
+                String patchType = guessExistingPatchType(patchFormatFactory);
+                return new PersonalBuildContext(wc, context, patchType, patchFormatFactory.createByFormatType(patchType));
+            }
         }
         catch (PersonalBuildException e)
         {
@@ -259,6 +245,58 @@ public class PersonalBuildClient
         }
     }
 
+    private void checkRepositoryIfRequired(WorkingCopy wc, WorkingCopyContext context, ScmLocation scmLocation) throws ScmException, UserAbortException
+    {
+        if (config.getCheckRepository())
+        {
+            ui.debug("Checking working copy matches project SCM configuration");
+            if (!wc.matchesLocation(context, scmLocation.getLocation()))
+            {
+                YesNoResponse response = ui.yesNoPrompt(I18N.format("prompt.wc.mismatch", new Object[]{ config.getProject() }), true, false, YesNoResponse.NO);
+                if (response.isPersistent())
+                {
+                    config.setCheckRepository(!response.isAffirmative());
+                }
+
+                if (!response.isAffirmative())
+                {
+                    throw new UserAbortException();
+                }
+            }
+            else
+            {
+                ui.debug("Configuration matches.");
+            }
+        }
+    }
+
+    private String guessExistingPatchType(PatchFormatFactory patchFormatFactory) throws PersonalBuildException
+    {
+        String patchFilename = config.getPatchFile();
+        File patchFile = new File(patchFilename);
+        if (!patchFile.exists())
+        {
+            throw new PersonalBuildException("Specified patch file '" + patchFilename + "' does not exist.");
+        }
+        
+        String patchType = config.getPatchType();
+        if (patchType == null)
+        {
+            ui.status("Guessing format of patch file...");
+            patchType = patchFormatFactory.guessFormatType(patchFile);
+            if (patchType == null)
+            {
+                List<String> supportedTypes = patchFormatFactory.getFormatTypes();
+                Collections.sort(supportedTypes, new Sort.StringComparator());
+                throw new PersonalBuildException("Unable to guess type of patch.  Please specify a type (supported types are " + supportedTypes + ").");
+            }
+
+            ui.status("Guessed type '" + patchType + "'.");
+        }
+
+        return patchType;
+    }
+
     public PersonalBuildRevision chooseRevision(PersonalBuildContext context) throws PersonalBuildException
     {
         String chosenRevision = config.getRevision();
@@ -266,7 +304,8 @@ public class PersonalBuildClient
         if (!TextUtils.stringSet(chosenRevision))
         {
             fromConfig = false;
-            Set<WorkingCopyCapability> capabilities = context.getWorkingCopy().getCapabilities();
+            WorkingCopy workingCopy = context.getWorkingCopy();
+            Set<WorkingCopyCapability> capabilities = workingCopy == null ? Collections.<WorkingCopyCapability>emptySet() : workingCopy.getCapabilities();
 
             List<MenuOption<String>> options = new LinkedList<MenuOption<String>>();
             if (capabilities.contains(WorkingCopyCapability.LOCAL_REVISION))
@@ -339,7 +378,7 @@ public class PersonalBuildClient
         ui.enterContext();
         try
         {
-            revision = context.getWorkingCopy().guessLocalRevision(context.getWorkingCopyContext());
+            revision = context.getRequiredWorkingCopy().guessLocalRevision(context.getWorkingCopyContext());
         }
         catch (ScmException e)
         {
@@ -360,7 +399,7 @@ public class PersonalBuildClient
         ui.status(I18N.format("status.getting.latest.revision"));
         try
         {
-            revision = context.getWorkingCopy().getLatestRemoteRevision(context.getWorkingCopyContext());
+            revision = context.getRequiredWorkingCopy().getLatestRemoteRevision(context.getWorkingCopyContext());
         }
         catch (ScmException e)
         {
@@ -378,7 +417,7 @@ public class PersonalBuildClient
     public void updateIfDesired(PersonalBuildContext context, Revision revision) throws PersonalBuildException
     {
         WorkingCopy wc = context.getWorkingCopy();
-        if (wc.getCapabilities().contains(WorkingCopyCapability.UPDATE))
+        if (wc != null && wc.getCapabilities().contains(WorkingCopyCapability.UPDATE))
         {
             Boolean update = config.getUpdate();
             if (update == null)
@@ -426,7 +465,7 @@ public class PersonalBuildClient
 
             try
             {
-                created = context.getPatchFormat().writePatchFile(context.getWorkingCopy(), context.getWorkingCopyContext(), patchFile, spec);
+                created = context.getPatchFormat().writePatchFile(context.getRequiredWorkingCopy(), context.getWorkingCopyContext(), patchFile, spec);
             }
             finally
             {

@@ -5,7 +5,10 @@ import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.util.Pair;
 import com.zutubi.util.bean.ObjectFactory;
 
+import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +48,11 @@ public class DefaultPatchFormatFactory implements PatchFormatFactory
         return formatMapping.containsKey(formatType);
     }
 
+    public List<String> getFormatTypes()
+    {
+        return new LinkedList<String>(formatMapping.keySet());
+    }
+
     public Pair<String, PatchFormat> createByScmType(String scmType)
     {
         String formatType = scmMapping.get(scmType);
@@ -72,6 +80,29 @@ public class DefaultPatchFormatFactory implements PatchFormatFactory
         {
             throw new PulseRuntimeException(e);
         }
+    }
+
+    public String guessFormatType(File patchFile)
+    {
+        String guess = null;
+        for (String formatType: formatMapping.keySet())
+        {
+            PatchFormat format = createByFormatType(formatType);
+            if (format.isPatchFile(patchFile))
+            {
+                if (guess == null)
+                {
+                    guess = formatType;
+                }
+                else
+                {
+                    // Ambiguous, bail out.
+                    return null;
+                }
+            }
+        }
+
+        return guess;
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

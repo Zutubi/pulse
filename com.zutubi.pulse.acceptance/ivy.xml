@@ -35,6 +35,7 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.git" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.svn" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.p4" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.patchformats.unified" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cppunit" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cunit" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.unittestpp" rev="latest.integration" conf="*->@"/>

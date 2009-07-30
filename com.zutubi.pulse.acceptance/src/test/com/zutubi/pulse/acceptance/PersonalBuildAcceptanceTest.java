@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.patchformats.unified.UnifiedPatchFormat;
 import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -130,7 +131,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         createConfigFile(random);
         loginAsAdmin();
 
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
@@ -294,6 +295,45 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         SystemUtils.runCommandWithInput(null, pd);
     }
 
+    public void testUnifiedPatch() throws Exception
+    {
+        File patchFile = copyInputToDirectory("txt", workingCopyDir);
+        // Specify a revision and a patch file and no working copy should be
+        // required.
+        createConfigFile(PROJECT_NAME,
+                asPair(PersonalBuildConfig.PROPERTY_REVISION, WorkingCopy.REVISION_FLOATING),
+                asPair(PersonalBuildConfig.PROPERTY_PATCH_FILE, patchFile.getAbsolutePath()));
+
+        loginAsAdmin();
+        ensureProject(PROJECT_NAME);
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
+        long buildNumber = runPersonalBuild(ResultState.FAILURE);
+
+        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTextPresent("unified diffs will sink you");
+
+        PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
+        assertEquals("build.xml", changesPage.getChangedFile(0));
+    }
+
+    public void testPatchToVersionedPulseFile() throws Exception
+    {
+        checkout(Constants.VERSIONED_REPOSITORY);
+        File patchFile = copyInputToDirectory("txt", workingCopyDir);
+        createConfigFile(random, asPair(PersonalBuildConfig.PROPERTY_PATCH_FILE, patchFile.getAbsolutePath()));
+
+        loginAsAdmin();
+
+        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
+        long buildNumber = runPersonalBuild(ResultState.ERROR);
+        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTextPresent("nosuchrecipe");
+        
+        browser.openAndWaitFor(PersonalBuildFilePage.class, buildNumber);
+        assertTextPresent("default-recipe=\"nosuchrecipe\"");
+    }
+
     private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception
     {
         Hashtable<String, Object> hook = xmlRpcHelper.createEmptyConfig(hookClass);
@@ -402,6 +442,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         patchFormatFactory.registerScm(SubversionClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);
         patchFormatFactory.registerFormatType("git", GitPatchFormat.class);
         patchFormatFactory.registerScm("git", "git");
+        patchFormatFactory.registerFormatType("unified", UnifiedPatchFormat.class);
         patchFormatFactory.setObjectFactory(new DefaultObjectFactory());
 
         PersonalBuildCommand command = new PersonalBuildCommand();

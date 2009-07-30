@@ -49,6 +49,7 @@ public class Constants
      * Subversion URL for a versioned pulse file project.
      */
     public static final String VERSIONED_REPOSITORY = SUBVERSION_ACCEPT_REPO + "testversioned";
+    public static final String VERSIONED_PULSE_FILE = "pulse/pulse.xml";
 
     /**
      * @return the url of the test git repository

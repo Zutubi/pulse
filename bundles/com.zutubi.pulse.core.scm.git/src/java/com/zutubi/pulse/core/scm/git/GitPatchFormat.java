@@ -160,4 +160,33 @@ public class GitPatchFormat implements PatchFormat
             throw new GitException("Unable to parse git patch: " + e.getMessage(), e);
         }
     }
+
+    public boolean isPatchFile(File patchFile)
+    {
+        try
+        {
+            // Check the first hundred lines for anything that looks like a git
+            // diff header.
+            BufferedReader reader = new BufferedReader(new FileReader(patchFile));
+            for (int i = 0; i < 100; i++)
+            {
+                String line = reader.readLine();
+                if (line == null)
+                {
+                    break;
+                }
+
+                if (line.startsWith("diff --git"))
+                {
+                    return true;
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            // Fall through.
+        }
+
+        return false;
+    }
 }

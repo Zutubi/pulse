@@ -1,0 +1,9 @@
+--- pulse/pulse.xml	(revision 16)
++++ pulse/pulse.xml	(working copy)
+@@ -1,5 +1,5 @@
+ <?xml version="1.0"?>
+-<project default-recipe="default">
++<project default-recipe="nosuchrecipe">
+     <import path="../properties.xml"/>
+     <import path="../optional.xml" optional="true"/>
+     <import path="include/macros.xml"/>
