@@ -35,9 +35,9 @@ public class ProjectDependenciesPage extends CompositePage
         row = row + 1; // skip the table header row.
         return new DependencyRow(
                 browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0),
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0),
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0),
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0)
+                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 1),
+                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 2),
+                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 3)
         );
     }
 
