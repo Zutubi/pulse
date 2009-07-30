@@ -31,6 +31,7 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven2" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.msbuild" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.xcode" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.patchformats.unified" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.boostregression" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.boosttest" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cppunit" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
