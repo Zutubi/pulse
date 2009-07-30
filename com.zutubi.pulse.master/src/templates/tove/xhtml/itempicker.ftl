@@ -60,13 +60,7 @@
 
 <#if parameters.dependentOn?exists>
 
-    var dependentField = ${form.name}.items.find(function(field) {
-        if (field.id === 'zfid.' + '${parameters.dependentOn}') {
-            return true;
-        }
-        return false;
-    });
-
+    var dependentField = ${form.name}.findField('zfid.${parameters.dependentOn}');
     if (dependentField) {
         dependentField.on('select', function(){
             var pane = Ext.get('nested-layout');

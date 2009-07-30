@@ -114,11 +114,11 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     private void assertDependenciesTableRow(ProjectDependenciesPage page, int rowIndex, String project, String revision, String stages, String transitive)
     {
-        String[] row = page.getDependencyRow(rowIndex);
-        assertEquals(project, row[0]);
-        assertEquals(revision, row[1]);
-        assertEquals(stages, row[2]);
-        assertEquals(transitive, row[3]);
+        ProjectDependenciesPage.DependencyRow row = page.getDependencyRow(rowIndex);
+        assertEquals(project, row.getProjectName());
+        assertEquals(revision, row.getRevision());
+        assertEquals(stages, row.getStageList());
+        assertEquals(transitive, row.getTransitive());
     }
 
     private void assertExpectedStageOptions(DependencyForm form, String projectName, String... expectedStages) throws Exception

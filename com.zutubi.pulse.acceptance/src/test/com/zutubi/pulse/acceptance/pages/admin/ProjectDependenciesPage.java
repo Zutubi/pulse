@@ -9,6 +9,8 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class ProjectDependenciesPage extends CompositePage
 {
+    private static final String DEPENDENTY_TABLE_ID = "config-table";
+
     public ProjectDependenciesPage(SeleniumBrowser browser, Urls urls, String path)
     {
         super(browser, urls, path);
@@ -26,18 +28,17 @@ public class ProjectDependenciesPage extends CompositePage
      *
      * @param row   the row index, starting at 1.
      *
-     * @return the contents of the row in the form of an array.  Index 0 is the project name,
-     * index 1 is the revision, index 2 is the stage list, index 3 is the transitive field.
+     * @return the contents of the row
      */
-    public String[] getDependencyRow(int row)
+    public DependencyRow getDependencyRow(int row)
     {
         row = row + 1; // skip the table header row.
-        String[] content = new String[4];
-        content[0] = browser.getCellContents("config-table", row, 0);
-        content[1] = browser.getCellContents("config-table", row, 1);
-        content[2] = browser.getCellContents("config-table", row, 2);
-        content[3] = browser.getCellContents("config-table", row, 3);
-        return content;
+        return new DependencyRow(
+                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0),
+                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0),
+                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0),
+                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0)
+        );
     }
 
     public DependencyForm clickView(String baseName)
@@ -51,4 +52,39 @@ public class ProjectDependenciesPage extends CompositePage
         return browser.createForm(DependencyForm.class);
     }
 
+    public class DependencyRow
+    {
+        String projectName;
+        String revision;
+        String stageList;
+        String transitive;
+
+        public DependencyRow(String projectName, String revision, String stageList, String transitive)
+        {
+            this.projectName = projectName;
+            this.revision = revision;
+            this.stageList = stageList;
+            this.transitive = transitive;
+        }
+
+        public String getProjectName()
+        {
+            return projectName;
+        }
+
+        public String getRevision()
+        {
+            return revision;
+        }
+
+        public String getStageList()
+        {
+            return stageList;
+        }
+
+        public String getTransitive()
+        {
+            return transitive;
+        }
+    }
 }
