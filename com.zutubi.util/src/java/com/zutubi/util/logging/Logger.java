@@ -41,7 +41,12 @@ public class Logger
 
     public void severe(String msg)
     {
-        severe(msg, null);
+        severe(msg, (Throwable) null);
+    }
+
+    public void severe(String msg, Object... args)
+    {
+        severe(String.format(msg, args), (Throwable) null);
     }
 
     public void severe(String msg, Throwable t)

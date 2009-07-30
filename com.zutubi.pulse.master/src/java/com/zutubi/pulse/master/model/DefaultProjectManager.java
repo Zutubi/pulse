@@ -854,7 +854,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    public void triggerBuild(long number, Project project, User user, Revision revision, File patchFile) throws PulseException
+    public void triggerBuild(long number, Project project, User user, Revision revision, File patchFile, String patchFormat) throws PulseException
     {
         ProjectConfiguration projectConfig = getProjectConfig(project.getId(), false);
         if(projectConfig == null)
@@ -865,7 +865,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         try
         {
             BuildRevision buildRevision = revision == null ? new BuildRevision(): new BuildRevision(revision, false);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, projectConfig));
+            eventManager.publish(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, patchFormat, projectConfig));
         }
         catch (Exception e)
         {

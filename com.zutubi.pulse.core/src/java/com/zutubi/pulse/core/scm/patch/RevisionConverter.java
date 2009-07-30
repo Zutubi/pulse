@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.personal;
+package com.zutubi.pulse.core.scm.patch;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;

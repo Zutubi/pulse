@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
@@ -358,16 +357,6 @@ public class CvsClient implements ScmClient
     public String getEmailAddress(ScmContext context, String user) throws ScmException
     {
         throw new ScmException("Operation not supported");
-    }
-
-    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
-    {
-        return StandardPatchFileSupport.applyPatch(patchFile, baseDir, localEOL, scmFeedbackHandler);
-    }
-
-    public List<FileStatus> readFileStatuses(ScmContext context, File patchFile) throws ScmException
-    {
-        return StandardPatchFileSupport.readFileStatuses(patchFile);
     }
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException

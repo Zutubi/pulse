@@ -4,10 +4,9 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
-import com.zutubi.pulse.core.scm.api.WorkingCopy;
-import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
+import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
-import com.zutubi.util.Pair;
 import org.apache.commons.cli.ParseException;
 
 import java.io.File;
@@ -20,23 +19,21 @@ import java.util.Map;
 /**
  * A command-line interface for requesting personal builds.
  */
-@SuppressWarnings({ "AccessStaticViaInstance" })
 public class PersonalBuildCommand implements Command
 {
     private static final Messages I18N = Messages.getInstance(PersonalBuildCommand.class);
+
+    private PatchFormatFactory patchFormatFactory;
 
     public int execute(PersonalBuildClient client)
     {
         try
         {
-            Pair<WorkingCopy, WorkingCopyContext> pair = client.checkConfiguration();
-            WorkingCopy wc = pair.first;
-            WorkingCopyContext context = pair.second;
-
-            PersonalBuildRevision revision = client.chooseRevision(wc, context);
+            PersonalBuildContext context = client.checkConfiguration(patchFormatFactory);
+            PersonalBuildRevision revision = client.chooseRevision(context);
             if (revision.isUpdateSupported())
             {
-                client.updateIfDesired(wc, context, revision.getRevision());
+                client.updateIfDesired(context, revision.getRevision());
             }
 
             File patchFile;
@@ -60,9 +57,9 @@ public class PersonalBuildCommand implements Command
                 patchFile = new File(patchFilename);
             }
 
-            if (client.preparePatch(wc, context, patchFile, config.getFiles()) && config.getSendRequest())
+            if (client.preparePatch(context, patchFile, config.getFiles()) && config.getSendRequest())
             {
-                client.sendRequest(revision.getRevision(), patchFile);
+                client.sendRequest(context, revision.getRevision(), patchFile);
             }
         }
         catch (UserAbortException e)
@@ -83,6 +80,7 @@ public class PersonalBuildCommand implements Command
         DevBootstrapManager.startup("com/zutubi/pulse/dev/personal/bootstrap/context/applicationContext.xml");
         try
         {
+            setPatchFormatFactory((PatchFormatFactory) SpringComponentContext.getBean("patchFormatFactory"));
             return execute(PersonalBuildClientFactory.newInstance(argv));
         }
         finally
@@ -141,6 +139,11 @@ public class PersonalBuildCommand implements Command
         return false;
     }
 
+    public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
+    {
+        this.patchFormatFactory = patchFormatFactory;
+    }
+
     public static void main(String[] argv)
     {
         PersonalBuildCommand command = new PersonalBuildCommand();
@@ -156,7 +159,7 @@ public class PersonalBuildCommand implements Command
         {
             e.printStackTrace();
         }
-        
+
         System.exit(1);
     }
 }

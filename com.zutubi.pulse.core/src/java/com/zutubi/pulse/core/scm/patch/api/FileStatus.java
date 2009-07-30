@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.api;
+package com.zutubi.pulse.core.scm.patch.api;
 
 import com.zutubi.diff.PatchType;
 import com.zutubi.util.FileSystemUtils;
@@ -12,16 +12,16 @@ import java.util.Map;
  * as part of a report of the status of a working copy, and to help apply the
  * same changes to another working copy (known as a "target" working copy).
  *
- * @see com.zutubi.pulse.core.scm.api.WorkingCopyStatus
+ * @see com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus
  */
 public class FileStatus
 {
     /**
      * If set, specifies how line endings should be translated for the file.
-     * Possible values are described in the {@link EOLStyle} enum (the property
+     * Possible values are described in the {@link com.zutubi.pulse.core.scm.api.EOLStyle} enum (the property
      * value is just the enum value converted to a string).
      *
-     * @see EOLStyle
+     * @see com.zutubi.pulse.core.scm.api.EOLStyle
      */
     public static final String PROPERTY_EOL_STYLE = "eol";
     /**

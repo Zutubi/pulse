@@ -4,8 +4,13 @@
     <extension point="com.zutubi.pulse.core.config">
         <config class="com.zutubi.pulse.core.scm.git.config.GitConfiguration"/>
     </extension>
+    <extension point="com.zutubi.pulse.core.patchformats">
+        <scm name="git" class="com.zutubi.pulse.core.scm.git.GitPatchFormat"/>
+    </extension>
     <extension point="com.zutubi.pulse.core.scms">
-        <scm name="git" factory-class="com.zutubi.pulse.core.scm.git.GitClientFactory"
-             working-copy-class="com.zutubi.pulse.core.scm.git.GitWorkingCopy"/>
+        <scm name="git"
+             factory-class="com.zutubi.pulse.core.scm.git.GitClientFactory"
+             working-copy-class="com.zutubi.pulse.core.scm.git.GitWorkingCopy"
+             patch-format="git"/>
     </extension>
 </plugin>

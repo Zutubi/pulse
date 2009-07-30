@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.repository.MasterFileRepository;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
@@ -17,7 +18,7 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 /**
- *
+ * A runnable that wraps execution of a recipe on the master.
  */
 public class MasterRecipeRunner implements Runnable
 {
@@ -30,15 +31,12 @@ public class MasterRecipeRunner implements Runnable
     private ResourceRepository resourceRepository;
     private RecipeCleanup recipeCleanup;
     private ScmClientFactory scmClientFactory;
+    private PatchFormatFactory patchFormatFactory;
 
-    public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, MasterConfigurationManager configurationManager, ResourceRepository resourceRepository, ScmClientFactory scmClientFactory)
+    public MasterRecipeRunner(RecipeRequest request, ResourceRepository resourceRepository)
     {
         this.request = request;
-        this.recipeProcessor = recipeProcessor;
-        this.eventManager = eventManager;
-        this.configurationManager = configurationManager;
         this.resourceRepository = resourceRepository;
-        this.scmClientFactory = scmClientFactory;
         recipeCleanup = new RecipeCleanup(new FileSystem());
     }
 
@@ -59,6 +57,7 @@ public class MasterRecipeRunner implements Runnable
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, recipePaths);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_PATCH_FORMAT_FACTORY, patchFormatFactory);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
             outputStream = new CommandEventOutputStream(eventManager, request.getId());
             context.setOutputStream(outputStream);
@@ -82,4 +81,28 @@ public class MasterRecipeRunner implements Runnable
         }
     }
 
+    public void setRecipeProcessor(RecipeProcessor recipeProcessor)
+    {
+        this.recipeProcessor = recipeProcessor;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
+    {
+        this.patchFormatFactory = patchFormatFactory;
+    }
 }

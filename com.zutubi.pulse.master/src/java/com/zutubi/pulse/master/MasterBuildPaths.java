@@ -61,7 +61,7 @@ public class MasterBuildPaths
 
     public static String getBuildDirName(long number)
     {
-        return String.format("%08d", number);
+        return getPatchFileName(number);
     }
 
     public File getBuildDir(BuildResult result)
@@ -106,6 +106,16 @@ public class MasterBuildPaths
 
     public File getUserPatchFile(long userId, long number)
     {
-        return new File(getUserPatchDir(userId), String.format("%08d", number));
+        return new File(getUserPatchDir(userId), getPatchFileName(number));
+    }
+
+    public File getUserPatchPropertiesFile(long userId, long number)
+    {
+        return new File(getUserPatchDir(userId), getPatchFileName(number) + ".properties");
+    }
+
+    private static String getPatchFileName(long number)
+    {
+        return String.format("%08d", number);
     }
 }

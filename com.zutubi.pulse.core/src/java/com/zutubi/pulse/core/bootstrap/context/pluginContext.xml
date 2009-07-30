@@ -5,9 +5,9 @@
 
     <bean id="commandExtensionManager" class="com.zutubi.pulse.core.plugins.CommandExtensionManager" init-method="init"/>
     <bean id="postProcessorExtensionManager" class="com.zutubi.pulse.core.plugins.PostProcessorExtensionManager" init-method="init"/>
+    <bean id="patchFormatExtensionManager" class="com.zutubi.pulse.core.scm.patch.PatchFormatExtensionManager" init-method="init"/>
+    <bean id="patchFormatFactory" class="com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory"/>
     <bean id="scmExtensionManager" class="com.zutubi.pulse.core.scm.ScmExtensionManager" init-method="init"/>
     <bean id="scmClientFactory" class="com.zutubi.pulse.core.scm.DelegateScmClientFactory"/>
     <bean id="hessianExtensionManager" class="com.zutubi.pulse.core.hessian.HessianConfigurationExtensionManager" init-method="init"/>
-
-
 </beans>

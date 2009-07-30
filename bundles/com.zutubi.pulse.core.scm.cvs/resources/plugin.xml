@@ -5,6 +5,9 @@
         <config class="com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.scms">
-        <scm name="cvs" factory-class="com.zutubi.pulse.core.scm.cvs.CvsClientFactory" working-copy-class="com.zutubi.pulse.core.scm.cvs.CvsWorkingCopy"/>
+        <scm name="cvs"
+             factory-class="com.zutubi.pulse.core.scm.cvs.CvsClientFactory"
+             working-copy-class="com.zutubi.pulse.core.scm.cvs.CvsWorkingCopy"
+             patch-format="standard"/>
     </extension>
 </plugin>

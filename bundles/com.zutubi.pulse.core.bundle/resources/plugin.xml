@@ -3,6 +3,7 @@
 <plugin>
     <extension-point name="Commands" id="commands" schema="schema/commands.exsd"/>
     <extension-point name="Config" id="config" schema="schema/config.exsd"/>
+    <extension-point name="Patch Formats" id="patchformats" schema="schema/patchformats.exsd"/>
     <extension-point name="Post Processors" id="postprocessors" schema="schema/postprocessors.exsd"/>
     <extension-point name="SCMs" id="scms" schema="schema/scms.exsd"/>
     <extension-point name="Upgrade" id="upgrade" schema="schema/upgrade.exsd"/>

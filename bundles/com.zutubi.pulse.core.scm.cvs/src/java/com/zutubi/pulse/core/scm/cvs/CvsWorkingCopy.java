@@ -2,6 +2,9 @@ package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
+import com.zutubi.pulse.core.scm.patch.api.FileStatus;
+import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.io.IOUtils;
@@ -76,11 +79,6 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
             branch = null;
         }
         return branch;
-    }
-
-    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... scope) throws ScmException
-    {
-        return StandardPatchFileSupport.writePatchFile(this, context, patchFile, scope);
     }
 
     public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... paths) throws ScmException

@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.scm.api.FileStatus;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
+import com.zutubi.pulse.core.scm.patch.PatchProperties;
+import com.zutubi.pulse.core.scm.patch.api.FileStatus;
+import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.scm.ScmClientUtils;
-import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -22,7 +22,7 @@ public class ViewPersonalChangesAction extends BuildActionBase
     private long id;
     private List<FileStatus> fileStatuses;
     private MasterConfigurationManager configurationManager;
-    private ScmManager scmManager;
+    private PatchFormatFactory patchFormatFactory;
 
     public void setId(long id)
     {
@@ -43,23 +43,23 @@ public class ViewPersonalChangesAction extends BuildActionBase
             return ERROR;
         }
 
+        User loggedInUser = getLoggedInUser();
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        final File patchFile = paths.getUserPatchFile(getLoggedInUser().getId(), result.getNumber());
+        final File patchFile = paths.getUserPatchFile(loggedInUser.getId(), result.getNumber());
         if(!patchFile.exists())
         {
             addActionError("Patch file not found");
             return ERROR;
         }
 
+        File propertiesFile = paths.getUserPatchPropertiesFile(loggedInUser.getId(), result.getNumber());
+        PatchProperties patchProperties = new PatchProperties(propertiesFile);
+        String patchFormatType = patchProperties.getPatchFormat();
+        PatchFormat format = patchFormatFactory.createByFormatType(patchFormatType);
+
         try
         {
-            fileStatuses = ScmClientUtils.withScmClient(result.getProject().getConfig(), scmManager, new ScmClientUtils.ScmContextualAction<List<FileStatus>>()
-            {
-                public List<FileStatus> process(ScmClient client, ScmContext context) throws ScmException
-                {
-                    return client.readFileStatuses(context, patchFile);
-                }
-            });
+            fileStatuses = format.readFileStatuses(patchFile);
         }
         catch (ScmException e)
         {
@@ -76,8 +76,8 @@ public class ViewPersonalChangesAction extends BuildActionBase
         this.configurationManager = configurationManager;
     }
 
-    public void setScmManager(ScmManager scmManager)
+    public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
     {
-        this.scmManager = scmManager;
+        this.patchFormatFactory = patchFormatFactory;
     }
 }

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
@@ -661,16 +660,6 @@ public class PerforceClient extends CachingScmClient
             // User may not exist.
             return null;
         }
-    }
-
-    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
-    {
-        return StandardPatchFileSupport.applyPatch(patchFile, baseDir, localEOL, scmFeedbackHandler);
-    }
-
-    public List<FileStatus> readFileStatuses(ScmContext context, File patchFile) throws ScmException
-    {
-        return StandardPatchFileSupport.readFileStatuses(patchFile);
     }
 
     public boolean labelExists(String client, String name) throws ScmException

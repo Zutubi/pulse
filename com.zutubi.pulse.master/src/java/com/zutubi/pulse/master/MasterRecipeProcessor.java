@@ -1,13 +1,11 @@
 package com.zutubi.pulse.master;
 
-import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
@@ -24,9 +22,7 @@ public class MasterRecipeProcessor implements Stoppable
 
     private ExecutorService executor;
     private RecipeProcessor recipeProcessor;
-    private MasterConfigurationManager configurationManager;
-    private EventManager eventManager;
-    private ScmClientFactory scmClientFactory;
+    private ObjectFactory objectFactory;
 
     public MasterRecipeProcessor()
     {
@@ -42,7 +38,7 @@ public class MasterRecipeProcessor implements Stoppable
                 try
                 {
                     buildingRecipe.set(request.getId());
-                    MasterRecipeRunner recipeRunner = new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, agentRepository, scmClientFactory);
+                    MasterRecipeRunner recipeRunner = objectFactory.buildBean(MasterRecipeRunner.class, new Class[]{RecipeRequest.class, ResourceRepository.class}, new Object[]{request, agentRepository});
                     recipeRunner.run();
                 }
                 finally
@@ -53,14 +49,9 @@ public class MasterRecipeProcessor implements Stoppable
         });
     }
 
-    public void setRecipeProcessor(RecipeProcessor recipeProcessor)
+    public long getBuildingRecipe()
     {
-        this.recipeProcessor = recipeProcessor;
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
+        return buildingRecipe.get();
     }
 
     public void terminateRecipe(long id)
@@ -82,18 +73,13 @@ public class MasterRecipeProcessor implements Stoppable
         executor.shutdownNow();
     }
 
-    public long getBuildingRecipe()
+    public void setRecipeProcessor(RecipeProcessor recipeProcessor)
     {
-        return buildingRecipe.get();
+        this.recipeProcessor = recipeProcessor;
     }
 
-    public void setEventManager(EventManager eventManager)
+    public void setObjectFactory(ObjectFactory objectFactory)
     {
-        this.eventManager = eventManager;
-    }
-
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
-    {
-        this.scmClientFactory = scmClientFactory;
+        this.objectFactory = objectFactory;
     }
 }

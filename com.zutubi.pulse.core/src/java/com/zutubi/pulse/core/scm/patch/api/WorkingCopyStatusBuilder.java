@@ -1,14 +1,17 @@
-package com.zutubi.pulse.core.scm.api;
+package com.zutubi.pulse.core.scm.patch.api;
+
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 
 import java.io.OutputStream;
 
 /**
- * Interface for methods used in the creation of standard patch files for the
- * implementation of {@link WorkingCopy#writePatchFile(WorkingCopyContext, java.io.File, String[])}.
- * These methods are called on by {@link StandardPatchFileSupport#writePatchFile(WorkingCopyStatusBuilder, WorkingCopyContext, java.io.File, String[])}.
+ * Interface for methods used in the creation of standard patch files by the
+ * {@link com.zutubi.pulse.core.scm.patch.StandardPatchFormat} implementation.  To leverage this
+ * format, your {@link com.zutubi.pulse.core.scm.api.WorkingCopy} class should implement this
+ * interface, and you should use patch-format="standard" in your SCM extension declaration.
  *
- * @see StandardPatchFileSupport
- * @see WorkingCopy
+ * @see com.zutubi.pulse.core.scm.api.WorkingCopy
  */
 public interface WorkingCopyStatusBuilder
 {
@@ -41,7 +44,7 @@ public interface WorkingCopyStatusBuilder
      *                emulate the behaviour of other tools for the SCM.
      * @return status information containing a file status for at least each
      *         interesting file in the working copy
-     * @throws ScmException on error
+     * @throws com.zutubi.pulse.core.scm.api.ScmException on error
      */
     WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException;
 

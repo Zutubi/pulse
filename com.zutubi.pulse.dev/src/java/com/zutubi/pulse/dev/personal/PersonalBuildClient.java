@@ -7,6 +7,8 @@ import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
+import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.Pair;
@@ -64,7 +66,7 @@ public class PersonalBuildClient
         return ui;
     }
 
-    public Pair<WorkingCopy, WorkingCopyContext> checkConfiguration() throws PersonalBuildException
+    public PersonalBuildContext checkConfiguration(PatchFormatFactory patchFormatFactory) throws PersonalBuildException
     {
         ui.debug("Verifying configuration with pulse server...");
         checkRequiredConfig();
@@ -82,9 +84,9 @@ public class PersonalBuildClient
                 ui.debug("Logging in to pulse: url: " + config.getPulseUrl() + ", user: " + config.getPulseUser());
                 token = rpc.login(config.getPulseUser(), getPassword());
                 ui.debug("Login successful.");
-                Pair<WorkingCopy, WorkingCopyContext> pair = prepare(rpc, token);
+                PersonalBuildContext context = prepare(rpc, token, patchFormatFactory);
                 ui.debug("Verified: personal build for project: " + config.getProject() + ".");
-                return pair;
+                return context;
             }
             catch (PersonalBuildException e)
             {
@@ -200,7 +202,7 @@ public class PersonalBuildClient
         }
     }
 
-    private Pair<WorkingCopy, WorkingCopyContext> prepare(PulseXmlRpcClient rpc, String token) throws PersonalBuildException
+    private PersonalBuildContext prepare(PulseXmlRpcClient rpc, String token, PatchFormatFactory patchFormatFactory) throws PersonalBuildException
     {
         try
         {
@@ -215,6 +217,12 @@ public class PersonalBuildClient
             if (wc == null)
             {
                 throw new PersonalBuildException("Personal builds are not supported for this SCM (" + scmType + ")");
+            }
+
+            Pair<String, PatchFormat> typeAndFormat = patchFormatFactory.createByScmType(scmType);
+            if (typeAndFormat == null)
+            {
+                throw new PersonalBuildException("Patching is not supported for this SCM (" + scmType + ")");
             }
 
             if (config.getCheckRepository())
@@ -239,7 +247,7 @@ public class PersonalBuildClient
                 }
             }
 
-            return new Pair<WorkingCopy, WorkingCopyContext>(wc, context);
+            return new PersonalBuildContext(wc, context, typeAndFormat.first, typeAndFormat.second);
         }
         catch (PersonalBuildException e)
         {
@@ -251,14 +259,14 @@ public class PersonalBuildClient
         }
     }
 
-    public PersonalBuildRevision chooseRevision(WorkingCopy wc, WorkingCopyContext context) throws PersonalBuildException
+    public PersonalBuildRevision chooseRevision(PersonalBuildContext context) throws PersonalBuildException
     {
         String chosenRevision = config.getRevision();
         boolean fromConfig = true;
         if (!TextUtils.stringSet(chosenRevision))
         {
             fromConfig = false;
-            Set<WorkingCopyCapability> capabilities = wc.getCapabilities();
+            Set<WorkingCopyCapability> capabilities = context.getWorkingCopy().getCapabilities();
 
             List<MenuOption<String>> options = new LinkedList<MenuOption<String>>();
             if (capabilities.contains(WorkingCopyCapability.LOCAL_REVISION))
@@ -283,11 +291,11 @@ public class PersonalBuildClient
 
         if (chosenRevision.equals(REVISION_OPTION_LOCAL))
         {
-            return guessLocalRevision(wc, context);
+            return guessLocalRevision(context);
         }
         else if (chosenRevision.equals(REVISION_OPTION_LATEST))
         {
-            return getLatestRemoteRevision(wc, context);
+            return getLatestRemoteRevision(context);
         }
         else if (chosenRevision.equals(REVISION_OPTION_FLOATING))
         {
@@ -324,14 +332,14 @@ public class PersonalBuildClient
         return new MenuOption<String>(value, I18N.format("revision.option." + value.substring(1)), defaultOption);
     }
 
-    private PersonalBuildRevision guessLocalRevision(WorkingCopy wc, WorkingCopyContext context) throws PersonalBuildException
+    private PersonalBuildRevision guessLocalRevision(PersonalBuildContext context) throws PersonalBuildException
     {
         Revision revision;
         ui.status(I18N.format("status.guessing.revision"));
         ui.enterContext();
         try
         {
-            revision = wc.guessLocalRevision(context);
+            revision = context.getWorkingCopy().guessLocalRevision(context.getWorkingCopyContext());
         }
         catch (ScmException e)
         {
@@ -346,13 +354,13 @@ public class PersonalBuildClient
         return new PersonalBuildRevision(revision, true);
     }
 
-    private PersonalBuildRevision getLatestRemoteRevision(WorkingCopy wc, WorkingCopyContext context) throws PersonalBuildException
+    private PersonalBuildRevision getLatestRemoteRevision(PersonalBuildContext context) throws PersonalBuildException
     {
         Revision revision;
         ui.status(I18N.format("status.getting.latest.revision"));
         try
         {
-            revision = wc.getLatestRemoteRevision(context);
+            revision = context.getWorkingCopy().getLatestRemoteRevision(context.getWorkingCopyContext());
         }
         catch (ScmException e)
         {
@@ -367,8 +375,9 @@ public class PersonalBuildClient
         return new PersonalBuildRevision(revision, true);
     }
 
-    public void updateIfDesired(WorkingCopy wc, WorkingCopyContext context, Revision revision) throws PersonalBuildException
+    public void updateIfDesired(PersonalBuildContext context, Revision revision) throws PersonalBuildException
     {
+        WorkingCopy wc = context.getWorkingCopy();
         if (wc.getCapabilities().contains(WorkingCopyCapability.UPDATE))
         {
             Boolean update = config.getUpdate();
@@ -391,7 +400,7 @@ public class PersonalBuildClient
                     ui.enterContext();
                     try
                     {
-                        wc.update(context, revision);
+                        wc.update(context.getWorkingCopyContext(), revision);
                         ui.status(I18N.format("status.updated"));
                     }
                     finally
@@ -407,7 +416,7 @@ public class PersonalBuildClient
         }
     }
 
-    public boolean preparePatch(WorkingCopy wc, WorkingCopyContext context, File patchFile, String... spec) throws PersonalBuildException
+    public boolean preparePatch(PersonalBuildContext context, File patchFile, String... spec) throws PersonalBuildException
     {
         try
         {
@@ -417,7 +426,7 @@ public class PersonalBuildClient
 
             try
             {
-                created = wc.writePatchFile(context, patchFile, spec);
+                created = context.getPatchFormat().writePatchFile(context.getWorkingCopy(), context.getWorkingCopyContext(), patchFile, spec);
             }
             finally
             {
@@ -441,7 +450,7 @@ public class PersonalBuildClient
         }
     }
 
-    public long sendRequest(Revision revision, File patchFile) throws PersonalBuildException
+    public long sendRequest(PersonalBuildContext context, Revision revision, File patchFile) throws PersonalBuildException
     {
         HttpClient client = new HttpClient();
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getPulseUser(), getPassword());
@@ -465,6 +474,7 @@ public class PersonalBuildClient
             Part[] parts = {
                     new StringPart("project", config.getProject()),
                     new StringPart("revision", revision.getRevisionString()),
+                    new StringPart("patchFormat", context.getPatchFormatType()),
                     new FilePart("patch.zip", patchFile),
             };
             post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));

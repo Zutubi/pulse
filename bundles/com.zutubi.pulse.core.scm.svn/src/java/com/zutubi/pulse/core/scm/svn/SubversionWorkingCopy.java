@@ -1,6 +1,9 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.patch.api.FileStatus;
+import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
@@ -199,11 +202,6 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
         {
             throw convertException(e);
         }
-    }
-
-    public boolean writePatchFile(WorkingCopyContext context, File patchFile, String... scope) throws ScmException
-    {
-        return StandardPatchFileSupport.writePatchFile(this, context, patchFile, scope);
     }
 
     public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... paths) throws ScmException

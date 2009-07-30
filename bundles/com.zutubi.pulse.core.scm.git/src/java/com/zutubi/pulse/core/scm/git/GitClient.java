@@ -1,22 +1,17 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.diff.Patch;
-import com.zutubi.diff.PatchFile;
-import com.zutubi.diff.PatchFileParser;
-import com.zutubi.diff.PatchParseException;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-import com.zutubi.pulse.core.scm.git.diff.GitPatchParser;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -598,38 +593,6 @@ public class GitClient implements ScmClient
     public String getEmailAddress(ScmContext context, String user) throws ScmException
     {
         throw new ScmException("Operation not supported");
-    }
-
-    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
-    {
-        NativeGit git = new NativeGit(inactivityTimeout);
-        git.setWorkingDirectory(baseDir);
-        git.apply(scmFeedbackHandler, patchFile);
-        return Collections.emptyList();
-    }
-
-    public List<FileStatus> readFileStatuses(ScmContext context, File patchFile) throws ScmException
-    {
-        try
-        {
-            PatchFileParser parser = new PatchFileParser(new GitPatchParser());
-            PatchFile gitPatch = parser.parse(new FileReader(patchFile));
-            return CollectionUtils.map(gitPatch.getPatches(), new Mapping<Patch, FileStatus>()
-            {
-                public FileStatus map(Patch patch)
-                {
-                    return new FileStatus(patch.getNewFile(), FileStatus.State.valueOf(patch.getType()), false);
-                }
-            });
-        }
-        catch (IOException e)
-        {
-            throw new GitException("I/O error reading git patch: " + e.getMessage(), e);
-        }
-        catch (PatchParseException e)
-        {
-            throw new GitException("Unable to parse git patch: " + e.getMessage(), e);
-        }
     }
 
     public void setRepository(String repository)

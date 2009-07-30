@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.api;
+package com.zutubi.pulse.core.scm.patch.api;
 
 
 import com.zutubi.util.CollectionUtils;
@@ -10,8 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Used to convey the local status of a working copy.  All outstanding changes
- * are recorded as {@link com.zutubi.pulse.core.scm.api.FileStatus} objects.
+ * Used to convey the local status of a working copy.  All outstanding changes are recorded as
+ * {@link FileStatus} objects.
  */
 public class WorkingCopyStatus
 {
@@ -19,11 +19,10 @@ public class WorkingCopyStatus
     private List<FileStatus> fileStatuses = new LinkedList<FileStatus>();
 
     /**
-     * Create a new working copy status for files based at the given directory.
-     * This directory is typically the root of a working copy.  Usually it is
-     * identical to the base directory specified by
-     * {@link WorkingCopyContext#getBase()}, but it may be different for some
-     * implementations (e.g. Perforce, where the base will be the client root
+     * Create a new working copy status for files based at the given directory.  This directory is
+     * typically the root of a working copy.  Usually it is identical to the base directory
+     * specified by {@link com.zutubi.pulse.core.scm.api.WorkingCopyContext#getBase()}, but it may
+     * be different for some implementations (e.g. Perforce, where the base will be the client root
      * regardless of the working directory of the pulse command).
      *
      * @param base base directory under which file statuses are found
@@ -43,8 +42,8 @@ public class WorkingCopyStatus
     }
 
     /**
-     * @return true if all recorded file statuses are in a consistent state
-     *         (i.e. there are no missing files, outstanding conflicts etc)
+     * @return true if all recorded file statuses are in a consistent state (i.e. there are no
+     *         missing files, outstanding conflicts etc)
      */
     public boolean inConsistentState()
     {
@@ -60,8 +59,8 @@ public class WorkingCopyStatus
     }
 
     /**
-     * @return true if at least one file status has been recorded: i.e. there
-     *         are local changes under the base directory
+     * @return true if at least one file status has been recorded: i.e. there are local changes
+     *         under the base directory
      */
     public boolean hasStatuses()
     {
@@ -69,8 +68,7 @@ public class WorkingCopyStatus
     }
 
     /**
-     * @return file status records for all local changes found under the base
-     *         directory
+     * @return file status records for all local changes found under the base directory
      */
     public List<FileStatus> getFileStatuses()
     {
@@ -91,8 +89,7 @@ public class WorkingCopyStatus
      * Finds an existing file status record by path, if one exists.
      *
      * @param path the path to find the status for
-     * @return the file status for the given path, or null if no such status
-     *         has been recorded
+     * @return the file status for the given path, or null if no such status has been recorded
      */
     public FileStatus getFileStatus(final String path)
     {

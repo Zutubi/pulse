@@ -189,6 +189,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_FILE_REPOSITORY         = "file.repository";
     /**
+     * An internal property used to create patch formats.
+     */
+    public static final String PROPERTY_PATCH_FORMAT_FACTORY    = "patch.format.factory";
+    /**
      * The name of the recipe being built, may be "[default]" if no recipe
      * was explicitly specified.
      */

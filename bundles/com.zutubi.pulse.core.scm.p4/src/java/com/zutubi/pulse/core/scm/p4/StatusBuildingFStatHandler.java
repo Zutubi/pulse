@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.EOLStyle;
-import com.zutubi.pulse.core.scm.api.FileStatus;
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
-import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import com.zutubi.pulse.core.scm.patch.api.FileStatus;
+import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 
 /**
  * A handler for p4 fstat output that builds up a working copy status.

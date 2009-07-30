@@ -5,6 +5,8 @@ import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
+import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
+import com.zutubi.pulse.core.scm.patch.PatchProperties;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildManager;
@@ -12,6 +14,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
@@ -30,12 +33,15 @@ public class PersonalBuildAction extends ActionSupport
     private static final Logger LOG = Logger.getLogger(PersonalBuildAction.class);
 
     private String project;
+    private String patchFormat;
     private String revision;
     private long number = 0;
     private List<String> responseErrors = new LinkedList<String>();
     private List<String> responseWarnings = new LinkedList<String>();
+
     private MasterConfigurationManager configurationManager;
     private BuildManager buildManager;
+    private PatchFormatFactory patchFormatFactory;
 
     public void setProject(String project)
     {
@@ -45,6 +51,11 @@ public class PersonalBuildAction extends ActionSupport
     public void setRevision(String revision)
     {
         this.revision = revision;
+    }
+
+    public void setPatchFormat(String patchFormat)
+    {
+        this.patchFormat = patchFormat;
     }
 
     public long getNumber()
@@ -83,6 +94,18 @@ public class PersonalBuildAction extends ActionSupport
         if(!accessManager.hasPermission(userManager.getPrinciple(user), ServerPermission.PERSONAL_BUILD.toString(), null))
         {
             throw new AccessDeniedException("User does not have authority to submit personal build requests.");
+        }
+
+        if (!TextUtils.stringSet(patchFormat))
+        {
+            responseErrors.add("Required parameter 'patchFormat' not specified");
+            return ERROR;
+        }
+
+        if (!patchFormatFactory.isValidFormatType(patchFormat))
+        {
+            responseErrors.add("Unrecognised patch format '" + patchFormat + "'");
+            return ERROR;
         }
 
         if (!(request instanceof MultiPartRequestWrapper))
@@ -145,8 +168,11 @@ public class PersonalBuildAction extends ActionSupport
             {
                 responseWarnings.add("Unable to clean up uploaded patch.");
             }
+
+            PatchProperties properties = new PatchProperties(paths.getUserPatchPropertiesFile(user.getId(), number));
+            properties.setPatchFormat(patchFormat);
             
-            projectManager.triggerBuild(number, p, user, convertRevision(p), patchFile);
+            projectManager.triggerBuild(number, p, user, convertRevision(p), patchFile, patchFormat);
         }
         catch (Exception e)
         {
@@ -193,5 +219,10 @@ public class PersonalBuildAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
+    {
+        this.patchFormatFactory = patchFormatFactory;
     }
 }

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schema targetNamespace="com.zutubi.pulse.core">
+    <annotation>
+        <appInfo>
+            <meta.schema plugin="com.zutubi.pulse.core" id="patchformats" name="Patch Formats"/>
+        </appInfo>
+        <documentation>
+        </documentation>
+    </annotation>
+
+    <element name="extension">
+        <complexType>
+            <sequence>
+                <element ref="command" minOccurs="1" maxOccurs="unbounded"/>
+            </sequence>
+            <attribute name="point" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The extension-point of this extension.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="id" type="string">
+                <annotation>
+                    <documentation>
+                        Extension identifier.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="name" type="string">
+                <annotation>
+                    <documentation>
+                        Name of this extension.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
+
+    <element name="patch-format">
+        <complexType>
+            <attribute name="name" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The name of the patch format.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="class" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The PatchFormat implementation class for the format.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
+</schema>

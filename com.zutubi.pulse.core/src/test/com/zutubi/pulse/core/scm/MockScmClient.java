@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 
 import java.io.File;
 import java.io.IOException;

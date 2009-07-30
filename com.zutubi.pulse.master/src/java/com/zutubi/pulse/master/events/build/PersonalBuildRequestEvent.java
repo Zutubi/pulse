@@ -16,13 +16,15 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
     private long number;
     private User user;
     private File patch;
+    private String patchFormat;
 
-    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, File patch, ProjectConfiguration projectConfig)
+    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, File patch, String patchFormat, ProjectConfiguration projectConfig)
     {
         super(source, revision, projectConfig, new TriggerOptions(new PersonalBuildReason(user.getLogin()), null));
         this.number = number;
         this.user = user;
         this.patch = patch;
+        this.patchFormat = patchFormat;
     }
 
     public NamedEntity getOwner()
@@ -48,6 +50,11 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
     public File getPatch()
     {
         return patch;
+    }
+
+    public String getPatchFormat()
+    {
+        return patchFormat;
     }
 
     public long getNumber()

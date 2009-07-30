@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
@@ -794,16 +793,6 @@ public class SubversionClient implements ScmClient
         throw new ScmException("Operation not supported");
     }
 
-    public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, EOLStyle localEOL, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
-    {
-        return StandardPatchFileSupport.applyPatch(patchFile, baseDir, localEOL, scmFeedbackHandler);
-    }
-
-    public List<FileStatus> readFileStatuses(ScmContext context, File patchFile) throws ScmException
-    {
-        return StandardPatchFileSupport.readFileStatuses(patchFile);
-    }
-    
     private static class ChangeEventHandler implements ISVNEventHandler
     {
         private static final String LABEL_NONE       = " ";

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.personal;
+package com.zutubi.pulse.core.scm.patch;
 
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.zutubi.pulse.core.scm.api.FileStatus;
+import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 
 import java.util.HashMap;
 import java.util.Map;

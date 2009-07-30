@@ -8,10 +8,12 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
-import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
+import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
+import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.servercore.repository.FileRepository;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -29,15 +31,17 @@ public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
     private Bootstrapper delegate;
     private long userId;
     private long number;
+    private String patchFormatType;
     private EOLStyle localEOL;
     private volatile boolean terminated;
     private transient PrintWriter outputWriter;
 
-    public PatchBootstrapper(Bootstrapper delegate, long userId, long number, EOLStyle localEOL)
+    public PatchBootstrapper(Bootstrapper delegate, long userId, long number, String patchFormatType, EOLStyle localEOL)
     {
         this.delegate = delegate;
         this.userId = userId;
         this.number = number;
+        this.patchFormatType = patchFormatType;
         this.localEOL = localEOL;
     }
 
@@ -57,14 +61,12 @@ public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
             throw new BuildException("Unable to retrieve patch file '" + e.getMessage(), e);
         }
 
-        ScmConfiguration scmConfig = context.getValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_SCM_CONFIGURATION, ScmConfiguration.class);
-        ScmClientFactory scmClientFactory = context.getValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_SCM_CLIENT_FACTORY, ScmClientFactory.class);
-        ScmClient scmClient = null;
+        PatchFormatFactory patchFormatFactory = context.getValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PATCH_FORMAT_FACTORY, PatchFormatFactory.class);
+        PatchFormat patchFormat = patchFormatFactory.createByFormatType(patchFormatType);
         try
         {
-            scmClient = scmClientFactory.createClient(scmConfig);
             outputWriter = new PrintWriter(commandContext.getExecutionContext().getOutputStream());
-            for (Feature feature: scmClient.applyPatch(context, patchFile, getBaseBuildDir(context), localEOL, this))
+            for (Feature feature: patchFormat.applyPatch(context, patchFile, getBaseBuildDir(context), localEOL, this))
             {
                 commandContext.addFeature(feature);
             }
@@ -76,7 +78,6 @@ public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
         finally
         {
             outputWriter.flush();
-            IOUtils.close(scmClient);
         }
     }
 

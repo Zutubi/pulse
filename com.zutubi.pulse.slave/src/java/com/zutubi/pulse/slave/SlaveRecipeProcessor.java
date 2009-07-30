@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
 import com.zutubi.pulse.servercore.RecipeCleanup;
 import com.zutubi.pulse.servercore.ServerBootstrapper;
@@ -35,6 +36,7 @@ public class SlaveRecipeProcessor
     private EventManager eventManager;
     private MasterProxyFactory masterProxyFactory;
     private ServiceTokenManager serviceTokenManager;
+    private PatchFormatFactory patchFormatFactory;
     private ScmClientFactory scmClientFactory;
     private RecipeCleanup recipeCleanup;
 
@@ -89,6 +91,7 @@ public class SlaveRecipeProcessor
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, processorPaths);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repo);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
+                context.addValue(NAMESPACE_INTERNAL, PROPERTY_PATCH_FORMAT_FACTORY, patchFormatFactory);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
                 outputStream = new CommandEventOutputStream(eventManager, request.getId());
                 context.setOutputStream(outputStream);
@@ -163,5 +166,10 @@ public class SlaveRecipeProcessor
     public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
+    {
+        this.patchFormatFactory = patchFormatFactory;
     }
 }

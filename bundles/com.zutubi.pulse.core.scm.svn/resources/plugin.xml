@@ -5,6 +5,9 @@
         <config class="com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.scms">
-        <scm name="svn" factory-class="com.zutubi.pulse.core.scm.svn.SubversionClientFactory" working-copy-class="com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy"/>
+        <scm name="svn"
+             factory-class="com.zutubi.pulse.core.scm.svn.SubversionClientFactory"
+             working-copy-class="com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy"
+             patch-format="standard"/>
     </extension>
 </plugin>

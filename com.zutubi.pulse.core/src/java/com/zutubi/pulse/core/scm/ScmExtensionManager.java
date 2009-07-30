@@ -1,8 +1,14 @@
 package com.zutubi.pulse.core.scm;
 
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.plugins.AbstractExtensionManager;
 import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory;
+import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -18,6 +24,7 @@ public class ScmExtensionManager extends AbstractExtensionManager
     private static final Logger LOG = Logger.getLogger(ScmExtensionManager.class);
 
     private DelegateScmClientFactory clientFactory;
+    private DefaultPatchFormatFactory patchFormatFactory;
 
     protected String getExtensionPointId()
     {
@@ -26,69 +33,50 @@ public class ScmExtensionManager extends AbstractExtensionManager
 
     protected void handleConfigurationElement(IExtension extension, IExtensionTracker tracker, IConfigurationElement config)
     {
-/*  Extension point configuration:
-        <extension point="com.zutubi.pulse.core.config">
-            <config class="aaaa"/>
-        </extension>
+        // Extension point configuration:
+        //     <extension point="com.zutubi.pulse.core.config">
+        //         <config class="..."/>
+        //     </extension>
+        //
+        //     <extension point="com.zutubi.pulse.core.scms">
+        //         <scm name="..." factory-class="..." patch-format="..." working-copy-class="..."/>
+        //     </extension>
+        String name = config.getAttribute("name");
+        if (!TextUtils.stringSet(name))
+        {
+            LOG.severe("Attempt to register SCM with no name: ignoring");
+            return;
+        }
 
-        <extension point="com.zutubi.pulse.core.scms">
-            <scm name="xxx" factory-class="yyy" working-copy-class="zzzz"/>
-        </extension>
-*/
         try
         {
-            String name = config.getAttribute("name");
+            Class configClazz = getConfigClass(extension, name);
+            Class factoryClazz = getFactoryClass(extension, config);
 
-            List<IConfigurationElement> configElements = getConfigElements(extension);
+            // The working copy and patch format are optional (may be null).
+            Class wcClazz = getWorkingCopyClass(extension, config);
+            String patchFormat = getPatchFormat(config, wcClazz);
 
-            if (configElements.size() != 1)
-            {
-                LOG.warning("Expected at one configuration extension for scm '%s' " +
-                        "but instead found %i", name, configElements.size());
-                //TODO: should the plugin be disabled?.
-                return;
-            }
-
-            IConfigurationElement configElement = configElements.get(0);
-
-            String configClassName = configElement.getAttribute("class");
-            Class configClazz = loadClass(extension, configClassName);
-
-            if (!ScmConfiguration.class.isAssignableFrom(configClazz))
-            {
-                LOG.warning("Configuration class '" + configClazz.getName() + "' must be " +
-                        "an extension of " + ScmConfiguration.class.getName());
-                //TODO: should the plugin be disabled?.
-                return;
-            }
-
-            ScmConfiguration configInstance = (ScmConfiguration) configClazz.newInstance();
-
-            if (!configInstance.getType().equals(name))
-            {
-                LOG.warning("Configuration class '" + configClazz + "'.getType() is expected " +
-                        "to return '" + name +"' but instead returns '" + configInstance.getType() +"'");
-                //TODO: should the plugin be disabled?.
-                return;
-            }
-
-            String factoryClassName = config.getAttribute("factory-class");
-            String wcClassName = config.getAttribute("working-copy-class");
-            
             if (PluginManager.VERBOSE_EXTENSIONS)
             {
-                System.out.println(String.format("Adding SCM: %s -> (%s, %s, %s)", name, configClassName, factoryClassName, wcClassName == null ? "<none>" : wcClassName));
+                System.out.println(String.format("Adding SCM: %s -> (%s, %s, %s, %s)", name,
+                        configClazz.getName(),
+                        factoryClazz.getName(),
+                        wcClazz == null ? "<none>" : wcClazz.getName(),
+                        patchFormat == null ? "<none>" : patchFormat));
             }
 
-            Class factoryClazz = loadClass(extension, factoryClassName);
             try
             {
                 //noinspection unchecked
                 clientFactory.register(configClazz, factoryClazz);
-                if (wcClassName != null)
+                if (wcClazz != null)
                 {
-                    Class wcClazz = loadClass(extension, wcClassName);
                     WorkingCopyFactory.registerType(name, wcClazz);
+                    if (patchFormat != null)
+                    {
+                        patchFormatFactory.registerScm(name, patchFormat);
+                    }
                 }
             }
             catch (Throwable e)
@@ -99,9 +87,97 @@ public class ScmExtensionManager extends AbstractExtensionManager
         }
         catch (Exception e)
         {
-            LOG.warning(e);
+            LOG.severe("While registering SCM '" + name + "': " + e.getMessage(), e);
             handleExtensionError(extension, e);
         }
+    }
+
+    private Class getConfigClass(IExtension extension, String name)
+    {
+        List<IConfigurationElement> configElements = getConfigElements(extension);
+        if (configElements.size() != 1)
+        {
+            throw new PulseRuntimeException(String.format("Expected one configuration extension but instead found %d", configElements.size()));
+        }
+
+        IConfigurationElement configElement = configElements.get(0);
+        String configClassName = configElement.getAttribute("class");
+        Class configClazz = loadClass(extension, configClassName);
+
+        if (!ScmConfiguration.class.isAssignableFrom(configClazz))
+        {
+            throw new PulseRuntimeException(String.format("Configuration class '%s' does not extend '%s'", configClassName, ScmConfiguration.class.getName()));
+        }
+
+        ScmConfiguration configInstance;
+        try
+        {
+            configInstance = (ScmConfiguration) configClazz.newInstance();
+        }
+        catch (Exception e)
+        {
+            throw new PulseRuntimeException("Could not instantiate config class: " + e.getMessage(), e);
+        }
+
+        String type = configInstance.getType();
+        if (!type.equals(name))
+        {
+            throw new PulseRuntimeException(String.format("Method %s.getType() is expected to return '%s' but instead returned '%s'", configClassName, name, type));
+        }
+
+        return configClazz;
+    }
+
+    private Class getFactoryClass(IExtension extension, IConfigurationElement config)
+    {
+        String factoryClassName = config.getAttribute("factory-class");
+        if (factoryClassName == null)
+        {
+            throw new PulseRuntimeException("No factory class specified");
+        }
+
+        Class factoryClazz = loadClass(extension, factoryClassName);
+        if (!ScmClientFactory.class.isAssignableFrom(factoryClazz))
+        {
+            throw new PulseRuntimeException(String.format("Factory class '%s' does not implement '%s'", factoryClassName, ScmClientFactory.class.getName()));
+        }
+
+        return factoryClazz;
+    }
+
+    private Class getWorkingCopyClass(IExtension extension, IConfigurationElement config)
+    {
+        String wcClassName = config.getAttribute("working-copy-class");
+        if (wcClassName == null)
+        {
+            return null;
+        }
+
+        Class wcClazz = loadClass(extension, wcClassName);
+        if (!WorkingCopy.class.isAssignableFrom(wcClazz))
+        {
+            throw new PulseRuntimeException((String.format("Working copy class '%s' does not implement '%s'", wcClassName, WorkingCopy.class.getName())));
+        }
+
+        return wcClazz;
+    }
+
+    private String getPatchFormat(IConfigurationElement config, Class wcClazz)
+    {
+        String patchFormat = config.getAttribute("patch-format");
+        if (patchFormat != null && wcClazz == null)
+        {
+            throw new PulseRuntimeException("Patch file format given, but no working copy class specified.");
+        }
+
+        // To support standard patch files, there must be a working copy
+        // implementing WorkingCopyStatusBuilder.
+        if (DefaultPatchFormatFactory.FORMAT_STANDARD.equals(patchFormat) && !WorkingCopyStatusBuilder.class.isAssignableFrom(wcClazz))
+        {
+            throw new PulseRuntimeException(String.format("Standard patch file format requested, but working copy class '%s' does not implement '%s'", wcClazz.getName(), WorkingCopyStatusBuilder.class.getName()));
+        }
+
+        return patchFormat;
     }
 
     public void removeExtension(IExtension extension, Object[] objects)
@@ -116,5 +192,10 @@ public class ScmExtensionManager extends AbstractExtensionManager
     public void setScmClientFactory(DelegateScmClientFactory clientFactory)
     {
         this.clientFactory = clientFactory;
+    }
+
+    public void setPatchFormatFactory(DefaultPatchFormatFactory patchFormatFactory)
+    {
+        this.patchFormatFactory = patchFormatFactory;
     }
 }

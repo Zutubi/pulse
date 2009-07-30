@@ -526,7 +526,7 @@ public class BuildController implements EventListener
                 {
                     PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
                     EOLStyle localEOL = client.getEOLPolicy(context);
-                    return new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
+                    return new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), pbr.getPatchFormat(), localEOL);
                 }
             });
         }

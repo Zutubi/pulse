@@ -1,6 +1,6 @@
-package com.zutubi.pulse.core.personal;
+package com.zutubi.pulse.core.scm.patch;
 
-import com.zutubi.pulse.core.scm.api.FileStatus;
+import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * A data object holding meta-information about the files in a patch archive.
  * Using a separate type helps simplify serialisation.
  *
- * @see com.zutubi.pulse.core.personal.PatchArchive
+ * @see PatchArchive
  */
 public class PatchMetadata
 {

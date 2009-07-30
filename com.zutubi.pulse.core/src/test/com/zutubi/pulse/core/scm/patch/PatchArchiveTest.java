@@ -1,10 +1,15 @@
-package com.zutubi.pulse.core.personal;
+package com.zutubi.pulse.core.scm.patch;
 
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
+import com.zutubi.pulse.core.scm.patch.api.FileStatus;
+import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -68,7 +73,8 @@ public class PatchArchiveTest extends PulseTestCase
         wcs.addFileStatus(fs);
         stub(statusBuilder.getLocalStatus(context)).toReturn(wcs);
 
-        StandardPatchFileSupport.writePatchFile(statusBuilder, context, archiveFile);
+        StandardPatchFormat patchFormat = new StandardPatchFormat();
+        patchFormat.writePatchFile(statusBuilder, context, archiveFile);
         assertTrue(archiveFile.exists());
         PulseZipUtils.extractZip(archiveFile, targetDir);
 
@@ -157,7 +163,8 @@ public class PatchArchiveTest extends PulseTestCase
     private List<Feature> createAndApplyPatch(WorkingCopyStatus status) throws PulseException, IOException
     {
         stub(statusBuilder.getLocalStatus(context)).toReturn(status);
-        StandardPatchFileSupport.writePatchFile(statusBuilder, context, archiveFile);
+        StandardPatchFormat patchFormat = new StandardPatchFormat();
+        patchFormat.writePatchFile(statusBuilder, context, archiveFile);
         PatchArchive archive = new PatchArchive(archiveFile);
         return archive.apply(targetDir, EOLStyle.BINARY, new RecordingScmFeedbackHandler());
     }

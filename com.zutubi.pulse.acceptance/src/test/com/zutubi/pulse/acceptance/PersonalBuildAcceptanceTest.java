@@ -8,7 +8,9 @@ import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
+import com.zutubi.pulse.core.scm.git.GitPatchFormat;
 import com.zutubi.pulse.core.scm.git.GitWorkingCopy;
+import com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
 import com.zutubi.pulse.dev.personal.PersonalBuildClient;
@@ -22,6 +24,7 @@ import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.*;
+import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -395,9 +398,16 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         AcceptancePersonalBuildUI ui = new AcceptancePersonalBuildUI();
         PersonalBuildClient client = new PersonalBuildClient(config, ui);
 
-        PersonalBuildCommand command = new PersonalBuildCommand();
-        command.execute(client);
+        DefaultPatchFormatFactory patchFormatFactory = new DefaultPatchFormatFactory();
+        patchFormatFactory.registerScm(SubversionClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);
+        patchFormatFactory.registerFormatType("git", GitPatchFormat.class);
+        patchFormatFactory.registerScm("git", "git");
+        patchFormatFactory.setObjectFactory(new DefaultObjectFactory());
 
+        PersonalBuildCommand command = new PersonalBuildCommand();
+        command.setPatchFormatFactory(patchFormatFactory);
+
+        command.execute(client);
         return ui;
     }
 
