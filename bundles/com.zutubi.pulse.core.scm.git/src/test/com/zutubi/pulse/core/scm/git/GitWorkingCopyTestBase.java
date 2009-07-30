@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.personal.TestPersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -38,10 +39,10 @@ public abstract class GitWorkingCopyTestBase extends PulseTestCase
         PulseZipUtils.extractZip(new File(url.toURI()), upstreamDir);
 
         baseDir = new File(tempDir, "base");
-        runGit(tempDir, GitConstants.COMMAND_CLONE, upstreamDir.getAbsolutePath(), "base");
+        runGit(tempDir, COMMAND_CLONE, upstreamDir.getName(), "base");
 
         otherDir = new File(tempDir, "other");
-        runGit(tempDir, GitConstants.COMMAND_CLONE, upstreamDir.getAbsolutePath(), "other");
+        runGit(tempDir, COMMAND_CLONE, upstreamDir.getName(), "other");
 
         context = new WorkingCopyContextImpl(baseDir, new PropertiesConfig(), new TestPersonalBuildUI());
         workingCopy = new GitWorkingCopy();
@@ -67,7 +68,7 @@ public abstract class GitWorkingCopyTestBase extends PulseTestCase
 
     protected void switchToBranch(String branch) throws IOException
     {
-        runGit(baseDir, com.zutubi.pulse.core.scm.git.GitConstants.COMMAND_CHECKOUT, com.zutubi.pulse.core.scm.git.GitConstants.FLAG_BRANCH, branch);
+        runGit(baseDir, COMMAND_CHECKOUT, FLAG_BRANCH, branch);
     }
 
     /**
@@ -81,7 +82,7 @@ public abstract class GitWorkingCopyTestBase extends PulseTestCase
     {
 
         editFile(otherDir, "file1");
-        runGit(otherDir, com.zutubi.pulse.core.scm.git.GitConstants.COMMAND_PUSH);
+        runGit(otherDir, COMMAND_PUSH);
         NativeGit nativeGit = new NativeGit();
         nativeGit.setWorkingDirectory(otherDir);
         return nativeGit.log(1).get(0).getId();
@@ -91,14 +92,14 @@ public abstract class GitWorkingCopyTestBase extends PulseTestCase
     {
         File f = new File(dir, path);
         FileSystemUtils.createFile(f, "edited in " + getName());
-        runGit(dir, com.zutubi.pulse.core.scm.git.GitConstants.COMMAND_COMMIT, com.zutubi.pulse.core.scm.git.GitConstants.FLAG_ALL, com.zutubi.pulse.core.scm.git.GitConstants.FLAG_MESSAGE, "made an edit");
+        runGit(dir, COMMAND_COMMIT, FLAG_ALL, FLAG_MESSAGE, "made an edit");
     }
 
     protected void stageFile(File dir, String path) throws IOException
     {
         File f = new File(dir, path);
         FileSystemUtils.createFile(f, "edited in " + getName());
-        runGit(dir, com.zutubi.pulse.core.scm.git.GitConstants.COMMAND_ADD, path);
+        runGit(dir, COMMAND_ADD, path);
     }
 }
 

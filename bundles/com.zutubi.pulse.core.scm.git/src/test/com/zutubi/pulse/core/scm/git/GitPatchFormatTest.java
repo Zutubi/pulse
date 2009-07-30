@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.diff.*;
-import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.git.diff.GitPatchParser;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
@@ -17,7 +16,6 @@ public class GitPatchFormatTest extends GitWorkingCopyTestBase
     private static final String EXTENSION_TXT = "txt";
 
     private GitPatchFormat patchFormat = new GitPatchFormat();
-    private RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
 
     public void testWritePatchFile() throws ScmException, IOException, PatchParseException
     {
