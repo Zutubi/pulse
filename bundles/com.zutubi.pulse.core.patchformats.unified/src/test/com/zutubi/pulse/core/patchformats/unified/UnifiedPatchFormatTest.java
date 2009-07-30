@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -30,6 +31,11 @@ public class UnifiedPatchFormatTest extends PulseTestCase
 
             List<Feature> features = patchFormat.applyPatch(null, patchFile, tempDir, EOLStyle.BINARY, null);
             assertEquals(0, features.size());
+
+            if (SystemUtils.IS_WINDOWS)
+            {
+                FileSystemUtils.translateEOLs(file, SystemUtils.LF_BYTES, true);
+            }
 
             String patchedContent = IOUtils.fileToString(file);
             String expectedContent = IOUtils.inputStreamToString(getInput("new", "txt"));
