@@ -25,7 +25,8 @@ import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
@@ -58,12 +59,9 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * The BuildController is responsible for executing and coordinating a single
@@ -110,6 +108,7 @@ public class BuildController implements EventListener
 
     private IvyManager ivyManager;
     private RepositoryAttributes repositoryAttributes;
+    private ModuleDescriptorFactory moduleDescriptorFactory = new ModuleDescriptorFactory();
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -959,15 +958,14 @@ public class BuildController implements EventListener
                 repositoryAttributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
             }
 
-            publishMarkedArtifacts(buildResult, mrid, ivy);
-
-            ModuleDescriptorFactory f = new ModuleDescriptorFactory();
-            DefaultModuleDescriptor descriptor = f.createDescriptor(projectConfig, buildResult, version);
+            DefaultModuleDescriptor descriptor = moduleDescriptorFactory.createDescriptor(projectConfig, buildResult, version, configurationManager);
             descriptor.setStatus(buildResult.getStatus());
             descriptor.addExtraInfo("buildNumber", String.valueOf(buildResult.getNumber()));
 
+            ivy.publishArtifacts(descriptor, "[sourcefile]");
+
             ivy.resolve(descriptor);
-            ivy.publish(descriptor, version);
+            ivy.publishIvy(descriptor, version);
         }
         catch (Exception e)
         {
@@ -976,114 +974,6 @@ public class BuildController implements EventListener
         finally
         {
             buildLogger.postIvyPublish();
-        }
-    }
-
-    // identify and publish the artifacts that are marked for publishing to the internal repository.
-    private void publishMarkedArtifacts(final BuildResult buildResult, final ModuleRevisionId mrid, final IvyClient ivy)
-    {
-        PublishMarkedArtifacts function = new PublishMarkedArtifacts(ivy, mrid);
-        buildResult.getRoot().forEachNode(function);
-
-        if (!function.isSuccessful())
-        {
-            throw new BuildException("Error occured during publish.  See build warnings for details.");
-        }
-    }
-
-    private class PublishMarkedArtifacts implements UnaryProcedure<RecipeResultNode>
-    {
-        private boolean successful = true;
-        private IvyClient ivy;
-        private ModuleRevisionId mrid;
-
-        private PublishMarkedArtifacts(IvyClient ivy, ModuleRevisionId mrid)
-        {
-            this.ivy = ivy;
-            this.mrid = mrid;
-        }
-
-        public boolean isSuccessful()
-        {
-            return successful;
-        }
-
-        public void process(RecipeResultNode node)
-        {
-            RecipeResult result = node.getResult();
-            if (result == null)
-            {
-                // ignore the root since it provides us with no useful information.
-                return;
-            }
-
-            String stage = node.getStageName();
-
-            for (CommandResult commandResult : result.getCommandResults())
-            {
-                for (StoredArtifact artifact : commandResult.getArtifacts())
-                {
-                    if (artifact.isPublish())
-                    {
-                        Pattern p = Pattern.compile(artifact.getArtifactPattern());
-
-                        for (StoredFileArtifact file : artifact.getChildren())
-                        {
-                            File outputDir = commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
-                            File artifactFile = new File(outputDir, file.getPath());
-
-                            successful = publishArtifact(result, stage, artifact, p, artifactFile);
-                            if (!successful)
-                            {
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private boolean publishArtifact(RecipeResult result, String stage, StoredArtifact artifact, Pattern p, File artifactFile)
-        {
-            try
-            {
-                Matcher m = p.matcher(artifactFile.getName());
-                if (m.matches())
-                {
-                    if (m.groupCount() < 2)
-                    {
-                        result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to match the 2 expected groups in file " + artifactFile.getName() + ". Skipping.");
-                        return false;
-                    }
-                    else
-                    {
-                        String artifactName = m.group(1);
-                        if (artifactName == null || artifactName.trim().length() == 0)
-                        {
-                            result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to capture an artifact name from file " + artifactFile.getName() + ". Skipping.");
-                            return false;
-                        }
-                        String artifactExt = m.group(2);
-                        if (artifactExt == null || artifactExt.trim().length() == 0)
-                        {
-                            result.warning("Artifact pattern " + artifact.getArtifactPattern() + " failed to capture an artifact name from file " + artifactFile.getName() + ". Skipping.");
-                            return false;
-                        }
-                        ivy.publish(mrid, stage, artifactName, artifactExt, artifactFile);
-                        return true;
-                    }
-                }
-                else
-                {
-                    result.warning("Artifact pattern " + artifact.getArtifactPattern() + " does not match artifact file " + artifactFile.getName() + ". Skipping.");
-                    return false;
-                }
-            }
-            catch (IOException e)
-            {
-                result.warning("Failed to publish artifact file: " + artifactFile + ". Cause: " + e.getMessage());
-                return  false;
-            }
         }
     }
 

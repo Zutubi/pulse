@@ -8,11 +8,13 @@ import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.cache.ArtifactOrigin;
 import org.apache.ivy.core.cache.ResolutionCacheManager;
 import org.apache.ivy.core.deliver.DeliverOptions;
-import org.apache.ivy.core.module.descriptor.*;
+import org.apache.ivy.core.module.descriptor.Artifact;
+import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
+import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.publish.PublishOptions;
-import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
+import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveData;
 import org.apache.ivy.core.resolve.ResolveEngine;
 import org.apache.ivy.core.resolve.ResolveOptions;
@@ -25,8 +27,8 @@ import org.apache.ivy.plugins.resolver.AbstractPatternsBasedResolver;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
 import org.apache.ivy.plugins.resolver.RepositoryResolver;
 import org.apache.ivy.plugins.resolver.util.ResolvedResource;
-import org.apache.ivy.util.MessageLogger;
 import org.apache.ivy.util.Message;
+import org.apache.ivy.util.MessageLogger;
 import org.apache.ivy.util.url.URLHandler;
 import org.apache.ivy.util.url.URLHandlerRegistry;
 
@@ -42,15 +44,11 @@ import java.util.*;
  */
 public class IvyClient
 {
-    public static final String NAMESPACE_EXTRA_ATTRIBUTES = "e";
-
     private static final Logger LOG = Logger.getLogger(IvyClient.class);
 
     private static final String[] ALL_CONFS = new String[]{"*"};
 
     public static final String CONFIGURATION_BUILD = "build";
-
-    private static final String DUMMY_NAME = "whatever";
 
     private Ivy ivy;
     private String ivyPattern;
@@ -210,30 +208,12 @@ public class IvyClient
     /**
      * Publish the file to the default repository resolver.
      *
-     * @param mrid                  the module revision id identifying the module to which the file will be published
-     * @param stage                 the name of the stage that generated this artifact
-     * @param artifactName          the name of the published artifact
-     * @param artifactExtension     the type of the published artifact
-     * @param artifact              the file to be published to the internal repository.
-     *
+     * @param descriptor    the module descriptor that defines how the artifact file will be published.
+     * @param pattern       the pattern used by ivy to locate the artifacts to be published.
      * @throws IOException is throw on error
      */
-    public void publish(ModuleRevisionId mrid, String stage, String artifactName, String artifactExtension, File artifact) throws IOException
+    public void publishArtifacts(ModuleDescriptor descriptor, String pattern) throws IOException
     {
-        DefaultModuleDescriptor descriptor = new DefaultModuleDescriptor(mrid, "integration", null);
-        descriptor.addConfiguration(new Configuration(IvyClient.CONFIGURATION_BUILD));
-        descriptor.addExtraAttributeNamespace(NAMESPACE_EXTRA_ATTRIBUTES, "http://ant.apache.org/ivy/extra");
-
-        descriptor.addConfiguration(new Configuration(DUMMY_NAME));
-
-        Map<String, String> extraAttributes = new HashMap<String, String>();
-        extraAttributes.put(NAMESPACE_EXTRA_ATTRIBUTES + ":stage", IvyUtils.ivyEncodeStageName(stage));
-        MDArtifact ivyArtifact = new MDArtifact(descriptor, artifactName, artifactExtension, artifactExtension, null, extraAttributes);
-        ivyArtifact.addConfiguration(DUMMY_NAME);
-        descriptor.addArtifact(DUMMY_NAME, ivyArtifact);
-
-        String pattern = artifact.getAbsolutePath();
-
         // annoying but necessary.  See CustomURLHandler for details.
         URLHandler originalDefault = URLHandlerRegistry.getDefault();
         ivy.pushContext();
@@ -251,7 +231,7 @@ public class IvyClient
             Collection missing = ivy.getPublishEngine().publish(descriptor, Arrays.asList(pattern), dependencyResolver, options);
             if (missing.size() > 0)
             {
-                throw new IOException("Failed to publish " + artifact.getCanonicalPath());
+                throw new IOException("Failed to publish.");
             }
         }
         finally
@@ -271,7 +251,7 @@ public class IvyClient
      * @throws IOException    is thrown on error
      * @throws ParseException is thrown on error
      */
-    public Collection publish(ModuleDescriptor descriptor, String revision) throws IOException, ParseException
+    public Collection publishIvy(ModuleDescriptor descriptor, String revision) throws IOException, ParseException
     {
         // we can only publish from a file, so we need to deliver the descriptor to a local file first.
         File tmp = null;

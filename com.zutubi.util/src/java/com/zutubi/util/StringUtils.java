@@ -1052,6 +1052,19 @@ public class StringUtils
         return byteOffset;
     }
 
+    public static boolean allowedInURI(String str)
+    {
+        for(int i = 0; i < str.length(); i++)
+        {
+            char c = str.charAt(i);
+            if(!allowedInURIComponent(c))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static boolean allowedInURIComponent(char c)
     {
         if(c < '\u0080')

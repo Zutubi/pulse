@@ -88,4 +88,17 @@ public class IvyUtils
         }
         return buffer.toString();
     }
+
+    /**
+     * Test whether the specified string can be used as an artifact name.  The rule for
+     * artifact names is that only characters allowed in a URI may be used.
+     *
+     * @param str   the string to be tested.
+     *
+     * @return true if the string can be used as an artifact name, false otherwise.
+     */
+    public static boolean isValidArtifactName(String str)
+    {
+        return StringUtils.allowedInURI(str);
+    }
 }

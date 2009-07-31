@@ -19,6 +19,7 @@ import java.util.HashMap;
 public class MasterIvyModuleRevisionId extends com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId 
 {
     public static final String EXTRA_ATTRIBUTE_STAGE = NAMESPACE_EXTRA_ATTRIBUTES + ":stage";
+    public static final String EXTRA_ATTRIBUTE_SOURCE_FILE = NAMESPACE_EXTRA_ATTRIBUTES + ":sourcefile";
 
     public static ModuleRevisionId newInstance(BuildResult build)
     {
@@ -48,7 +49,7 @@ public class MasterIvyModuleRevisionId extends com.zutubi.pulse.core.dependency.
     public static ModuleRevisionId newInstance(DependencyConfiguration dependency)
     {
         ProjectConfiguration dependentProject = dependency.getProject();
-        return newInstance(getOrganisation(dependentProject), dependentProject.getName(), dependency.getRevision());
+        return newInstance(getOrganisation(dependentProject), dependentProject.getName(), dependency.getDependencyRevision());
     }
 
     private static String getOrganisation(ProjectConfiguration project)

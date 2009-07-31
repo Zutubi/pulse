@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfigurationRevisionOptionProvider;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
@@ -488,6 +489,47 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifact);
     }
 
+    public void testUnusualCharactersInArtifactName() throws Exception
+    {
+        // The criteria for artifact names is that they must be allowed in a URI.  This
+        // is because the internal artifact repository is accessed by ivy via HTTP.
+        
+        String validCharacters = "!()._-";
+        String invalidCharacters = "@#%^&*";
+
+        // $ is not allowed in an artifact name 
+
+        runBuildWithCharacterInArtifactName(validCharacters, ResultState.SUCCESS);
+        runBuildWithCharacterInArtifactName(invalidCharacters, ResultState.ERROR);
+    }
+
+    private void runBuildWithCharacterInArtifactName(String testCharacters, ResultState expected) throws Exception
+    {
+        for (char c : testCharacters.toCharArray())
+        {
+            Project project = new Project(randomName());
+            Artifact artifact = project.addArtifact("artifact-"+c+".jar");
+            createProject(project);
+
+            AntBuildConfiguration build = new AntBuildConfiguration();
+            build.addFileToCreate("build/artifact-"+c+".jar");
+
+            int buildNumber = triggerBuild(project, build);
+            assertEquals("Unexpected result for character: " + c, expected, getBuildStatus(project.getName(), buildNumber));
+
+            if (expected == ResultState.SUCCESS)
+            {
+                assertIvyInRepository(project, buildNumber);
+                assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifact);
+            }
+            else
+            {
+                assertIvyNotInRepository(project, buildNumber);
+                assertArtifactNotInRepository(project, project.getDefaultStage(), buildNumber, artifact);
+            }
+        }
+    }
+
     private int triggerSuccessfulBuild(Project project, AntBuildConfiguration build) throws Exception
     {
         int buildNumber = triggerBuild(project, build);
@@ -668,9 +710,20 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> dependencies = (Vector<Hashtable<String, Object>>) projectDependencies.get("dependencies");
 
+        List<String> revisionOptions = new DependencyConfigurationRevisionOptionProvider().getOptions(null, null, null);
+
         Hashtable<String, Object> dependency = xmlRpcHelper.createEmptyConfig(DependencyConfiguration.class);
         dependency.put("project", "projects/" + projectDependency.project.getName());
-        dependency.put("revision", projectDependency.revision);
+        if (revisionOptions.contains(projectDependency.revision))
+        {
+            dependency.put("revision", projectDependency.revision);
+        }
+        else
+        {
+            dependency.put("revision", DependencyConfiguration.REVISION_CUSTOM);
+            dependency.put("customRevision", projectDependency.revision);
+        }
+        
         dependency.put("allStages", (projectDependency.stage == null));
         dependency.put("stages", asStagePaths(projectDependency));
         dependency.put("transitive", projectDependency.transitive);
@@ -905,7 +958,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         private String stage = null;
 
-        private String revision = DependencyConfiguration.LATEST_INTEGRATION;
+        private String revision = DependencyConfiguration.REVISION_LATEST_INTEGRATION;
 
         private Dependency(Project project, boolean transitive, String stage, String revision)
         {
