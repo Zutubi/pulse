@@ -37,4 +37,9 @@ public class DependencyConfigurationFormatter
         String joinedStageNames = StringUtils.join(", ", stageNames);
         return StringUtils.trimmedString(joinedStageNames, 15, "...");
     }
+
+    public String getRevision(DependencyConfiguration config)
+    {
+        return config.getDependencyRevision();
+    }
 }

@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -13,11 +14,16 @@ import java.util.LinkedList;
  */
 @SymbolicName("zutubi.dependency")
 @Table(columns = {"module", "revision", "stages", "transitive"})
-@Form(fieldOrder = {"project", "revision", "transitive", "allStages", "stages"})
+@Form(fieldOrder = {"project", "revision", "customRevision", "transitive", "allStages", "stages"})
 public class DependencyConfiguration extends AbstractConfiguration
 {
+    private static final String LATEST = "latest.";
+
     public static final String ALL_STAGES = "*";
-    public static final String LATEST_INTEGRATION = "latest.integration";
+    public static final String REVISION_LATEST_INTEGRATION = LATEST + IvyManager.STATUS_INTEGRATION;
+    public static final String REVISION_LATEST_MILESTONE = LATEST + IvyManager.STATUS_MILESTONE;
+    public static final String REVISION_LATEST_RELEASE = LATEST + IvyManager.STATUS_RELEASE;
+    public static final String REVISION_CUSTOM = "custom";
 
     /**
      * The organisation name of the dependency.
@@ -35,7 +41,14 @@ public class DependencyConfiguration extends AbstractConfiguration
      * The revision of this dependency.
      */
     @Required
-    private String revision = LATEST_INTEGRATION;
+    @ControllingSelect(enableSet = {REVISION_CUSTOM}, dependentFields = "customRevision", optionProvider = "DependencyConfigurationRevisionOptionProvider")
+    private String revision = REVISION_LATEST_INTEGRATION;
+
+    /**
+     * The custom revision, used if the revision field is set to custom.
+     */
+    @Required
+    private String customRevision = "";
 
     /**
      * Indicates whether or not to resolve this dependencies dependencies.
@@ -112,5 +125,24 @@ public class DependencyConfiguration extends AbstractConfiguration
     public void setAllStages(boolean allStages)
     {
         this.allStages = allStages;
+    }
+
+    public String getCustomRevision()
+    {
+        return customRevision;
+    }
+
+    public void setCustomRevision(String customRevision)
+    {
+        this.customRevision = customRevision;
+    }
+
+    public String getDependencyRevision()
+    {
+        if (revision != null && revision.equals(REVISION_CUSTOM))
+        {
+            return customRevision;
+        }
+        return revision;
     }
 }

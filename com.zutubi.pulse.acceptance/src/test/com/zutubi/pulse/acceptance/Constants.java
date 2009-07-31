@@ -201,7 +201,6 @@ public class Constants
 
         public class Dependencies
         {
-            public static final String PUBLICATION_PATTERN = "publicationPattern";
             public static final String RETRIEVAL_PATTERN = "retrievalPattern";
             public static final String STATUS = "status";
             public static final String VERSION = "version";
