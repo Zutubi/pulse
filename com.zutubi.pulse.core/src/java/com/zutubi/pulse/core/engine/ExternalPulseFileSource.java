@@ -6,6 +6,9 @@ import com.zutubi.util.io.IOUtils;
 import java.io.InputStream;
 
 /**
+ * Sources pulse files from an external source by looking them up via a
+ * {@link com.zutubi.pulse.core.marshal.FileResolver}.  The classic use-case for this is versioned
+ * projects, where the pulse file is in the project's source code.
  */
 public class ExternalPulseFileSource implements PulseFileSource
 {

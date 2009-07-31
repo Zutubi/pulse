@@ -14,11 +14,8 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfigurationRevisionOptionProvider;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.*;
 import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -495,7 +492,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // is because the internal artifact repository is accessed by ivy via HTTP.
         
         String validCharacters = "!()._-";
-        String invalidCharacters = "@#%^&*";
+        String invalidCharacters = "@#%^&";
 
         // $ is not allowed in an artifact name 
 
@@ -508,11 +505,14 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         for (char c : testCharacters.toCharArray())
         {
             Project project = new Project(randomName());
-            Artifact artifact = project.addArtifact("artifact-"+c+".jar");
+            Artifact artifact = project.addArtifact("artifact-" + c + ".jar");
             createProject(project);
 
             AntBuildConfiguration build = new AntBuildConfiguration();
-            build.addFileToCreate("build/artifact-"+c+".jar");
+            // The ant script on unix evals its arguments, so we need to escape
+            // these characters lest the shell choke on them.
+            String resolvedChar = SystemUtils.IS_WINDOWS ? Character.toString(c) : "\\" + c;
+            build.addFileToCreate("build/artifact-" + resolvedChar + ".jar");
 
             int buildNumber = triggerBuild(project, build);
             assertEquals("Unexpected result for character: " + c, expected, getBuildStatus(project.getName(), buildNumber));

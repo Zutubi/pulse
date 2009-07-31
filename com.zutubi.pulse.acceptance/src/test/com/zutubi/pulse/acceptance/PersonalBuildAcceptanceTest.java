@@ -297,16 +297,17 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     public void testUnifiedPatch() throws Exception
     {
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+
         File patchFile = copyInputToDirectory("txt", workingCopyDir);
         // Specify a revision and a patch file and no working copy should be
         // required.
-        createConfigFile(PROJECT_NAME,
+        createConfigFile(random,
                 asPair(PersonalBuildConfig.PROPERTY_REVISION, WorkingCopy.REVISION_FLOATING),
                 asPair(PersonalBuildConfig.PROPERTY_PATCH_FILE, patchFile.getAbsolutePath()));
 
         loginAsAdmin();
-        ensureProject(PROJECT_NAME);
-        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
         browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
