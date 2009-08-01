@@ -76,17 +76,14 @@ public class DirectoryArtifact extends LocalArtifact
         {
             base = context.getWorkingDir();
         }
-        else if (!base.isAbsolute())
+        else if (!isAbsolute(base))
         {
             base = new File(context.getWorkingDir(), base.getPath());
         }
 
         if (!base.exists())
         {
-            if(result.succeeded() && getFailIfNotPresent())
-            {
-                result.error("Capturing artifact '" + getName() + "': base directory '" + base.getAbsolutePath() + "' does not exist");
-            }
+            checkFailIfNotPresent(result, "Capturing artifact '" + getName() + "': base directory '" + base.getAbsolutePath() + "' does not exist");
 
             // Don't attempt to capture.
             return;

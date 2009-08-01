@@ -26,19 +26,25 @@ public class FileArtifact extends LocalArtifact
         // The specified file may or may not be absolute.  If it is absolute, then we need to jump through a few
         // hoops.
         File captureFile = new File(file);
-        if (captureFile.isAbsolute())
+        boolean absolutePathSpecified = isAbsolute(captureFile);
+        if (!absolutePathSpecified)
         {
-            if (captureFile.isFile())
-            {
-                // excellent, we have the file, we can capture it and continue.
-                StoredArtifact artifact = new StoredArtifact(getName());
-                if(captureFile(artifact, captureFile, FileSystemUtils.composeFilename(getName(), captureFile.getName()), result, context, type))
-                {
-                    result.addArtifact(artifact);
-                }
-                return;
-            }
+            captureFile = new File(context.getWorkingDir(), file);
+        }
 
+        if (captureFile.isFile())
+        {
+            // excellent, we have the file, we can capture it and continue.
+            StoredArtifact artifact = new StoredArtifact(getName());
+            if(captureFile(artifact, captureFile, FileSystemUtils.composeFilename(getName(), captureFile.getName()), result, context, type))
+            {
+                result.addArtifact(artifact);
+            }
+            return;
+        }
+
+        if (absolutePathSpecified)
+        {
             // does the file contain any wild cards?
             if (file.indexOf("*") != -1)
             {
@@ -62,10 +68,7 @@ public class FileArtifact extends LocalArtifact
             }
             else
             {
-                if (result.succeeded() && getFailIfNotPresent())
-                {
-                    result.error("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
-                }
+                checkFailIfNotPresent(result, "Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
             }
         }
         else
@@ -83,21 +86,24 @@ public class FileArtifact extends LocalArtifact
         scanner.scan();
 
         StoredArtifact artifact = new StoredArtifact(getName());
+        boolean multiFile = scanner.getIncludedFilesCount() > 1;
         for (String includedFile : scanner.getIncludedFiles())
         {
             File source = new File(baseDir, includedFile);
-            captureFile(artifact, source, FileSystemUtils.composeFilename(getName(), includedFile), result, context, type);
+            // Captured paths use just the file name unless we capture multiple
+            // files, in which case their paths are used.  Note that capturing
+            // multiple files should really be done with a DirectoryArtifact.
+            String capturedName = multiFile ? includedFile : source.getName();
+            captureFile(artifact, source, FileSystemUtils.composeFilename(getName(), capturedName), result, context, type);
         }
+        
         if (artifact.getChildren().size() > 0)
         {
             result.addArtifact(artifact);
         }
         else
         {
-            if (result.succeeded() && getFailIfNotPresent())
-            {
-                result.error("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
-            }
+            checkFailIfNotPresent(result, "Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
         }
     }
 

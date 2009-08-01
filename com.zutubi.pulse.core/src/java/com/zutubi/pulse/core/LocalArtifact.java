@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,6 +134,27 @@ public abstract class LocalArtifact extends ArtifactSupport
         catch (IOException e)
         {
             throw new BuildException("Unable to collect file '" + fromFile.getAbsolutePath() + "' for artifact '" + getName() + "': " + e.getMessage(), e);
+        }
+    }
+
+    protected boolean isAbsolute(File f)
+    {
+        if (f.isAbsolute())
+        {
+            return true;
+        }
+
+        // On Windows File.isAbsolute() can return false for paths beginning
+        // with a slash, although the path will act absolute in other ways.  So
+        // we treat anything starting with a slash as absolute on Windows
+        return SystemUtils.IS_WINDOWS && f.getPath().startsWith("/") || f.getPath().startsWith("\\");
+    }
+
+    protected void checkFailIfNotPresent(CommandResult result, String message)
+    {
+        if ((result.inProgress() || result.succeeded()) && getFailIfNotPresent())
+        {
+            result.error(message);
         }
     }
 }
