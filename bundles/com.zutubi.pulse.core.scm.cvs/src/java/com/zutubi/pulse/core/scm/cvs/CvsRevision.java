@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.util.StringUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -89,7 +90,7 @@ public class CvsRevision
         setRevisionString(revStr);
 
         // <author>:<branch/tag>:<date>
-        if (revStr == null || revStr.indexOf(":") == -1 || revStr.substring(revStr.indexOf(":")).indexOf(":") == -1)
+        if (revStr == null || StringUtils.count(revStr, ':') < 2)
         {
             throw new ScmException("Invalid CVS revision '" + revStr + "' (must be a date, or <author>:<branch>:<date>)");
         }
@@ -99,44 +100,34 @@ public class CvsRevision
         String branch = remainder.substring(0, remainder.indexOf(":"));
         String date = remainder.substring(remainder.indexOf(":") + 1);
 
-        if (author != null && !author.equals(""))
+        if (author.length() > 0)
         {
             setAuthor(author);
         }
-        if (branch != null && !branch.equals(""))
+
+        if (branch.length() > 0)
         {
             setBranch(branch);
         }
 
-        if (date != null && date.equals(""))
+        if (date.length() > 0)
         {
-            return;
-        }
-
-        // accept two types of date format.
-        try
-        {
-            setDate(DATE_FORMAT.parse(date));
-            return;
-        }
-        catch (ParseException e)
-        {
-            // noop.
-        }
-
-        try
-        {
-            setDate(format.parse(date));
-            return;
-        }
-        catch (ParseException e)
-        {
-            // noop.
-        }
-
-        if (!revStr.equals(""))
-        {
-            throw new ScmException("Invalid CVS revision '" + revStr + "' (must be a date, or <author>:<branch>:<date>)");
+            // accept two types of date format.
+            try
+            {
+                setDate(DATE_FORMAT.parse(date));
+            }
+            catch (ParseException e)
+            {
+                try
+                {
+                    setDate(format.parse(date));
+                }
+                catch (ParseException ex)
+                {
+                    throw new ScmException("Invalid CVS revision '" + revStr + "' cannot parse '" + date + "' as a date");
+                }
+            }
         }
     }
 

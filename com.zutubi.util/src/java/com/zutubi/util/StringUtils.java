@@ -1325,4 +1325,25 @@ public class StringUtils
         }
         return str.substring(i);
     }
+
+    /**
+     * Counts the number of occurrences of a given character in a given string.
+     *
+     * @param s the string to inspect
+     * @param c the character to count occurrences of
+     * @return the number of times {@code c} appears in {@code s}
+     */
+    public static int count(String s, char c)
+    {
+        int count = 0;
+        for (int i = 0; i < s.length(); i++)
+        {
+            if (s.charAt(i) == c)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }
