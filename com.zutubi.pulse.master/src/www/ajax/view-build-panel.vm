@@ -54,3 +54,37 @@
     <div id='#id("${result.ownerName}-build-${result.number}-summary")'>
         #showBuild($buildResult false false)
     </div>
+
+#if($dependencyDetails.size() > 0)
+    <div id='#id("${result.ownerName}-build-${result.number}-dependencies")'>
+        <table id="table.dependencies" width="150" class="content">
+             <th colspan="4" class="heading">retrieved dependencies</th>
+            <tr>
+                <th class="content">stage</th>
+                <th class="content">project</th>
+                <th class="content">build</th>
+                <th class="content">artifact</th>
+            </tr>
+        #foreach($detail in $dependencyDetails)
+            #if ($detail.reportAvailable)
+                #set($currentStageName = '')
+                #foreach($dependency in $detail.dependencies)
+                <tr>
+                    #if($currentStageName != $detail.stageName)
+                    <td class="content">$detail.stageName</td>
+                    #else
+                    <td class="content"></td>
+                    #end
+                    #set($currentStageName = $detail.stageName)
+                    <td class="content"><a href="$dependency.projectUrl">$dependency.projectName</a></td>
+                    <td class="content"><a href="$dependency.buildUrl">$dependency.buildName</a></td>
+                    <td class="content"><a href="$dependency.artifactUrl">$dependency.artifactName</a></td>
+                </tr>
+                #end
+            #else
+                <td colspan="4" class="content"><b>$detail.stageName</b> stage dependency details are not available.  They have most likely been cleaned up.</td>
+            #end
+        #end
+        </table>
+    </div>
+#end

@@ -7,6 +7,7 @@ import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getSeleniumBrowserProperty;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
@@ -258,6 +259,17 @@ public class SeleniumBrowser
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public void login(String username, String password)
+    {
+        LoginPage page = this.openAndWaitFor(LoginPage.class);
+        page.login(username, password);
+    }
+
+    public void loginAsAdmin()
+    {
+        login("admin", "admin");
     }
 
     /**

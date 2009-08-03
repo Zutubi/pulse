@@ -406,6 +406,11 @@ public class IvyClient
         return ivy.getResolveEngine();
     }
 
+    public ResolutionCacheManager getResolutionCacheManager()
+    {
+        return ivy.getResolutionCacheManager();
+    }
+
     public void setMessageLogger(MessageLogger logger)
     {
         ivy.getLoggerEngine().pushLogger(logger);
@@ -433,7 +438,7 @@ public class IvyClient
         // to allow the recipe processor tests to 'override' the retrieve command
         // with a noop.
         RetrieveDependenciesCommandConfiguration command = new RetrieveDependenciesCommandConfiguration();
-        command.setName("retrieve");
+        command.setName(RetrieveDependenciesCommand.COMMAND_NAME);
         command.setIvy(this);
         return command;
     }
