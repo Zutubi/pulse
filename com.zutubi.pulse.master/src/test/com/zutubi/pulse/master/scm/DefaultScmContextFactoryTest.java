@@ -38,7 +38,7 @@ public class DefaultScmContextFactoryTest extends PulseTestCase
 /*
         ScmContext context = factory.createContext(1, null);
         File expectedDir = new File(tmp, FileSystemUtils.join("1", "scm"));
-        assertEquals(expectedDir, context.getPersistentWorkingDir());
+        assertEquals(expectedDir, context.getPersistentWorkDir());
 */
     }
 }

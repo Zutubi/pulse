@@ -265,12 +265,12 @@ public class AgentPingServiceTest extends PulseTestCase
             throw new RuntimeException("Not implemented");
         }
 
-        public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
+        public void collectResults(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern, File outputDest, File workDest)
         {
             throw new RuntimeException("Not implemented");
         }
 
-        public void cleanup(String project, long recipeId, boolean incremental)
+        public void cleanup(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern)
         {
             throw new RuntimeException("Not implemented");
         }

@@ -50,9 +50,9 @@ public interface AgentService extends RemoteService
      * @param workDest    local directory to receive the working copy, or null
      *                    if the working copy should not be collected
      */
-    void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest);
+    void collectResults(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern, File outputDest, File workDest);
 
-    void cleanup(String project, long recipeId, boolean incremental);
+    void cleanup(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern);
 
     /**
      * Terminates the given recipe if it is still running.  This method may

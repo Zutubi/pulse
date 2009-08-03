@@ -12,8 +12,11 @@ import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
+import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Pair;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.mortbay.util.UrlEncoded;
@@ -95,16 +98,16 @@ public class SlaveAgentService implements AgentService
         }
     }
 
-    public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
+    public void collectResults(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern, File outputDest, File workDest)
     {
-        collect(project, recipeId, incremental, true, outputDest);
+        collect(projectHandle, project, recipeId, incremental, persistentPattern, true, outputDest);
         if (workDest != null)
         {
-            collect(project, recipeId, incremental, false, workDest);
+            collect(projectHandle, project, recipeId, incremental, persistentPattern, false, workDest);
         }
     }
 
-    private void collect(String project, long recipeId, boolean incremental, boolean output, File destination)
+    private void collect(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern, boolean output, File destination)
     {
         FileOutputStream fos = null;
         File tempDir = null;
@@ -121,7 +124,15 @@ public class SlaveAgentService implements AgentService
                 throw new BuildException("Unable to create temporary directory '" + tempDir.getAbsolutePath() + "'");
             }
 
-            URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
+            String query = buildQueryString(asPair(PARAM_TOKEN, serviceTokenManager.getToken()),
+                                            asPair(PARAM_PROJECT_HANDLE, Long.toString(projectHandle)),
+                                            asPair(PARAM_PROJECT, project),
+                                            asPair(PARAM_RECIPE_ID, Long.toString(recipeId)),
+                                            asPair(PARAM_INCREMENTAL, Boolean.toString(incremental)),
+                                            asPair(PARAM_PERSISTENT_PATTERN, persistentPattern),
+                                            asPair(PARAM_OUTPUT, Boolean.toString(output)));
+
+            URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?" + query);
             URLConnection urlConnection = resultUrl.openConnection();
             urlConnection.setReadTimeout(300000);
             
@@ -169,11 +180,29 @@ public class SlaveAgentService implements AgentService
         }
     }
 
-    public void cleanup(String project, long recipeId, boolean incremental)
+    private String buildQueryString(Pair<String, String>... params)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (Pair<String, String> param: params)
+        {
+            if (sb.length() > 0)
+            {
+                sb.append('&');
+            }
+
+            sb.append(param.first);
+            sb.append('=');
+            sb.append(UrlEncoded.encodeString(param.second));
+        }
+
+        return sb.toString();
+    }
+
+    public void cleanup(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern)
     {
         try
         {
-            service.cleanupRecipe(serviceTokenManager.getToken(), project, recipeId, incremental);
+            service.cleanupRecipe(serviceTokenManager.getToken(), projectHandle, project, recipeId, incremental, persistentPattern);
         }
         catch (Exception e)
         {

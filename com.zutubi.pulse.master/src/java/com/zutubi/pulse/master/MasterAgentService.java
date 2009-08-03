@@ -110,9 +110,9 @@ public class MasterAgentService implements AgentService
         return getMasterRecipeProcessor().getBuildingRecipe();
     }
 
-    public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
+    public void collectResults(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern, File outputDest, File workDest)
     {
-        ServerRecipePaths recipePaths = new ServerRecipePaths(project, recipeId, configurationManager.getUserPaths().getData(), incremental);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(projectHandle, project, recipeId, configurationManager.getUserPaths().getData(), incremental, persistentPattern);
         File outputDir = recipePaths.getOutputDir();
 
         try
@@ -152,10 +152,10 @@ public class MasterAgentService implements AgentService
         }
     }
 
-    public void cleanup(String project, long recipeId, boolean incremental)
+    public void cleanup(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern)
     {
         // We rename the output dir, so no need to remove it.
-        ServerRecipePaths recipePaths = new ServerRecipePaths(project, recipeId, configurationManager.getUserPaths().getData(), incremental);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(projectHandle, project, recipeId, configurationManager.getUserPaths().getData(), incremental, persistentPattern);
         File recipeRoot = recipePaths.getRecipeRoot();
 
         if (!FileSystemUtils.rmdir(recipeRoot))

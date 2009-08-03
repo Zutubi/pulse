@@ -91,6 +91,7 @@ public class MasterBuildProperties extends BuildProperties
 
         context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, Boolean.toString(true));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_WORKING_DIR, Boolean.toString(projectConfig.getOptions().getRetainWorkingCopy()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN, projectConfig.getOptions().getPersistentWorkDir());
     }
 
     public static void addRevisionProperties(ExecutionContext context, BuildRevision buildRevision)

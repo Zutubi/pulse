@@ -19,6 +19,7 @@ import com.zutubi.util.FileSystem;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -66,7 +67,7 @@ public class SlaveRecipeProcessor
         return null;
     }
 
-    public void processRecipe(String master, long handle, RecipeRequest request)
+    public void processRecipe(String master, long agentHandle, RecipeRequest request)
     {
         MasterService masterProxy = getMasterProxy(master);
         if(masterProxy != null)
@@ -74,8 +75,12 @@ public class SlaveRecipeProcessor
             buildingRecipe.set(request.getId());
             PulseExecutionContext context = request.getContext();
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
-            ResourceRepository repo = new RemoteResourceRepository(handle, masterProxy, serviceTokenManager);
-            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false));
+            ResourceRepository repo = new RemoteResourceRepository(agentHandle, masterProxy, serviceTokenManager);
+            long projectHandle = context.getLong(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, 0);
+            boolean incremental = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false);
+            File dataDir = configurationManager.getUserPaths().getData();
+            String persistentPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN);
+            ServerRecipePaths processorPaths = new ServerRecipePaths(projectHandle, request.getProject(), request.getId(), dataDir, incremental, persistentPattern);
 
             Bootstrapper requestBootstrapper = request.getBootstrapper();
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
@@ -86,6 +91,7 @@ public class SlaveRecipeProcessor
             {
                 recipeCleanup.cleanup(eventManager, processorPaths.getRecipesRoot(), request.getId());
 
+                context.addValue(NAMESPACE_INTERNAL, PROPERTY_DATA_DIR, dataDir.getAbsolutePath());
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, processorPaths);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repo);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));

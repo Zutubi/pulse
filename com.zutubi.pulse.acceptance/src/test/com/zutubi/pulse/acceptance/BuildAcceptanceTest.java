@@ -14,6 +14,7 @@ import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
@@ -23,6 +24,7 @@ import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfigurat
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
@@ -595,6 +597,34 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         // Make sure follower2 is back on its own sequence.
         assertEquals(4, xmlRpcHelper.runBuild(follower2, BUILD_TIMEOUT));
+    }
+
+    public void testPersistentWorkDir() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+
+        String optionsPath = PathUtils.getPath(projectPath, Constants.Project.OPTIONS);
+        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
+        options.put(Constants.Project.Options.PERSISTENT_WORK_DIR, "${data.dir}/customwork/${project}");
+        xmlRpcHelper.saveConfig(optionsPath, options, false);
+
+        String svnPath = PathUtils.getPath(projectPath, Constants.Project.SCM);
+        Hashtable<String, Object> svn = xmlRpcHelper.getConfig(svnPath);
+        svn.put(Constants.Project.Scm.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.toString());
+        xmlRpcHelper.saveConfig(svnPath, svn, false);
+
+        String stagePath = PathUtils.getPath(projectPath, Constants.Project.STAGES, "default");
+        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
+        stage.put(Constants.Project.Stage.AGENT, PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
+        xmlRpcHelper.saveConfig(stagePath, stage, false);
+
+        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        String dataDir = xmlRpcHelper.getServerInfo().get(ConfigurationManager.CORE_PROPERTY_PULSE_DATA_DIR);
+        File workDir = new File(FileSystemUtils.composeFilename(dataDir, "customwork", random));
+        assertTrue(workDir.isDirectory());
+        File buildFile = new File(workDir, "build.xml");
+        assertTrue(buildFile.isFile());
     }
 
     private void enableBuildPrompting(String projectName) throws Exception

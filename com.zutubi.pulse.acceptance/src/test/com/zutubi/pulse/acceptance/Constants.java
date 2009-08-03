@@ -80,6 +80,7 @@ public class Constants
          */
         public static class Scm
         {
+            public static final String CHECKOUT_SCHEME = "checkoutScheme";
             public static final String QUIET_PERIOD_ENABLED = "quietPeriodEnabled";
         }
 
@@ -97,6 +98,7 @@ public class Constants
         public static class Stage
         {
             public static final String RECIPE = "recipe";
+            public static final String AGENT = "agent";
         }
 
         /**
@@ -106,6 +108,7 @@ public class Constants
         {
             public static final String AUTO_CLEAR_RESPONSIBILITY = "autoClearResponsibility";
             public static final String ID_LEADER = "idLeader";
+            public static final String PERSISTENT_WORK_DIR = "persistentWorkDir";
         }
     }
 

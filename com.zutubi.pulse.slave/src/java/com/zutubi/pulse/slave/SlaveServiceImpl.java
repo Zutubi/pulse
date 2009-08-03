@@ -6,12 +6,12 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.SystemInfo;
-import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.services.*;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
@@ -136,11 +136,11 @@ public class SlaveServiceImpl implements SlaveService
         }
     }
 
-    public void cleanupRecipe(String token, String project, long recipeId, boolean incremental) throws InvalidTokenException
+    public void cleanupRecipe(String token, long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
 
-        CleanupRecipeCommand command = new CleanupRecipeCommand(project, recipeId, incremental);
+        CleanupRecipeCommand command = new CleanupRecipeCommand(projectHandle, project, recipeId, incremental, persistentPattern);
         SpringComponentContext.autowire(command);
         threadPool.execute(command);
     }

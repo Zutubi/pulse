@@ -23,22 +23,23 @@ import java.net.URLEncoder;
  */
 public class ServerRecipePaths implements RecipePaths
 {
-    private static final String PROPERTY_PERSISTENT_WORK_DIR = "pulse.persistent.work.dir";
-    private static final String DEFAULT_PERSISTENT_WORK_DIR = "${data}/work/${project}";
-
     private static final Logger LOG = Logger.getLogger(ServerRecipePaths.class);
 
-    private long id;
+    private long projectHandle;
+    private long recipeId;
     private File dataDir;
     private String project;
     private boolean incremental;
+    private String persistentPattern;
 
-    public ServerRecipePaths(String project, long id, File dataDir, boolean incremental)
+    public ServerRecipePaths(long projectHandle, String project, long recipeId, File dataDir, boolean incremental, String persistentPattern)
     {
+        this.projectHandle = projectHandle;
         this.project = project;
-        this.id = id;
+        this.recipeId = recipeId;
         this.dataDir = dataDir;
         this.incremental = incremental;
+        this.persistentPattern = persistentPattern;
     }
 
     public File getRecipesRoot()
@@ -48,24 +49,24 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getRecipeRoot()
     {
-        return new File(getRecipesRoot(), Long.toString(id));
+        return new File(getRecipesRoot(), Long.toString(recipeId));
     }
 
     public File getPersistentWorkDir()
     {
-        String pattern = System.getProperty(PROPERTY_PERSISTENT_WORK_DIR, DEFAULT_PERSISTENT_WORK_DIR);
         ReferenceMap references = new HashReferenceMap();
-        references.add(new Property("data", dataDir.getAbsolutePath()));
+        references.add(new Property("data.dir", dataDir.getAbsolutePath()));
         references.add(new Property("project", encode(project)));
+        references.add(new Property("project.handle", Long.toString(projectHandle)));
 
         try
         {
-            String path = ReferenceResolver.resolveReferences(pattern, references, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
+            String path = ReferenceResolver.resolveReferences(persistentPattern, references, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
             return new File(path);
         }
         catch (ResolutionException e)
         {
-            LOG.warning("Invalid persistent work directory '" + pattern + "': " + e.getMessage(), e);
+            LOG.warning("Invalid persistent work directory '" + persistentPattern + "': " + e.getMessage(), e);
             return new File(dataDir, FileSystemUtils.composeFilename("work", encode(project)));
         }
     }

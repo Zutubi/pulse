@@ -53,7 +53,7 @@ public interface SlaveService
      */
     boolean build(String token, String master, long handle, RecipeRequest request) throws InvalidTokenException;
 
-    void cleanupRecipe(String token, String project, long recipeId, boolean incremental) throws InvalidTokenException;
+    void cleanupRecipe(String token, long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern) throws InvalidTokenException;
 
     void terminateRecipe(String token, long recipeId) throws InvalidTokenException;
 

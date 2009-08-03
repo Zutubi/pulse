@@ -22,18 +22,29 @@ import java.io.IOException;
 public class DownloadResultsServlet extends HttpServlet
 {
     private static final Logger LOG = Logger.getLogger(DownloadResultsServlet.class);
+
+    public static final String PARAM_TOKEN = "token";
+    public static final String PARAM_PROJECT_HANDLE = "projectHandle";
+    public static final String PARAM_PROJECT = "project";
+    public static final String PARAM_RECIPE_ID = "recipeId";
+    public static final String PARAM_INCREMENTAL = "incremental";
+    public static final String PARAM_PERSISTENT_PATTERN = "persistentPattern";
+    public static final String PARAM_OUTPUT = "output";
+
     private ConfigurationManager configurationManager;
     private ServiceTokenManager serviceTokenManager;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     {
-        String project = request.getParameter("project");
-        String id = request.getParameter("recipe");
-        boolean incremental = Boolean.parseBoolean(request.getParameter("incremental"));
+        String projectHandleString = request.getParameter(PARAM_PROJECT_HANDLE);
+        String project = request.getParameter(PARAM_PROJECT);
+        String recipeIdString = request.getParameter(PARAM_RECIPE_ID);
+        boolean incremental = Boolean.parseBoolean(request.getParameter(PARAM_INCREMENTAL));
+        String persistentPattern = request.getParameter(PARAM_PERSISTENT_PATTERN);
 
         try
         {
-            String token = request.getParameter("token");
+            String token = request.getParameter(PARAM_TOKEN);
             try
             {
                 serviceTokenManager.validateToken(token);
@@ -43,11 +54,12 @@ public class DownloadResultsServlet extends HttpServlet
                 response.sendError(403, "Invalid token");
             }
 
-            long recipeId = Long.parseLong(id);
-            boolean output = Boolean.parseBoolean(request.getParameter("output"));
+            long projectHandle = Long.parseLong(projectHandleString);
+            long recipeId = Long.parseLong(recipeIdString);
+            boolean output = Boolean.parseBoolean(request.getParameter(PARAM_OUTPUT));
 
             // lookup the recipe location, zip it up and write to output.
-            ServerRecipePaths paths = new ServerRecipePaths(project, recipeId, configurationManager.getUserPaths().getData(), incremental);
+            ServerRecipePaths paths = new ServerRecipePaths(projectHandle, project, recipeId, configurationManager.getUserPaths().getData(), incremental, persistentPattern);
             File zipFile;
 
             if (output)
@@ -92,7 +104,7 @@ public class DownloadResultsServlet extends HttpServlet
         {
             try
             {
-                response.sendError(500, "Invalid recipe '" + id + "'");
+                response.sendError(500, "Invalid recipe '" + recipeIdString + "'");
             }
             catch (IOException e1)
             {
