@@ -36,7 +36,7 @@
         <echo message="    Component: ${ivy.module}"/>
         <echo message="----------------------------------------------"/>
 
-        <!-- behavioural properties -->
+        <!-- behavioural defaults -->
         <property name="javac.debug" value="true"/>
         <property name="javac.deprecation" value="off"/>
 
@@ -48,10 +48,9 @@
         <property name="classes.dir" value="${build.dir}/classes"/>
         <property name="test.classes.dir" value="${build.dir}/test.classes"/>
         <property name="report.dir" value="${build.dir}/reports"/>
-        
+
         <property name="build.tmp.dir" value="${build.dir}/tmp"/>
 
-        <property name="project.repository" value="${project.root.dir}/build/repository"/>
         <property name="distconf" value="build"/>
 
         <!-- resources / properties definition-->
@@ -145,7 +144,10 @@
 
     <target name="common-clean">
         <delete dir="${build.dir}"/>
-        <delete dir="${user.home}/.ivy-cache/zutubi/pulse-${ivy.module}"/>
+        <delete dir="${user.home}/.ivy2/cache/zutubi/${ivy.module}"/>
+        <delete>
+            <fileset dir="${user.home}/.ivy2/cache/" includes="*zutubi*"/>
+        </delete>
     </target>
 
     <!-- prepare for new build -->
@@ -156,20 +158,19 @@
     <target name="module-post-prepare" description="Post prepare hook."/>
 
     <target name="common-prepare">
+        <antcall target="build-dependencies"/>
+
         <mkdir dir="${classes.dir}"/>
         <mkdir dir="${build.lib.dir}"/>
         <mkdir dir="${test.classes.dir}"/>
         <mkdir dir="${report.dir}/junit/xml"/>
         <mkdir dir="${report.dir}/junit/html"/>
 
-        <!-- build the dependencies. -->
-        <antcall target="prepare-dependencies"/>
-
         <!-- resolve the dependencies, into the build/lib directory. -->
         <retrieve-dependencies dest="${build.lib.dir}" conf="build"/>
     </target>
 
-    <target name="prepare-dependencies" unless="skip.dependencies">
+    <target name="build-dependencies" unless="skip.dependencies">
         <!-- Determine the build list, storing the details in the build.path${ivy.module} reference. -->
         <ivy:buildlist reference="build.path.${ivy.module}" root="${ivy.module}" excluderoot="true" onMissingDescriptor="skip">
             <fileset dir="${project.root.dir}" includes="*/build.xml"/>
@@ -223,9 +224,9 @@
     <!-- run tests -->
     <target name="test" depends="init, module-pre-test, common-test, module-post-test"/>
 
-    <target name="module-pre-test" description="Pre test hook."/>
+    <target name="module-pre-test" description="Pre test hook." unless="skip.tests"/>
 
-    <target name="module-post-test" description="Post test hook."/>
+    <target name="module-post-test" description="Post test hook." unless="skip.tests"/>
 
     <target name="common-test" unless="skip.tests">
         <echo message="----------------------------------------------"/>
@@ -259,11 +260,11 @@
     <!-- package artifacts -->
     <target name="package" depends="init, module-pre-package, common-package, module-post-package"/>
 
-    <target name="module-pre-package"/>
+    <target name="module-pre-package" unless="skip.package"/>
 
-    <target name="module-post-package"/>
+    <target name="module-post-package" unless="skip.package"/>
 
-    <target name="common-package">
+    <target name="common-package" unless="skip.package">
         <echo message="----------------------------------------------"/>
         <echo message="    Component: package ${ivy.module}              "/>
         <echo message="----------------------------------------------"/>
@@ -289,11 +290,11 @@
     <!-- publish the artifacts to the defined repository. -->
     <target name="publish" depends="init, module-pre-publish, common-publish, module-post-publish"/>
 
-    <target name="module-pre-publish"/>
+    <target name="module-pre-publish" unless="skip.publish"/>
 
-    <target name="module-post-publish"/>
+    <target name="module-post-publish" unless="skip.publish"/>
 
-    <target name="common-publish">
+    <target name="common-publish" unless="skip.publish">
         <dirname property="current.dir" file="ivy.xml"/>
         <!-- copy built artifacts to the build/repository -->
         <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
@@ -328,11 +329,12 @@
             <jar file="build/@{name}">
                 <fileset dir="${build.tmp.dir}"/>
             </jar>
+            <delete dir="${build.tmp.dir}"/>
             
         </sequential>
     </macrodef>
 
-    <!-- build this module. -->
+    <!-- build this module and its dependencies. -->
     <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
 
 </project>
