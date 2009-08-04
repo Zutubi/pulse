@@ -1,8 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import static com.zutubi.pulse.acceptance.Constants.TEST_ANT_REPOSITORY;
-import static com.zutubi.pulse.acceptance.Constants.VERSIONED_REPOSITORY;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.SpecifyBuildPropertiesForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -24,6 +23,7 @@ import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfigurat
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.FileArtifactConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
@@ -558,6 +558,43 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         TestSuitePage suitePage = stageTestsPage.clickSuiteAndWait("com.zutubi.testant.UnitTest");
         assertEquals(expectedSummary, suitePage.getTestSummary());
         
+        suitePage.clickStageCrumb();
+        stageTestsPage.waitFor();
+        stageTestsPage.clickAllCrumb();
+        testsPage.waitFor();
+    }
+
+    public void testOCUnitTestResults() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(OCUNIT_REPOSITORY), xmlRpcHelper.getAntConfig());
+
+        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
+        artifactConfig.put("name", "test report");
+        artifactConfig.put("file", "results.txt");
+        artifactConfig.put("postprocessors", new Vector<String>(Arrays.asList("ocunit")));
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, "artifacts"), artifactConfig);
+
+        int buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        loginAsAdmin();
+
+        BuildTestsPage testsPage = new BuildTestsPage(selenium, urls, random, buildId);
+        testsPage.goTo();
+
+        TestResultSummary expectedSummary = new TestResultSummary(0, 3, 0, 583);
+
+        assertTrue(testsPage.hasTests());
+        assertEquals(expectedSummary, testsPage.getTestSummary());
+
+        StageTestsPage stageTestsPage = testsPage.clickStageAndWait("default");
+        assertEquals(expectedSummary, stageTestsPage.getTestSummary());
+
+        TestSuitePage allSuitePage = stageTestsPage.clickSuiteAndWait("All tests");
+        assertEquals(expectedSummary, allSuitePage.getTestSummary());
+
+        TestSuitePage suitePage = allSuitePage.clickSuiteAndWait("/Users/jhiggs/Documents/Projects/Connoisseur/build/Debug/UnitTests.octest(Tests)");
+        assertEquals(expectedSummary, suitePage.getTestSummary());
+
         suitePage.clickStageCrumb();
         stageTestsPage.waitFor();
         stageTestsPage.clickAllCrumb();

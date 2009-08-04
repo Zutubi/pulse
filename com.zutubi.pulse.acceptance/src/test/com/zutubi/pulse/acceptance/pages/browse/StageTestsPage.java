@@ -29,7 +29,7 @@ public class StageTestsPage extends AbstractTestsPage
     public TestSuitePage clickSuiteAndWait(String suite)
     {
         clickSuiteLink(suite);
-        TestSuitePage page = new TestSuitePage(selenium, urls, projectName, buildId, stageName, suite);
+        TestSuitePage page = new TestSuitePage(selenium, urls, projectName, buildId, stageName, uriComponentEncode(suite));
         page.waitFor();
         return page;
     }

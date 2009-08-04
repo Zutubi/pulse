@@ -996,6 +996,43 @@ public class StringUtils
     }
 
     /**
+     * Decodes the given URI path by applying percent decoding to each of its
+     * components.  The path is first split on / before applying {@link #uriComponentDecode(String)}
+     * to each of its components and then reassembling it.
+     *
+     * @param encodedPath the path to decode, should be encoded components
+     *                    joined with literal forward slashes
+     * @return the decoded form of the path
+     */
+    public static String uriPathDecode(String encodedPath)
+    {
+        // Normal splitting does not handle leading separators as we need it
+        // to, so we do it ourselves.
+        int offset = 0;
+        List<String> components = new LinkedList<String>();
+        for (int i = 0; i < encodedPath.length(); i++)
+        {
+            if (encodedPath.charAt(i) == '/')
+            {
+                components.add(encodedPath.substring(offset, i));
+                offset = i + 1;
+            }
+        }
+
+        components.add(encodedPath.substring(offset));
+
+        components = CollectionUtils.map(components, new Mapping<String, String>()
+        {
+            public String map(String s)
+            {
+                return uriComponentDecode(s);
+            }
+        });
+
+        return join("/", components);
+    }
+
+    /**
      * Encodes the given string such that it may be used as a component in a
      * URI (i.e. part of the path in the URI).  Note only a single path
      * component should be passed as the path separator (/) is encoded by

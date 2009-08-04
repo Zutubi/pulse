@@ -3,8 +3,8 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.StringUtils;
 import static com.zutubi.util.StringUtils.toValidHtmlName;
-import static com.zutubi.util.StringUtils.uriComponentEncode;
 
 /**
  * The tests page for a specific suite result.
@@ -18,7 +18,7 @@ public class TestSuitePage extends AbstractTestsPage
 
     public TestSuitePage(Selenium selenium, Urls urls, String projectName, long buildId, String stageName, String suitePath)
     {
-        super(selenium, urls, toValidHtmlName(uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests-" + uriComponentEncode(stageName) + "-" + suitePath), "build " + buildId);
+        super(selenium, urls, toValidHtmlName(projectName + "-build-" + Long.toString(buildId) + "-tests-" + stageName + "-" + suitePath), "build " + buildId);
         this.projectName = projectName;
         this.stageName = stageName;
         this.suitePath = suitePath;
@@ -33,7 +33,7 @@ public class TestSuitePage extends AbstractTestsPage
     public TestSuitePage clickSuiteAndWait(String suiteName)
     {
         clickSuiteLink(suiteName);
-        TestSuitePage page = new TestSuitePage(selenium, urls, projectName, buildId, stageName, PathUtils.getPath(suitePath, suiteName));
+        TestSuitePage page = new TestSuitePage(selenium, urls, projectName, buildId, stageName, PathUtils.getPath(suitePath, StringUtils.uriComponentEncode(suiteName)));
         page.waitFor();
         return page;
     }

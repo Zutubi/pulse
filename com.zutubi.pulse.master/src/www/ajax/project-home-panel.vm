@@ -150,7 +150,7 @@
                 #elseif($act.action == "clearResponsibility")
                         href="#" onclick="clearResponsibility('$project.id'); return false;"
                 #elseif($act.action == "clean")
-                        href="#" onclick="markForClean('$u_projectName'); return false;"
+                        href="#" onclick="markForClean('#jss($u_projectName)'); return false;"
                 #else
                         href="$urls.projectAction($project, $act.action)"
                 #end

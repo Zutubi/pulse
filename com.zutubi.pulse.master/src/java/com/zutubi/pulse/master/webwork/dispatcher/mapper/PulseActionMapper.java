@@ -4,6 +4,7 @@ import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;
 import com.opensymphony.xwork.ActionProxyFactory;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.agents.AgentsActionResolver;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.browse.BrowseActionResolver;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.dashboard.MyBuildsActionResolver;
@@ -11,9 +12,12 @@ import com.zutubi.pulse.master.webwork.dispatcher.mapper.server.ServerActionReso
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -70,19 +74,19 @@ public class PulseActionMapper implements ActionMapper
         {
             // Urls in this space currently have no parameters, just the
             // action name.
-            mapping = getDashboardMapping(path, request);
+            mapping = getDashboardMapping(getEncodedPath(request, namespace), request);
         }
         else if(BROWSE_NAMESPACE.equals(namespace))
         {
-            mapping = getBrowseMapping(path);
+            mapping = getBrowseMapping(getEncodedPath(request, namespace));
         }
         else if(SERVER_NAMESPACE.equals(namespace))
         {
-            mapping = getServerMapping(path);
+            mapping = getServerMapping(getEncodedPath(request, namespace));
         }
         else if(AGENTS_NAMESPACE.equals(namespace))
         {
-            mapping = getAgentsMapping(path);
+            mapping = getAgentsMapping(getEncodedPath(request, namespace));
         }
         else if(ADMIN_NAMESPACE.equals(namespace))
         {
@@ -95,6 +99,40 @@ public class PulseActionMapper implements ActionMapper
         }
 
         return mapping;
+    }
+
+    private String getEncodedPath(HttpServletRequest request, String namespace)
+    {
+        String encoded = request.getRequestURI();
+        try
+        {
+            // The URI may or may not have a scheme://host part.  Let the URI
+            // class parse this for us.
+            URI uri = new URI(encoded);
+            encoded = uri.getRawPath();
+
+            String context = request.getContextPath();
+            if (context.length() > 0 && encoded.startsWith(context))
+            {
+                encoded = encoded.substring(context.length());
+            }
+            
+            if (encoded.startsWith(namespace))
+            {
+                encoded = encoded.substring(namespace.length());
+            }
+
+            if (encoded.startsWith("/"))
+            {
+                encoded = encoded.substring(1);
+            }
+
+            return encoded;
+        }
+        catch (URISyntaxException e)
+        {
+            throw new PulseRuntimeException(e);
+        }
     }
 
     private ActionMapping getConfigMapping(String namespace, String path, String query)
@@ -164,10 +202,10 @@ public class PulseActionMapper implements ActionMapper
         return actionSubmit;
     }
 
-    private ActionMapping getDashboardMapping(String path, HttpServletRequest request)
+    private ActionMapping getDashboardMapping(String encodedPath, HttpServletRequest request)
     {
-        path = normalise(path);
-        if(path.startsWith(PATH_PREFERENCES))
+        encodedPath = normalise(encodedPath);
+        if(encodedPath.startsWith(PATH_PREFERENCES))
         {
             // /dashboard/preferences/<path> is a config view rooted at
             // users/<user>/preferences
@@ -175,37 +213,37 @@ public class PulseActionMapper implements ActionMapper
             parameters.put("prefixPath", "users/${principle}");
             parameters.put("section", "dashboard");
             parameters.put("tab", PATH_PREFERENCES);
-            return getConfigMapping(ADMIN_NAMESPACE, path, request.getQueryString(), parameters);
+            return getConfigMapping(ADMIN_NAMESPACE, StringUtils.uriPathDecode(encodedPath), request.getQueryString(), parameters);
         }
-        else if(path.startsWith(PATH_MY_CHANGES))
+        else if(encodedPath.startsWith(PATH_MY_CHANGES))
         {
-            String[] elements = path.split("/");
+            String[] elements = encodedPath.split("/");
             if(elements.length != 2)
             {
                 return null;
             }
 
             Map<String, String> parameters = new HashMap<String, String>(1);
-            parameters.put("id", elements[1]);
+            parameters.put("id", StringUtils.uriComponentDecode(elements[1]));
             return new ActionMapping("viewChangelist", "default", null, parameters);
         }
-        else if(path.startsWith(PATH_MY_BUILDS))
+        else if(encodedPath.startsWith(PATH_MY_BUILDS))
         {
-            return getResolverMapping(path.substring(2), DASHBOARD_NAMESPACE, new MyBuildsActionResolver());
+            return getResolverMapping(encodedPath.substring(2), DASHBOARD_NAMESPACE, new MyBuildsActionResolver());
         }
         else
         {
-            if (path.length() == 0)
+            if (encodedPath.length() == 0)
             {
-                path = PATH_MY_HOME;
+                encodedPath = PATH_MY_HOME;
             }
             
             // All other dashboard paths are trivial action names.
-            return new ActionMapping(path, DASHBOARD_NAMESPACE, null, null);
+            return new ActionMapping(encodedPath, DASHBOARD_NAMESPACE, null, null);
         }
     }
 
-    private ActionMapping getBrowseMapping(String path)
+    private ActionMapping getBrowseMapping(String encodedPath)
     {
         // browse/                    - projects page
         //   <project>/               - project tabs
@@ -223,22 +261,22 @@ public class PulseActionMapper implements ActionMapper
         //         tests/
         //         file/
         //         wc/
-        return getResolverMapping(path, BROWSE_NAMESPACE, browseActionResolver);
+        return getResolverMapping(encodedPath, BROWSE_NAMESPACE, browseActionResolver);
     }
 
-    private ActionMapping getServerMapping(String path)
+    private ActionMapping getServerMapping(String encodedPath)
     {
-        return getResolverMapping(path, SERVER_NAMESPACE, serverActionResolver);
+        return getResolverMapping(encodedPath, SERVER_NAMESPACE, serverActionResolver);
     }
 
-    private ActionMapping getAgentsMapping(String path)
+    private ActionMapping getAgentsMapping(String encodedPath)
     {
-        return getResolverMapping(path, AGENTS_NAMESPACE, agentsActionResolver);
+        return getResolverMapping(encodedPath, AGENTS_NAMESPACE, agentsActionResolver);
     }
 
-    private ActionMapping getResolverMapping(String path, String namespace, ActionResolver resolver)
+    private ActionMapping getResolverMapping(String encodedPath, String namespace, ActionResolver resolver)
     {
-        return resolve(namespace, normalise(path), resolver);
+        return resolve(namespace, normalise(encodedPath), resolver);
     }
 
     private String normalise(String path)
@@ -246,12 +284,13 @@ public class PulseActionMapper implements ActionMapper
         return path == null ? "" : PathUtils.normalisePath(path);
     }
 
-    private ActionMapping resolve(String namespace, String path, ActionResolver actionResolver)
+    private ActionMapping resolve(String namespace, String encodedPath, ActionResolver actionResolver)
     {
         Map<String, String> parameters = new HashMap<String, String>(actionResolver.getParameters());
-        String[] elements = path.length() == 0 ? new String[0] : path.split("/");
+        String[] elements = encodedPath.length() == 0 ? new String[0] : encodedPath.split("/");
         for(String element: elements)
         {
+            element = StringUtils.uriComponentDecode(element);
             actionResolver = actionResolver.getChild(element);
             if(actionResolver == null)
             {

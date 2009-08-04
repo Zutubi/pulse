@@ -37,6 +37,10 @@ public class Constants
      * Subversion URL for a versioned pulse file project.
      */
     public static final String VERSIONED_REPOSITORY = SUBVERSION_ACCEPT_REPO + "testversioned";
+    /**
+     * Subversion URL for a small sample ant project that has an OCUnit output file results.txt.
+     */
+    public static final String OCUNIT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "ocunit";
 
     /**
      * The constants for the property names in the ProjectConfiguration class.

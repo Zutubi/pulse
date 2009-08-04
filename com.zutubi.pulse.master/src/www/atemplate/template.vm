@@ -15,11 +15,11 @@
 #if(!$rootTemplate)
 #auth("path=$path" "action=create")
     <tr>
-        #actionHeader("clone" "clone" "page_copy" "actionPath('${path}', 'clone', false)")
+        #actionHeader("clone" "clone" "page_copy" "actionPath('#jss(${path})', 'clone', false)")
         <td>clone this #i18n("key=label") and optionally its descendents</td>
     </tr>
     <tr>
-        #actionHeader("smartclone" "smart clone" "smart-clone" "actionPath('${path}', 'smartclone', false)")
+        #actionHeader("smartclone" "smart clone" "smart-clone" "actionPath('#jss(${path})', 'smartclone', false)")
         <td>smart clone this #i18n("key=label") by extracting a template parent and optionally clone its descendents</td>
     </tr>
 #end

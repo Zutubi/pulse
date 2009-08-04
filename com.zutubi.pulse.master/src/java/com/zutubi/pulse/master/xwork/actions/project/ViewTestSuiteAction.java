@@ -9,7 +9,6 @@ import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -89,9 +88,15 @@ public class ViewTestSuiteAction extends StageActionBase
         if(TextUtils.stringSet(path))
         {
             String[] elements = path.split("/");
-            paths = Arrays.asList(elements);
+            paths = CollectionUtils.map(elements, new Mapping<String, String>()
+            {
+                public String map(String s)
+                {
+                    return StringUtils.uriComponentDecode(s);
+                }
+            });
 
-            String[] encodedElements = CollectionUtils.mapToArray(elements, new Mapping<String, String>()
+            String[] encodedElements = CollectionUtils.mapToArray(paths, new Mapping<String, String>()
             {
                 public String map(String s)
                 {

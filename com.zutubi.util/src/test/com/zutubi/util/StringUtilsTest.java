@@ -447,6 +447,66 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals(pieces, split);
     }
 
+    public void testURIPathDecodeEmpty()
+    {
+        assertEquals("", StringUtils.uriPathDecode(""));
+    }
+
+    public void testURIPathDecodeSlash()
+    {
+        assertEquals("/", StringUtils.uriPathDecode("/"));
+    }
+
+    public void testURIPathDecodeSlashes()
+    {
+        assertEquals("///", StringUtils.uriPathDecode("///"));
+    }
+    
+    public void testURIPathDecodeVariousComponents()
+    {
+        assertEquals("/bits/and/sometimes//empty/pieces", StringUtils.uriPathDecode("/bits/and/sometimes//empty/pieces"));
+    }
+
+    public void testURIPathDecodeEndsWithSlash()
+    {
+        assertEquals("trailing/slash/", StringUtils.uriPathDecode("trailing/slash/"));
+    }
+
+    public void testURIPathDecodeEncodedSlashes()
+    {
+        assertEquals("after/decode/cannot/tell", StringUtils.uriPathDecode("after%2Fdecode/cannot%2Ftell"));
+    }
+    
+    public void testURIPathDecodeComponentHasTrailingPercent()
+    {
+        assertEquals("path/%/here", StringUtils.uriPathDecode("path/%/here"));
+    }
+
+    public void testURIPathDecodeComponentWithIncompletePercent()
+    {
+        assertEquals("path/%e/here", StringUtils.uriPathDecode("path/%e/here"));
+    }
+
+    public void testURIPathDecodeComponentWithInvalidPercent()
+    {
+        assertEquals("path/%zz/here", StringUtils.uriPathDecode("path/%zz/here"));
+    }
+
+    public void testURIPathDecodePercent()
+    {
+        assertEquals("path/\u0001/here", StringUtils.uriPathDecode("path/%01/here"));
+    }
+
+    public void testURIPathDecodeMultiplePercents()
+    {
+        assertEquals("\u0001\u0002/path/\u0003\u0004\u0005/here", StringUtils.uriPathDecode("%01%02/path/%03%04%05/here"));
+    }
+
+    public void testURIPathDecodeComponentBeginsWithPercent()
+    {
+        assertEquals("path/\u0001abc/here", StringUtils.uriPathDecode("path/%01abc/here"));
+    }
+
     public void testURIComponentEncodeEmpty()
     {
         assertEquals("", StringUtils.uriComponentEncode(""));
