@@ -71,7 +71,7 @@ public class RetrieveDependenciesCommand implements Command
                     File ivyReport = new File(outDir, IVY_REPORT_FILE);
                     if (!outDir.isDirectory() && !outDir.mkdirs())
                     {
-                        // hmm, do we fail the build because we can not report on its dependency details?
+                        throw new BuildException("Failed to create command output directory: " + outDir.getCanonicalPath());
                     }
 
                     FileSystemUtils.copy(ivyReport, xml);

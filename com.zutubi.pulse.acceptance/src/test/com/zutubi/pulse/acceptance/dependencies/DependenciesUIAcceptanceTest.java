@@ -3,6 +3,8 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 
+import static java.lang.String.valueOf;
+
 public class DependenciesUIAcceptanceTest extends BaseDependenciesAcceptanceTest
 {
     private SeleniumBrowser browser;
@@ -61,14 +63,14 @@ public class DependenciesUIAcceptanceTest extends BaseDependenciesAcceptanceTest
         BuildSummaryPage.DependencyRow row2 = summaryPage.getDependencyRow(2);
 
         assertEquals("default", row1.getStage());
-        assertEquals("", row2.getStage());
+        assertEquals("default", row2.getStage());
 
         assertEquals(projectA.getName(), row1.getProject());
-        assertEquals("" + projectABuildNumber, row1.getBuild());
+        assertEquals(valueOf(projectABuildNumber), row1.getBuild());
         assertEquals("artifactA.jar", row1.getArtifact());
 
         assertEquals(projectB.getName(), row2.getProject());
-        assertEquals("" + projectBBuildNumber, row2.getBuild());
+        assertEquals(valueOf(projectBBuildNumber), row2.getBuild());
         assertEquals("artifactB.jar", row2.getArtifact());
     }
 

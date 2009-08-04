@@ -2,25 +2,25 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
+import com.zutubi.pulse.core.dependency.ivy.IvyFile;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.RetrieveDependenciesCommand;
-import com.zutubi.pulse.core.dependency.ivy.IvyFile;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
-import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
@@ -223,11 +223,6 @@ public class ViewBuildAction extends CommandActionBase
         if(result.completed())
         {
             result.loadFailedTestResults(dataDir, getFailureLimit());
-        }
-
-        // handle dependency reports
-        if (result.completed())
-        {
             loadRetrievalDetails(result);
         }
 
@@ -240,8 +235,6 @@ public class ViewBuildAction extends CommandActionBase
 
         for (RecipeResultNode recipe : result)
         {
-            // for each stage:
-
             CommandResult command = recipe.getResult().getCommandResult(RetrieveDependenciesCommand.COMMAND_NAME);
             if (command == null)
             {
@@ -357,22 +350,26 @@ public class ViewBuildAction extends CommandActionBase
                     StageDependency stageDependency = new StageDependency();
                     dependencies.add(stageDependency);
 
-                    // download link for the artifact.
                     ArtifactDownloadReport downloadReport = getDownloadReport(artifact);
-
                     stageDependency.setArtifactName(artifact.getName() + "." + artifact.getExt());
                     stageDependency.setArtifactUrl(downloadReport.getArtifactOrigin().getLocation());
 
-                    // project name
                     ModuleRevisionId mrid = artifact.getModuleRevisionId();
                     stageDependency.setProjectName(mrid.getName());
-                    stageDependency.setProjectUrl(urls.project(mrid.getName()));
+                    stageDependency.setProjectUrl(urls.project(uriComponentEncode(mrid.getName())));
 
-                    // get build number for MRID - load ivy file and access the buildNumber field.
                     String ivyPath = ivy.getIvyPath(mrid, mrid.getRevision());
                     IvyFile ivyFile = new IvyFile(repositoryRoot, ivyPath);
-                    stageDependency.setBuildName(ivyFile.getBuildNumber());
-                    stageDependency.setBuildUrl(urls.build(mrid.getName(), ivyFile.getBuildNumber()));
+                    if (ivyFile.exists())
+                    {
+                        stageDependency.setBuildName(ivyFile.getBuildNumber());
+                        stageDependency.setBuildUrl(urls.build(uriComponentEncode(mrid.getName()), ivyFile.getBuildNumber()));
+                    }
+                    else
+                    {
+                        stageDependency.setBuildName("unknown");
+                        stageDependency.setBuildUrl("");
+                    }
                 }
 
                 // sort by project name.

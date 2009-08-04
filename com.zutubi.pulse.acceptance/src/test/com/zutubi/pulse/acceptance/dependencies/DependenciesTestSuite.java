@@ -19,6 +19,7 @@ public class DependenciesTestSuite
         TestSuite dependencySuite = new TestSuite();
         dependencySuite.addTestSuite(DependenciesAcceptanceTest.class);
         dependencySuite.addTestSuite(DependenciesConfigurationAcceptanceTest.class);
+        dependencySuite.addTestSuite(DependenciesUIAcceptanceTest.class);
         dependencySuite.addTestSuite(BuildVersionAcceptanceTest.class);
         dependencySuite.addTestSuite(RepositoryPermissionsAcceptanceTest.class);
 
