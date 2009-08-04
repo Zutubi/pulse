@@ -137,6 +137,7 @@ public class DependencyConfiguration extends AbstractConfiguration
         this.customRevision = customRevision;
     }
 
+    @Transient
     public String getDependencyRevision()
     {
         if (revision != null && revision.equals(REVISION_CUSTOM))

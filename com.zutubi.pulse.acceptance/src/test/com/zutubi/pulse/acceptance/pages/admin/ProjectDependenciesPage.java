@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.IDs;
 import com.zutubi.pulse.acceptance.forms.admin.DependencyForm;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -9,8 +10,6 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class ProjectDependenciesPage extends CompositePage
 {
-    private static final String DEPENDENTY_TABLE_ID = "config-table";
-
     public ProjectDependenciesPage(SeleniumBrowser browser, Urls urls, String path)
     {
         super(browser, urls, path);
@@ -34,10 +33,10 @@ public class ProjectDependenciesPage extends CompositePage
     {
         row = row + 1; // skip the table header row.
         return new DependencyRow(
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 0),
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 1),
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 2),
-                browser.getCellContents(DEPENDENTY_TABLE_ID, row, 3)
+                browser.getCellContents(IDs.COLLECTION_TABLE, row, 0),
+                browser.getCellContents(IDs.COLLECTION_TABLE, row, 1),
+                browser.getCellContents(IDs.COLLECTION_TABLE, row, 2),
+                browser.getCellContents(IDs.COLLECTION_TABLE, row, 3)
         );
     }
 
