@@ -660,15 +660,11 @@
         </antcall>
     </target>
 
-    <target name="build.refresh.plugins" depends="clean.plugins,build.all">
-        <!-- retrieve the internal plugins -->
-        <!-- use the default ivy configuration properties. -->
+    <target name="build.refresh.plugins" depends="clean.plugins,buildlist">
         <property file="ivy.properties"/>
-        
         <ivy:settings/>
-
         <retrieve-dependencies ivyfile="package/core/ivy.xml" conf="equinox-bundles" dest="plugins/internal"/>
-        <subant buildpath="bundles" target="explode.prepackaged.deps"/>
+        <subant inheritall="false" target="extract.prepackaged" buildpathref="build.path"/>
         <echo message=""/>
         <echo message="IMPORTANT: The plugin modules must now be compiled in your IDE before the plugins can be used."/>
         <echo message=""/>

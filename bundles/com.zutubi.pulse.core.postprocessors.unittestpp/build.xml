@@ -7,4 +7,8 @@
         <dirname property="project.root.dir" file="../../common-build.xml"/>
     </target>
 
+    <target name="module-post-init">
+        <property name="${ivy.module}.bundle" value="true"/>
+    </target>
+
 </project>

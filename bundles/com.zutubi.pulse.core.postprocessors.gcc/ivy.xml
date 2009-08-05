@@ -20,7 +20,7 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="build,src->@"/>
     </dependencies>
 </ivy-module>
 

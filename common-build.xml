@@ -171,7 +171,7 @@
     </target>
 
     <target name="build-dependencies" unless="skip.dependencies">
-        <!-- Determine the build list, storing the details in the build.path${ivy.module} reference. -->
+        <!-- Determine the build list, storing the details in the build.path.${ivy.module} reference. -->
         <ivy:buildlist reference="build.path.${ivy.module}" root="${ivy.module}" excluderoot="true" onMissingDescriptor="skip">
             <fileset dir="${project.root.dir}" includes="*/build.xml"/>
             <fileset dir="${project.root.dir}/bundles" includes="*/build.xml"/>
@@ -269,9 +269,40 @@
         <echo message="    Component: package ${ivy.module}              "/>
         <echo message="----------------------------------------------"/>
 
-        <jar file="build/${ivy.module}.jar" basedir="${classes.dir}">
-            <patternset refid="release.excludes"/>
-        </jar>
+        <!--
+        Bundles and normal pulse components are jared slightly differently. Bundles
+        contain extracted 3rd party jars and use custom manifests, whilst pulse components
+        do not.
+         -->
+        <if>
+            <isset property="${ivy.module}.bundle"/>
+            <then>
+                <property name="3rd.party.extracted" value="${current.dir}/build/3rdparty/extracted"/>
+                <property name="3rd.party.jars" value="${current.dir}/build/3rdparty/jars"/>
+                <prepare.3rdparty extracted="${3rd.party.extracted}" jars="${3rd.party.jars}"/>
+                <jar file="build/${ivy.module}.jar" manifest="resources/META-INF/MANIFEST.MF">
+                    <fileset dir="${classes.dir}">
+                        <patternset refid="release.excludes"/>
+                    </fileset>
+                    <fileset dir="resources" excludes="resources/META-INF/MANIFEST.MF"/>
+                    <fileset dir="${3rd.party.extracted}">
+                        <exclude name="META-INF"/>
+                    </fileset>
+                    <!-- include license text files. -->
+                    <fileset dir="${3rd.party.jars}">
+                        <exclude name="*.jar"/>
+                    </fileset>
+                </jar>
+            </then>
+        </if>
+        <if>
+            <not><isset property="${ivy.module}.bundle"/></not>
+            <then>
+                <jar file="build/${ivy.module}.jar" basedir="${classes.dir}">
+                    <patternset refid="release.excludes"/>
+                </jar>
+            </then>
+        </if>
 
         <package-src name="${ivy.module}-src.jar" pathref="src.export.selection"/>
 
@@ -308,7 +339,28 @@
 
     <target name="common-dist">
         <dirname property="current.dir" file="ivy.xml"/>
-        <ivy:publish resolver="private" artifactspattern="${current.dir}/build/[artifact].[ext]" conf="${distconf}"/>
+        <ivy:publish resolver="private" forcedeliver="true" artifactspattern="${current.dir}/build/[artifact].[ext]" conf="${distconf}"/>
+    </target>
+
+    <!-- build this module and its dependencies. -->
+    <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
+
+    <target name="extract.prepackaged" depends="init" if="${ivy.module}.bundle"
+            description="Copy and extract the third party packages for the bundle into the plugin/prepackages/&lt;pluginId&gt; directory.">
+        <property name="3rd.party.extracted" value="${current.dir}/build/3rdparty/extracted"/>
+        <property name="3rd.party.jars" value="${current.dir}/build/3rdparty/jars"/>
+
+        <prepare.3rdparty extracted="${3rd.party.extracted}" jars="${3rd.party.extracted}"/>
+
+        <copy todir="${project.root.dir}/plugins/prepackaged/${ivy.module}">
+            <fileset dir="${3rd.party.extracted}">
+                <exclude name="META-INF/MANIFEST.MF"/>
+            </fileset>
+            <!-- include license text files. -->
+            <fileset dir="${3rd.party.jars}">
+                <exclude name="*.jar"/>
+            </fileset>
+        </copy>
     </target>
 
     <macrodef name="package-src">
@@ -330,11 +382,24 @@
                 <fileset dir="${build.tmp.dir}"/>
             </jar>
             <delete dir="${build.tmp.dir}"/>
-            
+
         </sequential>
     </macrodef>
 
-    <!-- build this module and its dependencies. -->
-    <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
+    <macrodef name="prepare.3rdparty">
+        <attribute name="extracted"/>
+        <attribute name="jars"/>
+        <sequential>
+            <mkdir dir="@{extracted}"/>
+            <mkdir dir="@{jars}"/>
+            <retrieve-dependencies dest="@{jars}" conf="bundled_3rd_party"/>
+
+            <unzip dest="@{extracted}">
+                <fileset dir="@{jars}">
+                    <include name="*.jar"/>
+                </fileset>
+            </unzip>
+        </sequential>
+    </macrodef>
 
 </project>
