@@ -36,7 +36,7 @@ public class DirectoryOutput extends FileSystemOutputSupport
         else
         {
             baseDir = new File(base);
-            if (!baseDir.isAbsolute())
+            if (!isAbsolute(baseDir))
             {
                 baseDir = new File(context.getExecutionContext().getWorkingDir(), baseDir.getPath());
             }

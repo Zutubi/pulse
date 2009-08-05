@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_RECIPE_TIMESTAMP_MILLIS;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +36,27 @@ public abstract class FileSystemOutputSupport extends OutputSupport
             context.markOutputForPublish(config.getName(), config.getArtifactPattern());
         }
         context.registerProcessors(config.getName(), config.getPostProcessors());
+    }
+
+    /**
+     * Helper method to test for absolute paths.  Adds extra logic to {@link java.io.File#isAbsolute()}
+     * to detect files that act absolute on Windows despite returning false
+     * from that API call.
+     *
+     * @param f file to test
+     * @return true if the file path resolves like an absolute path
+     */
+    protected boolean isAbsolute(File f)
+    {
+        if (f.isAbsolute())
+        {
+            return true;
+        }
+
+        // On Windows File.isAbsolute() can return false for paths beginning
+        // with a slash, although the path will act absolute in other ways.  So
+        // we treat anything starting with a slash as absolute on Windows
+        return SystemUtils.IS_WINDOWS && f.getPath().startsWith("/") || f.getPath().startsWith("\\");
     }
 
     /**

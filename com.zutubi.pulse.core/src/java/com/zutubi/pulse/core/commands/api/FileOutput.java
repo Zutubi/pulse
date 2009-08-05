@@ -27,19 +27,28 @@ public class FileOutput extends FileSystemOutputSupport
     {
         FileOutputConfiguration config = (FileOutputConfiguration) getConfig();
         String file = config.getFile();
+
         File captureFile = new File(file);
-
-        // The specified file may or may not be absolute.  If it is absolute, then we need to jump through a few
-        // hoops.
-        if (captureFile.isAbsolute())
+        boolean absolutePathSpecified = isAbsolute(captureFile);
+        if (!absolutePathSpecified)
         {
-            if (captureFile.isFile())
-            {
-                // excellent, we have the file, we can capture it and continue.
-                captureFile(new File(toDir, captureFile.getName()), captureFile, context);
-                return;
-            }
+            captureFile = new File(context.getExecutionContext().getWorkingDir(), file);
+        }
 
+        if (captureFile.isFile())
+        {
+            // Simple case: just capture it.
+            if (!captureFile(new File(toDir, captureFile.getName()), captureFile, context)  && config.isFailIfNotPresent())
+            {
+                throw new BuildException("Capturing artifact '" + config.getName() + "': existing file '" + file + "' is stale");
+            }
+            return;
+        }
+
+        // If the specified path was absolute with wildcards, then we need to
+        // jump through a few hoops.
+        if (absolutePathSpecified)
+        {
             // does the file contain any wild cards?
             if (file.indexOf("*") != -1)
             {
@@ -63,8 +72,6 @@ public class FileOutput extends FileSystemOutputSupport
             }
             else
             {
-                // absolute file without wildcards that does not exist. This will be picked up by the getFailIfNotPresent
-                // check at the end of this method.
                 if (config.isFailIfNotPresent() && !context.getResultState().isBroken())
                 {
                     throw new BuildException("Capturing artifact '" + config.getName() + "': no file matching '" + file + "' exists");
@@ -86,9 +93,18 @@ public class FileOutput extends FileSystemOutputSupport
         scanner.scan();
 
         boolean fileCaptured = false;
+        boolean singleFile = scanner.getIncludedFilesCount() == 1;
         for (String includedFile : scanner.getIncludedFiles())
         {
             File dest = new File(toDir, includedFile);
+            if (singleFile)
+            {
+                // Captured paths use just the file name unless we capture multiple
+                // files, in which case their paths are used.  Note that capturing
+                // multiple files should really be done with a DirectoryArtifact.
+                dest = new File(toDir, dest.getName());
+            }
+
             File source = new File(baseDir, includedFile);
             if (captureFile(dest, source, context))
             {
@@ -99,7 +115,14 @@ public class FileOutput extends FileSystemOutputSupport
         FileOutputConfiguration config = (FileOutputConfiguration) getConfig();
         if (!fileCaptured && config.isFailIfNotPresent() && !context.getResultState().isBroken())
         {
-            throw new BuildException("Capturing artifact '" + getConfig().getName() + "': no file matching '" + file + "' exists");
+            if (scanner.getIncludedFilesCount() == 0)
+            {
+                throw new BuildException("Capturing artifact '" + getConfig().getName() + "': no file matching '" + file + "' exists");
+            }
+            else
+            {
+                throw new BuildException("Capturing artifact '" + getConfig().getName() + "': all files matching '" + file + "' are stale");
+            }
         }
     }
 }
