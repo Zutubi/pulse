@@ -437,7 +437,6 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     {
         PersonalBuildConfig config = new PersonalBuildConfig(workingCopyDir);
         AcceptancePersonalBuildUI ui = new AcceptancePersonalBuildUI();
-        PersonalBuildClient client = new PersonalBuildClient(config, ui);
 
         DefaultPatchFormatFactory patchFormatFactory = new DefaultPatchFormatFactory();
         patchFormatFactory.registerScm(SubversionClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);
@@ -446,9 +445,10 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         patchFormatFactory.registerFormatType("unified", UnifiedPatchFormat.class);
         patchFormatFactory.setObjectFactory(new DefaultObjectFactory());
 
-        PersonalBuildCommand command = new PersonalBuildCommand();
-        command.setPatchFormatFactory(patchFormatFactory);
+        PersonalBuildClient client = new PersonalBuildClient(config, ui);
+        client.setPatchFormatFactory(patchFormatFactory);
 
+        PersonalBuildCommand command = new PersonalBuildCommand();
         command.execute(client);
         return ui;
     }

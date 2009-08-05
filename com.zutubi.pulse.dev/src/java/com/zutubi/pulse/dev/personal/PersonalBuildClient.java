@@ -50,6 +50,7 @@ public class PersonalBuildClient
 
     private PersonalBuildConfig config;
     private PersonalBuildUI ui;
+    private PatchFormatFactory patchFormatFactory;
     private String password;
 
     public PersonalBuildClient(PersonalBuildConfig config, PersonalBuildUI ui)
@@ -68,7 +69,7 @@ public class PersonalBuildClient
         return ui;
     }
 
-    public PersonalBuildContext checkConfiguration(PatchFormatFactory patchFormatFactory) throws PersonalBuildException
+    public PersonalBuildContext checkConfiguration() throws PersonalBuildException
     {
         ui.debug("Verifying configuration with pulse server...");
         checkRequiredConfig();
@@ -569,5 +570,10 @@ public class PersonalBuildClient
         {
             post.releaseConnection();
         }
+    }
+
+    public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
+    {
+        this.patchFormatFactory = patchFormatFactory;
     }
 }

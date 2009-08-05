@@ -23,13 +23,11 @@ public class PersonalBuildCommand implements Command
 {
     private static final Messages I18N = Messages.getInstance(PersonalBuildCommand.class);
 
-    private PatchFormatFactory patchFormatFactory;
-
     public int execute(PersonalBuildClient client)
     {
         try
         {
-            PersonalBuildContext context = client.checkConfiguration(patchFormatFactory);
+            PersonalBuildContext context = client.checkConfiguration();
             PersonalBuildRevision revision = client.chooseRevision(context);
 
             File patchFile;
@@ -86,8 +84,9 @@ public class PersonalBuildCommand implements Command
         DevBootstrapManager.startup("com/zutubi/pulse/dev/personal/bootstrap/context/applicationContext.xml");
         try
         {
-            setPatchFormatFactory((PatchFormatFactory) SpringComponentContext.getBean("patchFormatFactory"));
-            return execute(PersonalBuildClientFactory.newInstance(argv));
+            PersonalBuildClient client = PersonalBuildClientFactory.newInstance(argv);
+            client.setPatchFormatFactory((PatchFormatFactory) SpringComponentContext.getBean("patchFormatFactory"));
+            return execute(client);
         }
         finally
         {
@@ -144,11 +143,6 @@ public class PersonalBuildCommand implements Command
     public boolean isDefault()
     {
         return false;
-    }
-
-    public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
-    {
-        this.patchFormatFactory = patchFormatFactory;
     }
 
     public static void main(String[] argv)
