@@ -2,6 +2,7 @@ package com.zutubi.pulse.servercore.services;
 
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
@@ -53,7 +54,7 @@ public interface SlaveService
      */
     boolean build(String token, String master, long handle, RecipeRequest request) throws InvalidTokenException;
 
-    void cleanupRecipe(String token, String project, long recipeId, boolean incremental) throws InvalidTokenException;
+    void cleanupRecipe(String token, AgentRecipeDetails recipeDetails) throws InvalidTokenException;
 
     void terminateRecipe(String token, long recipeId) throws InvalidTokenException;
 

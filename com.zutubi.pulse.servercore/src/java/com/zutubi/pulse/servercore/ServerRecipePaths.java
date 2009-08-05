@@ -7,11 +7,10 @@ import com.zutubi.pulse.core.ResolutionException;
 import com.zutubi.pulse.core.engine.api.HashReferenceMap;
 import com.zutubi.pulse.core.engine.api.ReferenceMap;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * The server recipe paths:
@@ -23,22 +22,20 @@ import java.net.URLEncoder;
  */
 public class ServerRecipePaths implements RecipePaths
 {
-    private static final String PROPERTY_PERSISTENT_WORK_DIR = "pulse.persistent.work.dir";
-    private static final String DEFAULT_PERSISTENT_WORK_DIR = "${data}/work/${project}";
-
     private static final Logger LOG = Logger.getLogger(ServerRecipePaths.class);
 
-    private long id;
+    private AgentRecipeDetails recipeDetails;
     private File dataDir;
-    private String project;
-    private boolean incremental;
 
-    public ServerRecipePaths(String project, long id, File dataDir, boolean incremental)
+    public ServerRecipePaths(AgentRecipeDetails recipeDetails, File dataDir)
     {
-        this.project = project;
-        this.id = id;
+        this.recipeDetails = recipeDetails;
         this.dataDir = dataDir;
-        this.incremental = incremental;
+    }
+
+    public ServerRecipePaths(long projectHandle, String project, long recipeId, boolean incremental, String persistentPattern, File dataDir)
+    {
+        this(new AgentRecipeDetails(projectHandle, project, recipeId, incremental, persistentPattern), dataDir);
     }
 
     public File getRecipesRoot()
@@ -48,43 +45,31 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getRecipeRoot()
     {
-        return new File(getRecipesRoot(), Long.toString(id));
+        return new File(getRecipesRoot(), Long.toString(recipeDetails.getRecipeId()));
     }
 
     public File getPersistentWorkDir()
     {
-        String pattern = System.getProperty(PROPERTY_PERSISTENT_WORK_DIR, DEFAULT_PERSISTENT_WORK_DIR);
         ReferenceMap references = new HashReferenceMap();
-        references.add(new GenericReference<String>("data", dataDir.getAbsolutePath()));
-        references.add(new GenericReference<String>("project", encode(project)));
+        references.add(new GenericReference<String>("data.dir", dataDir.getAbsolutePath()));
+        references.add(new GenericReference<String>("project", WebUtils.formUrlEncode(recipeDetails.getProject())));
+        references.add(new GenericReference<String>("project.handle", Long.toString(recipeDetails.getProjectHandle())));
 
         try
         {
-            String path = ReferenceResolver.resolveReferences(pattern, references, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
+            String path = ReferenceResolver.resolveReferences(recipeDetails.getPersistentPattern(), references, ReferenceResolver.ResolutionStrategy.RESOLVE_STRICT);
             return new File(path);
         }
         catch (ResolutionException e)
         {
-            LOG.warning("Invalid persistent work directory '" + pattern + "': " + e.getMessage(), e);
-            return new File(dataDir, FileSystemUtils.composeFilename("work", encode(project)));
-        }
-    }
-
-    private String encode(String s)
-    {
-        try
-        {
-            return URLEncoder.encode(s, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return s;
+            LOG.warning("Invalid persistent work directory '" + recipeDetails.getPersistentPattern() + "': " + e.getMessage(), e);
+            return new File(dataDir, FileSystemUtils.composeFilename("work", WebUtils.formUrlEncode(recipeDetails.getProject())));
         }
     }
 
     public File getBaseDir()
     {
-        if(incremental)
+        if (recipeDetails.isIncremental())
         {
             return getPersistentWorkDir();
         }

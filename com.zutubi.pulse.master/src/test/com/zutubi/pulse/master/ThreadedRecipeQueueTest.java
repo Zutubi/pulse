@@ -29,6 +29,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.AgentRequirements;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
@@ -868,12 +869,14 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             return acceptBuild;
         }
 
-        public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
+        public void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest)
         {
+            throw new RuntimeException("Not implemented");
         }
 
-        public void cleanup(String project, long recipeId, boolean incremental)
+        public void cleanup(AgentRecipeDetails recipeDetails)
         {
+            throw new RuntimeException("Not implemented");
         }
 
         public void terminateRecipe(long recipeId)

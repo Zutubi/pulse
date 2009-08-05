@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.scm.api.ScmFile;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectProvider;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
@@ -43,7 +43,7 @@ public class ScmFileObject extends AbstractScmFileObject
                 if (projectProvider != null)
                 {
                     long id = projectProvider.getProjectId();
-                    availableActions = Arrays.asList(new FileAction(FileAction.TYPE_DOWNLOAD, "/downloadSCMFile.action?projectId=" + id + "&path=" + StringUtils.formUrlEncode(scmFile.getPath())));
+                    availableActions = Arrays.asList(new FileAction(FileAction.TYPE_DOWNLOAD, "/downloadSCMFile.action?projectId=" + id + "&path=" + WebUtils.formUrlEncode(scmFile.getPath())));
                 }
             }
             catch (FileSystemException e)

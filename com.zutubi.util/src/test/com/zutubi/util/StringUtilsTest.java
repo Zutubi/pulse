@@ -1060,6 +1060,26 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals("atch", StringUtils.stripPrefix("nomatch", "nom"));
     }
 
+    public void testCountEmpty()
+    {
+        assertEquals(0, StringUtils.count("", 'x'));
+    }
+
+    public void testCountNoOccurrences()
+    {
+        assertEquals(0, StringUtils.count("there are no ecses", 'x'));
+    }
+
+    public void testCountOneOccurrence()
+    {
+        assertEquals(1, StringUtils.count("there is one x here", 'x'));
+    }
+    
+    public void testCountMultipleOccurrences()
+    {
+        assertEquals(5, StringUtils.count("how do you spell xxxx? one x or two?", 'x'));
+    }
+
     private <T> T[] a(T... a)
     {
         return a;

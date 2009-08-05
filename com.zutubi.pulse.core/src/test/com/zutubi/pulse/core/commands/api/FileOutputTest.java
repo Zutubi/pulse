@@ -196,8 +196,7 @@ public class FileOutputTest extends PulseTestCase
     {
         if (SystemUtils.IS_WINDOWS)
         {
-            capture("/" + FILE_TXT_1);
-            assertNoFilesCaptured();
+            nonExistantTest("/" + FILE_TXT_1);
         }
     }
 

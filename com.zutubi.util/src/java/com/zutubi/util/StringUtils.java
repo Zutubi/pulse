@@ -3,7 +3,6 @@ package com.zutubi.util;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -675,27 +674,6 @@ public class StringUtils
     }
 
     /**
-     * Encodes the given string in application/x-www-form-urlencoded format.
-     * Note that this is *not* the same as encoding the string to be part of
-     * a URL itself.
-     *
-     * @param s the string to encode
-     * @return application/x-www-form-urlencoded form of the string
-     * @see URLEncoder
-     */
-    public static String formUrlEncode(String s)
-    {
-        try
-        {
-            return URLEncoder.encode(s, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return s;
-        }
-    }
-
-    /**
      * Encodes the given string as a path to appear in a literal URL (as
      * defined in RFC2396).
      *
@@ -1357,5 +1335,26 @@ public class StringUtils
         {
             return s;
         }
+    }
+
+    /**
+     * Counts the number of occurrences of a given character in a given string.
+     *
+     * @param s the string to inspect
+     * @param c the character to count occurrences of
+     * @return the number of times {@code c} appears in {@code s}
+     */
+    public static int count(String s, char c)
+    {
+        int count = 0;
+        for (int i = 0; i < s.length(); i++)
+        {
+            if (s.charAt(i) == c)
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 }

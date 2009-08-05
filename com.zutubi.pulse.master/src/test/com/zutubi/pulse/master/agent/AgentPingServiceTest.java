@@ -13,6 +13,7 @@ import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.events.AgentPingEvent;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
@@ -263,12 +264,12 @@ public class AgentPingServiceTest extends PulseTestCase
             throw new RuntimeException("Not implemented");
         }
 
-        public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
+        public void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest)
         {
             throw new RuntimeException("Not implemented");
         }
 
-        public void cleanup(String project, long recipeId, boolean incremental)
+        public void cleanup(AgentRecipeDetails recipeDetails)
         {
             throw new RuntimeException("Not implemented");
         }

@@ -4,13 +4,13 @@ import com.zutubi.pulse.core.postprocessors.api.TestResult;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.core.util.api.XMLUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.WebUtils;
 import nu.xom.*;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  */
@@ -37,7 +37,7 @@ public class TestSuitePersister
     {
         for (PersistentTestSuiteResult childSuite : suite.getSuites())
         {
-            File suiteDir = new File(directory, encodeName(childSuite.getName()));
+            File suiteDir = new File(directory, WebUtils.formUrlEncode(childSuite.getName()));
             FileSystemUtils.createDirectory(suiteDir);
 
             write(childSuite, suiteDir);
@@ -178,7 +178,7 @@ public class TestSuitePersister
 
             if (deep)
             {
-                File child = new File(directory, encodeName(name));
+                File child = new File(directory, WebUtils.formUrlEncode(name));
                 if (child.isDirectory())
                 {
                     read(handler, name, child, deep, failuresOnly, counter);
@@ -356,18 +356,6 @@ public class TestSuitePersister
     {
         Builder builder = new Builder();
         return builder.build(file);
-    }
-
-    private String encodeName(String name)
-    {
-        try
-        {
-            return URLEncoder.encode(name, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return name;
-        }
     }
 
     private class Counter

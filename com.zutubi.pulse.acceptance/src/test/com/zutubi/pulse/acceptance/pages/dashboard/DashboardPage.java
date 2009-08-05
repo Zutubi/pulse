@@ -4,8 +4,8 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.user.ResponsibilityModel;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * The dashboard page shows a user's configurable dashboard.
@@ -39,7 +39,7 @@ public class DashboardPage extends ProjectsSummaryPage
         // continue to test the link itself on non-Windows systems.
         if (SystemUtils.IS_WINDOWS)
         {
-            browser.open(urls.base() + "user/hideDashboardGroup.action?groupName=" + StringUtils.formUrlEncode(group));
+            browser.open(urls.base() + "user/hideDashboardGroup.action?groupName=" + WebUtils.formUrlEncode(group));
         }
         else
         {
@@ -54,7 +54,7 @@ public class DashboardPage extends ProjectsSummaryPage
         // As above, a workaround for Selenium/IE issues.
         if (SystemUtils.IS_WINDOWS)
         {
-            browser.open(urls.base() + "user/hideDashboardProject.action?projectName=" + StringUtils.formUrlEncode(project));
+            browser.open(urls.base() + "user/hideDashboardProject.action?projectName=" + WebUtils.formUrlEncode(project));
         }
         else
         {

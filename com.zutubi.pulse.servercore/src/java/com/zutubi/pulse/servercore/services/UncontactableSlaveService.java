@@ -2,6 +2,7 @@ package com.zutubi.pulse.servercore.services;
 
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
@@ -41,7 +42,7 @@ public class UncontactableSlaveService implements SlaveService
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
-    public void cleanupRecipe(String token, String project, long recipeId, boolean incremental) throws InvalidTokenException
+    public void cleanupRecipe(String token, AgentRecipeDetails recipeDetails) throws InvalidTokenException
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

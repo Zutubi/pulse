@@ -22,12 +22,12 @@ import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TimeStamps;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.utility.StringUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -161,14 +161,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public String urlEncode(String s)
     {
-        try
-        {
-            return URLEncoder.encode(s, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return s;
-        }
+        return WebUtils.formUrlEncode(s);
     }
 
     public String jsStringEncode(String s)

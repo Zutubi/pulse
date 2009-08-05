@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
@@ -110,9 +111,9 @@ public class MasterAgentService implements AgentService
         return getMasterRecipeProcessor().getBuildingRecipe();
     }
 
-    public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
+    public void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest)
     {
-        ServerRecipePaths recipePaths = new ServerRecipePaths(project, recipeId, configurationManager.getUserPaths().getData(), incremental);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
         File outputDir = recipePaths.getOutputDir();
 
         try
@@ -127,7 +128,7 @@ public class MasterAgentService implements AgentService
         if (workDest != null)
         {
             File workDir = recipePaths.getBaseDir();
-            if (incremental)
+            if (recipeDetails.isIncremental())
             {
                 try
                 {
@@ -152,10 +153,10 @@ public class MasterAgentService implements AgentService
         }
     }
 
-    public void cleanup(String project, long recipeId, boolean incremental)
+    public void cleanup(AgentRecipeDetails recipeDetails)
     {
         // We rename the output dir, so no need to remove it.
-        ServerRecipePaths recipePaths = new ServerRecipePaths(project, recipeId, configurationManager.getUserPaths().getData(), incremental);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
         File recipeRoot = recipePaths.getRecipeRoot();
 
         if (!FileSystemUtils.rmdir(recipeRoot))

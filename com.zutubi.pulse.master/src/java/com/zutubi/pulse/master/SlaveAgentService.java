@@ -8,15 +8,18 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
+import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import org.mortbay.util.UrlEncoded;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -95,16 +98,16 @@ public class SlaveAgentService implements AgentService
         }
     }
 
-    public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
+    public void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest)
     {
-        collect(project, recipeId, incremental, true, outputDest);
+        collect(recipeDetails, true, outputDest);
         if (workDest != null)
         {
-            collect(project, recipeId, incremental, false, workDest);
+            collect(recipeDetails, false, workDest);
         }
     }
 
-    private void collect(String project, long recipeId, boolean incremental, boolean output, File destination)
+    private void collect(AgentRecipeDetails recipeDetails, boolean output, File destination)
     {
         FileOutputStream fos = null;
         File tempDir = null;
@@ -121,7 +124,15 @@ public class SlaveAgentService implements AgentService
                 throw new BuildException("Unable to create temporary directory '" + tempDir.getAbsolutePath() + "'");
             }
 
-            URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
+            String query = WebUtils.buildQueryString(asPair(PARAM_TOKEN, serviceTokenManager.getToken()),
+                                            asPair(PARAM_PROJECT_HANDLE, Long.toString(recipeDetails.getProjectHandle())),
+                                            asPair(PARAM_PROJECT, recipeDetails.getProject()),
+                                            asPair(PARAM_RECIPE_ID, Long.toString(recipeDetails.getRecipeId())),
+                                            asPair(PARAM_INCREMENTAL, Boolean.toString(recipeDetails.isIncremental())),
+                                            asPair(PARAM_PERSISTENT_PATTERN, recipeDetails.getPersistentPattern()),
+                                            asPair(PARAM_OUTPUT, Boolean.toString(output)));
+
+            URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?" + query);
             URLConnection urlConnection = resultUrl.openConnection();
             urlConnection.setReadTimeout(300000);
             
@@ -169,15 +180,15 @@ public class SlaveAgentService implements AgentService
         }
     }
 
-    public void cleanup(String project, long recipeId, boolean incremental)
+    public void cleanup(AgentRecipeDetails recipeDetails)
     {
         try
         {
-            service.cleanupRecipe(serviceTokenManager.getToken(), project, recipeId, incremental);
+            service.cleanupRecipe(serviceTokenManager.getToken(), recipeDetails);
         }
         catch (Exception e)
         {
-            LOG.warning("Failed to cleanup recipe '" + recipeId + "' on slave '" + agentConfig.getName() + "'", e);
+            LOG.warning("Failed to cleanup recipe '" + recipeDetails.getRecipeId() + "' on slave '" + agentConfig.getName() + "'", e);
         }
     }
 

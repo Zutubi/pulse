@@ -6,9 +6,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import com.zutubi.util.WebUtils;
 
 /**
  * A change viwer implementation for linking to a Trac instance, version 0.11
@@ -46,14 +44,6 @@ public class Trac11ChangeViewer extends AbstractTracChangeViewer
             path = path.substring(1);
         }
 
-        try
-        {
-            return URLEncoder.encode(path, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            // Programmer error!
-            return path;
-        }
+        return WebUtils.formUrlEncode(path);
     }
 }

@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -125,7 +125,7 @@ public class DefaultTestManager implements TestManager
 
                 if (i > 0)
                 {
-                    path += StringUtils.formUrlEncode(suite.getName());
+                    path += WebUtils.formUrlEncode(suite.getName());
                 }
 
                 i++;
@@ -134,7 +134,7 @@ public class DefaultTestManager implements TestManager
 
         private String getCasePath(String name)
         {
-            name = StringUtils.formUrlEncode(name);
+            name = WebUtils.formUrlEncode(name);
             if (TextUtils.stringSet(path))
             {
                 return path + "/" + name;

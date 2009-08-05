@@ -17,6 +17,8 @@ import com.zutubi.util.FileSystem;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
+import java.io.File;
+
 /**
  * A runnable that wraps execution of a recipe on the master.
  */
@@ -46,7 +48,11 @@ public class MasterRecipeRunner implements Runnable
         request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
         PulseExecutionContext context = request.getContext();
-        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false));
+        long projectHandle = context.getLong(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, 0);
+        File dataDir = configurationManager.getUserPaths().getData();
+        boolean incremental = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false);
+        String persistentPattern = context.getString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(projectHandle, request.getProject(), request.getId(), incremental, persistentPattern, dataDir);
 
         CommandEventOutputStream outputStream = null;
         context.push();
@@ -54,6 +60,7 @@ public class MasterRecipeRunner implements Runnable
         {
             recipeCleanup.cleanup(eventManager, recipePaths.getRecipesRoot(), request.getId());
 
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_DATA_DIR, dataDir.getAbsolutePath());
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, recipePaths);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));

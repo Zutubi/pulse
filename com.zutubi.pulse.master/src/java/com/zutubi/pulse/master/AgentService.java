@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.RemoteService;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
@@ -42,17 +43,15 @@ public interface AgentService extends RemoteService
      * Collects files produced by the recipe execution to the given local
      * directories.  Note that working copy collection is optional.
      *
-     * @param project     name of the project
-     * @param recipeId    id of the recipe to collect results for
-     * @param incremental true for incremental builds
-     * @param outputDest  local directory to receive the output files
-     *                    (artifacts)
-     * @param workDest    local directory to receive the working copy, or null
-     *                    if the working copy should not be collected
+     * @param recipeDetails details of the recipe used to find the results
+     * @param outputDest    local directory to receive the output files
+     *                      (artifacts)
+     * @param workDest      local directory to receive the working copy, or null
+     *                      if the working copy should not be collected
      */
-    void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest);
+    void collectResults(AgentRecipeDetails recipeDetails, File outputDest, File workDest);
 
-    void cleanup(String project, long recipeId, boolean incremental);
+    void cleanup(AgentRecipeDetails recipeDetails);
 
     /**
      * Terminates the given recipe if it is still running.  This method may

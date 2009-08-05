@@ -62,7 +62,33 @@ public class CvsRevisionTest extends PulseTestCase
         }
         catch (ScmException e)
         {
-            assertEquals("Invalid CVS revision '1:2:3:4:5:6:7' (must be a date, or <author>:<branch>:<date>)", e.getMessage());
+            assertEquals("Invalid CVS revision '1:2:3:4:5:6:7' cannot parse '3:4:5:6:7' as a date", e.getMessage());
+        }
+    }
+
+    public void testGetRevisionJustColon() throws ScmException, ParseException
+    {
+        try
+        {
+            new CvsRevision(":");
+            fail();
+        }
+        catch (ScmException e)
+        {
+            assertEquals("Invalid CVS revision ':' (must be a date, or <author>:<branch>:<date>)", e.getMessage());
+        }
+    }
+    
+    public void testGetRevisionSingleColon() throws ScmException, ParseException
+    {
+        try
+        {
+            new CvsRevision(":branch");
+            fail();
+        }
+        catch (ScmException e)
+        {
+            assertEquals("Invalid CVS revision ':branch' (must be a date, or <author>:<branch>:<date>)", e.getMessage());
         }
     }
 
@@ -76,6 +102,19 @@ public class CvsRevisionTest extends PulseTestCase
         catch (ScmException e)
         {
             assertEquals("Invalid CVS revision 'baddate' (must be a date, or <author>:<branch>:<date>)", e.getMessage());
+        }
+    }
+
+    public void testGetRevisionInvalidDateAfterColons() throws ScmException, ParseException
+    {
+        try
+        {
+            new CvsRevision("::baddate");
+            fail();
+        }
+        catch (ScmException e)
+        {
+            assertEquals("Invalid CVS revision '::baddate' cannot parse 'baddate' as a date", e.getMessage());
         }
     }
 

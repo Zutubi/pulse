@@ -13,6 +13,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.WebUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -195,7 +196,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
             ReferenceMap references = new HashReferenceMap();
             references.add(new GenericReference<String>(PROPERTY_PATH, StringUtils.urlEncodePath(fileChange.getPath())));
             references.add(new GenericReference<String>(PROPERTY_PATH_RAW, fileChange.getPath()));
-            references.add(new GenericReference<String>(PROPERTY_PATH_FORM, StringUtils.formUrlEncode(fileChange.getPath())));
+            references.add(new GenericReference<String>(PROPERTY_PATH_FORM, WebUtils.formUrlEncode(fileChange.getPath())));
             references.add(new GenericReference<String>(PROPERTY_REVISION, fileChange.getRevision().getRevisionString()));
             references.add(new GenericReference<String>(PROPERTY_CHANGE_REVISION, context.getChangelist().getRevision().getRevisionString()));
 

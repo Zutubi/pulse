@@ -128,6 +128,12 @@ public class BuildProperties
      */
     public static final String PROPERTY_OWNER                   = "owner";
     /**
+     * Specifies the location of the persistent working directory for a project
+     * on an agent.  Supports limited properties (as it is resolved when the
+     * full context is not available).
+     */
+    public static final String PROPERTY_PERSISTENT_WORK_PATTERN = "persistent.work.pattern";
+    /**
      * Set to "true" for a personal build, "false" otherwise.
      */
     public static final String PROPERTY_PERSONAL_BUILD          = "personal.build";
@@ -183,6 +189,11 @@ public class BuildProperties
      * Internal property used to collect custom field values for a recipe.
      */
     public static final String PROPERTY_CUSTOM_FIELDS           = "custom.fields";
+    /**
+     * The absolute path of the data directory for the agent running the
+     * recipe.
+     */
+    public static final String PROPERTY_DATA_DIR                = "data.dir";
     /**
      * An internal property used by agents to locate files needed during the
      * build.

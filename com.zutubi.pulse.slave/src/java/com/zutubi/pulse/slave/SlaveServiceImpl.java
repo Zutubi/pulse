@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
@@ -136,11 +137,11 @@ public class SlaveServiceImpl implements SlaveService
         }
     }
 
-    public void cleanupRecipe(String token, String project, long recipeId, boolean incremental) throws InvalidTokenException
+    public void cleanupRecipe(String token, AgentRecipeDetails recipeDetails) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
 
-        CleanupRecipeCommand command = new CleanupRecipeCommand(project, recipeId, incremental);
+        CleanupRecipeCommand command = new CleanupRecipeCommand(recipeDetails);
         SpringComponentContext.autowire(command);
         threadPool.execute(command);
     }
