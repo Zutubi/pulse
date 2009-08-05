@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.engine.PulseFileProvider;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
@@ -24,7 +24,7 @@ public class RecipeRequest
      * The pulse file, potentially set lazily as it is determined (when
      * revision is determined).
      */
-    private PulseFileSource pulseFileSource;
+    private PulseFileProvider pulseFileProvider;
     /**
      * Context for the recipe.
      */
@@ -39,10 +39,10 @@ public class RecipeRequest
         this(null, null, context);
     }
 
-    public RecipeRequest(Bootstrapper bootstrapper, PulseFileSource pulseFileSource, PulseExecutionContext context)
+    public RecipeRequest(Bootstrapper bootstrapper, PulseFileProvider pulseFileProvider, PulseExecutionContext context)
     {
         this.bootstrapper = bootstrapper;
-        this.pulseFileSource = pulseFileSource;
+        this.pulseFileProvider = pulseFileProvider;
         this.context = context;
     }
 
@@ -85,9 +85,9 @@ public class RecipeRequest
         return bootstrapper;
     }
 
-    public PulseFileSource getPulseFileSource()
+    public PulseFileProvider getPulseFileSource()
     {
-        return pulseFileSource;
+        return pulseFileProvider;
     }
 
     public String getRecipeName()
@@ -123,9 +123,9 @@ public class RecipeRequest
         this.bootstrapper = bootstrapper;
     }
 
-    public void setPulseFileSource(PulseFileSource pulseFileSource)
+    public void setPulseFileSource(PulseFileProvider pulseFileProvider)
     {
-        this.pulseFileSource = pulseFileSource;
+        this.pulseFileProvider = pulseFileProvider;
     }
 
     public PulseExecutionContext getContext()

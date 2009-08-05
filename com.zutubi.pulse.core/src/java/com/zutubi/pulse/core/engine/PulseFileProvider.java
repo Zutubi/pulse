@@ -3,10 +3,10 @@ package com.zutubi.pulse.core.engine;
 import com.zutubi.pulse.core.marshal.FileResolver;
 
 /**
- * The source of a pulse file, primarily the file contents but possibly also
+ * Able to provide a pulse file, primarily the file contents but possibly also
  * other information.
  */
-public interface PulseFileSource
+public interface PulseFileProvider
 {
     String getPath();
     String getFileContent(FileResolver resolver) throws Exception;

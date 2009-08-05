@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
-import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.*;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -290,8 +290,8 @@ public class RecipeProcessor
         try
         {
             // CIB-286: special case empty file for better reporting
-            PulseFileSource pulseFileSource = request.getPulseFileSource();
-            String pulseFileContent = pulseFileSource.getFileContent(localResolver);
+            PulseFileProvider pulseFileProvider = request.getPulseFileSource();
+            String pulseFileContent = pulseFileProvider.getFileContent(localResolver);
             storePulseFile(pulseFileContent, context);
             if (!TextUtils.stringSet(pulseFileContent))
             {
@@ -300,7 +300,7 @@ public class RecipeProcessor
 
             // load the pulse file from the source.
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-            FileResolver relativeResolver = new RelativeFileResolver(pulseFileSource.getPath(), localResolver);
+            FileResolver relativeResolver = new RelativeFileResolver(pulseFileProvider.getPath(), localResolver);
             return fileLoader.loadRecipe(pulseFileContent, request.getRecipeName(), globalScope, relativeResolver);
         }
         catch (Exception e)

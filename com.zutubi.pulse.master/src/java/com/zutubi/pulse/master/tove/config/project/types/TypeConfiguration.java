@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -15,5 +15,5 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 public abstract class TypeConfiguration extends AbstractConfiguration
 {
     @Transient
-    public abstract PulseFileSource getPulseFile() throws Exception;
+    public abstract PulseFileProvider getPulseFile() throws Exception;
 }

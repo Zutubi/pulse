@@ -12,9 +12,9 @@ import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
-import com.zutubi.pulse.core.engine.FixedPulseFileSource;
+import com.zutubi.pulse.core.engine.FixedPulseFileProvider;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
-import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -406,9 +406,9 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         return re;
     }
 
-    private PulseFileSource getPulseFile(String name) throws IOException
+    private PulseFileProvider getPulseFile(String name) throws IOException
     {
-        return new FixedPulseFileSource(IOUtils.inputStreamToString(getInput(name, "xml")));
+        return new FixedPulseFileProvider(IOUtils.inputStreamToString(getInput(name, "xml")));
     }
 
     public void handleEvent(Event evt)
@@ -472,21 +472,21 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         private RecipeProcessor recipeProcessor;
         private long id;
         private Bootstrapper bootstrapper;
-        private PulseFileSource source;
+        private PulseFileProvider provider;
         private String recipe;
 
-        public AsyncRunner(RecipeProcessor recipeProcessor, long id, Bootstrapper bootstrapper, PulseFileSource source, String recipe)
+        public AsyncRunner(RecipeProcessor recipeProcessor, long id, Bootstrapper bootstrapper, PulseFileProvider provider, String recipe)
         {
             this.recipeProcessor = recipeProcessor;
             this.id = id;
             this.bootstrapper = bootstrapper;
-            this.source = source;
+            this.provider = provider;
             this.recipe = recipe;
         }
 
         public void run()
         {
-            recipeProcessor.build(new RecipeRequest(bootstrapper, source, makeContext(id, recipe)));
+            recipeProcessor.build(new RecipeRequest(bootstrapper, provider, makeContext(id, recipe)));
         }
     }
 }

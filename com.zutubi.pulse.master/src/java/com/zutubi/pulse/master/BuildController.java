@@ -15,7 +15,7 @@ import com.zutubi.pulse.core.dependency.ivy.AuthenticatedAction;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId;
-import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -210,7 +210,7 @@ public class BuildController implements EventListener
 
     private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode)
     {
-        PulseFileSource pulseFileSource = getPulseFileSource();
+        PulseFileProvider pulseFileProvider = getPulseFileSource();
 
         for (BuildStageConfiguration stageConfig : projectConfig.getStages().values())
         {
@@ -233,7 +233,7 @@ public class BuildController implements EventListener
             recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, retrievalPattern);
 
             RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
-            recipeRequest.setPulseFileSource(pulseFileSource);
+            recipeRequest.setPulseFileSource(pulseFileProvider);
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig);
             recipeRequest.addAllResourceRequirements(resourceRequirements);
             recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
@@ -260,7 +260,7 @@ public class BuildController implements EventListener
         }
     }
 
-    private PulseFileSource getPulseFileSource()
+    private PulseFileProvider getPulseFileSource()
     {
         try
         {

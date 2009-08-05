@@ -3,7 +3,7 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.engine.ExternalPulseFileSource;
+import com.zutubi.pulse.core.engine.ExternalPulseFileProvider;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
@@ -174,7 +174,7 @@ public class LocalBuild
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repository);
             context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipe);
             Bootstrapper bootstrapper = new LocalBootstrapper();
-            RecipeRequest request = new RecipeRequest(bootstrapper, new ExternalPulseFileSource(pulseFileName), context);
+            RecipeRequest request = new RecipeRequest(bootstrapper, new ExternalPulseFileProvider(pulseFileName), context);
             recipeProcessor.build(request);
         }
         catch (FileNotFoundException e)

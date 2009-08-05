@@ -3,14 +3,14 @@ package com.zutubi.pulse.core.engine;
 import com.zutubi.pulse.core.marshal.FileResolver;
 
 /**
- * "Sources" pulse files from a fixed string.  Used for projects that have a file generated entirely
- * from their internal configuration.  The file is generated and cached directly in this source.
+ * Provides pulse files from a fixed string.  Used for projects that have a file generated entirely
+ * from their internal configuration.  The file is generated and cached directly in this provider.
  */
-public class FixedPulseFileSource implements PulseFileSource
+public class FixedPulseFileProvider implements PulseFileProvider
 {
     private String fileContent;
 
-    public FixedPulseFileSource(String fileContent)
+    public FixedPulseFileProvider(String fileContent)
     {
         this.fileContent = fileContent;
     }

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.pulse.core.engine.ExternalPulseFileSource;
-import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.engine.ExternalPulseFileProvider;
+import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
@@ -29,9 +29,9 @@ public class VersionedTypeConfiguration extends TypeConfiguration
         this.pulseFileName = pulseFileName;
     }
 
-    public PulseFileSource getPulseFile() throws Exception
+    public PulseFileProvider getPulseFile() throws Exception
     {
         String normalisedPath = FileSystemUtils.normaliseSeparators(pulseFileName);
-        return new ExternalPulseFileSource(normalisedPath);
+        return new ExternalPulseFileProvider(normalisedPath);
     }
 }

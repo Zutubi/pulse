@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.engine.FixedPulseFileSource;
+import com.zutubi.pulse.core.engine.FixedPulseFileProvider;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
-import com.zutubi.pulse.core.engine.PulseFileSource;
+import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.ImportingNotSupportedFileResolver;
@@ -33,9 +33,9 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
     @Transient
     private PulseFileLoaderFactory fileLoaderFactory;
 
-    public PulseFileSource getPulseFile()
+    public PulseFileProvider getPulseFile()
     {
-        return new FixedPulseFileSource(pulseFileString);
+        return new FixedPulseFileProvider(pulseFileString);
     }
 
     public String getPulseFileString()
