@@ -1,0 +1,105 @@
+========================================================================
+Pulse Source Code
+========================================================================
+
+This package contains source code for the Pulse continuous integration
+server.  Code is made available to commercial license holders under
+the terms set out in the LICENSE file in this directory.
+
+------------------------------------------------------------------------
+Package Contents
+------------------------------------------------------------------------
+
+Rather than describing all files, this document focuses on those of
+most use to customers wishing to browse and/or make small
+modifications to the Pulse source.  The primary components of this
+package are:
+
+build.xml            - an Ant build file used to compile/package Pulse
+bundles/             - subdirectory holding the source for plugins
+  com.zutubi.*       - a directory with the source for each plugin
+com.zutubi.*         - sources  for the main Pulse components
+etc/                 - miscellaneous files required for building
+package/             - Ivy descriptors to direct Pulse packaging
+scripts/             - helper scripts mainly for acceptance testing
+
+Java source files are found underneath the components as follows:
+
+com.zutubi.*/
+  src/
+    java/            - main Java sources
+    test/            - unit test sources and associated files
+
+In addition, plugin components contain a resources/ subdirectory which
+includes the plugin metadata.
+
+------------------------------------------------------------------------
+Source Components
+------------------------------------------------------------------------
+
+As outlined above, the Pulse sources are split between main components
+(stored in com.zutubi.* directories in the package root) and plugins
+(stored under the bundles/ directory).  The main components are:
+
+com.zutubi.events                 - event handling library
+com.zutubi.i18n                   - internationalisation library
+com.zutuvi.pulse.acceptance       - Pulse acceptance/functional tests
+com.zutubi.pulse.core             - core shared by all Pulse packages
+com.zutubi.pulse.dev              - Pulse developer tools
+com.zutubi.pulse.master           - the Pulse master server
+com.zutubi.pulse.servercore       - shared between masters and slaves
+com.zutubi.pulse.slave            - the Pulse slave agent server
+com.zutubi.tove                   - configuration system framework
+com.zutubi.tove.annotations       - annotations for configuration
+com.zutubi.util                   - generic utility library
+com.zutubi.validation             - validation library
+com.zutubi.validation.annotations - annotations used for validation
+
+The plugins are self-describing.  Each has a file:
+
+resources/META-INF/MANIFEST.MF
+
+which includes a name and description.
+
+------------------------------------------------------------------------
+Building
+------------------------------------------------------------------------
+
+Pulse uses an Apache Ant (http://ant.apache.org/) build.  To build the
+sources, you must install Ant 1.7.1 or later.  You must also have a
+JDK of version 5 or later.
+
+To compile the Pulse source, execute:
+
+  $ ant -Dskip.tests=true clean build.all
+
+Tests are skipped as several of them require external tools (e.g. the
+plugin tests require the build tools that the plugins support).
+
+To build a Pulse package, execute:
+
+  $ ant -Dskip.tests=true clean package.master
+
+The packages will be created in a build/ subdirectory.
+
+------------------------------------------------------------------------
+Editing/Browsing
+------------------------------------------------------------------------
+
+The easiest way to browse the Pulse source is using an IDE.  As the
+code is split into various layers and plugins, setting up an IDE
+project is non-trivial.  For this reason the Ant script provides a
+target to automatically create a suitable Intellij IDEA project:
+
+  $ ant -Dskip.tests=true clean setup.dev
+
+After executing this target, open the project file "pulse.ipr" in the
+project root directory.
+
+Unfortunately no other IDEs are supported in this way at this stage.
+
+------------------------------------------------------------------------
+Copyright
+------------------------------------------------------------------------
+
+All contents of this package are Copyright 2006-2009 Zutubi Pty Ltd.

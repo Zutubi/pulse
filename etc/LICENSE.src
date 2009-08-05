@@ -1,0 +1,324 @@
+ZUTUBI END USER LICENSE AGREEMENT
+
+The individual breaking the seal of this package or using this
+software represents and warrants that he or she has authority to enter
+into this agreement with Zutubi on behalf of the Licensee, that he or
+she has read the terms and conditions set out herein and that the
+Licensee accepts and agrees to be bound by this agreement. If the
+Licensee does not agree with the terms and conditions, the Licensee
+must not use or permit the use of the Product.
+
+
+1. Definitions
+
+Accessible Code means source code contained within the
+Product that is unprotected and accessible under this agreement.
+
+Zutubi means Zutubi Pty Ltd (ABN 118 611 313).
+
+Authorised Machine means a single installation of a copy of the
+Product on a single physical computer. 
+
+Authorised Use means the defined number of copies or instances of the
+Product that may be used by Licensee, and where applicable, limited to
+the number of Authorised Users and/or the number of Authorised
+Machines, as designated in the Quote/Invoice issued by Zutubi.
+
+Authorised User means a person or user account who is Licensed to use
+the Product, regardless of whether that person is an employee,
+contractor, subcontractor, vendor, partner or customer of the
+Licensee.
+
+Commencement Date means the date that Zutubi processes payment of the
+License or Maintenance Fees from Licensee.
+
+Embedded Software means third party software licensed by Zutubi from a
+Licensor and embedded in the Product.
+
+License means the right to use the Product as defined by Authorised
+Use.
+
+Licensee means the individual or entity (inclusive of subsidiaries)
+that has licensed the Product under the terms and conditions of this
+agreement.
+
+Licensor means the licensor of the Embedded Software.
+
+OEM Distribution means distribution of the Product as either a bundled
+add-on to, or embedded component of, another application with such
+application being made available to its users as, but not limited to,
+an on-premise application, a hosted application, a
+Software-as-a-Service offering or a subscription service for which the
+distributor of the application receives a license fee or any form of
+direct or indirect compensation.
+
+Product means the Zutubi product defined in the Quote/Invoice
+delivered by Zutubi to Licensee, and which may contain Embedded
+Software, including any updates provided under the terms of this
+agreement in accordance with Clause 5.
+
+Protected Code means source code contained within the Product that is
+protected against access by Zutubi and is not accessible under this
+agreement.
+
+
+2. License Fee
+
+A one-time fee paid by Licensee to Zutubi, as designated by Product,
+in consideration for the Authorized Use of the Product. License fee is
+non-refundable and payable upon acceptance of the terms and conditions
+set out herein.
+
+
+3. Grant of License
+
+Subject to the terms of this agreement, including limitations defined
+by the License, Zutubi grants to Licensee, and Licensee accepts from
+Zutubi, a perpetual, worldwide, non-exclusive, non-transferable,
+non-sublicensable License to use the Product as defined by Authorised
+Use.
+
+
+4. No Warranty
+
+Save as provided in clauses 13 and 14 below, the Product is provided
+on an "as is" and "as available" basis without warranty, express or
+implied, of any kind or nature, including, but not limited to, any
+warranties of performance or merchantability or fitness for a
+particular purpose, including without limitation that Zutubi does not
+warranty that the Product will be error-free, complete, or
+correct. Zutubi provides evaluation copies of the Product so that
+customers can assess the Product.
+
+
+5. Zutubi's Obligations
+
+Upon receipt of Licensee Fee from Licensee, Zutubi will (a) supply the
+Licensee with the Product via electronic download; and (b) provide
+Software Maintenance as defined in Section 6, for a period of twelve
+(12) months from the Commencement Date (the "Initial Maintenance
+Period").
+
+
+6. Software Maintenance
+
+Software Maintenance includes Zutubi's provisioning to Licensee
+Product updates and/or enhancements made generally available to
+customers from time to time, and online technical support (and where
+applicable, phone support) to one Licensee-designated technical
+contact for the sole purpose of addressing technical issues relating
+to the use of the Product (excluding any form of on-site visits by
+Zutubi personnel or contractors). The Initial Maintenance Period may
+be renewed for additional twelve (12) month periods ("Renewal Period")
+at the then-current rate for Software Maintenance. Subsequent Renewal
+Periods commence upon the expiration of the prior Software Maintenance
+regardless of when it is purchased.
+
+
+7. Licensee Obligations
+
+The Licensee must at all times: (a) ensure that only an Authorised
+User may use the Product and only for Authorised Use in accordance
+with the terms and conditions of this agreement; (b) install all
+updates and enhancements provided by Zutubi; (c) immediately advise
+Zutubi, including in writing, if the Licensee becomes aware of any
+unauthorised use or distribution of the Product by any person.
+
+
+8. Unauthorised Use or Distribution
+
+Licensee may not, whether through deliberate or negligent act or act
+of omission: a) distribute or cause the distribution of the Product to
+any third party other than an Authorised User; or b) directly access
+or use any Embedded Software independently of the Product. Licensee is
+required to immediately report its knowledge of any violations of the
+foregoing to Zutubi, including in writing. Any such violations will
+entitle Zutubi and/or its Licensors to, in addition to any other right
+or claim that Zutubi or Embedded Software Licensor may have against
+Licensee, retroactively charge the Licensee, in addition to any other
+fees payable by the Licensee under this agreement, a fee calculated
+based on the number of prohibited distributions times the respective
+list prices that Zutubi and/or the Embedded Software Licensor charges
+for the Product or Embedded Software respectively.
+
+
+9. Investigation of Unauthorised Use and Distribution
+
+If Zutubi reasonably suspects that the Product has been distributed to
+or obtained by any person or party without Zutubi's prior written
+consent, or that Embedded Software is being accessed or used
+independently of the Product, Zutubi has the right to request from the
+Licensee an unqualified certificate executed by the Licensee's auditor
+at the Licensee's cost for the purpose of verifying compliance with
+Authorised Use of the Product or Embedded Software.
+
+10. Licensee's Restrictions
+
+Licensee must not, without the prior written consent of Zutubi, which
+may be withheld and which may include certain conditions: (a)
+decompile, reverse engineer, disassemble, modify, adapt, create
+derivative works from, or otherwise attempt to derive, the Protected
+Code; (b) sell, sublicense, redistribute, reproduce, transmit,
+circulate, disseminate, translate or reduce to or from any electronic
+medium or machine readable form the Product or any data/information
+provided to the Licensee through the Product to a person (except that
+nothing in this paragraph (b) is intended to prevent an Authorised
+Person undertaking Authorised Use); (c) vary or amend the Authorised
+Use without Zutubi's prior written approval; (d) publish, promote,
+broadcast, circulate or refer publicly to the Zutubi name, trade name,
+trademark, service mark or logo, without the prior written consent of
+Zutubi; (e) commit any act or omission the likely result of which is
+that Zutubi's reputation will be brought into disrepute or which act
+or omission could reasonably be expected to have or does have a
+material and adverse effect on Zutubi's interests. For avoidance of
+doubt, and subject to the terms and conditions contained herein,
+Licensee is permitted to modify the Accessible Code to develop bug
+fixes, customizations, or additional features, solely for the purpose
+of using the Product as defined in, and during the term of, this
+Agreement. Under no circumstance may Licensee distribute the Product
+via OEM Distribution without entering into a separate OEM Distribution
+Agreement with Zutubi. Licensee shall also not copy or embed elements
+of the Accessible Code into other applications. In addition, the
+Product includes license protection mechanisms that are designed to
+manage and protect the intellectual property rights of
+Zutubi. Licensee must not modify or alter those features to try to
+defeat the Product use rules that the license protection mechanisms
+are designed to enforce.
+
+
+11. Term
+
+The term of this agreement begins on the Commencement Date and will
+continue in full force and effect until terminated in accordance with
+Clause 12.
+
+
+12. Termination
+
+This agreement may be terminated by either party if the other party
+commits a material breach. Either party will have thirty (30) days to
+remedy any material breaches. Immediately upon termination, any
+Accessible Code in possession, custody or control of Licensee must be
+destroyed and written confirmation of such destruction provided to
+Zutubi. Clauses 1, 2, 4, 8, 10, 14, 15, 18, and 19 shall survive any
+termination of this agreement.
+
+
+13. Infringement Indemnification
+
+(a) Zutubi will defend or settle, at its expense, any action brought
+against Licensee based upon the claim that the Product, if used within
+the scope of the License granted under this agreement, directly
+infringe a registered United States, European Union or Commonwealth
+patent or copyright; provided, however, that: (i) Licensee shall
+notify Zutubi promptly in writing of any such claim; (ii) Licensee
+shall not enter into any settlement or compromise any claim without
+Zutubi's prior written consent; (iii) Zutubi shall have sole control
+of any such action and settlement negotiations; and (iv) Licensee
+shall provide Zutubi with information and assistance, at Zutubi's
+request and expense, necessary to settle or defend such claim. Zutubi
+agrees to pay all damages and costs finally awarded against Licensee
+attributable to such claim. The foregoing states the sole liability of
+Zutubi and the exclusive remedy of Licensee for any infringement of
+intellectual property rights by the Product or any other items
+provided by Zutubi hereunder.  (b) If the Product becomes, or in the
+opinion of Zutubi may become, the subject of a claim of infringement
+of any third party right, Zutubi may, at its option and in its
+discretion: (i) procure for Licensee the right to use the Product free
+of any liability; (ii) replace or modify the Product to make it
+non-infringing; or (iii) refund any license fees related to this
+Product paid by Licensee.  (c) Licensee will defend or settle, at its
+expense, any action brought against Zutubi based upon the claim that
+any modifications to the Product or combination of the Product with
+products infringes or violates any third party right; provided,
+however, that: (i) Zutubi shall notify Licensee promptly in writing of
+any such claim; (ii) Zutubi shall not enter into any settlement or
+compromise any such claim without Licensee's prior written consent;
+(iii) Licensee shall have sole control of any such action and
+settlement negotiations; and (iv) Zutubi shall provide Licensee with
+information and assistance, at Licensee's request and expense,
+necessary to settle or defend such claim. Licensee agrees to pay all
+damages and costs finally awarded against Zutubi attributable to such
+claim.  (d) Notwithstanding Subsection (a) above, Zutubi assumes no
+liability hereunder for, and shall have no obligation to defend
+Licensee or to pay costs, damages or attorney's fees for, any claim
+based upon any modifications to any of the Product not approved by
+Zutubi or combination of any of the Product with products not approved
+by Zutubi.
+
+
+14. Limitation of Liability
+
+Without limitation, Zutubi will not be liable to any person for any
+loss, damage, cost, expense or other claim (including consequential,
+directly, indirect, special, punitive or other damages and loss of
+data or profits) in relation to the Product including, without
+limitation: (a) any use or reliance on a Product by the person
+(including the form and content of errors in and/or omissions from
+any information contained in a Product); (b) any delay, interruption
+or other failure in the provision of the Product; or (c) any change
+in the form or content of the Product. In no event will Zutubi's and
+Zutubi's licensors' aggregate liability under any claims arising out
+of this agreement exceed the fees paid by licensee under this
+agreement. Except for each party's indemnification obligations or
+breach of Clauses 2, 8 or 10, neither party will be liable for lost
+profits or for special, indirect, incidental or consequential
+damages, regardless of the form of action, even if such party is
+advised of the possibility of such damages. The foregoing liability
+limitations shall apply to the maximum extent allowed by applicable
+law. To the extent the foregoing liability limitations or the
+warranty disclaimers of Clause 4 are not allowed by applicable law,
+then the liability of Zutubi, and the remedy of Licensee, shall be
+limited to: (i) the re-supply of any defective Product; or (ii) the
+refund of any license fees paid by Licensee for such defective
+Product.
+
+
+15. Intellectual Property
+
+ The Licensee acknowledges that the Product and all intellectual
+ property rights in relation to the Product are the property of Zutubi
+ or the Licensors and Zutubi is entitled to take whatever action it
+ may decide in order to protect its intellectual property rights in
+ the Product.
+
+
+16. Publicity Rights
+
+The Licensee grants permission for ZUTUBI to use Licensee's name
+solely in customer lists. ZUTUBI shall not, without prior consent in
+writing, use the Licensee's name, or that of its affiliates, in any
+form with the specific exception of customer lists. ZUTUBI agrees to
+remove Licensee's name from any and all materials within 7 days if
+notified by the Licensee in writing.
+
+
+17. No Assignment or Amendment
+
+Licensee may not amend this Agreement without prior written consent of
+Zutubi. Licensee may assign this agreement to succeeding parties in
+the case of a merger, acquisition or change of control so long as in
+doing so, Zutubi is notified in writing within ninety (90) days of the
+closure of such transaction. Zutubi may assign its rights and
+obligation under this agreement without consent of Licensee.
+
+
+18. Tax
+
+Payments made by the Licensee under this agreement exclude any taxes
+or duties payable in respect of the goods or services supplied in the
+jurisdiction where the payment is made or received. To the extent that
+any such taxes or duties are payable by Zutubi, the Licensee must pay
+to Zutubi the amount of such taxes or duties in addition to the
+license fee under this agreement unless Licensee is exempt from paying
+such taxes or duties at the time such taxes or duties are levied or
+assessed. Zutubi will provide the Licensee with documents requested by
+Licensee necessary to enable the Licensee to obtain a tax or duty
+refund or credit.
+
+
+19. Governing Law
+
+This agreement is governed by the laws of New South Wales (NSW),
+Australia, and the parties irrevocably and unconditionally submit to
+the exclusive jurisdiction of the courts of NSW, Australia.

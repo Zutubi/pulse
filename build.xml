@@ -576,6 +576,7 @@
             <fileset dir="com.zutubi.util/src/java">
                 <include name="com/zutubi/util/Pair.java"/>
                 <include name="com/zutubi/util/StringUtils.java"/>
+                <include name="com/zutubi/util/WebUtils.java"/>
                 <include name="com/zutubi/util/io/*.java"/>
             </fileset>
 
@@ -683,6 +684,7 @@
                 <include name="**/*"/>
                 <exclude name="build/**"/>
                 <exclude name="classes/**"/>
+                <exclude name="etc/*.src"/>
                 <exclude name="**/LicenseEncoder.java"/>
                 <exclude name="**/LicenseEncodeDecodeTest.java"/>
                 <exclude name="**/LicenseKeyValidatorTest.java"/>
@@ -699,6 +701,11 @@
                 <include name="etc/pulse.ipr"/>
                 <include name="etc/pulse.iws"/>
             </fileset>
+        </copy>
+
+        <copy todir="build/${package.name}">
+            <mapper type="glob" from="*.src" to="*"/>
+            <fileset dir="${project.root.dir}/etc" includes="*.src"/>
         </copy>
 
         <copyright src="build/${package.name}" value="${copyright.statement}">
