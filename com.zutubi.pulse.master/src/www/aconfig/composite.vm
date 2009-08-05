@@ -5,7 +5,8 @@
     <div class="config-panel">
         <h3 class="config-header">
             ${config.formHeading}
-            <a href="#" class="unadorned" onclick="showHelp('#jss($path)', 'type'); return false"><img alt="show help" src="$base/images/help.gif"/></a>
+            #set($onclick = "showHelp('#jss($path)', 'type'); return false")
+            <a href="#" class="unadorned" onclick="#html($onclick)"><img alt="show help" src="$base/images/help.gif"/></a>
         </h3>
         ##<!-- add some space around the form so that it does not sit directly on the border. -->
         <div class="config-container">

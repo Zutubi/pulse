@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.CAPTURES;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryOutput.BASE;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Output.POSTPROCESSORS;
@@ -9,7 +10,6 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import static com.zutubi.pulse.acceptance.Constants.*;
 import com.zutubi.pulse.acceptance.dependencies.Repository;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
@@ -18,6 +18,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
@@ -615,6 +616,41 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         nestedSuitePath.clickSuiteCrumb(PROCESSOR_SUITE);
         topSuitePage.waitFor();
         topSuitePage.clickStageCrumb();
+        stageTestsPage.waitFor();
+        stageTestsPage.clickAllCrumb();
+        testsPage.waitFor();
+    }
+
+    public void testOCUnitTestResults() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(OCUNIT_REPOSITORY), xmlRpcHelper.getAntConfig());
+
+        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileOutputConfiguration.class);
+        artifactConfig.put("name", "test report");
+        artifactConfig.put("file", "results.txt");
+        artifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, "ocunit output processor"))));
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, CAPTURES), artifactConfig);
+
+        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+
+        loginAsAdmin();
+
+        BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, random, buildId);
+        TestResultSummary expectedSummary = new TestResultSummary(0, 3, 0, 583);
+
+        assertTrue(testsPage.hasTests());
+        assertEquals(expectedSummary, testsPage.getTestSummary());
+
+        StageTestsPage stageTestsPage = testsPage.clickStageAndWait("default");
+        assertEquals(expectedSummary, stageTestsPage.getTestSummary());
+
+        TestSuitePage allSuitePage = stageTestsPage.clickSuiteAndWait("All tests");
+        assertEquals(expectedSummary, allSuitePage.getTestSummary());
+
+        TestSuitePage suitePage = allSuitePage.clickSuiteAndWait("/Users/jhiggs/Documents/Projects/Connoisseur/build/Debug/UnitTests.octest(Tests)");
+        assertEquals(expectedSummary, suitePage.getTestSummary());
+
+        suitePage.clickStageCrumb();
         stageTestsPage.waitFor();
         stageTestsPage.clickAllCrumb();
         testsPage.waitFor();

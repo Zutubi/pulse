@@ -1779,7 +1779,7 @@ Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
             {
                 var panel = this;
                 this.body.load({
-                    url: window.baseUrl + '/ahelp/' + path + '?' + type + '=',
+                    url: window.baseUrl + '/ahelp/' + encodeURIPath(path) + '?' + type + '=',
                     scripts: true,
                     callback: function() {
                         panel.shownPath = path;

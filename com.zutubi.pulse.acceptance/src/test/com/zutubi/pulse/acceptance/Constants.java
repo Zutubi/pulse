@@ -50,6 +50,10 @@ public class Constants
      */
     public static final String VERSIONED_REPOSITORY = SUBVERSION_ACCEPT_REPO + "testversioned";
     public static final String VERSIONED_PULSE_FILE = "pulse/pulse.xml";
+    /**
+     * Subversion URL for a small sample ant project that has an OCUnit output file results.txt.
+     */
+    public static final String OCUNIT_REPOSITORY = SUBVERSION_ACCEPT_REPO + "ocunit";
 
     /**
      * @return the url of the test git repository

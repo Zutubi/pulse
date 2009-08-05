@@ -29,7 +29,7 @@ public class StageTestsPage extends AbstractTestsPage
     public TestSuitePage clickSuiteAndWait(String suite)
     {
         clickSuiteLink(suite);
-        return browser.waitFor(TestSuitePage.class, projectName, buildId, stageName, suite);
+        return browser.waitFor(TestSuitePage.class, projectName, buildId, stageName, uriComponentEncode(suite));
     }
 
     public boolean isLoadFailureMessageShown()
