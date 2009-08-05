@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="git module" basedir="." default="build.module">
-
-    <import file="../common-build.xml"/>
+    <import file="../../common-build.xml"/>
 
     <target name="module-pre-init">
         <dirname property="project.root.dir" file="../../common-build.xml"/>

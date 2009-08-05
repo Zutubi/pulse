@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project>
-    <import file="../common-build.xml"/>
-
-    <target name="module-pre-dist">
-        <property name="distconf" value="bundle"/>
-    </target>
-</project>

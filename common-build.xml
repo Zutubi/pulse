@@ -339,7 +339,8 @@
 
     <target name="common-dist">
         <dirname property="current.dir" file="ivy.xml"/>
-        <ivy:publish resolver="private" forcedeliver="true" artifactspattern="${current.dir}/build/[artifact].[ext]" conf="${distconf}"/>
+        <ivy:resolve file="ivy.xml" conf="${distconf}"/>
+        <ivy:publish resolver="private" artifactspattern="${current.dir}/build/[artifact].[ext]" conf="${distconf}"/>
     </target>
 
     <!-- build this module and its dependencies. -->
@@ -350,7 +351,7 @@
         <property name="3rd.party.extracted" value="${current.dir}/build/3rdparty/extracted"/>
         <property name="3rd.party.jars" value="${current.dir}/build/3rdparty/jars"/>
 
-        <prepare.3rdparty extracted="${3rd.party.extracted}" jars="${3rd.party.extracted}"/>
+        <prepare.3rdparty extracted="${3rd.party.extracted}" jars="${3rd.party.jars}"/>
 
         <copy todir="${project.root.dir}/plugins/prepackaged/${ivy.module}">
             <fileset dir="${3rd.party.extracted}">
