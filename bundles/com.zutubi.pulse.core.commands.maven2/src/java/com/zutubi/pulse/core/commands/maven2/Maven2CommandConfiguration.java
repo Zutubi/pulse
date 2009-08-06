@@ -55,7 +55,7 @@ public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguratio
 
         if (TextUtils.stringSet(settingsFile))
         {
-            result.add(new NamedArgument("Settings file", settingsFile, "-s"));
+            result.add(new NamedArgument("settings file", settingsFile, "-s"));
         }
 
         if (TextUtils.stringSet(goals))
