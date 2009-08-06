@@ -18,10 +18,11 @@ import java.util.Map;
  * Configuration for instances of {@link Maven2Command}.
  */
 @SymbolicName("zutubi.maven2CommandConfig")
-@Form(fieldOrder = {"name", "workingDir", "pomFile", "goals", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
+@Form(fieldOrder = {"name", "workingDir", "pomFile", "settingsFile", "goals", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
 public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguration
 {
     private String pomFile;
+    private String settingsFile;
     private String goals;
 
     public Maven2CommandConfiguration()
@@ -52,6 +53,11 @@ public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguratio
             result.add(new NamedArgument("POM file", pomFile, "-f"));
         }
 
+        if (TextUtils.stringSet(settingsFile))
+        {
+            result.add(new NamedArgument("Settings file", settingsFile, "-s"));
+        }
+
         if (TextUtils.stringSet(goals))
         {
             result.add(new NamedArgument("goals", goals, Arrays.asList(goals.trim().split("\\s+"))));
@@ -68,6 +74,16 @@ public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguratio
     public void setPomFile(String pomFile)
     {
         this.pomFile = pomFile;
+    }
+
+    public String getSettingsFile()
+    {
+        return settingsFile;
+    }
+
+    public void setSettingsFile(String settingsFile)
+    {
+        this.settingsFile = settingsFile;
     }
 
     public String getGoals()

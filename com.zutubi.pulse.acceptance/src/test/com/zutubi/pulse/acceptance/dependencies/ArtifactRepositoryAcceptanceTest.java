@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
 
 import java.util.Hashtable;
@@ -56,6 +57,33 @@ public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         // ensure that the build passed.
         assertEquals(ResultState.SUCCESS, getBuildStatus(random, buildNumber));
+    }
+
+    public void testExternalMavenCanUseRepository() throws Exception
+    {
+        String projectA = random + "A";
+        int buildNumber = createAndRunMavenProject(projectA, "pom-artifact1.xml", "clean deploy");
+
+        assertEquals(ResultState.SUCCESS, getBuildStatus(projectA, buildNumber));
+
+        assertTrue(repository.isInRepository("zutubi/artifact1/maven-metadata.xml"));
+        assertTrue(repository.isInRepository("zutubi/artifact1/1.0/artifact1-1.0.jar"));
+        assertTrue(repository.isInRepository("zutubi/artifact1/1.0/artifact1-1.0.pom"));
+
+        String projectB = random + "B";
+        buildNumber = createAndRunMavenProject(projectB, "pom-artifact2.xml", "clean dependency:copy-dependencies");
+        assertEquals(ResultState.SUCCESS, getBuildStatus(projectB, buildNumber));
+    }
+
+    private int createAndRunMavenProject(String projectName, String pom, String goals) throws Exception
+    {
+        Hashtable<String, Object> mavenConfig = xmlRpcHelper.createDefaultConfig(Maven2CommandConfiguration.class);
+        mavenConfig.put("pomFile", pom);
+        mavenConfig.put("settingsFile", "settings.xml");
+        mavenConfig.put("goals", goals);
+
+        xmlRpcHelper.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.DEP_MAVEN_REPOSITORY), mavenConfig);
+        return xmlRpcHelper.runBuild(projectName);
     }
 
     private int createAndRunIvyAntProject(String target) throws Exception

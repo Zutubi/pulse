@@ -36,6 +36,13 @@ public class Constants
      */
     public static final String TEST_MAVEN_REPOSITORY = SUBVERSION_ACCEPT_REPO + "testmaven";
     /**
+     * Subversion URL for a small maven project that contains two pom files.  The pom-artifact1.xml
+     * is configured to produce the zutubi/artifact1-1.0.jar file and contains reference to the
+     * pulse artifact repository for deployment.  The pom-artifact2.xml is configured to retrieve
+     * the artifact1.jar as a dependency.
+     */
+    public static final String DEP_MAVEN_REPOSITORY = SUBVERSION_ACCEPT_REPO + "depmaven";
+    /**
      * Subversion URL for an ant project which will wait up to 5 minutes for a file to
      * appear.
      */
