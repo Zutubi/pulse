@@ -25,7 +25,7 @@ public abstract class AbstractPersonalBuildTestCase extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tempDir = createTempDirectory();
         baseParentDir = new File(tempDir, "intermediate");
         baseDir = new File(baseParentDir, "base");
         assertTrue(baseDir.mkdirs());

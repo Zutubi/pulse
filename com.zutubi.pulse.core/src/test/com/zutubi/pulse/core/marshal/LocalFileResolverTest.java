@@ -21,7 +21,7 @@ public class LocalFileResolverTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tempDir = createTempDirectory();
         resolver = new LocalFileResolver(tempDir);
     }
 

@@ -51,7 +51,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
 
-        tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tempDir = createTempDirectory();
         propertiesFile = new File(tempDir, "custom.properties");
         generateRandomMetrics();
         xmlRpcHelper.loginAsAdmin();

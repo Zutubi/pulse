@@ -202,6 +202,17 @@ public class ZutubiTestCase extends TestCase
     }
 
     /**
+     * Creates a temporary directory with a name that starts with the test
+     * name.
+     *
+     * @return a File pointing to the newly-created directory
+     */
+    public File createTempDirectory() throws IOException
+    {
+        return FileSystemUtils.createTempDir(getName());
+    }
+
+    /**
      * Removes a directory and all of its contents, ensuring that the removal
      * is successful.
      *

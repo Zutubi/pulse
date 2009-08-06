@@ -6,7 +6,6 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -28,7 +27,7 @@ public abstract class CommandTestCase extends PulseTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDir(getClass().getName() + "." + getName(), ".tmp");
+        tempDir = createTempDirectory();
         baseDir = new File(tempDir, "base");
         assertTrue(baseDir.mkdir());
         outputDir = new File(tempDir, "output");

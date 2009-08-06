@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.project;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import static com.zutubi.util.io.IOUtils.fileToString;
 import static com.zutubi.util.io.IOUtils.inputStreamToString;
@@ -23,7 +22,7 @@ public class ProjectLoggerTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tempDir = createTempDirectory();
 
         // 19 for the timestamp prefix
         int lineLength = 21 + TEST_MESSAGE.length() + LINE_SEPARATOR.length();

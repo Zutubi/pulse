@@ -32,7 +32,7 @@ public abstract class GitWorkingCopyTestBase extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tempDir = createTempDirectory();
 
         File upstreamDir = new File(tempDir, "upstream");
         URL url = getClass().getResource("GitWorkingCopyTestBase.repo.zip");

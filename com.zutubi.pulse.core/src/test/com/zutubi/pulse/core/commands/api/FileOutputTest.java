@@ -39,7 +39,7 @@ public class FileOutputTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tempDir = createTempDirectory();
         baseDir = new File(tempDir, "base");
         assertTrue(baseDir.mkdir());
         outputDir = new File(tempDir, "output");

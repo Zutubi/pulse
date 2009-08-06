@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -42,7 +41,7 @@ public abstract class GitClientTestBase extends PulseTestCase
     {
         super.setUp();
 
-        tmp = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tmp = createTempDirectory();
 
         URL url = getClass().getResource("GitClientTestBase.zip");
         PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));

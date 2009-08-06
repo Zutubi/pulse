@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.postprocessors.api;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +42,7 @@ public abstract class PostProcessorTestCase extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tempDir = createTempDirectory();
     }
 
     @Override

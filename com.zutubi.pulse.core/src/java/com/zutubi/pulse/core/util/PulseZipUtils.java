@@ -188,7 +188,7 @@ public class PulseZipUtils
                 // Do a simple test run of zipping.
                 try
                 {
-                    tmpDir = FileSystemUtils.createTempDir(PulseZipUtils.class.getName(), ".tmp");
+                    tmpDir = FileSystemUtils.createTempDir(PulseZipUtils.class.getName());
                     File testDir = new File(tmpDir, "test");
                     testDir.mkdir();
                     File testFile = new File(testDir, "afile");
@@ -448,7 +448,7 @@ public class PulseZipUtils
                 // Do a simple test run of unzipping.
                 try
                 {
-                    tmpDir = FileSystemUtils.createTempDir(PulseZipUtils.class.getName(), ".tmp");
+                    tmpDir = FileSystemUtils.createTempDir(PulseZipUtils.class.getName());
                     File testDir = new File(tmpDir, "test");
                     testDir.mkdir();
                     File testFile = new File(testDir, "afile");

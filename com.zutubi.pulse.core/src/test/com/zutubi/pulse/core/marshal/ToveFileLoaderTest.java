@@ -226,7 +226,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testBasicImport() throws IOException, PulseException
     {
-        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        File tempDir = createTempDirectory();
         try
         {
             copyInputToDirectory(EXTENSION_XML, tempDir);
@@ -242,7 +242,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testTopLevelImport() throws IOException, PulseException
     {
-        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        File tempDir = createTempDirectory();
         try
         {
             copyInputToDirectory(EXTENSION_XML, tempDir);
@@ -258,7 +258,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testSelfImport() throws IOException, PulseException
     {
-        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        File tempDir = createTempDirectory();
         try
         {
             copyInputToDirectory(EXTENSION_XML, tempDir);
@@ -278,7 +278,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testImportUnknownFile() throws IOException, PulseException
     {
-        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        File tempDir = createTempDirectory();
         try
         {
             copyInputToDirectory(EXTENSION_XML, tempDir);
@@ -307,7 +307,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testImportFromNestedDirectory() throws IOException, PulseException
     {
-        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        File tempDir = createTempDirectory();
         try
         {
             copyInputToDirectory(EXTENSION_XML, tempDir);
@@ -326,7 +326,7 @@ public class ToveFileLoaderTest extends PulseTestCase
 
     public void testImportRelativeToImportingFile() throws IOException, PulseException
     {
-        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        File tempDir = createTempDirectory();
         try
         {
             File importDir = new File(tempDir, "import");

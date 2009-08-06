@@ -423,7 +423,7 @@ public class ToveFileStorerTest extends PulseTestCase
     
     private void expectedOutputHelper(Configuration root, Element element) throws IOException
     {
-        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        File tempDir = createTempDirectory();
         try
         {
             File out = new File(tempDir, "pulse.xml");

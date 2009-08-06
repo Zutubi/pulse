@@ -2,7 +2,6 @@ package com.zutubi.pulse.master;
 
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -26,7 +25,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tmpDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tmpDir = createTempDirectory();
         logFile = new File(tmpDir, "file.log");
         logger = new DefaultRecipeLogger(logFile);
         logger.prepare();

@@ -179,7 +179,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     private String editAndCommitBuildFile() throws IOException, SVNException
     {
         SVNRepositoryFactoryImpl.setup();
-        File wcDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        File wcDir = createTempDirectory();
         try
         {
             DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);

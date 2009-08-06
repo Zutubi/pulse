@@ -19,7 +19,7 @@ public class ResultCustomFieldsTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tmpDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tmpDir = createTempDirectory();
         resultCustomFields = new ResultCustomFields(tmpDir);
     }
 

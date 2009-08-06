@@ -55,7 +55,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
 
         configurationManager = mock(MasterConfigurationManager.class);
         doReturn(mock(MasterUserPaths.class)).when(configurationManager).getUserPaths();
-        tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        tempDir = createTempDirectory();
         doReturn(tempDir).when(configurationManager).getDataDirectory();
 
         projectManager = mock(ProjectManager.class);

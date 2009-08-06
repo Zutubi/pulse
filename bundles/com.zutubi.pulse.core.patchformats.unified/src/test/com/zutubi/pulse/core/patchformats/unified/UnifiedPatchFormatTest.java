@@ -23,7 +23,7 @@ public class UnifiedPatchFormatTest extends PulseTestCase
 
     public void testApplyPatch() throws IOException, ScmException
     {
-        File tempDir = FileSystemUtils.createTempDir(getName(), ".tmp");
+        File tempDir = createTempDirectory();
         try
         {
             File file = copyInputToDirectory("original", "txt", tempDir);
