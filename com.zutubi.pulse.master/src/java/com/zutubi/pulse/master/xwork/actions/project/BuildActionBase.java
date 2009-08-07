@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Helper base class for actions under:
@@ -62,7 +62,7 @@ public class BuildActionBase extends ProjectActionBase
                     throw new LookupErrorException("Cannot look up personal builds when not logged in");
                 }
 
-                if(TextUtils.stringSet(buildVID))
+                if(StringUtils.stringSet(buildVID))
                 {
                     buildResult = buildManager.getByUserAndVirtualId(user, buildVID);
                     if(buildResult == null)
@@ -78,7 +78,7 @@ public class BuildActionBase extends ProjectActionBase
                 Project project = getProject();
                 if (project != null)
                 {
-                    if (TextUtils.stringSet(buildVID))
+                    if (StringUtils.stringSet(buildVID))
                     {
                         buildResult = buildManager.getByProjectAndVirtualId(project, buildVID);
                         if(buildResult == null)

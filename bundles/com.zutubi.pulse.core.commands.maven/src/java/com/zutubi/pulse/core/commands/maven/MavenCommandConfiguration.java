@@ -7,8 +7,8 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -49,11 +49,11 @@ public class MavenCommandConfiguration extends NamedArgumentCommandConfiguration
     protected List<NamedArgument> getNamedArguments()
     {
         List<NamedArgument> result = new LinkedList<NamedArgument>();
-        if (TextUtils.stringSet(projectFile))
+        if (StringUtils.stringSet(projectFile))
         {
             result.add(new NamedArgument("project file", projectFile, "-p"));
         }
-        if (TextUtils.stringSet(targets))
+        if (StringUtils.stringSet(targets))
         {
             result.add(new NamedArgument("targets", targets, Arrays.asList(targets.split("\\s+"))));
         }

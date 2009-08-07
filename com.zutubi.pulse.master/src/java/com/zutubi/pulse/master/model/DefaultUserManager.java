@@ -11,8 +11,8 @@ import com.zutubi.pulse.master.security.AcegiUser;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -21,7 +21,7 @@ import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
@@ -275,7 +275,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
      */
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException
     {
-        if (!TextUtils.stringSet(username))
+        if (!StringUtils.stringSet(username))
         {
             throw new UsernameNotFoundException("User not set");
         }

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
@@ -29,7 +29,7 @@ public class DirectoryOutput extends FileSystemOutputSupport
         DirectoryOutputConfiguration config = (DirectoryOutputConfiguration) getConfig();
         String base = config.getBase();
         File baseDir;
-        if (!TextUtils.stringSet(base))
+        if (!StringUtils.stringSet(base))
         {
             baseDir = context.getExecutionContext().getWorkingDir();
         }

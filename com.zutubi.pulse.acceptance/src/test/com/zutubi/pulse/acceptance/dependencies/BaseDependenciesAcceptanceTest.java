@@ -2,23 +2,22 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
-import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
+import com.zutubi.pulse.core.engine.RecipeConfiguration;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfigurationRevisionOptionProvider;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.engine.RecipeConfiguration;
-import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A base test case for the dependencies system that helps with the configuration
@@ -140,7 +139,7 @@ public abstract class BaseDependenciesAcceptanceTest extends BaseXmlRpcAcceptanc
 
     private void setProjectOrganisation(Project project) throws Exception
     {
-        if (TextUtils.stringSet(project.getOrg()))
+        if (StringUtils.stringSet(project.getOrg()))
         {
             String path = "projects/" + project.getName();
             Hashtable<String, Object> projectConfig = xmlRpcHelper.getConfig(path);
@@ -184,11 +183,11 @@ public abstract class BaseDependenciesAcceptanceTest extends BaseXmlRpcAcceptanc
         String dependenciesPath = "projects/" + project.getName() + "/dependencies";
         Hashtable<String, Object> dependencies = xmlRpcHelper.getConfig(dependenciesPath);
         dependencies.put(com.zutubi.pulse.acceptance.Constants.Project.Dependencies.RETRIEVAL_PATTERN, project.retrievalPattern);
-        if (TextUtils.stringSet(project.status))
+        if (StringUtils.stringSet(project.status))
         {
             dependencies.put(com.zutubi.pulse.acceptance.Constants.Project.Dependencies.STATUS, project.status);
         }
-        if (TextUtils.stringSet(project.version))
+        if (StringUtils.stringSet(project.version))
         {
             dependencies.put(com.zutubi.pulse.acceptance.Constants.Project.Dependencies.VERSION, project.version);
         }

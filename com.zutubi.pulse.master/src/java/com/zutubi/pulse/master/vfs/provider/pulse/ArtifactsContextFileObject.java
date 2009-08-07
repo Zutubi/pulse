@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.xwork.actions.vfs.DirectoryComparator;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -121,6 +121,6 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
 
     public String getUrlPath() throws FileSystemException
     {
-        return "/browse/projects/" + StringUtils.uriComponentEncode(getBuildResult().getProject().getName()) + "/" + getBuildResult().getNumber() + "/artifacts";
+        return "/browse/projects/" + WebUtils.uriComponentEncode(getBuildResult().getProject().getName()) + "/" + getBuildResult().getNumber() + "/artifacts";
     }
 }

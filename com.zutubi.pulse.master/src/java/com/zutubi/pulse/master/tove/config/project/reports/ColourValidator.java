@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.reports;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.FieldValidatorSupport;
 
@@ -17,7 +17,7 @@ public class ColourValidator extends FieldValidatorSupport
         if (value instanceof String)
         {
             String s = (String) value;
-            if (TextUtils.stringSet(s))
+            if (StringUtils.stringSet(s))
             {
                 try
                 {

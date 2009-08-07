@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
@@ -858,7 +857,7 @@ public class SubversionClient implements ScmClient
                     }
 
                     String labels = String.format(FORMAT_LABELS, pathChangeLabel, propertiesChangeLabel, lockLabel);
-                    if (TextUtils.stringSet(labels.trim()))
+                    if (StringUtils.stringSet(labels.trim()))
                     {
                         handler.status(labels + event.getFile().getPath());
                     }

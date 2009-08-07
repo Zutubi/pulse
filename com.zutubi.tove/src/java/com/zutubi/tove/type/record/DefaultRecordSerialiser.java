@@ -3,6 +3,7 @@ package com.zutubi.tove.type.record;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -61,7 +62,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
     private File getStorageDir(String path)
     {
-        path = StringUtils.encodeAndJoin(new Predicate<Character>()
+        path = WebUtils.encodeAndJoin(new Predicate<Character>()
         {
             public boolean satisfied(Character character)
             {
@@ -114,7 +115,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
             for (File childDir : dir.listFiles(new SubrecordDirFileFilter()))
             {
-                String childKey = StringUtils.uriComponentDecode(childDir.getName());
+                String childKey = WebUtils.uriComponentDecode(childDir.getName());
                 record.put(childKey, deserialise(childDir, PathUtils.getPath(path, childKey)));
             }
             return record;

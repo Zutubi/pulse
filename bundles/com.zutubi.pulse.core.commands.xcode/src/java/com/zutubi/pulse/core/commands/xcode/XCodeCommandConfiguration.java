@@ -5,7 +5,6 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.StringList;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,22 +31,22 @@ public class XCodeCommandConfiguration extends NamedArgumentCommandConfiguration
     protected List<NamedArgument> getNamedArguments()
     {
         List<NamedArgument> result = new LinkedList<NamedArgument>();
-        if (TextUtils.stringSet(project))
+        if (StringUtils.stringSet(project))
         {
             result.add(new NamedArgument("project", project, "-project"));
         }
 
-        if (TextUtils.stringSet(config))
+        if (StringUtils.stringSet(config))
         {
             result.add(new NamedArgument("configuration", config, "-configuration"));
         }
 
-        if (TextUtils.stringSet(target))
+        if (StringUtils.stringSet(target))
         {
             result.add(new NamedArgument("target", target, "-target"));
         }
 
-        if (TextUtils.stringSet(buildaction))
+        if (StringUtils.stringSet(buildaction))
         {
             result.add(new NamedArgument("build action", buildaction));
         }

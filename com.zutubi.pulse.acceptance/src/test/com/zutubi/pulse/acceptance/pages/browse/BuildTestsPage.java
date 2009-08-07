@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * The tests tab for a build result.
@@ -17,7 +17,7 @@ public class BuildTestsPage extends AbstractTestsPage
 
     public BuildTestsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests", "build " + buildId);
+        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }

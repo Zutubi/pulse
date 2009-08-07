@@ -8,7 +8,7 @@ import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
@@ -56,11 +56,11 @@ public class LsAction extends ActionSupport
     public String execute() throws Exception
     {
         String fullPath = "pulse:///";
-        if(TextUtils.stringSet(basePath))
+        if(StringUtils.stringSet(basePath))
         {
             fullPath += "/" + UriParser.encode(PathUtils.normalisePath(basePath));
         }
-        if(TextUtils.stringSet(path))
+        if(StringUtils.stringSet(path))
         {
             fullPath += "/" + UriParser.encode(PathUtils.normalisePath(path));
         }

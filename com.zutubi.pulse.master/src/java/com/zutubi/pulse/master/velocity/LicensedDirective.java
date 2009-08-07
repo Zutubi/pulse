@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.velocity;
 
 import com.zutubi.pulse.master.license.LicenseHolder;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -34,7 +34,7 @@ public class LicensedDirective  extends AbstractDirective
         Map params = createPropertyMap(context, node);
         wireParams(params);
 
-        if (!TextUtils.stringSet(require))
+        if (!StringUtils.stringSet(require))
         {
             return true;
         }

@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -50,12 +50,12 @@ public class MakeCommandConfiguration extends NamedArgumentCommandConfiguration
     {
         List<NamedArgument> result = new LinkedList<NamedArgument>();
 
-        if (TextUtils.stringSet(makefile))
+        if (StringUtils.stringSet(makefile))
         {
             result.add(new NamedArgument("makefile", makefile, "-f"));
         }
 
-        if (TextUtils.stringSet(targets))
+        if (StringUtils.stringSet(targets))
         {
             result.add(new NamedArgument("targets", targets, Arrays.asList(targets.split("\\s+"))));
         }

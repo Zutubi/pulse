@@ -7,7 +7,7 @@ import com.opensymphony.xwork.util.OgnlValueStack;
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.io.WireFeedOutput;
 import com.zutubi.util.Constants;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -116,8 +116,8 @@ public class JITFeedResult extends WebWorkResultSupport
         response.setDateHeader(LAST_MODIFIED, lastModified.getTime());
 
         // check the headers to determine whether or not a response is required.
-        if (TextUtils.stringSet(request.getHeader(IF_NONE_MATCH)) ||
-                TextUtils.stringSet(request.getHeader(IF_MODIFIED_SINCE)))
+        if (StringUtils.stringSet(request.getHeader(IF_NONE_MATCH)) ||
+                StringUtils.stringSet(request.getHeader(IF_MODIFIED_SINCE)))
         {
             if (etag.equals(request.getHeader(IF_NONE_MATCH)) &&
                     lastModified.getTime() == ifModifiedSince.getTime())

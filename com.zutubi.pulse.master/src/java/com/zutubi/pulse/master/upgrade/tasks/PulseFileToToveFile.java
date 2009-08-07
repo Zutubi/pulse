@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import nu.xom.*;
 
 import java.io.ByteArrayOutputStream;
@@ -94,7 +94,7 @@ public class PulseFileToToveFile
         else if (localName.equals(ELEMENT_VERSION))
         {
             String value = element.getAttributeValue(ATTRIBUTE_VALUE);
-            if (TextUtils.stringSet(value))
+            if (StringUtils.stringSet(value))
             {
                 parentElement.addAttribute(new Attribute(ATTRIBUTE_VERSION, value));
             }

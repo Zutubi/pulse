@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.vfs.CompoundFileFilter;
 import com.zutubi.pulse.master.vfs.FilePrefixFilter;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ComparatorProvider;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.*;
 
@@ -114,7 +114,7 @@ public class LsAction extends VFSActionSupport
     public void doList() throws FileSystemException
     {
         // provide temporary backwards compatibility for the deprecated root variable. 
-        if (TextUtils.stringSet(root))
+        if (StringUtils.stringSet(root))
         {
             path = root + path;
         }

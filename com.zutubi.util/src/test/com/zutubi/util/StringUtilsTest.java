@@ -2,13 +2,51 @@ package com.zutubi.util;
 
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class StringUtilsTest extends ZutubiTestCase
 {
+    public void testStringSetNull()
+    {
+        assertFalse(StringUtils.stringSet(null));
+    }
+
+    public void testStringSetEmpty()
+    {
+        assertFalse(StringUtils.stringSet(""));
+    }
+
+    public void testStringSetWhitespace()
+    {
+        assertTrue(StringUtils.stringSet("  "));
+    }
+
+    public void testStringSetWords()
+    {
+        assertTrue(StringUtils.stringSet("some words here"));
+    }
+
+    public void testTrimmedStringSetNull()
+    {
+        assertFalse(StringUtils.trimmedStringSet(null));
+    }
+
+    public void testTrimmedStringSetEmpty()
+    {
+        assertFalse(StringUtils.trimmedStringSet(""));
+    }
+
+    public void testTrimmedStringSetWhitespace()
+    {
+        assertFalse(StringUtils.trimmedStringSet("  "));
+    }
+
+    public void testTrimmedStringSetWords()
+    {
+        assertTrue(StringUtils.trimmedStringSet("some words here"));
+    }
+
     public void testTrimStringShort()
     {
         assertEquals("12345", StringUtils.trimmedString("12345", 10));
@@ -363,243 +401,6 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals("a,b,c", StringUtils.join(",", true, true, "", "", "a", "", "b", "", "", "c", ""));
     }
 
-    public void testUrlEncodePath()
-    {
-        assertEquals("foo%20bar/baz+quux%3Fquuux", StringUtils.urlEncodePath("foo bar/baz+quux?quuux"));
-    }
-    
-    public void testUrlEncodePathAbsolute()
-    {
-        assertEquals("/absolute%20path", StringUtils.urlEncodePath("/absolute path"));
-    }
-
-    public void testUrlEncodePathDoubleSlash()
-    {
-        assertEquals("//absolute/path+here", StringUtils.urlEncodePath("//absolute/path+here"));
-    }
-
-    public void testUrlEncodePathDoubleSlashMiddle()
-    {
-        assertEquals("double//slash/in+the%20path", StringUtils.urlEncodePath("double//slash/in+the path"));
-    }
-
-    public void testUrlEncodePathEmpty()
-    {
-        assertEquals("", StringUtils.urlEncodePath(""));
-    }
-
-    public void testEncodeAndJoinEmpty()
-    {
-        assertEquals("", StringUtils.encodeAndJoin(','));
-    }
-
-    public void testEncodeAndJoinSingle()
-    {
-        assertEquals("piece%2chere", StringUtils.encodeAndJoin(',', "piece,here"));
-    }
-
-    public void testEncodeAndJoinMultiple()
-    {
-        assertEquals("one,two%2cand,three%2c", StringUtils.encodeAndJoin(',', "one", "two,and", "three,"));
-    }
-
-    public void testEncodeAndJoinEmptyPiece()
-    {
-        assertEquals(",wow", StringUtils.encodeAndJoin(',', "", "wow"));
-    }
-
-    public void testSplitAndDecodeEmpty()
-    {
-        assertEquals(a(""), StringUtils.splitAndDecode(',', ""));
-    }
-
-    public void testSplitAndDecodeSingle()
-    {
-        assertEquals(a("hey,there"), StringUtils.splitAndDecode(',', "hey%2cthere"));
-    }
-
-    public void testSplitAndDecodeMultiple()
-    {
-        assertEquals(a("one", "two and", "three "), StringUtils.splitAndDecode(',', "one,two%20and,three%20"));
-    }
-
-    public void testSplitAndDecodeEmptyPiece()
-    {
-        assertEquals(a("", "wow"), StringUtils.splitAndDecode(',', ",wow"));
-    }
-
-    public void testShortHandJoinEncoded()
-    {
-        joinEncodedHelper(',', "hello", "there,sailor");
-    }
-
-    public void testShortHandJoinEncodedPercent()
-    {
-        joinEncodedHelper(',', "hello", "there%2csailor");
-    }
-
-    private void joinEncodedHelper(char separator, String... pieces)
-    {
-        String joined = StringUtils.encodeAndJoin(separator, pieces);
-        Collection<String> split = StringUtils.splitAndDecode(separator, joined);
-        assertEquals(pieces, split);
-    }
-
-    public void testURIPathDecodeEmpty()
-    {
-        assertEquals("", StringUtils.uriPathDecode(""));
-    }
-
-    public void testURIPathDecodeSlash()
-    {
-        assertEquals("/", StringUtils.uriPathDecode("/"));
-    }
-
-    public void testURIPathDecodeSlashes()
-    {
-        assertEquals("///", StringUtils.uriPathDecode("///"));
-    }
-    
-    public void testURIPathDecodeVariousComponents()
-    {
-        assertEquals("/bits/and/sometimes//empty/pieces", StringUtils.uriPathDecode("/bits/and/sometimes//empty/pieces"));
-    }
-
-    public void testURIPathDecodeEndsWithSlash()
-    {
-        assertEquals("trailing/slash/", StringUtils.uriPathDecode("trailing/slash/"));
-    }
-
-    public void testURIPathDecodeEncodedSlashes()
-    {
-        assertEquals("after/decode/cannot/tell", StringUtils.uriPathDecode("after%2Fdecode/cannot%2Ftell"));
-    }
-    
-    public void testURIPathDecodeComponentHasTrailingPercent()
-    {
-        assertEquals("path/%/here", StringUtils.uriPathDecode("path/%/here"));
-    }
-
-    public void testURIPathDecodeComponentWithIncompletePercent()
-    {
-        assertEquals("path/%e/here", StringUtils.uriPathDecode("path/%e/here"));
-    }
-
-    public void testURIPathDecodeComponentWithInvalidPercent()
-    {
-        assertEquals("path/%zz/here", StringUtils.uriPathDecode("path/%zz/here"));
-    }
-
-    public void testURIPathDecodePercent()
-    {
-        assertEquals("path/\u0001/here", StringUtils.uriPathDecode("path/%01/here"));
-    }
-
-    public void testURIPathDecodeMultiplePercents()
-    {
-        assertEquals("\u0001\u0002/path/\u0003\u0004\u0005/here", StringUtils.uriPathDecode("%01%02/path/%03%04%05/here"));
-    }
-
-    public void testURIPathDecodeComponentBeginsWithPercent()
-    {
-        assertEquals("path/\u0001abc/here", StringUtils.uriPathDecode("path/%01abc/here"));
-    }
-
-    public void testURIComponentEncodeEmpty()
-    {
-        assertEquals("", StringUtils.uriComponentEncode(""));
-    }
-
-    public void testURIComponentEncodeNoChange()
-    {
-        assertEquals("agzALZ0369_-!~.'()*", StringUtils.uriComponentEncode("agzALZ0369_-!~.'()*"));
-    }
-
-    public void testURIComponentEncodeNonASCII() throws UnsupportedEncodingException
-    {
-        assertEquals("%e1%88%b4", StringUtils.uriComponentEncode("\u1234"));
-    }
-
-    public void testURIComponentEncodeForwardSlash()
-    {
-        assertEquals("%2f", StringUtils.uriComponentEncode("/"));
-    }
-
-    public void testURIComponentEncodeMixedFirstOK()
-    {
-        assertEquals("a%2f%20b%26c%23", StringUtils.uriComponentEncode("a/ b&c#"));
-    }
-
-    public void testURIComponentEncodeMixedFirstEncoded()
-    {
-        assertEquals("%3ahelp%2b%26m%24e", StringUtils.uriComponentEncode(":help+&m$e"));
-    }
-
-    public void testURIComponentDecodeEmpty()
-    {
-        assertEquals("", StringUtils.uriComponentDecode(""));
-    }
-
-    public void testURIComponentDecodeTrailingPercent()
-    {
-        assertEquals("%", StringUtils.uriComponentDecode("%"));
-    }
-
-    public void testURIComponentDecodeIncompletePercent()
-    {
-        assertEquals("%e", StringUtils.uriComponentDecode("%e"));
-    }
-
-    public void testURIComponentDecodeInvalidPercent()
-    {
-        assertEquals("%zz", StringUtils.uriComponentDecode("%zz"));
-    }
-
-    public void testURIComponentDecodePercent()
-    {
-        assertEquals("\u0001", StringUtils.uriComponentDecode("%01"));
-    }
-
-    public void testURIComponentDecodeMultiplePercents()
-    {
-        assertEquals("\u0001\u0002\u0003\u0004\u0005", StringUtils.uriComponentDecode("%01%02%03%04%05"));
-    }
-
-    public void testURIComponentDecodeBeginsWithPercent()
-    {
-        assertEquals("\u0001abc", StringUtils.uriComponentDecode("%01abc"));
-    }
-
-    public void testURIComponentDecodeEndsWithPercent()
-    {
-        assertEquals("abc\u0001", StringUtils.uriComponentDecode("abc%01"));
-    }
-
-    public void testURIComponentDecodeInvalidUTF8()
-    {
-        // FFFD is a replacement used when the incoming character is "unknown"
-        assertEquals("\ufffd", StringUtils.uriComponentDecode("%e0"));
-    }
-
-    public void testURIComponentRoundTripNonASCII()
-    {
-        uriComponentHelper("\u1234");
-    }
-
-    public void testURIComponentRoundTripNoChange()
-    {
-        uriComponentHelper("agzALZ0369_-!~.'()*");
-    }
-
-    public void testURIComponentRoundTripSomeSpecials()
-    {
-        uriComponentHelper("a/b%c@@f%%");
-    }
-
-    private void uriComponentHelper(String s)
-    {
-        assertEquals(s, StringUtils.uriComponentDecode(StringUtils.uriComponentEncode(s)));
-    }
     private void splitHelper(String s, String... expected)
     {
         List<String> expectedParts = Arrays.asList(expected);
@@ -859,99 +660,6 @@ public class StringUtilsTest extends ZutubiTestCase
         assertFalse(StringUtils.isAsciiAlphabetical('~'));
     }
 
-    public void testIsHtmlNameStartLower()
-    {
-        assertTrue(StringUtils.isHtmlNameStartChar('a'));
-    }
-
-    public void testIsHtmlNameStartUpper()
-    {
-        assertTrue(StringUtils.isHtmlNameStartChar('G'));
-    }
-
-    public void testIsHtmlNameStartDigit()
-    {
-        assertFalse(StringUtils.isHtmlNameStartChar('0'));
-    }
-
-    public void testIsHtmlNameStartUnderScore()
-    {
-        assertFalse(StringUtils.isHtmlNameStartChar('_'));
-    }
-
-    public void testIsHtmlNameStartRandom()
-    {
-        assertFalse(StringUtils.isHtmlNameStartChar('&'));
-    }
-
-    public void testIsHtmlNameLower()
-    {
-        assertTrue(StringUtils.isHtmlNameChar('a'));
-    }
-
-    public void testIsHtmlNameUpper()
-    {
-        assertTrue(StringUtils.isHtmlNameChar('G'));
-    }
-
-    public void testIsHtmlNameDigit()
-    {
-        assertTrue(StringUtils.isHtmlNameChar('0'));
-    }
-
-    public void testIsHtmlNameAllowedPunct()
-    {
-        assertTrue(StringUtils.isHtmlNameChar('_'));
-        assertTrue(StringUtils.isHtmlNameChar('-'));
-        assertTrue(StringUtils.isHtmlNameChar('.'));
-        assertTrue(StringUtils.isHtmlNameChar(':'));
-    }
-
-    public void testIsHtmlNameRandom()
-    {
-        assertFalse(StringUtils.isHtmlNameChar('%'));
-    }
-
-    public void testToValidHtmlNameEmpty()
-    {
-        toValidHtmlNameHelper("a", "");
-    }
-
-    public void testToValidHtmlNameDigit()
-    {
-        toValidHtmlNameHelper("a0", "0");
-    }
-
-    public void testToValidHtmlNameInvalid()
-    {
-        toValidHtmlNameHelper("a.", "/");
-    }
-
-    public void testToValidHtmlNameLetter()
-    {
-        toValidHtmlNameHelper("b", "b");
-    }
-
-    public void testToValidHtmlNameValid()
-    {
-        toValidHtmlNameHelper("valid-id:here_0", "valid-id:here_0");
-    }
-
-    public void testToValidHtmlNameAllInvalid()
-    {
-        toValidHtmlNameHelper("a.....", "!@#$%");
-    }
-
-    public void testToValidHtmlNamePath()
-    {
-        toValidHtmlNameHelper("foo.bar.baz", "foo/bar/baz");
-    }
-
-    private void toValidHtmlNameHelper(String expected, String in)
-    {
-        assertEquals(expected, StringUtils.toValidHtmlName(in));
-    }
-
     public void testStripLineBreaksEmpty()
     {
         assertEquals("", StringUtils.stripLineBreaks(""));
@@ -1138,21 +846,6 @@ public class StringUtilsTest extends ZutubiTestCase
     public void testCountMultipleOccurrences()
     {
         assertEquals(5, StringUtils.count("how do you spell xxxx? one x or two?", 'x'));
-    }
-
-    private <T> T[] a(T... a)
-    {
-        return a;
-    }
-
-    private void assertEquals(String[] expected, Collection<String> got)
-    {
-        assertEquals(expected.length, got.size());
-        int i = 0;
-        for(String s: got)
-        {
-            assertEquals(expected[i++], s);
-        }
     }
 
     private void assertEquals(String[] expected, String[] got)

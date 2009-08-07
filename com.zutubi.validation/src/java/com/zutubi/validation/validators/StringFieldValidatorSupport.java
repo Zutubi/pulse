@@ -1,6 +1,6 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.ValidationException;
 
 /**
@@ -51,7 +51,7 @@ public abstract class StringFieldValidatorSupport extends FieldValidatorSupport
         }
 
         String s = (String) value;
-        if(allowEmpty || TextUtils.stringSet(s))
+        if(allowEmpty || StringUtils.stringSet(s))
         {
             validateStringField(s);
         }

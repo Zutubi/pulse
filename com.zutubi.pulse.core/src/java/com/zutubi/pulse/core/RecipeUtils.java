@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class RecipeUtils
                     importVersion = resource.getDefaultVersion();
                 }
 
-                if(TextUtils.stringSet(importVersion))
+                if(StringUtils.stringSet(importVersion))
                 {
                     ResourceVersionConfiguration version = resource.getVersion(importVersion);
                     if(version == null)

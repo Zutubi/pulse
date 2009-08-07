@@ -766,7 +766,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         Hashtable<String, Object> requirement = xmlRpcHelper.createDefaultConfig(ResourceRequirementConfiguration.class);
         requirement.put("resource", resource);
-        if (TextUtils.stringSet(version))
+        if (StringUtils.stringSet(version))
         {
             requirement.put("version", version);
             requirement.put("defaultVersion", false);
@@ -791,6 +791,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         browser.refreshUntilElement(statusId, BUILD_TIMEOUT);
         browser.refreshUntilText(statusId, "success", BUILD_TIMEOUT);
 
-        assertEquals(agent, browser.getText(StringUtils.toValidHtmlName(IDs.stageAgentCell(projectName, 1, "default"))));
+        assertEquals(agent, browser.getText(WebUtils.toValidHtmlName(IDs.stageAgentCell(projectName, 1, "default"))));
     }
 }

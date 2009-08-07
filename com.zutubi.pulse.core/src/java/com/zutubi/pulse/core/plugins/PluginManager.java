@@ -371,7 +371,7 @@ public class PluginManager
     private void processPendingAction(String id, PluginRegistryEntry entry) throws PluginException, IOException, URISyntaxException
     {
         String pendingAction = entry.get(PLUGIN_PENDING_KEY);
-        if (!TextUtils.stringSet(pendingAction))
+        if (!StringUtils.stringSet(pendingAction))
         {
             LOG.warning("Registry entry for plugin '" + id + "' is corrupt. Missing pending action.");
             return;

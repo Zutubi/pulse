@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 
@@ -39,7 +39,7 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
             TestSuiteResult suiteResult = new TestSuiteResult(null);
             TestSuiteResult accumulateSuite = suiteResult;
             String suite = config.getSuite();
-            if (TextUtils.stringSet(suite))
+            if (StringUtils.stringSet(suite))
             {
                 accumulateSuite = new TestSuiteResult(suite);
                 suiteResult.addSuite(accumulateSuite);

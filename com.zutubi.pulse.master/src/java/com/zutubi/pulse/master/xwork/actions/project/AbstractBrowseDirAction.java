@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.xwork.actions.DirectoryEntry;
 import com.zutubi.pulse.servercore.filesystem.File;
 import com.zutubi.pulse.servercore.filesystem.FileSystem;
 import com.zutubi.pulse.servercore.filesystem.FileSystemException;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -67,7 +67,7 @@ public abstract class AbstractBrowseDirAction extends ProjectActionBase
     {
         entries = new LinkedList<DirectoryEntry>();
 
-        if (TextUtils.stringSet(path))
+        if (StringUtils.stringSet(path))
         {
             File parentFile = dir.getParentFile();
             entries.add(new DirectoryEntry(parentFile, ".."));

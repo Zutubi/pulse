@@ -22,7 +22,7 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
@@ -82,7 +82,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
                 if (primaryType.equals(ProjectTypeSelectionConfiguration.TYPE_SINGLE_STEP))
                 {
                     String commandSymbolicName = config.getCommandType();
-                    if (TextUtils.stringSet(commandSymbolicName))
+                    if (StringUtils.stringSet(commandSymbolicName))
                     {
                         CompositeType selectedCommandType = typeRegistry.getType(commandSymbolicName);
                         SingleStepWizardState commandState = new SingleStepWizardState(ProjectConfigurationWizard.this, wizard.getNextUniqueId(), null, commandType, selectedCommandType, null);

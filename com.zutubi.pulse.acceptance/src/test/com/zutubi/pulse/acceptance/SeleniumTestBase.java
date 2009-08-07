@@ -118,7 +118,7 @@ public class SeleniumTestBase extends PulseTestCase
 
     protected void assertFormFieldNotEmpty(String id)
     {
-        String value = browser.getValue(StringUtils.toValidHtmlName(id));
+        String value = browser.getValue(WebUtils.toValidHtmlName(id));
         assertNotNull(value);
         assertTrue(value.length() > 0);
     }
@@ -136,7 +136,7 @@ public class SeleniumTestBase extends PulseTestCase
         {
             public boolean satisfied()
             {
-                return TextUtils.stringSet(browser.getText(IDs.STATUS_MESSAGE));
+                return StringUtils.stringSet(browser.getText(IDs.STATUS_MESSAGE));
             }
         }, STATUS_TIMEOUT, "status message to be set.");
 

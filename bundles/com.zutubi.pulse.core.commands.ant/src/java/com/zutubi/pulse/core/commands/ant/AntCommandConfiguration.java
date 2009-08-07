@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -50,12 +50,12 @@ public class AntCommandConfiguration extends NamedArgumentCommandConfiguration
     protected List<NamedArgument> getNamedArguments()
     {
         List<NamedArgument> args = new LinkedList<NamedArgument>();
-        if (TextUtils.stringSet(buildFile))
+        if (StringUtils.stringSet(buildFile))
         {
             args.add(new NamedArgument("build file", buildFile, "-f"));
         }
 
-        if (TextUtils.stringSet(targets))
+        if (StringUtils.stringSet(targets))
         {
             args.add(new NamedArgument("targets", targets, Arrays.asList(targets.split("\\s+"))));
         }

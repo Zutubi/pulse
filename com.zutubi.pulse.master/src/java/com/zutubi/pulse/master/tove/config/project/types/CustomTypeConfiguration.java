@@ -13,7 +13,6 @@ import com.zutubi.tove.annotations.TextArea;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
@@ -50,7 +49,7 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
 
     public void validate(ValidationContext context)
     {
-        if(!TextUtils.stringSet(pulseFileString))
+        if(!StringUtils.stringSet(pulseFileString))
         {
             context.addFieldError("pulseFileString", "pulse file is required");
             return;

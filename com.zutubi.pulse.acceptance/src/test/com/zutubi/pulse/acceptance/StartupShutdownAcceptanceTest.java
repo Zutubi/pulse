@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import org.apache.commons.cli.ParseException;
@@ -181,7 +181,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         assertServerAvailable();
 
         browser = initSelenium(expected);
-        if (TextUtils.stringSet(commandline.getConfiguredDataDirectory()))
+        if (StringUtils.stringSet(commandline.getConfiguredDataDirectory()))
         {
             assertPromptForDatabase(browser);
         }
@@ -391,19 +391,19 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     private void assertStartServer(RuntimeContext commandline) throws Exception
     {
-        if (TextUtils.stringSet(commandline.getPort()))
+        if (StringUtils.stringSet(commandline.getPort()))
         {
             pulse.setPort(Long.valueOf(commandline.getPort()));
         }
-        if (TextUtils.stringSet(commandline.getContextPath()))
+        if (StringUtils.stringSet(commandline.getContextPath()))
         {
             pulse.setContext(commandline.getContextPath());
         }
-        if (TextUtils.stringSet(commandline.getConfiguredDataDirectory()))
+        if (StringUtils.stringSet(commandline.getConfiguredDataDirectory()))
         {
             pulse.setDataDir(commandline.getConfiguredDataDirectory());
         }
-        if (TextUtils.stringSet(commandline.getExternalConfig()))
+        if (StringUtils.stringSet(commandline.getExternalConfig()))
         {
             pulse.setConfigFile(commandline.getExternalConfig());
         }

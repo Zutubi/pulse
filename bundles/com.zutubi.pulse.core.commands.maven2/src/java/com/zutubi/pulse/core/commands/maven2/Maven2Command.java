@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -57,7 +57,7 @@ public class Maven2Command extends NamedArgumentCommand
     {
         Maven2CommandConfiguration config = (Maven2CommandConfiguration) getConfig();
         String pomFile = config.getPomFile();
-        if (!TextUtils.stringSet(pomFile))
+        if (!StringUtils.stringSet(pomFile))
         {
             pomFile = DEFAULT_POM_FILE;
         }

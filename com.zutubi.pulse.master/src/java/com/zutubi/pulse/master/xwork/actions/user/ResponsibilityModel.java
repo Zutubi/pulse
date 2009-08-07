@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * JSON-encodeable information about a project a user is responsible for.
@@ -24,7 +24,7 @@ public class ResponsibilityModel
 
     public static String getResponsibilityId(String project)
     {
-        return StringUtils.toValidHtmlName("responsibility-" + project);
+        return WebUtils.toValidHtmlName("responsibility-" + project);
     }
 
     public String getProject()
@@ -39,6 +39,6 @@ public class ResponsibilityModel
 
     public String getUrl()
     {
-        return Urls.getBaselessInstance().project(StringUtils.uriComponentEncode(project));
+        return Urls.getBaselessInstance().project(WebUtils.uriComponentEncode(project));
     }
 }

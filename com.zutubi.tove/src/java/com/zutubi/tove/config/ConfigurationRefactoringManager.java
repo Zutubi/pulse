@@ -3,9 +3,12 @@ package com.zutubi.tove.config;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.GraphFunction;
+import com.zutubi.util.Pair;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
@@ -352,12 +355,12 @@ public class ConfigurationRefactoringManager
 
         private Record checkKeys(String parentPath, String originalKey, String cloneKey, boolean templatedCollection, Set<String> seenNames)
         {
-            if (!TextUtils.stringSet(originalKey))
+            if (!StringUtils.stringSet(originalKey))
             {
                 throw new IllegalArgumentException("Invalid empty original key");
             }
 
-            if (!TextUtils.stringSet(cloneKey))
+            if (!StringUtils.stringSet(cloneKey))
             {
                 throw new IllegalArgumentException("Invalid empty clone key");
             }
@@ -553,7 +556,7 @@ public class ConfigurationRefactoringManager
                 throw new IllegalArgumentException("Invalid parent path '" + parentPath + "': does not refer to a templated collection");
             }
 
-            if(!TextUtils.stringSet(parentTemplateName))
+            if(!StringUtils.stringSet(parentTemplateName))
             {
                 throw new IllegalArgumentException("Parent template name is required");
             }

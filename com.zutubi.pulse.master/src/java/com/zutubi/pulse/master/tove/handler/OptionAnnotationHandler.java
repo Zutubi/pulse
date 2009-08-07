@@ -11,7 +11,7 @@ import com.zutubi.tove.type.EnumType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ClassLoaderUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -41,7 +41,7 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 
         // And then a little bit extra.
         String className = getOptionProviderClass(annotation);
-        if(!TextUtils.stringSet(className))
+        if(!StringUtils.stringSet(className))
         {
             if(field.getProperty().getType() instanceof EnumType)
             {

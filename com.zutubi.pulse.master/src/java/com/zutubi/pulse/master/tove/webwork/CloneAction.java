@@ -12,7 +12,7 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
@@ -143,7 +143,7 @@ public class CloneAction extends ToveActionSupport
 
     private void validateCloneKey(String name, String value, Set<String> seenKeys, TextProvider textProvider)
     {
-        if(!TextUtils.stringSet(value))
+        if(!StringUtils.stringSet(value))
         {
             addFieldError(name, "name is required");
         }

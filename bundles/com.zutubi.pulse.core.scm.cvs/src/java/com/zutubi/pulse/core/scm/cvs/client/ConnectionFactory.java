@@ -5,10 +5,13 @@
 
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.scm.cvs.client.connection.SshConnection;
+import com.zutubi.util.StringUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
-import org.netbeans.lib.cvsclient.connection.*;
+import org.netbeans.lib.cvsclient.connection.Connection;
+import org.netbeans.lib.cvsclient.connection.LocalConnection;
+import org.netbeans.lib.cvsclient.connection.PServerConnection;
+import org.netbeans.lib.cvsclient.connection.StandardScrambler;
 
 public class ConnectionFactory
 {
@@ -18,7 +21,7 @@ public class ConnectionFactory
         if (CVSRoot.METHOD_EXT.equals(method))
         {
             SshConnection sshConnection = new SshConnection(cvsRoot);
-            if (TextUtils.stringSet(password))
+            if (StringUtils.stringSet(password))
             {
                 sshConnection.setPassword(password);
             }
@@ -27,7 +30,7 @@ public class ConnectionFactory
         else if (CVSRoot.METHOD_PSERVER.equals(method))
         {
             PServerConnection pServerConnection = new PServerConnection(cvsRoot);
-            if (TextUtils.stringSet(password))
+            if (StringUtils.stringSet(password))
             {
                 String encodedPassword = StandardScrambler.getInstance().scramble(password);
                 pServerConnection.setEncodedPassword(encodedPassword);

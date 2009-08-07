@@ -6,8 +6,8 @@ import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -48,17 +48,17 @@ public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguratio
     protected List<NamedArgument> getNamedArguments()
     {
         List<NamedArgument> result = new LinkedList<NamedArgument>();
-        if (TextUtils.stringSet(pomFile))
+        if (StringUtils.stringSet(pomFile))
         {
             result.add(new NamedArgument("POM file", pomFile, "-f"));
         }
 
-        if (TextUtils.stringSet(settingsFile))
+        if (StringUtils.stringSet(settingsFile))
         {
             result.add(new NamedArgument("settings file", settingsFile, "-s"));
         }
 
-        if (TextUtils.stringSet(goals))
+        if (StringUtils.stringSet(goals))
         {
             result.add(new NamedArgument("goals", goals, Arrays.asList(goals.trim().split("\\s+"))));
         }

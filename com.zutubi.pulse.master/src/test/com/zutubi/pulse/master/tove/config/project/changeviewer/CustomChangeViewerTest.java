@@ -68,25 +68,25 @@ public class CustomChangeViewerTest extends PulseTestCase
     public void testGetFileViewURLSpecial() throws ScmException
     {
         viewer.setFileViewURL("http://hello${path}?r=${revision}");
-        assertEquals("http://hello/my/path+special%20chars?r=123", viewer.getFileViewURL(getContext(), getFileChange("/my/path+special chars")));
+        assertEquals("http://hello/my/path%2bspecial%20chars?r=123", viewer.getFileViewURL(getContext(), getFileChange("/my/path+special chars")));
     }
 
     public void testGetFileDownloadURLSpecial() throws ScmException
     {
         viewer.setFileDownloadURL("http://hello${path}?r=${revision}&format=raw");
-        assertEquals("http://hello/my/path+special%20chars?r=123&format=raw", viewer.getFileDownloadURL(getContext(), getFileChange("/my/path+special chars")));
+        assertEquals("http://hello/my/path%2bspecial%20chars?r=123&format=raw", viewer.getFileDownloadURL(getContext(), getFileChange("/my/path+special chars")));
     }
 
     public void testGetFileDiffURLSpecial() throws ScmException
     {
         viewer.setFileDiffURL("http://hello${path}?r=${revision}&p=${previous.revision}");
-        assertEquals("http://hello/my/path+special%20chars?r=123&p=122", viewer.getFileDiffURL(getContext(), getFileChange("/my/path+special chars")));
+        assertEquals("http://hello/my/path%2bspecial%20chars?r=123&p=122", viewer.getFileDiffURL(getContext(), getFileChange("/my/path+special chars")));
     }
 
     public void testFilePropertiesSpecial() throws ScmException
     {
         viewer.setFileDiffURL("${path} ${path.raw} ${path.form}");
-        assertEquals("/my/path+special%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL(getContext(), getFileChange("/my/path+special chars")));
+        assertEquals("/my/path%2bspecial%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL(getContext(), getFileChange("/my/path+special chars")));
     }
 
     private ChangeContext getContext()

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.vfs;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.UriParser;
@@ -52,7 +52,7 @@ public class CatAction extends VFSActionSupport
 
     public String execute() throws FileSystemException
     {
-        if (TextUtils.stringSet(root))
+        if (StringUtils.stringSet(root))
         {
             path = root + path;
         }

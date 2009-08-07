@@ -4,7 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeRegistry;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  *
@@ -47,7 +47,7 @@ public abstract class AbstractI18NDirective extends ToveDirective
     protected Messages getMessages()
     {
         Type type;
-        if(TextUtils.stringSet(context))
+        if(StringUtils.stringSet(context))
         {
             type = typeRegistry.getType(context);
         }

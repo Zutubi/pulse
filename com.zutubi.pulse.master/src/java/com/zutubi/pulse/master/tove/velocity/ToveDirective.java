@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.velocity.AbstractDirective;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.io.IOException;
 
@@ -52,7 +52,7 @@ public abstract class ToveDirective extends AbstractDirective
     protected Object lookup(String key)
     {
         OgnlValueStack stack = ActionContext.getContext().getValueStack();
-        if(TextUtils.stringSet(property))
+        if(StringUtils.stringSet(property))
         {
             key = property + "." + key;
         }

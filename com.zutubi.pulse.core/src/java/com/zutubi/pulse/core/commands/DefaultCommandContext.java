@@ -14,7 +14,7 @@ import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
@@ -135,7 +135,7 @@ public class DefaultCommandContext implements CommandContext
 
     public void addCustomField(FieldScope scope, String name, String value)
     {
-        if (!TextUtils.stringSet(name))
+        if (!StringUtils.stringSet(name))
         {
             throw new IllegalArgumentException("Name must be specified");
         }

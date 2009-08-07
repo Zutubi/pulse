@@ -4,7 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.MethodPredicates;
@@ -73,7 +73,7 @@ public class ConfigurationLinks
                 List<ConfigurationLink> result = (List<ConfigurationLink>) linksMethod.invoke(linksInstance, configuration);
                 for (ConfigurationLink link: result)
                 {
-                    if (!TextUtils.stringSet(link.getLabel()))
+                    if (!StringUtils.stringSet(link.getLabel()))
                     {
                         link.setLabel(messages.format(link.getName() + KEY_SUFFIX_LABEL));
                     }

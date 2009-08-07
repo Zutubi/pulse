@@ -6,8 +6,11 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.FileSystemUtils;
 import static com.zutubi.util.FileSystemUtils.createFile;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -402,7 +405,7 @@ public class CvsClient implements ScmClient
 
     private boolean isUpdateSupported(CvsRevision rev) throws ScmException
     {
-        if (TextUtils.stringSet(rev.getBranch()) && rev.getDate() != null)
+        if (StringUtils.stringSet(rev.getBranch()) && rev.getDate() != null)
         {
             // can only update to a specified date on a branch on some cvs servers.
             String version = core.version();
@@ -413,7 +416,7 @@ public class CvsClient implements ScmClient
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
-        if (!TextUtils.stringSet(path))
+        if (!StringUtils.stringSet(path))
         {
             throw new IllegalArgumentException("You need to specify a file to checkout.");
         }

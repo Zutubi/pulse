@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.user;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Arrays;
 
@@ -67,7 +67,7 @@ public class UserActionSupport extends ActionSupport
         {
             return getUser(userId);
         }
-        else if (TextUtils.stringSet(userLogin))
+        else if (StringUtils.stringSet(userLogin))
         {
             return getUser(userLogin);
         }
@@ -96,7 +96,7 @@ public class UserActionSupport extends ActionSupport
         {
             addActionError(getText("user.unknown", Arrays.asList(userId)));
         }
-        else if (TextUtils.stringSet(userLogin))
+        else if (StringUtils.stringSet(userLogin))
         {
             addActionError(getText("user.unknown", Arrays.asList(userLogin)));
         }
@@ -108,7 +108,7 @@ public class UserActionSupport extends ActionSupport
         {
             addFieldError("userId", "Unknown user '" + userId + "'");
         }
-        else if (TextUtils.stringSet(userLogin))
+        else if (StringUtils.stringSet(userLogin))
         {
             addFieldError("userLogin", "Unknown user '" + userLogin + "'");
         }

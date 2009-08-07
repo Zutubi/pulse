@@ -5,7 +5,7 @@ import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.servercore.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.cli.*;
 
@@ -192,20 +192,20 @@ public class StartCommand implements Command
         try
         {
             // update the system properties
-            if (TextUtils.stringSet(pulseData))
+            if (StringUtils.stringSet(pulseData))
             {
                 System.setProperty(SystemConfiguration.PULSE_DATA, pulseData);
             }
-            else if(TextUtils.stringSet(System.getenv(ENV_PULSE_DATA)))
+            else if(StringUtils.stringSet(System.getenv(ENV_PULSE_DATA)))
             {
                 System.setProperty(SystemConfiguration.PULSE_DATA, System.getenv(ENV_PULSE_DATA));
             }
 
-            if (TextUtils.stringSet(pulseConfig))
+            if (StringUtils.stringSet(pulseConfig))
             {
                 System.setProperty(EnvConfig.PULSE_CONFIG, pulseConfig);
             }
-            else if (TextUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
+            else if (StringUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
             {
                 System.setProperty(EnvConfig.PULSE_CONFIG, System.getenv(ENV_PULSE_CONFIG));
             }
@@ -215,22 +215,22 @@ public class StartCommand implements Command
                 System.setProperty(SystemConfiguration.WEBAPP_PORT, Integer.toString(port));
             }
 
-            if (TextUtils.stringSet(contextPath))
+            if (StringUtils.stringSet(contextPath))
             {
                 System.setProperty(SystemConfiguration.CONTEXT_PATH, contextPath);
             }
 
-            if (TextUtils.stringSet(bindAddress))
+            if (StringUtils.stringSet(bindAddress))
             {
                 System.setProperty(SystemConfiguration.WEBAPP_BIND_ADDRESS, bindAddress);
             }
 
-            if (TextUtils.stringSet(restoreFile))
+            if (StringUtils.stringSet(restoreFile))
             {
                 System.setProperty(SystemConfiguration.RESTORE_FILE, restoreFile);
             }
 
-            if (TextUtils.stringSet(restoreArtifacts))
+            if (StringUtils.stringSet(restoreArtifacts))
             {
                 System.setProperty(SystemConfiguration.RESTORE_ARTIFACTS, restoreArtifacts);
             }

@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Helper base class for actions that may drill down to the command level.
@@ -39,7 +39,7 @@ public class CommandActionBase extends StageActionBase
         RecipeResultNode recipeResultNode = getRecipeResultNode();
         if (commandResult == null && recipeResultNode != null)
         {
-            if (TextUtils.stringSet(commandName))
+            if (StringUtils.stringSet(commandName))
             {
                 RecipeResult recipeResult = recipeResultNode.getResult();
                 commandResult = recipeResult == null ? null : recipeResult.getCommandResult(commandName);

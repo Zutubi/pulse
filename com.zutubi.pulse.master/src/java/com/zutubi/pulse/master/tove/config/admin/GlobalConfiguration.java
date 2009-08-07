@@ -8,7 +8,7 @@ import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * The global configuration scope, which holds server-administration configuration.
@@ -48,7 +48,7 @@ public class GlobalConfiguration extends AbstractConfiguration
     public void setBaseUrl(String baseUrl)
     {
         // munge the url a little. We assume that there is no trailing '/' when using this property.
-        if (TextUtils.stringSet(baseUrl) && baseUrl.endsWith("/"))
+        if (StringUtils.stringSet(baseUrl) && baseUrl.endsWith("/"))
         {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }

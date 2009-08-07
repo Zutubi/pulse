@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.io.*;
 import java.text.ParseException;
@@ -292,7 +292,7 @@ public class PerforceClient extends CachingScmClient
         this.core.setEnv(ENV_USER, configuration.getUser());
 
         String password = determinePassword(core, configuration);
-        if (TextUtils.stringSet(password))
+        if (StringUtils.stringSet(password))
         {
             this.core.setEnv(ENV_PASSWORD, password);
         }

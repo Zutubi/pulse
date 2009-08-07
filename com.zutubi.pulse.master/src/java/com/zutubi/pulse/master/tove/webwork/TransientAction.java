@@ -12,7 +12,7 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -60,13 +60,13 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
     
     public boolean isCancelSelected()
     {
-        if (TextUtils.stringSet(submitField))
+        if (StringUtils.stringSet(submitField))
         {
             return submitField.equals("cancel");
         }
         else
         {
-            return TextUtils.stringSet(cancel);
+            return StringUtils.stringSet(cancel);
         }
     }
 
@@ -133,7 +133,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
             return "cancel";
         }
         
-        if (!TextUtils.stringSet(symbolicName))
+        if (!StringUtils.stringSet(symbolicName))
         {
             analyse();
             return INPUT;

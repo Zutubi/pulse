@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  */
@@ -109,7 +109,7 @@ public class PluginVersion implements Comparable<PluginVersion>
 
     public String toString()
     {
-        return String.format("%d.%d.%d", major, minor, service) + (TextUtils.stringSet(qualifier) ? ("." + qualifier) : "");
+        return String.format("%d.%d.%d", major, minor, service) + (StringUtils.stringSet(qualifier) ? ("." + qualifier) : "");
     }
 
     public int compareTo(PluginVersion o)

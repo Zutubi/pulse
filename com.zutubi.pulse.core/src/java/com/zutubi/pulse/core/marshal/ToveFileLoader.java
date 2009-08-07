@@ -20,7 +20,7 @@ import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.ValidationContext;
@@ -154,7 +154,7 @@ public class ToveFileLoader
                 if (referenceable != null)
                 {
                     String referenceName = (String) type.getProperty(referenceable.nameProperty()).getValue(configuration);
-                    if (TextUtils.stringSet(referenceName))
+                    if (StringUtils.stringSet(referenceName))
                     {
                         Object value;
                         if (referenceable.valueProperty().length() == 0)
@@ -631,7 +631,7 @@ public class ToveFileLoader
     private String getAddableValue(Element element, String attribute) throws FileLoadException
     {
         String value;
-        if (TextUtils.stringSet(attribute))
+        if (StringUtils.stringSet(attribute))
         {
             value = element.getAttributeValue(attribute);
             if (value == null)
@@ -823,7 +823,7 @@ public class ToveFileLoader
                 }
             }
 
-            if (!TextUtils.stringSet(path))
+            if (!StringUtils.stringSet(path))
             {
                 throw new FileLoadException("Required attribute 'path' not set");
             }
@@ -1012,7 +1012,7 @@ public class ToveFileLoader
 
     private Object resolveReference(String rawReference, Class<? extends Configuration> expectedType, Scope scope) throws ResolutionException
     {
-        if (!TextUtils.stringSet(rawReference))
+        if (!StringUtils.stringSet(rawReference))
         {
             return null;
         }

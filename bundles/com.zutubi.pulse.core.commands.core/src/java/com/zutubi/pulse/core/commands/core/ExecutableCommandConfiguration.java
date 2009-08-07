@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.tove.config.annotations.BrowseScmDirAction;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 
@@ -109,7 +109,7 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
     public List<String> getCombinedArguments()
     {
         List<String> combined = new LinkedList<String>();
-        if (TextUtils.stringSet(args))
+        if (StringUtils.stringSet(args))
         {
             combined.addAll(Arrays.asList(args.split("\\s+")));
         }
@@ -119,7 +119,7 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
         {
             public boolean satisfied(String s)
             {
-                return TextUtils.stringSet(s);
+                return StringUtils.stringSet(s);
             }
         });
     }
@@ -171,7 +171,7 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
 
     public void validate(ValidationContext context)
     {
-        if (!TextUtils.stringSet(exe) && !TextUtils.stringSet(getDefaultExe()))
+        if (!StringUtils.stringSet(exe) && !StringUtils.stringSet(getDefaultExe()))
         {
             context.addFieldError("exe", "exe is required");
         }

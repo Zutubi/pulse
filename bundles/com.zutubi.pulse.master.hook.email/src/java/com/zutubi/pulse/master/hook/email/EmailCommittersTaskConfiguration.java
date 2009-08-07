@@ -34,7 +34,6 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.validation.annotations.Required;
 
 import static java.util.Arrays.asList;
@@ -125,7 +124,7 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
         }
 
         EmailConfiguration emailConfiguration = configurationProvider.get(EmailConfiguration.class);
-        if (!TextUtils.stringSet(emailConfiguration.getHost()))
+        if (!StringUtils.stringSet(emailConfiguration.getHost()))
         {
             throw new PulseException("Cannot execute email build hook task as no SMTP host is configured.");
         }
@@ -170,7 +169,7 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
                 // Only bother to map and add if we haven't already done so.
                 if (seenLogins.add(scmLogin))
                 {
-                    if (TextUtils.stringSet(scmLogin) && (!ignorePulseUsers || userManager.getUser(scmLogin) == null))
+                    if (StringUtils.stringSet(scmLogin) && (!ignorePulseUsers || userManager.getUser(scmLogin) == null))
                     {
                         emails.add(getEmail(scmLogin));
                     }

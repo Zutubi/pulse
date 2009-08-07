@@ -1623,7 +1623,7 @@ public class RemoteApi
             if (responsibility != null)
             {
                 result.put("user", responsibility.getUser().getLogin());
-                if (TextUtils.stringSet(responsibility.getComment()))
+                if (StringUtils.stringSet(responsibility.getComment()))
                 {
                     result.put("comment", responsibility.getComment());
                 }
@@ -2979,11 +2979,11 @@ public class RemoteApi
     public boolean triggerBuild(String token, String projectName, final String revision, String status, Hashtable<String, String> properties)
     {
         Hashtable<String, Object> triggerOptions = new Hashtable<String, Object>();
-        if (TextUtils.stringSet(revision))
+        if (StringUtils.stringSet(revision))
         {
             triggerOptions.put("revision", revision);
         }
-        if (TextUtils.stringSet(status))
+        if (StringUtils.stringSet(status))
         {
             triggerOptions.put("status", status);
         }

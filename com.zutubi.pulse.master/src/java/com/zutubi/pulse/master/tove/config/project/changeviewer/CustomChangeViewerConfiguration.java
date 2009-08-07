@@ -12,7 +12,6 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.WebUtils;
 
 import java.text.SimpleDateFormat;
@@ -113,13 +112,13 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         switch(capability)
         {
             case DOWNLOAD_FILE:
-                return TextUtils.stringSet(fileDownloadURL);
+                return StringUtils.stringSet(fileDownloadURL);
             case VIEW_FILE:
-                return TextUtils.stringSet(fileViewURL);
+                return StringUtils.stringSet(fileViewURL);
             case VIEW_FILE_DIFF:
-                return TextUtils.stringSet(fileDiffURL);
+                return StringUtils.stringSet(fileDiffURL);
             case VIEW_REVISION:
-                return TextUtils.stringSet(changesetURL);
+                return StringUtils.stringSet(changesetURL);
             default:
                 return false;
         }
@@ -153,7 +152,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
     private String resolveURL(String url, Revision revision)
     {
-        if(TextUtils.stringSet(url))
+        if(StringUtils.stringSet(url))
         {
             ReferenceMap references = new HashReferenceMap();
             references.add(new GenericReference<String>(PROPERTY_REVISION, revision.getRevisionString()));
@@ -191,10 +190,10 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
     private String resolveFileURL(String url, ChangeContext context, FileChange fileChange) throws ScmException
     {
-        if (TextUtils.stringSet(url))
+        if (StringUtils.stringSet(url))
         {
             ReferenceMap references = new HashReferenceMap();
-            references.add(new GenericReference<String>(PROPERTY_PATH, StringUtils.urlEncodePath(fileChange.getPath())));
+            references.add(new GenericReference<String>(PROPERTY_PATH, WebUtils.uriPathEncode(fileChange.getPath())));
             references.add(new GenericReference<String>(PROPERTY_PATH_RAW, fileChange.getPath()));
             references.add(new GenericReference<String>(PROPERTY_PATH_FORM, WebUtils.formUrlEncode(fileChange.getPath())));
             references.add(new GenericReference<String>(PROPERTY_REVISION, fileChange.getRevision().getRevisionString()));

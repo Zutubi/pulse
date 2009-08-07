@@ -315,11 +315,11 @@ public class FileSystemUtils
             base = getSystemTempDir();
         }
 
-        if (!TextUtils.stringSet(prefix))
+        if (!StringUtils.stringSet(prefix))
         {
             prefix = "";
         }
-        if (!TextUtils.stringSet(suffix))
+        if (!StringUtils.stringSet(suffix))
         {
             suffix = "";
         }
@@ -808,7 +808,7 @@ public class FileSystemUtils
      */
     public static boolean isDirectory(String path)
     {
-        if (TextUtils.stringSet(path))
+        if (StringUtils.stringSet(path))
         {
             File f = new File(path);
             return f.isDirectory();
@@ -825,7 +825,7 @@ public class FileSystemUtils
      */
     public static boolean isFile(String path)
     {
-        if (TextUtils.stringSet(path))
+        if (StringUtils.stringSet(path))
         {
             File f = new File(path);
             return f.isFile();

@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.user;
 
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * JSON-encodable object representing a build affected by a changelist.
@@ -23,7 +23,7 @@ public class ChangelistBuildModel
 
     public String getEncodedProject()
     {
-        return StringUtils.uriComponentEncode(getProject());
+        return WebUtils.uriComponentEncode(getProject());
     }
 
     public long getNumber()

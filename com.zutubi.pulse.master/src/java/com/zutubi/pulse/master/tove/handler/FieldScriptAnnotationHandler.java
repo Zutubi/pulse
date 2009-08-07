@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.handler;
 
-import com.zutubi.tove.annotations.FieldScript;
 import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
+import com.zutubi.tove.annotations.FieldScript;
 import com.zutubi.tove.type.CompositeType;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.lang.annotation.Annotation;
 
@@ -18,7 +18,7 @@ public class FieldScriptAnnotationHandler implements AnnotationHandler
         FieldDescriptor fieldDescriptor = (FieldDescriptor) descriptor;
         FieldScript fieldScript = (FieldScript) annotation;
         String template = fieldScript.template();
-        if(!TextUtils.stringSet(template))
+        if(!StringUtils.stringSet(template))
         {
             FieldDescriptor field = (FieldDescriptor) descriptor;
             template = annotatedType.getClazz().getSimpleName() + "." + field.getProperty().getName();

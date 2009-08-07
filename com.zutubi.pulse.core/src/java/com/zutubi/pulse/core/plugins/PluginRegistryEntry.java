@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,7 +49,7 @@ public class PluginRegistryEntry
 
     public boolean hasSource()
     {
-        return TextUtils.stringSet(getSource()); 
+        return StringUtils.stringSet(getSource());
     }
 
     public String getSource()
@@ -65,7 +65,7 @@ public class PluginRegistryEntry
     public PluginManager.State getState()
     {
         String stateStr = get(PLUGIN_STATE_KEY);
-        if (TextUtils.stringSet(stateStr))
+        if (StringUtils.stringSet(stateStr))
         {
             return PluginManager.State.valueOf(stateStr);
         }
@@ -80,7 +80,7 @@ public class PluginRegistryEntry
     public Plugin.Type getType()
     {
         String typeStr = get(PLUGIN_TYPE_KEY);
-        if (TextUtils.stringSet(typeStr))
+        if (StringUtils.stringSet(typeStr))
         {
             return Plugin.Type.valueOf(typeStr);
         }
@@ -95,7 +95,7 @@ public class PluginRegistryEntry
     public PluginVersion getVersion()
     {
         String versionString = get(PLUGIN_VERSION_KEY);
-        if (!TextUtils.stringSet(versionString))
+        if (!StringUtils.stringSet(versionString))
         {
             return null;
         }

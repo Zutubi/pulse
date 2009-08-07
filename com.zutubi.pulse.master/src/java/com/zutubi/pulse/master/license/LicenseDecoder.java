@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.license;
 
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
@@ -102,9 +101,9 @@ public class LicenseDecoder
             }
 
             // verify that all of the expected fields where available.
-            if (!TextUtils.stringSet(code) ||
-                    !TextUtils.stringSet(holder) ||
-                    !TextUtils.stringSet(expiryString))
+            if (!StringUtils.stringSet(code) ||
+                    !StringUtils.stringSet(holder) ||
+                    !StringUtils.stringSet(expiryString))
             {
                 return null;
             }

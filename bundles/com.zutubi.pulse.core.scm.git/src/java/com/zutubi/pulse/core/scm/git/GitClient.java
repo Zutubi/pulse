@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -576,7 +576,7 @@ public class GitClient implements ScmClient
     public Revision parseRevision(ScmContext context, String revision) throws ScmException
     {
         // FIXME this is not validating anything as it should.
-        if (!TextUtils.stringSet(revision))
+        if (!StringUtils.stringSet(revision))
         {
             throw new ScmException("Unexpected git revision format: '" + revision + "'");
         }
@@ -617,12 +617,12 @@ public class GitClient implements ScmClient
         git.lsRemote(handler, repository, branch);
 
         String stderr = handler.getStderr().trim();
-        if (TextUtils.stringSet(stderr))
+        if (StringUtils.stringSet(stderr))
         {
             throw new GitException("Command '" + handler.getCommandLine() + "' output error: " + stderr);
         }
 
-        if (!TextUtils.stringSet(handler.getStdout()))
+        if (!StringUtils.stringSet(handler.getStdout()))
         {
             throw new GitException("Branch '" + branch + "' does not exist");
         }

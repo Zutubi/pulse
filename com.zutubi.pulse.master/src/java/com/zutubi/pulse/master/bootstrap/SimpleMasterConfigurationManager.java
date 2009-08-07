@@ -10,7 +10,7 @@ import com.zutubi.pulse.servercore.bootstrap.AbstractConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfigurationSupport;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.VolatileReadOnlyConfig;
@@ -156,7 +156,7 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
     {
         if (data == null)
         {
-            if (!TextUtils.stringSet(getSystemConfig().getDataPath()))
+            if (!StringUtils.stringSet(getSystemConfig().getDataPath()))
             {
                 return null;
             }

@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.util.ClassLoaderUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -24,7 +24,7 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
     {
         FieldDescriptor fieldDescriptor = (FieldDescriptor) descriptor;
         FieldAction fieldAction = (FieldAction) annotation;
-        if (TextUtils.stringSet(fieldAction.filterClass()))
+        if (StringUtils.stringSet(fieldAction.filterClass()))
         {
             Class<Object> filterClass = ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), fieldAction.filterClass());
             if(!satisfied(filterClass, fieldDescriptor, fieldAction))
@@ -34,7 +34,7 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
         }
 
         fieldDescriptor.addAction(fieldAction.actionKey());
-        if (TextUtils.stringSet(fieldAction.template()))
+        if (StringUtils.stringSet(fieldAction.template()))
         {
             fieldDescriptor.addScript(fieldAction.template());
         }

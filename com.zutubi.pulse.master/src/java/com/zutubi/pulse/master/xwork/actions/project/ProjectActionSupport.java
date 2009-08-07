@@ -1,10 +1,13 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.scheduling.Scheduler;
-import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.util.TextUtils;
+import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import com.zutubi.util.StringUtils;
 import org.acegisecurity.AccessDeniedException;
 
 /**
@@ -79,7 +82,7 @@ public class ProjectActionSupport extends ActionSupport
         {
             return getProject(projectId);
         }
-        else if (TextUtils.stringSet(projectName))
+        else if (StringUtils.stringSet(projectName))
         {
             return getProject(projectName);
         }
@@ -102,7 +105,7 @@ public class ProjectActionSupport extends ActionSupport
         {
             addActionError("Unknown project [" + projectId + "]");
         }
-        else if (TextUtils.stringSet(projectName))
+        else if (StringUtils.stringSet(projectName))
         {
             addActionError("Unknown project [" + projectName + "]");
         }
@@ -118,7 +121,7 @@ public class ProjectActionSupport extends ActionSupport
         {
             addFieldError("projectId", "Unknown project [" + projectId + "]");
         }
-        else if (TextUtils.stringSet(projectName))
+        else if (StringUtils.stringSet(projectName))
         {
             addFieldError("projectName", "Unknown project [" + projectName + "]");
         }

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -135,7 +135,7 @@ public class TriggerOptions
 
     public boolean hasStatus()
     {
-        return TextUtils.stringSet(this.status);
+        return StringUtils.stringSet(this.status);
     }
 
     public String getVersion()
@@ -150,7 +150,7 @@ public class TriggerOptions
 
     public boolean hasVersion()
     {
-        return TextUtils.stringSet(this.version);
+        return StringUtils.stringSet(this.version);
     }
 
     public boolean isResolveVersion()

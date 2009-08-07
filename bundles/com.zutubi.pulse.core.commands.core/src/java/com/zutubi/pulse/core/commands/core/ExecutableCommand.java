@@ -10,8 +10,8 @@ import com.zutubi.pulse.core.engine.api.Reference;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.util.process.ProcessControl;
 import com.zutubi.util.Constants;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
@@ -221,7 +221,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
     private File checkInputFile(File workingDir)
     {
         String inputFile = getConfig().getInputFile();
-        if(TextUtils.stringSet(inputFile))
+        if(StringUtils.stringSet(inputFile))
         {
             File input = new File(workingDir, inputFile);
             if(!input.exists())
@@ -367,14 +367,14 @@ public class ExecutableCommand extends OutputProducingCommandSupport
     {
         ExecutableCommandConfiguration configuration = getConfig();
         String exe = configuration.getExe();
-        if (!TextUtils.stringSet(exe))
+        if (!StringUtils.stringSet(exe))
         {
-            if (TextUtils.stringSet(configuration.getExeProperty()))
+            if (StringUtils.stringSet(configuration.getExeProperty()))
             {
                 exe = context.getString(configuration.getExeProperty());
             }
 
-            if (!TextUtils.stringSet(exe))
+            if (!StringUtils.stringSet(exe))
             {
                 exe = configuration.getDefaultExe();
             }

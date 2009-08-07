@@ -11,7 +11,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.*;
 
@@ -232,7 +232,7 @@ public class ToveFileStorer
     private void applyAddable(Element element, Addable addable, String value)
     {
         String attribute = addable.attribute();
-        if (TextUtils.stringSet(attribute))
+        if (StringUtils.stringSet(attribute))
         {
             element.addAttribute(new Attribute(attribute, value));
         }

@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.admin.BuildOptionsForm;
 import com.zutubi.pulse.master.webwork.Urls;
-import static com.zutubi.util.StringUtils.uriComponentEncode;
+import com.zutubi.util.WebUtils;
 
 /**
  * The page shown when looking at a project in the configuration view.
@@ -35,7 +35,7 @@ public class ProjectConfigPage extends CompositePage
 
     public String getUrl()
     {
-        return urls.adminProject(uriComponentEncode(project));
+        return urls.adminProject(WebUtils.uriComponentEncode(project));
     }
 
     public ProjectHierarchyPage clickHierarchy()

@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 import java.net.URLConnection;
 import java.util.LinkedList;
@@ -60,7 +60,7 @@ public class StoredFileArtifact extends Entity
                 result.append('/');
             }
 
-            result.append(StringUtils.uriComponentEncode(piece));
+            result.append(WebUtils.uriComponentEncode(piece));
         }
 
         return result.toString();

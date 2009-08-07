@@ -18,7 +18,10 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Pair;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.util.Collections;
@@ -81,7 +84,7 @@ public class ConfigurationUIModel
 
     public ConfigurationUIModel(String path)
     {
-        if (!TextUtils.stringSet(path))
+        if (!StringUtils.stringSet(path))
         {
             throw new IllegalArgumentException("Path must be provided.");
         }

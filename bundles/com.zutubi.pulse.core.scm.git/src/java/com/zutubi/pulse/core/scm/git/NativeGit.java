@@ -8,7 +8,6 @@ import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -390,7 +389,7 @@ public class NativeGit
             {
                 String message = "Git command: '" + commandLine + "' exited with non-zero exit code: " + exitCode;
                 String error = stderr.toString().trim();
-                if (TextUtils.stringSet(error))
+                if (StringUtils.stringSet(error))
                 {
                     message += " (" + error + ")";
                 }

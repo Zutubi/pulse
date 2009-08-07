@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.webwork.dispatcher.mapper;
 
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.WebUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,8 +36,8 @@ public class PathConsumingActionResolver extends ActionResolverSupport
 
     public ActionResolver getChild(String name)
     {
-        String path = StringUtils.uriComponentEncode(name);
-        if(TextUtils.stringSet(currentPath))
+        String path = WebUtils.uriComponentEncode(name);
+        if(StringUtils.stringSet(currentPath))
         {
             path = currentPath + "/" + path;
         }

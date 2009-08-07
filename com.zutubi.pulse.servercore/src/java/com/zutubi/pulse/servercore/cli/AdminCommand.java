@@ -2,14 +2,14 @@ package com.zutubi.pulse.servercore.cli;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
-import com.zutubi.util.config.ConfigSupport;
 import com.zutubi.pulse.core.util.config.EnvConfig;
-import com.zutubi.util.config.FileConfig;
 import com.zutubi.pulse.servercore.api.AdminTokenManager;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.config.ConfigSupport;
+import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
@@ -87,11 +87,11 @@ public abstract class AdminCommand implements Command
         // a) the xml rpc client
         // b) the admin token.
 
-        if (TextUtils.stringSet(pulseConfig))
+        if (StringUtils.stringSet(pulseConfig))
         {
             System.setProperty(EnvConfig.PULSE_CONFIG, pulseConfig);
         }
-        else if (TextUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
+        else if (StringUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
         {
             System.setProperty(EnvConfig.PULSE_CONFIG, System.getenv(ENV_PULSE_CONFIG));
         }
@@ -115,7 +115,7 @@ public abstract class AdminCommand implements Command
             }
 
             String path = sysConfig.getProperty(SystemConfiguration.CONTEXT_PATH, config.getContextPath());
-            if (TextUtils.stringSet(contextPath))
+            if (StringUtils.stringSet(contextPath))
             {
                 path = contextPath;
             }

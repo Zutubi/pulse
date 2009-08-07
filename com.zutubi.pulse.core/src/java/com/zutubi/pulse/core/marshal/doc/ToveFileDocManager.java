@@ -18,7 +18,6 @@ import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.map;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -190,12 +189,12 @@ public class ToveFileDocManager
         if (docs == null)
         {
             TypeDocs typeDocs = configurationDocsManager.getDocs(type);
-            if (!TextUtils.stringSet(typeDocs.getBrief()))
+            if (!StringUtils.stringSet(typeDocs.getBrief()))
             {
                 LOG.warning("Documentation for type '" + type.getClazz().getName() + "' is missing 'introduction'");
             }
 
-            if (!TextUtils.stringSet(typeDocs.getVerbose()))
+            if (!StringUtils.stringSet(typeDocs.getVerbose()))
             {
                 LOG.warning("Documentation for type '" + type.getClazz().getName() + "' is missing 'verbose'");
             }
@@ -402,7 +401,7 @@ public class ToveFileDocManager
         ElementDocs elementDocs = new ElementDocs(formatProperty(messages, type, property, KEY_SUFFIX_ADDABLE_BRIEF), formatProperty(messages, type, property, KEY_SUFFIX_ADDABLE_VERBOSE));
 
         String attribute = addable.attribute();
-        if (TextUtils.stringSet(attribute))
+        if (StringUtils.stringSet(attribute))
         {
             elementDocs.addAttribute(new AttributeDocs(convertPropertyNameToLocalName(attribute), formatProperty(messages, type, property, KEY_SUFFIX_ADDABLE_ATTRIBUTE), true, ""));
         }

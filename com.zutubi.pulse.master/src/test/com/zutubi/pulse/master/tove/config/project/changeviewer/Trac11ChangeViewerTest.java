@@ -54,12 +54,12 @@ public class Trac11ChangeViewerTest extends PulseTestCase
 
     public void testGetFileViewURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673", viewer.getFileViewURL(getContext(), getFileChange("/trunk/INSTALL+this please")));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL%2bthis%20please?rev=3673", viewer.getFileViewURL(getContext(), getFileChange("/trunk/INSTALL+this please")));
     }
 
     public void testGetFileDownloadURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673&format=raw", viewer.getFileDownloadURL(getContext(), getFileChange("/trunk/INSTALL+this please")));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL%2bthis%20please?rev=3673&format=raw", viewer.getFileDownloadURL(getContext(), getFileChange("/trunk/INSTALL+this please")));
     }
 
     public void testGetFileDiffURLSpecial() throws ScmException

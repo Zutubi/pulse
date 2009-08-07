@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -42,7 +42,7 @@ public class ScmExtensionManager extends AbstractExtensionManager
         //         <scm name="..." factory-class="..." patch-format="..." working-copy-class="..."/>
         //     </extension>
         String name = config.getAttribute("name");
-        if (!TextUtils.stringSet(name))
+        if (!StringUtils.stringSet(name))
         {
             LOG.severe("Attempt to register SCM with no name: ignoring");
             return;

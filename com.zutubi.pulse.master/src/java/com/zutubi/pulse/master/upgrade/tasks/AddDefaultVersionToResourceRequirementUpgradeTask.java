@@ -5,7 +5,7 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Map;
@@ -34,7 +34,7 @@ public class AddDefaultVersionToResourceRequirementUpgradeTask extends AbstractU
 
             // validate that we are dealing with the expected entries.
             String symbolicName = record.getSymbolicName();
-            if (!TextUtils.stringSet(symbolicName) || !symbolicName.equals("zutubi.resourceRequirementConfig"))
+            if (!StringUtils.stringSet(symbolicName) || !symbolicName.equals("zutubi.resourceRequirementConfig"))
             {
                 LOG.warning("Found unexpected record. " + symbolicName);
                 continue;
@@ -48,7 +48,7 @@ public class AddDefaultVersionToResourceRequirementUpgradeTask extends AbstractU
             MutableRecord copy = record.copy(true);
 
             String version = (String) record.get("version");
-            if (TextUtils.stringSet(version))
+            if (StringUtils.stringSet(version))
             {
                 copy.put("defaultVersion", "false");
             }

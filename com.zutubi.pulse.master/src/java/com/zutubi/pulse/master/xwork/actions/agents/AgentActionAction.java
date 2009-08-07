@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.agents;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.actions.ActionManager;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Used to execute a named config action with/on an agent.
@@ -27,7 +27,7 @@ public class AgentActionAction extends AgentActionBase
     public String getRedirect()
     {
         Urls urls = Urls.getBaselessInstance();
-        if(TextUtils.stringSet(tab))
+        if(StringUtils.stringSet(tab))
         {
             return urls.agent(getAgent()) + tab + "/";
         }

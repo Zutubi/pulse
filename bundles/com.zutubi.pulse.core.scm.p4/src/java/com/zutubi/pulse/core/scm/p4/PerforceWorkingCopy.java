@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
 
@@ -167,7 +167,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
     {
         // Small optimisation: if the client is explicitly set, don't ask for it.
         String client = core.getEnv().get(ENV_CLIENT);
-        if (!TextUtils.stringSet(client))
+        if (!StringUtils.stringSet(client))
         {
             PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_OUTPUT);
             PerforceWorkspace workspace = PerforceWorkspace.parseSpecification(result.stdout.toString());

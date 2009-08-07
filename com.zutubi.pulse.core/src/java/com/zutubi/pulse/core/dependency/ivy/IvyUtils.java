@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 import org.apache.ivy.util.Message;
 
 import java.util.logging.Level;
@@ -99,6 +100,6 @@ public class IvyUtils
      */
     public static boolean isValidArtifactName(String str)
     {
-        return StringUtils.allowedInURI(str);
+        return WebUtils.allowedInURI(str);
     }
 }

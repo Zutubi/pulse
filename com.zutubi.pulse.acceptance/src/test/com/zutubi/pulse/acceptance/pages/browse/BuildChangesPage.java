@@ -9,7 +9,7 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class BuildChangesPage extends SeleniumPage
 
     public BuildChangesPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-changes", "build " + buildId);
+        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-changes", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }

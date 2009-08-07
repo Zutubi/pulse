@@ -171,7 +171,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public String uriComponentEncode(String s)
     {
-        return s == null ? null : StringUtils.uriComponentEncode(s);
+        return s == null ? null : WebUtils.uriComponentEncode(s);
     }
 
     public String htmlEncode(String s)

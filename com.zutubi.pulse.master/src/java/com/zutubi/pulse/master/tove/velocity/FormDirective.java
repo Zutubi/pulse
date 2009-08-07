@@ -1,19 +1,15 @@
 package com.zutubi.pulse.master.tove.velocity;
 
-import com.zutubi.pulse.master.tove.model.FormDescriptor;
-import com.zutubi.pulse.master.tove.model.FormDescriptorFactory;
-import com.zutubi.pulse.master.tove.model.TemplateFormDecorator;
+import com.zutubi.pulse.master.tove.model.*;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.pulse.master.tove.model.Form;
-import com.zutubi.pulse.master.tove.model.HiddenFieldDescriptor;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import org.apache.velocity.context.InternalContextAdapter;
@@ -23,8 +19,8 @@ import org.apache.velocity.runtime.parser.node.Node;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -130,7 +126,7 @@ public class FormDirective extends ToveDirective
             // Create the context object used to define the freemarker rendering context
             Class clazz = ctype.getClazz();
             Form form = formDescriptor.instantiate(lookupPath(), data);
-            if (TextUtils.stringSet(action))
+            if (StringUtils.stringSet(action))
             {
                 form.setAction(action);
             }

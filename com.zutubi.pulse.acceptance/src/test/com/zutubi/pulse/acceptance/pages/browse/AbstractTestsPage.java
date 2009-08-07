@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  */
@@ -41,11 +41,11 @@ public abstract class AbstractTestsPage extends SeleniumPage
 
     public void clickSuiteCrumb(String suitePath)
     {
-        browser.click(StringUtils.toValidHtmlName("suitecrumb-" + suitePath));
+        browser.click(WebUtils.toValidHtmlName("suitecrumb-" + suitePath));
     }
 
     public void clickSuiteLink(String suite)
     {
-        browser.click(StringUtils.toValidHtmlName("suite-" + suite));
+        browser.click(WebUtils.toValidHtmlName("suite-" + suite));
     }
 }

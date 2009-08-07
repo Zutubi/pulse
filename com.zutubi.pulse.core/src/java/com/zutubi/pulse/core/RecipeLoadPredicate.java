@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.marshal.TypeLoadPredicate;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import nu.xom.Element;
 
 /**
@@ -25,12 +25,12 @@ public class RecipeLoadPredicate implements TypeLoadPredicate
     {
         if(type instanceof RecipeConfiguration)
         {
-            if(!TextUtils.stringSet(recipeName))
+            if(!StringUtils.stringSet(recipeName))
             {
                 recipeName = recipesConfiguration.getDefaultRecipe();
             }
 
-            if(!TextUtils.stringSet(recipeName))
+            if(!StringUtils.stringSet(recipeName))
             {
                 return false;
             }

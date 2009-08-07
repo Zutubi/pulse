@@ -6,7 +6,7 @@ import com.opensymphony.xwork.interceptor.Interceptor;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.master.tove.wizard.Wizard;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Map;
 
@@ -115,7 +115,7 @@ public class ConfigurationWizardInterceptor implements Interceptor
             if(value instanceof String[])
             {
                 String[] array = (String[]) value;
-                return array.length > 0 && TextUtils.stringSet(array[0]);
+                return array.length > 0 && StringUtils.stringSet(array[0]);
             }
         }
 

@@ -60,7 +60,7 @@ public class ToveUtils
             for (String element: elements)
             {
                 result += "/";
-                result += StringUtils.uriComponentEncode(element);
+                result += WebUtils.uriComponentEncode(element);
             }
         }
 
@@ -292,7 +292,7 @@ public class ToveUtils
         //   - Transient path: look for label in <type>.properties, otherwise
         //     just use the basename
         //   - Persistent path: see below
-        if (TextUtils.stringSet(path))
+        if (StringUtils.stringSet(path))
         {
             String parentPath = PathUtils.getParentPath(path);
             if (parentPath == null)
@@ -516,14 +516,14 @@ public class ToveUtils
             {
                 if(type instanceof CompositeType)
                 {
-                    if(TextUtils.stringSet(classification.single()))
+                    if(StringUtils.stringSet(classification.single()))
                     {
                         return classification.single();
                     }
                 }
                 else
                 {
-                    if(TextUtils.stringSet(classification.collection()))
+                    if(StringUtils.stringSet(classification.collection()))
                     {
                         return classification.collection();
                     }

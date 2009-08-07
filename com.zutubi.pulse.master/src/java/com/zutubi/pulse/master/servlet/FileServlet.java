@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.servlet;
 
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileSystemManager;
@@ -72,7 +72,7 @@ public class FileServlet extends HttpServlet
         String filename = pfo.getName().getBaseName();
 
         String contentType = pfo.getContent().getContentInfo().getContentType();
-        if (TextUtils.stringSet(contentType))
+        if (StringUtils.stringSet(contentType))
         {
             response.setContentType(contentType);
         }

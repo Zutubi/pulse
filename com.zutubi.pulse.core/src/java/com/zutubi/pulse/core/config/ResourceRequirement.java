@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Identifies a required resource for a build stage.
@@ -35,7 +35,7 @@ public class ResourceRequirement
     
     public boolean isDefaultVersion()
     {
-        return !TextUtils.stringSet(version);
+        return !StringUtils.stringSet(version);
     }
 
     public String getVersion()

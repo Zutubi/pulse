@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servercore.spring;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
 import javax.servlet.*;
@@ -77,7 +77,7 @@ public class ServletWrapper implements Servlet
     protected Servlet createDelegate(ServletConfig servletConfig) throws ServletException
     {
         String className = servletConfig.getInitParameter(DELEGATE_CLASS_NAME);
-        if (!TextUtils.stringSet(className))
+        if (!StringUtils.stringSet(className))
         {
             throw new ServletException("Required init parameter " + DELEGATE_CLASS_NAME + " is missing.");
         }

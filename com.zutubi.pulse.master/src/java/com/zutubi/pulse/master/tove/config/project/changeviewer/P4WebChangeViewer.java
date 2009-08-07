@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * A ChangeViewer for linking to a P4Web instance.
@@ -52,6 +53,6 @@ public class P4WebChangeViewer extends BasePathChangeViewer
 
     private String pathPart(FileChange fileChange)
     {
-        return StringUtils.urlEncodePath(fileChange.getPath());
+        return WebUtils.uriPathEncode(fileChange.getPath());
     }
 }

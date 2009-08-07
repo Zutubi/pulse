@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.security;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.beans.PropertyEditorSupport;
 import java.io.BufferedReader;
-import java.io.StringReader;
 import java.io.IOException;
-import java.util.StringTokenizer;
-import java.util.List;
+import java.io.StringReader;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * A text property converter to allow easy configuration of the authority definitions
@@ -24,7 +24,7 @@ public class AuthorityDefinitionsEditor  extends PropertyEditorSupport
             text = text.trim();
             BufferedReader reader = new BufferedReader(new StringReader(text));
             String line;
-            while (TextUtils.stringSet(line = reader.readLine()))
+            while (StringUtils.stringSet(line = reader.readLine()))
             {
                 StringTokenizer tokens = new StringTokenizer(line, ",", false);
                 String path = tokens.nextToken().trim();

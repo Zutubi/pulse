@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
-import static com.zutubi.util.StringUtils.uriComponentEncode;
+import com.zutubi.util.WebUtils;
 
 /**
  * The tests page for a stage result.
@@ -15,7 +15,7 @@ public class StageTestsPage extends AbstractTestsPage
 
     public StageTestsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, String stageName)
     {
-        super(browser, urls, uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests-" + uriComponentEncode(stageName), "build " + buildId);
+        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-tests-" + WebUtils.uriComponentEncode(stageName), "build " + buildId);
         this.projectName = projectName;
         this.stageName = stageName;
         this.buildId = buildId;
@@ -29,7 +29,7 @@ public class StageTestsPage extends AbstractTestsPage
     public TestSuitePage clickSuiteAndWait(String suite)
     {
         clickSuiteLink(suite);
-        return browser.waitFor(TestSuitePage.class, projectName, buildId, stageName, uriComponentEncode(suite));
+        return browser.waitFor(TestSuitePage.class, projectName, buildId, stageName, WebUtils.uriComponentEncode(suite));
     }
 
     public boolean isLoadFailureMessageShown()

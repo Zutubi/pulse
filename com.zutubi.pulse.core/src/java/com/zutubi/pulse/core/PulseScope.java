@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.util.*;
@@ -178,7 +178,7 @@ public class PulseScope implements Scope
             if(envName.toUpperCase(Locale.US).equals(ENV_PATH))
             {
                 String pathPrefix = getPathPrefix();
-                if(TextUtils.stringSet(pathPrefix))
+                if(StringUtils.stringSet(pathPrefix))
                 {
                     if(result == null)
                     {
@@ -286,7 +286,7 @@ public class PulseScope implements Scope
         existingEnvironment.putAll(getEnvironment());
 
         String pathPrefix = getPathPrefix();
-        if(TextUtils.stringSet(pathPrefix))
+        if(StringUtils.stringSet(pathPrefix))
         {
             String pathKey = null;
             for(String key: existingEnvironment.keySet())

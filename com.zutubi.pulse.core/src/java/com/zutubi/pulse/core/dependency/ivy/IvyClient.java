@@ -185,7 +185,7 @@ public class IvyClient
         options.setHaltOnMissing(true);
         options.setConfs(new String[]{conf});
 
-        if (TextUtils.stringSet(revision))
+        if (StringUtils.stringSet(revision))
         {
             options.setPubrevision(revision);
         }
@@ -270,7 +270,7 @@ public class IvyClient
             options.setConfs(new String[]{"*"});
             options.setSrcIvyPattern(new File(tmp, "ivy.xml").getCanonicalPath());
 
-            if (TextUtils.stringSet(revision))
+            if (StringUtils.stringSet(revision))
             {
                 options.setPubrevision(revision);
             }

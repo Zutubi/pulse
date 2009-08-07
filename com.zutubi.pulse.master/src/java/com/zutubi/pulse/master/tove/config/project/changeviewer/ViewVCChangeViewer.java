@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * A change viewer for linking to ViewVC.
@@ -66,6 +67,6 @@ public class ViewVCChangeViewer extends BasePathChangeViewer
 
     private String pathPart(FileChange fileChange)
     {
-        return StringUtils.urlEncodePath(fileChange.getPath());
+        return WebUtils.uriPathEncode(fileChange.getPath());
     }
 }

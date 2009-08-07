@@ -64,17 +64,17 @@ public class P4WebChangeViewerTest extends PulseTestCase
 
     public void testGetFileViewSpecial()
     {
-        assertEquals("http://localhost:8080/@md=d@//depot/foo+bar%20baz?ac=64&rev1=8", viewer.getFileViewURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
+        assertEquals("http://localhost:8080/@md=d@//depot/foo%2bbar%20baz?ac=64&rev1=8", viewer.getFileViewURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
     }
 
     public void testGetFileDownloadSpecial()
     {
-        assertEquals("http://localhost:8080/@md=d&rev1=8@//depot/foo+bar%20baz", viewer.getFileDownloadURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
+        assertEquals("http://localhost:8080/@md=d&rev1=8@//depot/foo%2bbar%20baz", viewer.getFileDownloadURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
     }
 
     public void testGetFileDiffSpecial() throws ScmException
     {
-        assertEquals("http://localhost:8080/@md=d@//depot/foo+bar%20baz?ac=19&rev1=7&rev2=8", viewer.getFileDiffURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
+        assertEquals("http://localhost:8080/@md=d@//depot/foo%2bbar%20baz?ac=19&rev1=7&rev2=8", viewer.getFileDiffURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
     }
 
     private ChangeContext getContext()

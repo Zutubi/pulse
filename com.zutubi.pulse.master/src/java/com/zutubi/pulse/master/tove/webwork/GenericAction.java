@@ -9,7 +9,7 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -76,13 +76,13 @@ public class GenericAction extends ToveActionSupport
 
     public String execute() throws Exception
     {
-        if(!TextUtils.stringSet(path))
+        if(!StringUtils.stringSet(path))
         {
             addActionError("Path is required");
             return ERROR;
         }
 
-        if(!TextUtils.stringSet(actionName))
+        if(!StringUtils.stringSet(actionName))
         {
             addActionError("Action name is required");
             return ERROR;
@@ -108,7 +108,7 @@ public class GenericAction extends ToveActionSupport
         if (isInputSelected())
         {
             customAction = actionManager.getCustomiseName(actionName, config);
-            if(TextUtils.stringSet(customAction))
+            if(StringUtils.stringSet(customAction))
             {
                 return "chain";
             }
@@ -179,7 +179,7 @@ public class GenericAction extends ToveActionSupport
             actionResult = new ActionResult(ActionResult.Status.FAILURE, e.getMessage());
         }
 
-        if (TextUtils.stringSet(newPath))
+        if (StringUtils.stringSet(newPath))
         {
             response = new ConfigurationResponse(newPath, null);
         }
@@ -188,7 +188,7 @@ public class GenericAction extends ToveActionSupport
             response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
         }
 
-        if (TextUtils.stringSet(actionResult.getMessage()))
+        if (StringUtils.stringSet(actionResult.getMessage()))
         {
             response.setStatus(new ConfigurationResponse.Status(mapStatus(actionResult.getStatus()), actionResult.getMessage()));
         }

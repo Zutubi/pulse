@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.TempFileInputStream;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -61,7 +61,7 @@ public class ZipAction extends VFSActionSupport
 
     public String execute() throws FileSystemException
     {
-        if (TextUtils.stringSet(root))
+        if (StringUtils.stringSet(root))
         {
             path = root + path;
         }

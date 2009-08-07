@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.WebUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class ProjectsModel
 
     public String getId()
     {
-        return labelled ? StringUtils.toValidHtmlName("group." + groupName) : "ungroup";
+        return labelled ? WebUtils.toValidHtmlName("group." + groupName) : "ungroup";
     }
     
     public TemplateProjectModel getRoot()

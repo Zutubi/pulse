@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.admin;
 
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -140,16 +140,16 @@ public class EmailConfiguration extends AbstractConfiguration implements Validat
 
     public void validate(ValidationContext context)
     {
-        if (TextUtils.stringSet(host))
+        if (StringUtils.stringSet(host))
         {
-            if (!TextUtils.stringSet(from))
+            if (!StringUtils.stringSet(from))
             {
                 context.addFieldError("from", "from address is required when smtp host is provided");
             }
         }
 
         // If the from address is specified, then ensure that a valid value is set.
-        if (TextUtils.stringSet(from))
+        if (StringUtils.stringSet(from))
         {
             EmailValidator validator = new EmailValidator();
             validator.setValidationContext(context);

@@ -10,7 +10,7 @@ import com.zutubi.pulse.master.tove.config.project.reports.CustomFieldSource;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -92,7 +92,7 @@ public class ViewReportsAction extends ProjectActionBase
         if (reportGroups.size() > 0)
         {
             groupNames = new LinkedList<String>(reportGroups.keySet());
-            if (!TextUtils.stringSet(group))
+            if (!StringUtils.stringSet(group))
             {
                 group = groupNames.get(0);
             }

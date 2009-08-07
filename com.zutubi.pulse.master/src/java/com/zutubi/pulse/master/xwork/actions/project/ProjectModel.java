@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.WebUtils;
 
 /**
  * JSON-encodable details for a single project or project template for display
@@ -28,7 +28,7 @@ public abstract class ProjectModel
     public String getId()
     {
         String groupPrefix = group.isLabelled() ? "grouped." + group.getGroupName() : "ungrouped";
-        return StringUtils.toValidHtmlName(groupPrefix + "." + name);
+        return WebUtils.toValidHtmlName(groupPrefix + "." + name);
     }
 
     public String getHealth()

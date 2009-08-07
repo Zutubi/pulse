@@ -10,7 +10,7 @@ import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.StringUtils.uriComponentEncode;
+import com.zutubi.util.WebUtils;
 
 /**
  * Helper object that computes consistent URLs for use in velocity templates
@@ -88,7 +88,7 @@ public class Urls
 
     public String dashboardMyStageLog(String number, String stage)
     {
-        return dashboardMyBuild(number) + "logs/" + uriComponentEncode(stage) + "/";
+        return dashboardMyBuild(number) + "logs/" + WebUtils.uriComponentEncode(stage) + "/";
     }
 
     public String dashboardMyBuildFile(String number)
@@ -103,7 +103,7 @@ public class Urls
 
     public String dashboardMyCommandArtifacts(String number, String stage, String command)
     {
-        return dashboardMyBuildArtifacts(number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
+        return dashboardMyBuildArtifacts(number) + WebUtils.uriComponentEncode(stage) + "/" + WebUtils.uriComponentEncode(command) + "/";
     }
 
     public String dashboardMyBuildWorkingCopy(String number)
@@ -136,7 +136,7 @@ public class Urls
         }
         else if(project instanceof Project)
         {
-            encodedName = uriComponentEncode(((Project)project).getName());
+            encodedName = WebUtils.uriComponentEncode(((Project)project).getName());
         }
 
         return encodedName;
@@ -262,7 +262,7 @@ public class Urls
 
     public String commandDetails(BuildResult build, RecipeResultNode node, CommandResult command)
     {
-        return stageDetails(build, node) + uriComponentEncode(command.getCommandName()) + "/";
+        return stageDetails(build, node) + WebUtils.uriComponentEncode(command.getCommandName()) + "/";
     }
 
     public String buildLogs(BuildResult build)
@@ -327,7 +327,7 @@ public class Urls
 
     public String stageTests(Object project, String number, String stage)
     {
-        return buildTests(project, number) + uriComponentEncode(stage) + "/";
+        return buildTests(project, number) + WebUtils.uriComponentEncode(stage) + "/";
     }
 
     public String buildFile(BuildResult build)
@@ -363,12 +363,12 @@ public class Urls
     public String commandArtifacts(BuildResult build, CommandResult commandResult)
     {
         RecipeResultNode recipeResultNode = build.findResultNode(commandResult);
-        return buildArtifacts(build) + getStageComponent(recipeResultNode) + uriComponentEncode(commandResult.getCommandName()) + "/";
+        return buildArtifacts(build) + getStageComponent(recipeResultNode) + WebUtils.uriComponentEncode(commandResult.getCommandName()) + "/";
     }
 
     public String commandArtifacts(Object project, String number, String stage, String command)
     {
-        return buildArtifacts(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
+        return buildArtifacts(project, number) + WebUtils.uriComponentEncode(stage) + "/" + WebUtils.uriComponentEncode(command) + "/";
     }
 
     public String buildDownloads(BuildResult build)
@@ -389,17 +389,17 @@ public class Urls
     public String commandDownloads(BuildResult build, CommandResult commandResult)
     {
         RecipeResultNode recipeResultNode = build.findResultNode(commandResult);
-        return buildDownloads(build) + getStageComponent(recipeResultNode) + uriComponentEncode(commandResult.getCommandName()) + "/";
+        return buildDownloads(build) + getStageComponent(recipeResultNode) + WebUtils.uriComponentEncode(commandResult.getCommandName()) + "/";
     }
 
     public String commandDownloads(Object project, String number, String stage, String command)
     {
-        return buildDownloads(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
+        return buildDownloads(project, number) + WebUtils.uriComponentEncode(stage) + "/" + WebUtils.uriComponentEncode(command) + "/";
     }
 
     public String commandDownload(Object project, String number, String stage, String command, String artifact)
     {
-        return buildDownloads(project, number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/" + uriComponentEncode(artifact) + "/";
+        return buildDownloads(project, number) + WebUtils.uriComponentEncode(stage) + "/" + WebUtils.uriComponentEncode(command) + "/" + WebUtils.uriComponentEncode(artifact) + "/";
     }
 
     public String buildWorkingCopy(BuildResult build)
@@ -416,11 +416,11 @@ public class Urls
     {
         if (stage instanceof RecipeResultNode)
         {
-            return uriComponentEncode(((RecipeResultNode)stage).getStageName()) + "/";
+            return WebUtils.uriComponentEncode(((RecipeResultNode)stage).getStageName()) + "/";
         }
         else if (stage instanceof String)
         {
-            return uriComponentEncode((String)stage) + "/";
+            return WebUtils.uriComponentEncode((String)stage) + "/";
         }
         return null;
     }
@@ -460,11 +460,11 @@ public class Urls
         }
         else if(agent instanceof Agent)
         {
-            encodedName = uriComponentEncode(((Agent)agent).getConfig().getName());
+            encodedName = WebUtils.uriComponentEncode(((Agent)agent).getConfig().getName());
         }
         else if (agent instanceof AgentConfiguration)
         {
-            encodedName = uriComponentEncode(((AgentConfiguration) agent).getName());
+            encodedName = WebUtils.uriComponentEncode(((AgentConfiguration) agent).getName());
         }
         return encodedName;
     }

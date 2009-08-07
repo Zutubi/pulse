@@ -11,7 +11,7 @@ import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
@@ -98,7 +98,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
 
             ProcessBuilder builder = new ProcessBuilder(commandLine);
             builder.redirectErrorStream(true);
-            if(TextUtils.stringSet(workingDir))
+            if(StringUtils.stringSet(workingDir))
             {
                 builder.directory(new File(workingDir));
             }

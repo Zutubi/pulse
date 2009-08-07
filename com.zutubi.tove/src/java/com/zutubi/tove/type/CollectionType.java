@@ -4,7 +4,7 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 import java.util.*;
 
@@ -55,7 +55,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
             return new LinkedList<String>();
         }
 
-        return new LinkedList(StringUtils.splitAndDecode(SEPARATOR, order));
+        return new LinkedList(WebUtils.splitAndDecode(SEPARATOR, order));
     }
 
     public List<String> getOrder(Record record)
@@ -88,7 +88,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
     public static void setOrder(MutableRecord record, Collection<String> order)
     {
-        record.putMeta(ORDER_KEY, StringUtils.encodeAndJoin(SEPARATOR, order));
+        record.putMeta(ORDER_KEY, WebUtils.encodeAndJoin(SEPARATOR, order));
     }
 
     public abstract String getItemKey(String path, Record record);
@@ -132,10 +132,10 @@ public abstract class CollectionType extends AbstractType implements ComplexType
             String value = record.getMeta(metaKey);
             if(value != null)
             {
-                List<String> keys = StringUtils.splitAndDecode(SEPARATOR, value);
+                List<String> keys = WebUtils.splitAndDecode(SEPARATOR, value);
                 if(Collections.replaceAll(keys, oldKey, newKey))
                 {
-                    record.putMeta(metaKey, StringUtils.encodeAndJoin(SEPARATOR, keys));
+                    record.putMeta(metaKey, WebUtils.encodeAndJoin(SEPARATOR, keys));
                     changes = true;
                 }
             }

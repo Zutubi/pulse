@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * Base class shared by implementations for different trac versions.
@@ -23,7 +24,7 @@ public abstract class AbstractTracChangeViewer extends BasePathChangeViewer
 
     public String getFileViewURL(ChangeContext context, FileChange fileChange)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browser", StringUtils.urlEncodePath(fileChange.getPath()) + "?rev=" + fileChange.getRevision());
+        return StringUtils.join("/", true, true, getBaseURL(), "browser", WebUtils.uriPathEncode(fileChange.getPath()) + "?rev=" + fileChange.getRevision());
     }
 
     public String getFileDownloadURL(ChangeContext context, FileChange fileChange)

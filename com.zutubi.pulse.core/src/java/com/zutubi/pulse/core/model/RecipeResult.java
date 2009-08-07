@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.model;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -134,7 +134,7 @@ public class RecipeResult extends Result
 
     public static String getRecipeSafe(String recipeName)
     {
-        if (!TextUtils.stringSet(recipeName))
+        if (!StringUtils.stringSet(recipeName))
         {
             return "[default]";
         }

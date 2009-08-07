@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  */
@@ -40,7 +40,7 @@ public class AgentActionBase extends ActionSupport
     {
         if(agent == null)
         {
-            if (TextUtils.stringSet(agentName))
+            if (StringUtils.stringSet(agentName))
             {
                 agent = agentManager.getAgent(agentName);
                 if(agent == null)

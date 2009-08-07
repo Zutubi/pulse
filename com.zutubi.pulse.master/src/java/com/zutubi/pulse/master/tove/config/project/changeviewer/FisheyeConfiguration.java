@@ -8,7 +8,7 @@ import static com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeVie
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.WebUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -99,12 +99,12 @@ public class FisheyeConfiguration extends BasePathChangeViewer
 
     private String pathPart(FileChange fileChange)
     {
-        return StringUtils.urlEncodePath(stripPathPrefix(fileChange.getPath()));
+        return WebUtils.uriPathEncode(stripPathPrefix(fileChange.getPath()));
     }
 
     private String stripPathPrefix(String path)
     {
-        if(TextUtils.stringSet(pathStripPrefix) && path.startsWith(pathStripPrefix))
+        if(StringUtils.stringSet(pathStripPrefix) && path.startsWith(pathStripPrefix))
         {
             path = path.substring(pathStripPrefix.length());
         }

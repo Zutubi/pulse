@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.freemarker;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.type.Type;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import freemarker.ext.beans.BeanModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.*;
@@ -89,13 +89,13 @@ public class GetTextMethod implements TemplateMethodModelEx
                 continue;
             }
             value = message.format(key);
-            if (TextUtils.stringSet(value))
+            if (StringUtils.stringSet(value))
             {
                 break;
             }
         }
 
-        if (!TextUtils.stringSet(value))
+        if (!StringUtils.stringSet(value))
         {
             value = key;
         }

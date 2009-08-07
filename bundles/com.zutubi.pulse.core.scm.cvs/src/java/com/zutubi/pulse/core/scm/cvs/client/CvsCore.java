@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.scm.cvs.client.commands.*;
 import com.zutubi.pulse.core.scm.cvs.client.util.CvsUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -128,7 +128,7 @@ public class CvsCore
                 // strip the relative repo path from the working directory to determine the relative repository root.
                 String path = FileSystemUtils.normaliseSeparators(workingDirectory.getCanonicalPath());
                 String repoPath = readRespositoryPath(workingDirectory);
-                if (TextUtils.stringSet(repoPath))
+                if (StringUtils.stringSet(repoPath))
                 {
                     if (path.endsWith(repoPath))
                     {
@@ -179,13 +179,13 @@ public class CvsCore
 
         if (revision != null)
         {
-            if (TextUtils.stringSet(revision.getBranch()) && revision.getDate() != null)
+            if (StringUtils.stringSet(revision.getBranch()) && revision.getDate() != null)
             {
                 // -r TAG[:date] (format only supported by some cvs servers).
                 String rev = revision.getBranch() + ":" + dateFormat.format(revision.getDate());
                 update.setUpdateByRevision(rev);
             }
-            else if (TextUtils.stringSet(revision.getBranch()))
+            else if (StringUtils.stringSet(revision.getBranch()))
             {
                 update.setUpdateByRevision(revision.getBranch());
             }
@@ -214,7 +214,7 @@ public class CvsCore
 
         if (revision != null)
         {
-            if (TextUtils.stringSet(revision.getBranch()))
+            if (StringUtils.stringSet(revision.getBranch()))
             {
                 checkout.setCheckoutByRevision(revision.getBranch());
             }
@@ -251,7 +251,7 @@ public class CvsCore
 
         if (revision != null)
         {
-            if (TextUtils.stringSet(revision.getBranch()))
+            if (StringUtils.stringSet(revision.getBranch()))
             {
                 tag.setTagByRevision(revision.getBranch());
             }
@@ -296,7 +296,7 @@ public class CvsCore
         rlog.setSuppressHeader(useSuppressHeader);
 
         String branch = from == null ? to == null ? null : to.getBranch() : from.getBranch();
-        if (TextUtils.stringSet(branch))
+        if (StringUtils.stringSet(branch))
         {
             rlog.setRevisionFilter(branch);
         }
@@ -316,7 +316,7 @@ public class CvsCore
         {
             dateFilter = dateFilter + del + dateFormat.format(to.getDate());
         }
-        if (TextUtils.stringSet(dateFilter))
+        if (StringUtils.stringSet(dateFilter))
         {
             rlog.setDateFilter(dateFilter);
         }

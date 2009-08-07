@@ -6,14 +6,11 @@ import com.thoughtworks.selenium.SeleniumException;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getSeleniumBrowserProperty;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
+import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -322,7 +319,7 @@ public class SeleniumBrowser
      */
     public boolean isElementIdPresent(String id)
     {
-        return selenium.isElementPresent(StringUtils.toValidHtmlName(id));
+        return selenium.isElementPresent(WebUtils.toValidHtmlName(id));
     }
 
     public boolean isElementPresent(String locator)
@@ -347,7 +344,7 @@ public class SeleniumBrowser
      */
     public boolean isLinkPresent(String id)
     {
-        return CollectionUtils.contains(selenium.getAllLinks(), StringUtils.toValidHtmlName(id));
+        return CollectionUtils.contains(selenium.getAllLinks(), WebUtils.toValidHtmlName(id));
     }
 
     /**
@@ -417,7 +414,7 @@ public class SeleniumBrowser
 
     public String getCellContents(String tableLocator, int row, int column)
     {
-        return selenium.getTable(StringUtils.toValidHtmlName(tableLocator + "." + row + "." + column));
+        return selenium.getTable(WebUtils.toValidHtmlName(tableLocator + "." + row + "." + column));
     }
 
     public String[] getSelectOptions(String fieldId)
@@ -473,7 +470,7 @@ public class SeleniumBrowser
 
     public String getElementExistenceCondition(String id)
     {
-        return "selenium.browserbot.findElementOrNull('id=" + StringUtils.toValidHtmlName(id) + "') != null";
+        return "selenium.browserbot.findElementOrNull('id=" + WebUtils.toValidHtmlName(id) + "') != null";
     }
 
     public void waitForLocator(String locator)
@@ -565,7 +562,7 @@ public class SeleniumBrowser
         {
             public boolean satisfied()
             {
-                return selenium.isElementPresent(StringUtils.toValidHtmlName(id));
+                return selenium.isElementPresent(WebUtils.toValidHtmlName(id));
             }
         }, "element '" + id + "'");
     }
@@ -581,7 +578,7 @@ public class SeleniumBrowser
         {
             public boolean satisfied()
             {
-                return text.equals(selenium.getText(StringUtils.toValidHtmlName(id)));
+                return text.equals(selenium.getText(WebUtils.toValidHtmlName(id)));
             }
         }, "text '" + text + "' in element '" + id + "'");
     }

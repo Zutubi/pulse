@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * The browse project log page.
@@ -13,7 +13,7 @@ public class ProjectLogPage extends AbstractLogPage
 
     public ProjectLogPage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        super(browser, urls, "project-log-" + StringUtils.uriComponentEncode(projectName));
+        super(browser, urls, "project-log-" + WebUtils.uriComponentEncode(projectName));
         this.projectName = projectName;
     }
 

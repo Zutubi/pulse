@@ -8,7 +8,7 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
 import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -122,7 +122,7 @@ public class InstallPluginAction extends PluginActionSupport
 
         Field pluginPathField = new Field(FieldType.TEXT, "pluginPath");
         pluginPathField.setLabel("path");
-        if (TextUtils.stringSet(pluginPath))
+        if (StringUtils.stringSet(pluginPath))
         {
             pluginPathField.setValue(pluginPath);
         }
@@ -190,7 +190,7 @@ public class InstallPluginAction extends PluginActionSupport
 
     public String doLocal() throws Exception
     {
-        if (!TextUtils.stringSet(pluginPath))
+        if (!StringUtils.stringSet(pluginPath))
         {
             addFieldError("pluginPath", "path is required");
             return INPUT;

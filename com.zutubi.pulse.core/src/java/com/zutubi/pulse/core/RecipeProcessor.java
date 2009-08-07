@@ -25,7 +25,7 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Pair;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 
@@ -143,10 +143,10 @@ public class RecipeProcessor
         // Now we can load the recipe from the pulse file
         ProjectRecipesConfiguration recipesConfiguration = loadPulseFile(request, context);
         String recipeName = request.getRecipeName();
-        if (!TextUtils.stringSet(recipeName))
+        if (!StringUtils.stringSet(recipeName))
         {
             recipeName = recipesConfiguration.getDefaultRecipe();
-            if (!TextUtils.stringSet(recipeName))
+            if (!StringUtils.stringSet(recipeName))
             {
                 throw new BuildException("Please specify a default recipe for your project.");
             }
@@ -293,7 +293,7 @@ public class RecipeProcessor
             PulseFileProvider pulseFileProvider = request.getPulseFileSource();
             String pulseFileContent = pulseFileProvider.getFileContent(localResolver);
             storePulseFile(pulseFileContent, context);
-            if (!TextUtils.stringSet(pulseFileContent))
+            if (!StringUtils.stringSet(pulseFileContent))
             {
                 throw new BuildException("Unable to parse pulse file: File is empty");
             }

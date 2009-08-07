@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Helper base class for actions that may drill down to the stage level.
@@ -38,7 +38,7 @@ public class StageActionBase extends BuildActionBase
         BuildResult buildResult = getBuildResult();
         if (recipeResultNode == null && buildResult != null)
         {
-            if (TextUtils.stringSet(stageName))
+            if (StringUtils.stringSet(stageName))
             {
                 recipeResultNode = buildResult.findResultNode(stageName);
                 if(recipeResultNode == null)

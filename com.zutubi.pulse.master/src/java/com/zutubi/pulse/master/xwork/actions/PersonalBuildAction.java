@@ -14,7 +14,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
@@ -96,7 +96,7 @@ public class PersonalBuildAction extends ActionSupport
             throw new AccessDeniedException("User does not have authority to submit personal build requests.");
         }
 
-        if (!TextUtils.stringSet(patchFormat))
+        if (!StringUtils.stringSet(patchFormat))
         {
             responseErrors.add("Required parameter 'patchFormat' not specified");
             return ERROR;

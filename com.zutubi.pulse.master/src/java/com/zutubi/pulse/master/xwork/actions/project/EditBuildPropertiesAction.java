@@ -27,7 +27,7 @@ import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -242,7 +242,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         Revision r = null;
         revision = revision.trim();
-        if (TextUtils.stringSet(revision))
+        if (StringUtils.stringSet(revision))
         {
             try
             {

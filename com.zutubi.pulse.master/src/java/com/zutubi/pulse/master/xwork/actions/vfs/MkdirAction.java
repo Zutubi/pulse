@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.vfs;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileObject;
 
 /**
@@ -36,7 +36,7 @@ public class MkdirAction extends VFSActionSupport
 
     public String execute() throws Exception
     {
-        if (TextUtils.stringSet(root))
+        if (StringUtils.stringSet(root))
         {
             path = root + path;
         }

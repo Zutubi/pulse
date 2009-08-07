@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.NotificationException;
+import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.NotificationException;
-import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Required;
@@ -66,7 +66,7 @@ public class EmailContactConfiguration extends ContactConfiguration
     {
         EmailConfiguration config = configurationProvider.get(EmailConfiguration.class);
 
-        if (!TextUtils.stringSet(config.getHost()))
+        if (!StringUtils.stringSet(config.getHost()))
         {
             LOG.severe(NO_SMTP_HOST_ERROR);
             throw new NotificationException(NO_SMTP_HOST_ERROR);
@@ -86,7 +86,7 @@ public class EmailContactConfiguration extends ContactConfiguration
     public static void sendMail(List<String> emails, final EmailConfiguration config, String subject, String mimeType, String message) throws MessagingException
     {
         String prefix = config.getSubjectPrefix();
-        if (TextUtils.stringSet(prefix))
+        if (StringUtils.stringSet(prefix))
         {
             subject = prefix + " " + subject;
         }
@@ -114,7 +114,7 @@ public class EmailContactConfiguration extends ContactConfiguration
         }
 
         String localhost = config.getLocalhost();
-        if(TextUtils.stringSet(localhost))
+        if(StringUtils.stringSet(localhost))
         {
             if(config.getSsl())
             {
@@ -129,7 +129,7 @@ public class EmailContactConfiguration extends ContactConfiguration
 //        properties.put("mail.smtp.starttls.enable","true");
 
         Authenticator authenticator = null;
-        if (TextUtils.stringSet(config.getUsername()))
+        if (StringUtils.stringSet(config.getUsername()))
         {
             if(config.getSsl())
             {
@@ -153,7 +153,7 @@ public class EmailContactConfiguration extends ContactConfiguration
 
         Message msg = new MimeMessage(session);
 
-        if (TextUtils.stringSet(config.getFrom()))
+        if (StringUtils.stringSet(config.getFrom()))
         {
             msg.setFrom(new InternetAddress(config.getFrom()));
         }

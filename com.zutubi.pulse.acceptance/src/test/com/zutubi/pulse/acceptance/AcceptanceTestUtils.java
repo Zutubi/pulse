@@ -3,8 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.Condition;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
@@ -186,7 +186,7 @@ public class AcceptanceTestUtils
     private static File getPackage(String packageProperty)
     {
         String pkgProperty = System.getProperty(packageProperty);
-        if (!TextUtils.stringSet(pkgProperty))
+        if (!StringUtils.stringSet(pkgProperty))
         {
             throw new IllegalStateException("No package specified (use the system property " + packageProperty + ")");
         }

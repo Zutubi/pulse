@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.*;
 
@@ -43,12 +43,12 @@ public class MsBuildCommandConfiguration extends NamedArgumentCommandConfigurati
 
         // Add the build file first so it is easy to distinguish in the full
         // command line.
-        if (TextUtils.stringSet(buildFile))
+        if (StringUtils.stringSet(buildFile))
         {
             result.add(new NamedArgument("build file", buildFile));
         }
 
-        if (TextUtils.stringSet(targets))
+        if (StringUtils.stringSet(targets))
         {
             List<String> flaggedTargets = new LinkedList<String>();
             for (String target: targets.split("\\s+"))
@@ -60,7 +60,7 @@ public class MsBuildCommandConfiguration extends NamedArgumentCommandConfigurati
         }
 
         // We support the configuration property explicitly as it is so common.
-        if (TextUtils.stringSet(configuration))
+        if (StringUtils.stringSet(configuration))
         {
             result.add(new NamedArgument("configuration", configuration, Arrays.asList(FLAG_PROPERTY + PROPERTY_CONFIGURATION + PROPERTY_SEPARATOR + configuration)));
         }

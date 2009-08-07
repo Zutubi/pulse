@@ -8,7 +8,7 @@ import com.zutubi.pulse.master.vfs.provider.pulse.reference.ExtensibleFileObject
 import com.zutubi.pulse.master.vfs.provider.pulse.reference.FileTypeFileObject;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemManager;
 
@@ -58,7 +58,7 @@ public class ReferenceAction extends ActionSupport
     @Override
     public String execute() throws Exception
     {
-        if (!TextUtils.stringSet(path))
+        if (!StringUtils.stringSet(path))
         {
             throw new IllegalArgumentException("Required parameter 'path' not specified.");
         }

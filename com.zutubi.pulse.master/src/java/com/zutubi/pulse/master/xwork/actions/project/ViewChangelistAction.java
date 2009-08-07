@@ -16,7 +16,7 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -147,11 +147,11 @@ public class ViewChangelistAction extends ActionSupport
             return ERROR;
         }
 
-        if (TextUtils.stringSet(projectName))
+        if (StringUtils.stringSet(projectName))
         {
             project = projectManager.getProject(projectName, false);
         }
-        if (TextUtils.stringSet(buildVID))
+        if (StringUtils.stringSet(buildVID))
         {
             // It is valid to have no build ID set: we may not be viewing
             // the change as part of a build.

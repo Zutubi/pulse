@@ -6,7 +6,7 @@ import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -349,7 +349,7 @@ public class TemplateRecord extends AbstractRecord
     {
         Set<String> hiddenKeys = getHiddenKeys(record);
         hiddenKeys.add(key);
-        record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
+        record.putMeta(HIDDEN_KEY, WebUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
     }
 
     public static boolean restoreItem(MutableRecord record, String key)
@@ -362,7 +362,7 @@ public class TemplateRecord extends AbstractRecord
         }
         else
         {
-            record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
+            record.putMeta(HIDDEN_KEY, WebUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
         }
 
         return result;
@@ -377,7 +377,7 @@ public class TemplateRecord extends AbstractRecord
         }
         else
         {
-            return new HashSet<String>(StringUtils.splitAndDecode(SEPARATOR, hidden));
+            return new HashSet<String>(WebUtils.splitAndDecode(SEPARATOR, hidden));
         }
     }
 }

@@ -10,7 +10,7 @@ import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.commons.cli.*;
 
 import javax.sql.DataSource;
@@ -102,16 +102,16 @@ public abstract class DataCommand implements Command
 
     private void updateSystemProperties()
     {
-        if (TextUtils.stringSet(pulseData))
+        if (StringUtils.stringSet(pulseData))
         {
             System.setProperty(SystemConfiguration.PULSE_DATA, pulseData);
         }
 
-        if (TextUtils.stringSet(pulseConfig))
+        if (StringUtils.stringSet(pulseConfig))
         {
             System.setProperty(EnvConfig.PULSE_CONFIG, pulseConfig);
         }
-        else if (TextUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
+        else if (StringUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
         {
             System.setProperty(EnvConfig.PULSE_CONFIG, System.getenv(ENV_PULSE_CONFIG));
         }
@@ -121,7 +121,7 @@ public abstract class DataCommand implements Command
     {
         EnvConfig envConfig = configurationManager.getEnvConfig();
         String configFileName = envConfig.getPulseConfig();
-        if(TextUtils.stringSet(configFileName))
+        if(StringUtils.stringSet(configFileName))
         {
             File configFile = new File(configFileName);
             DefaultSetupManager.printConsoleMessage("Using config file '%s'", configFile.getAbsolutePath());

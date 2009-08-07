@@ -17,12 +17,12 @@ import com.zutubi.pulse.master.search.BuildResultExpressions;
 import com.zutubi.pulse.master.search.Queries;
 import com.zutubi.pulse.master.search.SearchQuery;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.webwork.dispatcher.JITFeed;
+import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.WebUtils;
 import org.hibernate.criterion.Projections;
 
 import java.io.StringWriter;
@@ -80,7 +80,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
                 User u = userManager.getUser(userId);
                 feed = new BuildJITFeed(new UserDashboardTemplate(u));
             }
-            else if(TextUtils.stringSet(groupName))
+            else if(StringUtils.stringSet(groupName))
             {
                 ProjectGroup g = projectManager.getProjectGroup(groupName);
                 feed = new BuildJITFeed(new ProjectGroupTemplate(g));
@@ -283,7 +283,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getUID()
         {
-            return "ProjectGroupTemplate." + ((group != null) ? StringUtils.uriComponentEncode(group.getName()) : "");
+            return "ProjectGroupTemplate." + ((group != null) ? WebUtils.uriComponentEncode(group.getName()) : "");
         }
     }
 

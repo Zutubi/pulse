@@ -14,7 +14,7 @@ import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileSystemManager;
 
@@ -40,7 +40,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
 
         if (MasterConfigurationRegistry.PROJECTS_SCOPE.equals(PathUtils.getParentPath(parentPath)))
         {
-            if(TextUtils.stringSet(field.getBaseName()))
+            if(StringUtils.stringSet(field.getBaseName()))
             {
                 projectPath = "c" + parentPath;
             }

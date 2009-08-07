@@ -6,7 +6,7 @@ import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * This action provides support for rendering the admins configuration pages.
@@ -127,7 +127,7 @@ public class DisplayScopeAction extends ActionSupport
         }
 
         path = PathUtils.getPath(prefixPath, path);
-        if (!TextUtils.stringSet(path))
+        if (!StringUtils.stringSet(path))
         {
             addActionError("Path is required");
             return ERROR;

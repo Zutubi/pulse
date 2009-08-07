@@ -7,7 +7,7 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Generic configuration save action.  Applies changes made to an existing
@@ -53,7 +53,7 @@ public class SaveAction extends ToveActionSupport
     @SuppressWarnings({"unchecked"})
     private String doSave() throws Exception
     {
-        if (!TextUtils.stringSet(symbolicName))
+        if (!StringUtils.stringSet(symbolicName))
         {
             return doRender();
         }

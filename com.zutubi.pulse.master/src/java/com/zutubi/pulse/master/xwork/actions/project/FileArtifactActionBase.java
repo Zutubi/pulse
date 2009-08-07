@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Helper base class for actions that may drill down to the file artifact
@@ -29,7 +29,7 @@ public class FileArtifactActionBase extends ArtifactActionBase
         StoredArtifact artifact = getArtifact();
         if (fileArtifact == null && artifact != null)
         {
-            if (TextUtils.stringSet(path))
+            if (StringUtils.stringSet(path))
             {
                 fileArtifact = artifact.findFileBase(path);
                 if(fileArtifact == null)

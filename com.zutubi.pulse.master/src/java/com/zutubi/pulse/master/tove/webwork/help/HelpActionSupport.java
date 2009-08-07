@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.util.TextUtils;
 import com.zutubi.tove.config.docs.PropertyDocs;
+import com.zutubi.util.StringUtils;
 
 /**
  * This is the base support class for actions that generate content for the
@@ -24,7 +24,7 @@ public class HelpActionSupport extends ActionSupport
 
     public String safeDetails(String s)
     {
-        return TextUtils.stringSet(s) ? sentencify(s) : "No details.";
+        return StringUtils.stringSet(s) ? sentencify(s) : "No details.";
     }
 
     private String sentencify(String s)

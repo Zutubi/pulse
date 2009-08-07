@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Stores a (label, project template) pairing used to represent a collapsible
@@ -41,7 +41,7 @@ public class LabelProjectTuple
 
     public boolean isUnlabelled()
     {
-        return !TextUtils.stringSet(label);
+        return !StringUtils.stringSet(label);
     }
 
     public String getLabel()

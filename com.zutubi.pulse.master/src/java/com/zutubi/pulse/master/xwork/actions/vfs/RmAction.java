@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.vfs;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
 
@@ -31,7 +31,7 @@ public class RmAction extends VFSActionSupport
 
     public String execute() throws Exception
     {
-        if (TextUtils.stringSet(root))
+        if (StringUtils.stringSet(root))
         {
             path = root + path;
         }

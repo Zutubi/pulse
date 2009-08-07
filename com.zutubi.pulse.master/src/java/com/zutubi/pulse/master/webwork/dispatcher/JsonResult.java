@@ -5,7 +5,7 @@ import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.json.JSONException;
@@ -121,7 +121,7 @@ public class JsonResult extends WebWorkResultSupport
         String ref = e.getAttribute("ref");
 
         Object newData = data;
-        if (TextUtils.stringSet(ref))
+        if (StringUtils.stringSet(ref))
         {
             newData = evaluateReference(ref, data);
         }
@@ -190,7 +190,7 @@ public class JsonResult extends WebWorkResultSupport
         if (children.size() == 0)
         {
             String ref = e.getTextContent();
-            if (TextUtils.stringSet(ref))
+            if (StringUtils.stringSet(ref))
             {
                 Object o = evaluateReference(ref, data);
                 jw.value( (o != null) ? o : "");

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.velocity;
 
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -32,7 +32,7 @@ public class URIComponentEncodeDirective extends Directive
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException
     {
         String in = String.valueOf(node.jjtGetChild(0).value(context));
-        writer.write(StringUtils.uriComponentEncode(in));
+        writer.write(WebUtils.uriComponentEncode(in));
         return true;
     }
 }

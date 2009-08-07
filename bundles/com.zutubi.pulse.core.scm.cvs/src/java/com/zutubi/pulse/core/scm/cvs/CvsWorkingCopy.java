@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.io.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -152,7 +152,7 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
     {
         CvsCore core = new CvsCore();
         CVSRoot cvsRoot = loadLocalWorkingRoot(context);
-        if (!TextUtils.stringSet(cvsRoot.getPassword()))
+        if (!StringUtils.stringSet(cvsRoot.getPassword()))
         {
             Config config = context.getConfig();
             if (config.hasProperty(CvsConstants.PASS))

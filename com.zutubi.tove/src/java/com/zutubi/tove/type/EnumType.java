@@ -1,6 +1,6 @@
 package com.zutubi.tove.type;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Type used for enum-valued properties.  They are similar to simple string
@@ -23,7 +23,7 @@ public class EnumType extends SimpleType
     public Object instantiate(Object data, Instantiator instantiator) throws TypeException
     {
         String s = (String) data;
-        if (TextUtils.stringSet(s))
+        if (StringUtils.stringSet(s))
         {
             try
             {

@@ -16,7 +16,7 @@ import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.GrantedAuthority;
@@ -96,7 +96,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                 return;
             }
 
-            if (TextUtils.stringSet(ldapConfiguration.getGroupBaseDn()))
+            if (StringUtils.stringSet(ldapConfiguration.getGroupBaseDn()))
             {
                 populator = createPopulator(ldapConfiguration.getGroupBaseDn(), ldapConfiguration.getGroupSearchFilter(), ldapConfiguration.getGroupRoleAttribute(), ldapConfiguration.getSearchGroupSubtree(), escapeSpaces, contextFactory);
             }
@@ -127,11 +127,11 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
         DefaultInitialDirContextFactory result = new DefaultInitialDirContextFactory(hostUrl + baseDn);
 
-        if (TextUtils.stringSet(managerDn))
+        if (StringUtils.stringSet(managerDn))
         {
             result.setManagerDn(managerDn);
 
-            if (TextUtils.stringSet(managerPassword))
+            if (StringUtils.stringSet(managerPassword))
             {
                 result.setManagerPassword(managerPassword);
             }
@@ -165,12 +165,12 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
 
         DefaultLdapAuthoritiesPopulator populator = new DefaultLdapAuthoritiesPopulator(contextFactory, groupDn);
-        if (TextUtils.stringSet(groupFilter))
+        if (StringUtils.stringSet(groupFilter))
         {
             populator.setGroupSearchFilter(convertGroupFilter(groupFilter));
         }
 
-        if (TextUtils.stringSet(groupRoleAttribute))
+        if (StringUtils.stringSet(groupRoleAttribute))
         {
             populator.setGroupRoleAttribute(groupRoleAttribute);
         }
@@ -231,7 +231,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                     user.setAuthenticatedViaLdap(true);
                 }
 
-                if (addContact && TextUtils.stringSet(emailAttribute))
+                if (addContact && StringUtils.stringSet(emailAttribute))
                 {
                     addContact(user, details);
                 }
@@ -255,7 +255,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     private LdapUserDetails ldapAuthenticate(BindAuthenticator authenticator, String username, String password)
     {
-        if(!TextUtils.stringSet(password))
+        if(!StringUtils.stringSet(password))
         {
             throw new BadCredentialsException("LDAP users cannot have an empty password");
         }
@@ -365,7 +365,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         BindAuthenticator authenticator = createAuthenticator(configuration.getUserBaseDn(), configuration.getUserFilter(), contextFactory);
         LdapUserDetails details = ldapAuthenticate(authenticator, testLogin, testPassword);
 
-        if(TextUtils.stringSet(configuration.getGroupBaseDn()))
+        if(StringUtils.stringSet(configuration.getGroupBaseDn()))
         {
             DefaultLdapAuthoritiesPopulator populator = createPopulator(configuration.getGroupBaseDn(), configuration.getGroupSearchFilter(), configuration.getGroupRoleAttribute(), configuration.getSearchGroupSubtree(), configuration.getEscapeSpaceCharacters(), contextFactory);
             return getLdapGroups(details, populator);

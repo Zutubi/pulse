@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.commands.core;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.LineBasedPostProcessorSupport;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class RegexPostProcessor extends LineBasedPostProcessorSupport
             }
 
             String summary = patternConfiguration.getSummary();
-            if (TextUtils.stringSet(summary))
+            if (StringUtils.stringSet(summary))
             {
                 result = matcher.replaceAll(summary);
             }

@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * The project home page is a summary of the state and recent activity for a
@@ -14,7 +14,7 @@ public class ProjectHomePage extends ResponsibilityPage
 
     public ProjectHomePage(SeleniumBrowser browser, Urls urls, String projectName)
     {
-        super(browser, urls, "project-home-" + StringUtils.uriComponentEncode(projectName), StringUtils.uriComponentEncode(projectName));
+        super(browser, urls, "project-home-" + WebUtils.uriComponentEncode(projectName), WebUtils.uriComponentEncode(projectName));
         this.projectName = projectName;
     }
 

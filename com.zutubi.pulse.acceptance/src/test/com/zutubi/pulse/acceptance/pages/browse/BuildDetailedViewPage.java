@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * The detailed view tab for a build result.
@@ -15,7 +15,7 @@ public class BuildDetailedViewPage extends SeleniumPage
     
     public BuildDetailedViewPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-detailed", StringUtils.uriComponentEncode(projectName));
+        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-detailed", WebUtils.uriComponentEncode(projectName));
         this.projectName = projectName;
         this.buildId = buildId;
     }

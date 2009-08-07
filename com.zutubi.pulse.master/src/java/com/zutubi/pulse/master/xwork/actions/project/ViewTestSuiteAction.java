@@ -80,7 +80,7 @@ public class ViewTestSuiteAction extends StageActionBase
      */
     public String getChildUriPath(String childName)
     {
-        String uriChildName = StringUtils.uriComponentEncode(childName);
+        String uriChildName = WebUtils.uriComponentEncode(childName);
         if (paths == null)
         {
             return uriChildName;
@@ -91,7 +91,7 @@ public class ViewTestSuiteAction extends StageActionBase
             {
                 public String map(String s)
                 {
-                    return StringUtils.uriComponentEncode(s);
+                    return WebUtils.uriComponentEncode(s);
                 }
             }));
 
@@ -116,14 +116,14 @@ public class ViewTestSuiteAction extends StageActionBase
         File testDir = new File(node.getResult().getAbsoluteOutputDir(configurationManager.getDataDirectory()), RecipeResult.TEST_DIR);
 
         path = StringUtils.stripPrefix(path, "/");
-        if(TextUtils.stringSet(path))
+        if(StringUtils.stringSet(path))
         {
             String[] elements = path.split("/");
             paths = CollectionUtils.map(elements, new Mapping<String, String>()
             {
                 public String map(String s)
                 {
-                    return StringUtils.uriComponentDecode(s);
+                    return WebUtils.uriComponentDecode(s);
                 }
             });
 

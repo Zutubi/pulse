@@ -8,7 +8,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,7 +70,7 @@ public class ProjectActionBase extends ActionSupport
     {
         if(project == null)
         {
-            if (TextUtils.stringSet(projectName))
+            if (StringUtils.stringSet(projectName))
             {
                 project = projectManager.getProject(projectName, true);
                 if(project == null)

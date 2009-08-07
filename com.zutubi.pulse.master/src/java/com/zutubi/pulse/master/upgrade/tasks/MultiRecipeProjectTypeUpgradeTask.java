@@ -5,8 +5,11 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Pair;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.UnaryFunction;
 
 import java.util.*;
 
@@ -271,7 +274,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
 
     private String[] splitString(String patterns)
     {
-        if(TextUtils.stringSet(patterns))
+        if(StringUtils.stringSet(patterns))
         {
             List<String> result = StringUtils.split(patterns);
             return result.toArray(new String[result.size()]);

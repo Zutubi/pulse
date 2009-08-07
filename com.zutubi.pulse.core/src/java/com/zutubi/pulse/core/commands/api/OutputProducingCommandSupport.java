@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.ForkOutputStream;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.IgnoreCloseOutputStream;
@@ -130,7 +130,7 @@ public abstract class OutputProducingCommandSupport extends CommandSupport
         }
 
         String outputFile = getConfig().getOutputFile();
-        if (TextUtils.stringSet(outputFile))
+        if (StringUtils.stringSet(outputFile))
         {
             try
             {

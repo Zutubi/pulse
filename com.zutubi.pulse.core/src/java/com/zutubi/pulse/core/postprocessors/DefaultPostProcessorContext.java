@@ -11,7 +11,7 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Pair;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Map;
 
@@ -91,7 +91,7 @@ public class DefaultPostProcessorContext implements PostProcessorContext
 
     public void addCustomField(FieldScope scope, String name, String value)
     {
-        if (!TextUtils.stringSet(name))
+        if (!StringUtils.stringSet(name))
         {
             throw new IllegalArgumentException("Name must be specified");
         }

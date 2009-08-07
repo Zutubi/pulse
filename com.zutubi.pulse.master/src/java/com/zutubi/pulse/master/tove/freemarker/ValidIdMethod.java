@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.freemarker;
 
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModel;
@@ -23,7 +23,7 @@ public class ValidIdMethod implements TemplateMethodModelEx
             Object arg = args.get(0);
             if(arg instanceof SimpleScalar)
             {
-                return new SimpleScalar(StringUtils.toValidHtmlName(((SimpleScalar) args.get(0)).getAsString()));
+                return new SimpleScalar(WebUtils.toValidHtmlName(((SimpleScalar) args.get(0)).getAsString()));
             }
             else
             {

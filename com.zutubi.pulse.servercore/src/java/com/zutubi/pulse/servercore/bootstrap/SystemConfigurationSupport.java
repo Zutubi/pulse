@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servercore.bootstrap;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.CompositeConfig;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.ConfigSupport;
@@ -26,7 +26,7 @@ public class SystemConfigurationSupport extends ConfigSupport implements SystemC
     public String getBindAddress()
     {
         String result = delegate.getProperty(WEBAPP_BIND_ADDRESS);
-        if(TextUtils.stringSet(result))
+        if(StringUtils.stringSet(result))
         {
             return result;
         }

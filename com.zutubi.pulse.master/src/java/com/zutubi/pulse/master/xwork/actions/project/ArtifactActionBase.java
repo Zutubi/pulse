@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * Helper base class for actions that may drill down to the artifact level.
@@ -38,7 +38,7 @@ public class ArtifactActionBase extends CommandActionBase
         CommandResult commandResult = getCommandResult();
         if (artifact == null && commandResult != null)
         {
-            if (TextUtils.stringSet(artifactName))
+            if (StringUtils.stringSet(artifactName))
             {
                 artifact = commandResult.getArtifact(artifactName);
                 if(artifact == null)

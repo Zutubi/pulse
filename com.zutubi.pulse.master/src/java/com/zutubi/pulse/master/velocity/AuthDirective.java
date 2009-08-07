@@ -5,7 +5,7 @@ import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -86,7 +86,7 @@ public class AuthDirective extends AbstractDirective
 
         if(action != null)
         {
-            if(TextUtils.stringSet(path) && configurationSecurityManager.hasPermission(path, action) || accessManager.hasPermission(action, resource))
+            if(StringUtils.stringSet(path) && configurationSecurityManager.hasPermission(path, action) || accessManager.hasPermission(action, resource))
             {
                 String body = extractBodyContext(node, context);
                 writer.write(body);

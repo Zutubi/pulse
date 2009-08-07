@@ -56,17 +56,17 @@ public class ViewVCChangeViewerTest extends PulseTestCase
 
     public void testGetFileViewURLSpecial()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact+this%20number.html?rev=1412&view=markup", viewer.getFileViewURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact%2bthis%20number.html?rev=1412&view=markup", viewer.getFileViewURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
     }
 
     public void testGetFileDownloadURLSpecial()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/*checkout*/viewvc/trunk/viewvc.org/contact+this%20number.html?rev=1412", viewer.getFileDownloadURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
+        assertEquals("http://viewvc.tigris.org/source/browse/*checkout*/viewvc/trunk/viewvc.org/contact%2bthis%20number.html?rev=1412", viewer.getFileDownloadURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
     }
 
     public void testGetFileDiffURLSpecial() throws ScmException
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact+this%20number.html?r1=1411&r2=1412", viewer.getFileDiffURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc/trunk/viewvc.org/contact%2bthis%20number.html?r1=1411&r2=1412", viewer.getFileDiffURL(getContext(), getFileChange(SPECIAL_FILE_PATH)));
     }
 
     private ChangeContext getContext()

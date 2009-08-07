@@ -2,7 +2,7 @@ package com.zutubi.tove.squeezer.squeezers;
 
 import com.zutubi.tove.squeezer.SqueezeException;
 import com.zutubi.tove.squeezer.TypeSqueezer;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * A type squeezer that converts to and from enums.  Assumes a naming
@@ -30,7 +30,7 @@ public class EnumSqueezer implements TypeSqueezer
     public Object unsqueeze(String... str) throws SqueezeException
     {
         String s = str[0];
-        if (!TextUtils.stringSet(s))
+        if (!StringUtils.stringSet(s))
         {
             return null;
         }

@@ -4,7 +4,7 @@ import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
@@ -49,7 +49,7 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
 
         // if we did not locate a descriptor (value field) then something went wrong
         // in the transfer.
-        if (!TextUtils.stringSet(descriptor))
+        if (!StringUtils.stringSet(descriptor))
         {
             throw new IOException("Invalid descriptor string.");
         }

@@ -6,7 +6,6 @@ import com.zutubi.tove.type.TypeProperty;
 import static com.zutubi.util.CollectionUtils.asOrderedMap;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
@@ -104,7 +103,7 @@ public class ConfigurationDocsManager
 
     private void ensureBrief(Docs docs)
     {
-        if(!TextUtils.stringSet(docs.getBrief()) && TextUtils.stringSet(docs.getVerbose()))
+        if(!StringUtils.stringSet(docs.getBrief()) && StringUtils.stringSet(docs.getVerbose()))
         {
             docs.setBrief(StringUtils.trimmedString(stripTags(docs.getVerbose()), TRIM_LIMIT));
         }
@@ -174,7 +173,7 @@ public class ConfigurationDocsManager
         try
         {
             String current = (String) BeanUtils.getProperty(property, target);
-            if(!TextUtils.stringSet(current) && messages.isKeyDefined(key))
+            if(!StringUtils.stringSet(current) && messages.isKeyDefined(key))
             {
                 BeanUtils.setProperty(property, messages.format(key), target);
             }

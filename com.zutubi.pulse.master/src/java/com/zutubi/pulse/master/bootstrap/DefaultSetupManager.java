@@ -25,7 +25,7 @@ import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.PropertiesWriter;
 import com.zutubi.util.logging.Logger;
@@ -140,7 +140,7 @@ public class DefaultSetupManager implements SetupManager
             SystemConfiguration sysConfig = configurationManager.getSystemConfig();
 
             String externalConfig = envConfig.getPulseConfig();
-            if (!TextUtils.stringSet(externalConfig))
+            if (!StringUtils.stringSet(externalConfig))
             {
                 // default is something like ~/.pulse2/config.properties
                 externalConfig = envConfig.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
@@ -326,7 +326,7 @@ public class DefaultSetupManager implements SetupManager
             if (databaseConfig.isFile())
             {
                 String driverClassName = configurationManager.getDatabaseConfig().getDriverClassName();
-                if (TextUtils.stringSet(driverClassName) && !driverRegistry.isRegistered(driverClassName))
+                if (StringUtils.stringSet(driverClassName) && !driverRegistry.isRegistered(driverClassName))
                 {
                     File driverRoot = configurationManager.getData().getDriverRoot();
                     File[] driverJars = driverRoot.listFiles(new FilenameFilter()
@@ -607,7 +607,7 @@ public class DefaultSetupManager implements SetupManager
                 }
             }
 
-            if (!TextUtils.stringSet(baseUrl))
+            if (!StringUtils.stringSet(baseUrl))
             {
                 // fall back to the default host url.
                 SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();

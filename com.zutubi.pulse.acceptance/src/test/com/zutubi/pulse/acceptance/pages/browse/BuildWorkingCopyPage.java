@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * The working copy tab for a build result.
@@ -15,7 +15,7 @@ public class BuildWorkingCopyPage extends SeleniumPage
 
     public BuildWorkingCopyPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-wc", "build " + buildId);
+        super(browser, urls, WebUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-wc", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 
 /**
@@ -12,7 +12,7 @@ public class ConfigUtils
     public static String getString(IConfigurationElement config, String attribute, String defaultValue)
     {
         String value = config.getAttribute(attribute);
-        if(TextUtils.stringSet(value))
+        if(StringUtils.stringSet(value))
         {
             return value;
         }
@@ -25,7 +25,7 @@ public class ConfigUtils
     public static boolean getBoolean(IConfigurationElement config, String attribute, boolean defaultValue)
     {
         String value = config.getAttribute(attribute);
-        if(TextUtils.stringSet(value))
+        if(StringUtils.stringSet(value))
         {
             return Boolean.parseBoolean(value);
         }

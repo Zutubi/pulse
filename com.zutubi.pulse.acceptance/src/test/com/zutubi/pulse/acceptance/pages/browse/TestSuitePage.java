@@ -3,8 +3,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.StringUtils.toValidHtmlName;
-import static com.zutubi.util.StringUtils.uriComponentEncode;
+import com.zutubi.util.WebUtils;
 
 /**
  * The tests page for a specific suite result.
@@ -18,7 +17,7 @@ public class TestSuitePage extends AbstractTestsPage
 
     public TestSuitePage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, String stageName, String suitePath)
     {
-        super(browser, urls, toValidHtmlName(projectName + "-build-" + Long.toString(buildId) + "-tests-" + stageName + "-" + suitePath), "build " + buildId);
+        super(browser, urls, WebUtils.toValidHtmlName(projectName + "-build-" + Long.toString(buildId) + "-tests-" + stageName + "-" + suitePath), "build " + buildId);
         this.projectName = projectName;
         this.stageName = stageName;
         this.suitePath = suitePath;
@@ -33,6 +32,6 @@ public class TestSuitePage extends AbstractTestsPage
     public TestSuitePage clickSuiteAndWait(String suiteName)
     {
         clickSuiteLink(suiteName);
-        return browser.waitFor(TestSuitePage.class, projectName, buildId, stageName, PathUtils.getPath(suitePath, uriComponentEncode(suiteName)));
+        return browser.waitFor(TestSuitePage.class, projectName, buildId, stageName, PathUtils.getPath(suitePath, WebUtils.uriComponentEncode(suiteName)));
     }
 }

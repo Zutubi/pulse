@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.test;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.Condition;
+import com.zutubi.util.StringUtils;
 import junit.framework.AssertionFailedError;
 
 import java.io.File;
@@ -52,7 +52,7 @@ public class TestUtils
     {
         // Allow the root to be expllicitly specified using a system property.
         String pulseRoot = System.getProperty(PROPERTY_PULSE_ROOT);
-        if (TextUtils.stringSet(pulseRoot))
+        if (StringUtils.stringSet(pulseRoot))
         {
             File rootFile = new File(pulseRoot);
             if (rootFile.isDirectory())

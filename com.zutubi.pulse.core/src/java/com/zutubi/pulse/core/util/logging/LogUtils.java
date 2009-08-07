@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.util.logging;
 
 import com.zutubi.util.ClassLoaderUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -76,7 +76,7 @@ public class LogUtils
 
             // CIB-766.  Still have not been able to determine what the root cause of this is.
             String value = config.getProperty(key);
-            if (!TextUtils.stringSet(value))
+            if (!StringUtils.stringSet(value))
             {
                 return defaultValue;
             }

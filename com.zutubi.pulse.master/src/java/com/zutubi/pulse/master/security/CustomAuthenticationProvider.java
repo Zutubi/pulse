@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
@@ -54,7 +54,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
             final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
             final String login = token.getName();
-            if (TextUtils.stringSet(login))
+            if (StringUtils.stringSet(login))
             {
                 // has this user been added yet?.
                 final UserConfiguration user = userManager.getUserConfig(login);

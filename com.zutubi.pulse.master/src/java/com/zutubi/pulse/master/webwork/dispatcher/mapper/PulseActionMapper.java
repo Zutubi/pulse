@@ -14,7 +14,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -204,7 +204,7 @@ public class PulseActionMapper implements ActionMapper
             query = query.replaceAll("_dc=[0-9]+", "");
         }
         
-        if (TextUtils.stringSet(query))
+        if (StringUtils.stringSet(query))
         {
             int index = query.indexOf('=');
             if (index > 0)
@@ -237,7 +237,7 @@ public class PulseActionMapper implements ActionMapper
             parameters.put("prefixPath", "users/${principle}");
             parameters.put("section", "dashboard");
             parameters.put("tab", PATH_PREFERENCES);
-            return getConfigMapping(ADMIN_NAMESPACE, StringUtils.uriPathDecode(encodedPath), request.getQueryString(), parameters);
+            return getConfigMapping(ADMIN_NAMESPACE, WebUtils.uriPathDecode(encodedPath), request.getQueryString(), parameters);
         }
         else if(encodedPath.startsWith(PATH_MY_CHANGES))
         {
@@ -248,7 +248,7 @@ public class PulseActionMapper implements ActionMapper
             }
 
             Map<String, String> parameters = new HashMap<String, String>(1);
-            parameters.put("id", StringUtils.uriComponentDecode(elements[1]));
+            parameters.put("id", WebUtils.uriComponentDecode(elements[1]));
             return new ActionMapping("viewChangelist", "default", null, parameters);
         }
         else if(encodedPath.startsWith(PATH_MY_BUILDS))
@@ -314,7 +314,7 @@ public class PulseActionMapper implements ActionMapper
         String[] elements = encodedPath.length() == 0 ? new String[0] : encodedPath.split("/");
         for(String element: elements)
         {
-            element = StringUtils.uriComponentDecode(element);
+            element = WebUtils.uriComponentDecode(element);
             actionResolver = actionResolver.getChild(element);
             if(actionResolver == null)
             {
@@ -341,7 +341,7 @@ public class PulseActionMapper implements ActionMapper
             // /admin/actions?action=method takes your to:
             //   <action>!<method>
             // for example:  http://..../admin/actions?hibernateStatistics=execute
-            if(TextUtils.stringSet(request.getQueryString()))
+            if(StringUtils.stringSet(request.getQueryString()))
             {
                 String[] pieces = request.getQueryString().split("=", 2);
                 return new ActionMapping(pieces[0], ADMIN_NAMESPACE, pieces.length > 1 ? pieces[1] : null, null);
@@ -353,7 +353,7 @@ public class PulseActionMapper implements ActionMapper
         {
             // /admin/plugins?<action>=<method> takes you to:
             //   <action>Plugin.action!<method>
-            if(TextUtils.stringSet(request.getQueryString()))
+            if(StringUtils.stringSet(request.getQueryString()))
             {
                 String[] pieces = request.getQueryString().split("=", 2);
                 return new ActionMapping(pieces[0] + "Plugin", ADMIN_NAMESPACE, pieces.length > 1 ? pieces[1] : null, null);

@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.plugins.AbstractExtensionManager;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -27,7 +27,7 @@ public class PatchFormatExtensionManager extends AbstractExtensionManager
     protected void handleConfigurationElement(IExtension extension, IExtensionTracker tracker, IConfigurationElement config)
     {
         String name = config.getAttribute("name");
-        if (!TextUtils.stringSet(name))
+        if (!StringUtils.stringSet(name))
         {
             LOG.severe("Ignoring patch format with no name");
         }

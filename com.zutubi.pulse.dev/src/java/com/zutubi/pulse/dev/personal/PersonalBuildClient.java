@@ -13,7 +13,7 @@ import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Sort;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.StringUtils;
 import nu.xom.ParsingException;
 import nu.xom.XMLException;
 import org.apache.commons.httpclient.HttpClient;
@@ -302,7 +302,7 @@ public class PersonalBuildClient
     {
         String chosenRevision = config.getRevision();
         boolean fromConfig = true;
-        if (!TextUtils.stringSet(chosenRevision))
+        if (!StringUtils.stringSet(chosenRevision))
         {
             fromConfig = false;
             WorkingCopy workingCopy = context.getWorkingCopy();
@@ -497,7 +497,7 @@ public class PersonalBuildClient
         final AuthScope authScope = new AuthScope(null, -1);
 
         String proxyHost = config.getProxyHost();
-        if (TextUtils.stringSet(proxyHost))
+        if (StringUtils.stringSet(proxyHost))
         {
             client.getHostConfiguration().setProxy(proxyHost, config.getProxyPort());
             client.getState().setProxyCredentials(authScope, credentials);
