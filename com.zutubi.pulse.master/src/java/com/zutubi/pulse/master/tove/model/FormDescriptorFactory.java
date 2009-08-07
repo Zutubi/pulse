@@ -2,10 +2,8 @@ package com.zutubi.pulse.master.tove.model;
 
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
-import com.zutubi.pulse.master.tove.handler.OptionAnnotationHandler;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Handler;
-import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.ConfigurationValidationContext;
 import com.zutubi.tove.config.ConfigurationValidatorProvider;
@@ -58,7 +56,6 @@ public class FormDescriptorFactory
     private Map<String, Class<? extends FieldDescriptor>> fieldDescriptorTypes = new HashMap<String, Class<? extends FieldDescriptor>>();
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationValidatorProvider configurationValidatorProvider;
-    private ConfigurationProvider configurationProvider;
 
     public void init()
     {
@@ -119,7 +116,7 @@ public class FormDescriptorFactory
         for (TypeProperty property : type.getProperties(SimpleType.class))
         {
             FieldDescriptor fd = createField(parentPath, baseName, property, form);
-            addFieldParameters(type, parentPath, baseName, property, fd, validators);
+            addFieldParameters(type, parentPath, property, fd, validators);
             fieldDescriptors.add(fd);
         }
 
@@ -147,7 +144,7 @@ public class FormDescriptorFactory
                 fd.setBaseName(baseName);
                 fd.setProperty(property);
                 fd.setName(property.getName());
-                addFieldParameters(type, parentPath, baseName, property, fd, validators);
+                addFieldParameters(type, parentPath, property, fd, validators);
                 fieldDescriptors.add(fd);
             }
         }
@@ -234,7 +231,7 @@ public class FormDescriptorFactory
         }
     }
 
-    private void addFieldParameters(CompositeType type, String parentPath, String baseName, TypeProperty property, FieldDescriptor fd, List<Validator> validators)
+    private void addFieldParameters(CompositeType type, String parentPath, TypeProperty property, FieldDescriptor fd, List<Validator> validators)
     {
         handleAnnotations(type, fd, property.getAnnotations());
 
@@ -256,7 +253,7 @@ public class FormDescriptorFactory
             SelectFieldDescriptor select = (SelectFieldDescriptor) fd;
             if (select.getList() == null)
             {
-                addDefaultOptions(parentPath, baseName, property, select);
+                addDefaultOptions(parentPath, property, select);
             }
         }
 
@@ -273,11 +270,22 @@ public class FormDescriptorFactory
         }
     }
 
-    private void addDefaultOptions(String parentPath, String baseName, TypeProperty typeProperty, SelectFieldDescriptor fd)
+    private void addDefaultOptions(String parentPath, TypeProperty typeProperty, SelectFieldDescriptor fd)
     {
         if (typeProperty.getType().getTargetType() instanceof EnumType)
         {
-            OptionAnnotationHandler.process(configurationProvider, new EnumOptionProvider(), parentPath, baseName, fd);
+            // We can pass null through to the option provider here because we know that the EnumOptionProvider
+            // does not make use of the instance.
+            EnumOptionProvider optionProvider = new EnumOptionProvider();
+            fd.setList(optionProvider.getOptions(null, parentPath, fd.getProperty()));
+            fd.setListKey(optionProvider.getOptionKey());
+            fd.setListValue(optionProvider.getOptionValue());
+
+            Object emptyOption = optionProvider.getEmptyOption(null, parentPath, fd.getProperty());
+            if (emptyOption != null)
+            {
+                fd.setEmptyOption(emptyOption);
+            }
         }
         else
         {
@@ -335,10 +343,5 @@ public class FormDescriptorFactory
     public void setConfigurationValidatorProvider(ConfigurationValidatorProvider configurationValidatorProvider)
     {
         this.configurationValidatorProvider = configurationValidatorProvider;
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
     }
 }

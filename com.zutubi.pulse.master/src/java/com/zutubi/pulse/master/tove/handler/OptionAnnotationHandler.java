@@ -12,10 +12,8 @@ import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.TextUtils;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.bean.BeanUtils;
-import com.zutubi.util.bean.BeanException;
+import com.zutubi.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -35,13 +33,13 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
-        // do everything that the standard field annotation handler does,
+        // Do everything that the standard field annotation handler does,
         super.process(annotatedType, annotation, descriptor);
 
         OptionFieldDescriptor field = (OptionFieldDescriptor) descriptor;
         OptionProvider optionProvider;
 
-        //  and then a little bit extra.
+        // And then a little bit extra.
         String className = getOptionProviderClass(annotation);
         if(!TextUtils.stringSet(className))
         {
@@ -59,39 +57,20 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
             optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
         }
 
-        process(configurationProvider, optionProvider, field.getParentPath(), field.getBaseName(), field);
-    }
+        String parentPath = field.getParentPath();
+        String baseName = field.getBaseName();
 
-    public static void process(ConfigurationProvider configurationProvider, OptionProvider optionProvider, String parentPath, String baseName, OptionFieldDescriptor field)
-    {
         Object instance = null;
-        if(baseName != null && configurationProvider != null)
+        if (baseName != null && configurationProvider != null) // may be null during the setup since we are rendering forms but the configuration system is not yet available.
         {
             instance = configurationProvider.get(PathUtils.getPath(parentPath, baseName), Configuration.class);
         }
 
-        // In the case of the @Reference annotation, the presence of the 'dependentOn' field is used to
-        // replace the default 'instance' for use by the OptionProvider.  Note that the configured OptionProvider
-        // will need to expect that it will not be receiving the default instance.
-        if (field.hasParameter("dependentOn"))
-        {
-            String dependentField = (String) field.getParameter("dependentOn");
-            if (instance != null)
-            {
-                try
-                {
-                    instance = BeanUtils.getProperty(dependentField, instance);
-                }
-                catch (BeanException e)
-                {
-                    // This is caused by an annotation configuration problem.  Would be good to catch
-                    // this earlier.
-                    LOG.warning("Failed to retrieve dependent property.", e);
-                }
-            }
-        }
+        process(field, optionProvider, parentPath, instance, field.getProperty());
+    }
 
-        TypeProperty fieldTypeProperty = field.getProperty();
+    protected void process(OptionFieldDescriptor field, OptionProvider optionProvider, String parentPath, Object instance, TypeProperty fieldTypeProperty)
+    {
         List optionList = optionProvider.getOptions(instance, parentPath, fieldTypeProperty);
         field.setList(optionList);
 
