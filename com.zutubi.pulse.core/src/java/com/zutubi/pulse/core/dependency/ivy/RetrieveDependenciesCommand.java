@@ -1,14 +1,12 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.BootstrapCommand;
 import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import com.zutubi.util.NullaryFunctionE;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.NullaryFunctionE;
 import org.apache.ivy.core.cache.ResolutionCacheManager;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleId;
@@ -42,7 +40,7 @@ public class RetrieveDependenciesCommand implements Command
         {
             final PulseExecutionContext context = (PulseExecutionContext) commandContext.getExecutionContext();
 
-            commandContext.registerOutput(OUTPUT_NAME, null);
+            commandContext.registerArtifact(OUTPUT_NAME, null);
             final File outDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), OUTPUT_NAME);
 
             URL masterUrl = new URL(context.getString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL));

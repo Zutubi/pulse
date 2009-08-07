@@ -22,7 +22,7 @@ public class PerforceClient extends CachingScmClient
 {
     public static final String TYPE = "p4";
 
-    // Output of p4 sync -f:
+    // Artifact of p4 sync -f:
     //   <depot file>#<revision> - (refreshing|added as) <local file>
     //   <depot file>#<revision> - (refreshing|updating|added as|deleted as) <local file>
     //   ...

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.postprocessors.cppunit;
 
-import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
-import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
-import com.zutubi.pulse.core.commands.api.FileSystemOutputConfigurationSupport;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.FileSystemArtifactConfigurationSupport;
 import com.zutubi.pulse.core.commands.core.ExamplesBuilder;
 import com.zutubi.tove.config.api.ConfigurationExample;
 
@@ -15,7 +15,7 @@ public class CppUnitReportPostProcessorConfigurationExamples
 
     public ConfigurationExample getSingleReport()
     {
-        FileOutputConfiguration output = new FileOutputConfiguration();
+        FileArtifactConfiguration output = new FileArtifactConfiguration();
         output.setName("cppunit xml report");
         output.setFile("build/reports/CppUnit.xml");
         output.setFailIfNotPresent(false);
@@ -25,7 +25,7 @@ public class CppUnitReportPostProcessorConfigurationExamples
 
     public ConfigurationExample getReportDir()
     {
-        DirectoryOutputConfiguration output = new DirectoryOutputConfiguration();
+        DirectoryArtifactConfiguration output = new DirectoryArtifactConfiguration();
         output.setName("test reports");
         output.setBase("${base.dir}/reports");
         output.getInclusions().add("**/*.xml");
@@ -34,7 +34,7 @@ public class CppUnitReportPostProcessorConfigurationExamples
         return buildProject(output);
     }
 
-    private ConfigurationExample buildProject(FileSystemOutputConfigurationSupport output)
+    private ConfigurationExample buildProject(FileSystemArtifactConfigurationSupport output)
     {
         CppUnitReportPostProcessorConfiguration processor = new CppUnitReportPostProcessorConfiguration();
         processor.setName(NAME);

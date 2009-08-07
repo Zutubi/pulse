@@ -7,11 +7,11 @@ import com.zutubi.validation.annotations.Required;
 /**
  * Configures a capture of a link to an external system.
  *
- * @see LinkOutput
+ * @see LinkArtifact
  */
-@SymbolicName("zutubi.linkOutputConfig")
+@SymbolicName("zutubi.linkArtifactConfig")
 @Form(fieldOrder = {"name", "url"})
-public class LinkOutputConfiguration extends OutputConfigurationSupport
+public class LinkArtifactConfiguration extends ArtifactConfigurationSupport
 {
     @Required
     private String url;
@@ -26,8 +26,8 @@ public class LinkOutputConfiguration extends OutputConfigurationSupport
         this.url = url;
     }
 
-    public Class<? extends Output> outputType()
+    public Class<? extends Artifact> artifactType()
     {
-        return LinkOutput.class;
+        return LinkArtifact.class;
     }
 }

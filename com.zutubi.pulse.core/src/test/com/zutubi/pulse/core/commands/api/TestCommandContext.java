@@ -25,7 +25,7 @@ public class TestCommandContext implements CommandContext
     private List<Feature> features = new LinkedList<Feature>();
     private Map<String, String> properties = new HashMap<String, String>();
     private Map<String, String> links = new HashMap<String, String>();
-    private Map<String, Output> outputs = new HashMap<String, Output>();
+    private Map<String, Artifact> artifacts = new HashMap<String, Artifact>();
     private Map<Pair<FieldScope, String>, String> customFields = new HashMap<Pair<FieldScope, String>, String>();
 
     /**
@@ -89,7 +89,7 @@ public class TestCommandContext implements CommandContext
     /**
      * Returns all links registered via {@link #registerLink(String, String)}.
      *
-     * @return all registered link outputs
+     * @return all registered link artifacts
      */
     public Map<String, String> getLinks()
     {
@@ -97,16 +97,16 @@ public class TestCommandContext implements CommandContext
     }
 
     /**
-     * Returns all outputs registered via {@link #registerOutput(String, String)}.
-     * These output instances in turn include details of processors etc
+     * Returns all artifacts registered via {@link #registerArtifact(String, String)}.
+     * These artifact instances in turn include details of processors etc
      * registered against them.
      *
-     * @return all registered outputs
-     * @see Output
+     * @return all registered artifacts
+     * @see com.zutubi.pulse.core.commands.api.TestCommandContext.Artifact
      */
-    public Map<String, Output> getOutputs()
+    public Map<String, Artifact> getArtifacts()
     {
-        return outputs;
+        return artifacts;
     }
 
     /**
@@ -148,32 +148,32 @@ public class TestCommandContext implements CommandContext
         links.put(name, url);
     }
 
-    public void markOutputForPublish(String name, String pattern)
+    public void markArtifactForPublish(String name, String pattern)
     {
-        outputs.get(name).setPublish(true);
+        artifacts.get(name).setPublish(true);
     }
 
-    public File registerOutput(String name, String type)
+    public File registerArtifact(String name, String type)
     {
         File toDir = new File(executionContext.getFile(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_OUTPUT_DIR), name);
         if (!toDir.mkdirs())
         {
-            throw new BuildException("Unable to create storage directory '" + toDir.getAbsolutePath() + "' for output '" + name + "'");
+            throw new BuildException("Unable to create storage directory '" + toDir.getAbsolutePath() + "' for artifact '" + name + "'");
         }
 
-        outputs.put(name, new Output(name));
+        artifacts.put(name, new Artifact(name));
         return toDir;
     }
 
-    public void setOutputIndex(String name, String index)
+    public void setArtifactIndex(String name, String index)
     {
-        Output output = outputs.get(name);
-        if (output == null)
+        Artifact artifact = artifacts.get(name);
+        if (artifact == null)
         {
-            throw new BuildException("Attempt to set index file for unknown output '" + name + "'");
+            throw new BuildException("Attempt to set index file for unknown artifact '" + name + "'");
         }
 
-        output.setIndex(index);
+        artifact.setIndex(index);
     }
 
     public void addCustomField(FieldScope scope, String name, String value)
@@ -183,10 +183,10 @@ public class TestCommandContext implements CommandContext
 
     public void registerProcessors(String name, List<PostProcessorConfiguration> postProcessors)
     {
-        Output output = outputs.get(name);
-        if (output != null)
+        Artifact artifact = artifacts.get(name);
+        if (artifact != null)
         {
-            output.applyProcessors(postProcessors);
+            artifact.applyProcessors(postProcessors);
         }
     }
 
@@ -202,11 +202,11 @@ public class TestCommandContext implements CommandContext
     }
 
     /**
-     * Records information about a registered output.
+     * Records information about a registered artifact.
      *
-     * @see TestCommandContext#registerOutput(String, String)
+     * @see TestCommandContext#registerArtifact(String, String)
      */
-    public static class Output
+    public static class Artifact
     {
         private String name;
         private String index;
@@ -214,19 +214,19 @@ public class TestCommandContext implements CommandContext
         private boolean publish;
 
         /**
-         * Creates an output of the given name.
+         * Creates an artifact of the given name.
          *
-         * @param name the name of the output
+         * @param name the name of the artifact
          */
-        public Output(String name)
+        public Artifact(String name)
         {
             this.name = name;
         }
 
         /**
-         * Returns this output's name.
+         * Returns this artifact's name.
          *
-         * @return the name of the output
+         * @return the name of the artifact
          */
         public String getName()
         {
@@ -235,10 +235,10 @@ public class TestCommandContext implements CommandContext
 
         /**
          * Returns the index, which will only be set if a call to
-         * {@link TestCommandContext#setOutputIndex(String, String)} was made
-         * for this output.
+         * {@link TestCommandContext#setArtifactIndex(String, String)} was made
+         * for this artifact.
          *
-         * @return the index set for this output (may be null)
+         * @return the index set for this artifact (may be null)
          */
         public String getIndex()
         {
@@ -246,10 +246,10 @@ public class TestCommandContext implements CommandContext
         }
 
         /**
-         * Sets the index file path for this output.  Used for setting up
-         * expected outputs.
+         * Sets the index file path for this artifact.  Used for setting up
+         * expected artifacts.
          *
-         * @param index the index for this output
+         * @param index the index for this artifact
          * @see #getIndex()
          */
         public void setIndex(String index)
@@ -258,10 +258,10 @@ public class TestCommandContext implements CommandContext
         }
 
         /**
-         * Returns all processors registered against this output via
+         * Returns all processors registered against this artifact via
          * {@link TestCommandContext#registerProcessors(String, java.util.List)}.
          *
-         * @return all processors registered against this output
+         * @return all processors registered against this artifact
          */
         public List<PostProcessorConfiguration> getAppliedProcessors()
         {
@@ -269,8 +269,8 @@ public class TestCommandContext implements CommandContext
         }
 
         /**
-         * Adds registered processors to this output.  Used for setting up
-         * expected outputs.
+         * Adds registered processors to this artifact.  Used for setting up
+         * expected artifacts.
          *
          * @param processors the processors to register
          */

@@ -12,13 +12,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Helper base for configuring captures that capture files from the local file
+ * Helper base for configuring artifacts that capture files from the local file
  * system.
  *
- * @see com.zutubi.pulse.core.commands.api.FileSystemOutputSupport
+ * @see FileSystemArtifactSupport
  */
-@SymbolicName("zutubi.fileSystemOutputConfigSupport")
-public abstract class FileSystemOutputConfigurationSupport extends OutputConfigurationSupport
+@SymbolicName("zutubi.fileSystemArtifactConfigSupport")
+public abstract class FileSystemArtifactConfigurationSupport extends ArtifactConfigurationSupport
 {
     @Wizard.Ignore
     private boolean failIfNotPresent = true;
@@ -46,11 +46,11 @@ public abstract class FileSystemOutputConfigurationSupport extends OutputConfigu
     @Wizard.Ignore
     private String artifactPattern = "(.+)\\.(.+)";
 
-    protected FileSystemOutputConfigurationSupport()
+    protected FileSystemArtifactConfigurationSupport()
     {
     }
 
-    protected FileSystemOutputConfigurationSupport(String name)
+    protected FileSystemArtifactConfigurationSupport(String name)
     {
         super(name);
     }

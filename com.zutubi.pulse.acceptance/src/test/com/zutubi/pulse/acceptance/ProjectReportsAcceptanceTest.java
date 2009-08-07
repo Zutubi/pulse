@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.CAPTURES;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
@@ -8,7 +8,7 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
-import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.FieldScope;
@@ -86,12 +86,12 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
     public void testCustomFieldPostProcessing() throws Exception
     {
         String projectPath = addProject(random, true);
-        String capturesPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, CAPTURES);
+        String capturesPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, ARTIFACTS);
 
-        Hashtable<String, Object> capture = xmlRpcHelper.createEmptyConfig(FileOutputConfiguration.class);
-        capture.put(Constants.Project.Command.FileOutput.NAME, "fields");
-        capture.put(Constants.Project.Command.FileOutput.FILE, propertiesFile.getAbsolutePath().replace('\\', '/'));
-        capture.put(Constants.Project.Command.FileOutput.POSTPROCESSORS, new Vector<String>(asList(getPath(projectPath, "postProcessors", "custom field processor"))));
+        Hashtable<String, Object> capture = xmlRpcHelper.createEmptyConfig(FileArtifactConfiguration.class);
+        capture.put(Constants.Project.Command.FileArtifact.NAME, "fields");
+        capture.put(Constants.Project.Command.FileArtifact.FILE, propertiesFile.getAbsolutePath().replace('\\', '/'));
+        capture.put(Constants.Project.Command.FileArtifact.POSTPROCESSORS, new Vector<String>(asList(getPath(projectPath, "postProcessors", "custom field processor"))));
 
         xmlRpcHelper.insertConfig(capturesPath, capture);
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);

@@ -300,7 +300,7 @@ public class XmlRpcHelper
         Hashtable<String, Object> recipe = (Hashtable<String, Object>) recipes.get(recipeName);
         Hashtable<String, Object> commands = (Hashtable<String, Object>) recipe.get("commands");
         Hashtable<String, Object> command = (Hashtable<String, Object>) commands.get(commandName);
-        Hashtable<String, Object> captures = (Hashtable<String, Object>) command.get(Constants.Project.Command.CAPTURES);
+        Hashtable<String, Object> captures = (Hashtable<String, Object>) command.get(Constants.Project.Command.ARTIFACTS);
         return (Hashtable<String, Object>) captures.get(captureName);
     }
 

@@ -20,7 +20,7 @@ public abstract class CommandConfigurationSupport extends AbstractNamedConfigura
 {
     private Class<? extends Command> commandType;
     private boolean force = false;
-    private Map<String, OutputConfiguration> outputs = new LinkedHashMap<String, OutputConfiguration>();
+    private Map<String, ArtifactConfiguration> artifacts = new LinkedHashMap<String, ArtifactConfiguration>();
 
     @Transient
     private PostProcessorExtensionManager postProcessorExtensionManager;
@@ -69,19 +69,19 @@ public abstract class CommandConfigurationSupport extends AbstractNamedConfigura
         this.force = force;
     }
 
-    public Map<String, OutputConfiguration> getOutputs()
+    public Map<String, ArtifactConfiguration> getArtifacts()
     {
-        return outputs;
+        return artifacts;
     }
 
-    public void setOutputs(Map<String, OutputConfiguration> outputs)
+    public void setArtifacts(Map<String, ArtifactConfiguration> artifacts)
     {
-        this.outputs = outputs;
+        this.artifacts = artifacts;
     }
 
-    public void addOutput(OutputConfiguration output)
+    public void addArtifact(ArtifactConfiguration artifact)
     {
-        outputs.put(output.getName(), output);
+        artifacts.put(artifact.getName(), artifact);
     }
 
     public Class<? extends Command> commandType()

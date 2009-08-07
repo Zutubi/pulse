@@ -2,9 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import com.zutubi.pulse.core.commands.ArtifactFactory;
 import com.zutubi.pulse.core.commands.CommandFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandContext;
-import com.zutubi.pulse.core.commands.OutputFactory;
 import com.zutubi.pulse.core.commands.api.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyManager;
@@ -58,7 +58,7 @@ public class RecipeProcessor
     private boolean terminating = false;
     private PulseFileLoaderFactory fileLoaderFactory;
     private CommandFactory commandFactory;
-    private OutputFactory outputFactory;
+    private ArtifactFactory artifactFactory;
     private PostProcessorFactory postProcessorFactory;
     private IvyManager ivyManager;
 
@@ -423,7 +423,7 @@ public class RecipeProcessor
         {
             // still need to process any available artifacts, even in the event of an error.
             captureOutputs(commandConfig, commandContext);
-            commandContext.processOutputs();
+            commandContext.processArtifacts();
         }
     }
 
@@ -445,20 +445,20 @@ public class RecipeProcessor
 
     private void captureOutputs(CommandConfiguration commandConfig, CommandContext context)
     {
-        for (OutputConfiguration outputConfiguration : commandConfig.getOutputs().values())
+        for (ArtifactConfiguration artifactConfiguration : commandConfig.getArtifacts().values())
         {
             try
             {
-                Output output = outputFactory.create(outputConfiguration);
-                output.capture(context);
+                Artifact artifact = artifactFactory.create(artifactConfiguration);
+                artifact.capture(context);
             }
             catch (BuildException e)
             {
-                context.error("Unable to capture output '" + outputConfiguration.getName() + "': " + e.getMessage());
+                context.error("Unable to capture output '" + artifactConfiguration.getName() + "': " + e.getMessage());
             }
             catch (Exception e)
             {
-                String message = "Unexpected error capturing output '" + outputConfiguration.getName() + "': " + e.getMessage();
+                String message = "Unexpected error capturing output '" + artifactConfiguration.getName() + "': " + e.getMessage();
                 LOG.warning(message, e);
                 context.error(message + " (check agent logs)");
             }
@@ -520,9 +520,9 @@ public class RecipeProcessor
         this.postProcessorFactory = postProcessorFactory;
     }
 
-    public void setOutputFactory(OutputFactory outputFactory)
+    public void setOutputFactory(ArtifactFactory artifactFactory)
     {
-        this.outputFactory = outputFactory;
+        this.artifactFactory = artifactFactory;
     }
 
     private static class RecipeStatus

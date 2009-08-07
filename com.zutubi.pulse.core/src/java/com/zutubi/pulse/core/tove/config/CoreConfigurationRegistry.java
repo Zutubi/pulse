@@ -29,12 +29,12 @@ public class CoreConfigurationRegistry implements ConfigurationRegistry
         {
             registerConfigurationType(ProjectRecipesConfiguration.class);
             registerConfigurationType(PropertyConfiguration.class);
-            registerConfigurationType(OutputConfiguration.class);
-            registerConfigurationType(OutputConfigurationSupport.class);
-            registerConfigurationType(FileSystemOutputConfigurationSupport.class);
-            registerConfigurationType(DirectoryOutputConfiguration.class);
-            registerConfigurationType(FileOutputConfiguration.class);
-            registerConfigurationType(LinkOutputConfiguration.class);
+            registerConfigurationType(ArtifactConfiguration.class);
+            registerConfigurationType(ArtifactConfigurationSupport.class);
+            registerConfigurationType(FileSystemArtifactConfigurationSupport.class);
+            registerConfigurationType(DirectoryArtifactConfiguration.class);
+            registerConfigurationType(FileArtifactConfiguration.class);
+            registerConfigurationType(LinkArtifactConfiguration.class);
 
             registerConfigurationType(PostProcessorConfiguration.class);
             registerConfigurationType(PostProcessorConfigurationSupport.class);

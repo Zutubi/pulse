@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.commands.core;
 
-import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
-import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
-import com.zutubi.pulse.core.commands.api.FileSystemOutputConfigurationSupport;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.FileSystemArtifactConfigurationSupport;
 import com.zutubi.tove.config.api.ConfigurationExample;
 
 /**
@@ -14,7 +14,7 @@ public class JUnitReportPostProcessorConfigurationExamples
 
     public ConfigurationExample getSingleReport()
     {
-        FileOutputConfiguration output = new FileOutputConfiguration();
+        FileArtifactConfiguration output = new FileArtifactConfiguration();
         output.setName("junit xml report");
         output.setFile("build/reports/junit/TESTS-TestSuites.xml");
         output.setFailIfNotPresent(false);
@@ -24,7 +24,7 @@ public class JUnitReportPostProcessorConfigurationExamples
 
     public ConfigurationExample getReportDir()
     {
-        DirectoryOutputConfiguration output = new DirectoryOutputConfiguration();
+        DirectoryArtifactConfiguration output = new DirectoryArtifactConfiguration();
         output.setName("test reports");
         output.setBase("${base.dir}/reports");
         output.getInclusions().add("**/TEST-*.xml");
@@ -33,7 +33,7 @@ public class JUnitReportPostProcessorConfigurationExamples
         return buildProject(output);
     }
 
-    private ConfigurationExample buildProject(FileSystemOutputConfigurationSupport output)
+    private ConfigurationExample buildProject(FileSystemArtifactConfigurationSupport output)
     {
         JUnitReportPostProcessorConfiguration processor = new JUnitReportPostProcessorConfiguration();
         processor.setName(NAME);

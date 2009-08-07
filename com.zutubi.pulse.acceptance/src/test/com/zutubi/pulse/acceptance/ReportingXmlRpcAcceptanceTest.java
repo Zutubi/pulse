@@ -2,14 +2,14 @@ package com.zutubi.pulse.acceptance;
 
 import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Artifact.NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.CAPTURES;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.DirectoryArtifact.BASE;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -429,10 +429,10 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, antConfig);
 
-        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(DirectoryOutputConfiguration.class);
+        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(DirectoryArtifactConfiguration.class);
         artifactConfig.put(NAME, "reports");
         artifactConfig.put(BASE, "build/reports");
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, CAPTURES), artifactConfig);
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
 
         int buildId = xmlRpcHelper.runBuild(project);
 

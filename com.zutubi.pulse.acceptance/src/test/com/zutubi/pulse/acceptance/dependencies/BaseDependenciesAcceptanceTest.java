@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.Constants;
-import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -196,9 +196,9 @@ public abstract class BaseDependenciesAcceptanceTest extends BaseXmlRpcAcceptanc
 
     private void addArtifact(Project project, String recipe, String command, String artifactName, String artifactExtension, String pattern) throws Exception
     {
-        String artifactsPath = "projects/" + project.getName() + "/type/recipes/" + recipe + "/commands/" + command + "/outputs";
+        String artifactsPath = "projects/" + project.getName() + "/type/recipes/" + recipe + "/commands/" + command + "/artifacts";
 
-        Hashtable<String, Object> artifactData = xmlRpcHelper.createDefaultConfig(FileOutputConfiguration.class);
+        Hashtable<String, Object> artifactData = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
         artifactData.put("name", artifactName);
         artifactData.put("file", "build/" + artifactName + "." + artifactExtension);
         artifactData.put("publish", true);

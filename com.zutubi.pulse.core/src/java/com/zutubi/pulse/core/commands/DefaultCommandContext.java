@@ -30,7 +30,7 @@ public class DefaultCommandContext implements CommandContext
 {
     private ExecutionContext executionContext;
     private CommandResult result;
-    private Map<String, OutputSpec> registeredOutputs = new LinkedHashMap<String, OutputSpec>();
+    private Map<String, ArtifactSpec> registeredArtifacts = new LinkedHashMap<String, ArtifactSpec>();
     private PostProcessorFactory postProcessorFactory;
 
     public DefaultCommandContext(ExecutionContext executionContext, CommandResult result, PostProcessorFactory postProcessorFactory)
@@ -41,13 +41,13 @@ public class DefaultCommandContext implements CommandContext
     }
 
     /**
-     * It is important that @{link #processOutputs} is called before this method
+     * It is important that {@link #processArtifacts()} is called before this method
      * to ensure that artifact files have been both picked up and processed before
      * recording them on the result. 
      */
     public void addArtifactsToResult()
     {
-        for (OutputSpec spec: registeredOutputs.values())
+        for (ArtifactSpec spec: registeredArtifacts.values())
         {
             if (spec.getArtifact().getChildren().size() > 0)
             {
@@ -98,36 +98,36 @@ public class DefaultCommandContext implements CommandContext
         result.addArtifact(new StoredArtifact(name, url));
     }
 
-    public File registerOutput(String name, String type)
+    public File registerArtifact(String name, String type)
     {
         StoredArtifact artifact = new StoredArtifact(name);
         File toDir = new File(executionContext.getFile(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_OUTPUT_DIR), name);
         if (!toDir.mkdirs())
         {
-            throw new BuildException("Unable to create storage directory '" + toDir.getAbsolutePath() + "' for output '" + name + "'");
+            throw new BuildException("Unable to create storage directory '" + toDir.getAbsolutePath() + "' for artifact '" + name + "'");
         }
 
-        registeredOutputs.put(name, new OutputSpec(artifact, type, toDir));
+        registeredArtifacts.put(name, new ArtifactSpec(artifact, type, toDir));
         return toDir;
     }
 
-    public void setOutputIndex(String name, String index)
+    public void setArtifactIndex(String name, String index)
     {
-        OutputSpec spec = registeredOutputs.get(name);
+        ArtifactSpec spec = registeredArtifacts.get(name);
         if (spec == null)
         {
-            throw new BuildException("Attempt to set index file for unknown output '" + name + "'");
+            throw new BuildException("Attempt to set index file for unknown artifact '" + name + "'");
         }
 
         spec.getArtifact().setIndex(index);
     }
 
-    public void markOutputForPublish(String name, String pattern)
+    public void markArtifactForPublish(String name, String pattern)
     {
-        OutputSpec spec = registeredOutputs.get(name);
+        ArtifactSpec spec = registeredArtifacts.get(name);
         if (spec == null)
         {
-            throw new BuildException("Attempt to set publish for unknown output '" + name + "'");
+            throw new BuildException("Attempt to set publish for unknown artifact '" + name + "'");
         }
         spec.getArtifact().setPublish(true);
         spec.getArtifact().setArtifactPattern(pattern);
@@ -147,17 +147,17 @@ public class DefaultCommandContext implements CommandContext
 
     public void registerProcessors(String name, List<PostProcessorConfiguration> postProcessors)
     {
-        OutputSpec spec = registeredOutputs.get(name);
+        ArtifactSpec spec = registeredArtifacts.get(name);
         if (spec == null)
         {
-            throw new BuildException("Attempt to register processors for unknown output '" + name + "'");
+            throw new BuildException("Attempt to register processors for unknown artifact '" + name + "'");
         }
         spec.addAll(postProcessors);
     }
 
-    public void processOutputs()
+    public void processArtifacts()
     {
-        for (OutputSpec spec: registeredOutputs.values())
+        for (ArtifactSpec spec: registeredArtifacts.values())
         {
             final List<PostProcessor> processors = CollectionUtils.map(spec.getProcessors(), new Mapping<PostProcessorConfiguration, PostProcessor>()
             {
@@ -186,14 +186,14 @@ public class DefaultCommandContext implements CommandContext
         }
     }
 
-    private static class OutputSpec
+    private static class ArtifactSpec
     {
         private StoredArtifact artifact;
         private String type;
         private File toDir;
         private List<PostProcessorConfiguration> processors = new LinkedList<PostProcessorConfiguration>();
 
-        private OutputSpec(StoredArtifact artifact, String type, File toDir)
+        private ArtifactSpec(StoredArtifact artifact, String type, File toDir)
         {
             this.artifact = artifact;
             this.type = type;

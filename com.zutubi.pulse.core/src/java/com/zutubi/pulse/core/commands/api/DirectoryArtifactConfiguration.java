@@ -10,14 +10,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Configuration for directory captures: used to capture a bunch of files
+ * Configuration for directory artifacts: used to capture a bunch of files
  * nested under a single directory.
  *
- * @see DirectoryOutput
+ * @see DirectoryArtifact
  */
-@SymbolicName("zutubi.directoryOutputConfig")
+@SymbolicName("zutubi.directoryArtifactConfig")
 @Form(fieldOrder = {"name", "base", "inclusions", "exclusions", "postProcessors", "index", "type", "failIfNotPresent", "ignoreStale", "followSymlinks", "publish", "artifactPattern"})
-public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationSupport
+public class DirectoryArtifactConfiguration extends FileSystemArtifactConfigurationSupport
 {
     private String base;
     @Wizard.Ignore
@@ -79,8 +79,8 @@ public class DirectoryOutputConfiguration extends FileSystemOutputConfigurationS
         this.followSymlinks = followSymlinks;
     }
 
-    public Class<? extends Output> outputType()
+    public Class<? extends Artifact> artifactType()
     {
-        return DirectoryOutput.class;
+        return DirectoryArtifact.class;
     }
 }

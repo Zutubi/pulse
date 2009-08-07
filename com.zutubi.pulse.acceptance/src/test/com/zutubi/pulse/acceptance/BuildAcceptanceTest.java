@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
 import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.CAPTURES;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryOutput.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Output.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
@@ -17,8 +17,8 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
-import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
-import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_INTEGRATION;
@@ -625,11 +625,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(OCUNIT_REPOSITORY), xmlRpcHelper.getAntConfig());
 
-        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileOutputConfiguration.class);
+        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
         artifactConfig.put("name", "test report");
         artifactConfig.put("file", "results.txt");
         artifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, "ocunit output processor"))));
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, CAPTURES), artifactConfig);
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
 
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
@@ -721,11 +721,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private void insertTestCapture(String projectPath, String processorName) throws Exception
     {
-        Hashtable<String, Object> dirOutputConfig = xmlRpcHelper.createDefaultConfig(DirectoryOutputConfiguration.class);
-        dirOutputConfig.put(NAME, "xml reports");
-        dirOutputConfig.put(BASE, "build/reports/xml");
-        dirOutputConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, CAPTURES), dirOutputConfig);
+        Hashtable<String, Object> dirArtifactConfig = xmlRpcHelper.createDefaultConfig(DirectoryArtifactConfiguration.class);
+        dirArtifactConfig.put(NAME, "xml reports");
+        dirArtifactConfig.put(BASE, "build/reports/xml");
+        dirArtifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), dirArtifactConfig);
     }
 
     private String getPropertiesPath(String projectName)

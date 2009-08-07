@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.commands.api;
 
 /**
- * Basic interface for classes capable of capturing output as part of a command
- * result.  Examples of such output include built packages and HTML reports.
+ * Basic interface for classes capable of capturing artifacts as part of a command
+ * result.  Examples of such artifacts include built packages and HTML reports.
  */
-public interface Output
+public interface Artifact
 {
     /**
      * Called to capture the output, after a command has executed.  To capture

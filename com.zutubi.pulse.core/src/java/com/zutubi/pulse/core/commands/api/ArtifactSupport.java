@@ -3,16 +3,16 @@ package com.zutubi.pulse.core.commands.api;
 /**
  * Support base class for output capturing types.  Stores the configuration.
  */
-public abstract class OutputSupport implements Output
+public abstract class ArtifactSupport implements Artifact
 {
-    private OutputConfiguration config;
+    private ArtifactConfiguration config;
 
     /**
      * Creates a new output based on the given configuration.
      *
      * @param config configuration for this output
      */
-    protected OutputSupport(OutputConfiguration config)
+    protected ArtifactSupport(ArtifactConfiguration config)
     {
         this.config = config;
     }
@@ -22,7 +22,7 @@ public abstract class OutputSupport implements Output
      *
      * @return the configuration for this output
      */
-    public OutputConfiguration getConfig()
+    public ArtifactConfiguration getConfig()
     {
         return config;
     }

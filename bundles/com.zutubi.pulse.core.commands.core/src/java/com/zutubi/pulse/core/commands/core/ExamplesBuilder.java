@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.pulse.core.commands.api.FileSystemOutputConfigurationSupport;
+import com.zutubi.pulse.core.commands.api.FileSystemArtifactConfigurationSupport;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
@@ -40,12 +40,12 @@ public class ExamplesBuilder
      *                   usually only) post-processor
      * @return an example illustrating a post-processor on capture files
      */
-    public static ConfigurationExample buildProjectForCaptureProcessor(String commandExe, FileSystemOutputConfigurationSupport output)
+    public static ConfigurationExample buildProjectForCaptureProcessor(String commandExe, FileSystemArtifactConfigurationSupport output)
     {
         ExecutableCommandConfiguration command = new ExecutableCommandConfiguration();
         command.setName("build");
         command.setExe(commandExe);
-        command.addOutput(output);
+        command.addArtifact(output);
 
         return new ConfigurationExample("project", recipes(command, output.getPostProcessors().get(0)));
     }

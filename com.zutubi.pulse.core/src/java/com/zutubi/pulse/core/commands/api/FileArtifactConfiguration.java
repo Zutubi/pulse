@@ -7,20 +7,20 @@ import com.zutubi.validation.annotations.Required;
 /**
  * Configures a capture of a single file from the local file sysytem.
  *
- * @see FileOutput
+ * @see FileArtifact
  */
-@SymbolicName("zutubi.fileOutputConfig")
+@SymbolicName("zutubi.fileArtifactConfig")
 @Form(fieldOrder = {"name", "file", "postProcessors", "type", "failIfNotPresent", "ignoreStale", "publish", "artifactPattern"})
-public class FileOutputConfiguration extends FileSystemOutputConfigurationSupport
+public class FileArtifactConfiguration extends FileSystemArtifactConfigurationSupport
 {
     @Required
     private String file;
 
-    public FileOutputConfiguration()
+    public FileArtifactConfiguration()
     {
     }
 
-    public FileOutputConfiguration(String name, String file)
+    public FileArtifactConfiguration(String name, String file)
     {
         super(name);
         this.file = file;
@@ -36,8 +36,8 @@ public class FileOutputConfiguration extends FileSystemOutputConfigurationSuppor
         this.file = file;
     }
 
-    public Class<? extends Output> outputType()
+    public Class<? extends Artifact> artifactType()
     {
-        return FileOutput.class;
+        return FileArtifact.class;
     }
 }

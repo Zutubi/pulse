@@ -7,26 +7,26 @@ import org.apache.tools.ant.DirectoryScanner;
 import java.io.File;
 
 /**
- * An output capture that captures a set of files under a base directory.
+ * An artifact that captures a set of files under a base directory.
  *
- * @see com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration
+ * @see DirectoryArtifactConfiguration
  */
-public class DirectoryOutput extends FileSystemOutputSupport
+public class DirectoryArtifact extends FileSystemArtifactSupport
 {
     /**
      * Constructor that stores the configuration.
      *
-     * @param config configuration for this output
+     * @param config configuration for this atifact
      * @see #getConfig() 
      */
-    public DirectoryOutput(DirectoryOutputConfiguration config)
+    public DirectoryArtifact(DirectoryArtifactConfiguration config)
     {
         super(config);
     }
 
     protected void captureFiles(File toDir, CommandContext context)
     {
-        DirectoryOutputConfiguration config = (DirectoryOutputConfiguration) getConfig();
+        DirectoryArtifactConfiguration config = (DirectoryArtifactConfiguration) getConfig();
         String base = config.getBase();
         File baseDir;
         if (!StringUtils.stringSet(base))
@@ -75,7 +75,7 @@ public class DirectoryOutput extends FileSystemOutputSupport
         scanner.setFollowSymlinks(config.isFollowSymlinks());
         scanner.scan();
 
-        context.setOutputIndex(config.getName(), config.getIndex());
+        context.setArtifactIndex(config.getName(), config.getIndex());
         for (String file : scanner.getIncludedFiles())
         {
             captureFile(new File(toDir, file), new File(baseDir, file), context);

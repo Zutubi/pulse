@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-public class FileOutputTest extends PulseTestCase
+public class FileArtifactTest extends PulseTestCase
 {
     private static final String DIR_NESTED = "nested";
 
@@ -26,7 +26,7 @@ public class FileOutputTest extends PulseTestCase
     private static final String FILE_LOG = "file.log";
     private static final String FILE_NESTED_TXT = "file-3.txt";
 
-    private static final String OUTPUT_NAME = "test-out";
+    private static final String ARTIFACT_NAME = "test-out";
     private static final String TEST_CONTENT = "file content";
 
     private File tempDir;
@@ -184,7 +184,7 @@ public class FileOutputTest extends PulseTestCase
 
     private void nonExistantNoFailTest(String path)
     {
-        FileOutputConfiguration config = new FileOutputConfiguration(OUTPUT_NAME, path);
+        FileArtifactConfiguration config = new FileArtifactConfiguration(ARTIFACT_NAME, path);
         config.setFailIfNotPresent(false);
 
         capture(config);
@@ -231,7 +231,7 @@ public class FileOutputTest extends PulseTestCase
 
     public void testIgnoreStaleNotStale() throws IOException
     {
-        FileOutputConfiguration config = new FileOutputConfiguration(OUTPUT_NAME, FILE_LOG);
+        FileArtifactConfiguration config = new FileArtifactConfiguration(ARTIFACT_NAME, FILE_LOG);
         config.setIgnoreStale(true);
 
         capture(config);
@@ -253,7 +253,7 @@ public class FileOutputTest extends PulseTestCase
     {
         setRecipeTimestampInFuture();
 
-        FileOutputConfiguration config = new FileOutputConfiguration(OUTPUT_NAME, path);
+        FileArtifactConfiguration config = new FileArtifactConfiguration(ARTIFACT_NAME, path);
         config.setIgnoreStale(true);
 
         try
@@ -281,7 +281,7 @@ public class FileOutputTest extends PulseTestCase
     {
         setRecipeTimestampInFuture();
 
-        FileOutputConfiguration config = new FileOutputConfiguration(OUTPUT_NAME, path);
+        FileArtifactConfiguration config = new FileArtifactConfiguration(ARTIFACT_NAME, path);
         config.setFailIfNotPresent(false);
         config.setIgnoreStale(true);
 
@@ -297,29 +297,29 @@ public class FileOutputTest extends PulseTestCase
 
     private void capture(String path)
     {
-        FileOutputConfiguration config = new FileOutputConfiguration(OUTPUT_NAME, path);
+        FileArtifactConfiguration config = new FileArtifactConfiguration(ARTIFACT_NAME, path);
         capture(config);
     }
 
-    private void capture(FileOutputConfiguration config)
+    private void capture(FileArtifactConfiguration config)
     {
-        FileOutput output = new FileOutput(config);
-        output.capture(commandContext);
+        FileArtifact artifact = new FileArtifact(config);
+        artifact.capture(commandContext);
     }
 
     private void assertFileCaptured(String fileName) throws IOException
     {
-        Map<String, TestCommandContext.Output> outputs = commandContext.getOutputs();
-        assertNotNull(outputs.get(OUTPUT_NAME));
+        Map<String, TestCommandContext.Artifact> artifacts = commandContext.getArtifacts();
+        assertNotNull(artifacts.get(ARTIFACT_NAME));
 
-        File capturedFile = new File(outputDir, FileSystemUtils.composeFilename(OUTPUT_NAME, fileName));
+        File capturedFile = new File(outputDir, FileSystemUtils.composeFilename(ARTIFACT_NAME, fileName));
         assertTrue(capturedFile.isFile());
         assertEquals(TEST_CONTENT, IOUtils.fileToString(capturedFile));
     }
 
     private void assertNoFilesCaptured()
     {
-        File dir = new File(outputDir, OUTPUT_NAME);
+        File dir = new File(outputDir, ARTIFACT_NAME);
         assertEquals(0, dir.list().length);
     }
 }

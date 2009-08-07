@@ -71,7 +71,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         }
 
         // verify that the env output is captured even with the command failing.
-        assertOutputRegistered(new TestCommandContext.Output(ENV_ARTIFACT_NAME), context);
+        assertArtifactRegistered(new TestCommandContext.Artifact(ENV_ARTIFACT_NAME), context);
         assertFileExists(ENV_ARTIFACT_NAME, ENV_FILENAME);
     }
 
@@ -139,11 +139,11 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         ExecutableCommand command = new ExecutableCommand(config);
         TestCommandContext context = runCommand(command);
 
-        assertEquals(2, context.getOutputs().size());
+        assertEquals(2, context.getArtifacts().size());
 
         assertEnvironment(context, "Command Line:", "Process Environment:", "Resources:");
 
-        assertOutputRegistered(new TestCommandContext.Output(OUTPUT_NAME), context);
+        assertArtifactRegistered(new TestCommandContext.Artifact(OUTPUT_NAME), context);
         assertFileExists(OUTPUT_NAME, OUTPUT_FILE);
     }
 
@@ -388,7 +388,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
 
     private void assertEnvironment(TestCommandContext context, String... contents) throws IOException
     {
-        assertOutputRegistered(new TestCommandContext.Output(ENV_ARTIFACT_NAME), context);
+        assertArtifactRegistered(new TestCommandContext.Artifact(ENV_ARTIFACT_NAME), context);
         assertFileExists(ENV_ARTIFACT_NAME, ENV_FILENAME);
         assertFileContains(ENV_ARTIFACT_NAME, ENV_FILENAME, false, contents);
     }

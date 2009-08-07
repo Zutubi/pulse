@@ -6,26 +6,26 @@ import org.apache.tools.ant.DirectoryScanner;
 import java.io.File;
 
 /**
- * An output capture that captures a single file.
+ * An artifact that captures a single file.
  *
- * @see com.zutubi.pulse.core.commands.api.FileOutputConfiguration
+ * @see FileArtifactConfiguration
  */
-public class FileOutput extends FileSystemOutputSupport
+public class FileArtifact extends FileSystemArtifactSupport
 {
     /**
      * Constructor which stores the configuration.
      *
-     * @param config configuration for this output
+     * @param config configuration for this artifact
      * @see #getConfig() 
      */
-    public FileOutput(FileOutputConfiguration config)
+    public FileArtifact(FileArtifactConfiguration config)
     {
         super(config);
     }
 
     protected void captureFiles(File toDir, CommandContext context)
     {
-        FileOutputConfiguration config = (FileOutputConfiguration) getConfig();
+        FileArtifactConfiguration config = (FileArtifactConfiguration) getConfig();
         String file = config.getFile();
 
         File captureFile = new File(file);
@@ -112,7 +112,7 @@ public class FileOutput extends FileSystemOutputSupport
             }
         }
 
-        FileOutputConfiguration config = (FileOutputConfiguration) getConfig();
+        FileArtifactConfiguration config = (FileArtifactConfiguration) getConfig();
         if (!fileCaptured && config.isFailIfNotPresent() && !context.getResultState().isBroken())
         {
             if (scanner.getIncludedFilesCount() == 0)

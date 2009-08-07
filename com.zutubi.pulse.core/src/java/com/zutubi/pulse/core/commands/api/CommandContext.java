@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Context in which a command executes.  Provides a high-level interface for
- * recording command result information and registering captured output.
+ * recording command result information and registering captured artifacts.
  */
 public interface CommandContext
 {
@@ -71,55 +71,71 @@ public interface CommandContext
     void addCommandProperty(String name, String value);
 
     /**
-     * Registers a link output (a link to an external resource) with the
+     * Registers a link artifact (a link to an external resource) with the
      * command result.
      *
-     * @param name name of the output
+     * @param name name of the artifact
      * @param url  url of the external resource to link to
      */
     void registerLink(String name, String url);
 
     /**
-     * Registers a local output with the given name, returning the directory
-     * to which all files in the output should be stored.  This is used, for
+     * Registers a local artifact with the given name, returning the directory
+     * to which all files in the artifact should be stored.  This is used, for
      * example, to capture an output file from the build for post-processing
      * and/or permanent storage.  All files written under the returned
-     * directory will be captured as part of the output.
+     * directory will be captured as part of the artifact.
      *
-     * @param name the name of the output, e.g. "my report"
+     * @param name the name of the artifact, e.g. "my report"
      * @param type the MIME type of the captured files, or null if their types
      *             are unknown and should be guessed
-     * @return the directory to which all files that are part of this output
+     * @return the directory to which all files that are part of this artifact
      *         should be captured
      *
      * @see #registerProcessors(String, java.util.List)
-     * @see #setOutputIndex(String, String)
+     * @see #setArtifactIndex(String, String)
      */
-    File registerOutput(String name, String type);
+    File registerArtifact(String name, String type);
 
     /**
      * Registers post-processors that should be applied to all files in the
-     * output with the given name.  The output should have been previously
-     * registered via {@link #registerOutput(String, String)}.  The processors
+     * artifact with the given name.  The artifact should have been previously
+     * registered via {@link #registerArtifact(String, String)}.  The processors
      * are applied after the command completes to all files captured under the
-     * given output.
+     * given artifact.
      *
-     * @param name           name of the output to process files from
-     * @param postProcessors the post-processors to apply to the given output
+     * @param name           name of the artifact to process files from
+     * @param postProcessors the post-processors to apply to the given artifact
      */
     void registerProcessors(String name, List<PostProcessorConfiguration> postProcessors);
 
     /**
-     * Sets the index file for a registered output.  When an index file is
-     * set, the output will be treated as an HTML report, with the index
+     * Mark the registered artifact for publishing.  An artifact that is published
+     * will be stored in the internal artifact repository and subsequently be
+     * available for use by other projects.
+     *
+     * The name and extension of the published artifact are defined by the
+     * pattern argument.
+     *
+     * @param name      name of the artifact
+     * @param pattern   the regex pattern used to extract the name and type of
+     *                  the artifact to be published from the file name.  The regex
+     *                  requires two groups.  The first identifies the published
+     *                  artifact name, the second the artifact type.
+     */
+    void markArtifactForPublish(String name, String pattern);
+
+    /**
+     * Sets the index file for a registered artifact.  When an index file is
+     * set, the artifact will be treated as an HTML report, with the index
      * being the default file to view.  For common cases, e.g. where an
      * index file of "index.html" is present, it is not necessary to
      * explicitly register the index (it will be guessed automatically).
      *
-     * @param name  name of the output to set the index file for
-     * @param index path of the index file, relative to the output's directory
+     * @param name  name of the artifact to set the index file for
+     * @param index path of the index file, relative to the artifact's directory
      */
-    void setOutputIndex(String name, String index);
+    void setArtifactIndex(String name, String index);
 
     /**
      * Adds a custom field to a result.  Custom fields can be used to attach
@@ -132,20 +148,4 @@ public interface CommandContext
      * @param value value of the field
      */
     void addCustomField(FieldScope scope, String name, String value);
-
-    /**
-     * Mark the registered output for publishing.  An output that is published
-     * will be stored in the internal artifact repository and subsequently be
-     * available for use by other projects.
-     *
-     * The name and extension of the published artifact are defined by the
-     * pattern argument.
-     *
-     * @param name      name of the output
-     * @param pattern   the regex pattern used to extract the name and type of
-     *                  the artifact to be published from the file name.  The regex
-     *                  requires two groups.  The first identifies the artifact name,
-     *                  the second the artifact type.
-     */
-    void markOutputForPublish(String name, String pattern);
 }

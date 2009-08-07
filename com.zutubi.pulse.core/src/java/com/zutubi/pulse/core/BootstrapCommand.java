@@ -23,7 +23,7 @@ public class BootstrapCommand implements Command
 
     public void execute(CommandContext commandContext)
     {
-        commandContext.registerOutput(OUTPUT_NAME, null);
+        commandContext.registerArtifact(OUTPUT_NAME, null);
         config.getBootstrapper().bootstrap(commandContext);
     }
 

@@ -48,9 +48,8 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
 
     private static final String SYMBOLIC_NAME_RECIPE = "zutubi.recipeConfig";
     private static final String SYMBOLIC_NAME_MULTI_RECIPE_TYPE = "zutubi.multiRecipeTypeConfig";
+    private static final String SYMBOLIC_NAME_FILE_ARTIFACT = "zutubi.fileArtifactConfig";
     private static final String SYMBOLIC_NAME_DIRECTORY_ARTIFACT = "zutubi.directoryArtifactConfig";
-    private static final String SYMBOLIC_NAME_DIRECTORY_OUTPUT = "zutubi.directoryOutputConfig";
-    private static final String SYMBOLIC_NAME_FILE_OUTPUT = "zutubi.fileOutputConfig";
 
     private RecordManager recordManager;
 
@@ -229,7 +228,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
 
             if (oldArtifact.getSymbolicName().equals(SYMBOLIC_NAME_DIRECTORY_ARTIFACT))
             {
-                newArtifact.setSymbolicName(SYMBOLIC_NAME_DIRECTORY_OUTPUT);
+                newArtifact.setSymbolicName(SYMBOLIC_NAME_DIRECTORY_ARTIFACT);
                 if (isRoot)
                 {
                     newArtifact.put(PROPERTY_INDEX, "");
@@ -242,7 +241,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
             }
             else
             {
-                newArtifact.setSymbolicName(SYMBOLIC_NAME_FILE_OUTPUT);
+                newArtifact.setSymbolicName(SYMBOLIC_NAME_FILE_ARTIFACT);
                 copyValueIfPresent(oldArtifact, PROPERTY_FILE, newArtifact);
             }
 

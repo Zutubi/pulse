@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.upgrade.tasks;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.RecordManager;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Upgrade task that refactors the dependency publication, from being explicitly
@@ -30,9 +30,9 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
         removeProjectDependenciesPublications.setRecordManager(recordManager);
         removeProjectDependenciesPublications.execute();
 
-        AddPublishToFileSystemOutputConfiguration addPublishToFileSystemOutputConfiguration = new AddPublishToFileSystemOutputConfiguration();
-        addPublishToFileSystemOutputConfiguration.setRecordManager(recordManager);
-        addPublishToFileSystemOutputConfiguration.execute();
+        AddPublishToFileSystemArtifactConfiguration addPublishToFileSystemArtifactConfiguration = new AddPublishToFileSystemArtifactConfiguration();
+        addPublishToFileSystemArtifactConfiguration.setRecordManager(recordManager);
+        addPublishToFileSystemArtifactConfiguration.execute();
     }
 
     public void setRecordManager(RecordManager recordManager)
@@ -77,13 +77,13 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
         }
     }
 
-    private class AddPublishToFileSystemOutputConfiguration extends AbstractRecordPropertiesUpgradeTask
+    private class AddPublishToFileSystemArtifactConfiguration extends AbstractRecordPropertiesUpgradeTask
     {
         protected RecordLocator getRecordLocator()
         {
             return RecordLocators.newTypeFilter(
-                RecordLocators.newPathPattern("projects/*/type/recipes/*/commands/*/outputs/*"),
-                "zutubi.fileSystemOutputConfigSupport"
+                RecordLocators.newPathPattern("projects/*/type/recipes/*/commands/*/artifacts/*"),
+                "zutubi.fileSystemArtifactConfigSupport"
             ) ;
         }
 

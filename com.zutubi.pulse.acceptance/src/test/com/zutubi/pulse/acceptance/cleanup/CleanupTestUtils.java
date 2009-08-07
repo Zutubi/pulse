@@ -3,9 +3,9 @@ package com.zutubi.pulse.acceptance.cleanup;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.Constants;
 import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.CAPTURES;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryOutput.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Output.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
@@ -15,7 +15,7 @@ import static com.zutubi.pulse.acceptance.Constants.Project.Options.RETAIN_WORKI
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.acceptance.dependencies.Repository;
-import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
@@ -152,11 +152,11 @@ public class CleanupTestUtils
 
     public void insertTestCapture(String projectPath, String processorName) throws Exception
     {
-        Hashtable<String, Object> dirOutputConfig = xmlRpcHelper.createDefaultConfig(DirectoryOutputConfiguration.class);
-        dirOutputConfig.put(NAME, "xml reports");
-        dirOutputConfig.put(BASE, "build/reports/xml");
-        dirOutputConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, CAPTURES), dirOutputConfig);
+        Hashtable<String, Object> dirArtifactConfig = xmlRpcHelper.createDefaultConfig(DirectoryArtifactConfiguration.class);
+        dirArtifactConfig.put(NAME, "xml reports");
+        dirArtifactConfig.put(BASE, "build/reports/xml");
+        dirArtifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), dirArtifactConfig);
     }
 
     public void setAntTarget(String projectName, String target) throws Exception

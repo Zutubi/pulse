@@ -10,30 +10,30 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Support base class for output that captures files from the base directory
+ * Support base class for artifacts that captures files from the base directory
  * into the output directory.
  */
-public abstract class FileSystemOutputSupport extends OutputSupport
+public abstract class FileSystemArtifactSupport extends ArtifactSupport
 {
     /**
      * Constructor that stores the configuration.
      *
-     * @param config configuration for this output
+     * @param config configuration for this artifact
      * @see #getConfig()
      */
-    protected FileSystemOutputSupport(FileSystemOutputConfigurationSupport config)
+    protected FileSystemArtifactSupport(FileSystemArtifactConfigurationSupport config)
     {
         super(config);
     }
 
     public void capture(CommandContext context)
     {
-        FileSystemOutputConfigurationSupport config = (FileSystemOutputConfigurationSupport) getConfig();
-        File file = context.registerOutput(config.getName(), config.getType());
+        FileSystemArtifactConfigurationSupport config = (FileSystemArtifactConfigurationSupport) getConfig();
+        File file = context.registerArtifact(config.getName(), config.getType());
         captureFiles(file, context);
         if (config.isPublish())
         {
-            context.markOutputForPublish(config.getName(), config.getArtifactPattern());
+            context.markArtifactForPublish(config.getName(), config.getArtifactPattern());
         }
         context.registerProcessors(config.getName(), config.getPostProcessors());
     }
@@ -70,7 +70,7 @@ public abstract class FileSystemOutputSupport extends OutputSupport
      */
     protected boolean captureFile(File toFile, File fromFile, CommandContext context)
     {
-        FileSystemOutputConfigurationSupport config = (FileSystemOutputConfigurationSupport) getConfig();
+        FileSystemArtifactConfigurationSupport config = (FileSystemArtifactConfigurationSupport) getConfig();
         long recipeTimestamp = context.getExecutionContext().getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, 0);
         if (config.isIgnoreStale() && fromFile.lastModified() < recipeTimestamp)
         {
@@ -86,7 +86,7 @@ public abstract class FileSystemOutputSupport extends OutputSupport
         }
         catch (IOException e)
         {
-            throw new BuildException("Unable to collect file '" + fromFile.getAbsolutePath() + "' for output '" + getConfig().getName() + "': " + e.getMessage(), e);
+            throw new BuildException("Unable to collect file '" + fromFile.getAbsolutePath() + "' for artifact '" + getConfig().getName() + "': " + e.getMessage(), e);
         }
     }
 

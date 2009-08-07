@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.commands.maven2;
 
-import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
@@ -36,12 +36,12 @@ public class Maven2CommandConfiguration extends NamedArgumentCommandConfiguratio
         PostProcessorConfiguration processor = availableProcessors.get(getDefaultPostProcessorName(JUnitReportPostProcessorConfiguration.class));
         if (processor != null)
         {
-            DirectoryOutputConfiguration output = new DirectoryOutputConfiguration();
+            DirectoryArtifactConfiguration output = new DirectoryArtifactConfiguration();
             output.setName("test reports");
             output.setBase("target/surefire-reports");
             output.getInclusions().add("TEST-*.xml");
             output.getPostProcessors().add(processor);
-            getOutputs().put(output.getName(), output);
+            getArtifacts().put(output.getName(), output);
         }
     }
 

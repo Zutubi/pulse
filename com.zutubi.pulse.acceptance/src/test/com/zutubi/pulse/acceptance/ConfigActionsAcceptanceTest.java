@@ -135,9 +135,9 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         projectPage.waitFor();
         assertFalse(projectPage.isTreeLinkPresent("pulse file"));
-        assertTrue(projectPage.isTreeLinkPresent("recipes, commands and captures"));
+        assertTrue(projectPage.isTreeLinkPresent("recipes, commands and artifacts"));
 
-        projectPage.clickComposite("type", "recipes, commands and captures");
+        projectPage.clickComposite("type", "recipes, commands and artifacts");
         MultiRecipeTypeForm typeForm = browser.createForm(MultiRecipeTypeForm.class);
         typeForm.waitFor();
     }

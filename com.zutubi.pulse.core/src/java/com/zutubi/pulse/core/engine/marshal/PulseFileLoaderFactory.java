@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.engine.marshal;
 
 import com.zutubi.pulse.core.api.PulseRuntimeException;
-import com.zutubi.pulse.core.commands.api.DirectoryOutputConfiguration;
-import com.zutubi.pulse.core.commands.api.FileOutputConfiguration;
-import com.zutubi.pulse.core.commands.api.LinkOutputConfiguration;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.api.LinkArtifactConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.marshal.ToveFileStorer;
@@ -28,9 +28,9 @@ public class PulseFileLoaderFactory
     {
         register("property", PropertyConfiguration.class);
         register("recipe", RecipeConfiguration.class);
-        register("dir-artifact", DirectoryOutputConfiguration.class);
-        register("link-artifact", LinkOutputConfiguration.class);
-        register("artifact", FileOutputConfiguration.class);
+        register("dir-artifact", DirectoryArtifactConfiguration.class);
+        register("link-artifact", LinkArtifactConfiguration.class);
+        register("artifact", FileArtifactConfiguration.class);
     }
 
     public PulseFileLoader createLoader()

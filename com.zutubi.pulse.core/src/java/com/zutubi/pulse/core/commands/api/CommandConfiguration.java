@@ -54,20 +54,20 @@ public interface CommandConfiguration extends NamedConfiguration
     void setForce(boolean force);
 
     /**
-     * The outputs that should be captured when this command completes.  These
+     * The artifacts that should be captured when this command completes.  These
      * are typically files or reports created by running the command.
      *
-     * @return outputs to capture when the command completes
+     * @return artifacts to capture when the command completes
      */
     @Ordered
-    Map<String, OutputConfiguration> getOutputs();
+    Map<String, ArtifactConfiguration> getArtifacts();
 
     /**
-     * Sets the outputs to be captured when this command completes.
+     * Sets the artifacts to be captured when this command completes.
      *
-     * @param outputs outputs to capture when the command completes
+     * @param artifacts artifacts to capture when the command completes
      */
-    void setOutputs(Map<String, OutputConfiguration> outputs);
+    void setArtifacts(Map<String, ArtifactConfiguration> artifacts);
 
     /**
      * Indicates the type of command to build from this configuration.  The

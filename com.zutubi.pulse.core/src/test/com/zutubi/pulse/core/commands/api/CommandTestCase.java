@@ -94,13 +94,13 @@ public abstract class CommandTestCase extends PulseTestCase
     }
 
     /**
-     * Gets a file object pointing at the file within the given output with the
+     * Gets a file object pointing at the file within the given artifact with the
      * given path.
      *
-     * @param name the name of the registered output the file should have been
+     * @param name the name of the registered artifact the file should have been
      *             captured in
-     * @param path the path of the file under the output directory
-     * @return a file object pointing to the given file in the given output
+     * @param path the path of the file under the artifact directory
+     * @return a file object pointing to the given file in the given artifact
      */
     protected File getFile(String name, String path)
     {
@@ -110,11 +110,11 @@ public abstract class CommandTestCase extends PulseTestCase
 
     /**
      * Asserts a file exists (was captured during execution) in the given
-     * output with the given path.
+     * artifact with the given path.
      *
-     * @param name the name of the registered output the file should have been
+     * @param name the name of the registered artifact the file should have been
      *             captured in
-     * @param path the path of the file under the output directory to test for
+     * @param path the path of the file under the artifact directory to test for
      */
     protected void assertFileExists(String name, String path)
     {
@@ -123,12 +123,12 @@ public abstract class CommandTestCase extends PulseTestCase
     }
 
     /**
-     * Gets the contents of a file captured in the given output with the given
+     * Gets the contents of a file captured in the given artifact with the given
      * path.
      *
-     * @param name the name of the registered output the file should have been
+     * @param name the name of the registered artifact the file should have been
      *             captured in
-     * @param path the path of the file under the output directory
+     * @param path the path of the file under the artifact directory
      * @return the entire contents of the file
      * @throws java.io.IOException if there is an error reading the file
      */
@@ -138,13 +138,13 @@ public abstract class CommandTestCase extends PulseTestCase
     }
 
     /**
-     * Asserts that the file captured in the given output with the given path
+     * Asserts that the file captured in the given artifact with the given path
      * contains all of the given strings.  The order of the strings is not
      * important.
      *
-     * @param name     the name of the registered output the file should have
+     * @param name     the name of the registered artifact the file should have
      *                 been captured in
-     * @param path     the path of the file under the output directory
+     * @param path     the path of the file under the artifact directory
      * @param contents the strings to test for in the file
      * @throws IOException if there is an error reading the file
      */
@@ -154,13 +154,13 @@ public abstract class CommandTestCase extends PulseTestCase
     }
 
     /**
-     * Asserts that the file captured in the given output with the given path
+     * Asserts that the file captured in the given artifact with the given path
      * contains all of the given strings, possibly case-insensitively.  The
      * order of the strings is not important.
      *
-     * @param name          the name of the registered output the file should
+     * @param name          the name of the registered artifact the file should
      *                      have been captured in
-     * @param path          the path of the file under the output directory
+     * @param path          the path of the file under the artifact directory
      * @param caseSensitive if true, the search is case-insensitive
      * @param contents the strings to test for in the file
      * @throws IOException if there is an error reading the file
@@ -225,22 +225,22 @@ public abstract class CommandTestCase extends PulseTestCase
     }
 
     /**
-     * Asserts that an output matching the given expected output has been
+     * Asserts that an artifact matching the given expected artifact has been
      * registered with the given context.  Used to check that execution of a
-     * command registered an expected output.
+     * command registered an expected artifact.
      *
-     * @param expectedOutput the expected output, including post-processors
+     * @param expectedArtifact the expected artifact, including post-processors
      *                       that should be registered against it
      * @param context        context from the command execution
      */
-    protected void assertOutputRegistered(TestCommandContext.Output expectedOutput, TestCommandContext context)
+    protected void assertArtifactRegistered(TestCommandContext.Artifact expectedArtifact, TestCommandContext context)
     {
-        TestCommandContext.Output gotOutput = context.getOutputs().get(expectedOutput.getName());
-        assertNotNull("Expected output '" + expectedOutput.getName() + "' not registered");
-        assertEquals(expectedOutput.getIndex(), gotOutput.getIndex());
+        TestCommandContext.Artifact gotArtifact = context.getArtifacts().get(expectedArtifact.getName());
+        assertNotNull("Expected artifact '" + expectedArtifact.getName() + "' not registered");
+        assertEquals(expectedArtifact.getIndex(), gotArtifact.getIndex());
 
-        List<PostProcessorConfiguration> expectedProcessors = expectedOutput.getAppliedProcessors();
-        List<PostProcessorConfiguration> gotProcessors = gotOutput.getAppliedProcessors();
+        List<PostProcessorConfiguration> expectedProcessors = expectedArtifact.getAppliedProcessors();
+        List<PostProcessorConfiguration> gotProcessors = gotArtifact.getAppliedProcessors();
         assertEquals(expectedProcessors.size(), gotProcessors.size());
         for (int i = 0; i < expectedProcessors.size(); i++)
         {

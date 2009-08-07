@@ -119,29 +119,29 @@ public class Constants
         public static class Command
         {
             public static final String NAME = "name";
-            public static final String CAPTURES = "outputs";
+            public static final String ARTIFACTS = "artifacts";
 
             /**
              * The constants for the property names in the ArtifactConfiguration class.
              */
-            public static class Output
+            public static class Artifact
             {
                 public static final String NAME = "name";
                 public static final String POSTPROCESSORS = "postProcessors";
             }
 
             /**
-             * The constants for the property names in the FileOutputConfiguration class.
+             * The constants for the property names in the FileArtifactConfiguration class.
              */
-            public static class FileOutput extends Output
+            public static class FileArtifact extends Artifact
             {
                 public static final String FILE = "file";
             }
 
             /**
-             * The constants for the property names in the DirectoryOutputConfiguration class.
+             * The constants for the property names in the DirectoryArtifactConfiguration class.
              */
-            public static class DirectoryOutput extends Output
+            public static class DirectoryArtifact extends Artifact
             {
                 public static final String BASE = "base";
                 public static final String INCLUSIONS = "inclusions";
