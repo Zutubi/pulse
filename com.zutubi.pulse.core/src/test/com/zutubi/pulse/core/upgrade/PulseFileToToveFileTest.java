@@ -1,6 +1,7 @@
-package com.zutubi.pulse.master.upgrade.tasks;
+package com.zutubi.pulse.core.upgrade;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.upgrade.PulseFileToToveFile;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.ParsingException;
 

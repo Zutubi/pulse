@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.upgrade.tasks;
+package com.zutubi.pulse.core.upgrade;
 
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;

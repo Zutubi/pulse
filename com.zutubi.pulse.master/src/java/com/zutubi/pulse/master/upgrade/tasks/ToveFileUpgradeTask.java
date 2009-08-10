@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.master.util.monitor.TaskException;
+import com.zutubi.pulse.core.upgrade.PulseFileToToveFile;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
