@@ -10,11 +10,10 @@
                    regex="(.*?): (.*?)(?:: (.*))?"/>
 
     <recipe name="tests">
-        <command name="run tests">
-            <print message="Pretending to run tests..."/>
+        <print name="run tests" message="Pretending to run tests...">
             <artifact name="test report" file="test-report.txt">
                 <process processor="${test.pp}"/>
             </artifact>
-        </command>
+        </print>
     </recipe>
 </project>

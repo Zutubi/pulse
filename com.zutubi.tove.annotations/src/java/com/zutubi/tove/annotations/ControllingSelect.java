@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Field(type = FieldType.CONTROLLING_SELECT)
-@Constraint("com.zutubi.pulse.master.validation.validators.ControllingSelectValidator")
+@Constraint("com.zutubi.tove.validation.ControllingSelectValidator")
 @Handler(className = DefaultAnnotationHandlers.CONTROLLING_SELECT)
 public @interface ControllingSelect
 {

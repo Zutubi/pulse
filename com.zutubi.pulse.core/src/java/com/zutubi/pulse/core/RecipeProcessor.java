@@ -127,16 +127,18 @@ public class RecipeProcessor
             return;
         }
 
-        IvyClient ivy = ivyManager.createIvyClient(context.getString(PROPERTY_MASTER_URL) + "/repository");
-        ivy.setMessageLogger(new IvyMessageOutputStreamAdapter(context.getOutputStream()));
-
         ModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, ModuleDescriptor.class);
-        if (ivy.hasDependencies(descriptor))
+        if (descriptor != null)
         {
-            CommandConfiguration retrieveCommandConfig = ivy.getRetrieveCommand();
-            if (pushContextAndExecute(context, retrieveCommandConfig, outputDir, status) || !status.isSuccess())
+            IvyClient ivy = ivyManager.createIvyClient(context.getString(PROPERTY_MASTER_URL) + "/repository");
+            ivy.setMessageLogger(new IvyMessageOutputStreamAdapter(context.getOutputStream()));
+            if (ivy.hasDependencies(descriptor))
             {
-                return;
+                CommandConfiguration retrieveCommandConfig = ivy.getRetrieveCommand();
+                if (pushContextAndExecute(context, retrieveCommandConfig, outputDir, status) || !status.isSuccess())
+                {
+                    return;
+                }
             }
         }
 
@@ -349,7 +351,7 @@ public class RecipeProcessor
     private boolean pushContextAndExecute(PulseExecutionContext context, CommandConfiguration commandConfig, File outputDir, RecipeStatus status)
     {
         CommandResult result = new CommandResult(commandConfig.getName());
-        File commandOutput = new File(outputDir, getCommandDirName(status.getCommandIndex(), result));
+        File commandOutput = new File(outputDir, getCommandDirName(status.nextCommandIndex(), result));
         if (!commandOutput.mkdirs())
         {
             throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
@@ -535,9 +537,9 @@ public class RecipeProcessor
             return success;
         }
 
-        public int getCommandIndex()
+        public int nextCommandIndex()
         {
-            return commandIndex;
+            return commandIndex++;
         }
 
         public void commandCompleted(ResultState state)

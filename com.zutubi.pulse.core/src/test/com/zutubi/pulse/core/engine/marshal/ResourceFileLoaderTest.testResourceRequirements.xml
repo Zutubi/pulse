@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<resources>
+    <require name="basic"/>
+    <require name="versioned" version="aver"/>
+    <require name="optional-versioned" version="aver" optional="true"/>
+</resources>
+        

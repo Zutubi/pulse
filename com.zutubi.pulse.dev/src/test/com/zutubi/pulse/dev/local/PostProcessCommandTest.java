@@ -1,6 +1,8 @@
 package com.zutubi.pulse.dev.local;
 
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.plugins.BasePluginSystemTestCase;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.IOAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
@@ -28,6 +30,8 @@ public class PostProcessCommandTest extends PulseTestCase
     @Override
     protected void tearDown() throws Exception
     {
+        BasePluginSystemTestCase.OSGIUtilsAccessor.reset();
+        SpringComponentContext.closeAll();
         removeDirectory(tmpDir);
         super.tearDown();
     }

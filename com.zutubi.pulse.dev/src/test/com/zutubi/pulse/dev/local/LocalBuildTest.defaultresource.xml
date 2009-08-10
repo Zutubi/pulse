@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <project defaultRecipe="my-default">
     <recipe name="my-default">
-        <resource name="with-default"/>
         <print name="show" message="${var}"/>
     </recipe>
 </project>

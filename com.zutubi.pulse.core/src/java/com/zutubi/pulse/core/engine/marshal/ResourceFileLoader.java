@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.engine.marshal;
 
-import com.zutubi.pulse.core.InMemoryResourceRepository;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
+import com.zutubi.pulse.core.engine.SimpleResourceRequirementConfiguration;
 import com.zutubi.pulse.core.marshal.LocalFileResolver;
 import com.zutubi.pulse.core.marshal.ToveFileLoader;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
@@ -22,6 +22,7 @@ public class ResourceFileLoader
     public static final String ROOT_ELEMENT = "resources";
 
     private static final String ELEMENT_RESOURCE = "resource";
+    private static final String ELEMENT_REQUIRE = "require";
 
     protected TypeDefinitions typeDefinitions;
 
@@ -32,6 +33,7 @@ public class ResourceFileLoader
     public void init()
     {
         typeDefinitions = new TypeDefinitions();
+        typeDefinitions.register(ELEMENT_REQUIRE, typeRegistry.getType(SimpleResourceRequirementConfiguration.class));
         typeDefinitions.register(ELEMENT_RESOURCE, typeRegistry.getType(ResourceConfiguration.class));
 
         loader = new ToveFileLoader();
@@ -41,20 +43,11 @@ public class ResourceFileLoader
         loader.setTypeDefinitions(typeDefinitions);
     }
 
-    public InMemoryResourceRepository load(File input) throws PulseException, IOException
-    {
-        return load(input, new InMemoryResourceRepository());
-    }
-
-    public InMemoryResourceRepository load(File input, InMemoryResourceRepository repository) throws PulseException, IOException
+    public ResourcesConfiguration load(File input) throws PulseException, IOException
     {
         ResourcesConfiguration configuration = new ResourcesConfiguration();
         loader.load(input, configuration, new LocalFileResolver(input.getParentFile()));
-        for (ResourceConfiguration resource: configuration.getResources().values())
-        {
-            repository.addResource(resource);
-        }
-        return repository;
+        return configuration;
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

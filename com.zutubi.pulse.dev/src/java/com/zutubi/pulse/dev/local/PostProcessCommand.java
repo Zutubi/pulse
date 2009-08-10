@@ -199,7 +199,7 @@ public class PostProcessCommand implements Command
             try
             {
                 ResourceFileLoader resourceFileLoader = SpringComponentContext.getBean("resourceFileLoader");
-                resourceRepository = resourceFileLoader.load(f);
+                resourceRepository = resourceFileLoader.load(f).createRepository();
             }
             catch (Exception e)
             {

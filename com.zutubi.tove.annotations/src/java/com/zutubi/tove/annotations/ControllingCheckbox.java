@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Field(type = FieldType.CONTROLLING_CHECKBOX)
-@Constraint("com.zutubi.pulse.master.validation.validators.ControllingCheckboxValidator")
+@Constraint("com.zutubi.tove.validation.ControllingCheckboxValidator")
 @Handler(className = DefaultAnnotationHandlers.FIELD)
 public @interface ControllingCheckbox
 {

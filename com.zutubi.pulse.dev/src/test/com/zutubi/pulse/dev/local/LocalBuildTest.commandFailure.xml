@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <project defaultRecipe="my-default">
-
     <recipe name="my-default">
         <executable name="noice" exe="nosuchexe"/>
     </recipe>
-
 </project>

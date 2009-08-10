@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.validation.validators;
+package com.zutubi.tove.validation;
 
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.FieldValidatorSupport;

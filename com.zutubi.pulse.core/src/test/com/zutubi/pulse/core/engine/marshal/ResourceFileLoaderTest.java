@@ -4,13 +4,17 @@ import com.zutubi.pulse.core.InMemoryResourceRepository;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.DefaultObjectFactory;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
+import static java.util.Arrays.asList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +38,7 @@ public class ResourceFileLoaderTest extends PulseTestCase
 
     public void testEmptyRepo() throws Exception
     {
-        InMemoryResourceRepository repo = load();
+        InMemoryResourceRepository repo = loadRepo();
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(0, resources.size());
@@ -42,7 +46,7 @@ public class ResourceFileLoaderTest extends PulseTestCase
 
     public void testResource() throws Exception
     {
-        InMemoryResourceRepository repo = load();
+        InMemoryResourceRepository repo = loadRepo();
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(1, resources.size());
@@ -56,7 +60,7 @@ public class ResourceFileLoaderTest extends PulseTestCase
 
     public void testResourceWithVersion() throws Exception
     {
-        InMemoryResourceRepository repo = load();
+        InMemoryResourceRepository repo = loadRepo();
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
         assertEquals(1, resources.size());
@@ -75,7 +79,7 @@ public class ResourceFileLoaderTest extends PulseTestCase
 
     public void testMultipleResources() throws Exception
     {
-        InMemoryResourceRepository repo = load();
+        InMemoryResourceRepository repo = loadRepo();
 
         List<String> resources = repo.getResourceNames();
         assertNotNull(resources);
@@ -90,7 +94,39 @@ public class ResourceFileLoaderTest extends PulseTestCase
         assertNotNull(resource.getVersion("bVersion"));
     }
 
-    private InMemoryResourceRepository load() throws PulseException, IOException
+    public void testResourceRequirements() throws Exception
+    {
+        List<ResourceRequirement> requirements = loadRequirements();
+        assertEquals(asList(new ResourceRequirement("basic", false),
+                            new ResourceRequirement("versioned", "aver", false),
+                            new ResourceRequirement("optional-versioned", "aver", true)),
+                     requirements);
+    }
+
+    public void testInvalidResourceRequirement() throws Exception
+    {
+        try
+        {
+            loadRequirements();
+            fail("Requirements must specify a name");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getMessage(), containsString("Required attribute name not specified"));
+        }
+    }
+
+    private InMemoryResourceRepository loadRepo() throws PulseException, IOException
+    {
+        return load().createRepository();
+    }
+
+    private List<ResourceRequirement> loadRequirements() throws PulseException, IOException
+    {
+        return load().createRequirements();
+    }
+
+    private ResourcesConfiguration load() throws PulseException, IOException
     {
         return loader.load(getInputFile(EXTENSION_XML));
     }

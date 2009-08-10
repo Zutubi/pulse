@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <project defaultRecipe="my-default">
-
     <recipe name="my-default">
-        <resource name="my-resource"/>
         <print name="noice" message="${resource-var}"/>
     </recipe>
-
 </project>
+        

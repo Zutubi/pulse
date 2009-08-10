@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <project defaultRecipe="my-default">
-
     <recipe name="cool">
         <print name="howdy" message="hello world!"/>
         <print name="chowdy" message="bye now"/>
@@ -10,32 +9,23 @@
         <print name="local" message="${local.build}"/>
     </recipe>
     
-    <post-processor name="my-pp">
-        <regex.pp>
-            <pattern category="info" expression="info:.*"/>
-            <pattern category="warning" expression="warning:.*"/>
-            <pattern category="error" expression="error:.*"/>
-        </regex.pp>
-    </post-processor>
+    <regex.pp name="my-pp">
+        <pattern category="info" expression="info:.*"/>
+        <pattern category="warning" expression="warning:.*"/>
+        <pattern category="error" expression="error:.*"/>
+    </regex.pp>
 
     <recipe name="my-default">
         <print name="noice" message="brief intro..."/>
-        <command name="oops">
-            <print message="warning: everythings ok">
-                <process processor="${my-pp}"/>
-            </print>
-        </command>
-        <command name="whoa">
-            <print message="warning: everythings still fine">
-                <process processor="${my-pp}"/>
-            </print>
-        </command>
-        <command name="hey">
-            <print message="info: informative">
-                <process processor="${my-pp}"/>
-            </print>
-        </command>
+        <print name="oops" message="warning: everythings ok">
+            <process processor="${my-pp}"/>
+        </print>
+        <print name="whoa" message="warning: everythings still fine">
+            <process processor="${my-pp}"/>
+        </print>
+        <print name="hey" message="info: informative">
+            <process processor="${my-pp}"/>
+        </print>
         <print name="bzzzt" message="donskis"/>
     </recipe>
-
 </project>

@@ -3,97 +3,41 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.ExternalPulseFileProvider;
+import com.zutubi.pulse.core.engine.ResourcesConfiguration;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Entry point for executing local builds within a development tree.
  */
 public class LocalBuild
 {
-    private static final int DEFAULT_FAILURE_LIMIT = 50;
-
-    private int failureLimit = DEFAULT_FAILURE_LIMIT;
     private EventManager eventManager;
     private RecipeProcessor recipeProcessor;
     private ResourceFileLoader resourceFileLoader;
 
-    @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
     public static void main(String argv[])
     {
-        String pulseFile = "pulse.xml";
-        String resourcesFile = null;
-        String outputDir = "pulse.out";
-        String recipe = null;
-
-        Options options = new Options();
-
-        options.addOption(OptionBuilder.withLongOpt("output-dir")
-                .hasArg()
-                .create('o'));
-
-        options.addOption(OptionBuilder.withLongOpt("pulse-file")
-                .hasArg()
-                .create('p'));
-
-        options.addOption(OptionBuilder.withLongOpt("recipe")
-                .hasArg()
-                .create('r'));
-
-        options.addOption(OptionBuilder.withLongOpt("resources-file")
-                .hasArg()
-                .create('e'));
-
-        options.addOption(OptionBuilder.withLongOpt("failure-limit")
-                .hasArg()
-                .withType(Number.class)
-                .create('l'));
-
         LocalBuild b = bootstrap();
-
         try
         {
-            CommandLineParser parser = new GnuParser();
-            CommandLine commandLine = parser.parse(options, argv, false);
-
-            if (commandLine.hasOption('p'))
-            {
-                pulseFile = commandLine.getOptionValue('p');
-            }
-
-            if (commandLine.hasOption('r'))
-            {
-                recipe = commandLine.getOptionValue('r');
-            }
-
-            if (commandLine.hasOption('e'))
-            {
-                resourcesFile = commandLine.getOptionValue('e');
-            }
-
-            if (commandLine.hasOption('o'))
-            {
-                outputDir = commandLine.getOptionValue('o');
-            }
-
-            if (commandLine.hasOption('l'))
-            {
-                b.setFailureLimit(((Number) commandLine.getOptionObject('l')).intValue());
-            }
-
+            LocalBuildOptions options = new LocalBuildOptions(argv);
             File baseDir = new File(System.getProperty("user.dir"));
-            b.runBuild(baseDir, pulseFile, recipe, resourcesFile, outputDir);
+            b.runBuild(baseDir, options);
         }
         catch (Exception e)
         {
@@ -111,11 +55,11 @@ public class LocalBuild
         return SpringComponentContext.getBean("localBuild");
     }
 
-    private InMemoryResourceRepository createRepository(String resourcesFile) throws PulseException
+    private ResourcesConfiguration createRepository(String resourcesFile) throws PulseException
     {
         if (resourcesFile == null)
         {
-            return new InMemoryResourceRepository();
+            return new ResourcesConfiguration();
         }
 
         try
@@ -129,33 +73,40 @@ public class LocalBuild
     }
 
     /**
-     * Executes a local build with the given inputs, using the given output
-     * directory to save results.  All paths provided must be absolute or
-     * relative to the current working directory.
+     * Executes a local build in the given directory, with the given options.  All paths provided
+     * must be absolute or relative to the current working directory.
      *
-     * @param baseDir       the base directory in which to execute the build
-     * @param pulseFileName the name of the pulsefile to load
-     * @param recipe        the recipe to execute, may be null to indicate the default
-     *                      recipe in the given pulsefile
-     * @param resourcesFile the resources file to load prior to building , or null if no
-     *                      resources are to be loaded
-     * @param outputDir     the name of the output directory to capture output
-     *                      and save results to
+     * @param baseDir the base directory in which to execute the build
+     * @param options options controlling the behaviour of the build
      * @throws PulseException if a build error occurs
      */
-    public void runBuild(File baseDir, String pulseFileName, String recipe, String resourcesFile, String outputDir) throws PulseException
+    public void runBuild(File baseDir, LocalBuildOptions options) throws PulseException
     {
-        printPrologue(pulseFileName, resourcesFile, outputDir);
+        printPrologue(options);
 
-        InMemoryResourceRepository repository = createRepository(resourcesFile);
+        ResourcesConfiguration resourcesConfiguration = createRepository(options.getResourcesFile());
+
+        InMemoryResourceRepository repository = resourcesConfiguration.createRepository();
         ResourceDiscoverer discoverer = new ResourceDiscoverer();
         discoverer.discoverAndAdd(repository);
 
-        RecipePaths paths = new LocalRecipePaths(baseDir, outputDir);
+        List<ResourceRequirement> resourceRequirements = new LinkedList<ResourceRequirement>(options.getResourceRequirements());
+        resourceRequirements.addAll(resourcesConfiguration.createRequirements());
+        
+        RecipePaths paths = new LocalRecipePaths(baseDir, options.getOutputDir());
 
         if (!paths.getBaseDir().isDirectory())
         {
             throw new PulseException("Base directory '" + paths.getBaseDir().getAbsolutePath() + "' does not exist");
+        }
+
+        try
+        {
+            FileSystemUtils.cleanOutputDir(paths.getOutputDir());
+        }
+        catch (IOException e)
+        {
+            throw new PulseException("Unable to clean output diretory '" + paths.getOutputDir().getAbsolutePath() + "': " + e.getMessage(), e);
         }
 
         File logFile = new File(baseDir, "build.log");
@@ -165,16 +116,17 @@ public class LocalBuild
         {
             logStream = new FileOutputStream(logFile);
 
-            eventManager.register(new BuildStatusPrinter(paths.getBaseDir(), paths.getOutputDir(), logStream, failureLimit));
+            eventManager.register(new BuildStatusPrinter(paths.getBaseDir(), paths.getOutputDir(), logStream, options.getFailureLimit()));
 
             PulseExecutionContext context = new PulseExecutionContext();
             context.setWorkingDir(baseDir);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_LOCAL_BUILD, Boolean.toString(true));
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repository);
-            context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipe);
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, options.getRecipe());
             Bootstrapper bootstrapper = new LocalBootstrapper();
-            RecipeRequest request = new RecipeRequest(bootstrapper, new ExternalPulseFileProvider(pulseFileName), context);
+            RecipeRequest request = new RecipeRequest(bootstrapper, new ExternalPulseFileProvider(options.getPulseFile()), context);
+            request.addAllResourceRequirements(resourceRequirements);
             recipeProcessor.build(request);
         }
         catch (FileNotFoundException e)
@@ -189,11 +141,12 @@ public class LocalBuild
         printEpilogue(logFile);
     }
 
-    private void printPrologue(String pulseFile, String resourcesFile, String outputDir)
+    private void printPrologue(LocalBuildOptions options)
     {
-        System.out.println("pulse file      : '" + pulseFile + "'");
-        System.out.println("output directory: '" + outputDir + "'");
+        System.out.println("pulse file      : '" + options.getPulseFile() + "'");
+        System.out.println("output directory: '" + options.getOutputDir() + "'");
 
+        String resourcesFile = options.getResourcesFile();
         if (resourcesFile != null)
         {
             System.out.println("resources file  : '" + resourcesFile + "'");
@@ -212,11 +165,6 @@ public class LocalBuild
     {
         System.err.println(throwable.getMessage());
         System.exit(1);
-    }
-
-    public void setFailureLimit(int failureLimit)
-    {
-        this.failureLimit = failureLimit;
     }
 
     public void setEventManager(EventManager eventManager)
