@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.marshal.ToveFileUtils;
 import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
 import com.zutubi.tove.ConventionSupport;
+import com.zutubi.tove.annotations.Internal;
 import com.zutubi.tove.config.api.ConfigurationExample;
 import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.config.docs.PropertyDocs;
@@ -132,10 +133,13 @@ public class ToveFileDocManager
      */
     public synchronized void registerType(String name, CompositeType type, TypeDefinitions typeDefinitions)
     {
-        ElementDocs elementDocs = getDocs(type, typeDefinitions);
-        for (ExtensibleDocs extensibleDocs: getExtensibleParents(type))
+        if (!type.hasAnnotation(Internal.class, false))
         {
-            extensibleDocs.addExtension(name, elementDocs);
+            ElementDocs elementDocs = getDocs(type, typeDefinitions);
+            for (ExtensibleDocs extensibleDocs: getExtensibleParents(type))
+            {
+                extensibleDocs.addExtension(name, elementDocs);
+            }
         }
     }
 

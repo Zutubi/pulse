@@ -257,7 +257,7 @@ public class ToveFileLoader
         {
             if (property.getName().equals(propertyName))
             {
-                return new Setter(property);
+                return new Setter(property, (CompositeType) property.getType());
             }
         }
 
@@ -310,7 +310,7 @@ public class ToveFileLoader
         {
             if (property.getType().getClazz().isAssignableFrom(type.getClazz()))
             {
-                return new Setter(property);
+                return new Setter(property, type);
             }
         }
 
@@ -417,20 +417,24 @@ public class ToveFileLoader
     private class Setter extends CreatingBinder
     {
         private TypeProperty property;
+        private CompositeType type;
 
         /**
          * Creates a setter.
          *
          * @param property the property of the parent instance to set
+         * @param type     the type of the instance being set (may be a
+         *                 subtype of the property type)
          */
-        public Setter(TypeProperty property)
+        public Setter(TypeProperty property, CompositeType type)
         {
             this.property = property;
+            this.type = type;
         }
 
         public CompositeType getType()
         {
-            return (CompositeType) property.getType();
+            return type;
         }
 
         public void set(Configuration parent, Object instance) throws Exception

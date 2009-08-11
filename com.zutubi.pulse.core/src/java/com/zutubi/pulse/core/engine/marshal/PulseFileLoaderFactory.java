@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.engine.marshal;
 
 import com.zutubi.pulse.core.api.PulseRuntimeException;
+import com.zutubi.pulse.core.commands.CommandGroupConfiguration;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.LinkArtifactConfiguration;
@@ -28,6 +29,7 @@ public class PulseFileLoaderFactory
     {
         register("property", PropertyConfiguration.class);
         register("recipe", RecipeConfiguration.class);
+        register("command", CommandGroupConfiguration.class);
         register("dir-artifact", DirectoryArtifactConfiguration.class);
         register("link-artifact", LinkArtifactConfiguration.class);
         register("artifact", FileArtifactConfiguration.class);

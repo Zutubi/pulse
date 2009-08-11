@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.tove.config;
 
+import com.zutubi.pulse.core.commands.CommandGroupConfiguration;
 import com.zutubi.pulse.core.commands.api.*;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
@@ -46,6 +47,7 @@ public class CoreConfigurationRegistry implements ConfigurationRegistry
 
             registerConfigurationType(CommandConfigurationSupport.class);
             registerConfigurationType(OutputProducingCommandConfigurationSupport.class);
+            registerConfigurationType(CommandGroupConfiguration.class);
 
             registerConfigurationType(ResourcesConfiguration.class);
         }

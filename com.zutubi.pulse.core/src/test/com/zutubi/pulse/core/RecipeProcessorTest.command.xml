@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<project default-recipe="default">
+    <recipe name="default">
+        <command>
+            <noop name="nested-name"/>
+            <artifact name="file" fail-if-not-present="false" file="command.xml"/>
+        </command>
+        <command name="outer-name">
+            <noop/>
+        </command>
+    </recipe>
+</project>

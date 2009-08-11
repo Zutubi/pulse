@@ -4,6 +4,7 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.commands.CommandGroupConfiguration;
 import com.zutubi.pulse.core.commands.DefaultArtifactFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandFactory;
 import com.zutubi.pulse.core.commands.api.CommandContext;
@@ -88,6 +89,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         typeRegistry.register(DirectoryArtifactConfiguration.class);
         typeRegistry.register(LinkArtifactConfiguration.class);
         typeRegistry.register(FileArtifactConfiguration.class);
+        typeRegistry.register(CommandGroupConfiguration.class);
         typeRegistry.register(NoopCommandConfiguration.class);
         typeRegistry.register(FailureCommandConfiguration.class);
         typeRegistry.register(ExceptionCommandConfiguration.class);
@@ -99,6 +101,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         fileLoaderFactory.setTypeRegistry(typeRegistry);
         fileLoaderFactory.setObjectFactory(objectFactory);
         fileLoaderFactory.init();
+        fileLoaderFactory.register("command", CommandGroupConfiguration.class);
         fileLoaderFactory.register("noop", NoopCommandConfiguration.class);
         fileLoaderFactory.register("failure", FailureCommandConfiguration.class);
         fileLoaderFactory.register("exception", ExceptionCommandConfiguration.class);
@@ -307,6 +310,16 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         // remove directory call in the tearDown. So, we sleep briefly here to give the
         // terminated child process (?) a chance to release its resources.
         Thread.sleep(100);
+    }
+
+    public void testCommandBackwardsCompatibility() throws Exception
+    {
+        PulseExecutionContext context = makeContext(1, "default");
+        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("command"), context));
+        assertRecipeCommenced(1, "default");
+        assertCommandsCompleted(ResultState.SUCCESS, "bootstrap", "nested-name", "outer-name");
+        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertNoMoreEvents();
     }
 
     private void assertNoMoreEvents()
