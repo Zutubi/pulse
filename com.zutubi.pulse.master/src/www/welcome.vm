@@ -14,12 +14,11 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to the Pulse 2.1 <span style="color: red; font-weight: bold">EAP</span>!  Early
-        Access builds give you a chance to play with new Pulse features before they hit the street.
-        It's your best chance to give feedback on these features!
+        Welcome to the Pulse 2.1 Beta!  Beta builds give you a chance to try new Pulse features
+        before the stable release.  It's a great chance to give feedback on these features!
     </p>
     <p>
-        You can return to this page at any time by clicking on the "pulse 2" link in the top left
+        You can return to this page at any time by clicking on the "pulse 2.1" link in the top left
         corner.
     </p>
     <h1> :: getting started :: </h1>
@@ -83,8 +82,7 @@
     
     <h1> :: what's new :: </h1>
     <p>
-        Pulse 2.1 has a couple of major new features.  Be warned that these are very much a work in
-        progress.  In particular, these features are not very user friendly just yet!
+        Pulse 2.1 has several new features.  Among the most important are:
     </p>
     <p>
         <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
@@ -96,10 +94,10 @@
                 <td>
                     Pulse now boasts project dependency management, allowing you to declare
                     dependencies between your projects and deliver built artifacts between them.
-                    Future 2.1 versions will also include smart triggering for dependent projects.
-                    Dependency support is built on Apache Ivy, making it interoperable with Maven
-                    and Ivy repositories, and with projects that already use Ivy.  Pulse can act as
-                    an Ivy repository both for internal projects, and later for external ones.
+                    Smarter triggering has also been added for dependent projects.  Dependency
+                    support is built on Apache Ivy, making it interoperable with Maven and Ivy
+                    repositories, and with projects that already use Ivy.  Pulse can act as an Ivy
+                    repository both for internal projects and external ones.
                 </td>
             </tr>
             <tr>
@@ -113,7 +111,56 @@
                     ways.
                 </td>
             </tr>
+            <tr>
+                #actionHeader("personal.build.improvements" "personal build improvements" "accept" false)
+                <td>
+                    Several improvements have been made to personal builds, including:
+                    <ul class="points">
+                        <li>The ability to choose the revision for the build.</li>
+                        <li>No more forced update when requesting a personal build.</li>
+                        <li>Pluggable patch formats: including support for standard unified diffs.</li>
+                        <li>The ability to submit an existing patch file (in any supported format).</li>
+                        <li>Smarter internal patch format and application.</li>
+                    </ul>
+                    These improvements make requesting personal builds more flexible and
+                    interoperable.  For example, you can create patches with other tools and submit
+                    them directly to Pulse.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("built.in.docs" "built-in documentation" "accept" false)
+                <td>
+                    The documentation for Pulse files is now built-in to the Pulse server, so that
+                    it matches the exact version and plugin set you have installed.  Clicking the
+                    book link in the top right-hand corner of the UI opens this reference
+                    documentation.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("pluggable.commands" "pluggable commands" "accept" false)
+                <td>
+                    As part of the changes for multi-command projects, both command configuration
+                    and the command APIs were overhauled.  These changes make plugging in a command
+                    much easier than before.  As with other configurable elements, commands can now
+                    be fully documented and integrated into the UI when plugged-in.  Single command
+                    projects can use any plugged-in command with no extra effort for the plugin
+                    author.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("admin.ui.improvements" "admin ui improvements" "accept" false)
+                <td>
+                    Multiple improvements have been made to the administration user interface.  Most
+                    notable among these are:
+                    <ul class="points">
+                        <li>A reduction in nesting in the configuration tree (simplifying navigation).</li>
+                        <li>Performance improvements for large configuration sets.</li>
+                    </ul>
+                    These changes make the UI both simpler and snappier.
+                </td>
+            </tr>
         </table>
     </p>
 </body>
 </html>
+
