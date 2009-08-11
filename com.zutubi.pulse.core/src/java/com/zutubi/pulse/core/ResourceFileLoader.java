@@ -32,6 +32,7 @@ public class ResourceFileLoader
         FileLoader loader = new FileLoader();
         loader.setObjectFactory(new DefaultObjectFactory());
         loader.register("resource", Resource.class);
+        loader.register("require", SimpleResourceRequirement.class);
         loader.register("version", ResourceVersion.class);
         loader.register("property", ResourceProperty.class);
         return loader;

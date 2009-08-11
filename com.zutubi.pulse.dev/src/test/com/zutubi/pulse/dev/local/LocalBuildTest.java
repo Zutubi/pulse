@@ -1,6 +1,7 @@
 package com.zutubi.pulse.dev.local;
 
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.plugins.BasePluginSystemTestCase;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.IOAssertions;
@@ -11,6 +12,7 @@ import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.Collections;
 
 public class LocalBuildTest extends PulseTestCase
 {
@@ -59,7 +61,7 @@ public class LocalBuildTest extends PulseTestCase
     public void testProperties() throws Exception
     {
         String pulseFile = copyFile("basic");
-        builder.runBuild(baseDir, pulseFile, "properties", null, DIR_OUTPUT);
+        builder.runBuild(baseDir, pulseFile, "properties", Collections.<ResourceRequirement>emptyList(), null, DIR_OUTPUT);
         compareOutput("properties");
     }
 
@@ -68,7 +70,7 @@ public class LocalBuildTest extends PulseTestCase
         File baseDir = new File("/no/such/dir");
         try
         {
-            builder.runBuild(baseDir, "pulse.xml", "my-default", null, DIR_OUTPUT);
+            builder.runBuild(baseDir, "pulse.xml", "my-default", Collections.<ResourceRequirement>emptyList(), null, DIR_OUTPUT);
             fail("Should not complete with invalid base directory");
         }
         catch (PulseException e)
@@ -81,7 +83,7 @@ public class LocalBuildTest extends PulseTestCase
     {
         try
         {
-            builder.runBuild(baseDir, "no-such-pulse.xml", "my-default", null, DIR_OUTPUT);
+            builder.runBuild(baseDir, "no-such-pulse.xml", "my-default", Collections.<ResourceRequirement>emptyList(), null, DIR_OUTPUT);
             fail("Should not complete with invalid pulse file");
         }
         catch (PulseException e)
@@ -95,7 +97,7 @@ public class LocalBuildTest extends PulseTestCase
         String pulseFile = copyFile("resourceload");
         String resourceFile = copyInputToDirectory("resources", "xml", tmpDir).getAbsolutePath();
 
-        builder.runBuild(baseDir, pulseFile, null, resourceFile, DIR_OUTPUT);
+        builder.runBuild(baseDir, pulseFile, null, Collections.<ResourceRequirement>emptyList(), resourceFile, DIR_OUTPUT);
         compareOutput("resourceload");
     }
 
@@ -104,7 +106,7 @@ public class LocalBuildTest extends PulseTestCase
         String pulseFile = copyFile("defaultresource");
         String resourceFile = new File(getInputURL("resources", "xml").toURI()).getAbsolutePath();
 
-        builder.runBuild(baseDir, pulseFile, null, resourceFile, DIR_OUTPUT);
+        builder.runBuild(baseDir, pulseFile, null, Collections.<ResourceRequirement>emptyList(), resourceFile, DIR_OUTPUT);
         compareOutput("defaultresource");
     }
 
@@ -130,14 +132,14 @@ public class LocalBuildTest extends PulseTestCase
         File toFile = new File(baseDir, "test-report.txt");
         IOUtils.copyFile(testFile, toFile);
 
-        builder.runBuild(baseDir, pulseFile, null, null, DIR_OUTPUT);
+        builder.runBuild(baseDir, pulseFile, null, Collections.<ResourceRequirement>emptyList(), null, DIR_OUTPUT);
         compareOutput(name);
     }
 
     private void simpleCase(String name) throws IOException, PulseException, URISyntaxException
     {
         String pulseFile = copyFile(name);
-        builder.runBuild(baseDir, pulseFile, "my-default", null, DIR_OUTPUT);
+        builder.runBuild(baseDir, pulseFile, "my-default", Collections.<ResourceRequirement>emptyList(), null, DIR_OUTPUT);
         compareOutput(name);
     }
 

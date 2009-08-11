@@ -82,4 +82,16 @@ public class FileResourceRepositoryTest extends PulseTestCase
         assertNotNull(resource.getVersion("aVersion"));
         assertNotNull(resource.getVersion("bVersion"));
     }
+
+    public void testRequirement() throws Exception
+    {
+        repo = ResourceFileLoader.load(getInputFile("xml"));
+        List<SimpleResourceRequirement> reqs = repo.getRequirements();
+        assertNotNull(reqs);
+        assertEquals(1, reqs.size());
+
+        SimpleResourceRequirement req = reqs.get(0);
+        assertEquals("foo", req.getName());
+        assertEquals("bar", req.getVersion());
+    }
 }

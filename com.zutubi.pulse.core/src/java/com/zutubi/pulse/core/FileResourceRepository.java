@@ -21,6 +21,7 @@ public class FileResourceRepository implements ResourceRepository
     private static final Logger LOG = Logger.getLogger(FileResourceRepository.class);
 
     private Map<String, Resource> resources = new TreeMap<String, Resource>();
+    private List<SimpleResourceRequirement> requirements = new LinkedList<SimpleResourceRequirement>();
 
     private File resourceDef;
 
@@ -31,6 +32,11 @@ public class FileResourceRepository implements ResourceRepository
     public void addResource(Resource r)
     {
         resources.put(r.getName(), r);
+    }
+
+    public void add(SimpleResourceRequirement r)
+    {
+        requirements.add(r);
     }
 
     public boolean hasResource(ResourceRequirement requirement)
@@ -60,6 +66,11 @@ public class FileResourceRepository implements ResourceRepository
     public List<String> getResourceNames()
     {
         return new LinkedList<String>(resources.keySet());
+    }
+
+    public List<SimpleResourceRequirement> getRequirements()
+    {
+        return requirements;
     }
 
     public void initialise()
