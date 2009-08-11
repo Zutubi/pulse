@@ -43,8 +43,8 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
     private static final String PROPERTY_INCLUDES = "includes";
     private static final String PROPERTY_EXCLUDES = "excludes";
     private static final String PROPERTY_FILE = "file";
-    private static final String PROPERTY_OUTPUTS = "outputs";
-    private static final String PROPERTY_POST_PROCESSORS = "postProcessors";
+    private static final String PROPERTY_OLD_POST_PROCESSORS = "postprocessors";
+    private static final String PROPERTY_NEW_POST_PROCESSORS = "postProcessors";
 
     private static final String SYMBOLIC_NAME_RECIPE = "zutubi.recipeConfig";
     private static final String SYMBOLIC_NAME_MULTI_RECIPE_TYPE = "zutubi.multiRecipeTypeConfig";
@@ -211,7 +211,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
     private void mapArtifacts(Record oldTypeRecord, MutableRecord newCommandRecord, Map<String, String> postProcessorMappings, ScopeHierarchy projectHierarchy)
     {
         Record oldArtifacts = (Record) oldTypeRecord.get(PROPERTY_ARTIFACTS);
-        MutableRecord newOutputs = new MutableRecordImpl();
+        MutableRecord newArtifacts = new MutableRecordImpl();
         for (Object o: oldArtifacts.values())
         {
             Record oldArtifact = (Record) o;
@@ -245,15 +245,15 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
                 copyValueIfPresent(oldArtifact, PROPERTY_FILE, newArtifact);
             }
 
-            newOutputs.put(name, newArtifact);
+            newArtifacts.put(name, newArtifact);
         }
         
-        newCommandRecord.put(PROPERTY_OUTPUTS, newOutputs);
+        newCommandRecord.put(PROPERTY_ARTIFACTS, newArtifacts);
     }
 
     private void mapPostProcessors(Record oldRecord, MutableRecord newRecord, Map<String, String> postProcessorMappings, ScopeHierarchy projectHierarchy)
     {
-        String[] oldPostProcessors = (String[]) oldRecord.get(PROPERTY_POST_PROCESSORS);
+        String[] oldPostProcessors = (String[]) oldRecord.get(PROPERTY_OLD_POST_PROCESSORS);
         if (oldPostProcessors != null)
         {
             List<String> newPostProcessors = new LinkedList<String>();
@@ -267,7 +267,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
                 }
             }
 
-            newRecord.put(PROPERTY_POST_PROCESSORS, newPostProcessors.toArray(new String[newPostProcessors.size()]));
+            newRecord.put(PROPERTY_NEW_POST_PROCESSORS, newPostProcessors.toArray(new String[newPostProcessors.size()]));
         }
     }
 
@@ -293,7 +293,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
 
     private String getPostProcessorPath(String projectName, String processorName)
     {
-        return SCOPE_PROJECTS + "/" + projectName + "/" + PROPERTY_POST_PROCESSORS + "/" + processorName;
+        return SCOPE_PROJECTS + "/" + projectName + "/" + PROPERTY_NEW_POST_PROCESSORS + "/" + processorName;
     }
 
     private Object copyValueIfPresent(Record from, String key, MutableRecord to)

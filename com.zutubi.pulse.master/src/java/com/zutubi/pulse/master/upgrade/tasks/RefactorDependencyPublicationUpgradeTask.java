@@ -1,10 +1,12 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.master.util.monitor.TaskException;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Upgrade task that refactors the dependency publication, from being explicitly
@@ -22,17 +24,25 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
 
     public void execute() throws TaskException
     {
-        RemoveBuildStagePublications removeBuildStagePublications = new RemoveBuildStagePublications();
-        removeBuildStagePublications.setRecordManager(recordManager);
-        removeBuildStagePublications.execute();
+        deleteAll("projects/*/stages/*/publications");
+        deleteAll("projects/*/dependencies/publications");
 
-        RemoveProjectDependenciesPublications removeProjectDependenciesPublications = new RemoveProjectDependenciesPublications();
-        removeProjectDependenciesPublications.setRecordManager(recordManager);
-        removeProjectDependenciesPublications.execute();
+        RemoveProjectDependenciesPublicationPattern removeProjectDependenciesPublicationPattern = new RemoveProjectDependenciesPublicationPattern();
+        removeProjectDependenciesPublicationPattern.setRecordManager(recordManager);
+        removeProjectDependenciesPublicationPattern.execute();
 
         AddPublishToFileSystemArtifactConfiguration addPublishToFileSystemArtifactConfiguration = new AddPublishToFileSystemArtifactConfiguration();
         addPublishToFileSystemArtifactConfiguration.setRecordManager(recordManager);
         addPublishToFileSystemArtifactConfiguration.execute();
+    }
+
+    private void deleteAll(String pathPattern)
+    {
+        Map<String,Record> records = recordManager.selectAll(pathPattern);
+        for (String path: records.keySet())
+        {
+            recordManager.delete(path);
+        }
     }
 
     public void setRecordManager(RecordManager recordManager)
@@ -40,25 +50,7 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
         this.recordManager = recordManager;
     }
 
-    private class RemoveBuildStagePublications extends AbstractRecordPropertiesUpgradeTask
-    {
-        protected RecordLocator getRecordLocator()
-        {
-            return RecordLocators.newPathPattern("projects/*/stages/*");
-        }
-
-        protected List<RecordUpgrader> getRecordUpgraders()
-        {
-            return Arrays.asList(RecordUpgraders.newDeleteProperty("publications"));
-        }
-
-        public boolean haltOnFailure()
-        {
-            return false;
-        }
-    }
-
-    private class RemoveProjectDependenciesPublications extends AbstractRecordPropertiesUpgradeTask
+    private class RemoveProjectDependenciesPublicationPattern extends AbstractRecordPropertiesUpgradeTask
     {
         protected RecordLocator getRecordLocator()
         {
@@ -67,8 +59,7 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
 
         protected List<RecordUpgrader> getRecordUpgraders()
         {
-            return Arrays.asList(RecordUpgraders.newDeleteProperty("publications"),
-                    RecordUpgraders.newDeleteProperty("publicationPattern"));
+            return Arrays.asList(RecordUpgraders.newDeleteProperty("publicationPattern"));
         }
 
         public boolean haltOnFailure()
@@ -89,7 +80,7 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
 
         protected List<RecordUpgrader> getRecordUpgraders()
         {
-            return Arrays.asList(RecordUpgraders.newAddProperty("publish", false),
+            return Arrays.asList(RecordUpgraders.newAddProperty("publish", "false"),
                     RecordUpgraders.newAddProperty("artifactPattern", "(.+)\\.(.+)"));
         }
 
