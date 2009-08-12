@@ -35,13 +35,24 @@ public class AsynchronousDelegatingListener implements EventListener
         // a separate thread. The executor will queue the event handling until the
         // thread is available. See Executors.newSingleThreadExecutor for full
         // sematic definition.
-        executor.execute(new Runnable()
+/*
+        if (!executor.isShutdown())
         {
-            public void run()
+*/
+            executor.execute(new Runnable()
             {
-                delegate.handleEvent(event);
-            }
-        });
+                public void run()
+                {
+                    delegate.handleEvent(event);
+                }
+            });
+/*
+        }
+        else
+        {
+            System.out.println("blah.." + event);
+        }
+*/
     }
 
     public Class[] getHandledEvents()

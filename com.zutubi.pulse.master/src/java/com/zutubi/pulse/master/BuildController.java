@@ -67,7 +67,7 @@ import java.util.concurrent.ThreadFactory;
  * The BuildController is responsible for executing and coordinating a single
  * build request.
  */
-public class BuildController implements EventListener
+public class BuildController implements EventListener, BuildHandler
 {
     private static final Logger LOG = Logger.getLogger(BuildController.class);
 

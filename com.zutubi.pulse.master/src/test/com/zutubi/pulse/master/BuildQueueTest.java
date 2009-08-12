@@ -4,9 +4,6 @@ import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,22 +24,10 @@ public class BuildQueueTest extends BuildQueueTestCase
         project1 = createProject("project1");
         project2 = createProject("project2");
 
-        doReturn(project1).when(projectManager).getProject(eq(project1.getId()), anyBoolean());
-        doReturn(project2).when(projectManager).getProject(eq(project2.getId()), anyBoolean());
-
         queue = new BuildQueue();
         queue.setObjectFactory(objectFactory);
 
         objectFactory.initProperties(this);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        queue = null;
-        project1 = null;
-        project2 = null;
-
-        super.tearDown();
     }
 
     public void testSimpleQueue()

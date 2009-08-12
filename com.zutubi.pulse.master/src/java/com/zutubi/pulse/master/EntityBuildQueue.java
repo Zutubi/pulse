@@ -5,13 +5,11 @@ import com.zutubi.events.PublishFlag;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Iterator;
@@ -53,8 +51,7 @@ public class EntityBuildQueue
     private List<AbstractBuildRequestEvent> queuedBuilds = new LinkedList<AbstractBuildRequestEvent>();
     private volatile boolean stopped = false;
 
-    private ObjectFactory objectFactory;
-    private MasterConfigurationManager configurationManager;
+    private BuildHandlerFactory buildHandlerFactory;
     private AccessManager accessManager;
     private EventManager eventManager;
 
@@ -110,7 +107,7 @@ public class EntityBuildQueue
         Iterator<ActiveBuild> it = activeBuilds.iterator();
         while (it.hasNext())
         {
-            if (it.next().getController().getBuildId() == id)
+            if (it.next().getHandler().getBuildId() == id)
             {
                 it.remove();
                 found = true;
@@ -179,7 +176,7 @@ public class EntityBuildQueue
                 try
                 {
                     BuildRevision buildRevision = event.getRevision();
-                    if (activeBuild.getController().updateRevisionIfNotFixed(buildRevision.getRevision()))
+                    if (activeBuild.getHandler().updateRevisionIfNotFixed(buildRevision.getRevision()))
                     {
                         return true;
                     }
@@ -219,14 +216,10 @@ public class EntityBuildQueue
             return;
         }
 
-        BuildController controller = objectFactory.buildBean(BuildController.class,
-                                                             new Class[] { AbstractBuildRequestEvent.class },
-                                                             new Object[] { event });
-        DefaultRecipeResultCollector collector = new DefaultRecipeResultCollector(configurationManager);
-        collector.setProjectConfig(event.getProjectConfig());
-        controller.setCollector(collector);
-        controller.run();
-        activeBuilds.add(0, new ActiveBuild(event, controller));
+        BuildHandler handler = buildHandlerFactory.createHandler(event);
+        handler.run();
+
+        activeBuilds.add(0, new ActiveBuild(event, handler));
 
         // Defer this as it must come after a build completed event that
         // we may be handling.
@@ -282,14 +275,9 @@ public class EntityBuildQueue
         stopped = true;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
+    public void setBuildHandlerFactory(BuildHandlerFactory buildHandlerFactory)
     {
-        this.objectFactory = objectFactory;
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
+        this.buildHandlerFactory = buildHandlerFactory;
     }
 
     public void setAccessManager(AccessManager accessManager)
@@ -309,12 +297,12 @@ public class EntityBuildQueue
     public static class ActiveBuild
     {
         private AbstractBuildRequestEvent event;
-        private BuildController controller;
+        private BuildHandler handler;
 
-        public ActiveBuild(AbstractBuildRequestEvent event, BuildController controller)
+        public ActiveBuild(AbstractBuildRequestEvent event, BuildHandler handler)
         {
             this.event = event;
-            this.controller = controller;
+            this.handler = handler;
         }
 
         public AbstractBuildRequestEvent getEvent()
@@ -322,9 +310,9 @@ public class EntityBuildQueue
             return event;
         }
 
-        public BuildController getController()
+        public BuildHandler getHandler()
         {
-            return controller;
+            return handler;
         }
     }
 }

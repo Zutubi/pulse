@@ -8,25 +8,18 @@ import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.agent.MasterLocationProvider;
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.security.PulseThreadFactory;
-import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
-import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.io.File;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ThreadFactory;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -35,49 +28,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class BuildQueueTestCase extends PulseTestCase
 {
-    protected MasterConfigurationManager configurationManager;
     protected EventManager eventManager;
-    protected ProjectManager projectManager;
-    protected BuildManager buildManager;
-    protected ThreadFactory threadFactory;
     protected WiringObjectFactory objectFactory;
-    protected MasterLocationProvider masterLocationProvider;
-    protected BuildHookManager buildHookManager;
-    protected TestManager testManager;
-    protected File tempDir;
     protected AtomicInteger nextId = new AtomicInteger(1);
     protected AccessManager accessManager;
-    protected RepositoryAuthenticationProvider repositoryAuthenticationProvider;
+    protected BuildHandlerFactory buildHandlerFactory;
+
+    protected Map<AbstractBuildRequestEvent, BuildHandler> handlers = new HashMap<AbstractBuildRequestEvent, BuildHandler>();
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        configurationManager = mock(MasterConfigurationManager.class);
-        doReturn(mock(MasterUserPaths.class)).when(configurationManager).getUserPaths();
-        tempDir = createTempDirectory();
-        doReturn(tempDir).when(configurationManager).getDataDirectory();
-
-        projectManager = mock(ProjectManager.class);
-
-        masterLocationProvider = mock(MasterLocationProvider.class);
-        doReturn("mock location").when(masterLocationProvider).getMasterLocation();
-        doReturn("mock url").when(masterLocationProvider).getMasterUrl();
-
-        buildHookManager = mock(BuildHookManager.class);
         eventManager = new DefaultEventManager();
-        buildManager = mock(BuildManager.class);
-        threadFactory = new PulseThreadFactory();
         objectFactory = new WiringObjectFactory();
-        testManager = mock(TestManager.class);
+        buildHandlerFactory = mock(BuildHandlerFactory.class);
         accessManager = mock(AccessManager.class);
-        repositoryAuthenticationProvider = mock(RepositoryAuthenticationProvider.class);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        FileSystemUtils.rmdir(tempDir);
-        super.tearDown();
     }
 
     protected void assertActive(List<EntityBuildQueue.ActiveBuild> activeSnapshot, AbstractBuildRequestEvent... events)
@@ -137,7 +103,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         TriggerOptions options = new TriggerOptions(null, source);
         options.setStatus(STATUS_INTEGRATION);
         options.setReplaceable(replaceable);
-        return new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), options)
+        AbstractBuildRequestEvent request = new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), options)
         {
             public NamedEntity getOwner()
             {
@@ -157,5 +123,14 @@ public abstract class BuildQueueTestCase extends PulseTestCase
                 return buildResult;
             }
         };
+
+        // By default, the build handler that is used by the BuildQueue to process the build request does nothing.
+        BuildHandler handler = mock(BuildHandler.class);
+        doReturn(handler).when(buildHandlerFactory).createHandler(request);
+        doReturn(buildId).when(handler).getBuildId();
+
+        handlers.put(request, handler);
+        
+        return request;
     }
 }

@@ -138,7 +138,7 @@
  <!-- END OF MACRO SECTION -->
 
 
- <!-- START OF STANDARD CAVALIER X86 BUILD SECTION -->
+ <!-- START OF STANDARD CAVALIER X86 SINGLE_BUILD SECTION -->
 
  <recipe name="cavalier-x86-shared-release">
  <property name="device" value="cavalierx86"/>
@@ -179,7 +179,7 @@
  <macro-ref macro="${unit-test}"/>
  </recipe>
 
- <!-- END OF STANDARD CAVALIER X86 BUILD SECTION -->
+ <!-- END OF STANDARD CAVALIER X86 SINGLE_BUILD SECTION -->
 
 
  <!-- START OF STANDARD CAVALIER X86 PACKAGE SECTION -->
@@ -227,7 +227,7 @@
 
 
 
- <!-- START OF STANDARD CAVALIER ARM BUILD SECTION -->
+ <!-- START OF STANDARD CAVALIER ARM SINGLE_BUILD SECTION -->
 
  <recipe name="cavalier-arm-shared-release">
  <property name="device" value="cavalierarm"/>
@@ -265,7 +265,7 @@
  <macro-ref macro="${make}"/>
  </recipe>
 
- <!-- END OF STANDARD CAVALIER ARM BUILD SECTION -->
+ <!-- END OF STANDARD CAVALIER ARM SINGLE_BUILD SECTION -->
 
 
  <!-- START OF STANDARD CAVALIER ARM PACKAGE SECTION -->
@@ -309,7 +309,7 @@
  <!-- END OF STANDARD CAVALIER ARM PACKAGE SECTION -->
 
 
- <!-- START OF STANDARD TOOLS X86 STATIC BUILD SECTION -->
+ <!-- START OF STANDARD TOOLS X86 STATIC SINGLE_BUILD SECTION -->
 
  <recipe name="tools-x86-static-release">
  <property name="device" value="toolsx86"/>
@@ -330,7 +330,7 @@
  <macro-ref macro="${make}"/>
  </recipe>
 
- <!-- END OF STANDARD TOOLS X86 STATIC BUILD SECTION -->
+ <!-- END OF STANDARD TOOLS X86 STATIC SINGLE_BUILD SECTION -->
 
 
  <!-- START OF STANDARD TOOLS X86 STATIC PACKAGE SECTION -->
@@ -357,7 +357,7 @@
  <!-- END OF STANDARD TOOLS X86 STATIC PACKAGE SECTION -->
 
 
- <!-- START OF COVERITY BUILD SECTION -->
+ <!-- START OF COVERITY SINGLE_BUILD SECTION -->
 
  <recipe name="coverity-cavalier-x86-shared-release">
  <property name="device" value="cavalierx86"/>
@@ -386,10 +386,10 @@
  <macro-ref macro="${coverity}"/>
  </recipe>
 
- <!-- END OF COVERITY BUILD SECTION -->
+ <!-- END OF COVERITY SINGLE_BUILD SECTION -->
 
 
- <!-- START OF QE BUILD SECTION -->
+ <!-- START OF QE SINGLE_BUILD SECTION -->
 
  <recipe name="qe-cavalier-x86-shared-release-package">
  <property name="device" value="cavalierx86"/>
@@ -454,9 +454,9 @@
  <macro-ref macro="${qe.copy}"/>
  </recipe>
 
- <!-- END OF QE BUILD SECTION -->
+ <!-- END OF QE SINGLE_BUILD SECTION -->
 
- <!-- START OF PRODUCTION BUILD SECTION -->
+ <!-- START OF PRODUCTION SINGLE_BUILD SECTION -->
 
  <recipe name="production-cavalier-x86-shared-release-package">
  <property name="project.home" value="${base.dir}/${production.release}"/>
@@ -527,7 +527,7 @@
  <macro-ref macro="${qe.copy}"/>
  </recipe>
 
- <!-- END OF PRODUCTION BUILD SECTION -->
+ <!-- END OF PRODUCTION SINGLE_BUILD SECTION -->
 
  <!-- START OF DOXYGEN SECTION -->
 
