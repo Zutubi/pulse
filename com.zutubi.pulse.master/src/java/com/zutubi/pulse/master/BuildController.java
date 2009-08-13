@@ -53,10 +53,7 @@ import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.util.url.CredentialsStore;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
+import org.quartz.*;
 
 import java.io.File;
 import java.net.URL;
@@ -71,6 +68,8 @@ public class BuildController implements EventListener, BuildHandler
 {
     private static final Logger LOG = Logger.getLogger(BuildController.class);
 
+    public static final String TIMEOUT_JOB_NAME = "build";
+    public static final String TIMEOUT_JOB_GROUP = "timeout";
     private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
 
     private AbstractBuildRequestEvent request;
@@ -120,6 +119,21 @@ public class BuildController implements EventListener, BuildHandler
     {
         project = projectManager.getProject(projectConfig.getProjectId(), false);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
+
+        try
+        {
+            JobDetail detail = quartzScheduler.getJobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP);
+            if (detail ==  null)
+            {
+                detail = new JobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP, TimeoutRecipeJob.class);
+                detail.setDurability(true); // will stay around after the trigger has gone.
+                quartzScheduler.addJob(detail, true);
+            }
+        }
+        catch (SchedulerException e)
+        {
+            LOG.severe("Unable to setup build timeout job: " + e.getMessage(), e);
+        }
 
         createBuildTree();
 
@@ -544,7 +558,7 @@ public class BuildController implements EventListener, BuildHandler
     {
         long id = event.getBuildId();
 
-        if (id == buildResult.getId() || id == -1)
+        if (id == buildResult.getId() || id == BuildTerminationRequestEvent.ALL_BUILDS)
         {
             // Tell every running recipe to stop, and mark the build terminating
             // (so it will go into the error state on completion).
@@ -784,8 +798,8 @@ public class BuildController implements EventListener, BuildHandler
         Date time = new Date(System.currentTimeMillis() + projectConfig.getOptions().getTimeout() * Constants.MINUTE);
 
         Trigger timeoutTrigger = new SimpleTrigger(name, TIMEOUT_TRIGGER_GROUP, time);
-        timeoutTrigger.setJobName(FatController.TIMEOUT_JOB_NAME);
-        timeoutTrigger.setJobGroup(FatController.TIMEOUT_JOB_GROUP);
+        timeoutTrigger.setJobName(TIMEOUT_JOB_NAME);
+        timeoutTrigger.setJobGroup(TIMEOUT_JOB_GROUP);
         timeoutTrigger.getJobDataMap().put(TimeoutRecipeJob.PARAM_BUILD_ID, buildResult.getId());
         timeoutTrigger.getJobDataMap().put(TimeoutRecipeJob.PARAM_RECIPE_ID, recipeId);
 

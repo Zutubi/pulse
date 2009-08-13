@@ -567,7 +567,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     }
 
     /**
-     * Retrieves the project's current state.  Note is anything is acted upon
+     * Retrieves the project's current state.  Note if anything is acted upon
      * based on this state it should be done holding the state lock exposed by
      * the project manager.
      *

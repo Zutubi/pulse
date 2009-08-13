@@ -6,28 +6,25 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
+import static com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent.ALL_BUILDS;
 import com.zutubi.pulse.master.license.License;
 import com.zutubi.pulse.master.license.LicenseHolder;
-import com.zutubi.pulse.master.license.events.LicenseEvent;
 import com.zutubi.pulse.master.license.events.LicenseExpiredEvent;
 import com.zutubi.pulse.master.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Condition;
@@ -41,21 +38,16 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class FatController implements EventListener, Stoppable
 {
-    public static final String TIMEOUT_JOB_NAME = "build";
-    public static final String TIMEOUT_JOB_GROUP = "timeout";
-
     private static final Logger LOG = Logger.getLogger(FatController.class);
 
     private EventManager eventManager;
     private AsynchronousDelegatingListener asyncListener;
+    private ControllerStateListener controllerStateListener;
 
     private Lock lock = new ReentrantLock();
     private Condition stoppedCondition = lock.newCondition();
-    private BuildQueue buildQueue = new BuildQueue();
-    private Scheduler quartzScheduler;
+    private BuildQueue buildQueue ;
     private ProjectManager projectManager;
-    private AgentManager agentManager;
-    private UserManager userManager;
     private ThreadFactory threadFactory;
     private AccessManager accessManager;
 
@@ -70,23 +62,17 @@ public class FatController implements EventListener, Stoppable
     {
     }
 
-    public void init() throws SchedulerException
+    public void init()
     {
+        buildQueue = new BuildQueue();
         buildQueue.setObjectFactory(objectFactory);
+
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
         eventManager.register(asyncListener);
 
-        JobDetail detail = new JobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP, TimeoutRecipeJob.class);
-        detail.setDurability(true); // will stay around after the trigger has gone.
-        quartzScheduler.addJob(detail, true);
-    }
-
-    private boolean licensedToBuild()
-    {
-        // First check we can run (handles eval expiry and illegal upgrades
-        // for commercial license) and then ensure we are within our limits.
-        License license = LicenseHolder.getLicense();
-        return license.canRunVersion(Version.getVersion()) && !license.isExceeded(projectManager.getProjectCount(), agentManager.getAgentCount(), userManager.getUserCount());
+        controllerStateListener = objectFactory.buildBean(ControllerStateListener.class);
+        controllerStateListener.setController(this);
+        eventManager.register(controllerStateListener);
     }
 
     /**
@@ -142,7 +128,7 @@ public class FatController implements EventListener, Stoppable
             if (force)
             {
                 // Notify controllers to stop forcefully
-                eventManager.publish(new BuildTerminationRequestEvent(this, -1, "due to server shutdown"));
+                eventManager.publish(new BuildTerminationRequestEvent(this, ALL_BUILDS, "due to server shutdown"));
             }
             else
             {
@@ -169,6 +155,7 @@ public class FatController implements EventListener, Stoppable
 
         // Now stop handling events
         eventManager.unregister(asyncListener);
+        eventManager.unregister(controllerStateListener);
         asyncListener.stop(force);
     }
 
@@ -181,35 +168,6 @@ public class FatController implements EventListener, Stoppable
         else if (event instanceof BuildCompletedEvent)
         {
             handleBuildCompleted((BuildCompletedEvent) event);
-        }
-        else if (event instanceof LicenseEvent)
-        {
-            handleLicenseEvent();
-        }
-        else if (event instanceof SystemStartedEvent)
-        {
-            // check license: enable the fat controller iff the license is valid.
-            if (licensedToBuild())
-            {
-                enable();
-            }
-            else
-            {
-                disable();
-            }
-        }
-    }
-
-    private void handleLicenseEvent()
-    {
-        // the type or detail of the license event does not matter at this stage.
-        if (licensedToBuild())
-        {
-            enable();
-        }
-        else
-        {
-            disable();
         }
     }
 
@@ -308,10 +266,7 @@ public class FatController implements EventListener, Stoppable
     public Class[] getHandledEvents()
     {
         return new Class[]{AbstractBuildRequestEvent.class,
-                BuildCompletedEvent.class,
-                LicenseExpiredEvent.class,
-                LicenseUpdateEvent.class,
-                SystemStartedEvent.class
+                BuildCompletedEvent.class
         };
     }
 
@@ -359,29 +314,14 @@ public class FatController implements EventListener, Stoppable
         this.eventManager = eventManager;
     }
 
-    public void setQuartzScheduler(Scheduler quartzScheduler)
-    {
-        this.quartzScheduler = quartzScheduler;
-    }
-
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
     }
 
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
-
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
-    }
-
-    public void setAgentManager(AgentManager agentManager)
-    {
-        this.agentManager = agentManager;
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)
@@ -392,5 +332,75 @@ public class FatController implements EventListener, Stoppable
     public void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
+    }
+
+    /**
+     * This listener is responsible for managing the enabled/disabled state of the controller
+     * based on the installed license.
+     */
+    public static class ControllerStateListener implements EventListener
+    {
+        private ProjectManager projectManager;
+        private UserManager userManager;
+        private AgentManager agentManager;
+        private FatController controller;
+
+        public void handleEvent(Event event)
+        {
+            if (event instanceof SystemStartedEvent)
+            {
+                // Ensure that we are correctly wired.  This is necessary because this controller does not
+                // appear in a spring file, and so is built by the object factory before its dependencies
+                // are available. Moving this outside the FatController will resolve this.
+                SpringComponentContext.autowire(this);
+            }
+            checkLicense();
+        }
+
+        private void checkLicense()
+        {
+            // the type or detail of the event does not matter at this stage.
+            if (licensedToBuild())
+            {
+                controller.enable();
+            }
+            else
+            {
+                controller.disable();
+            }
+        }
+
+        private boolean licensedToBuild()
+        {
+            // First check we can run (handles eval expiry and illegal upgrades
+            // for commercial license) and then ensure we are within our limits.
+            License license = LicenseHolder.getLicense();
+            return license.canRunVersion(Version.getVersion()) && !license.isExceeded(projectManager.getProjectCount(), agentManager.getAgentCount(), userManager.getUserCount());
+        }
+
+        public Class[] getHandledEvents()
+        {
+            return new Class[]{LicenseExpiredEvent.class, LicenseUpdateEvent.class, SystemStartedEvent.class};
+        }
+
+        public void setProjectManager(ProjectManager projectManager)
+        {
+            this.projectManager = projectManager;
+        }
+
+        public void setUserManager(UserManager userManager)
+        {
+            this.userManager = userManager;
+        }
+
+        public void setAgentManager(AgentManager agentManager)
+        {
+            this.agentManager = agentManager;
+        }
+
+        public void setController(FatController controller)
+        {
+            this.controller = controller;
+        }
     }
 }

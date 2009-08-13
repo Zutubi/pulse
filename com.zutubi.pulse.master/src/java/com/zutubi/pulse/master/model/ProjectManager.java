@@ -112,7 +112,7 @@ public interface ProjectManager extends EntityManager<Project>
      * so.  In cases where the caller needs to inspect the state first or
      * perform other operations atomically with the transition, however, the
      * caller should increase the scope of the locking as required using
-     * {@link #lockProjectStates(long)}.  State locks are reentrant to allow
+     * {@link #lockProjectStates(long...)}.  State locks are reentrant to allow
      * this pattern.
      * <p/>
      * If the project transitions into a state which requires further action,

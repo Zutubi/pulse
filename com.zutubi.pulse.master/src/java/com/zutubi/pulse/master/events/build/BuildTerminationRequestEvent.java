@@ -10,6 +10,8 @@ import java.util.Locale;
  */
 public class BuildTerminationRequestEvent extends Event
 {
+    public static final int ALL_BUILDS = -1;
+
     /**
      * ID of the build to terminate, or -1 to terminate all builds.
      */
