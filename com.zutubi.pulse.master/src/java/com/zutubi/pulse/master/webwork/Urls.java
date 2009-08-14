@@ -178,6 +178,11 @@ public class Urls
         return project(project) + "history/";
     }
 
+    public String projectDependencies(Object project)
+    {
+        return project(project) + "dependencies/";
+    }
+
     public String projectLog(Object project)
     {
         return project(project) + "log/";

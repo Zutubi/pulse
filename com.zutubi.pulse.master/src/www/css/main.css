@@ -141,6 +141,7 @@ pre {
 
 #center {
     clear: both;
+    padding-bottom: 16px
 }
 
     /*------------------------------
@@ -1608,4 +1609,41 @@ div.reference {
     border: 1px dashed #ccc;
     margin: 20px 30px 20px 30px;
     padding: 4px;
+}
+
+/*
+ * Grid-based diagramming
+ */
+
+table.grid
+{
+    /*width: 98%;*/
+}
+
+table.grid td
+{
+    padding: 2px 5px 2px 5px;
+    text-align: center;
+    line-height: 1.7em;
+    white-space: nowrap;
+}
+
+table.grid td.gbox
+{
+    border: solid 1px #888;
+}
+
+table.grid td.gbottom
+{
+    border-bottom: solid 1px #aaa;
+}
+
+table.grid td.gleft
+{
+    border-left: solid 1px #aaa;
+}
+
+table.grid td.gright
+{
+    border-right: solid 1px #aaa;
 }

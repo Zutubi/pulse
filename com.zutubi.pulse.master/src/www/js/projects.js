@@ -167,6 +167,10 @@ ZUTUBI.ConcreteProject.prototype = {
                 url: this.getProjectTabLink('history'),
                 image: 'time.gif'
             }, {
+                id: 'dependencies',
+                url: this.getProjectTabLink('dependencies'),
+                image: 'dependencies.gif'
+            }, {
                 id: 'log',
                 url: this.getProjectTabLink('log'),
                 image: 'script.gif'

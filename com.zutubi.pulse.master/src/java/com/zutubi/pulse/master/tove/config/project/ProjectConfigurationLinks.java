@@ -23,6 +23,7 @@ public class ProjectConfigurationLinks
                     new ConfigurationLink("home", urls.projectHome(name)),
                     new ConfigurationLink("reports", urls.projectReports(name)),
                     new ConfigurationLink("history", urls.projectHistory(name)),
+                    new ConfigurationLink("dependencies", urls.projectDependencies(name)),
                     new ConfigurationLink("log", urls.projectLog(name))
             );
         }

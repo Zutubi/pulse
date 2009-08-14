@@ -247,4 +247,5 @@
         </constructor-arg>
     </bean>
 
+    <bean id="projectDependencyGraphBuilder" class="com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder"/>
 </beans>

@@ -1,7 +1,8 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
-import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
 
 import static java.lang.String.valueOf;
 
@@ -72,6 +73,27 @@ public class DependenciesUIAcceptanceTest extends BaseDependenciesAcceptanceTest
         assertEquals(projectB.getName(), row2.getProject());
         assertEquals(valueOf(projectBBuildNumber), row2.getBuild());
         assertEquals("artifactB.jar", row2.getArtifact());
+    }
+
+    public void testProjectDependenciesTab() throws Exception
+    {
+        Project projectA = new Project(randomName());
+        createProject(projectA);
+
+        Project projectB = new Project(randomName());
+        projectB.addDependency(new Dependency(projectA, true));
+        createProject(projectB);
+
+        Project projectC = new Project(randomName());
+        projectC.addDependency(projectB);
+        createProject(projectC);
+
+        browser.loginAsAdmin();
+        ProjectDependenciesPage page = browser.openAndWaitFor(ProjectDependenciesPage.class, projectB.getName());
+        assertTrue(page.isUpstreamPresent(projectA.getName(), 0, 0));
+        assertTrue(page.isUpstreamPresent(projectB.getName(), 3, 0));
+        assertTrue(page.isDownstreamPresent(projectB.getName(), 0, 0));
+        assertTrue(page.isDownstreamPresent(projectC.getName(), 3, 0));
     }
 
 

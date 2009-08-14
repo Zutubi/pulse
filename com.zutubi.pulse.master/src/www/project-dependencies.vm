@@ -1,0 +1,20 @@
+#helpTag("Project+Dependencies+Tab")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>$!webwork.htmlEncode($project.name)</title>
+    <script type="text/javascript">
+        #updater("$base/ajax/projectDependenciesPanel.action?projectName=$u_projectName" "panel" $principle)
+    </script>
+</head>
+<body>
+    #projectTabs("dependencies")
+
+    #parse("/template/includes/actionerrors.vm")
+
+    <div id="panel">
+        #parse("/ajax/project-dependencies-panel.vm")
+    </div>
+</body>
+</html>

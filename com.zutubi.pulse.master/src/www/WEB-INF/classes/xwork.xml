@@ -241,9 +241,15 @@
             </result>
         </action>
 
-        <action name="currentBuild" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">
+        <action name="projectHome" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/project-home.vm</result>
+            <result name="error" type="redirect">/browse/</result>
+        </action>
+
+        <action name="projectDependencies" class="com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
+            <result name="success" type="velocity">/project-dependencies.vm</result>
             <result name="error" type="redirect">/browse/</result>
         </action>
 
@@ -418,6 +424,10 @@
 
         <action name="projectHomePanel" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">
             <result name="success" type="velocity">project-home-panel.vm</result>
+        </action>
+
+        <action name="projectDependenciesPanel" class="com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction">
+            <result name="success" type="velocity">project-dependencies-panel.vm</result>
         </action>
 
         <action name="viewBuildPanel" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">

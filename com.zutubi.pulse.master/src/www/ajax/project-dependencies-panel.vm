@@ -1,0 +1,13 @@
+<h2 id='#id("project-dependencies-$project.name")' class="section" style="margin-top: 0">#wwtext("name=upstream.heading")</h2>
+<p style="margin-bottom: 16px">
+    #wwtext("name=upstream.blurb")
+</p>
+
+#dependencyGraph("upstream" $upstream)
+
+<h2 class="section">#wwtext("name=downstream.heading")</h2>
+<p style="margin-bottom: 16px">
+    #wwtext("name=downstream.blurb")
+</p>
+
+#dependencyGraph("downstream" $downstream)

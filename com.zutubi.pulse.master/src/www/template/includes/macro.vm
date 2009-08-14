@@ -202,6 +202,7 @@
         #projectTab("home" $selected)
         #projectTab("reports" $selected)
         #projectTab("history" $selected)
+        #projectTab("dependencies" $selected)
         #projectTab("log" $selected)
     #closeTabs()
 #end
@@ -2166,4 +2167,47 @@
         #end
     </p>
     #end
+#end
+
+##
+## A graph of dependencies drawn with HTML tables.
+##
+#macro(dependencyGraph $id $graph)
+    <table class="grid" id="$id">
+        #set($y = 0)
+        #foreach($row in $graph.iterator())
+            #set($x = 0)
+            <tr>
+                ## This dummy cell at the start of each row is used to workaround
+                ## a table border bug in FireFox.
+                <td>&nbsp;</td>
+            #foreach($cell in $row)
+                #if($cell.data)
+                    #set($cellData = $cell.data)
+                    #if(!$cellData.dead)
+                    <td id="${id}-${x}-${y}" #if($cellData.rowspan > 1) rowspan="$cellData.rowspan" #end class="$cellData.classes">
+                        #if($cellData.project)
+                            #set($health = $action.getHealth($cellData.project).toString().toLowerCase())
+                            <a id='#id("${id}-${x}-${y}-${cellData.project.name}")' href="$urls.projectHome($cellData.project)">#html(${cellData.project.name})</a><br/>
+                            <img alt="health" src="${base}/images/health/${health}.gif"> ${health} <span class="understated">//</span>
+                            #if($cellData.project.state.building)
+                                <img alt="building" src="${base}/images/inprogress.gif"/>
+                            #end
+                            $cellData.project.state.toString()
+                        #else
+                            &nbsp;
+                        #end
+                    </td>
+                    #end
+                #else
+                    <td id="${id}-${x}-${y}">&nbsp;</td>
+                #end
+
+                #set($x = $x + 1)
+            #end
+            </tr>
+
+            #set($y = $y + 1)
+        #end
+    </table>
 #end

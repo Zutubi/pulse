@@ -10,11 +10,12 @@ public class BrowseProjectActionResolver extends StaticMapActionResolver
 {
     public BrowseProjectActionResolver(String project)
     {
-        super("currentBuild");
+        super("projectHome");
 
-        addMapping("home", new ParameterisedActionResolver("currentBuild"));
+        addMapping("home", new ParameterisedActionResolver("projectHome"));
         addMapping("reports", new ProjectReportsActionResolver());
         addMapping("history", new PagedActionResolver("history"));
+        addMapping("dependencies", new ParameterisedActionResolver("projectDependencies"));
         addMapping("log", new ProjectLogActionResolver());
         addMapping("builds", new ProjectBuildsActionResolver());
         addMapping("changes", new ChangelistsActionResolver());
