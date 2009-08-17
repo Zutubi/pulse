@@ -38,9 +38,9 @@ public class SimpleTreeLayoutAlgorithm<T>
         final int maxX[] = new int[]{0};
         final int maxY[] = new int[]{0};
 
-        root.depthFirstWalk(new TreeNodeOperation<Pair<T, Point>>()
+        root.depthFirstWalk(new UnaryProcedure<TreeNode<Pair<T, Point>>>()
         {
-            public void apply(TreeNode<Pair<T, Point>> node)
+            public void process(TreeNode<Pair<T, Point>> node)
             {
                 Point nodePosition = node.getData().second;
                 if (nodePosition.getX() > maxX[0])

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.master.dependency.DependencyGraphData;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -19,6 +20,8 @@ public class ProjectDependencyData
     public static final String CLASS_BOTTOM_BORDER = "gbottom";
     public static final String CLASS_LEFT_BORDER   = "gleft";
     public static final String CLASS_RIGHT_BORDER  = "gright";
+    public static final String CLASS_HIGHLIGHTED   = "ghighlighted";
+    public static final String CLASS_UNDERSTATED   = "gunderstated";
 
     private Project project;
     private int rowspan = 1;
@@ -35,14 +38,24 @@ public class ProjectDependencyData
      * diagram.  As boxes occupy two rows, the cells directly below them will
      * be marked as dead.
      *
-     * @param project project that the cell displays
+     * @param data data about the project that the cell displays
      * @return data for a box cell displaying the given project
      */
-    public static ProjectDependencyData makeBox(Project project)
+    public static ProjectDependencyData makeBox(DependencyGraphData data, boolean root)
     {
         ProjectDependencyData dd = new ProjectDependencyData();
-        dd.project = project;
+        dd.project = data.getProject();
         dd.classes.add(CLASS_BOX);
+        if (root)
+        {
+            dd.classes.add(CLASS_HIGHLIGHTED);
+        }
+
+        if (data.isSubtreeFiltered())
+        {
+            dd.classes.add(CLASS_UNDERSTATED);
+        }
+
         dd.rowspan = 2;
         return dd;
     }
@@ -148,6 +161,11 @@ public class ProjectDependencyData
     public String getClasses()
     {
         return StringUtils.join(" ", classes);
+    }
+
+    public boolean isRoot()
+    {
+        return classes.contains(CLASS_HIGHLIGHTED);
     }
 
     public boolean hasLeftBorder()

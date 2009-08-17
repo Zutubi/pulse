@@ -9,6 +9,9 @@ import com.zutubi.util.WebUtils;
  */
 public class ProjectDependenciesPage extends AbstractLogPage
 {
+    private static final String SECTION_UPSTREAM = "upstream";
+    private static final String SECTION_DOWNSTREAM = "downstream";
+
     private String projectName;
 
     public ProjectDependenciesPage(SeleniumBrowser browser, Urls urls, String projectName)
@@ -24,16 +27,31 @@ public class ProjectDependenciesPage extends AbstractLogPage
 
     public boolean isUpstreamPresent(String project, int row, int column)
     {
-        return isProjectPresent("upstream", project, row, column);
+        return isProjectPresent(SECTION_UPSTREAM, project, row, column);
+    }
+
+    public String getUpstreamId(String project, int row, int column)
+    {
+        return getDependencyId(SECTION_UPSTREAM, project, row, column);
     }
 
     public boolean isDownstreamPresent(String project, int row, int column)
     {
-        return isProjectPresent("downstream", project, row, column);
+        return isProjectPresent(SECTION_DOWNSTREAM, project, row, column);
+    }
+
+    public String getDownstreamId(String project, int row, int column)
+    {
+        return getDependencyId(SECTION_DOWNSTREAM, project, row, column);
     }
 
     private boolean isProjectPresent(String section, String project, int row, int column)
     {
-        return browser.isElementIdPresent(section + "-" + row + "-" + column + "-" + project);
+        return browser.isElementIdPresent(getDependencyId(section, project, row, column));
+    }
+
+    private String getDependencyId(String section, String project, int row, int column)
+    {
+        return section + "-" + row + "-" + column + "-" + project;
     }
 }

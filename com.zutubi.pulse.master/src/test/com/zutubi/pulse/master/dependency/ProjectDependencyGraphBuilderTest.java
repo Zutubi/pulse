@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class ProjectDependencyGraphBuilderTest extends PulseTestCase
 {
-    private long nextId = 0;
+    private long nextId = 1;
     private List<ProjectConfiguration> allConfigs = new LinkedList<ProjectConfiguration>();
     private Map<Long, Project> idToProject = new HashMap<Long, Project>();
 
@@ -77,9 +77,9 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
         eventManager.publish(new SystemStartedEvent(this));
     }
 
-    public void testUtilLibrary()
+    public void testUtilLibraryFull()
     {
-        ProjectDependencyGraph graph = builder.build(utilProject);
+        ProjectDependencyGraph graph = builder.build(utilProject, ProjectDependencyGraphBuilder.TransitiveMode.FULL);
         assertEquals(node(utilProject), graph.getUpstreamRoot());
         assertEquals(
                 node(utilProject,
@@ -97,9 +97,55 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
                 graph.getDownstreamRoot());
     }
 
-    public void testServerModule()
+    public void testUtilLibraryTrimmed()
     {
-        ProjectDependencyGraph graph = builder.build(serverProject);
+        ProjectDependencyGraph graph = builder.build(utilProject, ProjectDependencyGraphBuilder.TransitiveMode.TRIM_DUPLICATES);
+        assertEquals(node(utilProject), graph.getUpstreamRoot());
+        assertEquals(
+                node(utilProject,
+                        node(coreProject,
+                                node(devProject),
+                                node(serverProject,
+                                        node(slaveProject),
+                                        node(masterProject))),
+                        filteredNode(devProject),
+                        filteredNode(serverProject),
+                        filteredNode(slaveProject),
+                        filteredNode(masterProject)),
+                graph.getDownstreamRoot());
+    }
+
+    public void testUtilLibraryRemoved()
+    {
+        ProjectDependencyGraph graph = builder.build(utilProject, ProjectDependencyGraphBuilder.TransitiveMode.REMOVE_DUPLICATES);
+        assertEquals(node(utilProject), graph.getUpstreamRoot());
+        assertEquals(
+                node(utilProject,
+                        node(coreProject,
+                                node(devProject),
+                                node(serverProject,
+                                        node(slaveProject),
+                                        node(masterProject)))),
+                graph.getDownstreamRoot());
+    }
+
+    public void testUtilLibraryNone()
+    {
+        ProjectDependencyGraph graph = builder.build(utilProject, ProjectDependencyGraphBuilder.TransitiveMode.NONE);
+        assertEquals(node(utilProject), graph.getUpstreamRoot());
+        assertEquals(
+                node(utilProject,
+                        node(coreProject),
+                        node(devProject),
+                        node(serverProject),
+                        node(slaveProject),
+                        node(masterProject)),
+                graph.getDownstreamRoot());
+    }
+
+    public void testServerModuleFull()
+    {
+        ProjectDependencyGraph graph = builder.build(serverProject, ProjectDependencyGraphBuilder.TransitiveMode.FULL);
         assertEquals(
                 node(serverProject,
                         node(coreProject,
@@ -114,9 +160,58 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
                 graph.getDownstreamRoot());
     }
 
-    public void testMasterModule()
+    public void testServerModuleTrimmed()
     {
-        ProjectDependencyGraph graph = builder.build(masterProject);
+        ProjectDependencyGraph graph = builder.build(serverProject, ProjectDependencyGraphBuilder.TransitiveMode.TRIM_DUPLICATES);
+        assertEquals(
+                node(serverProject,
+                        node(coreProject,
+                                node(utilProject)),
+                        filteredNode(utilProject)),
+                graph.getUpstreamRoot());
+
+        assertEquals(
+                node(serverProject,
+                        node(slaveProject),
+                        node(masterProject)),
+                graph.getDownstreamRoot());
+    }
+
+    public void testServerModuleRemoved()
+    {
+        ProjectDependencyGraph graph = builder.build(serverProject, ProjectDependencyGraphBuilder.TransitiveMode.REMOVE_DUPLICATES);
+        assertEquals(
+                node(serverProject,
+                        node(coreProject,
+                                node(utilProject))),
+                graph.getUpstreamRoot());
+
+        assertEquals(
+                node(serverProject,
+                        node(slaveProject),
+                        node(masterProject)),
+                graph.getDownstreamRoot());
+    }
+
+    public void testServerModuleNone()
+    {
+        ProjectDependencyGraph graph = builder.build(serverProject, ProjectDependencyGraphBuilder.TransitiveMode.NONE);
+        assertEquals(
+                node(serverProject,
+                        node(coreProject),
+                        node(utilProject)),
+                graph.getUpstreamRoot());
+
+        assertEquals(
+                node(serverProject,
+                        node(slaveProject),
+                        node(masterProject)),
+                graph.getDownstreamRoot());
+    }
+
+    public void testMasterModuleFull()
+    {
+        ProjectDependencyGraph graph = builder.build(masterProject, ProjectDependencyGraphBuilder.TransitiveMode.FULL);
         assertEquals(
                 node(masterProject,
                         node(serverProject,
@@ -129,23 +224,63 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
         assertEquals(node(masterProject), graph.getDownstreamRoot());
     }
 
-    private void assertEquals(TreeNode<Project> expected, TreeNode<Project> got)
+    public void testMasterModuleTrimmed()
     {
-        assertSame(expected.getData(), got.getData());
+        ProjectDependencyGraph graph = builder.build(masterProject, ProjectDependencyGraphBuilder.TransitiveMode.TRIM_DUPLICATES);
+        assertEquals(
+                node(masterProject,
+                        node(serverProject,
+                                node(coreProject,
+                                        node(utilProject)),
+                                filteredNode(utilProject)),
+                        filteredNode(utilProject)),
+                graph.getUpstreamRoot());
 
-        List<TreeNode<Project>> expectedChildren = expected.getChildren();
-        List<TreeNode<Project>> gotChildren = got.getChildren();
+        assertEquals(node(masterProject), graph.getDownstreamRoot());
+    }
+
+    public void testMasterModuleRemoved()
+    {
+        ProjectDependencyGraph graph = builder.build(masterProject, ProjectDependencyGraphBuilder.TransitiveMode.REMOVE_DUPLICATES);
+        assertEquals(
+                node(masterProject,
+                        node(serverProject,
+                                node(coreProject,
+                                        node(utilProject)))),
+                graph.getUpstreamRoot());
+
+        assertEquals(node(masterProject), graph.getDownstreamRoot());
+    }
+
+    public void testMasterModuleNone()
+    {
+        ProjectDependencyGraph graph = builder.build(masterProject, ProjectDependencyGraphBuilder.TransitiveMode.NONE);
+        assertEquals(
+                node(masterProject,
+                        node(serverProject),
+                        node(utilProject)),
+                graph.getUpstreamRoot());
+
+        assertEquals(node(masterProject), graph.getDownstreamRoot());
+    }
+
+    private void assertEquals(TreeNode<DependencyGraphData> expected, TreeNode<DependencyGraphData> got)
+    {
+        assertEquals(expected.getData(), got.getData());
+
+        List<TreeNode<DependencyGraphData>> expectedChildren = expected.getChildren();
+        List<TreeNode<DependencyGraphData>> gotChildren = got.getChildren();
         assertEquals(expectedChildren.size(), gotChildren.size());
 
         // Order of children does not matter.
-        for (TreeNode<Project> expectedChild: expectedChildren)
+        for (TreeNode<DependencyGraphData> expectedChild: expectedChildren)
         {
-            final Project childProject = expectedChild.getData();
-            TreeNode<Project> gotChild = CollectionUtils.find(gotChildren, new Predicate<TreeNode<Project>>()
+            final DependencyGraphData childData = expectedChild.getData();
+            TreeNode<DependencyGraphData> gotChild = CollectionUtils.find(gotChildren, new Predicate<TreeNode<DependencyGraphData>>()
             {
-                public boolean satisfied(TreeNode<Project> node)
+                public boolean satisfied(TreeNode<DependencyGraphData> node)
                 {
-                    return node.getData() == childProject;
+                    return node.getData().equals(childData);
                 }
             });
 
@@ -154,9 +289,18 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
         }
     }
 
-    private TreeNode<Project> node(Project data, TreeNode<Project>... children)
+    private TreeNode<DependencyGraphData> node(Project project, TreeNode<DependencyGraphData>... children)
     {
-        TreeNode<Project> node = new TreeNode<Project>(data);
+        TreeNode<DependencyGraphData> node = new TreeNode<DependencyGraphData>(new DependencyGraphData(project));
+        node.addAll(asList(children));
+        return node;
+    }
+
+    private TreeNode<DependencyGraphData> filteredNode(Project project, TreeNode<DependencyGraphData>... children)
+    {
+        DependencyGraphData data = new DependencyGraphData(project);
+        data.markSubtreeFiltered();
+        TreeNode<DependencyGraphData> node = new TreeNode<DependencyGraphData>(data);
         node.addAll(asList(children));
         return node;
     }

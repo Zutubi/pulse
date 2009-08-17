@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.dependency.DependencyGraphData;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraph;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -47,33 +48,33 @@ public class ProjectDependencyGraphRendererTest extends PulseTestCase
         upstreamTest(getComplexTree());
     }
 
-    private void downstreamTest(TreeNode<Project> tree) throws IOException
+    private void downstreamTest(TreeNode<DependencyGraphData> tree) throws IOException
     {
         ProjectDependencyGraph graph = new ProjectDependencyGraph(null, tree);
         Grid<ProjectDependencyData> grid = renderer.renderDownstream(graph);
         assertEquals(IOUtils.inputStreamToString(getInput("txt")), renderToAscii(grid));
     }
 
-    private void upstreamTest(TreeNode<Project> tree) throws IOException
+    private void upstreamTest(TreeNode<DependencyGraphData> tree) throws IOException
     {
         ProjectDependencyGraph graph = new ProjectDependencyGraph(tree, null);
         Grid<ProjectDependencyData> grid = renderer.renderUpstream(graph);
         assertEquals(IOUtils.inputStreamToString(getInput("txt")), renderToAscii(grid));
     }
 
-    private TreeNode<Project> getSimpleTree()
+    private TreeNode<DependencyGraphData> getSimpleTree()
     {
         return node("a",
                 node("b"),
                 node("c"));
     }
 
-    private TreeNode<Project> getTrivialTree()
+    private TreeNode<DependencyGraphData> getTrivialTree()
     {
         return node("x");
     }
 
-    private TreeNode<Project> getComplexTree()
+    private TreeNode<DependencyGraphData> getComplexTree()
     {
         return node("x",
                         node("0",
@@ -138,6 +139,12 @@ public class ProjectDependencyGraphRendererTest extends PulseTestCase
                     {
                         art.getCell(artCenter.down()).setData('-');
                     }
+
+                    if (data.isRoot())
+                    {
+                        art.getCell(artCenter.left()).setData('!');
+                        art.getCell(artCenter.right()).setData('!');
+                    }
                 }
 
                 x++;
@@ -162,11 +169,11 @@ public class ProjectDependencyGraphRendererTest extends PulseTestCase
         return result.toString().replaceAll(" +\n", "\n");
     }
 
-    private TreeNode<Project> node(String name, TreeNode<Project>... children)
+    private TreeNode<DependencyGraphData> node(String name, TreeNode<DependencyGraphData>... children)
     {
         Project project = new Project();
         project.setConfig(new ProjectConfiguration(name));
-        TreeNode<Project> node = new TreeNode<Project>(project);
+        TreeNode<DependencyGraphData> node = new TreeNode<DependencyGraphData>(new DependencyGraphData(project));
         node.addAll(asList(children));
         return node;
     }

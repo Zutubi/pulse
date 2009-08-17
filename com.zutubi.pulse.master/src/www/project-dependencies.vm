@@ -6,12 +6,79 @@
     <title>$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript">
         #updater("$base/ajax/projectDependenciesPanel.action?projectName=$u_projectName" "panel" $principle)
+
+        Ext.onReady(function() {
+            var form = new Ext.form.FormPanel({
+                labelWidth: 200,
+                labelAlign: 'right',
+                method: 'POST',
+                border: false,
+                items: [{
+                    xtype: 'combo',
+                    name: 'mode',
+                    id: 'zfid.mode',
+                    fieldLabel: '#wwtext("name=transitive.dependencies")',
+                    editable: false,
+                    forceSelection: true,
+                    triggerAction: 'all',
+                    store: [
+                        #foreach($pair in $modes)
+                               ['$pair.first', '$pair.second'],
+                        #end
+                    ],
+                    value: '$transitiveMode',
+                    width: 230,
+                    listeners: {
+                        select: function() {
+                            form.getForm().submit({
+                                url: '$base/ajax/setDependenciesTransitiveMode.action',
+                                success: function() {
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    }
+                }]
+            });
+
+            form.render("dependencies-form");
+        });
     </script>
 </head>
 <body>
     #projectTabs("dependencies")
 
     #parse("/template/includes/actionerrors.vm")
+
+    <div id='#id("project-dependencies-$project.name")' class="config-panel">
+        <h3 class="config-header config-header-small">#wwtext("name=dependency.diagrams")</h3>
+        <table>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td class="glegend">
+                                #wwtext("name=legend"):
+                            </td>
+                            <td class="glegend">
+                                <table class="grid" style="display: inline"><tr><td class="gbox ghighlighted">#wwtext("name=legend.this")</td></tr></table>
+                            </td>
+                            <td class="glegend">
+                                <table class="grid" style="display: inline"><tr><td class="gbox">#wwtext("name=legend.normal")</td></tr></table>
+                            </td>
+                            <td class="glegend">
+                                <table class="grid" style="display: inline"><tr><td class="gunderstated">#wwtext("name=legend.trimmed")</td></tr></table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <div class="config-container" id="dependencies-form">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
 
     <div id="panel">
         #parse("/ajax/project-dependencies-panel.vm")

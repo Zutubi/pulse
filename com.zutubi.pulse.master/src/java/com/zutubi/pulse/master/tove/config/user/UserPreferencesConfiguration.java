@@ -52,6 +52,9 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     @Internal
     private String projectHistoryColumns = defaultProjectColumns();
 
+    @Internal
+    private DependencyTransitiveMode dependencyTransitiveMode = DependencyTransitiveMode.SHOW_FULL_CASCADE;
+
     private Map<String, ContactConfiguration> contacts = new HashMap<String, ContactConfiguration>();
     private Map<String, SubscriptionConfiguration> subscriptions = new HashMap<String, SubscriptionConfiguration>();
     private DashboardConfiguration dashboard = new DashboardConfiguration();
@@ -180,6 +183,16 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     public void setProjectHistoryColumns(String projectHistoryColumns)
     {
         this.projectHistoryColumns = projectHistoryColumns;
+    }
+
+    public DependencyTransitiveMode getDependencyTransitiveMode()
+    {
+        return dependencyTransitiveMode;
+    }
+
+    public void setDependencyTransitiveMode(DependencyTransitiveMode dependencyTransitiveMode)
+    {
+        this.dependencyTransitiveMode = dependencyTransitiveMode;
     }
 
     public Map<String, ContactConfiguration> getContacts()

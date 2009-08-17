@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.dependency;
 
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.TreeNode;
 
 /**
@@ -10,8 +9,8 @@ import com.zutubi.util.TreeNode;
  */
 public class ProjectDependencyGraph
 {
-    private TreeNode<Project> upstreamRoot;
-    private TreeNode<Project> downstreamRoot;
+    private TreeNode<DependencyGraphData> upstreamRoot;
+    private TreeNode<DependencyGraphData> downstreamRoot;
 
     /**
      * Create a graph holding the given trees.  The project of interest is the
@@ -22,18 +21,18 @@ public class ProjectDependencyGraph
      * @param downstreamRoot tree of projects that depend on the project of
      *                       interest
      */
-    public ProjectDependencyGraph(TreeNode<Project> upstreamRoot, TreeNode<Project> downstreamRoot)
+    public ProjectDependencyGraph(TreeNode<DependencyGraphData> upstreamRoot, TreeNode<DependencyGraphData> downstreamRoot)
     {
         this.upstreamRoot = upstreamRoot;
         this.downstreamRoot = downstreamRoot;
     }
 
-    public TreeNode<Project> getUpstreamRoot()
+    public TreeNode<DependencyGraphData> getUpstreamRoot()
     {
         return upstreamRoot;
     }
 
-    public TreeNode<Project> getDownstreamRoot()
+    public TreeNode<DependencyGraphData> getDownstreamRoot()
     {
         return downstreamRoot;
     }

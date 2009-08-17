@@ -132,9 +132,9 @@ public class SimpleTreeLayoutAlgorithmTest extends PulseTestCase
         // human eyeballs.
         Point bounds = algorithm.getBounds(layedOut);
         final Grid<String> grid = new Grid<String>(bounds.getX() + 1, bounds.getY() + 1);
-        layedOut.depthFirstWalk(new TreeNodeOperation<Pair<String, Point>>()
+        layedOut.depthFirstWalk(new UnaryProcedure<TreeNode<Pair<String, Point>>>()
         {
-            public void apply(TreeNode<Pair<String, Point>> node)
+            public void process(TreeNode<Pair<String, Point>> node)
             {
                 Pair<String, Point> nodeData = node.getData();
                 grid.getCell(nodeData.second).setData(nodeData.first);

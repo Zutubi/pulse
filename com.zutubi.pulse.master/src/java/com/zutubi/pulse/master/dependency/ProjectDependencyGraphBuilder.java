@@ -11,9 +11,7 @@ import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,6 +26,30 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class ProjectDependencyGraphBuilder implements ConfigurationEventListener
 {
+    public enum TransitiveMode
+    {
+        /**
+         * Show all transitive dependencies, including duplicates.
+         */
+        FULL,
+        /**
+         * Show transitive dependencies but trim the children of duplicate
+         * subtree roots and mark those roots as filtered.  A single occurrence
+         * of the subtree is left intact at the deepest level found.
+         */
+        TRIM_DUPLICATES,
+        /**
+         * Show transitive dependencies but completely remove duplicate
+         * subtrees.  A single occurrence of the subtree is left intact at the
+         * deepest level found.
+         */
+        REMOVE_DUPLICATES,
+        /**
+         * Show only a single level of dependencies.
+         */
+        NONE
+    }
+
     /**
      * Maps from a project to those projects that directly depend upon it, as
      * this information is only indirectly available in the configuration.
@@ -40,33 +62,47 @@ public class ProjectDependencyGraphBuilder implements ConfigurationEventListener
      * Builds and returns the dependency graph for the given project.
      *
      * @param project project to build the graph for
+     * @param mode    mode that determines if and how transitive dependencies
+     *                are included in the result (see the enum constants for
+     *                details)
      * @return a dependency graph for the given project
      */
-    public ProjectDependencyGraph build(Project project)
+    public ProjectDependencyGraph build(Project project, TransitiveMode mode)
     {
-        return new ProjectDependencyGraph(buildUpstream(project), buildDownstream(project));
+        return new ProjectDependencyGraph(buildUpstream(project, mode), buildDownstream(project, mode));
     }
 
-    private TreeNode<Project> buildUpstream(Project project)
+    private TreeNode<DependencyGraphData> buildUpstream(Project project, TransitiveMode mode)
     {
-        TreeNode<Project> node = new TreeNode<Project>(project);
+        TreeNode<DependencyGraphData> node = new TreeNode<DependencyGraphData>(new DependencyGraphData(project));
 
         List<ProjectConfiguration> upstreamProjectConfigs = getDependentProjectConfigs(project.getConfig());
         List<Project> upstreamProjects = projectManager.mapConfigsToProjects(upstreamProjectConfigs);
         for (Project upstream: upstreamProjects)
         {
-            node.add(buildUpstream(upstream));
+            TreeNode<DependencyGraphData> child;
+            if (mode == TransitiveMode.NONE)
+            {
+                child = new TreeNode<DependencyGraphData>(new DependencyGraphData(upstream));
+            }
+            else
+            {
+                child = buildUpstream(upstream, mode);
+            }
+
+            node.add(child);
         }
 
+        processDuplicateSubtrees(node, mode);
         return node;
     }
 
-    private TreeNode<Project> buildDownstream(Project project)
+    private TreeNode<DependencyGraphData> buildDownstream(Project project, TransitiveMode mode)
     {
         downstreamCacheLock.readLock().lock();
         try
         {
-            TreeNode<Project> node = new TreeNode<Project>(project);
+            TreeNode<DependencyGraphData> node = new TreeNode<DependencyGraphData>(new DependencyGraphData(project));
 
             List<ProjectConfiguration> downstreamProjectConfigs = downstreamCache.get(project.getConfig());
             if (downstreamProjectConfigs != null)
@@ -74,15 +110,65 @@ public class ProjectDependencyGraphBuilder implements ConfigurationEventListener
                 List<Project> downstreamProjects = projectManager.mapConfigsToProjects(downstreamProjectConfigs);
                 for (Project downstream: downstreamProjects)
                 {
-                    node.add(buildDownstream(downstream));
+                    TreeNode<DependencyGraphData> child;
+                    if (mode == TransitiveMode.NONE)
+                    {
+                        child = new TreeNode<DependencyGraphData>(new DependencyGraphData(downstream));
+                    }
+                    else
+                    {
+                        child = buildDownstream(downstream, mode);
+                    }
+
+                    node.add(child);
                 }
             }
 
+            processDuplicateSubtrees(node, mode);
             return node;
         }
         finally
         {
             downstreamCacheLock.readLock().unlock();
+        }
+    }
+
+    private void processDuplicateSubtrees(TreeNode<DependencyGraphData> root, TransitiveMode mode)
+    {
+        if (mode == TransitiveMode.TRIM_DUPLICATES || mode == TransitiveMode.REMOVE_DUPLICATES)
+        {
+            final Map<Project, TreeNode<DependencyGraphData>> seenProjects = new HashMap<Project, TreeNode<DependencyGraphData>>();
+
+            root.breadFirstWalk(new UnaryProcedure<TreeNode<DependencyGraphData>>()
+            {
+                public void process(TreeNode<DependencyGraphData> node)
+                {
+                    TreeNode<DependencyGraphData> lastSeen = seenProjects.get(node.getData().getProject());
+                    if (lastSeen != null)
+                    {
+                        // Seen somewhere less (or equally as) deep, filter that
+                        // previous node's children.  We can safely modify that
+                        // node as the walk has already visited it (and although we
+                        // may needlessly walk on its children, that does no harm).
+                        lastSeen.getData().markSubtreeFiltered();
+                        lastSeen.clear();
+                    }
+
+                    seenProjects.put(node.getData().getProject(), node);
+                }
+            });
+
+            if (mode == TransitiveMode.REMOVE_DUPLICATES)
+            {
+                // Remove the marked nodes themselves too.
+                root.filteringWalk(new Predicate<TreeNode<DependencyGraphData>>()
+                {
+                    public boolean satisfied(TreeNode<DependencyGraphData> node)
+                    {
+                        return !node.getData().isSubtreeFiltered();
+                    }
+                });
+            }
         }
     }
 

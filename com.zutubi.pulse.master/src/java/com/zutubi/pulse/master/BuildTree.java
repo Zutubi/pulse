@@ -2,7 +2,7 @@ package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.TreeNode;
-import com.zutubi.util.TreeNodeOperation;
+import com.zutubi.util.UnaryProcedure;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,25 +26,25 @@ public class BuildTree implements Iterable<RecipeController>
 
     public void prepare(final BuildResult buildResult)
     {
-        apply(new TreeNodeOperation<RecipeController>()
+        apply(new UnaryProcedure<TreeNode<RecipeController>>()
         {
-            public void apply(TreeNode<RecipeController> node)
+            public void process(TreeNode<RecipeController> node)
             {
                 node.getData().prepare(buildResult);
             }
         });
     }
 
-    public void apply(TreeNodeOperation<RecipeController> op)
+    public void apply(UnaryProcedure<TreeNode<RecipeController>> op)
     {
         apply(op, root);
     }
 
-    private void apply(TreeNodeOperation<RecipeController> op, TreeNode<RecipeController> node)
+    private void apply(UnaryProcedure<TreeNode<RecipeController>> op, TreeNode<RecipeController> node)
     {
         for (TreeNode<RecipeController> child : node)
         {
-            op.apply(child);
+            op.process(child);
             apply(op, child);
         }
     }
@@ -56,7 +56,7 @@ public class BuildTree implements Iterable<RecipeController>
         return accumulator.getControllers().iterator();
     }
 
-    private class ControllerAccumulator implements TreeNodeOperation<RecipeController>
+    private class ControllerAccumulator implements UnaryProcedure<TreeNode<RecipeController>>
     {
         private List<RecipeController> controllers = new LinkedList<RecipeController>();
 
@@ -65,7 +65,7 @@ public class BuildTree implements Iterable<RecipeController>
             return controllers;
         }
 
-        public void apply(TreeNode<RecipeController> node)
+        public void process(TreeNode<RecipeController> node)
         {
             controllers.add(node.getData());
         }

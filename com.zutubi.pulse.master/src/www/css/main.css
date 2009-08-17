@@ -1615,11 +1615,6 @@ div.reference {
  * Grid-based diagramming
  */
 
-table.grid
-{
-    /*width: 98%;*/
-}
-
 table.grid td
 {
     padding: 2px 5px 2px 5px;
@@ -1646,4 +1641,21 @@ table.grid td.gleft
 table.grid td.gright
 {
     border-right: solid 1px #aaa;
+}
+
+table.grid td.ghighlighted
+{
+    border-color: #667E9F;
+    background-color: #fefee0;
+}
+
+table.grid td.gunderstated
+{
+    border: dotted 1px #ccc;
+    opacity: 0.3;
+}
+
+td.glegend
+{
+    padding: 0 10px 0 10px;
 }

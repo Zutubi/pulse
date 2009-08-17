@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.master.dependency.DependencyGraphData;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraph;
 import com.zutubi.pulse.master.dependency.SimpleTreeLayoutAlgorithm;
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.*;
 
 import java.util.List;
@@ -47,41 +47,34 @@ public class ProjectDependencyGraphRenderer
         return render(graph.getDownstreamRoot());
     }
 
-    private Grid<ProjectDependencyData> render(TreeNode<Project> root)
+    private Grid<ProjectDependencyData> render(TreeNode<DependencyGraphData> root)
     {
-        SimpleTreeLayoutAlgorithm<Project> layout = new SimpleTreeLayoutAlgorithm<Project>();
-        TreeNode<Pair<Project, Point>> layTree = layout.layout(root);
+        SimpleTreeLayoutAlgorithm<DependencyGraphData> layout = new SimpleTreeLayoutAlgorithm<DependencyGraphData>();
+        TreeNode<Pair<DependencyGraphData, Point>> layTree = layout.layout(root);
         Point bounds = layout.getBounds(layTree);
 
-        final Grid<ProjectDependencyData> grid = new Grid<ProjectDependencyData>(bounds.getX() * 3 + 1, bounds.getY() * 2 + 2);
-        layTree.depthFirstWalk(new TreeNodeOperation<Pair<Project, Point>>()
-        {
-            public void apply(TreeNode<Pair<Project, Point>> pairTreeNode)
-            {
-                renderToGrid(pairTreeNode, grid);
-            }
-        });
-
+        Grid<ProjectDependencyData> grid = new Grid<ProjectDependencyData>(bounds.getX() * 3 + 1, bounds.getY() * 2 + 2);
+        renderToGrid(layTree, grid, true);
         return grid;
     }
 
-    private void renderToGrid(TreeNode<Pair<Project, Point>> node, Grid<ProjectDependencyData> grid)
+    private void renderToGrid(TreeNode<Pair<DependencyGraphData, Point>> node, Grid<ProjectDependencyData> grid, boolean root)
     {
         Point position = getGridPosition(node);
 
         // Fill the cell at our position, and mark the one below dead.
-        grid.getCell(position).setData(ProjectDependencyData.makeBox(node.getData().first));
+        grid.getCell(position).setData(ProjectDependencyData.makeBox(node.getData().first, root));
         grid.getCell(position.down()).setData(ProjectDependencyData.makeDead());
 
         if (!node.isLeaf())
         {
             // Draw the edge coming from us and the vertical line (if required).
-            List<TreeNode<Pair<Project,Point>>> children = node.getChildren();
+            List<TreeNode<Pair<DependencyGraphData,Point>>> children = node.getChildren();
             boolean multiChild = children.size() > 1;
             if (multiChild)
             {
-                TreeNode<Pair<Project, Point>> firstChild = children.get(0);
-                TreeNode<Pair<Project, Point>> lastChild = children.get(children.size() - 1);
+                TreeNode<Pair<DependencyGraphData, Point>> firstChild = children.get(0);
+                TreeNode<Pair<DependencyGraphData, Point>> lastChild = children.get(children.size() - 1);
                 Point firstChildPosition = getGridPosition(firstChild);
                 Point lastChildPosition = getGridPosition(lastChild);
 
@@ -100,15 +93,15 @@ public class ProjectDependencyGraphRenderer
             }
 
             // Draw children, including an edge leading in to each one.
-            for (TreeNode<Pair<Project, Point>> child: node)
+            for (TreeNode<Pair<DependencyGraphData, Point>> child: node)
             {
                 grid.getCell(getGridPosition(child).left()).setData(ProjectDependencyData.makeBordered(false, true));
-                renderToGrid(child, grid);
+                renderToGrid(child, grid, false);
             }
         }
     }
 
-    private Point getGridPosition(TreeNode<Pair<Project, Point>> node)
+    private Point getGridPosition(TreeNode<Pair<DependencyGraphData, Point>> node)
     {
         return treeToGrid(node.getData().second);
     }

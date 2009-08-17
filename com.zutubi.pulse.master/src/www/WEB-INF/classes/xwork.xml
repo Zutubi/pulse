@@ -483,6 +483,11 @@
             <result name="success" type="httpheader">200</result>
         </action>
 
+        <action name="setDependenciesTransitiveMode" class="com.zutubi.pulse.master.xwork.actions.user.SetDependenciesTransitiveModeAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="httpheader">200</result>
+        </action>
+
         <action name="getLatestRevision" class="com.zutubi.pulse.master.xwork.actions.ajax.GetLatestRevisionAction">
             <result name="success" type="json">revision.xml</result>
         </action>

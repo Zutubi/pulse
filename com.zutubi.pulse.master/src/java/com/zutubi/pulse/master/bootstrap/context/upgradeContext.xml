@@ -76,6 +76,7 @@
                 <ref local="addDependentTriggerPropagateFields"/>
                 <ref local="refactorDependencyPublicationUpgradeTask"/>
                 <ref local="addSettingsFileToMaven2UpgradeTask"/>
+                <ref local="dependencyTransitiveMode"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -325,5 +326,9 @@
 
     <bean id="addSettingsFileToMaven2UpgradeTask" class="com.zutubi.pulse.master.upgrade.tasks.AddSettingsFileArgumentToMaven2ConfigurationUpgradeTask">
         <property name="buildNumber" value="201003010"/>
+    </bean>
+
+    <bean id="dependencyTransitiveMode" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyTransitiveModeUpgradeTask">
+        <property name="buildNumber" value="201004001"/>
     </bean>
 </beans>
