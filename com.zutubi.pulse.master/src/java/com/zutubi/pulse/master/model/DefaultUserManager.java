@@ -232,7 +232,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     public Set<Project> getUserProjects(User user, final ProjectManager projectManager)
     {
         Set<Project> projects = new HashSet<Project>();
-        DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
+        final DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
         if(dashboardConfig.isShowAllProjects())
         {
             projects.addAll(projectManager.getProjects(true));
@@ -240,6 +240,27 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         else
         {
             projects.addAll(projectManager.mapConfigsToProjects(dashboardConfig.getShownProjects()));
+        }
+
+        if (!dashboardConfig.isShowAllGroups() && !dashboardConfig.isShowUngrouped())
+        {
+            Set<Project> groupedProjects = new HashSet<Project>();
+            for (String groupName: dashboardConfig.getShownGroups())
+            {
+                ProjectGroup group = projectManager.getProjectGroup(groupName);
+                if (group != null)
+                {
+                    for (Project p: group.getProjects())
+                    {
+                        if (projects.contains(p))
+                        {
+                            groupedProjects.add(p);
+                        }
+                    }
+                }
+            }
+
+            projects = groupedProjects; 
         }
 
         return projects;

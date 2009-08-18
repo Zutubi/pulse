@@ -29,8 +29,8 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
 
     public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
-        // A zero handle means a null reference
-        return new MapOption("0", "");
+        // An empty option is always available from getMap.
+        return null;
     }
 
     public Map<String, String> getMap(Object instance, String path, TypeProperty property)
@@ -38,6 +38,11 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
         ReferenceType referenceType = (ReferenceType) property.getType().getTargetType();
         Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), path);
         Map<String, String> options = new LinkedHashMap<String, String>();
+
+        // Empty option (0 handle == null refeerence).  This is the initial
+        // selection when a new instance is being created - required validation
+        // can be used to ensure a selection is made.
+        options.put("0", "");
 
         for (Configuration r : referencable)
         {
