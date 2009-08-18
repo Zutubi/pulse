@@ -51,6 +51,7 @@ public class Constants
         public static final String STAGES = "stages";
         public static final String SCM = "scm";
         public static final String TYPE = "type";
+        public static final String LABELS = "labels";
         public static final String OPTIONS = "options";
         public static final String REPORT_GROUPS = "reportGroups";
 

@@ -146,6 +146,38 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(project, myProjects.get(0));
     }
 
+    public void testGetMyProjectNamesGroupsFiltered() throws Exception
+    {
+        String random = randomName();
+        String login = random + "-user";
+        String project1 = random + "-project-1";
+        String project2 = random + "-project-2";
+
+        String userPath = xmlRpcHelper.insertTrivialUser(login);
+
+        // First project has label
+        String project1Path = xmlRpcHelper.insertSimpleProject(project1, false);
+        Hashtable<String, Object> labelConfig = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
+        labelConfig.put("label", random);
+        xmlRpcHelper.insertConfig(PathUtils.getPath(project1Path, Constants.Project.LABELS), labelConfig);
+
+        // Second has no label
+        xmlRpcHelper.insertSimpleProject(project2, false);
+        xmlRpcHelper.logout();
+
+        xmlRpcHelper.login(login, "");
+        String dashboardPath = PathUtils.getPath(userPath, "preferences", "dashboard");
+        Hashtable<String, Object> dashboardSettings = xmlRpcHelper.getConfig(dashboardPath);
+        dashboardSettings.put("showAllGroups", false);
+        dashboardSettings.put("showUngrouped", false);
+        dashboardSettings.put("shownGroups", new Vector<String>(asList(random)));
+        xmlRpcHelper.saveConfig(dashboardPath, dashboardSettings, true);
+
+        Vector<String> myProjects = xmlRpcHelper.getMyProjectNames();
+        assertEquals(1, myProjects.size());
+        assertEquals(project1, myProjects.get(0));
+    }
+
     public void testGetAllProjectGroups() throws Exception
     {
         String projectName = randomName() + "-project";
