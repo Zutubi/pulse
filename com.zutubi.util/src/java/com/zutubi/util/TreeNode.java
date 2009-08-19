@@ -55,7 +55,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
     }
 
     /**
-     * Retrieves teh data in this node.
+     * Retrieves the data in this node.
      *
      * @return this node's data
      */
@@ -154,14 +154,14 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
      *
      * @param fn the operation to apply to all nodes
      */
-    public void breadFirstWalk(UnaryProcedure<TreeNode<T>> fn)
+    public void breadthFirstWalk(UnaryProcedure<TreeNode<T>> fn)
     {
         Queue<TreeNode<T>> toProcess = new LinkedList<TreeNode<T>>();
         toProcess.offer(this);
-        breadFirstWalk(fn, toProcess);
+        breadthFirstWalk(fn, toProcess);
     }
 
-    private void breadFirstWalk(UnaryProcedure<TreeNode<T>> fn, Queue<TreeNode<T>> toProcess)
+    private void breadthFirstWalk(UnaryProcedure<TreeNode<T>> fn, Queue<TreeNode<T>> toProcess)
     {
         while (!toProcess.isEmpty())
         {

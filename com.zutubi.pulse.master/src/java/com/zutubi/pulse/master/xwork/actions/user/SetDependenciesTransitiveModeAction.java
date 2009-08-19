@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.tove.config.user.DependencyTransitiveMode;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesAction;
@@ -29,8 +29,7 @@ public class SetDependenciesTransitiveModeAction extends ActionSupport
     @Override @SuppressWarnings({"unchecked"})
     public String execute() throws Exception
     {
-        mode = mode.toUpperCase().replace(' ', '_');
-        DependencyTransitiveMode transitiveMode = DependencyTransitiveMode.valueOf(mode);
+        ProjectDependencyGraphBuilder.TransitiveMode transitiveMode = ProjectDependencyGraphBuilder.TransitiveMode.valueOf(mode);
 
         User user = getLoggedInUser();
         if (user == null)

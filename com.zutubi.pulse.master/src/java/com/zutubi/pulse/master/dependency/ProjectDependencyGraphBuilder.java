@@ -139,7 +139,7 @@ public class ProjectDependencyGraphBuilder implements ConfigurationEventListener
         {
             final Map<Project, TreeNode<DependencyGraphData>> seenProjects = new HashMap<Project, TreeNode<DependencyGraphData>>();
 
-            root.breadFirstWalk(new UnaryProcedure<TreeNode<DependencyGraphData>>()
+            root.breadthFirstWalk(new UnaryProcedure<TreeNode<DependencyGraphData>>()
             {
                 public void process(TreeNode<DependencyGraphData> node)
                 {

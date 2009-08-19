@@ -5,7 +5,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
-import com.zutubi.pulse.master.tove.config.user.DependencyTransitiveMode;
+import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 
 import static java.lang.String.valueOf;
 
@@ -106,7 +106,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // Filter out transients, make sure this takes effect.
         ProjectDependenciesForm form = browser.createForm(ProjectDependenciesForm.class);
         assertTrue(form.isFormPresent());
-        form.submitMode(DependencyTransitiveMode.SHOW_DIRECT_DEPENDENCIES_ONLY);
+        form.submitMode(ProjectDependencyGraphBuilder.TransitiveMode.NONE);
 
         browser.waitForElement(page.getUpstreamId(projectB.getName(), 0, 0));
         assertFalse(page.isUpstreamPresent(projectA.getName(), 0, 0));

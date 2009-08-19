@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
+import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.master.xwork.actions.DefaultAction;
@@ -53,7 +54,7 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private String projectHistoryColumns = defaultProjectColumns();
 
     @Internal
-    private DependencyTransitiveMode dependencyTransitiveMode = DependencyTransitiveMode.SHOW_FULL_CASCADE;
+    private ProjectDependencyGraphBuilder.TransitiveMode dependencyTransitiveMode = ProjectDependencyGraphBuilder.TransitiveMode.FULL;
 
     private Map<String, ContactConfiguration> contacts = new HashMap<String, ContactConfiguration>();
     private Map<String, SubscriptionConfiguration> subscriptions = new HashMap<String, SubscriptionConfiguration>();
@@ -185,12 +186,12 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
         this.projectHistoryColumns = projectHistoryColumns;
     }
 
-    public DependencyTransitiveMode getDependencyTransitiveMode()
+    public ProjectDependencyGraphBuilder.TransitiveMode getDependencyTransitiveMode()
     {
         return dependencyTransitiveMode;
     }
 
-    public void setDependencyTransitiveMode(DependencyTransitiveMode dependencyTransitiveMode)
+    public void setDependencyTransitiveMode(ProjectDependencyGraphBuilder.TransitiveMode dependencyTransitiveMode)
     {
         this.dependencyTransitiveMode = dependencyTransitiveMode;
     }

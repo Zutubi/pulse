@@ -16,6 +16,7 @@
                 items: [{
                     xtype: 'combo',
                     name: 'mode',
+                    hiddenName: 'mode',
                     id: 'zfid.mode',
                     fieldLabel: '#wwtext("name=transitive.dependencies")',
                     editable: false,
@@ -23,7 +24,7 @@
                     triggerAction: 'all',
                     store: [
                         #foreach($pair in $modes)
-                               ['$pair.first', '$pair.second'],
+                               ['$pair.first', '$pair.second'] #if($velocityCount < $modes.size()) , #end
                         #end
                     ],
                     value: '$transitiveMode',

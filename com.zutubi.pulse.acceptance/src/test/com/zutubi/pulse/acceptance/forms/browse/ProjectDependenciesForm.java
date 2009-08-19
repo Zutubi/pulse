@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.forms.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
-import com.zutubi.pulse.master.tove.config.user.DependencyTransitiveMode;
+import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 
 /**
  * The options form on a project dependencies tab.
@@ -39,7 +39,7 @@ public class ProjectDependenciesForm extends SeleniumForm
         browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(name) + "'); field.setValue('" + value + "'); field.fireEvent('select');");
     }
 
-    public void submitMode(DependencyTransitiveMode mode)
+    public void submitMode(ProjectDependencyGraphBuilder.TransitiveMode mode)
     {
         setFieldValue(FIELD_MODE, mode.name());
     }

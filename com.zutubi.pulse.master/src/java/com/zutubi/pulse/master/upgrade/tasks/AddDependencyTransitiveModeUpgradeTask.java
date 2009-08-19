@@ -26,6 +26,6 @@ public class AddDependencyTransitiveModeUpgradeTask extends AbstractRecordProper
 
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_MODE, "SHOW_FULL_CASCADE"));
+        return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_MODE, "FULL"));
     }
 }

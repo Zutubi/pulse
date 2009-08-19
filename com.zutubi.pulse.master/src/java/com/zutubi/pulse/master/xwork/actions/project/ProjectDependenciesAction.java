@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraph;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.tove.config.user.DependencyTransitiveMode;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Grid;
 import com.zutubi.util.Mapping;
@@ -21,10 +21,12 @@ public class ProjectDependenciesAction extends ProjectActionBase
 {
     public static final String ANONYMOUS_MODE_KEY = "pulse.anonymousUserDependencyTransientMode";
 
+    private static final Messages I18N = Messages.getInstance(ProjectDependenciesAction.class);
+
     private ProjectDependencyGraphBuilder projectDependencyGraphBuilder;
     private Grid<ProjectDependencyData> upstream;
     private Grid<ProjectDependencyData> downstream;
-    private String transitiveMode = DependencyTransitiveMode.SHOW_FULL_CASCADE.name();
+    private String transitiveMode = ProjectDependencyGraphBuilder.TransitiveMode.FULL.name();
 
     public Grid<ProjectDependencyData> getUpstream()
     {
@@ -48,11 +50,11 @@ public class ProjectDependenciesAction extends ProjectActionBase
 
     public List<Pair<String, String>> getModes()
     {
-        return CollectionUtils.map(DependencyTransitiveMode.values(), new Mapping<DependencyTransitiveMode, Pair<String, String>>()
+        return CollectionUtils.map(ProjectDependencyGraphBuilder.TransitiveMode.values(), new Mapping<ProjectDependencyGraphBuilder.TransitiveMode, Pair<String, String>>()
         {
-            public Pair<String, String> map(DependencyTransitiveMode mode)
+            public Pair<String, String> map(ProjectDependencyGraphBuilder.TransitiveMode mode)
             {
-                return CollectionUtils.asPair(mode.name(), mode.name().toLowerCase().replace('_', ' '));
+                return CollectionUtils.asPair(mode.name(), I18N.format(mode.name() + ".label"));
             }
         });
     }
@@ -60,13 +62,13 @@ public class ProjectDependenciesAction extends ProjectActionBase
     public String execute()
     {
         User user = getLoggedInUser();
-        DependencyTransitiveMode mode;
+        ProjectDependencyGraphBuilder.TransitiveMode mode;
         if (user == null)
         {
-            mode = (DependencyTransitiveMode) ActionContext.getContext().getSession().get(ANONYMOUS_MODE_KEY);
+            mode = (ProjectDependencyGraphBuilder.TransitiveMode) ActionContext.getContext().getSession().get(ANONYMOUS_MODE_KEY);
             if (mode == null)
             {
-                mode = DependencyTransitiveMode.SHOW_FULL_CASCADE;
+                mode = ProjectDependencyGraphBuilder.TransitiveMode.FULL;
             }
         }
         else
@@ -77,7 +79,7 @@ public class ProjectDependenciesAction extends ProjectActionBase
         transitiveMode = mode.name();
 
         Project project = getRequiredProject();
-        ProjectDependencyGraph dependencyGraph = projectDependencyGraphBuilder.build(project, mode.getCorrespondingMode());
+        ProjectDependencyGraph dependencyGraph = projectDependencyGraphBuilder.build(project, mode);
         ProjectDependencyGraphRenderer renderer = new ProjectDependencyGraphRenderer();
         upstream = renderer.renderUpstream(dependencyGraph);
         downstream = renderer.renderDownstream(dependencyGraph);
