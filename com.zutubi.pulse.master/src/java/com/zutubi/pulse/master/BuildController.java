@@ -119,21 +119,6 @@ public class BuildController implements EventListener, BuildHandler
         project = projectManager.getProject(projectConfig.getProjectId(), false);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
 
-        try
-        {
-            JobDetail detail = quartzScheduler.getJobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP);
-            if (detail ==  null)
-            {
-                detail = new JobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP, TimeoutRecipeJob.class);
-                detail.setDurability(true); // will stay around after the trigger has gone.
-                quartzScheduler.addJob(detail, true);
-            }
-        }
-        catch (SchedulerException e)
-        {
-            LOG.severe("Unable to setup build timeout job: " + e.getMessage(), e);
-        }
-
         createBuildTree();
 
         // Fail early if things are not as expected.
