@@ -242,6 +242,9 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
             projects.addAll(projectManager.mapConfigsToProjects(dashboardConfig.getShownProjects()));
         }
 
+        // When groups are filtered and ungrouped projects hidden, not all the
+        // projects selected above are included.  Collect only those that are
+        // both selected above *and* are members of a selected group.
         if (!dashboardConfig.isShowAllGroups() && !dashboardConfig.isShowUngrouped())
         {
             Set<Project> groupedProjects = new HashSet<Project>();
