@@ -86,12 +86,10 @@ public class RecipeProcessor
         }
         catch (BuildException e)
         {
-            e.printStackTrace();
             recipeResult.error(e);
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             LOG.severe(e);
             recipeResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
         }
