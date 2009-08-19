@@ -21,6 +21,8 @@ import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
@@ -242,10 +244,26 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
             projects.addAll(projectManager.mapConfigsToProjects(dashboardConfig.getShownProjects()));
         }
 
-        if (!dashboardConfig.isShowAllGroups() && !dashboardConfig.isShowUngrouped())
+        if (!dashboardConfig.isShowUngrouped())
         {
             Set<Project> groupedProjects = new HashSet<Project>();
-            for (String groupName: dashboardConfig.getShownGroups())
+            List<String> shownGroups;
+            if (dashboardConfig.isShowAllGroups())
+            {
+                shownGroups = CollectionUtils.map(projectManager.getAllProjectGroups(), new Mapping<ProjectGroup, String>()
+                {
+                    public String map(ProjectGroup projectGroup)
+                    {
+                        return projectGroup.getName();
+                    }
+                });
+            }
+            else
+            {
+                shownGroups = dashboardConfig.getShownGroups();
+            }
+            
+            for (String groupName: shownGroups)
             {
                 ProjectGroup group = projectManager.getProjectGroup(groupName);
                 if (group != null)
