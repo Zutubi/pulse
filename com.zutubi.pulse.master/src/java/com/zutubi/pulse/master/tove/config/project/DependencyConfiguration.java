@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
-import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A dependency defines a project and the artifacts built by that project that this project requires
@@ -17,7 +17,7 @@ import java.util.LinkedList;
 @Form(fieldOrder = {"project", "revision", "customRevision", "transitive", "allStages", "stages"})
 public class DependencyConfiguration extends AbstractConfiguration
 {
-    private static final String LATEST = "latest.";
+    public static final String LATEST = "latest.";
 
     public static final String ALL_STAGES = "*";
     public static final String REVISION_LATEST_INTEGRATION = LATEST + IvyManager.STATUS_INTEGRATION;
@@ -35,6 +35,7 @@ public class DependencyConfiguration extends AbstractConfiguration
      * The project being depended upon.
      */
     @Required @Reference(optionProvider = "DependencyProjectOptionProvider")
+//    @Constraint("CircularDependencyValidator")
     private ProjectConfiguration project;
 
     /**

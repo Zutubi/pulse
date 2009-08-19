@@ -17,6 +17,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
+import com.zutubi.pulse.master.tove.model.CheckboxFieldDescriptor;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationPanel;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationResponse;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -49,6 +50,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private List<ResourcePropertyConfiguration> properties;
     private String status;
     private String version;
+    private boolean rebuild;
     private boolean ajax;
     private ConfigurationPanel newPanel;
     private ConfigurationResponse configurationResponse;
@@ -101,6 +103,16 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public void setVersion(String version)
     {
         this.version = version;
+    }
+
+    public boolean isRebuild()
+    {
+        return rebuild;
+    }
+
+    public void setRebuild(boolean rebuild)
+    {
+        this.rebuild = rebuild;
     }
 
     public void setPath(String path)
@@ -157,6 +169,15 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         MutableRecord r = new MutableRecordImpl();
         r.put("status", project.getConfig().getDependencies().getStatus());
         form.add(statusFieldDescriptor.instantiate(null, r));
+
+        if (project.getConfig().hasDependencies())
+        {
+            CheckboxFieldDescriptor rebuildFieldDescriptor = new CheckboxFieldDescriptor();
+            rebuildFieldDescriptor.setName("rebuild");
+            field = rebuildFieldDescriptor.instantiate(null, null);
+            field.setValue(Boolean.toString(rebuild));
+            form.add(field);
+        }
 
         field = new Field(FieldType.TEXT, "revision");
         field.setLabel("revision");
@@ -269,6 +290,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             options.setProperties(mapProperties(project.getConfig()));
             options.setStatus(status);
             options.setVersion(version);
+            options.setRebuild(rebuild);
+            
             projectManager.triggerBuild(project.getConfig(), options, r);
         }
         catch (Exception e)

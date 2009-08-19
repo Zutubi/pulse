@@ -8,7 +8,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
 import static com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent.ALL_BUILDS;
@@ -16,16 +16,15 @@ import com.zutubi.pulse.master.license.License;
 import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.license.events.LicenseExpiredEvent;
 import com.zutubi.pulse.master.license.events.LicenseUpdateEvent;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -38,6 +37,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class FatController implements EventListener, Stoppable
 {
+    protected static final String SEQUENCE_BUILD_ID = "BUILD_ID";
+
     private static final Logger LOG = Logger.getLogger(FatController.class);
 
     private EventManager eventManager;
@@ -50,6 +51,7 @@ public class FatController implements EventListener, Stoppable
     private ProjectManager projectManager;
     private ThreadFactory threadFactory;
     private AccessManager accessManager;
+    private SequenceManager sequenceManager;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
@@ -57,6 +59,8 @@ public class FatController implements EventListener, Stoppable
      */
     private boolean enabled = false;
     private ObjectFactory objectFactory;
+
+    private Map<Long, ScheduleHandler> handlers = new HashMap<Long, ScheduleHandler>();
 
     public FatController()
     {
@@ -73,6 +77,18 @@ public class FatController implements EventListener, Stoppable
         controllerStateListener = objectFactory.buildBean(ControllerStateListener.class);
         controllerStateListener.setController(this);
         eventManager.register(controllerStateListener);
+    }
+
+    /**
+     * Returns true if there are no events that the fat controller still needs to process.
+     * This is useful for determining when the processing has caught up with the events that
+     * have been published.
+     *
+     * @return true if no events are pending processing, false otherwise.
+     */
+    protected boolean isIdle()
+    {
+        return asyncListener.isIdle();
     }
 
     /**
@@ -101,7 +117,7 @@ public class FatController implements EventListener, Stoppable
      * @see #isEnabled()
      * @see #isDisabled()
      */
-    private void enable()
+    void enable()
     {
         enabled = true;
     }
@@ -112,7 +128,7 @@ public class FatController implements EventListener, Stoppable
      * @see #isEnabled()
      * @see #isDisabled()
      */
-    private void disable()
+    void disable()
     {
         enabled = false;
     }
@@ -159,11 +175,17 @@ public class FatController implements EventListener, Stoppable
         asyncListener.stop(force);
     }
 
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{BuildRequestEvent.class, BuildCompletedEvent.class
+        };
+    }
+
     public void handleEvent(Event event)
     {
-        if (event instanceof AbstractBuildRequestEvent)
+        if (event instanceof BuildRequestEvent)
         {
-            handleBuildRequest((AbstractBuildRequestEvent) event);
+            requestBuild((BuildRequestEvent) event);
         }
         else if (event instanceof BuildCompletedEvent)
         {
@@ -171,7 +193,42 @@ public class FatController implements EventListener, Stoppable
         }
     }
 
-    private void handleBuildRequest(AbstractBuildRequestEvent event)
+    public void requestBuild(BuildRequestEvent request)
+    {
+        if (handlers.containsKey(request.getBuildId()))
+        {
+            ScheduleHandler handler = handlers.get(request.getBuildId());
+            handler.handle(request);
+            return;
+        }
+
+        ScheduleHandler handler;
+        if (request.getOptions().isRebuild() && !request.isPersonal())
+        {
+            // do not want Personal build requests using this handler at the moment.
+            handler = objectFactory.buildBean(DependencyRebuildScheduleHandler.class);
+        }
+        else
+        {
+            handler = objectFactory.buildBean(SingleBuildScheduleHandler.class);
+        }
+        ((BaseScheduleHandler)handler).setSequence(sequenceManager.getSequence(SEQUENCE_BUILD_ID));
+        handler.init();
+
+        if (handler.isMultiBuild())
+        {
+            handlers.put(handler.getMetaBuildId(), handler);
+        }
+
+        handler.handle(request);
+    }
+
+    protected void multiBuildComplete(long buildId)
+    {
+        handlers.remove(buildId);
+    }
+
+    protected void enqueueBuildRequest(BuildRequestEvent request)
     {
         // if we are disabled, we ignore incoming build requests.
         if (isDisabled())
@@ -180,12 +237,12 @@ public class FatController implements EventListener, Stoppable
             return;
         }
 
-        long projectId = event.getProjectConfig().getProjectId();
+        long projectId = request.getProjectConfig().getProjectId();
         projectManager.lockProjectStates(projectId);
         try
         {
             Project project = projectManager.getProject(projectId, false);
-            if (!project.getState().acceptTrigger(event.isPersonal()))
+            if (!project.getState().acceptTrigger(request.isPersonal()))
             {
                 // Ignore build requests while project is not able to be built
                 // (e.g. if it is pausing).
@@ -193,10 +250,10 @@ public class FatController implements EventListener, Stoppable
             }
 
             lock.lock();
-            boolean newlyActive = !event.isPersonal() && buildQueue.getActiveBuildCount(project) == 0;
+            boolean newlyActive = !request.isPersonal() && buildQueue.getActiveBuildCount(project) == 0;
             try
             {
-                buildQueue.buildRequested(event);
+                buildQueue.buildRequested(request);
             }
             finally
             {
@@ -263,13 +320,6 @@ public class FatController implements EventListener, Stoppable
         }
     }
 
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{AbstractBuildRequestEvent.class,
-                BuildCompletedEvent.class
-        };
-    }
-
     /**
      * Retrieve a snapshot of the current build queue.
      *
@@ -332,6 +382,11 @@ public class FatController implements EventListener, Stoppable
     public void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
+    }
+
+    public void setSequenceManager(SequenceManager sequenceManager)
+    {
+        this.sequenceManager = sequenceManager;
     }
 
     /**

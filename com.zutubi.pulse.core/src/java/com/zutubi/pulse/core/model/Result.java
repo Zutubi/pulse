@@ -21,7 +21,7 @@ public abstract class Result extends Entity
 
     // NOTE: if you add a field here, check the update() method in
     // CommandResult!
-    protected ResultState state = ResultState.INITIAL;
+    protected ResultState state = ResultState.PENDING;
     protected TimeStamps stamps = new TimeStamps();
     private File outputDir;
     protected List<PersistentFeature> features = new LinkedList<PersistentFeature>();
@@ -44,7 +44,7 @@ public abstract class Result extends Entity
      */
     public boolean pending()
     {
-        return ResultState.INITIAL == getState();
+        return (ResultState.PENDING == getState()) || (ResultState.PENDING_DEPENDENCY == getState());
     }
 
     public boolean inProgress()

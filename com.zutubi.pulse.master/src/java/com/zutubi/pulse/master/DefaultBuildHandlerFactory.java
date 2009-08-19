@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master;
 
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.bean.ObjectFactory;
 
@@ -13,10 +13,10 @@ public class DefaultBuildHandlerFactory implements BuildHandlerFactory
     private ObjectFactory objectFactory;
     private MasterConfigurationManager configurationManager;
 
-    public BuildHandler createHandler(AbstractBuildRequestEvent request)
+    public BuildHandler createHandler(BuildRequestEvent request)
     {
         BuildController controller = objectFactory.buildBean(BuildController.class,
-                                                             new Class[] { AbstractBuildRequestEvent.class },
+                                                             new Class[] { BuildRequestEvent.class },
                                                              new Object[] { request });
         DefaultRecipeResultCollector collector = new DefaultRecipeResultCollector(configurationManager);
         collector.setProjectConfig(request.getProjectConfig());

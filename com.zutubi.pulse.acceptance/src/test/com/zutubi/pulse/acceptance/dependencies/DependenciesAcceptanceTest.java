@@ -2,15 +2,19 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.CollectionUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
 import java.util.List;
 
-public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
+public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
+    private Repository repository;
+
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -32,12 +36,10 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
     public void testPublish_NoArtifacts() throws Exception
     {
         // configure project.
-        Project project = new Project(randomName());
-        createProject(project);
+        Project project = new DepAntProject(xmlRpcHelper, randomName());
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-
-        int buildNumber = triggerSuccessfulBuild(project, build);
+        int buildNumber = project.triggerSuccessfulBuild();
 
         // verify existance of expected artifacts.
         assertIvyInRepository(project, buildNumber);
@@ -45,14 +47,12 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testPublish_SingleArtifact() throws Exception
     {
-        Project project = new Project(randomName());
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
         Artifact artifact = project.getDefaultRecipe().addArtifact("artifact.jar");
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact.jar");
-
-        int buildNumber = triggerSuccessfulBuild(project, build);
+        project.addFileToCreate("build/artifact.jar");
+        int buildNumber = project.triggerSuccessfulBuild();
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
@@ -61,15 +61,14 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testPublish_MultipleArtifacts() throws Exception
     {
-        Project project = new Project(randomName());
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
         List<Artifact> artifacts = project.addArtifacts("artifact.jar", "another-artifact.jar");
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact.jar");
-        build.addFileToCreate("build/another-artifact.jar");
+        project.addFileToCreate("build/artifact.jar");
+        project.addFileToCreate("build/another-artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(project, build);
+        int buildNumber = project.triggerSuccessfulBuild();
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
@@ -79,15 +78,14 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testPublish_MultipleStages() throws Exception
     {
-        Project project = new Project(randomName());
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
         Artifact artifact = project.addArtifact("artifact.jar");
         project.addStage("stage");
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact.jar");
+        project.addFileToCreate("build/artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(project, build);
+        int buildNumber = project.triggerSuccessfulBuild();
 
         assertIvyInRepository(project, buildNumber);
         assertArtifactInRepository(project, project.getStage("default"), buildNumber, artifact);
@@ -96,14 +94,13 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testPublishFails_MissingArtifacts() throws Exception
     {
-        Project project = new Project(randomName());
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
         Artifact artifact = project.addArtifact("artifact.jar");
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("incorrect/path/artifact.jar");
+        project.addFileToCreate("incorrect/path/artifact.jar");
 
-        int buildNumber = triggerBuild(project, build);
+        int buildNumber = project.triggerCompleteBuild();
         assertEquals(ResultState.ERROR, getBuildStatus(project.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
@@ -113,15 +110,14 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testPublish_StatusConfiguration() throws Exception
     {
-        Project project = new Project(randomName());
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
         project.setStatus(STATUS_RELEASE);
         project.addArtifacts("artifact.jar");
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact.jar");
+        project.addFileToCreate("build/artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(project, build);
+        int buildNumber = project.triggerSuccessfulBuild();
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
@@ -130,14 +126,13 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testPublish_DefaultStatus() throws Exception
     {
-        Project project = new Project(randomName());
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
         project.addArtifacts("artifact.jar");
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact.jar");
+        project.addFileToCreate("build/artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(project, build);
+        int buildNumber = project.triggerSuccessfulBuild();
 
         assertIvyStatus(STATUS_INTEGRATION, project, buildNumber);
     }
@@ -146,10 +141,10 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
     {
         try
         {
-            Project project = new Project(randomName());
+            DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
             project.setStatus("invalid");
             project.addArtifacts("artifact.jar");
-            createProject(project);
+            project.createProject();
         }
         catch (Exception e)
         {
@@ -159,14 +154,13 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testRemoteTriggerWithCustomStatus() throws Exception
     {
-        Project project = new Project(randomName());
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
         project.addArtifacts("artifact.jar");
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact.jar");
+        project.addFileToCreate("build/artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(project, build, STATUS_MILESTONE);
+        int buildNumber = project.triggerSuccessfulBuild(CollectionUtils.asPair("status", (Object)STATUS_MILESTONE));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyInRepository(project, buildNumber);
@@ -175,44 +169,40 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testRetrieve_SingleArtifact() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("artifact.jar");
-        createProject(projectA);
+        projectA.createProject();
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFileToCreate("build/artifact.jar");
-        triggerSuccessfulBuild(projectA, buildA);
+        projectA.addFileToCreate("build/artifact.jar");
+        projectA.triggerSuccessfulBuild();
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addDependency(projectA);
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addExpectedFile("lib/artifact.jar");
+        projectB.addExpectedFile("lib/artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(projectB, build);
+        int buildNumber = projectB.triggerSuccessfulBuild();
 
         assertIvyInRepository(projectB, buildNumber);
     }
 
     public void testRetrieve_MultipleArtifacts() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("artifact.jar", "another-artifact.jar");
-        createProject(projectA);
+        projectA.createProject();
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFilesToCreate("build/artifact.jar", "build/another-artifact.jar");
-        triggerSuccessfulBuild(projectA, buildA);
+        projectA.addFilesToCreate("build/artifact.jar", "build/another-artifact.jar");
+        projectA.triggerSuccessfulBuild();
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addDependency(projectA);
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration buildB = new AntBuildConfiguration();
-        buildB.addExpectedFiles("lib/artifact.jar", "lib/another-artifact.jar");
+        projectB.addExpectedFiles("lib/artifact.jar", "lib/another-artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(projectB, buildB);
+        int buildNumber = projectB.triggerSuccessfulBuild();
 
         assertIvyInRepository(projectB, buildNumber);
     }
@@ -220,18 +210,17 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
     public void testRetrieve_SpecificStage() throws Exception
     {
         // need different recipies that produce different artifacts.
-        Project project = new Project(randomName());
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
         Artifact recipeAArtifact = project.addRecipe("recipeA").addArtifact("artifactA.jar");
         Artifact recipeBArtifact = project.addRecipe("recipeB").addArtifact("artifactB.jar");
         Stage stageA = project.addStage("A");
         stageA.setRecipe(project.getRecipe("recipeA"));
         Stage stageB = project.addStage("B");
         stageB.setRecipe(project.getRecipe("recipeB"));
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFilesToCreate("build/artifactA.jar", "build/artifactB.jar");
-        int buildNumber = triggerSuccessfulBuild(project, build);
+        project.addFilesToCreate("build/artifactA.jar", "build/artifactB.jar");
+        int buildNumber = project.triggerSuccessfulBuild();
 
         assertIvyInRepository(project, buildNumber);
         assertArtifactInRepository(project, stageA, buildNumber, recipeAArtifact);
@@ -243,136 +232,124 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testRetrieve_SpeicificRevision() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("default-artifact.jar");
-        createProject(projectA);
+        projectA.createProject();
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFileToCreate("build/default-artifact.jar");
+        projectA.addFileToCreate("build/default-artifact.jar");
         
         // build twice and then depend on the first.
-        int buildNumber = triggerSuccessfulBuild(projectA, buildA);
-        triggerSuccessfulBuild(projectA, buildA);
+        int buildNumber = projectA.triggerSuccessfulBuild();
+        projectA.triggerSuccessfulBuild();
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.setRetrievalPattern("lib/[artifact]-[revision].[ext]");
         projectB.addDependency(new Dependency(projectA, true, "default", "" + buildNumber));
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration buildB = new AntBuildConfiguration();
-        buildB.addExpectedFiles("lib/default-artifact-" + buildNumber + ".jar");
-        triggerSuccessfulBuild(projectB, buildB);
+        projectB.addExpectedFiles("lib/default-artifact-" + buildNumber + ".jar");
+        projectB.triggerSuccessfulBuild();
     }
 
     public void testRetrieve_MultipleProjects() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("projectA-artifact.jar");
-        createProject(projectA);
+        projectA.createProject();
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFileToCreate("build/projectA-artifact.jar");
-        triggerSuccessfulBuild(projectA, buildA);
+        projectA.addFileToCreate("build/projectA-artifact.jar");
+        projectA.triggerSuccessfulBuild();
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addArtifacts("projectB-artifact.jar");
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration buildB = new AntBuildConfiguration();
-        buildB.addFileToCreate("build/projectB-artifact.jar");
-        triggerSuccessfulBuild(projectB, buildB);
+        projectB.addFileToCreate("build/projectB-artifact.jar");
+        projectB.triggerSuccessfulBuild();
 
-        Project projectC = new Project(randomName());
+        DepAntProject projectC = new DepAntProject(xmlRpcHelper, randomName());
         projectC.addDependency(projectA);
         projectC.addDependency(projectB);
-        createProject(projectC);
+        projectC.createProject();
 
-        AntBuildConfiguration buildC = new AntBuildConfiguration();
-        buildC.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
+        projectB.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(projectC, buildC);
+        int buildNumber = projectC.triggerSuccessfulBuild();
         assertIvyInRepository(projectC, buildNumber);
     }
 
     public void testRetrieve_TransitiveDependencies() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("projectA-artifact.jar");
-        createProject(projectA);
+        projectA.createProject();
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFileToCreate("build/projectA-artifact.jar");
-        triggerSuccessfulBuild(projectA, buildA);
+        projectA.addFileToCreate("build/projectA-artifact.jar");
+        projectA.triggerSuccessfulBuild();
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addArtifacts("projectB-artifact.jar");
         projectB.addDependency(new Dependency(projectA, true));
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration buildB = new AntBuildConfiguration();
-        buildB.addFileToCreate("build/projectB-artifact.jar");
-        buildB.addExpectedFile("lib/projectA-artifact.jar");
-        triggerSuccessfulBuild(projectB, buildB);
+        projectB.addFileToCreate("build/projectB-artifact.jar");
+        projectB.addExpectedFile("lib/projectA-artifact.jar");
+        projectB.triggerSuccessfulBuild();
 
-        Project projectC = new Project(randomName());
+        DepAntProject projectC = new DepAntProject(xmlRpcHelper, randomName());
         projectC.addDependency(projectB);
-        createProject(projectC);
+        projectC.createProject();
 
-        AntBuildConfiguration buildC = new AntBuildConfiguration();
-        buildC.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
+        projectC.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(projectC, buildC);
+        int buildNumber = projectC.triggerSuccessfulBuild();
         assertIvyInRepository(projectC, buildNumber);
     }
 
     public void testRetrieve_TransitiveDependenciesDisabled() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("projectA-artifact.jar");
-        createProject(projectA);
+        projectA.createProject();
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFileToCreate("build/projectA-artifact.jar");
-        triggerSuccessfulBuild(projectA, buildA);
+        projectA.addFileToCreate("build/projectA-artifact.jar");
+        projectA.triggerSuccessfulBuild();
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addArtifacts("projectB-artifact.jar");
         projectB.addDependency(projectA);
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration buildB = new AntBuildConfiguration();
-        buildB.addFileToCreate("build/projectB-artifact.jar");
-        buildB.addExpectedFile("lib/projectA-artifact.jar");
-        triggerSuccessfulBuild(projectB, buildB);
+        projectB.addFileToCreate("build/projectB-artifact.jar");
+        projectB.addExpectedFile("lib/projectA-artifact.jar");
+        projectB.triggerSuccessfulBuild();
 
-        Project projectC = new Project(randomName());
+        DepAntProject projectC = new DepAntProject(xmlRpcHelper, randomName());
         projectC.addDependency(new Dependency(projectB, false));
-        createProject(projectC);
+        projectC.createProject();
 
-        AntBuildConfiguration buildC = new AntBuildConfiguration();
-        buildC.addExpectedFiles("lib/projectB-artifact.jar");
-        buildC.addNotExpectedFile("lib/projectA-artifact.jar");
+        projectC.addExpectedFiles("lib/projectB-artifact.jar");
+        projectC.addNotExpectedFile("lib/projectA-artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(projectC, buildC);
+        int buildNumber = projectC.triggerSuccessfulBuild();
         assertIvyInRepository(projectC, buildNumber);
     }
 
     public void testRetrieveFails_MissingDependencies() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("artifact.jar");
-        createProject(projectA);
+        projectA.createProject();
 
-        // do not build project a simulating dependency not available.
+        // do not build projectA simulating dependency not available.
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addDependency(projectA);
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration buildB = new AntBuildConfiguration();
-        buildB.addExpectedFile("lib/artifact.jar");
+        projectB.addExpectedFile("lib/artifact.jar");
 
-        int buildNumber = triggerBuild(projectB, buildB);
+        int buildNumber = projectB.triggerCompleteBuild();
         assertEquals(ResultState.FAILURE, getBuildStatus(projectB.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
@@ -381,37 +358,35 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testDependentBuild_TriggeredOnSuccess() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("artifact.jar");
-        createProject(projectA);
+        projectA.createProject();
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addDependency(projectA);
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFileToCreate("build/artifact.jar");
-        triggerSuccessfulBuild(projectA, buildA);
+        projectA.addFileToCreate("build/artifact.jar");
+        projectA.triggerSuccessfulBuild();
 
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
     }
 
     public void testDependentBuild_PropagateStatus() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("artifact.jar");
         projectA.setStatus(STATUS_RELEASE);
-        createProject(projectA);
+        projectA.createProject();
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addDependency(projectA);
         projectB.setStatus(STATUS_INTEGRATION);
         projectB.setPropagateStatus(true);
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFileToCreate("build/artifact.jar");
-        triggerSuccessfulBuild(projectA, buildA);
+        projectA.addFileToCreate("build/artifact.jar");
+        projectA.triggerSuccessfulBuild();
 
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
@@ -421,19 +396,18 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testDependentBuild_PropagateVersion() throws Exception
     {
-        Project projectA = new Project(randomName());
+        DepAntProject projectA = new DepAntProject(xmlRpcHelper, randomName());
         projectA.addArtifacts("artifact.jar");
         projectA.setVersion("FIXED");
-        createProject(projectA);
+        projectA.createProject();
 
-        Project projectB = new Project(randomName());
+        DepAntProject projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addDependency(projectA);
         projectB.setPropagateVersion(true);
-        createProject(projectB);
+        projectB.createProject();
 
-        AntBuildConfiguration buildA = new AntBuildConfiguration();
-        buildA.addFileToCreate("build/artifact.jar");
-        triggerSuccessfulBuild(projectA, buildA);
+        projectA.addFileToCreate("build/artifact.jar");
+        projectA.triggerSuccessfulBuild();
 
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
@@ -443,31 +417,29 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testRepositoryFormat_OrgSpecified() throws Exception
     {
-        Project project = new Project(randomName(), "org");
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName(), "org");
         project.addArtifacts("artifact.jar");
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact.jar");
+        project.addFileToCreate("build/artifact.jar");
 
-        int buildNumber = triggerSuccessfulBuild(project, build);
+        int buildNumber = project.triggerSuccessfulBuild();
 
         assertIvyInRepository(project, buildNumber);
     }
 
     public void testArtifactPattern() throws Exception
     {
-        Project project = new Project(randomName());
+        DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
         Artifact artifact = project.addArtifact("artifact-12345.jar");
         artifact.setArtifactPattern("(.+)-[0-9]+\\.(.+)");
-        createProject(project);
+        project.createProject();
 
-        AntBuildConfiguration build = new AntBuildConfiguration();
-        build.addFileToCreate("build/artifact-12345.jar");
+        project.addFileToCreate("build/artifact-12345.jar");
 
-        int buildNumber = triggerSuccessfulBuild(project, build);
+        int buildNumber = project.triggerSuccessfulBuild();
 
-        // update the artifact details because the -1 should be filtered out by the artifact pattern.
+        // update the artifact details because the '-12345' should be filtered out by the artifact pattern.
         artifact.setName("artifact");
         artifact.setExtension("jar");
         assertArtifactInRepository(project, project.getDefaultStage(), buildNumber, artifact);
@@ -491,17 +463,16 @@ public class DependenciesAcceptanceTest extends BaseDependenciesAcceptanceTest
     {
         for (char c : testCharacters.toCharArray())
         {
-            Project project = new Project(randomName());
+            DepAntProject project = new DepAntProject(xmlRpcHelper, randomName());
             Artifact artifact = project.addArtifact("artifact-" + c + ".jar");
-            createProject(project);
+            project.createProject();
 
-            AntBuildConfiguration build = new AntBuildConfiguration();
             // The ant script on unix evals its arguments, so we need to escape
             // these characters lest the shell choke on them.
             String resolvedChar = SystemUtils.IS_WINDOWS ? Character.toString(c) : "\\" + c;
-            build.addFileToCreate("build/artifact-" + resolvedChar + ".jar");
+            project.addFileToCreate("build/artifact-" + resolvedChar + ".jar");
 
-            int buildNumber = triggerBuild(project, build);
+            int buildNumber = project.triggerCompleteBuild();
             assertEquals("Unexpected result for character: " + c, expected, getBuildStatus(project.getName(), buildNumber));
 
             if (expected == ResultState.SUCCESS)

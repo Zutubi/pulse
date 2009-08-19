@@ -290,6 +290,11 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
         this.dependencies = dependencies;
     }
 
+    public boolean hasDependencies()
+    {
+        return dependencies != null && dependencies.getDependencies() != null && dependencies.getDependencies().size() > 0;
+    }
+
     public String getOrganisation()
     {
         return organisation;

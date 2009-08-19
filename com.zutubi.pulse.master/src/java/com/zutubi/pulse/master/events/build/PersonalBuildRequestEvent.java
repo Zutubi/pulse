@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * A request for a personal build.
  */
-public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
+public class PersonalBuildRequestEvent extends BuildRequestEvent
 {
     private long number;
     private User user;
@@ -37,14 +37,23 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
         return true;
     }
 
-    public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
+    public BuildResult createResult(ProjectManager projectManager, BuildManager buildManager)
     {
         Project project = projectManager.getProject(getProjectConfig().getProjectId(), false);
         BuildResult result = new BuildResult(options.getReason(), user, project, number);
         // although a personal build doesn't have it's ivy file published, it still
         // requires a status.
-        result.setStatus(STATUS_INTEGRATION);
+        result.setStatus(getStatus());
+        result.setBuildId(getBuildId());
+
+        buildManager.save(result);
+
         return result;
+    }
+
+    public String getStatus()
+    {
+        return STATUS_INTEGRATION;
     }
 
     public File getPatch()

@@ -2,7 +2,7 @@ package com.zutubi.pulse.master;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.NamedEntity;
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -35,7 +35,7 @@ public class BuildQueue
      *
      * @param event the request to add
      */
-    public void buildRequested(AbstractBuildRequestEvent event)
+    public void buildRequested(BuildRequestEvent event)
     {
         if (!stopped)
         {
@@ -157,7 +157,7 @@ public class BuildQueue
     public static class Snapshot
     {
         private Map<Entity, List<EntityBuildQueue.ActiveBuild>> activeBuilds = new HashMap<Entity, List<EntityBuildQueue.ActiveBuild>>();
-        private Map<Entity, List<AbstractBuildRequestEvent>> queuedBuilds = new HashMap<Entity, List<AbstractBuildRequestEvent>>();
+        private Map<Entity, List<BuildRequestEvent>> queuedBuilds = new HashMap<Entity, List<BuildRequestEvent>>();
 
         void addEntityQueue(EntityBuildQueue queue)
         {
@@ -179,7 +179,7 @@ public class BuildQueue
          * requests for that entity.  Builds requested first are last in the
          * list.
          */
-        public Map<Entity, List<AbstractBuildRequestEvent>> getQueuedBuilds()
+        public Map<Entity, List<BuildRequestEvent>> getQueuedBuilds()
         {
             return Collections.unmodifiableMap(queuedBuilds);
         }

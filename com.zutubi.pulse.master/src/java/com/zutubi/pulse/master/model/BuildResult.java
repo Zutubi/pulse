@@ -45,6 +45,17 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     private String status;
 
+    /**
+     * A globally unique id used by a set of related builds to identify them as being related.
+     */
+    private long buildId;
+
+    /**
+     * A list of build results that this build depends on.  That is, these are the build
+     * results that needed to be completed before this result's build could commence.
+     */
+    private List<BuildResult> dependsOn =  new LinkedList<BuildResult>();
+
     public BuildResult()
     {
 
@@ -66,7 +77,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         this.user = null;
         this.number = number;
         this.userRevision = userRevision;
-        state = ResultState.INITIAL;
+        state = ResultState.PENDING;
         root = new RecipeResultNode(null, 0, null);
         hasWorkDir = true;
     }
@@ -145,6 +156,31 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     public void setHasWorkDir(boolean hasWorkDir)
     {
         this.hasWorkDir = hasWorkDir;
+    }
+
+    public long getBuildId()
+    {
+        return buildId;
+    }
+
+    public void setBuildId(long buildId)
+    {
+        this.buildId = buildId;
+    }
+
+    public List<BuildResult> getDependsOn()
+    {
+        return dependsOn;
+    }
+
+    public void setDependsOn(List<BuildResult> dependsOn)
+    {
+        this.dependsOn = dependsOn;
+    }
+
+    public void addDependsOn(BuildResult result)
+    {
+        this.dependsOn.add(result);        
     }
 
     public void abortUnfinishedRecipes()

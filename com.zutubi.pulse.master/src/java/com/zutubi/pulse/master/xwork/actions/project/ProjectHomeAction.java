@@ -206,6 +206,11 @@ public class ProjectHomeAction extends ProjectActionBase
             }
         }
 
+        if (project.getConfig().hasDependencies())
+        {
+            actions.add(ToveUtils.getActionLink(ProjectConfigurationActions.ACTION_REBUILD, messages, contentRoot));
+        }
+
         ProjectResponsibility projectResponsibility = project.getResponsibility();
         if (projectResponsibility == null && accessManager.hasPermission(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY, project))
         {

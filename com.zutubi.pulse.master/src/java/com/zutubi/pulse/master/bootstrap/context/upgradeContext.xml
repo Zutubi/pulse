@@ -77,6 +77,7 @@
                 <ref local="refactorDependencyPublicationUpgradeTask"/>
                 <ref local="addSettingsFileToMaven2UpgradeTask"/>
                 <ref local="dependencyTransitiveMode"/>
+                <ref local="updateBuildResultAndAddSequenceTableUpgradeTask"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -331,4 +332,14 @@
     <bean id="dependencyTransitiveMode" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyTransitiveModeUpgradeTask">
         <property name="buildNumber" value="201004001"/>
     </bean>
+
+    <bean id="updateBuildResultAndAddSequenceTableUpgradeTask" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="201004002"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.1.5-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>

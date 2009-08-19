@@ -40,6 +40,7 @@ public class ProjectConfigurationActions
     public static final String ACTION_VIEW_SOURCE          = "view source";
     public static final String ACTION_TRIGGER              = "trigger";
     public static final String ACTION_MARK_CLEAN           = "clean";
+    public static final String ACTION_REBUILD              = "rebuild";
 
     private static final Logger LOG = Logger.getLogger(ProjectConfigurationActions.class);
 
@@ -68,6 +69,12 @@ public class ProjectConfigurationActions
                 if (state.acceptTrigger(false))
                 {
                     result.add(ACTION_TRIGGER);
+                    
+                    // If the project has dependencies, then we can also trigger a dependency rebuild.
+                    if (instance.hasDependencies())
+                    {
+                        result.add(ACTION_REBUILD);
+                    }
                 }
 
                 initialised = state.isInitialised();
@@ -137,6 +144,18 @@ public class ProjectConfigurationActions
         if (user != null)
         {
             TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);
+            projectManager.triggerBuild(projectConfig, options, null);
+        }
+    }
+
+    @Permission(ACTION_TRIGGER)
+    public void doRebuild(ProjectConfiguration projectConfig)
+    {
+        String user = AcegiUtils.getLoggedInUsername();
+        if (user != null)
+        {
+            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);
+            options.setRebuild(true);
             projectManager.triggerBuild(projectConfig, options, null);
         }
     }

@@ -3,15 +3,11 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
-import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
+import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import org.acegisecurity.AccessDeniedException;
 import static org.mockito.Mockito.*;
@@ -19,8 +15,7 @@ import static org.mockito.Mockito.*;
 import java.util.LinkedList;
 import java.util.List;
 
-// We have fields that looked unused but actually are by the magic
-// WiringObjectFactory.
+// We have fields that looked unused but actually are by the magic WiringObjectFactory.
 @SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
 public class EntityBuildQueueTest extends BuildQueueTestCase
 {
@@ -55,8 +50,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         activeSnapshot.add(mock(EntityBuildQueue.ActiveBuild.class));
         assertEquals(0, queue.getActiveBuildCount());
 
-        List<AbstractBuildRequestEvent> queuedSnapshot = queue.getQueuedBuildsSnapshot();
-        queuedSnapshot.add(mock(BuildRequestEvent.class));
+        List<BuildRequestEvent> queuedSnapshot = queue.getQueuedBuildsSnapshot();
+        queuedSnapshot.add(mock(SingleBuildRequestEvent.class));
         assertEquals(0, queue.getQueuedBuildCount());
     }
 
@@ -67,7 +62,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         ActivatedEventListener listener = new ActivatedEventListener();
         eventManager.register(listener);
 
-        AbstractBuildRequestEvent request = createRequest(BUILD_ID, "source", false);
+        BuildRequestEvent request = createRequest(BUILD_ID, "source", false);
         queue.handleRequest(request);
 
         assertActive(request);
@@ -88,8 +83,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         ActivatedEventListener listener = new ActivatedEventListener();
         eventManager.register(listener);
 
-        AbstractBuildRequestEvent request1 = createRequest(BUILD_ID1, "source1", false);
-        AbstractBuildRequestEvent request2 = createRequest(BUILD_ID2, "source2", false);
+        BuildRequestEvent request1 = createRequest(BUILD_ID1, "source1", false);
+        BuildRequestEvent request2 = createRequest(BUILD_ID2, "source2", false);
         queue.handleRequest(request1);
         queue.handleRequest(request2);
 
@@ -112,7 +107,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
 
     public void testBuildCompletedInvalidId()
     {
-        AbstractBuildRequestEvent request = createRequest((long) nextId.getAndIncrement(), "source", false);
+        BuildRequestEvent request = createRequest((long) nextId.getAndIncrement(), "source", false);
         queue.handleRequest(request);
         assertActive(request);
         queue.handleBuildCompleted(-1);
@@ -124,8 +119,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final long ACTIVE_ID = nextId.getAndIncrement();
         final long QUEUED_ID = nextId.getAndIncrement();
 
-        AbstractBuildRequestEvent request1 = createRequest(ACTIVE_ID, "source", false);
-        AbstractBuildRequestEvent request2 = createRequest(QUEUED_ID, "source", false);
+        BuildRequestEvent request1 = createRequest(ACTIVE_ID, "source", false);
+        BuildRequestEvent request2 = createRequest(QUEUED_ID, "source", false);
         queue.handleRequest(request1);
         queue.handleRequest(request2);
 
@@ -151,8 +146,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final long BUILD_ID1 = nextId.getAndIncrement();
         final long BUILD_ID2 = nextId.getAndIncrement();
 
-        AbstractBuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
-        AbstractBuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
+        BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
+        BuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
         queue.handleRequest(activeRequest);
         queue.handleRequest(queuedRequest);
 
@@ -174,8 +169,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final Revision revision1 = new Revision("1");
         final Revision revision2 = new Revision("2");
 
-        AbstractBuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source", true, revision1);
-        AbstractBuildRequestEvent replacementRequest = createRequest(BUILD_ID2, "source", true, revision2);
+        BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source", true, revision1);
+        BuildRequestEvent replacementRequest = createRequest(BUILD_ID2, "source", true, revision2);
 
         BuildHandler handler = handlers.get(activeRequest);
         doReturn(true).when(handler).updateRevisionIfNotFixed(revision2);
@@ -201,8 +196,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final Revision revision1 = new Revision("1");
         final Revision revision2 = new Revision("2");
 
-        AbstractBuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", true, revision1);
-        AbstractBuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", true, revision2);
+        BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", true, revision1);
+        BuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", true, revision2);
 
         queue.handleRequest(activeRequest);
         assertSame(activeRequest.getRevision().getRevision(), revision1);
@@ -223,8 +218,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final Revision revision1 = new Revision("1");
         final Revision revision2 = new Revision("2");
 
-        AbstractBuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source", true, revision1);
-        AbstractBuildRequestEvent replacementRequest = createRequest(BUILD_ID2, "source", true, revision2);
+        BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source", true, revision1);
+        BuildRequestEvent replacementRequest = createRequest(BUILD_ID2, "source", true, revision2);
 
         queue.handleRequest(activeRequest);
         BuildRevision activeBuildRevision = activeRequest.getRevision();
@@ -250,9 +245,9 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final Revision revision1 = new Revision("1");
         final Revision revision2 = new Revision("2");
 
-        AbstractBuildRequestEvent activeRequest = createRequest(BUILD_ID1, "another source", true, revision1);
-        AbstractBuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source", true, revision1);
-        AbstractBuildRequestEvent replacementRequest = createRequest(BUILD_ID3, "source", true, revision2);
+        BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "another source", true, revision1);
+        BuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source", true, revision1);
+        BuildRequestEvent replacementRequest = createRequest(BUILD_ID3, "source", true, revision2);
 
         queue.handleRequest(activeRequest);
         queue.handleRequest(queuedRequest);
@@ -271,8 +266,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final long BUILD_ID1 = nextId.getAndIncrement();
         final long BUILD_ID2 = nextId.getAndIncrement();
 
-        AbstractBuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
-        AbstractBuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
+        BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
+        BuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
         queue.handleRequest(activeRequest);
         queue.handleRequest(queuedRequest);
 
@@ -290,8 +285,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final long BUILD_ID1 = nextId.getAndIncrement();
         final long BUILD_ID2 = nextId.getAndIncrement();
 
-        AbstractBuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
-        AbstractBuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
+        BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
+        BuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
         queue.handleRequest(activeRequest);
         queue.handleRequest(queuedRequest);
 
@@ -309,8 +304,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final long BUILD_ID1 = nextId.getAndIncrement();
         final long BUILD_ID2 = nextId.getAndIncrement();
 
-        AbstractBuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
-        AbstractBuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
+        BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
+        BuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
         queue.handleRequest(activeRequest);
         queue.handleRequest(queuedRequest);
 
@@ -328,9 +323,10 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         final long BUILD_ID1 = nextId.getAndIncrement();
         final long BUILD_ID2 = nextId.getAndIncrement();
 
-        AbstractBuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
-        AbstractBuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
+        BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source1", false);
+        BuildRequestEvent queuedRequest = createRequest(BUILD_ID2, "source2", false);
 
+        //noinspection ThrowableInstanceNeverThrown
         doThrow(new AccessDeniedException("badness")).when(accessManager).ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, queuedRequest);
 
         queue.handleRequest(activeRequest);
@@ -355,23 +351,9 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
     {
         try
         {
-            AbstractBuildRequestEvent request = new AbstractBuildRequestEvent(null, null, null, null)
-            {
-                public NamedEntity getOwner()
-                {
-                    return new Project();
-                }
+            SingleBuildRequestEvent request = mock(SingleBuildRequestEvent.class);
+            stub(request.getOwner()).toReturn(new Project());
 
-                public boolean isPersonal()
-                {
-                    return false;
-                }
-
-                public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
-                {
-                    return null;
-                }
-            };
             queue.handleRequest(request);
             fail("Queue accepted build for another owner");
         }
@@ -381,12 +363,12 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         }
     }
 
-    private void assertActive(AbstractBuildRequestEvent... events)
+    private void assertActive(BuildRequestEvent... events)
     {
         assertActive(queue.getActiveBuildsSnapshot(), events);
     }
 
-    private void assertQueued(AbstractBuildRequestEvent... events)
+    private void assertQueued(BuildRequestEvent... events)
     {
         assertQueued(queue.getQueuedBuildsSnapshot(), events);
     }
@@ -400,12 +382,12 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         }
     }
 
-    private AbstractBuildRequestEvent createRequest(final long buildId, String source, boolean replaceable)
+    private BuildRequestEvent createRequest(final long buildId, String source, boolean replaceable)
     {
         return createRequest(buildId, source, replaceable, null);
     }
 
-    private AbstractBuildRequestEvent createRequest(final long buildId, String source, boolean replaceable, Revision revision)
+    private BuildRequestEvent createRequest(final long buildId, String source, boolean replaceable, Revision revision)
     {
         return createRequest(owner, buildId, source, replaceable, revision);
     }

@@ -29,6 +29,7 @@ public class ConcreteProjectModel extends ProjectModel
     private boolean built;
     private List<ProjectBuildModel> buildRows;
     private boolean canTrigger;
+    private boolean canRebuild;
     private boolean canViewSource;
     private long projectId;
 
@@ -63,6 +64,7 @@ public class ConcreteProjectModel extends ProjectModel
         });
 
         this.canTrigger = canTrigger;
+        this.canRebuild = canTrigger && project.getConfig().hasDependencies();
         this.canViewSource = canViewSource;
     }
 
@@ -110,6 +112,11 @@ public class ConcreteProjectModel extends ProjectModel
     public boolean isCanTrigger()
     {
         return canTrigger;
+    }
+
+    public boolean isCanRebuild()
+    {
+        return canRebuild;
     }
 
     public boolean isCanViewSource()

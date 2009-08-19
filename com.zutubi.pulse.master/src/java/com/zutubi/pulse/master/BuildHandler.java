@@ -26,7 +26,7 @@ public interface BuildHandler
      * Get the build result id associated with this build.
      * @return build result id.
      */
-    long getBuildId();
+    long getBuildResultId();
 
     /**
      * Run the build.

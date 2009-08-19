@@ -48,25 +48,6 @@ This context requires:
         </property>
     </bean>
 
-
-    <bean id="anyTypeDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAnyTypeDao">
-        <property name="sessionFactory">
-            <ref local="sessionFactory"/>
-        </property>
-    </bean>
-    <bean id="anyTypeDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="anyTypeDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
-
     <bean id="artifactDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateArtifactDao">
         <property name="sessionFactory">
             <ref local="sessionFactory"/>
@@ -144,6 +125,23 @@ This context requires:
         <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
             <ref local="projectDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="sequenceEntryDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateSequenceEntryDao">
+        <property name="sessionFactory">
+            <ref local="sessionFactory"/>
+        </property>
+    </bean>
+    <bean id="sequenceEntryDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="target">
+            <ref local="sequenceEntryDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

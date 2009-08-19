@@ -17,11 +17,13 @@ import java.util.List;
  */
 public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoSupport implements EntityDao<T>
 {
+    @SuppressWarnings({"unchecked"})
     public T findById(long id)
     {
         return (T) findByIdAndType(id, persistentClass());
     }
 
+    @SuppressWarnings({"unchecked"})
     public <U extends T> U findByIdAndType(long id, Class<U> type)
     {
         return (U)findAnyType(id, type);
@@ -43,6 +45,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     public List<T> findAll()
     {
         return (List<T>) getHibernateTemplate().loadAll(persistentClass());
@@ -92,6 +95,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         return findFirstByNamedQuery(queryName, propertyName, propertyValue, false);
     }
 
+    @SuppressWarnings({"unchecked"})
     public Object findFirstByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final boolean cacheable)
     {
         List<Object> results = (List<Object>) getHibernateTemplate().execute(new HibernateCallback()
@@ -142,6 +146,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         return findByNamedQuery(queryName, propertyName, propertyValue, maxResults, false);
     }
 
+    @SuppressWarnings({"unchecked"})
     public <U> List<U> findByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final int maxResults, final boolean cachable)
     {
         return (List<U>) getHibernateTemplate().execute(new HibernateCallback()
@@ -189,9 +194,10 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         return findUniqueByNamedQuery(queryName, propertyName, propertyValue, secondPropertyName, secondPropertyValue, false);
     }
 
-    public final Object findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final String secondPropertyName, final Object secondPropertyValue, final boolean cachable)
+    @SuppressWarnings({"unchecked"})
+    public final <U> U findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final String secondPropertyName, final Object secondPropertyValue, final boolean cachable)
     {
-        return getHibernateTemplate().execute(new HibernateCallback()
+        return (U) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {

@@ -15,6 +15,18 @@ public class TriggerBuildAction extends ProjectActionBase
 {
     private ActionManager actionManager;
 
+    private boolean rebuild = false;
+
+    public boolean isRebuild()
+    {
+        return rebuild;
+    }
+
+    public void setRebuild(boolean rebuild)
+    {
+        this.rebuild = rebuild;
+    }
+
     public String execute()
     {
         Project project = getRequiredProject();
@@ -26,8 +38,15 @@ public class TriggerBuildAction extends ProjectActionBase
         {
             return "prompt";
         }
-        
-        actionManager.execute(ProjectConfigurationActions.ACTION_TRIGGER, projectConfig, null);
+
+        if (rebuild)
+        {
+            actionManager.execute(ProjectConfigurationActions.ACTION_REBUILD, projectConfig, null);
+        }
+        else
+        {
+            actionManager.execute(ProjectConfigurationActions.ACTION_TRIGGER, projectConfig, null);
+        }
 
         try
         {

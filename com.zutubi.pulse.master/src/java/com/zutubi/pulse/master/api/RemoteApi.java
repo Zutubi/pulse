@@ -22,7 +22,7 @@ import com.zutubi.pulse.master.charting.model.SeriesData;
 import com.zutubi.pulse.master.charting.render.ChartUtils;
 import com.zutubi.pulse.master.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.master.events.AgentEnableRequestedEvent;
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
@@ -2734,21 +2734,21 @@ public class RemoteApi
         try
         {
             BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
-            List<AbstractBuildRequestEvent> filteredQueue = new LinkedList<AbstractBuildRequestEvent>();
-            for (List<AbstractBuildRequestEvent> entityQueue: snapshot.getQueuedBuilds().values())
+            List<BuildRequestEvent> filteredQueue = new LinkedList<BuildRequestEvent>();
+            for (List<BuildRequestEvent> entityQueue: snapshot.getQueuedBuilds().values())
             {
-                CollectionUtils.filter(entityQueue, new Predicate<AbstractBuildRequestEvent>()
+                CollectionUtils.filter(entityQueue, new Predicate<BuildRequestEvent>()
                 {
-                    public boolean satisfied(AbstractBuildRequestEvent e)
+                    public boolean satisfied(BuildRequestEvent e)
                     {
                         return accessManager.hasPermission(AccessManager.ACTION_VIEW, e.getOwner());
                     }
                 }, filteredQueue);
             }
 
-            return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<AbstractBuildRequestEvent, Hashtable<String, Object>>()
+            return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<BuildRequestEvent, Hashtable<String, Object>>()
             {
-                public Hashtable<String, Object> map(AbstractBuildRequestEvent e)
+                public Hashtable<String, Object> map(BuildRequestEvent e)
                 {
                     return convertBuildRequestEvent(e);
                 }
@@ -2760,7 +2760,7 @@ public class RemoteApi
         }
     }
 
-    private Hashtable<String, Object> convertBuildRequestEvent(AbstractBuildRequestEvent event)
+    private Hashtable<String, Object> convertBuildRequestEvent(BuildRequestEvent event)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
         result.put("id", Long.toString(event.getId()));
@@ -3065,6 +3065,10 @@ public class RemoteApi
             if (triggerOptions.containsKey("resolveVersion"))
             {
                 options.setResolveVersion(Boolean.valueOf((String) triggerOptions.get("resolveVersion")));
+            }
+            if (triggerOptions.containsKey("rebuild"))
+            {
+                options.setRebuild(Boolean.valueOf((String) triggerOptions.get("rebuild")));
             }
 
             projectManager.triggerBuild(project.getConfig(), options, revision);

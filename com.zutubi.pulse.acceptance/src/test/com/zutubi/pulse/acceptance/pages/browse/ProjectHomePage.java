@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_REBUILD;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_TRIGGER;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
 
@@ -20,9 +22,19 @@ public class ProjectHomePage extends ResponsibilityPage
 
     public void triggerBuild()
     {
-        clickAction("trigger");
+        clickAction(ACTION_TRIGGER);
     }
-    
+
+    public boolean isTriggerActionPresent()
+    {
+        return isActionPresent(ACTION_TRIGGER);
+    }
+
+    public boolean isRebuildActionPresent()
+    {
+        return isActionPresent(ACTION_REBUILD);
+    }
+
     public String getUrl()
     {
         return urls.project(projectName);

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.security;
 
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.tove.security.AuthorityProvider;
 import com.zutubi.tove.security.DefaultAccessManager;
@@ -11,11 +11,11 @@ import java.util.Set;
 /**
  * Controls access to cancellation of build requests.
  */
-public class BuildRequestEventAuthorityProvider implements AuthorityProvider<AbstractBuildRequestEvent>
+public class BuildRequestEventAuthorityProvider implements AuthorityProvider<BuildRequestEvent>
 {
     private ProjectConfigurationAuthorityProvider projectConfigurationAuthorityProvider;
 
-    public Set<String> getAllowedAuthorities(String action, AbstractBuildRequestEvent resource)
+    public Set<String> getAllowedAuthorities(String action, BuildRequestEvent resource)
     {
         if(resource.isPersonal())
         {
@@ -32,7 +32,7 @@ public class BuildRequestEventAuthorityProvider implements AuthorityProvider<Abs
 
     public void setAccessManager(DefaultAccessManager accessManager)
     {
-        accessManager.registerAuthorityProvider(AbstractBuildRequestEvent.class, this);
+        accessManager.registerAuthorityProvider(BuildRequestEvent.class, this);
     }
 
     public void setProjectConfigurationAuthorityProvider(ProjectConfigurationAuthorityProvider projectConfigurationAuthorityProvider)

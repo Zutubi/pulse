@@ -14,6 +14,7 @@
                 <value>com/zutubi/pulse/model/persistence/hibernate/Resource.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Revision.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Scm.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/Sequence.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/AgentState.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Trigger.hbm.xml</value>

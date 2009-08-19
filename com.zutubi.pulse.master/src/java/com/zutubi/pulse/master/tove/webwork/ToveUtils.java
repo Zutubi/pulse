@@ -676,7 +676,8 @@ public class ToveUtils
                 return "exclamation.gif";
             case IN_PROGRESS:
                 return "inprogress.gif";
-            case INITIAL:
+            case PENDING:
+            case PENDING_DEPENDENCY:
                 return "hourglass.gif";
             case TERMINATING:
                 return "stop.gif";

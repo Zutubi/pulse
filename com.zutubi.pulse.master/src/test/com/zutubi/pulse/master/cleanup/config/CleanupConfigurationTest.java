@@ -50,7 +50,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         b4 = createBuild(p1, 4, System.currentTimeMillis() - Constants.DAY * 2, ResultState.SUCCESS, true, IvyManager.STATUS_MILESTONE);
         createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, true, IvyManager.STATUS_RELEASE);
         // Create a build that has started but is not in progress yet: -1 timestamp
-        createBuild(p1, 6, -1, ResultState.INITIAL, true, IvyManager.STATUS_INTEGRATION);
+        createBuild(p1, 6, -1, ResultState.PENDING, true, IvyManager.STATUS_INTEGRATION);
 
         dependencyManager = mock(DependencyManager.class);
         stub(dependencyManager.getStatuses()).toReturn(

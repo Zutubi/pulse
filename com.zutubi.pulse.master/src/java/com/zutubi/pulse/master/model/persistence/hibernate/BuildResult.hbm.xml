@@ -24,6 +24,11 @@
             <one-to-many class="com.zutubi.pulse.core.model.PersistentFeature"/>
         </bag>
 
+        <bag name="dependsOn" cascade="none" lazy="true">
+            <key column="DEPENDENT_BUILD_RESULT_ID"/>
+            <one-to-many class="com.zutubi.pulse.master.model.BuildResult"/>
+        </bag>
+
         <property name="number" type="long">
             <column name="NUMBER" not-null="true" index="idx_buildresult_number"/>
         </property>
@@ -52,6 +57,9 @@
         <property name="hasWorkDir" type="boolean"/>
 
         <property name="revisionString" column="REVISION_STRING" type="string" length="8191"/>
+
+        <property name="buildId" column="BUILD_ID" type="long"/>
+
     </class>
 
     <class name="com.zutubi.pulse.master.model.AbstractBuildReason" table="BUILD_REASON" lazy="false">

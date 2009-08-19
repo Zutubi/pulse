@@ -8,15 +8,15 @@ import com.zutubi.pulse.master.model.User;
  */
 public class BuildActivatedEvent extends BuildEvent
 {
-    private AbstractBuildRequestEvent event;
+    private BuildRequestEvent event;
 
-    public BuildActivatedEvent(Object source, AbstractBuildRequestEvent event)
+    public BuildActivatedEvent(Object source, BuildRequestEvent event)
     {
         super(source, null, null);
         this.event = event;
     }
 
-    public AbstractBuildRequestEvent getEvent()
+    public BuildRequestEvent getEvent()
     {
         return event;
     }

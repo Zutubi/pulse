@@ -5,7 +5,7 @@ import com.zutubi.events.PublishFlag;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
@@ -48,7 +48,7 @@ public class EntityBuildQueue
     /**
      * Queue of builds that have not yet become active, newest first.
      */
-    private List<AbstractBuildRequestEvent> queuedBuilds = new LinkedList<AbstractBuildRequestEvent>();
+    private List<BuildRequestEvent> queuedBuilds = new LinkedList<BuildRequestEvent>();
     private volatile boolean stopped = false;
 
     private BuildHandlerFactory buildHandlerFactory;
@@ -80,7 +80,7 @@ public class EntityBuildQueue
      * @throws IllegalArgumentException if the event's owner does not match the
      *                                  queue's
      */
-    public void handleRequest(AbstractBuildRequestEvent event)
+    public void handleRequest(BuildRequestEvent event)
     {
         if (!event.getOwner().equals(owner))
         {
@@ -107,7 +107,7 @@ public class EntityBuildQueue
         Iterator<ActiveBuild> it = activeBuilds.iterator();
         while (it.hasNext())
         {
-            if (it.next().getHandler().getBuildId() == id)
+            if (it.next().getHandler().getBuildResultId() == id)
             {
                 it.remove();
                 found = true;
@@ -134,16 +134,16 @@ public class EntityBuildQueue
      *       administrator</li>
      * </ul>
      * 
-     * @param id identifer of the {@link com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent}
+     * @param id identifer of the {@link com.zutubi.pulse.master.events.build.BuildRequestEvent}
      *           to cancel
      * @return true if the request was found and successfully cancelled
      */
     public boolean cancelQueuedRequest(long id)
     {
-        Iterator<AbstractBuildRequestEvent> it = queuedBuilds.iterator();
+        Iterator<BuildRequestEvent> it = queuedBuilds.iterator();
         while (it.hasNext())
         {
-            AbstractBuildRequestEvent event = it.next();
+            BuildRequestEvent event = it.next();
             if (event.getId() == id)
             {
                 accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, event);
@@ -155,11 +155,11 @@ public class EntityBuildQueue
         return false;
     }
     
-    private boolean updateExistingReplaceableRequest(AbstractBuildRequestEvent event)
+    private boolean updateExistingReplaceableRequest(BuildRequestEvent event)
     {
         // Look for a possibly-replaceable existing request.  Start with the
         // latest queued.
-        for (AbstractBuildRequestEvent existing : queuedBuilds)
+        for (BuildRequestEvent existing : queuedBuilds)
         {
             if (eventCanReplaceRequest(event, existing))
             {
@@ -191,12 +191,12 @@ public class EntityBuildQueue
         return false;
     }
 
-    private boolean eventCanReplaceRequest(AbstractBuildRequestEvent event, AbstractBuildRequestEvent existingRequest)
+    private boolean eventCanReplaceRequest(BuildRequestEvent event, BuildRequestEvent existingRequest)
     {
         return existingRequest.getOptions().isReplaceable() && StringUtils.equals(existingRequest.getOptions().getSource(), event.getOptions().getSource());
     }
 
-    private void queue(AbstractBuildRequestEvent event)
+    private void queue(BuildRequestEvent event)
     {
         if (activeBuilds.size() < maxActive)
         {
@@ -208,7 +208,7 @@ public class EntityBuildQueue
         }
     }
 
-    private void activate(AbstractBuildRequestEvent event)
+    private void activate(BuildRequestEvent event)
     {
         if (stopped)
         {
@@ -261,9 +261,9 @@ public class EntityBuildQueue
      * @return a snapshot of all queued (i.e. not yet active) builds in this
      *         queue
      */
-    public List<AbstractBuildRequestEvent> getQueuedBuildsSnapshot()
+    public List<BuildRequestEvent> getQueuedBuildsSnapshot()
     {
-        return new LinkedList<AbstractBuildRequestEvent>(queuedBuilds);
+        return new LinkedList<BuildRequestEvent>(queuedBuilds);
     }
 
     /**
@@ -296,16 +296,16 @@ public class EntityBuildQueue
      */
     public static class ActiveBuild
     {
-        private AbstractBuildRequestEvent event;
+        private BuildRequestEvent event;
         private BuildHandler handler;
 
-        public ActiveBuild(AbstractBuildRequestEvent event, BuildHandler handler)
+        public ActiveBuild(BuildRequestEvent event, BuildHandler handler)
         {
             this.event = event;
             this.handler = handler;
         }
 
-        public AbstractBuildRequestEvent getEvent()
+        public BuildRequestEvent getEvent()
         {
             return event;
         }

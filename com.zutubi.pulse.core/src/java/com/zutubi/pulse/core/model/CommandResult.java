@@ -32,7 +32,7 @@ public class CommandResult extends Result
     public CommandResult(String name)
     {
         commandName = name;
-        state = ResultState.INITIAL;
+        state = ResultState.PENDING;
     }
 
     public String getCommandName()

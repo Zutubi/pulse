@@ -1,11 +1,12 @@
 package com.zutubi.events;
 
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * The Asynchronous delegating listener, as the name suggests, is an event listener that
@@ -23,6 +24,12 @@ public class AsynchronousDelegatingListener implements EventListener
     private final ExecutorService executor;
     private final EventListener delegate;
 
+    /**
+     * The futures allows us to track the processing of the events on the delegate thread,
+     * allowing us to answer the question: Are you busy?
+     */
+    private final List<Future> futures = new LinkedList<Future>();
+
     public AsynchronousDelegatingListener(EventListener delegate, ThreadFactory threadFactory)
     {
         this.delegate = delegate;
@@ -35,24 +42,34 @@ public class AsynchronousDelegatingListener implements EventListener
         // a separate thread. The executor will queue the event handling until the
         // thread is available. See Executors.newSingleThreadExecutor for full
         // sematic definition.
-/*
         if (!executor.isShutdown())
         {
-*/
-            executor.execute(new Runnable()
+            synchronized (futures)
             {
-                public void run()
+                // Cleanup any futures that are already done.  We do not need to track these any longer.
+                cleanupCompletedEvents();
+
+                futures.add(executor.submit(new Runnable()
                 {
-                    delegate.handleEvent(event);
-                }
-            });
-/*
+                    public void run()
+                    {
+                        delegate.handleEvent(event);
+                    }
+                }));
+            }
         }
-        else
+    }
+
+    private void cleanupCompletedEvents()
+    {
+        List<Future> doneFutures = CollectionUtils.filter(futures, new Predicate<Future>()
         {
-            System.out.println("blah.." + event);
-        }
-*/
+            public boolean satisfied(Future future)
+            {
+                return future.isDone();
+            }
+        });
+        futures.removeAll(doneFutures);
     }
 
     public Class[] getHandledEvents()
@@ -81,5 +98,40 @@ public class AsynchronousDelegatingListener implements EventListener
                 LOG.warning(e);
             }
         }
+    }
+
+    /**
+     * Returns true if the asynchronous delegate is currently not processing any events and
+     * there are no events queued to be processed.
+     *
+     * @return true if the delegate is idle, false otherwise.
+     *
+     * @see #isActive() 
+     */
+    public boolean isIdle()
+    {
+        synchronized (futures)
+        {
+            return CollectionUtils.find(futures, new Predicate<Future>()
+            {
+                public boolean satisfied(Future future)
+                {
+                    return !future.isDone();
+                }
+            }) == null;
+        }
+    }
+
+    /**
+     * Returns true if the asynchronous delegate is actively processing an event or if it has
+     * a queued event that will be processed.
+     *
+     * @return true if the delegate is active, false otherwise.
+     *
+     * @see #isIdle()
+     */
+    public boolean isActive()
+    {
+        return !isIdle();
     }
 }

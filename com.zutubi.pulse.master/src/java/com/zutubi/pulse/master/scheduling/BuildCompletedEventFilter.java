@@ -28,28 +28,29 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
 
     public boolean accept(Trigger trigger, Event event, TaskExecutionContext context)
     {
-        BuildCompletedEvent bce = (BuildCompletedEvent) event;
+        BuildCompletedEvent buildCompletedEvent = (BuildCompletedEvent) event;
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
-        boolean accept = !bce.getBuildResult().isPersonal() && checkProject(dataMap, bce) && checkState(dataMap, bce);
+        boolean accept = !buildCompletedEvent.getBuildResult().isPersonal() && checkProject(dataMap, buildCompletedEvent) && checkState(dataMap, buildCompletedEvent);
         if (accept)
         {
             // Pass some information to the task.
             if (getBooleanParam(dataMap, PARAM_PROPAGATE_REVISION, false))
             {
                 // Copy the revision: we don't want to share the persistent instance.
-                context.put(BuildProjectTask.PARAM_REVISION, new Revision(bce.getBuildResult().getRevision().getRevisionString()));
+                context.put(BuildProjectTask.PARAM_REVISION, new Revision(buildCompletedEvent.getBuildResult().getRevision().getRevisionString()));
                 context.put(BuildProjectTask.PARAM_REPLACEABLE, getBooleanParam(dataMap, PARAM_REPLACEABLE, false));
             }
             if (getBooleanParam(dataMap, PARAM_PROPAGATE_STATUS, false))
             {
-                context.put(BuildProjectTask.PARAM_STATUS, bce.getBuildResult().getStatus());
+                context.put(BuildProjectTask.PARAM_STATUS, buildCompletedEvent.getBuildResult().getStatus());
             }
             if (getBooleanParam(dataMap, PARAM_PROPAGATE_VERSION, false))
             {
-                context.put(BuildProjectTask.PARAM_VERSION, bce.getBuildResult().getVersion());
+                context.put(BuildProjectTask.PARAM_VERSION, buildCompletedEvent.getBuildResult().getVersion());
                 context.put(BuildProjectTask.PARAM_VERSION_PROPAGATED, true);
             }
             context.put(BuildProjectTask.PARAM_DEPENDENT, true);
+            context.put(BuildProjectTask.PARAM_BUILD_ID, buildCompletedEvent.getBuildResult().getBuildId());
         }
         return accept;
     }

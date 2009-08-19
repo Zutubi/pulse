@@ -189,6 +189,15 @@ ZUTUBI.ConcreteProject.prototype = {
                 });
             }
 
+            if (this.data.canRebuild)
+            {
+                items.push({
+                    id: 'rebuild',
+                    url: 'triggerBuild.action?projectName=' + encodeURIComponent(this.data.name) + '&rebuild=true',
+                    image: 'lightning.gif'
+                });
+            }
+
             if (this.showHideLinks)
             {
                 items.push({

@@ -62,6 +62,17 @@ public class TriggerOptions
      */
     private boolean dependent = false;
 
+    /**
+     * Indicates whether or not this is a request to rebuild this project and
+     * all of its dependencies.
+     */
+    private boolean rebuild = false;
+
+    /**
+     * The id of the build that triggered this build request, if any.
+     */
+    private long buildId;
+
     public TriggerOptions(TriggerOptions other)
     {
         this.properties.addAll(other.properties);
@@ -171,5 +182,25 @@ public class TriggerOptions
     public void setDependent(boolean dependent)
     {
         this.dependent = dependent;
+    }
+
+    public boolean isRebuild()
+    {
+        return rebuild;
+    }
+
+    public void setRebuild(boolean rebuild)
+    {
+        this.rebuild = rebuild;
+    }
+
+    public long getBuildId()
+    {
+        return buildId;
+    }
+
+    public void setBuildId(long buildId)
+    {
+        this.buildId = buildId;
     }
 }

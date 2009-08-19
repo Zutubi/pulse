@@ -71,7 +71,11 @@
                 <tr>
                     <td class="content">#html($detail.stageName)</td>
                     <td class="content"><a href="$dependency.projectUrl">#html($dependency.projectName)</a></td>
-                    <td class="content"><a href="$dependency.buildUrl">#html($dependency.buildName)</a></td>
+                    #if($dependency.buildUrl)
+                        <td class="content"><a href="$dependency.buildUrl">#html($dependency.buildName)</a></td>
+                    #else
+                        <td class="content">#html($dependency.buildName)</td>
+                    #end
                     <td class="content"><a href="$dependency.artifactUrl">#html($dependency.artifactName)</a></td>
                 </tr>
                 #end

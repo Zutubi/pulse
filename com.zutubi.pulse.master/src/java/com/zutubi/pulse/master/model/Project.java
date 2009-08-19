@@ -556,6 +556,17 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     {
     }
 
+    /**
+     * For testing only.  This constructor allows the initial state of this project
+     * to be set rather than needing to go through the formal state transition process.
+     * 
+     * @param state     the state of this project.
+     */
+    public Project(State state)
+    {
+        this.state = state;
+    }
+
     public Long getLastPollTime()
     {
         return lastPollTime;

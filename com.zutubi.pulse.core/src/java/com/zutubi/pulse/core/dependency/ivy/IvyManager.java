@@ -75,6 +75,11 @@ public class IvyManager implements DependencyManager
         });
     }
 
+    public int getPriority(String status)
+    {
+        return StatusManager.getCurrent().getPriority(status);
+    }
+
     /**
      * Get the default status.
      *

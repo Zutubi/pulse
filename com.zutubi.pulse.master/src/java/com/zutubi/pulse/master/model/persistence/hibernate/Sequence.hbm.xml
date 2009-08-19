@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.zutubi.pulse.master.model.SequenceEntry" table="SEQUENCE_TABLE" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+        <property name="name" column="SEQUENCE_NAME" type="string" length="255"/>
+        <property name="next" column="NEXT_VALUE" type="long"/>
+    </class>
+
+    <query name="findByName"><![CDATA[
+        from SequenceEntry sequence
+        where sequence.name = :name
+    ]]></query>
+
+</hibernate-mapping>

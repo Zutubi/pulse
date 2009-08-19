@@ -368,7 +368,6 @@ public class ViewBuildAction extends CommandActionBase
                     else
                     {
                         stageDependency.setBuildName("unknown");
-                        stageDependency.setBuildUrl("");
                     }
                 }
 

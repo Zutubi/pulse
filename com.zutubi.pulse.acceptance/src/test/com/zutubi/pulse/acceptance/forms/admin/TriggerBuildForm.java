@@ -1,8 +1,7 @@
 package com.zutubi.pulse.acceptance.forms.admin;
 
-import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.util.Pair;
 
 import java.util.LinkedList;
@@ -14,6 +13,8 @@ import java.util.List;
  */
 public class TriggerBuildForm extends SeleniumForm
 {
+    private boolean expectRebuildField = false;
+
     /**
      * The names of the properties configured for the project.
      */
@@ -29,6 +30,11 @@ public class TriggerBuildForm extends SeleniumForm
         propertyNames.add(name);
     }
 
+    public void expectRebuildField()
+    {
+        expectRebuildField = true;
+    }
+
     public String getFormName()
     {
         return "edit.build.properties";
@@ -40,6 +46,10 @@ public class TriggerBuildForm extends SeleniumForm
         fieldNames.add("revision");
         fieldNames.add("version");
         fieldNames.add("status");
+        if (expectRebuildField)
+        {
+            fieldNames.add("rebuild");
+        }
         for (String propertyName : propertyNames)
         {
             fieldNames.add("property." + propertyName);
@@ -50,11 +60,16 @@ public class TriggerBuildForm extends SeleniumForm
 
     public int[] getFieldTypes()
     {
-        int[] types = new int[propertyNames.size() + 3];
+        int nonPropertyFields = (expectRebuildField) ? 4 : 3;
+        int[] types = new int[propertyNames.size() + nonPropertyFields];
         types[0] = TEXTFIELD;
         types[1] = TEXTFIELD;
         types[2] = ITEM_PICKER;
-        for (int i = 3; i < types.length; i++)
+        if (expectRebuildField)
+        {
+            types[3] = CHECKBOX;
+        }
+        for (int i = nonPropertyFields; i < types.length; i++)
         {
             types[i] = TEXTFIELD;
         }
@@ -70,5 +85,10 @@ public class TriggerBuildForm extends SeleniumForm
     public void triggerFormElements(Pair<String, String>... args)
     {
         submitNamedFormElements("trigger", args);
+    }
+
+    public boolean isRebuildCheckboxPresent()
+    {
+        return browser.isElementIdPresent(getFieldId("rebuild"));
     }
 }

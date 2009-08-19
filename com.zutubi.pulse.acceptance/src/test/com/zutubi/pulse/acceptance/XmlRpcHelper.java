@@ -758,6 +758,11 @@ public class XmlRpcHelper
         return number;
     }
 
+    public void waitForBuildInProgress(final String projectName, final int number) throws Exception
+    {
+        waitForBuildInProgress(projectName, number, BUILD_TIMEOUT);
+    }
+
     /**
      * Waits for a project build to be in progress.  Should not be used if
      * there is a risk the build has already completed.

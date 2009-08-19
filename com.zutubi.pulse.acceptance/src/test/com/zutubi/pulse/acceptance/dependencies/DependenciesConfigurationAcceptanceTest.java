@@ -2,14 +2,15 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import com.zutubi.pulse.acceptance.SeleniumTestBase;
 import com.zutubi.pulse.acceptance.forms.admin.DependencyForm;
+import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectDependenciesPage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.*;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -100,7 +101,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
         form = projectDependenciesPage.clickView(dependencyName);
         form.waitFor();
-        
+
         assertExpectedStageOptions(form, projectA, "a1", "a2", "a3", "a4", "default");
         form.saveNamedFormElements(
                 asPair("project", getProjectHandle(projectA)),
@@ -110,6 +111,62 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         projectDependenciesPage.waitFor();
 
         assertDependenciesTableRow(projectDependenciesPage, 1, projectA, "latest.integration", "a1", "true");
+    }
+
+    public void testRebuildCheckboxAppearsOnManualTrigger() throws Exception
+    {
+        String projectA = random + "A";
+        String projectB = random + "B";
+
+        addProject(projectA, true);
+        addProject(projectB, true);
+        xmlRpcHelper.enableBuildPrompting(projectB);
+
+        loginAsAdmin();
+
+        assertFalse(isRebuildOptionAvailableOnPrompt(projectB, false));
+
+        // add a dependency to the project.
+        addDependency(projectB, projectA);
+
+        assertTrue(isRebuildOptionAvailableOnPrompt(projectB, true));
+    }
+
+    private boolean isRebuildOptionAvailableOnPrompt(String projectName, boolean expected)
+    {
+        ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectName);
+        home.triggerBuild();
+
+        TriggerBuildForm form = browser.createForm(TriggerBuildForm.class);
+        if (expected)
+        {
+            form.expectRebuildField();
+        }
+        form.waitFor();
+        assertTrue(form.isFormPresent());
+        return form.isRebuildCheckboxPresent();
+    }
+
+    public void testRebuildOptionIsAvailableOnProjectHomePage() throws Exception
+    {
+        String projectA = random + "A";
+        String projectB = random + "B";
+
+        addProject(projectA, true);
+        addProject(projectB, true);
+
+        addDependency(projectB, projectA);
+
+        loginAsAdmin();
+
+        assertFalse(isRebuildActionAvailableOnProjectHomePage(projectA));
+        assertTrue(isRebuildActionAvailableOnProjectHomePage(projectB));
+    }
+
+    private boolean isRebuildActionAvailableOnProjectHomePage(String projectName)
+    {
+        ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectName);
+        return home.isRebuildActionPresent();
     }
 
     private void assertDependenciesTableRow(ProjectDependenciesPage page, int rowIndex, String project, String revision, String stages, String transitive)
@@ -153,5 +210,27 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
             stage.put("name", stageName);
             xmlRpcHelper.insertConfig("projects/" + projectName + "/stages", stage);
         }
+    }
+
+    private void addDependency(String projectFrom, String projectTo) throws Exception
+    {
+        // configure the default stage.
+        String projectDependenciesPath = "projects/" + projectFrom + "/dependencies";
+
+        Hashtable<String, Object> projectDependencies = xmlRpcHelper.getConfig(projectDependenciesPath);
+        if (!projectDependencies.containsKey("dependencies"))
+        {
+            projectDependencies.put("dependencies", new Vector<Hashtable<String, Object>>());
+        }
+
+        @SuppressWarnings("unchecked")
+        Vector<Hashtable<String, Object>> dependencies = (Vector<Hashtable<String, Object>>) projectDependencies.get("dependencies");
+        Hashtable<String, Object> dependency = xmlRpcHelper.createEmptyConfig(DependencyConfiguration.class);
+        dependency.put("project", "projects/" + projectTo);
+        dependency.put("revision", "latest.integration");
+
+        dependencies.add(dependency);
+
+        xmlRpcHelper.saveConfig(projectDependenciesPath, projectDependencies, true);
     }
 }

@@ -72,13 +72,12 @@ public class BuildController implements EventListener, BuildHandler
     public static final String TIMEOUT_JOB_GROUP = "timeout";
     private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
 
-    private AbstractBuildRequestEvent request;
+    private BuildRequestEvent request;
     private Project project;
     private ProjectConfiguration projectConfig;
 
     private EventManager eventManager;
     private ProjectManager projectManager;
-    private UserManager userManager;
     private BuildManager buildManager;
     private TestManager testManager;
     private MasterLocationProvider masterLocationProvider;
@@ -109,7 +108,7 @@ public class BuildController implements EventListener, BuildHandler
     private RepositoryAttributes repositoryAttributes;
     private ModuleDescriptorFactory moduleDescriptorFactory = new ModuleDescriptorFactory();
 
-    public BuildController(AbstractBuildRequestEvent event)
+    public BuildController(BuildRequestEvent event)
     {
         this.request = event;
         projectConfig = request.getProjectConfig();
@@ -161,8 +160,7 @@ public class BuildController implements EventListener, BuildHandler
         tree = new BuildTree();
 
         TreeNode<RecipeController> root = tree.getRoot();
-        buildResult = request.createResult(projectManager, userManager);
-        buildManager.save(buildResult);
+        buildResult = request.createResult(projectManager, buildManager);
         previousSuccessful = buildManager.getLatestSuccessfulBuildResult(project);
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
@@ -1010,7 +1008,7 @@ public class BuildController implements EventListener, BuildHandler
         return project;
     }
 
-    public long getBuildId()
+    public long getBuildResultId()
     {
         return buildResult.getId();
     }
@@ -1038,11 +1036,6 @@ public class BuildController implements EventListener, BuildHandler
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 
     public void setBuildManager(BuildManager buildManager)

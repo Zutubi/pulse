@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
@@ -34,7 +34,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
     protected AccessManager accessManager;
     protected BuildHandlerFactory buildHandlerFactory;
 
-    protected Map<AbstractBuildRequestEvent, BuildHandler> handlers = new HashMap<AbstractBuildRequestEvent, BuildHandler>();
+    protected Map<BuildRequestEvent, BuildHandler> handlers = new HashMap<BuildRequestEvent, BuildHandler>();
 
     protected void setUp() throws Exception
     {
@@ -46,7 +46,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         accessManager = mock(AccessManager.class);
     }
 
-    protected void assertActive(List<EntityBuildQueue.ActiveBuild> activeSnapshot, AbstractBuildRequestEvent... events)
+    protected void assertActive(List<EntityBuildQueue.ActiveBuild> activeSnapshot, BuildRequestEvent... events)
     {
         if (events.length == 0)
         {
@@ -65,7 +65,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         }
     }
 
-    protected void assertQueued(List<AbstractBuildRequestEvent> queuedSnapshot, AbstractBuildRequestEvent... events)
+    protected void assertQueued(List<BuildRequestEvent> queuedSnapshot, BuildRequestEvent... events)
     {
         if (events.length == 0)
         {
@@ -97,13 +97,13 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         return project;
     }
 
-    protected AbstractBuildRequestEvent createRequest(final Project owner, final long buildId, String source, boolean replaceable, Revision revision)
+    protected BuildRequestEvent createRequest(final Project owner, final long buildId, String source, boolean replaceable, Revision revision)
     {
         BuildRevision buildRevision = revision == null ? new BuildRevision() : new BuildRevision(revision, false);
         TriggerOptions options = new TriggerOptions(null, source);
         options.setStatus(STATUS_INTEGRATION);
         options.setReplaceable(replaceable);
-        AbstractBuildRequestEvent request = new AbstractBuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), options)
+        BuildRequestEvent request = new BuildRequestEvent(BuildQueueTestCase.this, buildRevision, owner.getConfig(), options)
         {
             public NamedEntity getOwner()
             {
@@ -115,11 +115,16 @@ public abstract class BuildQueueTestCase extends PulseTestCase
                 return false;
             }
 
-            public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
+            public String getStatus()
+            {
+                return options.getStatus();
+            }
+
+            public BuildResult createResult(ProjectManager projectManager, BuildManager buildManager)
             {
                 BuildResult buildResult = new BuildResult(new UnknownBuildReason(), owner, 0, false);
                 buildResult.setId(buildId);
-                buildResult.setStatus(options.getStatus());
+                buildResult.setStatus(getStatus());
                 return buildResult;
             }
         };
@@ -127,7 +132,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         // By default, the build handler that is used by the BuildQueue to process the build request does nothing.
         BuildHandler handler = mock(BuildHandler.class);
         doReturn(handler).when(buildHandlerFactory).createHandler(request);
-        doReturn(buildId).when(handler).getBuildId();
+        doReturn(buildId).when(handler).getBuildResultId();
 
         handlers.put(request, handler);
         

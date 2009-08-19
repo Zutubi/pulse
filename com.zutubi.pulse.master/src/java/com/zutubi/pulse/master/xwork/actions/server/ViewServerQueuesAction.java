@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.server;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.*;
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.security.AcegiUtils;
@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class ViewServerQueuesAction extends ActionSupport
 {
-    private List<AbstractBuildRequestEvent> buildQueue;
+    private List<BuildRequestEvent> buildQueue;
     private List<BuildResult> executingBuilds;
     private List<RecipeAssignmentRequest> recipeQueueSnapshot;
 
@@ -25,7 +25,7 @@ public class ViewServerQueuesAction extends ActionSupport
     private RecipeQueue recipeQueue;
     private BuildManager buildManager;
 
-    public List<AbstractBuildRequestEvent> getBuildQueue()
+    public List<BuildRequestEvent> getBuildQueue()
     {
         return buildQueue;
     }
@@ -70,11 +70,11 @@ public class ViewServerQueuesAction extends ActionSupport
             {
                 recipeQueueSnapshot = recipeQueue.takeSnapshot();
 
-                buildQueue = new LinkedList<AbstractBuildRequestEvent>();
+                buildQueue = new LinkedList<BuildRequestEvent>();
                 executingBuilds = new LinkedList<BuildResult>();
 
                 BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
-                for (Map.Entry<Entity, List<AbstractBuildRequestEvent>>  entityQueue: snapshot.getQueuedBuilds().entrySet())
+                for (Map.Entry<Entity, List<BuildRequestEvent>>  entityQueue: snapshot.getQueuedBuilds().entrySet())
                 {
                     buildQueue.addAll(entityQueue.getValue());
                 }
@@ -84,7 +84,7 @@ public class ViewServerQueuesAction extends ActionSupport
                     for (EntityBuildQueue.ActiveBuild activeBuild: activeForEntity)
                     {
                         BuildHandler buildHandler = activeBuild.getHandler();
-                        BuildResult buildResult = buildManager.getBuildResult(buildHandler.getBuildId());
+                        BuildResult buildResult = buildManager.getBuildResult(buildHandler.getBuildResultId());
                         if (buildResult != null && !buildResult.completed())
                         {
                             executingBuilds.add(buildResult);

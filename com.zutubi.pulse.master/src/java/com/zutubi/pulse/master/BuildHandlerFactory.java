@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master;
 
-import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 
 /**
  * The build handler factory is a simple factory interface responsible
@@ -15,5 +15,5 @@ public interface BuildHandlerFactory
      * @param request the build request details.
      * @return the new build handler instance.
      */
-    BuildHandler createHandler(AbstractBuildRequestEvent request);
+    BuildHandler createHandler(BuildRequestEvent request);
 }

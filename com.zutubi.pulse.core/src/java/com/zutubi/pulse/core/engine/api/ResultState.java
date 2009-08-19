@@ -10,7 +10,7 @@ public enum ResultState
     /**
      * The result has not yet commenced.
      */
-    INITIAL
+    PENDING
             {
                 public boolean isBroken()
                 {
@@ -30,6 +30,29 @@ public enum ResultState
                 public String getPrettyString()
                 {
                     return "pending";
+                }
+            },
+    /**
+     * The result has not yet commenced and is waiting on a dependency to complete
+     * before it can commence.
+     */
+    PENDING_DEPENDENCY
+            {
+                public boolean isBroken()
+                {
+                    return false;
+                }
+                public boolean isCompleted()
+                {
+                    return false;
+                }
+                public String getPrettyString()
+                {
+                    return "pending dependency";
+                }
+                public String getString()
+                {
+                    return "pending dependency";
                 }
             },
     /**
@@ -216,7 +239,7 @@ public enum ResultState
     {
         return BROKEN_STATES;
     }
-    
+
     /**
      * @return the set of states that return true from {@link #isCompleted()}
      */
@@ -287,10 +310,12 @@ public enum ResultState
      * @return true if this state indicates a result that is complete
      */
     public abstract boolean isCompleted();
+
     /**
      * @return a human-readable string for this state
      */
     public abstract String getPrettyString();
+
     /**
      * @return an all lower-case machine-readable string for this state
      */

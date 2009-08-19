@@ -69,6 +69,7 @@ public class DependentBuildEventFilter implements EventTriggerFilter
         }
 
         context.put(BuildProjectTask.PARAM_DEPENDENT, true);
+        context.put(BuildProjectTask.PARAM_BUILD_ID, buildCompletedEvent.getBuildResult().getBuildId());
         
         final Project builtProject = result.getProject();
 

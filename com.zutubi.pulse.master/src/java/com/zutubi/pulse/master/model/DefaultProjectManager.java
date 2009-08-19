@@ -17,7 +17,7 @@ import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.events.build.BuildRequestEvent;
+import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.license.LicenseManager;
@@ -907,14 +907,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void requestBuildFloating(Project project, TriggerOptions options)
     {
-        eventManager.publish(new BuildRequestEvent(this, project, new BuildRevision(), options));
+        eventManager.publish(new SingleBuildRequestEvent(this, project, new BuildRevision(), options));
     }
 
     private void requestBuildOfRevision(Project project, TriggerOptions options, Revision revision)
     {
         try
         {
-            eventManager.publish(new BuildRequestEvent(this, project, new BuildRevision(revision, options.getReason().isUser()), options));
+            eventManager.publish(new SingleBuildRequestEvent(this, project, new BuildRevision(revision, options.getReason().isUser()), options));
         }
         catch (Exception e)
         {

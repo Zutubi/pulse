@@ -30,13 +30,13 @@ public class RecipeResult extends Result
 
     public RecipeResult()
     {
-        state = ResultState.INITIAL;
+        state = ResultState.PENDING;
     }
 
     public RecipeResult(String recipeName)
     {
         this.recipeName = recipeName;
-        state = ResultState.INITIAL;
+        state = ResultState.PENDING;
     }
 
     public void commence(String recipeName, long startTime)

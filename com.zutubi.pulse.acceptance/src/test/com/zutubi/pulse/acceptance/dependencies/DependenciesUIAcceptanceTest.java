@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.dependencies;
 
+import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.browse.ProjectDependenciesForm;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
@@ -8,7 +9,7 @@ import com.zutubi.pulse.master.tove.config.user.DependencyTransitiveMode;
 
 import static java.lang.String.valueOf;
 
-public class DependenciesUIAcceptanceTest extends BaseDependenciesAcceptanceTest
+public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private SeleniumBrowser browser;
 
@@ -18,7 +19,7 @@ public class DependenciesUIAcceptanceTest extends BaseDependenciesAcceptanceTest
 
         loginAsAdmin();
 
-        repository = new Repository();
+        Repository repository = new Repository();
         repository.clear();
 
         browser = new SeleniumBrowser();
@@ -40,24 +41,24 @@ public class DependenciesUIAcceptanceTest extends BaseDependenciesAcceptanceTest
         browser.loginAsAdmin();
 
         String randomName = randomName();
-        Project projectA = new Project(randomName + "A");
+        Project projectA = new DepAntProject(xmlRpcHelper, randomName + "A");
         projectA.addArtifact("artifactA.jar");
-        createProject(projectA);
-        long projectABuildNumber = triggerSuccessfulBuild(projectA);
+        projectA.createProject();
+        long projectABuildNumber = projectA.triggerSuccessfulBuild();
 
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, projectA.getName(), projectABuildNumber);
         assertFalse(summaryPage.hasDependencies());
 
-        Project projectB = new Project(randomName + "B");
+        Project projectB = new DepAntProject(xmlRpcHelper, randomName + "B");
         projectB.addArtifact("artifactB.jar");
-        createProject(projectB);
-        long projectBBuildNumber = triggerSuccessfulBuild(projectB);
+        projectB.createProject();
+        long projectBBuildNumber = projectB.triggerSuccessfulBuild();
 
-        Project dependentProject = new Project(randomName + "C");
+        Project dependentProject = new DepAntProject(xmlRpcHelper, randomName + "C");
         dependentProject.addDependency(projectA);
         dependentProject.addDependency(projectB);
-        createProject(dependentProject);
-        long buildNumber = triggerSuccessfulBuild(dependentProject);
+        dependentProject.createProject();
+        long buildNumber = dependentProject.triggerSuccessfulBuild();
 
         summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, dependentProject.getName(), buildNumber);
         assertTrue(summaryPage.hasDependencies());
@@ -79,16 +80,16 @@ public class DependenciesUIAcceptanceTest extends BaseDependenciesAcceptanceTest
 
     public void testProjectDependenciesTab() throws Exception
     {
-        Project projectA = new Project(randomName());
-        createProject(projectA);
+        Project projectA = new DepAntProject(xmlRpcHelper, randomName());
+        projectA.createProject();
 
-        Project projectB = new Project(randomName());
+        Project projectB = new DepAntProject(xmlRpcHelper, randomName());
         projectB.addDependency(new Dependency(projectA, true));
-        createProject(projectB);
+        projectB.createProject();
 
-        Project projectC = new Project(randomName());
+        Project projectC = new DepAntProject(xmlRpcHelper, randomName());
         projectC.addDependency(projectB);
-        createProject(projectC);
+        projectC.createProject();
 
         browser.loginAsAdmin();
         ProjectDependenciesPage page = browser.openAndWaitFor(ProjectDependenciesPage.class, projectB.getName());
@@ -110,6 +111,4 @@ public class DependenciesUIAcceptanceTest extends BaseDependenciesAcceptanceTest
         browser.waitForElement(page.getUpstreamId(projectB.getName(), 0, 0));
         assertFalse(page.isUpstreamPresent(projectA.getName(), 0, 0));
     }
-
-
 }
