@@ -208,7 +208,9 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         String projectHandle = getProjectHandle(projectName);
         form.setProject(projectHandle);
         List<String> optionValues = form.getStagesOptionValues();
-        assertEquals(expectedStages.length, optionValues.size());
+        // Along with the expected stages, we also expect an empty option
+        assertEquals(expectedStages.length + 1, optionValues.size());
+        assertEquals(optionValues.get(0), "0");
         assertThat(optionValues, hasItems(getStageHandles(projectName, expectedStages)));
     }
 
