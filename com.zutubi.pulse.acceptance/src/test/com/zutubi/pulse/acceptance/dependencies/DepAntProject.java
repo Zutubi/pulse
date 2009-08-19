@@ -35,7 +35,7 @@ public class DepAntProject extends Project
     public int triggerBuild(Pair<String, Object>... options) throws Exception
     {
         triggerBuildCommon();
-        return super.triggerCompleteBuild(options);
+        return super.triggerBuild(options);
     }
 
     private void triggerBuildCommon() throws Exception

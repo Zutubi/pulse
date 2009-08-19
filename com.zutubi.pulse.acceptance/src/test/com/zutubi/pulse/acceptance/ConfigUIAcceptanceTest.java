@@ -36,7 +36,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        random = getRandomName() + SPECIAL_CHARACTERS;
+        random = randomName() + SPECIAL_CHARACTERS;
         xmlRpcHelper.loginAsAdmin();
     }
 

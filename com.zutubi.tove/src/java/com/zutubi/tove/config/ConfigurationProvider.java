@@ -83,6 +83,18 @@ public interface ConfigurationProvider
     <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz);
 
     /**
+     * Retrieve the ancestor of the specific path that is of the specified type.
+     *
+     * @param path      is the path from which the search is started.
+     * @param clazz     is the type of configuration instance being searched for.
+     *
+     * @return the located configuration instance, or null if none is found.
+     *
+     * @see #getAncestorOfType(com.zutubi.tove.config.api.Configuration, Class) 
+     */
+    <T extends Configuration> T getAncestorOfType(String path, Class<T> clazz);
+
+    /**
      * Retrieves all descendents of a given path, which should all be of the specified type.  If the
      * path is within a templated scope, all instances that descend from the given path are
      * returned, potentially including the instance at that path (see the {@code strict} parameter).

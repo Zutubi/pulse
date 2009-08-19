@@ -7,6 +7,7 @@ import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
 
@@ -114,6 +115,26 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         return configurationTemplateManager.getAncestorOfType(c, clazz);
+    }
+
+    public <T extends Configuration> T getAncestorOfType(String path, Class<T> clazz)
+    {
+        if (path == null)
+        {
+            return null;
+        }
+        
+        Configuration instance = get(path, Configuration.class);
+        while (instance == null)
+        {
+            path = PathUtils.getParentPath(path);
+            if (path == null)
+            {
+                return null;
+            }
+            instance = get(path, Configuration.class);
+        }
+        return getAncestorOfType(instance, clazz);
     }
 
     public <T extends Configuration> Set<T> getAllDescendents(String path, Class<T> clazz, boolean strict, boolean concreteOnly)

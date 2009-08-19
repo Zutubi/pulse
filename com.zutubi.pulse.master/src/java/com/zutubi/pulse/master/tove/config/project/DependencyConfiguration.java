@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.Constraint;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class DependencyConfiguration extends AbstractConfiguration
      * The project being depended upon.
      */
     @Required @Reference(optionProvider = "DependencyProjectOptionProvider")
-//    @Constraint("CircularDependencyValidator")
+    @Constraint("CircularDependencyValidator")
     private ProjectConfiguration project;
 
     /**

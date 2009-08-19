@@ -55,7 +55,7 @@ public class SeleniumTestBase extends PulseTestCase
         super.setUp();
 
         xmlRpcHelper = new XmlRpcHelper();
-        random = getRandomName();
+        random = randomName();
 
         browser = new SeleniumBrowser();
         browser.start();
@@ -69,7 +69,7 @@ public class SeleniumTestBase extends PulseTestCase
         super.tearDown();
     }
 
-    protected String getRandomName()
+    protected String randomName()
     {
         return getName() + "-" + RandomUtils.randomString(10);
     }

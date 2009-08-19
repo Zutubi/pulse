@@ -268,6 +268,11 @@ public abstract class Project
         return xmlRpcHelper.getProjectState(getName());
     }
 
+    public String getProjectHandle() throws Exception
+    {
+        return xmlRpcHelper.getConfigHandle("projects/" + getName());
+    }
+
     protected void createProject() throws Exception
     {
         Hashtable<String, Object> commandConfig = insertProject();

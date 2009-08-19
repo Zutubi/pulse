@@ -113,6 +113,31 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         assertDependenciesTableRow(projectDependenciesPage, 1, projectA, "latest.integration", "a1", "true");
     }
 
+    public void testCircularDependencyCheck() throws Exception
+    {
+        Project projectA = new DepAntProject(xmlRpcHelper, randomName());
+        projectA.createProject();
+
+        Project projectB = new DepAntProject(xmlRpcHelper, randomName());
+        projectB.addDependency(new Dependency(projectA, true));
+        projectB.createProject();
+
+        Project projectC = new DepAntProject(xmlRpcHelper, randomName());
+        projectC.addDependency(projectB);
+        projectC.createProject();
+
+        loginAsAdmin();
+
+        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, projectA.getName(), false);
+
+        ProjectDependenciesPage projectDependenciesPage = projectPage.clickDependenciesAndWait();
+        DependencyForm form = projectDependenciesPage.clickAdd(); // takes us to the wizard version of the dependency form.
+        form.waitFor();
+
+        form.finishNamedFormElements(asPair("project", projectC.getProjectHandle()));
+        assertTrue(form.isFormPresent()); // because we have a validation error.
+    }
+
     public void testRebuildCheckboxAppearsOnManualTrigger() throws Exception
     {
         String projectA = random + "A";
