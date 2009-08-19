@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.pulse.master.xwork.actions.project.ProjectDependencyGraphRenderer;
 import com.zutubi.util.WebUtils;
 
 /**
@@ -25,33 +26,33 @@ public class ProjectDependenciesPage extends AbstractLogPage
         return urls.projectDependencies(projectName);
     }
 
-    public boolean isUpstreamPresent(String project, int row, int column)
+    public boolean isUpstreamPresent(String project, int x, int y)
     {
-        return isProjectPresent(SECTION_UPSTREAM, project, row, column);
+        return isProjectPresent(SECTION_UPSTREAM, project, x, y);
     }
 
-    public String getUpstreamId(String project, int row, int column)
+    public String getUpstreamId(String project, int x, int y)
     {
-        return getDependencyId(SECTION_UPSTREAM, project, row, column);
+        return getDependencyId(SECTION_UPSTREAM, project, x, y);
     }
 
-    public boolean isDownstreamPresent(String project, int row, int column)
+    public boolean isDownstreamPresent(String project, int x, int y)
     {
-        return isProjectPresent(SECTION_DOWNSTREAM, project, row, column);
+        return isProjectPresent(SECTION_DOWNSTREAM, project, x, y);
     }
 
-    public String getDownstreamId(String project, int row, int column)
+    public String getDownstreamId(String project, int x, int y)
     {
-        return getDependencyId(SECTION_DOWNSTREAM, project, row, column);
+        return getDependencyId(SECTION_DOWNSTREAM, project, x, y);
     }
 
-    private boolean isProjectPresent(String section, String project, int row, int column)
+    private boolean isProjectPresent(String section, String project, int x, int y)
     {
-        return browser.isElementIdPresent(getDependencyId(section, project, row, column));
+        return browser.isElementIdPresent(getDependencyId(section, project, x, y));
     }
 
-    private String getDependencyId(String section, String project, int row, int column)
+    private String getDependencyId(String section, String project, int x, int y)
     {
-        return section + "-" + row + "-" + column + "-" + project;
+        return section + "-" + (x * ProjectDependencyGraphRenderer.SCALE_FACTOR_X) + "-" + (y * ProjectDependencyGraphRenderer.SCALE_FACTOR_Y) + "-" + project;
     }
 }

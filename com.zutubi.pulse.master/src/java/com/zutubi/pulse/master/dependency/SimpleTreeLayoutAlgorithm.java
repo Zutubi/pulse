@@ -8,7 +8,21 @@ import java.util.List;
 
 /**
  * Implements a basic algorithm for laying out a tree in two-dimensional space
- * so that it can be visualised.
+ * so that it can be visualised.  The layout begins with the root on the left
+ * and leaves end up on the right.  Nodes are spread vertically to avoid
+ * overlap in a simple and conservative fashion (i.e. more vertical space may
+ * be used than is strictly required).  A resulting tree may look something
+ * like:
+ *
+ * <pre>{@code
+ *  b
+ * a
+ *    d
+ *  c
+ *    e
+ * }</pre>
+ *
+ * if rendered in simple text.
  */
 public class SimpleTreeLayoutAlgorithm<T>
 {

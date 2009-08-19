@@ -94,14 +94,14 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         browser.loginAsAdmin();
         ProjectDependenciesPage page = browser.openAndWaitFor(ProjectDependenciesPage.class, projectB.getName());
         assertTrue(page.isUpstreamPresent(projectA.getName(), 0, 0));
-        assertTrue(page.isUpstreamPresent(projectB.getName(), 3, 0));
+        assertTrue(page.isUpstreamPresent(projectB.getName(), 1, 0));
         assertTrue(page.isDownstreamPresent(projectB.getName(), 0, 0));
-        assertTrue(page.isDownstreamPresent(projectC.getName(), 3, 0));
+        assertTrue(page.isDownstreamPresent(projectC.getName(), 1, 0));
 
         // Go to a project with transitive dependencies
         page = browser.openAndWaitFor(ProjectDependenciesPage.class, projectC.getName());
         assertTrue(page.isUpstreamPresent(projectA.getName(), 0, 0));
-        assertTrue(page.isUpstreamPresent(projectB.getName(), 3, 0));
+        assertTrue(page.isUpstreamPresent(projectB.getName(), 1, 0));
         
         // Filter out transients, make sure this takes effect.
         ProjectDependenciesForm form = browser.createForm(ProjectDependenciesForm.class);

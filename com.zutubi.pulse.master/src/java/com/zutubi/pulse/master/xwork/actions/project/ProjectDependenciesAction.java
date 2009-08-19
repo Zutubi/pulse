@@ -14,7 +14,8 @@ import com.zutubi.util.Pair;
 import java.util.List;
 
 /**
- * Action to display project home page - the latest project status.
+ * Action to display project dependencies page - upstream and downstream
+ * dependency trees.
  */
 public class ProjectDependenciesAction extends ProjectActionBase
 {

@@ -9,11 +9,22 @@ import java.util.List;
 
 /**
  * Renders the trees in project dependency graphs to grid-based diagrams so
- * that they may be visualised.  Grids are used as the translate directly to
+ * that they may be visualised.  Grids are used as they translate directly to
  * HTML tables.
  */
 public class ProjectDependencyGraphRenderer
 {
+    /**
+     * Factor for scaling from abstract x positions to grid x positions.
+     * Accounts for the grid space used to draw connecting lines.
+     */
+    public static final int SCALE_FACTOR_X = 3;
+    /**
+     * Factor for scaling from abstract y positions to grid y positions.
+     * Accounts for the fact that boxes are two cells high.
+     */
+    public static final int SCALE_FACTOR_Y = 2;
+
     /**
      * Renders a tree of upstream dependencies.  This tree is rendered with the
      * leaves on the left flowing to the root on the right.
@@ -53,7 +64,9 @@ public class ProjectDependencyGraphRenderer
         TreeNode<Pair<DependencyGraphData, Point>> layTree = layout.layout(root);
         Point bounds = layout.getBounds(layTree);
 
-        Grid<ProjectDependencyData> grid = new Grid<ProjectDependencyData>(bounds.getX() * 3 + 1, bounds.getY() * 2 + 2);
+        // The additional 1 for x and 2 for y allow for the fact that the grid
+        // encompasses the boxs at the right and bottom of the diagram.
+        Grid<ProjectDependencyData> grid = new Grid<ProjectDependencyData>(bounds.getX() * SCALE_FACTOR_X + 1, bounds.getY() * SCALE_FACTOR_Y + 2);
         renderToGrid(layTree, grid, true);
         return grid;
     }
@@ -108,6 +121,6 @@ public class ProjectDependencyGraphRenderer
 
     private Point treeToGrid(Point point)
     {
-        return new Point(point.getX() * 3, point.getY() * 2);
+        return new Point(point.getX() * SCALE_FACTOR_X, point.getY() * SCALE_FACTOR_Y);
     }
 }

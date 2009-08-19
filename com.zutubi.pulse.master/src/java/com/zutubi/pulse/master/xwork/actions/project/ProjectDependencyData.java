@@ -35,7 +35,7 @@ public class ProjectDependencyData
 
     /**
      * Makes data for a cell holding a project.  These are the boxes in the
-     * diagram.  As boxes occupy two rows, the cells directly below them will
+     * diagram.  As boxes occupy two rows, the cells directly below them should
      * be marked as dead.
      *
      * @param data data about the project that the cell displays
