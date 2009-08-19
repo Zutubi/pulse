@@ -185,7 +185,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
 
         // The actual updating of the request is handled externally by the BuildController which is
         // currently mocked out.  Instead we verify that the expected method was called.
-        // assertSame(activeRequest.getRevision().getRevision(), revision2);
+        verify(handler, times(1)).updateRevisionIfNotFixed(revision2);
     }
 
     public void testDifferentSourceNotReplaced()

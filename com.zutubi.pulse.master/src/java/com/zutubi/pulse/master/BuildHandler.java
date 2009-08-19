@@ -29,10 +29,10 @@ public interface BuildHandler
     long getBuildResultId();
 
     /**
-     * Run the build.
+     * Start the build.
      *
      * Note that the actual build execution should not occur on the callers
      * thread else the scheduling will be blocked whilst the build is running.
      */
-    void run();
+    void start();
 }

@@ -217,7 +217,7 @@ public class EntityBuildQueue
         }
 
         BuildHandler handler = buildHandlerFactory.createHandler(event);
-        handler.run();
+        handler.start();
 
         activeBuilds.add(0, new ActiveBuild(event, handler));
 

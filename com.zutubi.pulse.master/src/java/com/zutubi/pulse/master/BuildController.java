@@ -114,7 +114,7 @@ public class BuildController implements EventListener, BuildHandler
         projectConfig = request.getProjectConfig();
     }
 
-    public void run()
+    public void start()
     {
         project = projectManager.getProject(projectConfig.getProjectId(), false);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);

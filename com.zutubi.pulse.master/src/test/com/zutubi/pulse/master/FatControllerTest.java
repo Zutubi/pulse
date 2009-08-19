@@ -23,7 +23,10 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.Constants;
 import com.zutubi.util.bean.WiringObjectFactory;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.stub;
+import org.mockito.stubbing.Answer;
+import org.mockito.invocation.InvocationOnMock;
 
 import java.util.HashMap;
 import java.util.List;
@@ -76,25 +79,18 @@ public class FatControllerTest extends PulseTestCase
             {
                 final long buildResultId = nextBuildResultId.getAndIncrement();
                 
-                // I would prefer to mock the BuildHandler, but we need to at least
-                // call request.createResult() in run() so that the results are initialised.
-                BuildHandler handler = new BuildHandler()
+                BuildHandler handler = mock(BuildHandler.class);
+                stub(handler.getBuildResultId()).toReturn(buildResultId);
+
+                // a bit hackish, but prevents the need to implement the interface.
+                doAnswer(new Answer()
                 {
-                    public boolean updateRevisionIfNotFixed(Revision revision)
-                    {
-                        return false;
-                    }
-
-                    public long getBuildResultId()
-                    {
-                        return buildResultId;
-                    }
-
-                    public void run()
+                    public Object answer(InvocationOnMock invocationOnMock) throws Throwable
                     {
                         request.createResult(projectManager, buildManager);
+                        return null;
                     }
-                };
+                }).when(handler).start();
 
                 // record enough information about the build request so that we can create
                 // an appropriate build completed event 
