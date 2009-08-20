@@ -22,7 +22,6 @@ public class CircularDependencyValidator extends FieldValidatorSupport
 
     protected void validateField(Object value) throws ValidationException
     {
-        // PROBLEM: Need some way to tie back to the project we are being configured for...
         ConfigurationValidationContext context = (ConfigurationValidationContext) getValidationContext();
 
         String parentPath = context.getParentPath();

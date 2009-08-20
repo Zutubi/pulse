@@ -15,12 +15,12 @@ import java.util.List;
  */
 public abstract class SeleniumForm
 {
-    public static final int TEXTFIELD      = 3;
-    public static final int CHECKBOX       = 4;
-    public static final int COMBOBOX       = 6;
+    public static final int TEXTFIELD = 3;
+    public static final int CHECKBOX = 4;
+    public static final int COMBOBOX = 6;
     public static final int MULTI_CHECKBOX = 7;
-    public static final int MULTI_SELECT   = 8;
-    public static final int ITEM_PICKER    = 9;
+    public static final int MULTI_SELECT = 8;
+    public static final int ITEM_PICKER = 9;
 
     protected SeleniumBrowser browser;
     protected Selenium selenium;
@@ -111,12 +111,12 @@ public abstract class SeleniumForm
     public String[] getComboBoxOptions(String name)
     {
         String js = "var result = function() { " +
-                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid." + name + "'); " +
-                        "var values = []; " +
-                        "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
-                        "return values; " +
-                    "}(); " +
-                    "result";
+                "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid." + name + "'); " +
+                "var values = []; " +
+                "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
+                "return values; " +
+                "}(); " +
+                "result";
         return browser.evalExpression(js).split(",");
     }
 
@@ -124,7 +124,7 @@ public abstract class SeleniumForm
     {
         if (fieldValues != null)
         {
-            for (Pair<String, String> fv: fieldValues)
+            for (Pair<String, String> fv : fieldValues)
             {
                 setFieldValue(fv.first, fv.second);
             }
@@ -219,10 +219,20 @@ public abstract class SeleniumForm
         return new String[getFieldNames().length];
     }
 
+    public String getFieldErrorMessage(String name)
+    {
+        return browser.getText("//div[@id='x-form-el-zfid."+name+"']");
+    }
+
+    public boolean hasFieldError(String name)
+    {
+        return getFieldErrorMessage(name) != null;
+    }
+
     public String getFieldValue(String name)
     {
         int type = getFieldType(name);
-        switch(type)
+        switch (type)
         {
             case ITEM_PICKER:
             case MULTI_SELECT:
@@ -287,9 +297,9 @@ public abstract class SeleniumForm
     {
         int i;
         String[] names = getActualFieldNames();
-        for(i = 0; i < names.length; i++)
+        for (i = 0; i < names.length; i++)
         {
-            if(names[i].equals(name))
+            if (names[i].equals(name))
             {
                 break;
             }
@@ -338,7 +348,7 @@ public abstract class SeleniumForm
         String[] set = convertMultiValue(values);
 
         String fieldLocator = getFieldId(name);
-        for(String value: set)
+        for (String value : set)
         {
             browser.addSelection(fieldLocator, "value=" + value);
         }
@@ -361,7 +371,7 @@ public abstract class SeleniumForm
     public String[] getActualFieldNames()
     {
         String[] fieldNames = getFieldNames();
-        if(inherited)
+        if (inherited)
         {
             String[] temp = fieldNames;
             fieldNames = new String[fieldNames.length - 1];
@@ -373,7 +383,7 @@ public abstract class SeleniumForm
     public int[] getActualFieldTypes()
     {
         int[] fieldTypes = getFieldTypes();
-        if(inherited)
+        if (inherited)
         {
             int[] temp = fieldTypes;
             fieldTypes = new int[fieldTypes.length - 1];
@@ -384,9 +394,10 @@ public abstract class SeleniumForm
 
     public void triggerEvent(String fieldName, String eventType)
     {
-        browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(fieldName) + "'); field.fireEvent('"+ eventType +"', field);");
+        browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(fieldName) + "'); field.fireEvent('" + eventType + "', field);");
     }
 
     public abstract String getFormName();
+
     public abstract String[] getFieldNames();
 }

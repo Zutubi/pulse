@@ -12,7 +12,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Scheduler;
 
 /**
- * The default build handler factory creates and configures a BuildController instance
+ * The default build controller factory creates and configures a BuildController instance
  * to handle the build request.
  */
 public class BuildControllerFactory implements BuildHandlerFactory

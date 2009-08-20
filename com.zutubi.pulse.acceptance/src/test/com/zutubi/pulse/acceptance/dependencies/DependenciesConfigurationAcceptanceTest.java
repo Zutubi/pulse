@@ -77,7 +77,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, projectC, false);
 
         ProjectDependenciesPage projectDependenciesPage = projectPage.clickDependenciesAndWait();
-        DependencyForm form = projectDependenciesPage.clickAdd(); // takes us to the wizard version of the dependency form.
+        DependencyForm form = projectDependenciesPage.clickAdd();
         form.waitFor();
 
         // We expect no initial stage option values since no project is selected.
@@ -135,7 +135,8 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         form.waitFor();
 
         form.finishNamedFormElements(asPair("project", projectC.getProjectHandle()));
-        assertTrue(form.isFormPresent()); // because we have a validation error.
+        assertTrue(form.isFormPresent());
+        assertTrue(form.getFieldErrorMessage("project").contains("circular dependency detected"));
     }
 
     public void testRebuildCheckboxAppearsOnManualTrigger() throws Exception
