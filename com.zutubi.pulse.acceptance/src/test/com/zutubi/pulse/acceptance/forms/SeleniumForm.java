@@ -15,12 +15,12 @@ import java.util.List;
  */
 public abstract class SeleniumForm
 {
-    public static final int TEXTFIELD = 3;
-    public static final int CHECKBOX = 4;
-    public static final int COMBOBOX = 6;
-    public static final int MULTI_CHECKBOX = 7;
-    public static final int MULTI_SELECT = 8;
-    public static final int ITEM_PICKER = 9;
+    public static final int TEXTFIELD       = 3;
+    public static final int CHECKBOX        = 4;
+    public static final int COMBOBOX        = 6;
+    public static final int MULTI_CHECKBOX  = 7;
+    public static final int MULTI_SELECT    = 8;
+    public static final int ITEM_PICKER     = 9;
 
     protected SeleniumBrowser browser;
     protected Selenium selenium;
@@ -111,12 +111,12 @@ public abstract class SeleniumForm
     public String[] getComboBoxOptions(String name)
     {
         String js = "var result = function() { " +
-                "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid." + name + "'); " +
-                "var values = []; " +
-                "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
-                "return values; " +
-                "}(); " +
-                "result";
+                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid." + name + "'); " +
+                        "var values = []; " +
+                        "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
+                        "return values; " +
+                    "}(); " +
+                    "result";
         return browser.evalExpression(js).split(",");
     }
 
