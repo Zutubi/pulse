@@ -52,7 +52,7 @@ public class EnumUtils
      */
     public static String toString(String name)
     {
-        return name.replace("_", "");
+        return name.replace("_", "").toLowerCase();
     }
 
     /**
