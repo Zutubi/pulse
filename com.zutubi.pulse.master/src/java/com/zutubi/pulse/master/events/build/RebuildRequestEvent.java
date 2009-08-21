@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.pulse.master.DependencyRebuildScheduleHandler;
+import com.zutubi.pulse.master.DependencyMetaBuildHandler;
 import com.zutubi.util.CollectionUtils;
 
 import java.util.Map;
@@ -16,16 +16,16 @@ import java.util.List;
  * A build request event that is used when multiple dependent projects
  * are being 'rebuilt'.
  *
- * @see com.zutubi.pulse.master.DependencyRebuildScheduleHandler
+ * @see com.zutubi.pulse.master.DependencyMetaBuildHandler
  */
 public class RebuildRequestEvent extends BuildRequestEvent
 {
     private Project owner;
     private final Map<ProjectConfiguration, BuildResult> resultCache;
     private ProjectConfiguration rootProject;
-    private DependencyRebuildScheduleHandler source;
+    private DependencyMetaBuildHandler source;
 
-    public RebuildRequestEvent(DependencyRebuildScheduleHandler source, BuildRevision revision, Project project, TriggerOptions options, ProjectConfiguration rootProject, Map<ProjectConfiguration, BuildResult> resultCache)
+    public RebuildRequestEvent(DependencyMetaBuildHandler source, BuildRevision revision, Project project, TriggerOptions options, ProjectConfiguration rootProject, Map<ProjectConfiguration, BuildResult> resultCache)
     {
         super(source, revision, project.getConfig(), options);
         this.source = source;
@@ -100,7 +100,7 @@ public class RebuildRequestEvent extends BuildRequestEvent
         BuildResult result = new BuildResult(options.getReason(), project, projectManager.getNextBuildNumber(project, true), getRevision().isUser());
 
         result.setStatus(getStatus());
-        result.setBuildId(getBuildId());
+        result.setMetaBuildId(getMetaBuildId());
         result.setState(ResultState.PENDING_DEPENDENCY);
         
         return result;

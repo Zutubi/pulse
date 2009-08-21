@@ -51,7 +51,7 @@ public class EntityBuildQueue
     private List<BuildRequestEvent> queuedBuilds = new LinkedList<BuildRequestEvent>();
     private volatile boolean stopped = false;
 
-    private BuildHandlerFactory buildHandlerFactory;
+    private BuildControllerFactory buildControllerFactory;
     private AccessManager accessManager;
     private EventManager eventManager;
 
@@ -107,7 +107,7 @@ public class EntityBuildQueue
         Iterator<ActiveBuild> it = activeBuilds.iterator();
         while (it.hasNext())
         {
-            if (it.next().getHandler().getBuildResultId() == id)
+            if (it.next().getController().getBuildResultId() == id)
             {
                 it.remove();
                 found = true;
@@ -176,7 +176,7 @@ public class EntityBuildQueue
                 try
                 {
                     BuildRevision buildRevision = event.getRevision();
-                    if (activeBuild.getHandler().updateRevisionIfNotFixed(buildRevision.getRevision()))
+                    if (activeBuild.getController().updateRevisionIfNotFixed(buildRevision.getRevision()))
                     {
                         return true;
                     }
@@ -216,10 +216,10 @@ public class EntityBuildQueue
             return;
         }
 
-        BuildHandler handler = buildHandlerFactory.createHandler(event);
-        handler.start();
+        BuildController controller = buildControllerFactory.createHandler(event);
+        controller.start();
 
-        activeBuilds.add(0, new ActiveBuild(event, handler));
+        activeBuilds.add(0, new ActiveBuild(event, controller));
 
         // Defer this as it must come after a build completed event that
         // we may be handling.
@@ -275,9 +275,9 @@ public class EntityBuildQueue
         stopped = true;
     }
 
-    public void setBuildHandlerFactory(BuildHandlerFactory buildHandlerFactory)
+    public void setBuildControllerFactory(BuildControllerFactory factory)
     {
-        this.buildHandlerFactory = buildHandlerFactory;
+        this.buildControllerFactory = factory;
     }
 
     public void setAccessManager(AccessManager accessManager)
@@ -297,12 +297,12 @@ public class EntityBuildQueue
     public static class ActiveBuild
     {
         private BuildRequestEvent event;
-        private BuildHandler handler;
+        private BuildController controller;
 
-        public ActiveBuild(BuildRequestEvent event, BuildHandler handler)
+        public ActiveBuild(BuildRequestEvent event, BuildController controller)
         {
             this.event = event;
-            this.handler = handler;
+            this.controller = controller;
         }
 
         public BuildRequestEvent getEvent()
@@ -310,9 +310,9 @@ public class EntityBuildQueue
             return event;
         }
 
-        public BuildHandler getHandler()
+        public BuildController getController()
         {
-            return handler;
+            return controller;
         }
     }
 }

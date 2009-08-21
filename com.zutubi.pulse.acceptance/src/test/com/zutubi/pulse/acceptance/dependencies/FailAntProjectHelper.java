@@ -5,16 +5,15 @@ import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.master.model.ProjectManager;
 
 import java.util.Hashtable;
-import java.util.Map;
 
-public class FailAntProject extends Project
+public class FailAntProjectHelper extends ProjectHelper
 {
-    public FailAntProject(XmlRpcHelper xmlRpcHelper, String name)
+    public FailAntProjectHelper(XmlRpcHelper xmlRpcHelper, String name)
     {
         super(xmlRpcHelper, name);
     }
 
-    public FailAntProject(XmlRpcHelper xmlRpcHelper, String name, String org)
+    public FailAntProjectHelper(XmlRpcHelper xmlRpcHelper, String name, String org)
     {
         super(xmlRpcHelper, name, org);
     }

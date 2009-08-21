@@ -50,7 +50,7 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
                 context.put(BuildProjectTask.PARAM_VERSION_PROPAGATED, true);
             }
             context.put(BuildProjectTask.PARAM_DEPENDENT, true);
-            context.put(BuildProjectTask.PARAM_BUILD_ID, buildCompletedEvent.getBuildResult().getBuildId());
+            context.put(BuildProjectTask.PARAM_META_BUILD_ID, buildCompletedEvent.getBuildResult().getMetaBuildId());
         }
         return accept;
     }

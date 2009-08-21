@@ -115,14 +115,14 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     public void testCircularDependencyCheck() throws Exception
     {
-        Project projectA = new DepAntProject(xmlRpcHelper, randomName());
+        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
         projectA.createProject();
 
-        Project projectB = new DepAntProject(xmlRpcHelper, randomName());
-        projectB.addDependency(new Dependency(projectA, true));
+        ProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        projectB.addDependency(new DependencyHelper(projectA, true));
         projectB.createProject();
 
-        Project projectC = new DepAntProject(xmlRpcHelper, randomName());
+        ProjectHelper projectC = new DepAntProjectHelper(xmlRpcHelper, randomName());
         projectC.addDependency(projectB);
         projectC.createProject();
 

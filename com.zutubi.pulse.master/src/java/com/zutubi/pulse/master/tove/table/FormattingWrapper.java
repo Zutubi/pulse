@@ -7,6 +7,7 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.EnumType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.EnumUtils;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -106,14 +107,14 @@ public class FormattingWrapper
             if (property.getType() instanceof EnumType)
             {
                 // Apply default formatting for enums.
-                fieldValue = fieldValue.toString().toLowerCase().replace('_', ' ');
+                fieldValue = EnumUtils.toPrettyString((Enum)fieldValue);
             }
         }
 
         // Default formatting for enum constants.
         if (fieldValue.getClass().isEnum())
         {
-            return fieldValue.toString().toLowerCase().replace('_', ' ');
+            return EnumUtils.toPrettyString((Enum) fieldValue);
         }
         
         return fieldValue;

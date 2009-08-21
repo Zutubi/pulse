@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.EnumType;
 import com.zutubi.tove.type.TypeProperty;
+import com.zutubi.util.EnumUtils;
 
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -60,6 +61,6 @@ public class EnumOptionProvider extends MapOptionProvider
      */
     public static String getPrettyName(Enum e)
     {
-        return e.toString().toLowerCase().replace('_', ' ');
+        return EnumUtils.toPrettyString(e);
     }
 }

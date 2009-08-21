@@ -42,7 +42,7 @@ public class SingleBuildRequestEvent extends BuildRequestEvent
         Project project = projectManager.getProject(getProjectConfig().getProjectId(), false); // can we use the 'owner' project instance instead of loading here?
         BuildResult result = new BuildResult(options.getReason(), project, projectManager.getNextBuildNumber(project, true), getRevision().isUser());
         result.setStatus(getStatus());
-        result.setBuildId(getBuildId());
+        result.setMetaBuildId(getMetaBuildId());
 
         buildManger.save(result);
 

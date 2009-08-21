@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.engine.api;
 
+import com.zutubi.util.EnumUtils;
+
 /**
  * The possible states for a build, stage or command result.  Indicates what
  * step of the lifecycle the result has reached, and in the case of a completed
@@ -21,16 +23,6 @@ public enum ResultState
                 {
                     return false;
                 }
-
-                public String getString()
-                {
-                    return "pending";
-                }
-
-                public String getPrettyString()
-                {
-                    return "pending";
-                }
             },
     /**
      * The result has not yet commenced and is waiting on a dependency to complete
@@ -42,17 +34,10 @@ public enum ResultState
                 {
                     return false;
                 }
+
                 public boolean isCompleted()
                 {
                     return false;
-                }
-                public String getPrettyString()
-                {
-                    return "pending dependency";
-                }
-                public String getString()
-                {
-                    return "pending dependency";
                 }
             },
     /**
@@ -68,16 +53,6 @@ public enum ResultState
                 public boolean isCompleted()
                 {
                     return false;
-                }
-
-                public String getString()
-                {
-                    return "inprogress";
-                }
-
-                public String getPrettyString()
-                {
-                    return "in progress";
                 }
             },
     /**
@@ -95,16 +70,6 @@ public enum ResultState
                 {
                     return false;
                 }
-
-                public String getString()
-                {
-                    return "terminating";
-                }
-
-                public String getPrettyString()
-                {
-                    return "terminating";
-                }
             },
     /**
      * The result completed successfully.
@@ -119,16 +84,6 @@ public enum ResultState
                 public boolean isCompleted()
                 {
                     return true;
-                }
-
-                public String getString()
-                {
-                    return "success";
-                }
-
-                public String getPrettyString()
-                {
-                    return "success";
                 }
             },
     /**
@@ -145,16 +100,6 @@ public enum ResultState
                 {
                     return true;
                 }
-
-                public String getString()
-                {
-                    return "failure";
-                }
-
-                public String getPrettyString()
-                {
-                    return "failure";
-                }
             },
     /**
      * The result has completed and has failed due to an external problem.
@@ -169,16 +114,6 @@ public enum ResultState
                 public boolean isCompleted()
                 {
                     return true;
-                }
-
-                public String getString()
-                {
-                    return "error";
-                }
-
-                public String getPrettyString()
-                {
-                    return "error";
                 }
             };
 
@@ -289,15 +224,7 @@ public enum ResultState
      */
     public static ResultState fromPrettyString(String prettyString)
     {
-        for(ResultState state: values())
-        {
-            if(state.getPrettyString().equals(prettyString))
-            {
-                return state;
-            }
-        }
-
-        throw new IllegalArgumentException("No such result state '" + prettyString + "'");
+        return ResultState.valueOf(EnumUtils.fromPrettyString(prettyString));
     }
 
     /**
@@ -314,10 +241,16 @@ public enum ResultState
     /**
      * @return a human-readable string for this state
      */
-    public abstract String getPrettyString();
+    public String getPrettyString()
+    {
+        return EnumUtils.toPrettyString(this);
+    }
 
     /**
      * @return an all lower-case machine-readable string for this state
      */
-    public abstract String getString();
+    public String getString()
+    {
+        return EnumUtils.toString(this);
+    }
 }

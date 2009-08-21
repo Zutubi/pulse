@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.util.EnumUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,7 +39,7 @@ public class LicenseConfigurationStateDisplay
 
     public String formatType()
     {
-        return LicenseHolder.getLicense().getType().name().toLowerCase().replace("_", " ");
+        return EnumUtils.toPrettyString(LicenseHolder.getLicense().getType());
     }
 
     public String formatSupportExpiry()

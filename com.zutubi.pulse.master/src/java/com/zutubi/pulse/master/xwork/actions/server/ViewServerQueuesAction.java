@@ -83,8 +83,8 @@ public class ViewServerQueuesAction extends ActionSupport
                 {
                     for (EntityBuildQueue.ActiveBuild activeBuild: activeForEntity)
                     {
-                        BuildHandler buildHandler = activeBuild.getHandler();
-                        BuildResult buildResult = buildManager.getBuildResult(buildHandler.getBuildResultId());
+                        BuildController controller = activeBuild.getController();
+                        BuildResult buildResult = buildManager.getBuildResult(controller.getBuildResultId());
                         if (buildResult != null && !buildResult.completed())
                         {
                             executingBuilds.add(buildResult);

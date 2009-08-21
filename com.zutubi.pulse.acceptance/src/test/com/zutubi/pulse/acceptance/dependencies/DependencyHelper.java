@@ -2,9 +2,9 @@ package com.zutubi.pulse.acceptance.dependencies;
 
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.REVISION_LATEST_INTEGRATION;
 
-public class Dependency
+public class DependencyHelper
 {
-    private Project project;
+    private ProjectHelper project;
 
     private boolean transitive = true;
 
@@ -12,30 +12,30 @@ public class Dependency
 
     private String revision = REVISION_LATEST_INTEGRATION;
 
-    public Dependency(Project project, boolean transitive, String stage, String revision)
+    public DependencyHelper(ProjectHelper project, boolean transitive, String stage, String revision)
     {
         this(project, transitive, stage);
         this.revision = revision;
     }
 
-    public Dependency(Project project, boolean transitive, String stage)
+    public DependencyHelper(ProjectHelper project, boolean transitive, String stage)
     {
         this(project, transitive);
         this.stage = stage;
     }
 
-    public Dependency(Project project, boolean transitive)
+    public DependencyHelper(ProjectHelper project, boolean transitive)
     {
         this(project);
         this.transitive = transitive;
     }
 
-    public Dependency(Project project)
+    public DependencyHelper(ProjectHelper project)
     {
         this.project = project;
     }
 
-    public Project getProject()
+    public ProjectHelper getProject()
     {
         return project;
     }

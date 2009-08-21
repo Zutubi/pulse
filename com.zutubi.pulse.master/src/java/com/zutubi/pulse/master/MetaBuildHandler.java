@@ -3,29 +3,20 @@ package com.zutubi.pulse.master;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 
 /**
- * The schedule handler is responsible for the scheduling of a build with the
- * build queue.  It is used by the FatController to allow a build request to
- * span multiple builds.
+ * The meta build handler is responsible for the coordination of one or more
+ * related builds into a 'meta build'.
  */
-public interface ScheduleHandler
+public interface MetaBuildHandler
 {
     /**
      * The unique id for the 'build' that is managed by this handler.  That is, if
-     * this scheduler creates 3 related builds from a build request, each of these
+     * this handler creates 3 related builds from a build request, each of these
      * builds is considered to be part of the same 'meta' build, and will have the
      * same meta build id.
      *
-     * @return  unique build id.
+     * @return  unique meta build id.
      */
     Long getMetaBuildId();
-
-    /**
-     * If true, this handler manages more than one build and will therefore receive
-     * all build request events that match its build id.
-     *
-     * @return true if this handler receives multiple requests, false otherwise.
-     */
-    boolean isMultiBuild();
 
     /**
      * This method is where all the work is done.  The handler processes the build request,

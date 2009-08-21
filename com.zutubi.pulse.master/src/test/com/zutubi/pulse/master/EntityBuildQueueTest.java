@@ -30,7 +30,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
 
         queue = new EntityBuildQueue(owner, 1);
         queue.setAccessManager(accessManager);
-        queue.setBuildHandlerFactory(buildHandlerFactory);
+        queue.setBuildControllerFactory(buildControllerFactory);
         queue.setEventManager(eventManager);
 
         objectFactory.initProperties(this);
@@ -172,8 +172,8 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
         BuildRequestEvent activeRequest = createRequest(BUILD_ID1, "source", true, revision1);
         BuildRequestEvent replacementRequest = createRequest(BUILD_ID2, "source", true, revision2);
 
-        BuildHandler handler = handlers.get(activeRequest);
-        doReturn(true).when(handler).updateRevisionIfNotFixed(revision2);
+        BuildController controller = controllers.get(activeRequest);
+        doReturn(true).when(controller).updateRevisionIfNotFixed(revision2);
 
         queue.handleRequest(activeRequest);
         assertSame(activeRequest.getRevision().getRevision(), revision1);
@@ -185,7 +185,7 @@ public class EntityBuildQueueTest extends BuildQueueTestCase
 
         // The actual updating of the request is handled externally by the BuildController which is
         // currently mocked out.  Instead we verify that the expected method was called.
-        verify(handler, times(1)).updateRevisionIfNotFixed(revision2);
+        verify(controller, times(1)).updateRevisionIfNotFixed(revision2);
     }
 
     public void testDifferentSourceNotReplaced()

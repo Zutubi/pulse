@@ -6,13 +6,13 @@ import com.zutubi.pulse.master.model.Sequence;
  * Base implementation of the schedule handler that manages the allocation
  * of the unique handler id.
  */
-public abstract class BaseScheduleHandler implements ScheduleHandler
+public abstract class BaseMetaBuildHandler implements MetaBuildHandler
 {
     private Sequence sequence;
 
     private long metaBuildId;
 
-    public BaseScheduleHandler()
+    public BaseMetaBuildHandler()
     {
     }
 

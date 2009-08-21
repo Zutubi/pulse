@@ -44,7 +44,7 @@ public class PersonalBuildRequestEvent extends BuildRequestEvent
         // although a personal build doesn't have it's ivy file published, it still
         // requires a status.
         result.setStatus(getStatus());
-        result.setBuildId(getBuildId());
+        result.setMetaBuildId(getMetaBuildId());
 
         buildManager.save(result);
 

@@ -69,9 +69,9 @@ public class TriggerOptions
     private boolean rebuild = false;
 
     /**
-     * The id of the build that triggered this build request, if any.
+     * The id of the meta build that triggered this build request, if any.
      */
-    private long buildId;
+    private long metaBuildId;
 
     public TriggerOptions(TriggerOptions other)
     {
@@ -81,6 +81,11 @@ public class TriggerOptions
         this.replaceable = other.replaceable;
         this.force = other.force;
         this.status = other.status;
+        this.version = other.version;
+        this.resolveVersion = other.resolveVersion;
+        this.dependent = other.dependent;
+        this.rebuild = other.rebuild;
+        this.metaBuildId = other.metaBuildId;
     }
 
     public TriggerOptions(BuildReason reason, String source)
@@ -194,13 +199,13 @@ public class TriggerOptions
         this.rebuild = rebuild;
     }
 
-    public long getBuildId()
+    public long getMetaBuildId()
     {
-        return buildId;
+        return metaBuildId;
     }
 
-    public void setBuildId(long buildId)
+    public void setMetaBuildId(long metaBuildId)
     {
-        this.buildId = buildId;
+        this.metaBuildId = metaBuildId;
     }
 }

@@ -29,6 +29,11 @@ public class BuildEvent extends Event
         return buildResult;
     }
 
+    public long getMetaBuildId()
+    {
+        return buildResult.getMetaBuildId();
+    }
+
     public PulseExecutionContext getContext()
     {
         return context;

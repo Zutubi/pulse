@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.EnumUtils;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -525,7 +526,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
         public String toString()
         {
-            return name().replace('_', ' ').toLowerCase();
+            return EnumUtils.toPrettyString(this);
         }
     }
 

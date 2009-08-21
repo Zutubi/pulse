@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
+import com.zutubi.pulse.master.events.build.MetaBuildCompletedEvent;
 import static com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent.ALL_BUILDS;
 import com.zutubi.pulse.master.license.License;
 import com.zutubi.pulse.master.license.LicenseHolder;
@@ -60,7 +61,7 @@ public class FatController implements EventListener, Stoppable
     private boolean enabled = false;
     private ObjectFactory objectFactory;
 
-    private Map<Long, ScheduleHandler> handlers = new HashMap<Long, ScheduleHandler>();
+    private final Map<Long, MetaBuildHandler> handlers = new HashMap<Long, MetaBuildHandler>();
 
     public FatController()
     {
@@ -77,18 +78,6 @@ public class FatController implements EventListener, Stoppable
         controllerStateListener = objectFactory.buildBean(ControllerStateListener.class);
         controllerStateListener.setController(this);
         eventManager.register(controllerStateListener);
-    }
-
-    /**
-     * Returns true if there are no events that the fat controller still needs to process.
-     * This is useful for determining when the processing has caught up with the events that
-     * have been published.
-     *
-     * @return true if no events are pending processing, false otherwise.
-     */
-    protected boolean isIdle()
-    {
-        return asyncListener.isIdle();
     }
 
     /**
@@ -177,8 +166,7 @@ public class FatController implements EventListener, Stoppable
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildRequestEvent.class, BuildCompletedEvent.class
-        };
+        return new Class[]{BuildRequestEvent.class, BuildCompletedEvent.class, MetaBuildCompletedEvent.class};
     }
 
     public void handleEvent(Event event)
@@ -191,41 +179,40 @@ public class FatController implements EventListener, Stoppable
         {
             handleBuildCompleted((BuildCompletedEvent) event);
         }
+        else if (event instanceof MetaBuildCompletedEvent)
+        {
+            handleMetaBuildCompleted((MetaBuildCompletedEvent)event);
+        }
     }
 
     public void requestBuild(BuildRequestEvent request)
     {
-        if (handlers.containsKey(request.getBuildId()))
+        synchronized (handlers)
         {
-            ScheduleHandler handler = handlers.get(request.getBuildId());
-            handler.handle(request);
-            return;
-        }
+            if (handlers.containsKey(request.getMetaBuildId()))
+            {
+                MetaBuildHandler handler = handlers.get(request.getMetaBuildId());
+                handler.handle(request);
+                return;
+            }
 
-        ScheduleHandler handler;
-        if (request.getOptions().isRebuild() && !request.isPersonal())
-        {
-            // do not want Personal build requests using this handler at the moment.
-            handler = objectFactory.buildBean(DependencyRebuildScheduleHandler.class);
-        }
-        else
-        {
-            handler = objectFactory.buildBean(SingleBuildScheduleHandler.class);
-        }
-        ((BaseScheduleHandler)handler).setSequence(sequenceManager.getSequence(SEQUENCE_BUILD_ID));
-        handler.init();
+            BaseMetaBuildHandler handler;
+            if (request.getOptions().isRebuild() && !request.isPersonal())
+            {
+                // do not want Personal build requests using this handler at the moment.
+                handler = objectFactory.buildBean(DependencyMetaBuildHandler.class);
+            }
+            else
+            {
+                handler = objectFactory.buildBean(SingleMetaBuildHandler.class);
+            }
+            handler.setSequence(sequenceManager.getSequence(SEQUENCE_BUILD_ID));
+            handler.init();
 
-        if (handler.isMultiBuild())
-        {
             handlers.put(handler.getMetaBuildId(), handler);
+
+            handler.handle(request);
         }
-
-        handler.handle(request);
-    }
-
-    protected void multiBuildComplete(long buildId)
-    {
-        handlers.remove(buildId);
     }
 
     protected void enqueueBuildRequest(BuildRequestEvent request)
@@ -317,6 +304,14 @@ public class FatController implements EventListener, Stoppable
             {
                 projectManager.unlockProjectStates(projectId);
             }
+        }
+    }
+
+    private void handleMetaBuildCompleted(MetaBuildCompletedEvent event)
+    {
+        synchronized (handlers)
+        {
+            handlers.remove(event.getMetaBuildId());
         }
     }
 

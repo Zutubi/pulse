@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.BaseXmlRpcAcceptanceTest;
 import static com.zutubi.pulse.core.dependency.ivy.IvyManager.STATUS_MILESTONE;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.master.model.Project.State.IDLE;
+import static com.zutubi.pulse.master.model.Project.State.BUILDING;
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
@@ -36,15 +37,13 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
         super.tearDown();
     }
 
-    // control the start / finish of the build to check ordering etc.
-
     public void testRebuildSingleDependency() throws Exception
     {
         String projectName = randomName();
-        WaitAntProject projectA = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "A");
+        WaitAntProjectHelper projectA = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "A");
         projectA.createProject();
 
-        WaitAntProject projectB = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "B");
+        WaitAntProjectHelper projectB = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "B");
         projectB.addDependency(projectA);
         projectB.createProject();
 
@@ -71,44 +70,50 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRebuildMultipleDependencies() throws Exception
     {
         String projectName = randomName();
-        WaitAntProject projectA = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "A");
+        WaitAntProjectHelper projectA = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "A");
         projectA.createProject();
 
-        WaitAntProject projectB = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "B");
+        WaitAntProjectHelper projectB = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "B");
         projectB.createProject();
 
-        WaitAntProject projectC = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "C");
+        WaitAntProjectHelper projectC = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "C");
         projectC.addDependency(projectA);
         projectC.addDependency(projectB);
         projectC.createProject();
 
         projectC.triggerRebuild();
 
-        //TODO: do not rely on the ordering of the dependencies.  Only one can be 'in progress' at a time since we only have one agent.
-        //TODO.. but how?
+        WaitAntProjectHelper firstDependency;
+        WaitAntProjectHelper secondDependency;
+        if (projectA.getState() == BUILDING)
+        {
+            firstDependency = projectA;
+            secondDependency = projectB;
+        }
+        else
+        {
+            firstDependency = projectB;
+            secondDependency = projectA;
+        }
 
-        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
-
-        assertEquals(ResultState.IN_PROGRESS, projectA.getBuildStatus(1));
-        assertEquals(ResultState.PENDING, projectB.getBuildStatus(1));
+        xmlRpcHelper.waitForBuildInProgress(firstDependency.getName(), 1);
+        assertEquals(ResultState.IN_PROGRESS, firstDependency.getBuildStatus(1));
+        assertEquals(ResultState.PENDING, secondDependency.getBuildStatus(1));
         assertEquals(ResultState.PENDING_DEPENDENCY, projectC.getBuildStatus(1));
+        firstDependency.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(firstDependency.getName(), 1);
 
-        projectA.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
-        xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
-
-        assertEquals(ResultState.SUCCESS, projectA.getBuildStatus(1));
-        assertEquals(ResultState.IN_PROGRESS, projectB.getBuildStatus(1));
+        xmlRpcHelper.waitForBuildInProgress(secondDependency.getName(), 1);
+        assertEquals(ResultState.SUCCESS, firstDependency.getBuildStatus(1));
+        assertEquals(ResultState.IN_PROGRESS, secondDependency.getBuildStatus(1));
         assertEquals(ResultState.PENDING_DEPENDENCY, projectC.getBuildStatus(1));
+        secondDependency.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(secondDependency.getName(), 1);
 
-        projectB.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
         xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
-
         assertEquals(ResultState.SUCCESS, projectA.getBuildStatus(1));
         assertEquals(ResultState.SUCCESS, projectB.getBuildStatus(1));
         assertEquals(ResultState.IN_PROGRESS, projectC.getBuildStatus(1));
-
         projectC.releaseBuild();
         xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
     }
@@ -116,14 +121,14 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRebuildTransitiveDependency() throws Exception
     {
         String projectName = randomName();
-        WaitAntProject projectA = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "A");
+        WaitAntProjectHelper projectA = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "A");
         projectA.createProject();
 
-        WaitAntProject projectB = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "B");
+        WaitAntProjectHelper projectB = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "B");
         projectB.addDependency(projectA);
         projectB.createProject();
 
-        WaitAntProject projectC = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "C");
+        WaitAntProjectHelper projectC = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "C");
         projectC.addDependency(projectB);
         projectC.createProject();
 
@@ -158,14 +163,14 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRebuildUsesTransitiveProperty() throws Exception
     {
         String projectName = randomName();
-        WaitAntProject projectA = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "A");
+        WaitAntProjectHelper projectA = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "A");
         projectA.createProject();
 
-        WaitAntProject projectB = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "B");
+        WaitAntProjectHelper projectB = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "B");
         projectB.addDependency(projectA).setTransitive(false);
         projectB.createProject();
 
-        WaitAntProject projectC = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "C");
+        WaitAntProjectHelper projectC = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "C");
         projectC.addDependency(projectB);
         projectC.createProject();
 
@@ -191,18 +196,18 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRebuildUsesStatusProperty() throws Exception
     {
         String projectName = randomName();
-        WaitAntProject projectA = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "A");
+        WaitAntProjectHelper projectA = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "A");
         projectA.createProject();
 
-        WaitAntProject projectB = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "B");
+        WaitAntProjectHelper projectB = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "B");
         projectB.addDependency(projectA).setRevision(REVISION_LATEST_RELEASE);
         projectB.createProject();
 
-        WaitAntProject projectC = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "C");
+        WaitAntProjectHelper projectC = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "C");
         projectC.addDependency(projectB).setRevision(REVISION_LATEST_MILESTONE);
         projectC.createProject();
 
-        WaitAntProject projectD = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "D");
+        WaitAntProjectHelper projectD = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "D");
         projectD.addDependency(projectC).setRevision(REVISION_LATEST_INTEGRATION);
         projectD.createProject();
 
@@ -238,10 +243,10 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testRebuildStopsOnFailure() throws Exception
     {
         String projectName = randomName();
-        FailAntProject projectA = new FailAntProject(xmlRpcHelper, projectName + "A");
+        FailAntProjectHelper projectA = new FailAntProjectHelper(xmlRpcHelper, projectName + "A");
         projectA.createProject();
 
-        WaitAntProject projectB = new WaitAntProject(xmlRpcHelper, tmpDir, projectName + "B");
+        WaitAntProjectHelper projectB = new WaitAntProjectHelper(xmlRpcHelper, tmpDir, projectName + "B");
         projectB.addDependency(projectA);
         projectB.createProject();
 

@@ -3,28 +3,28 @@ package com.zutubi.pulse.acceptance.dependencies;
 import java.util.List;
 import java.util.LinkedList;
 
-public class Recipe
+public class RecipeHelper
 {
-    private Project project;
+    private ProjectHelper project;
     private String name;
-    private List<Artifact> artifacts = new LinkedList<Artifact>();
+    private List<ArtifactHelper> artifacts = new LinkedList<ArtifactHelper>();
 
-    public Recipe(Project project, String name)
+    public RecipeHelper(ProjectHelper project, String name)
     {
         this.project = project;
         this.name = name;
     }
 
-    public Artifact addArtifact(String artifactName)
+    public ArtifactHelper addArtifact(String artifactName)
     {
-        Artifact artifact = new Artifact(artifactName, this);
+        ArtifactHelper artifact = new ArtifactHelper(artifactName, this);
         this.artifacts.add(artifact);
         return artifact;
     }
 
-    public List<Artifact> addArtifacts(String... artifactNames)
+    public List<ArtifactHelper> addArtifacts(String... artifactNames)
     {
-        List<Artifact> artifacts = new LinkedList<Artifact>();
+        List<ArtifactHelper> artifacts = new LinkedList<ArtifactHelper>();
         for (String artifactName : artifactNames)
         {
             artifacts.add(addArtifact(artifactName));
@@ -32,7 +32,7 @@ public class Recipe
         return artifacts;
     }
 
-    public List<Artifact> getArtifacts()
+    public List<ArtifactHelper> getArtifacts()
     {
         return artifacts;
     }
@@ -42,7 +42,7 @@ public class Recipe
         return name;
     }
 
-    public Project getProject()
+    public ProjectHelper getProject()
     {
         return project;
     }

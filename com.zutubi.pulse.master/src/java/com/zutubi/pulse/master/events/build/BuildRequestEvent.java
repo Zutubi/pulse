@@ -22,10 +22,10 @@ public abstract class BuildRequestEvent extends Event implements Comparable
     protected TriggerOptions options;
 
     /**
-     * If set, this build id indicates that this build request is
+     * If set, this meta build id indicates that this build request is
      * associated with an existing build.
      */
-    private long buildId;
+    private long metaBuildId;
 
     /**
      * @param source        the event source
@@ -42,7 +42,7 @@ public abstract class BuildRequestEvent extends Event implements Comparable
         this.projectConfig = projectConfig;
         this.options = options;
         this.queued = System.currentTimeMillis();
-        this.buildId = options.getBuildId();
+        this.metaBuildId = options.getMetaBuildId();
     }
 
     public abstract NamedEntity getOwner();
@@ -127,14 +127,14 @@ public abstract class BuildRequestEvent extends Event implements Comparable
         return options.isReplaceable();
     }
 
-    public long getBuildId()
+    public long getMetaBuildId()
     {
-        return buildId;
+        return metaBuildId;
     }
 
-    public void setBuildId(long buildId)
+    public void setMetaBuildId(long buildId)
     {
-        this.buildId = buildId;
+        this.metaBuildId = buildId;
     }
 
     public int compareTo(Object o)

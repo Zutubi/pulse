@@ -41,7 +41,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         browser.loginAsAdmin();
 
         String randomName = randomName();
-        Project projectA = new DepAntProject(xmlRpcHelper, randomName + "A");
+        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName + "A");
         projectA.addArtifact("artifactA.jar");
         projectA.createProject();
         long projectABuildNumber = projectA.triggerSuccessfulBuild();
@@ -49,12 +49,12 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, projectA.getName(), projectABuildNumber);
         assertFalse(summaryPage.hasDependencies());
 
-        Project projectB = new DepAntProject(xmlRpcHelper, randomName + "B");
+        ProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName + "B");
         projectB.addArtifact("artifactB.jar");
         projectB.createProject();
         long projectBBuildNumber = projectB.triggerSuccessfulBuild();
 
-        Project dependentProject = new DepAntProject(xmlRpcHelper, randomName + "C");
+        ProjectHelper dependentProject = new DepAntProjectHelper(xmlRpcHelper, randomName + "C");
         dependentProject.addDependency(projectA);
         dependentProject.addDependency(projectB);
         dependentProject.createProject();
@@ -80,14 +80,14 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testProjectDependenciesTab() throws Exception
     {
-        Project projectA = new DepAntProject(xmlRpcHelper, randomName());
+        ProjectHelper projectA = new DepAntProjectHelper(xmlRpcHelper, randomName());
         projectA.createProject();
 
-        Project projectB = new DepAntProject(xmlRpcHelper, randomName());
-        projectB.addDependency(new Dependency(projectA, true));
+        ProjectHelper projectB = new DepAntProjectHelper(xmlRpcHelper, randomName());
+        projectB.addDependency(new DependencyHelper(projectA, true));
         projectB.createProject();
 
-        Project projectC = new DepAntProject(xmlRpcHelper, randomName());
+        ProjectHelper projectC = new DepAntProjectHelper(xmlRpcHelper, randomName());
         projectC.addDependency(projectB);
         projectC.createProject();
 

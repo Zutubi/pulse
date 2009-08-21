@@ -32,9 +32,9 @@ public abstract class BuildQueueTestCase extends PulseTestCase
     protected WiringObjectFactory objectFactory;
     protected AtomicInteger nextId = new AtomicInteger(1);
     protected AccessManager accessManager;
-    protected BuildHandlerFactory buildHandlerFactory;
+    protected BuildControllerFactory buildControllerFactory;
 
-    protected Map<BuildRequestEvent, BuildHandler> handlers = new HashMap<BuildRequestEvent, BuildHandler>();
+    protected Map<BuildRequestEvent, BuildController> controllers = new HashMap<BuildRequestEvent, BuildController>();
 
     protected void setUp() throws Exception
     {
@@ -42,7 +42,7 @@ public abstract class BuildQueueTestCase extends PulseTestCase
 
         eventManager = new DefaultEventManager();
         objectFactory = new WiringObjectFactory();
-        buildHandlerFactory = mock(BuildHandlerFactory.class);
+        buildControllerFactory = mock(BuildControllerFactory.class);
         accessManager = mock(AccessManager.class);
     }
 
@@ -130,11 +130,11 @@ public abstract class BuildQueueTestCase extends PulseTestCase
         };
 
         // By default, the build handler that is used by the BuildQueue to process the build request does nothing.
-        BuildHandler handler = mock(BuildHandler.class);
-        doReturn(handler).when(buildHandlerFactory).createHandler(request);
-        doReturn(buildId).when(handler).getBuildResultId();
+        BuildController controller = mock(BuildController.class);
+        doReturn(controller).when(buildControllerFactory).createHandler(request);
+        doReturn(buildId).when(controller).getBuildResultId();
 
-        handlers.put(request, handler);
+        controllers.put(request, controller);
         
         return request;
     }

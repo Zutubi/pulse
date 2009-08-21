@@ -58,7 +58,7 @@
 
         <property name="revisionString" column="REVISION_STRING" type="string" length="8191"/>
 
-        <property name="buildId" column="BUILD_ID" type="long"/>
+        <property name="metaBuildId" column="META_BUILD_ID" type="long"/>
 
     </class>
 

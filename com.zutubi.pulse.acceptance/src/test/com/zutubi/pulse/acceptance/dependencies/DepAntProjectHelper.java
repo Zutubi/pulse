@@ -8,7 +8,7 @@ import com.zutubi.util.StringUtils;
 
 import java.util.*;
 
-public class DepAntProject extends Project
+public class DepAntProjectHelper extends ProjectHelper
 {
     private static final String PROPERTY_CREATE_LIST = "create.list";
     private static final String PROPERTY_EXPECTED_LIST = "expected.list";
@@ -16,12 +16,12 @@ public class DepAntProject extends Project
 
     private AntBuildConfiguration build = null;
 
-    public DepAntProject(XmlRpcHelper xmlRpcHelper, String name)
+    public DepAntProjectHelper(XmlRpcHelper xmlRpcHelper, String name)
     {
         super(xmlRpcHelper, name);
     }
 
-    public DepAntProject(XmlRpcHelper xmlRpcHelper, String name, String org)
+    public DepAntProjectHelper(XmlRpcHelper xmlRpcHelper, String name, String org)
     {
         super(xmlRpcHelper, name, org);
     }
@@ -43,7 +43,7 @@ public class DepAntProject extends Project
         initBuildAntConfigurationIfRequired();
 
         // for each stage, set the necessary build properties.
-        for (Stage stage : getStages())
+        for (StageHelper stage : getStages())
         {
             stage.getRecipe();
             xmlRpcHelper.insertOrUpdateStageProperty(getName(), stage.getName(), PROPERTY_CREATE_LIST, build.getCreateList());
@@ -57,9 +57,9 @@ public class DepAntProject extends Project
         if (build == null)
         {
             build = new AntBuildConfiguration();
-            for (Recipe recipe : getRecipes())
+            for (RecipeHelper recipe : getRecipes())
             {
-                for (Artifact artifact : recipe.getArtifacts())
+                for (ArtifactHelper artifact : recipe.getArtifacts())
                 {
                     build.addFilesToCreate("build/" + artifact.getName() + "." + artifact.getExtension());
                 }
@@ -83,7 +83,7 @@ public class DepAntProject extends Project
     }
 
     @Override
-    protected void insertStage(Stage stage) throws Exception
+    protected void insertStage(StageHelper stage) throws Exception
     {
         super.insertStage(stage);
 

@@ -3,17 +3,16 @@ package com.zutubi.pulse.acceptance.dependencies;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-public class Artifact
+public class ArtifactHelper
 {
-    @SuppressWarnings({"FieldCanBeLocal"})
-    private final Pattern pattern = Pattern.compile("(.+)\\.(.+)");
+    private static final Pattern pattern = Pattern.compile("(.+)\\.(.+)");
 
     private String name;
     private String extension;
-    private Recipe recipe;
+    private RecipeHelper recipe;
     private String artifactPattern;
 
-    public Artifact(String filename, Recipe recipe)
+    public ArtifactHelper(String filename, RecipeHelper recipe)
     {
         this.recipe = recipe;
         Matcher m = pattern.matcher(filename);
@@ -44,7 +43,7 @@ public class Artifact
         this.name = name;
     }
 
-    public Recipe getRecipe()
+    public RecipeHelper getRecipe()
     {
         return recipe;
     }

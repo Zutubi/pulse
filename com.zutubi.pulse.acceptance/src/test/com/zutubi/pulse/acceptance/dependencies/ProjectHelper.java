@@ -23,16 +23,16 @@ import java.lang.reflect.Array;
 /**
  * The project model used by these tests to simplify management of the test configuration.
  */
-public abstract class Project
+public abstract class ProjectHelper
 {
     private String name;
     private String org;
     private String status;
     private String version;
-    private List<Dependency> dependencies = new LinkedList<Dependency>();
+    private List<DependencyHelper> dependencies = new LinkedList<DependencyHelper>();
 
-    private List<Stage> stages = new LinkedList<Stage>();
-    private List<Recipe> recipes = new LinkedList<Recipe>();
+    private List<StageHelper> stages = new LinkedList<StageHelper>();
+    private List<RecipeHelper> recipes = new LinkedList<RecipeHelper>();
 
     private boolean propagateStatus = false;
     private boolean propagateVersion = false;
@@ -40,7 +40,7 @@ public abstract class Project
     private String retrievalPattern = "lib/[artifact].[ext]";
     protected XmlRpcHelper xmlRpcHelper;
 
-    public Project(XmlRpcHelper xmlRpcHelper, String name)
+    public ProjectHelper(XmlRpcHelper xmlRpcHelper, String name)
     {
         this.setName(name);
         addStage("default");
@@ -48,50 +48,50 @@ public abstract class Project
         this.xmlRpcHelper = xmlRpcHelper;
     }
 
-    public Project(XmlRpcHelper xmlRpcHelper, String name, String org)
+    public ProjectHelper(XmlRpcHelper xmlRpcHelper, String name, String org)
     {
         this(xmlRpcHelper, name);
         this.setOrg(org);
         this.xmlRpcHelper = xmlRpcHelper;
     }
 
-    public Recipe addRecipe(String recipeName)
+    public RecipeHelper addRecipe(String recipeName)
     {
-        Recipe recipe = new Recipe(this, recipeName);
+        RecipeHelper recipe = new RecipeHelper(this, recipeName);
         this.recipes.add(recipe);
         return recipe;
     }
 
-    public Stage addStage(String stageName)
+    public StageHelper addStage(String stageName)
     {
-        Stage stage = new Stage(this, stageName);
+        StageHelper stage = new StageHelper(this, stageName);
         this.stages.add(stage);
         return stage;
     }
 
-    public Dependency addDependency(Project dependency)
+    public DependencyHelper addDependency(ProjectHelper dependency)
     {
-        Dependency instance = new Dependency(dependency);
+        DependencyHelper instance = new DependencyHelper(dependency);
         dependencies.add(instance);
         return instance;
     }
 
-    public void addDependency(Dependency dependnecy)
+    public void addDependency(DependencyHelper dependnecy)
     {
         dependencies.add(dependnecy);
     }
 
-    public Stage getDefaultStage()
+    public StageHelper getDefaultStage()
     {
         return getStage("default");
     }
 
-    public Artifact addArtifact(String artifact)
+    public ArtifactHelper addArtifact(String artifact)
     {
         return getRecipe("default").addArtifact(artifact);
     }
 
-    public List<Artifact> addArtifacts(String... artifacts)
+    public List<ArtifactHelper> addArtifacts(String... artifacts)
     {
         return getRecipe("default").addArtifacts(artifacts);
     }
@@ -156,44 +156,44 @@ public abstract class Project
         this.propagateVersion = b;
     }
 
-    public List<Stage> getStages()
+    public List<StageHelper> getStages()
     {
         return stages;
     }
 
-    public Stage getStage(final String stageName)
+    public StageHelper getStage(final String stageName)
     {
-        return CollectionUtils.find(stages, new Predicate<Stage>()
+        return CollectionUtils.find(stages, new Predicate<StageHelper>()
         {
-            public boolean satisfied(Stage stage)
+            public boolean satisfied(StageHelper stage)
             {
                 return stage.getName().equals(stageName);
             }
         });
     }
 
-    public Recipe getRecipe(final String recipeName)
+    public RecipeHelper getRecipe(final String recipeName)
     {
-        return CollectionUtils.find(recipes, new Predicate<Recipe>()
+        return CollectionUtils.find(recipes, new Predicate<RecipeHelper>()
         {
-            public boolean satisfied(Recipe recipe)
+            public boolean satisfied(RecipeHelper recipe)
             {
                 return recipe.getName().equals(recipeName);
             }
         });
     }
 
-    public List<Recipe> getRecipes()
+    public List<RecipeHelper> getRecipes()
     {
         return recipes;
     }
 
-    public Recipe getDefaultRecipe()
+    public RecipeHelper getDefaultRecipe()
     {
         return getRecipe("default");
     }
 
-    public List<Dependency> getDependencies()
+    public List<DependencyHelper> getDependencies()
     {
         return dependencies;
     }
@@ -280,16 +280,16 @@ public abstract class Project
         insertProjectOrganisation();
         insertDependencies();
 
-        for (Recipe recipe : getRecipes())
+        for (RecipeHelper recipe : getRecipes())
         {
             insertRecipe(recipe, commandConfig);
-            for (Artifact artifact : recipe.getArtifacts())
+            for (ArtifactHelper artifact : recipe.getArtifacts())
             {
                 insertArtifact(recipe.getName(), "build", artifact.getName(), artifact.getExtension(), artifact.getArtifactPattern());
             }
         }
 
-        for (Stage stage : getStages())
+        for (StageHelper stage : getStages())
         {
             // create stage.
             insertStage(stage);
@@ -301,7 +301,7 @@ public abstract class Project
             }
         }
 
-        for (Dependency dependency : getDependencies())
+        for (DependencyHelper dependency : getDependencies())
         {
             insertDependency(dependency);
         }
@@ -332,7 +332,7 @@ public abstract class Project
         }
     }
 
-    protected void insertRecipe(Recipe recipe, Hashtable<String, Object> commandConfig) throws Exception
+    protected void insertRecipe(RecipeHelper recipe, Hashtable<String, Object> commandConfig) throws Exception
     {
         String recipePath = "projects/" + getName() + "/type/recipes/" + recipe.getName();
         if (!xmlRpcHelper.configPathExists(recipePath))
@@ -348,7 +348,7 @@ public abstract class Project
         }
     }
 
-    protected void insertStage(Stage stage) throws Exception
+    protected void insertStage(StageHelper stage) throws Exception
     {
         // configure the default stage.
         String stagePath = "projects/" + getName() + "/stages/" + stage.getName();
@@ -394,7 +394,7 @@ public abstract class Project
         xmlRpcHelper.insertConfig(artifactsPath, artifactData);
     }
 
-    protected void insertDependency(Dependency projectDependency) throws Exception
+    protected void insertDependency(DependencyHelper projectDependency) throws Exception
     {
         // configure the default stage.
         String projectDependenciesPath = "projects/" + getName() + "/dependencies";
@@ -430,7 +430,7 @@ public abstract class Project
         xmlRpcHelper.saveConfig(projectDependenciesPath, projectDependencies, true);
     }
 
-    private Vector<String> asStagePaths(Dependency dependency)
+    private Vector<String> asStagePaths(DependencyHelper dependency)
     {
         Vector<String> v = new Vector<String>();
         if (dependency.getStage() != null)

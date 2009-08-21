@@ -3,15 +3,15 @@ package com.zutubi.pulse.acceptance.dependencies;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Stage
+public class StageHelper
 {
-    private Project project;
+    private ProjectHelper project;
     private String name;
-    private Recipe recipe;
+    private RecipeHelper recipe;
 
     private Map<String, String> properties = new HashMap<String, String>();
 
-    public Stage(Project project, String name)
+    public StageHelper(ProjectHelper project, String name)
     {
         this.setName(name);
         this.setProject(project);
@@ -32,17 +32,17 @@ public class Stage
         this.name = name;
     }
 
-    public Project getProject()
+    public ProjectHelper getProject()
     {
         return project;
     }
 
-    public void setProject(Project project)
+    public void setProject(ProjectHelper project)
     {
         this.project = project;
     }
 
-    public Recipe getRecipe()
+    public RecipeHelper getRecipe()
     {
         if (recipe != null)
         {
@@ -51,7 +51,7 @@ public class Stage
         return project.getDefaultRecipe();
     }
 
-    public void setRecipe(Recipe recipe)
+    public void setRecipe(RecipeHelper recipe)
     {
         this.recipe = recipe;
     }

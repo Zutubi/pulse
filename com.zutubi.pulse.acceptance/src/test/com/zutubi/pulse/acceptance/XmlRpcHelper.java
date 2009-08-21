@@ -25,6 +25,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Pair;
+import com.zutubi.util.EnumUtils;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.MalformedURLException;
@@ -288,7 +289,7 @@ public class XmlRpcHelper
     public Project.State getProjectState(String projectName) throws Exception
     {
         String stateString = call("getProjectState", projectName);
-        return Project.State.valueOf(stateString.replace(' ', '_').toUpperCase());
+        return Project.State.valueOf(EnumUtils.fromPrettyString(stateString));
     }
 
     @SuppressWarnings({"unchecked"})

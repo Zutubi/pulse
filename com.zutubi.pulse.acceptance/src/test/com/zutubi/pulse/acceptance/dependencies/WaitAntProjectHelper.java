@@ -3,29 +3,24 @@ package com.zutubi.pulse.acceptance.dependencies;
 import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Pair;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.LinkedList;
 
-public class WaitAntProject extends Project
+public class WaitAntProjectHelper extends ProjectHelper
 {
     private File waitFile;
     private File tmpDir;
 
-    public WaitAntProject(XmlRpcHelper xmlRpcHelper, File tmpDir, String name)
+    public WaitAntProjectHelper(XmlRpcHelper xmlRpcHelper, File tmpDir, String name)
     {
         super(xmlRpcHelper, name);
         this.tmpDir = tmpDir;
     }
 
-    public WaitAntProject(XmlRpcHelper xmlRpcHelper, File tmpDir, String name, String org)
+    public WaitAntProjectHelper(XmlRpcHelper xmlRpcHelper, File tmpDir, String name, String org)
     {
         super(xmlRpcHelper, name, org);
         this.tmpDir = tmpDir;

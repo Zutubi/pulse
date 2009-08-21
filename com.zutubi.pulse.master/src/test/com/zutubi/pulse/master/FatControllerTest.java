@@ -21,6 +21,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.Constants;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doAnswer;
@@ -45,7 +47,7 @@ public class FatControllerTest extends PulseTestCase
     private EventManager eventManager;
     private WiringObjectFactory objectFactory;
     private ThreadFactory threadFactory;
-    private BuildHandlerFactory buildHandlerFactory;
+    private BuildControllerFactory buildControllerFactory;
     private BuildManager buildManager;
     private DependencyManager dependencyManager;
 
@@ -58,8 +60,8 @@ public class FatControllerTest extends PulseTestCase
 
     // NOTE: This map can only store a single handler at a time, so only functions while a single
     // build per owner is possible.
-    private Map<NamedEntity, BuildHandler> projectToHandlerMap;
-    private Map<NamedEntity, Long> projectToBuildIdMap;
+    private Map<NamedEntity, BuildController> projectToControllerMap;
+    private Map<NamedEntity, Long> projectToMetaBuildIdMap;
 
     @Override
     protected void setUp() throws Exception
@@ -73,13 +75,13 @@ public class FatControllerTest extends PulseTestCase
         objectFactory = new WiringObjectFactory();
         threadFactory = new PulseThreadFactory();
         
-        buildHandlerFactory = new BuildHandlerFactory()
+        buildControllerFactory = new BuildControllerFactory()
         {
-            public BuildHandler createHandler(final BuildRequestEvent request)
+            public BuildController createHandler(final BuildRequestEvent request)
             {
                 final long buildResultId = nextBuildResultId.getAndIncrement();
                 
-                BuildHandler handler = mock(BuildHandler.class);
+                BuildController handler = mock(BuildController.class);
                 stub(handler.getBuildResultId()).toReturn(buildResultId);
 
                 // a bit hackish, but prevents the need to implement the interface.
@@ -94,8 +96,8 @@ public class FatControllerTest extends PulseTestCase
 
                 // record enough information about the build request so that we can create
                 // an appropriate build completed event 
-                projectToHandlerMap.put(request.getOwner(), handler);
-                projectToBuildIdMap.put(request.getOwner(), request.getBuildId());
+                projectToControllerMap.put(request.getOwner(), handler);
+                projectToMetaBuildIdMap.put(request.getOwner(), request.getMetaBuildId());
 
                 return handler;
             }
@@ -124,8 +126,8 @@ public class FatControllerTest extends PulseTestCase
 
         objectFactory.initProperties(this);
 
-        projectToHandlerMap = new HashMap<NamedEntity, BuildHandler>();
-        projectToBuildIdMap = new HashMap<NamedEntity, Long>();
+        projectToControllerMap = new HashMap<NamedEntity, BuildController>();
+        projectToMetaBuildIdMap = new HashMap<NamedEntity, Long>();
     }
 
     //TODO: Testing to be done on the project state transitions that the FatController manages.
@@ -151,7 +153,7 @@ public class FatControllerTest extends PulseTestCase
         SingleBuildRequestEvent request = createRequest(project);
 
         fatController.requestBuild(request);
-        assertEquals(1, request.getBuildId());
+        assertEquals(1, request.getMetaBuildId());
 
         assertCounts(project, 1, 0);
 
@@ -168,8 +170,8 @@ public class FatControllerTest extends PulseTestCase
         fatController.requestBuild(request1);
         fatController.requestBuild(request2);
 
-        assertEquals(1, request1.getBuildId());
-        assertEquals(2, request2.getBuildId());
+        assertEquals(1, request1.getMetaBuildId());
+        assertEquals(2, request2.getMetaBuildId());
         assertCounts(project, 1, 1);
 
         publishSucceededEvent(project);
@@ -436,14 +438,14 @@ public class FatControllerTest extends PulseTestCase
     private void publishCompletedEvent(Project project, ResultState resultState) throws InterruptedException
     {
         BuildResult buildResult = mock(BuildResult.class);
-        long buildResultId = projectToHandlerMap.get(project).getBuildResultId();
-        long buildId = projectToBuildIdMap.get(project);
+        long buildResultId = projectToControllerMap.get(project).getBuildResultId();
+        long metaBuildId = projectToMetaBuildIdMap.get(project);
 
         stub(buildResult.getProject()).toReturn(project);
         stub(buildResult.getId()).toReturn(buildResultId);
         stub(buildResult.isPersonal()).toReturn(false);
         stub(buildResult.getOwner()).toReturn(project);
-        stub(buildResult.getBuildId()).toReturn(buildId);
+        stub(buildResult.getMetaBuildId()).toReturn(metaBuildId);
 
         switch (resultState)
         {
@@ -467,13 +469,26 @@ public class FatControllerTest extends PulseTestCase
         BuildCompletedEvent evt = new BuildCompletedEvent(this, buildResult, null);
         eventManager.publish(evt);
 
-        // wait for the scheduler to process the event.
-        while (!fatController.isIdle())
+        // wait for the build to be finished by monitoring the active builds.
+        while (isBuildActive(project, buildResultId))
         {
             Thread.sleep(Constants.SECOND);
         }
 
         assertNull(evt.getExceptions());
+    }
+
+    private boolean isBuildActive(Project project, final long buildResultId)
+    {
+        BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
+        EntityBuildQueue.ActiveBuild activeBuild = CollectionUtils.find(snapshot.getActiveBuilds().get(project), new Predicate<EntityBuildQueue.ActiveBuild>()
+        {
+            public boolean satisfied(EntityBuildQueue.ActiveBuild activeBuild)
+            {
+                return activeBuild.getController().getBuildResultId() == buildResultId;
+            }
+        });
+        return activeBuild != null;
     }
 
     private SingleBuildRequestEvent createRebuildRequest(Project project)

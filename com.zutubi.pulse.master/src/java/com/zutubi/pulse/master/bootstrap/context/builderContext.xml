@@ -151,7 +151,7 @@
     <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory"/>
 
     <bean id="fatController" class="com.zutubi.pulse.master.FatController" init-method="init"/>
-    <bean id="buildHandlerFactory" class="com.zutubi.pulse.master.BuildControllerFactory" init-method="init"/>
+    <bean id="buildControllerFactory" class="com.zutubi.pulse.master.DefaultBuildControllerFactory" init-method="init"/>
     <bean id="sequenceManager" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateSequenceManager"/>
 
     <bean id="recipeQueue" class="com.zutubi.pulse.master.ThreadedRecipeQueue"/>

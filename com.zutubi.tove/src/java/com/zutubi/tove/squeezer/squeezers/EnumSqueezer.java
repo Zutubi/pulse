@@ -3,6 +3,7 @@ package com.zutubi.tove.squeezer.squeezers;
 import com.zutubi.tove.squeezer.SqueezeException;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.EnumUtils;
 
 /**
  * A type squeezer that converts to and from enums.  Assumes a naming
@@ -24,7 +25,7 @@ public class EnumSqueezer implements TypeSqueezer
         {
             return "";
         }
-        return obj.toString().toLowerCase().replace('_', ' ');
+        return EnumUtils.toPrettyString(((Enum)obj));
     }
 
     public Object unsqueeze(String... str) throws SqueezeException
@@ -35,7 +36,7 @@ public class EnumSqueezer implements TypeSqueezer
             return null;
         }
 
-        String converted = s.toUpperCase().replace(' ', '_');
+        String converted = EnumUtils.fromPrettyString(s);
         try
         {
             return Enum.valueOf(enumClass, converted);

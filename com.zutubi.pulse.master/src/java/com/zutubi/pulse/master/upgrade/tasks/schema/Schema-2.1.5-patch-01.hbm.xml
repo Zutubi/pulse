@@ -12,7 +12,7 @@
             <one-to-many class="com.zutubi.pulse.master.model.BuildResult"/>
         </bag>
 
-        <property name="buildId" column="BUILD_ID" type="long"/>
+        <property name="metaBuildId" column="META_BUILD_ID" type="long"/>
     </class>
 
     <class name="com.zutubi.pulse.master.model.SequenceEntry" table="SEQUENCE_TABLE" lazy="false">

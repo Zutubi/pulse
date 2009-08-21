@@ -23,12 +23,14 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     private BuildReason reason;
     private Project project;
+
     /**
      * If not null, this build is a personal build for the given user.
      */
     private User user;
 
     private long number;
+
     /**
      * If true, this build was triggered by a user at a fixed revision.
      * This build will be ignored for the purposes of calculating changes
@@ -38,6 +40,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     private Revision revision;
     private RecipeResultNode root;
     private String version;
+    
     /**
      * Set to false when the working directory is cleaned up.
      */
@@ -48,7 +51,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     /**
      * A globally unique id used by a set of related builds to identify them as being related.
      */
-    private long buildId;
+    private long metaBuildId;
 
     /**
      * A list of build results that this build depends on.  That is, these are the build
@@ -158,14 +161,14 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         this.hasWorkDir = hasWorkDir;
     }
 
-    public long getBuildId()
+    public long getMetaBuildId()
     {
-        return buildId;
+        return metaBuildId;
     }
 
-    public void setBuildId(long buildId)
+    public void setMetaBuildId(long metaBuildId)
     {
-        this.buildId = buildId;
+        this.metaBuildId = metaBuildId;
     }
 
     public List<BuildResult> getDependsOn()

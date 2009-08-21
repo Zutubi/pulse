@@ -54,7 +54,7 @@ public class BuildProjectTask implements Task
      */
     public static final String PARAM_DEPENDENT = "dependent";
 
-    public static final String PARAM_BUILD_ID = "buildId";
+    public static final String PARAM_META_BUILD_ID = "metaBuildId";
 
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
 
@@ -78,8 +78,8 @@ public class BuildProjectTask implements Task
 
         String version = (String) context.get(PARAM_VERSION);
 
-        Long buildIdValue = (Long) context.get(PARAM_BUILD_ID);
-        long buildId = (buildIdValue != null) ? buildIdValue : 0;
+        Long metaBuildIdValue = (Long) context.get(PARAM_META_BUILD_ID);
+        long metaBuildId = (metaBuildIdValue != null) ? metaBuildIdValue : 0;
 
         ProjectConfiguration project = projectManager.getProjectConfig(projectId, false);
         if (project != null)
@@ -106,7 +106,7 @@ public class BuildProjectTask implements Task
             options.setResolveVersion(!versionPropagated);
             options.setVersion(version);
             options.setDependent(dependent);
-            options.setBuildId(buildId);
+            options.setMetaBuildId(metaBuildId);
             projectManager.triggerBuild(project, options, revision);
         }
         else
